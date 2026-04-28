@@ -1,0 +1,7 @@
+{
+  "name": "linguaCard",
+  "integrations": {
+    "capacitor": {}
+  },
+  "type": "angular-standalone"
+}
