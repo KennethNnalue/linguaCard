@@ -1,0 +1,938 @@
+{
+  "cards": [
+    {
+      "id": "card-001",
+      "deckId": "deck-001",
+      "userId": "user-001",
+      "contextId": "german-vocab",
+      "categoryIds": ["cat-001"],
+      "tags": ["noun", "animal"],
+      "version": 3,
+      "createdAt": "2025-01-15T10:00:00Z",
+      "updatedAt": "2025-01-15T10:00:00Z",
+      "content": {
+        "front": "the cat",
+        "back": "Katze",
+        "article": "die",
+        "gender": "feminine",
+        "phonetic": "/ˈkat.sə/",
+        "examples": [
+          { "id": "ex-001a", "target": "Die Katze sitzt auf dem Sofa.", "native": "The cat is sitting on the sofa." },
+          { "id": "ex-001b", "target": "Meine Katze heißt Luna.", "native": "My cat is called Luna." }
+        ],
+        "notes": "Always feminine. Plural: die Katzen.",
+        "audioAssetId": "audio-001",
+        "imageUrl": null
+      },
+      "srsState": {
+        "id": "srs-card-001",
+        "cardId": "card-001",
+        "userId": "user-001",
+        "algorithm": "sm2",
+        "intervalDays": 30,
+        "easeFactor": 2.5,
+        "repetitions": 8,
+        "lastRating": 5,
+        "lastReviewedAt": "2026-04-30T00:00:00.000Z",
+        "nextDueAt": "2026-05-30T00:00:00.000Z",
+        "masteryLevel": 5,
+        "state": "mastered"
+      }
+    },
+    {
+      "id": "card-002",
+      "deckId": "deck-001",
+      "userId": "user-001",
+      "contextId": "german-vocab",
+      "categoryIds": ["cat-001"],
+      "tags": ["noun", "animal"],
+      "version": 2,
+      "createdAt": "2025-01-15T10:05:00Z",
+      "updatedAt": "2025-01-15T10:05:00Z",
+      "content": {
+        "front": "the dog",
+        "back": "Hund",
+        "article": "der",
+        "gender": "masculine",
+        "phonetic": "/hʊnt/",
+        "examples": [
+          { "id": "ex-002a", "target": "Der Hund bellt laut.", "native": "The dog barks loudly." },
+          { "id": "ex-002b", "target": "Ich gehe mit dem Hund spazieren.", "native": "I am going for a walk with the dog." }
+        ],
+        "notes": "Masculine. Plural: die Hunde.",
+        "audioAssetId": "audio-002",
+        "imageUrl": null
+      },
+      "srsState": {
+        "id": "srs-card-002",
+        "cardId": "card-002",
+        "userId": "user-001",
+        "algorithm": "sm2",
+        "intervalDays": 14,
+        "easeFactor": 2.5,
+        "repetitions": 5,
+        "lastRating": 4,
+        "lastReviewedAt": "2026-04-22T00:00:00.000Z",
+        "nextDueAt": "2026-05-06T00:00:00.000Z",
+        "masteryLevel": 4,
+        "state": "review"
+      }
+    },
+    {
+      "id": "card-003",
+      "deckId": "deck-001",
+      "userId": "user-001",
+      "contextId": "german-vocab",
+      "categoryIds": ["cat-001"],
+      "tags": ["noun", "animal"],
+      "version": 1,
+      "createdAt": "2025-01-16T09:00:00Z",
+      "updatedAt": "2025-01-16T09:00:00Z",
+      "content": {
+        "front": "the bird",
+        "back": "Vogel",
+        "article": "der",
+        "gender": "masculine",
+        "phonetic": "/ˈfoː.ɡəl/",
+        "examples": [
+          { "id": "ex-003a", "target": "Der Vogel singt im Baum.", "native": "The bird is singing in the tree." }
+        ],
+        "notes": "Masculine. Plural: die Vögel (umlaut changes!).",
+        "audioAssetId": null,
+        "imageUrl": null
+      },
+      "srsState": {
+        "id": "srs-card-003",
+        "cardId": "card-003",
+        "userId": "user-001",
+        "algorithm": "sm2",
+        "intervalDays": 4,
+        "easeFactor": 2.5,
+        "repetitions": 2,
+        "lastRating": 2,
+        "lastReviewedAt": "2026-05-01T00:00:00.000Z",
+        "nextDueAt": "2026-05-02T00:00:00.000Z",
+        "masteryLevel": 2,
+        "state": "learning"
+      }
+    },
+    {
+      "id": "card-004",
+      "deckId": "deck-001",
+      "userId": "user-001",
+      "contextId": "german-vocab",
+      "categoryIds": ["cat-001"],
+      "tags": ["noun", "animal"],
+      "version": 1,
+      "createdAt": "2025-01-16T09:10:00Z",
+      "updatedAt": "2025-01-16T09:10:00Z",
+      "content": {
+        "front": "the horse",
+        "back": "Pferd",
+        "article": "das",
+        "gender": "neuter",
+        "phonetic": "/p͡feːɐ̯t/",
+        "examples": [
+          { "id": "ex-004a", "target": "Das Pferd läuft schnell.", "native": "The horse runs fast." },
+          { "id": "ex-004b", "target": "Das Kind reitet auf dem Pferd.", "native": "The child rides on the horse." }
+        ],
+        "notes": "Neuter. Plural: die Pferde.",
+        "audioAssetId": null,
+        "imageUrl": null
+      },
+      "srsState": {
+        "id": "srs-card-004",
+        "cardId": "card-004",
+        "userId": "user-001",
+        "algorithm": "sm2",
+        "intervalDays": 1,
+        "easeFactor": 2.5,
+        "repetitions": 0,
+        "lastRating": null,
+        "lastReviewedAt": null,
+        "nextDueAt": "2026-05-02T00:00:00.000Z",
+        "masteryLevel": 0,
+        "state": "new"
+      }
+    },
+    {
+      "id": "card-005",
+      "deckId": "deck-001",
+      "userId": "user-001",
+      "contextId": "german-vocab",
+      "categoryIds": ["cat-001"],
+      "tags": ["noun", "animal"],
+      "version": 2,
+      "createdAt": "2025-01-17T08:00:00Z",
+      "updatedAt": "2025-01-17T08:00:00Z",
+      "content": {
+        "front": "the fish",
+        "back": "Fisch",
+        "article": "der",
+        "gender": "masculine",
+        "phonetic": "/fɪʃ/",
+        "examples": [
+          { "id": "ex-005a", "target": "Der Fisch schwimmt im Wasser.", "native": "The fish swims in the water." }
+        ],
+        "notes": "Masculine. Plural: die Fische.",
+        "audioAssetId": null,
+        "imageUrl": null
+      },
+      "srsState": {
+        "id": "srs-card-005",
+        "cardId": "card-005",
+        "userId": "user-001",
+        "algorithm": "sm2",
+        "intervalDays": 2,
+        "easeFactor": 2.5,
+        "repetitions": 1,
+        "lastRating": 1,
+        "lastReviewedAt": "2026-05-01T00:00:00.000Z",
+        "nextDueAt": "2026-05-02T00:00:00.000Z",
+        "masteryLevel": 1,
+        "state": "learning"
+      }
+    },
+    {
+      "id": "card-006",
+      "deckId": "deck-001",
+      "userId": "user-001",
+      "contextId": "german-vocab",
+      "categoryIds": ["cat-002"],
+      "tags": ["noun", "food"],
+      "version": 2,
+      "createdAt": "2025-01-17T10:00:00Z",
+      "updatedAt": "2025-01-17T10:00:00Z",
+      "content": {
+        "front": "the bread",
+        "back": "Brot",
+        "article": "das",
+        "gender": "neuter",
+        "phonetic": "/bʁoːt/",
+        "examples": [
+          { "id": "ex-006a", "target": "Das Brot ist frisch gebacken.", "native": "The bread is freshly baked." },
+          { "id": "ex-006b", "target": "Ich esse Brot zum Frühstück.", "native": "I eat bread for breakfast." }
+        ],
+        "notes": "Neuter. Plural: die Brote. Germany is famous for its bread variety!",
+        "audioAssetId": "audio-006",
+        "imageUrl": null
+      },
+      "srsState": {
+        "id": "srs-card-006",
+        "cardId": "card-006",
+        "userId": "user-001",
+        "algorithm": "sm2",
+        "intervalDays": 21,
+        "easeFactor": 2.5,
+        "repetitions": 7,
+        "lastRating": 5,
+        "lastReviewedAt": "2026-04-27T00:00:00.000Z",
+        "nextDueAt": "2026-05-18T00:00:00.000Z",
+        "masteryLevel": 5,
+        "state": "mastered"
+      }
+    },
+    {
+      "id": "card-007",
+      "deckId": "deck-001",
+      "userId": "user-001",
+      "contextId": "german-vocab",
+      "categoryIds": ["cat-002"],
+      "tags": ["noun", "food", "drink"],
+      "version": 1,
+      "createdAt": "2025-01-18T09:00:00Z",
+      "updatedAt": "2025-01-18T09:00:00Z",
+      "content": {
+        "front": "the water",
+        "back": "Wasser",
+        "article": "das",
+        "gender": "neuter",
+        "phonetic": "/ˈvas.ɐ/",
+        "examples": [
+          { "id": "ex-007a", "target": "Ich trinke ein Glas Wasser.", "native": "I am drinking a glass of water." },
+          { "id": "ex-007b", "target": "Das Wasser ist kalt.", "native": "The water is cold." }
+        ],
+        "notes": "Neuter. Uncountable in most contexts.",
+        "audioAssetId": null,
+        "imageUrl": null
+      },
+      "srsState": {
+        "id": "srs-card-007",
+        "cardId": "card-007",
+        "userId": "user-001",
+        "algorithm": "sm2",
+        "intervalDays": 7,
+        "easeFactor": 2.5,
+        "repetitions": 3,
+        "lastRating": 3,
+        "lastReviewedAt": "2026-04-27T00:00:00.000Z",
+        "nextDueAt": "2026-05-04T00:00:00.000Z",
+        "masteryLevel": 3,
+        "state": "review"
+      }
+    },
+    {
+      "id": "card-008",
+      "deckId": "deck-001",
+      "userId": "user-001",
+      "contextId": "german-vocab",
+      "categoryIds": ["cat-002"],
+      "tags": ["noun", "food"],
+      "version": 2,
+      "createdAt": "2025-01-18T10:00:00Z",
+      "updatedAt": "2025-01-18T10:00:00Z",
+      "content": {
+        "front": "the apple",
+        "back": "Apfel",
+        "article": "der",
+        "gender": "masculine",
+        "phonetic": "/ˈap.fəl/",
+        "examples": [
+          { "id": "ex-008a", "target": "Der Apfel ist rot und süß.", "native": "The apple is red and sweet." },
+          { "id": "ex-008b", "target": "Ich esse jeden Tag einen Apfel.", "native": "I eat an apple every day." }
+        ],
+        "notes": "Masculine. Plural: die Äpfel (umlaut!).",
+        "audioAssetId": null,
+        "imageUrl": null
+      },
+      "srsState": {
+        "id": "srs-card-008",
+        "cardId": "card-008",
+        "userId": "user-001",
+        "algorithm": "sm2",
+        "intervalDays": 10,
+        "easeFactor": 2.5,
+        "repetitions": 4,
+        "lastRating": 4,
+        "lastReviewedAt": "2026-04-24T00:00:00.000Z",
+        "nextDueAt": "2026-05-04T00:00:00.000Z",
+        "masteryLevel": 4,
+        "state": "review"
+      }
+    },
+    {
+      "id": "card-009",
+      "deckId": "deck-001",
+      "userId": "user-001",
+      "contextId": "german-vocab",
+      "categoryIds": ["cat-002"],
+      "tags": ["noun", "food", "drink"],
+      "version": 1,
+      "createdAt": "2025-01-19T08:00:00Z",
+      "updatedAt": "2025-01-19T08:00:00Z",
+      "content": {
+        "front": "the coffee",
+        "back": "Kaffee",
+        "article": "der",
+        "gender": "masculine",
+        "phonetic": "/ˈka.feː/",
+        "examples": [
+          { "id": "ex-009a", "target": "Ich trinke morgens immer Kaffee.", "native": "I always drink coffee in the morning." },
+          { "id": "ex-009b", "target": "Darf ich einen Kaffee bestellen?", "native": "May I order a coffee?" }
+        ],
+        "notes": "Masculine. Very culturally important in Germany!",
+        "audioAssetId": "audio-009",
+        "imageUrl": null
+      },
+      "srsState": {
+        "id": "srs-card-009",
+        "cardId": "card-009",
+        "userId": "user-001",
+        "algorithm": "sm2",
+        "intervalDays": 3,
+        "easeFactor": 2.5,
+        "repetitions": 2,
+        "lastRating": 2,
+        "lastReviewedAt": "2026-04-30T00:00:00.000Z",
+        "nextDueAt": "2026-05-02T00:00:00.000Z",
+        "masteryLevel": 2,
+        "state": "learning"
+      }
+    },
+    {
+      "id": "card-010",
+      "deckId": "deck-001",
+      "userId": "user-001",
+      "contextId": "german-vocab",
+      "categoryIds": ["cat-002"],
+      "tags": ["noun", "food"],
+      "version": 1,
+      "createdAt": "2025-01-19T09:00:00Z",
+      "updatedAt": "2025-01-19T09:00:00Z",
+      "content": {
+        "front": "the cake",
+        "back": "Kuchen",
+        "article": "der",
+        "gender": "masculine",
+        "phonetic": "/ˈkuː.xən/",
+        "examples": [
+          { "id": "ex-010a", "target": "Der Kuchen schmeckt wunderbar.", "native": "The cake tastes wonderful." },
+          { "id": "ex-010b", "target": "Sie backt jeden Sonntag einen Kuchen.", "native": "She bakes a cake every Sunday." }
+        ],
+        "notes": "Masculine. Kaffee und Kuchen (coffee and cake) is a beloved German tradition!",
+        "audioAssetId": null,
+        "imageUrl": null
+      },
+      "srsState": {
+        "id": "srs-card-010",
+        "cardId": "card-010",
+        "userId": "user-001",
+        "algorithm": "sm2",
+        "intervalDays": 1,
+        "easeFactor": 2.5,
+        "repetitions": 0,
+        "lastRating": null,
+        "lastReviewedAt": null,
+        "nextDueAt": "2026-05-02T00:00:00.000Z",
+        "masteryLevel": 0,
+        "state": "new"
+      }
+    },
+    {
+      "id": "card-011",
+      "deckId": "deck-001",
+      "userId": "user-001",
+      "contextId": "german-vocab",
+      "categoryIds": ["cat-003"],
+      "tags": ["noun", "travel", "transport"],
+      "version": 3,
+      "createdAt": "2025-01-20T08:00:00Z",
+      "updatedAt": "2025-01-20T08:00:00Z",
+      "content": {
+        "front": "the train",
+        "back": "Zug",
+        "article": "der",
+        "gender": "masculine",
+        "phonetic": "/t͡suːk/",
+        "examples": [
+          { "id": "ex-011a", "target": "Der Zug fährt um 8 Uhr ab.", "native": "The train departs at 8 o'clock." },
+          { "id": "ex-011b", "target": "Ich nehme den Zug nach Berlin.", "native": "I am taking the train to Berlin." }
+        ],
+        "notes": "Masculine. Germany's rail network (Deutsche Bahn) is extensive.",
+        "audioAssetId": "audio-011",
+        "imageUrl": null
+      },
+      "srsState": {
+        "id": "srs-card-011",
+        "cardId": "card-011",
+        "userId": "user-001",
+        "algorithm": "sm2",
+        "intervalDays": 7,
+        "easeFactor": 2.5,
+        "repetitions": 3,
+        "lastRating": 3,
+        "lastReviewedAt": "2026-04-28T00:00:00.000Z",
+        "nextDueAt": "2026-05-05T00:00:00.000Z",
+        "masteryLevel": 3,
+        "state": "review"
+      }
+    },
+    {
+      "id": "card-012",
+      "deckId": "deck-001",
+      "userId": "user-001",
+      "contextId": "german-vocab",
+      "categoryIds": ["cat-003"],
+      "tags": ["noun", "travel"],
+      "version": 1,
+      "createdAt": "2025-01-20T09:00:00Z",
+      "updatedAt": "2025-01-20T09:00:00Z",
+      "content": {
+        "front": "the airport",
+        "back": "Flughafen",
+        "article": "der",
+        "gender": "masculine",
+        "phonetic": "/ˈfluːkˌhaː.fən/",
+        "examples": [
+          { "id": "ex-012a", "target": "Wir treffen uns am Flughafen.", "native": "We meet at the airport." },
+          { "id": "ex-012b", "target": "Der Flughafen ist sehr groß.", "native": "The airport is very large." }
+        ],
+        "notes": "Masculine. Compound: Flug (flight) + Hafen (harbour/port).",
+        "audioAssetId": null,
+        "imageUrl": null
+      },
+      "srsState": {
+        "id": "srs-card-012",
+        "cardId": "card-012",
+        "userId": "user-001",
+        "algorithm": "sm2",
+        "intervalDays": 2,
+        "easeFactor": 2.5,
+        "repetitions": 1,
+        "lastRating": 1,
+        "lastReviewedAt": "2026-05-01T00:00:00.000Z",
+        "nextDueAt": "2026-05-02T00:00:00.000Z",
+        "masteryLevel": 1,
+        "state": "learning"
+      }
+    },
+    {
+      "id": "card-013",
+      "deckId": "deck-001",
+      "userId": "user-001",
+      "contextId": "german-vocab",
+      "categoryIds": ["cat-003"],
+      "tags": ["noun", "travel"],
+      "version": 1,
+      "createdAt": "2025-01-21T08:00:00Z",
+      "updatedAt": "2025-01-21T08:00:00Z",
+      "content": {
+        "front": "the ticket",
+        "back": "Fahrkarte",
+        "article": "die",
+        "gender": "feminine",
+        "phonetic": "/ˈfaːɐ̯ˌkaʁ.tə/",
+        "examples": [
+          { "id": "ex-013a", "target": "Wo kann ich eine Fahrkarte kaufen?", "native": "Where can I buy a ticket?" },
+          { "id": "ex-013b", "target": "Die Fahrkarte kostet zehn Euro.", "native": "The ticket costs ten euros." }
+        ],
+        "notes": "Feminine. Fahr (travel/drive) + Karte (card/ticket). Often also \"Ticket\" informally.",
+        "audioAssetId": null,
+        "imageUrl": null
+      },
+      "srsState": {
+        "id": "srs-card-013",
+        "cardId": "card-013",
+        "userId": "user-001",
+        "algorithm": "sm2",
+        "intervalDays": 1,
+        "easeFactor": 2.5,
+        "repetitions": 0,
+        "lastRating": null,
+        "lastReviewedAt": null,
+        "nextDueAt": "2026-05-02T00:00:00.000Z",
+        "masteryLevel": 0,
+        "state": "new"
+      }
+    },
+    {
+      "id": "card-014",
+      "deckId": "deck-001",
+      "userId": "user-001",
+      "contextId": "german-vocab",
+      "categoryIds": ["cat-004"],
+      "tags": ["verb", "daily"],
+      "version": 2,
+      "createdAt": "2025-01-21T09:00:00Z",
+      "updatedAt": "2025-01-21T09:00:00Z",
+      "content": {
+        "front": "to eat",
+        "back": "essen",
+        "article": null,
+        "gender": null,
+        "phonetic": "/ˈɛs.ən/",
+        "examples": [
+          { "id": "ex-014a", "target": "Was isst du zum Mittagessen?", "native": "What are you eating for lunch?" },
+          { "id": "ex-014b", "target": "Wir essen zusammen.", "native": "We eat together." }
+        ],
+        "notes": "Strong verb: ich esse, du isst, er/sie isst. Past: aß. Participle: gegessen.",
+        "audioAssetId": null,
+        "imageUrl": null
+      },
+      "srsState": {
+        "id": "srs-card-014",
+        "cardId": "card-014",
+        "userId": "user-001",
+        "algorithm": "sm2",
+        "intervalDays": 8,
+        "easeFactor": 2.5,
+        "repetitions": 3,
+        "lastRating": 3,
+        "lastReviewedAt": "2026-04-26T00:00:00.000Z",
+        "nextDueAt": "2026-05-04T00:00:00.000Z",
+        "masteryLevel": 3,
+        "state": "review"
+      }
+    },
+    {
+      "id": "card-015",
+      "deckId": "deck-001",
+      "userId": "user-001",
+      "contextId": "german-vocab",
+      "categoryIds": ["cat-004"],
+      "tags": ["verb", "daily"],
+      "version": 1,
+      "createdAt": "2025-01-22T08:00:00Z",
+      "updatedAt": "2025-01-22T08:00:00Z",
+      "content": {
+        "front": "to go",
+        "back": "gehen",
+        "article": null,
+        "gender": null,
+        "phonetic": "/ˈɡeː.ən/",
+        "examples": [
+          { "id": "ex-015a", "target": "Ich gehe jeden Morgen spazieren.", "native": "I go for a walk every morning." },
+          { "id": "ex-015b", "target": "Gehen wir ins Kino?", "native": "Shall we go to the cinema?" }
+        ],
+        "notes": "Irregular. ich gehe, du gehst, er geht. Past: ging. Participle: gegangen.",
+        "audioAssetId": null,
+        "imageUrl": null
+      },
+      "srsState": {
+        "id": "srs-card-015",
+        "cardId": "card-015",
+        "userId": "user-001",
+        "algorithm": "sm2",
+        "intervalDays": 28,
+        "easeFactor": 2.5,
+        "repetitions": 9,
+        "lastRating": 5,
+        "lastReviewedAt": "2026-04-29T00:00:00.000Z",
+        "nextDueAt": "2026-05-27T00:00:00.000Z",
+        "masteryLevel": 5,
+        "state": "mastered"
+      }
+    },
+    {
+      "id": "card-016",
+      "deckId": "deck-001",
+      "userId": "user-001",
+      "contextId": "german-vocab",
+      "categoryIds": ["cat-004"],
+      "tags": ["verb", "daily"],
+      "version": 1,
+      "createdAt": "2025-01-22T09:00:00Z",
+      "updatedAt": "2025-01-22T09:00:00Z",
+      "content": {
+        "front": "to speak",
+        "back": "sprechen",
+        "article": null,
+        "gender": null,
+        "phonetic": "/ˈʃpʁɛ.çən/",
+        "examples": [
+          { "id": "ex-016a", "target": "Sprechen Sie Deutsch?", "native": "Do you speak German?" },
+          { "id": "ex-016b", "target": "Er spricht sehr schnell.", "native": "He speaks very fast." }
+        ],
+        "notes": "Strong verb: ich spreche, du sprichst, er spricht. Past: sprach.",
+        "audioAssetId": "audio-016",
+        "imageUrl": null
+      },
+      "srsState": {
+        "id": "srs-card-016",
+        "cardId": "card-016",
+        "userId": "user-001",
+        "algorithm": "sm2",
+        "intervalDays": 4,
+        "easeFactor": 2.5,
+        "repetitions": 2,
+        "lastRating": 2,
+        "lastReviewedAt": "2026-04-29T00:00:00.000Z",
+        "nextDueAt": "2026-05-02T00:00:00.000Z",
+        "masteryLevel": 2,
+        "state": "learning"
+      }
+    },
+    {
+      "id": "card-017",
+      "deckId": "deck-001",
+      "userId": "user-001",
+      "contextId": "german-vocab",
+      "categoryIds": ["cat-004"],
+      "tags": ["adjective", "daily"],
+      "version": 1,
+      "createdAt": "2025-01-23T08:00:00Z",
+      "updatedAt": "2025-01-23T08:00:00Z",
+      "content": {
+        "front": "big / large",
+        "back": "groß",
+        "article": null,
+        "gender": null,
+        "phonetic": "/ɡʁoːs/",
+        "examples": [
+          { "id": "ex-017a", "target": "Das ist ein großes Haus.", "native": "That is a big house." },
+          { "id": "ex-017b", "target": "Er ist sehr groß.", "native": "He is very tall/big." }
+        ],
+        "notes": "Adjective. Comparative: größer. Superlative: am größten.",
+        "audioAssetId": null,
+        "imageUrl": null
+      },
+      "srsState": {
+        "id": "srs-card-017",
+        "cardId": "card-017",
+        "userId": "user-001",
+        "algorithm": "sm2",
+        "intervalDays": 12,
+        "easeFactor": 2.5,
+        "repetitions": 4,
+        "lastRating": 4,
+        "lastReviewedAt": "2026-04-23T00:00:00.000Z",
+        "nextDueAt": "2026-05-05T00:00:00.000Z",
+        "masteryLevel": 4,
+        "state": "review"
+      }
+    },
+    {
+      "id": "card-018",
+      "deckId": "deck-001",
+      "userId": "user-001",
+      "contextId": "german-vocab",
+      "categoryIds": ["cat-005"],
+      "tags": ["noun", "family"],
+      "version": 2,
+      "createdAt": "2025-01-23T09:00:00Z",
+      "updatedAt": "2025-01-23T09:00:00Z",
+      "content": {
+        "front": "the child",
+        "back": "Kind",
+        "article": "das",
+        "gender": "neuter",
+        "phonetic": "/kɪnt/",
+        "examples": [
+          { "id": "ex-018a", "target": "Das Kind spielt im Garten.", "native": "The child plays in the garden." },
+          { "id": "ex-018b", "target": "Sie hat drei Kinder.", "native": "She has three children." }
+        ],
+        "notes": "Neuter. Plural: die Kinder.",
+        "audioAssetId": null,
+        "imageUrl": null
+      },
+      "srsState": {
+        "id": "srs-card-018",
+        "cardId": "card-018",
+        "userId": "user-001",
+        "algorithm": "sm2",
+        "intervalDays": 25,
+        "easeFactor": 2.5,
+        "repetitions": 7,
+        "lastRating": 5,
+        "lastReviewedAt": "2026-04-28T00:00:00.000Z",
+        "nextDueAt": "2026-05-23T00:00:00.000Z",
+        "masteryLevel": 5,
+        "state": "mastered"
+      }
+    },
+    {
+      "id": "card-019",
+      "deckId": "deck-001",
+      "userId": "user-001",
+      "contextId": "german-vocab",
+      "categoryIds": ["cat-005"],
+      "tags": ["noun", "family"],
+      "version": 1,
+      "createdAt": "2025-01-24T08:00:00Z",
+      "updatedAt": "2025-01-24T08:00:00Z",
+      "content": {
+        "front": "the mother",
+        "back": "Mutter",
+        "article": "die",
+        "gender": "feminine",
+        "phonetic": "/ˈmʊ.tɐ/",
+        "examples": [
+          { "id": "ex-019a", "target": "Meine Mutter kocht sehr gut.", "native": "My mother cooks very well." },
+          { "id": "ex-019b", "target": "Die Mutter liest dem Kind vor.", "native": "The mother reads to the child." }
+        ],
+        "notes": "Feminine. Plural: die Mütter (umlaut!).",
+        "audioAssetId": null,
+        "imageUrl": null
+      },
+      "srsState": {
+        "id": "srs-card-019",
+        "cardId": "card-019",
+        "userId": "user-001",
+        "algorithm": "sm2",
+        "intervalDays": 7,
+        "easeFactor": 2.5,
+        "repetitions": 3,
+        "lastRating": 3,
+        "lastReviewedAt": "2026-04-27T00:00:00.000Z",
+        "nextDueAt": "2026-05-04T00:00:00.000Z",
+        "masteryLevel": 3,
+        "state": "review"
+      }
+    },
+    {
+      "id": "card-020",
+      "deckId": "deck-001",
+      "userId": "user-001",
+      "contextId": "german-vocab",
+      "categoryIds": ["cat-005"],
+      "tags": ["noun", "family"],
+      "version": 1,
+      "createdAt": "2025-01-24T09:00:00Z",
+      "updatedAt": "2025-01-24T09:00:00Z",
+      "content": {
+        "front": "the brother",
+        "back": "Bruder",
+        "article": "der",
+        "gender": "masculine",
+        "phonetic": "/ˈbʁuː.dɐ/",
+        "examples": [
+          { "id": "ex-020a", "target": "Mein Bruder wohnt in München.", "native": "My brother lives in Munich." },
+          { "id": "ex-020b", "target": "Er ist mein jüngerer Bruder.", "native": "He is my younger brother." }
+        ],
+        "notes": "Masculine. Plural: die Brüder (umlaut!).",
+        "audioAssetId": null,
+        "imageUrl": null
+      },
+      "srsState": {
+        "id": "srs-card-020",
+        "cardId": "card-020",
+        "userId": "user-001",
+        "algorithm": "sm2",
+        "intervalDays": 1,
+        "easeFactor": 2.5,
+        "repetitions": 0,
+        "lastRating": null,
+        "lastReviewedAt": null,
+        "nextDueAt": "2026-05-02T00:00:00.000Z",
+        "masteryLevel": 0,
+        "state": "new"
+      }
+    },
+    {
+      "id": "card-021",
+      "deckId": "deck-001",
+      "userId": "user-001",
+      "contextId": "german-vocab",
+      "categoryIds": ["cat-006"],
+      "tags": ["noun", "home"],
+      "version": 1,
+      "createdAt": "2025-01-25T08:00:00Z",
+      "updatedAt": "2025-01-25T08:00:00Z",
+      "content": {
+        "front": "the door",
+        "back": "Tür",
+        "article": "die",
+        "gender": "feminine",
+        "phonetic": "/tyːɐ̯/",
+        "examples": [
+          { "id": "ex-021a", "target": "Bitte schließ die Tür!", "native": "Please close the door!" },
+          { "id": "ex-021b", "target": "Die Tür ist offen.", "native": "The door is open." }
+        ],
+        "notes": "Feminine. Plural: die Türen.",
+        "audioAssetId": null,
+        "imageUrl": null
+      },
+      "srsState": {
+        "id": "srs-card-021",
+        "cardId": "card-021",
+        "userId": "user-001",
+        "algorithm": "sm2",
+        "intervalDays": 6,
+        "easeFactor": 2.5,
+        "repetitions": 3,
+        "lastRating": 3,
+        "lastReviewedAt": "2026-04-27T00:00:00.000Z",
+        "nextDueAt": "2026-05-03T00:00:00.000Z",
+        "masteryLevel": 3,
+        "state": "review"
+      }
+    },
+    {
+      "id": "card-022",
+      "deckId": "deck-001",
+      "userId": "user-001",
+      "contextId": "german-vocab",
+      "categoryIds": ["cat-006"],
+      "tags": ["noun", "home"],
+      "version": 1,
+      "createdAt": "2025-01-25T09:00:00Z",
+      "updatedAt": "2025-01-25T09:00:00Z",
+      "content": {
+        "front": "the window",
+        "back": "Fenster",
+        "article": "das",
+        "gender": "neuter",
+        "phonetic": "/ˈfɛns.tɐ/",
+        "examples": [
+          { "id": "ex-022a", "target": "Das Fenster ist geschlossen.", "native": "The window is closed." },
+          { "id": "ex-022b", "target": "Ich öffne das Fenster.", "native": "I open the window." }
+        ],
+        "notes": "Neuter. Plural: die Fenster (same form!).",
+        "audioAssetId": null,
+        "imageUrl": null
+      },
+      "srsState": {
+        "id": "srs-card-022",
+        "cardId": "card-022",
+        "userId": "user-001",
+        "algorithm": "sm2",
+        "intervalDays": 3,
+        "easeFactor": 2.5,
+        "repetitions": 2,
+        "lastRating": 2,
+        "lastReviewedAt": "2026-04-30T00:00:00.000Z",
+        "nextDueAt": "2026-05-03T00:00:00.000Z",
+        "masteryLevel": 2,
+        "state": "learning"
+      }
+    },
+    {
+      "id": "card-023",
+      "deckId": "deck-001",
+      "userId": "user-001",
+      "contextId": "german-vocab",
+      "categoryIds": ["cat-007"],
+      "tags": ["noun", "work"],
+      "version": 1,
+      "createdAt": "2025-01-26T08:00:00Z",
+      "updatedAt": "2025-01-26T08:00:00Z",
+      "content": {
+        "front": "the meeting",
+        "back": "Besprechung",
+        "article": "die",
+        "gender": "feminine",
+        "phonetic": "/bəˈʃpʁɛ.çʊŋ/",
+        "examples": [
+          { "id": "ex-023a", "target": "Die Besprechung beginnt um neun Uhr.", "native": "The meeting starts at nine o'clock." },
+          { "id": "ex-023b", "target": "Wir haben eine wichtige Besprechung.", "native": "We have an important meeting." }
+        ],
+        "notes": "Feminine. Also \"Meeting\" (borrowing) is widely used in German business.",
+        "audioAssetId": null,
+        "imageUrl": null
+      },
+      "srsState": {
+        "id": "srs-card-023",
+        "cardId": "card-023",
+        "userId": "user-001",
+        "algorithm": "sm2",
+        "intervalDays": 2,
+        "easeFactor": 2.5,
+        "repetitions": 1,
+        "lastRating": 1,
+        "lastReviewedAt": "2026-05-01T00:00:00.000Z",
+        "nextDueAt": "2026-05-02T00:00:00.000Z",
+        "masteryLevel": 1,
+        "state": "learning"
+      }
+    },
+    {
+      "id": "card-024",
+      "deckId": "deck-001",
+      "userId": "user-001",
+      "contextId": "german-vocab",
+      "categoryIds": ["cat-007"],
+      "tags": ["noun", "work"],
+      "version": 1,
+      "createdAt": "2025-01-26T09:00:00Z",
+      "updatedAt": "2025-01-26T09:00:00Z",
+      "content": {
+        "front": "the computer",
+        "back": "Computer",
+        "article": "der",
+        "gender": "masculine",
+        "phonetic": "/kɔmˈpjuː.tɐ/",
+        "examples": [
+          { "id": "ex-024a", "target": "Ich arbeite am Computer.", "native": "I am working on the computer." },
+          { "id": "ex-024b", "target": "Der Computer ist zu langsam.", "native": "The computer is too slow." }
+        ],
+        "notes": "Masculine. Loanword from English. Plural: die Computer.",
+        "audioAssetId": null,
+        "imageUrl": null
+      },
+      "srsState": {
+        "id": "srs-card-024",
+        "cardId": "card-024",
+        "userId": "user-001",
+        "algorithm": "sm2",
+        "intervalDays": 1,
+        "easeFactor": 2.5,
+        "repetitions": 0,
+        "lastRating": null,
+        "lastReviewedAt": null,
+        "nextDueAt": "2026-05-02T00:00:00.000Z",
+        "masteryLevel": 0,
+        "state": "new"
+      }
+    }
+  ]
+}

@@ -1,0 +1,101 @@
+<ion-header class="ion-no-border">
+  <ion-toolbar>
+    <div class="vault-nav">
+      <h1 class="vault-title lc-display">Vocabulary Vault</h1>
+      <button class="lc-fab" (click)="openAddWord()" aria-label="Add word">
+        <ion-icon name="add-outline"></ion-icon>
+      </button>
+    </div>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+  <ion-refresher slot="fixed" (ionRefresh)="handleRefresh($event)">
+    <ion-refresher-content></ion-refresher-content>
+  </ion-refresher>
+
+  <!-- Search -->
+  <div class="vault-search">
+    <ion-searchbar
+      placeholder="Search words..."
+      [debounce]="300"
+      (ionInput)="onSearch($event)"
+      mode="ios"
+      style="--background: var(--lc-card); --border-radius: 10px; --box-shadow: var(--lc-shadow-card);">
+    </ion-searchbar>
+  </div>
+
+  <!-- Category filter -->
+  <div class="cat-scroll">
+    <button class="lc-cat-chip" [class.lc-cat-chip--active]="!activeCategory()"
+            [class.lc-cat-chip--inactive]="!!activeCategory()"
+            (click)="setCategory(null)">
+      All ({{ totalCount() }})
+    </button>
+    @for (cat of categories(); track cat.id) {
+      <button class="lc-cat-chip"
+              [class.lc-cat-chip--active]="activeCategory() === cat.id"
+              [class.lc-cat-chip--inactive]="activeCategory() !== cat.id"
+              (click)="setCategory(cat.id)">
+        {{ cat.name }} ({{ cat.cardCount }})
+      </button>
+    }
+  </div>
+
+  <!-- Article legend + sort -->
+  <div class="article-legend-sm">
+    <div class="legend-item">
+      <span class="lc-article-badge lc-article-badge--der">der</span>
+      <span class="legend-lbl">Masc.</span>
+    </div>
+    <div class="legend-item">
+      <span class="lc-article-badge lc-article-badge--die">die</span>
+      <span class="legend-lbl">Fem.</span>
+    </div>
+    <div class="legend-item">
+      <span class="lc-article-badge lc-article-badge--das">das</span>
+      <span class="legend-lbl">Neut.</span>
+    </div>
+    <div style="flex:1"></div>
+    <div class="sort-btn" (click)="toggleSort()">
+      <ion-icon name="funnel-outline"></ion-icon>
+      {{ sortLabel() }}
+    </div>
+  </div>
+
+  <!-- Word list -->
+  <div class="word-list">
+    @if (loading()) {
+      @for (i of [1, 2, 3, 4, 5]; track i) {
+        <div class="lc-card" style="padding:12px;display:flex;gap:10px;align-items:center;margin:0 14px 8px;">
+          <div class="lc-skeleton" style="width:7px;height:7px;border-radius:50%;"></div>
+          <div class="lc-skeleton" style="width:36px;height:18px;border-radius:8px;"></div>
+          <div style="flex:1">
+            <div class="lc-skeleton" style="width:100px;height:13px;border-radius:4px;margin-bottom:4px;"></div>
+            <div class="lc-skeleton" style="width:70px;height:11px;border-radius:4px;"></div>
+          </div>
+          <div class="lc-skeleton" style="width:50px;height:16px;border-radius:8px;"></div>
+        </div>
+      }
+    } @else {
+      @for (card of cards(); track card.id) {
+        <div class="lc-word-item word-item-padded" (click)="openDetail(card)">
+          <app-mastery-dot [level]="card.srsState?.masteryLevel ?? 0"></app-mastery-dot>
+          <app-article-badge [article]="card.content.article"></app-article-badge>
+          <div style="flex:1;min-width:0;">
+            <p class="lc-word-front">{{ card.content.front }}</p>
+            <p class="lc-word-back">{{ card.content.article ? card.content.article + ' ' : '' }}{{ card.content.back }}</p>
+          </div>
+          <span class="lc-word-tag">{{ getCategoryName(card.categoryIds[0], categories()) }}</span>
+        </div>
+      } @empty {
+        <div class="lc-empty-state">
+          <span class="lc-empty-icon">🔍</span>
+          <p class="lc-empty-title">No words found</p>
+          <p class="lc-empty-sub">Try a different search or category</p>
+        </div>
+      }
+    }
+  </div>
+
+</ion-content>

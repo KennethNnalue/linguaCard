@@ -1,0 +1,140 @@
+<ion-header class="ion-no-border">
+  <ion-toolbar>
+    <div class="home-nav">
+      <span class="home-logo lc-display">LinguaCard</span>
+      <div class="home-nav-right">
+        <button class="lc-fab" (click)="openAddWord()" aria-label="Add new word">
+          <ion-icon name="add-outline"></ion-icon>
+        </button>
+        <div class="avatar">{{ user()?.avatarInitials }}</div>
+      </div>
+    </div>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+  <ion-refresher slot="fixed" (ionRefresh)="handleRefresh($event)">
+    <ion-refresher-content></ion-refresher-content>
+  </ion-refresher>
+
+  <div class="home-content">
+
+    <!-- Greeting -->
+    <div class="greeting">
+      <p class="greeting-sub">{{ greeting() }}</p>
+      <h1 class="greeting-name lc-display">Ready to<br>learn today?</h1>
+    </div>
+
+    <!-- Hero card -->
+    <div class="lc-hero-card hero-card">
+      <p class="hero-label">Cards due today</p>
+      @if (loading()) {
+        <div class="lc-skeleton" style="width:80px;height:52px;margin-bottom:4px;border-radius:8px;"></div>
+      } @else {
+        <p class="hero-count lc-display">{{ stats().dueToday }}</p>
+        <p class="hero-meta">{{ stats().newCards }} new
+          · {{ stats().dueToday - stats().newCards }} review</p>
+      }
+      <div class="hero-actions">
+        <button class="lc-btn-pill" routerLink="/review">
+          <ion-icon name="play-outline"></ion-icon>
+          Review cards
+        </button>
+        <button class="lc-btn-ghost" routerLink="/listen">
+          <ion-icon name="volume-high-outline"></ion-icon>
+          Listen
+        </button>
+      </div>
+    </div>
+
+    <!-- Stats row -->
+    <div class="stats-row">
+      <div class="stat-card lc-card">
+        <span class="stat-icon">🔥</span>
+        @if (loading()) {
+          <div class="lc-skeleton" style="width:36px;height:24px;border-radius:4px;"></div>
+        } @else {
+          <p class="stat-val lc-display">{{ stats().dayStreak }}</p>
+        }
+        <p class="stat-lbl">Day streak</p>
+      </div>
+      <div class="stat-card lc-card">
+        <span class="stat-icon">📚</span>
+        @if (loading()) {
+          <div class="lc-skeleton" style="width:36px;height:24px;border-radius:4px;"></div>
+        } @else {
+          <p class="stat-val lc-display">{{ stats().totalCards }}</p>
+        }
+        <p class="stat-lbl">Words</p>
+      </div>
+      <div class="stat-card lc-card">
+        <span class="stat-icon">⭐</span>
+        @if (loading()) {
+          <div class="lc-skeleton" style="width:36px;height:24px;border-radius:4px;"></div>
+        } @else {
+          <p class="stat-val lc-display">{{ stats().masteredCards }}</p>
+        }
+        <p class="stat-lbl">Mastered</p>
+      </div>
+    </div>
+
+    <!-- Recent words -->
+    <div class="lc-section-header">
+      <span class="lc-section-title">Recent words</span>
+      <span class="lc-section-link" routerLink="/vault">See all →</span>
+    </div>
+
+    <!-- Article legend -->
+    <div class="article-legend">
+      <div class="legend-item">
+        <span class="lc-article-badge lc-article-badge--der">der</span>
+        <span class="legend-lbl">Masculine</span>
+      </div>
+      <div class="legend-item">
+        <span class="lc-article-badge lc-article-badge--die">die</span>
+        <span class="legend-lbl">Feminine</span>
+      </div>
+      <div class="legend-item">
+        <span class="lc-article-badge lc-article-badge--das">das</span>
+        <span class="legend-lbl">Neuter</span>
+      </div>
+    </div>
+
+    <!-- Word list -->
+    <div class="word-list-home">
+      @if (loading()) {
+        @for (i of [1, 2, 3]; track i) {
+          <div class="lc-card" style="padding:12px;display:flex;gap:10px;align-items:center;">
+            <div class="lc-skeleton" style="width:7px;height:7px;border-radius:50%;"></div>
+            <div class="lc-skeleton" style="width:36px;height:18px;border-radius:8px;"></div>
+            <div style="flex:1;">
+              <div class="lc-skeleton" style="width:80px;height:14px;border-radius:4px;margin-bottom:4px;"></div>
+              <div class="lc-skeleton" style="width:60px;height:11px;border-radius:4px;"></div>
+            </div>
+          </div>
+        }
+      } @else {
+        @for (card of recent(); track card.id) {
+          <div class="lc-word-item" [routerLink]="['/vault', card.id]">
+            <app-mastery-dot [level]="card.srsState?.masteryLevel ?? 0"></app-mastery-dot>
+            <app-article-badge [article]="card.content.article"></app-article-badge>
+            <div style="flex:1">
+              <p class="lc-word-front">{{ card.content.front }}</p>
+              <p
+                class="lc-word-back">{{ card.content.article ? card.content.article + ' ' : '' }}{{ card.content.back }}</p>
+            </div>
+            <span class="lc-word-tag">{{ getCategory(card.categoryIds[0]) }}</span>
+          </div>
+        } @empty {
+          <div class="lc-empty-state">
+            <span class="lc-empty-icon">📖</span>
+            <p class="lc-empty-title">No words yet</p>
+            <p class="lc-empty-sub">Tap the + button to add your first word</p>
+          </div>
+        }
+      }
+    </div>
+
+    <div style="height: 24px;"></div>
+  </div>
+</ion-content>
