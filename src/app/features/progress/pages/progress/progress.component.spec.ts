@@ -1,5 +1,4 @@
 import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
-import { IonicModule } from '@ionic/angular';
 
 import { ProgressComponent } from './progress.component';
 
@@ -9,8 +8,7 @@ describe('ProgressComponent', () => {
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
-      declarations: [ ProgressComponent ],
-      imports: [IonicModule.forRoot()]
+      imports: [ProgressComponent]
     }).compileComponents();
 
     fixture = TestBed.createComponent(ProgressComponent);

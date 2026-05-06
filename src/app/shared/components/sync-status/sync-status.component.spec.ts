@@ -1,5 +1,4 @@
 import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
-import { IonicModule } from '@ionic/angular';
 
 import { SyncStatusComponent } from './sync-status.component';
 
@@ -9,8 +8,7 @@ describe('SyncStatusComponent', () => {
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
-      declarations: [ SyncStatusComponent ],
-      imports: [IonicModule.forRoot()]
+      imports: [SyncStatusComponent]
     }).compileComponents();
 
     fixture = TestBed.createComponent(SyncStatusComponent);

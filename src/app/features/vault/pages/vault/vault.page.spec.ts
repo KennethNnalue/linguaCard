@@ -1,7 +1,8 @@
-import {ComponentFixture, TestBed, waitForAsync} from '@angular/core/testing';
-import {IonicModule} from '@ionic/angular';
+import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
+import { provideRouter } from '@angular/router';
+import { provideIonicAngular } from '@ionic/angular/standalone';
 
-import {VaultPage} from './vault.page';
+import { VaultPage } from './vault.page';
 
 describe('VaultPage', () => {
   let component: VaultPage;
@@ -9,8 +10,8 @@ describe('VaultPage', () => {
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
-      declarations: [VaultPage],
-      imports: [IonicModule.forRoot()]
+      imports: [VaultPage],
+      providers: [provideIonicAngular(), provideRouter([])],
     }).compileComponents();
 
     fixture = TestBed.createComponent(VaultPage);

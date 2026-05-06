@@ -1,5 +1,4 @@
 import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
-import { IonicModule } from '@ionic/angular';
 
 import { ArticleBadgeComponent } from './article-badge.component';
 
@@ -9,8 +8,7 @@ describe('ArticleBadgeComponent', () => {
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
-      declarations: [ ArticleBadgeComponent ],
-      imports: [IonicModule.forRoot()]
+      imports: [ArticleBadgeComponent]
     }).compileComponents();
 
     fixture = TestBed.createComponent(ArticleBadgeComponent);

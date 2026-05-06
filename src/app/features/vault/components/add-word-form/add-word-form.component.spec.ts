@@ -1,5 +1,4 @@
 import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
-import { IonicModule } from '@ionic/angular';
 
 import { AddWordFormComponent } from './add-word-form.component';
 
@@ -9,8 +8,7 @@ describe('AddWordFormComponent', () => {
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
-      declarations: [ AddWordFormComponent ],
-      imports: [IonicModule.forRoot()]
+      imports: [AddWordFormComponent]
     }).compileComponents();
 
     fixture = TestBed.createComponent(AddWordFormComponent);

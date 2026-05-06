@@ -1,7 +1,8 @@
-import {ComponentFixture, TestBed, waitForAsync} from '@angular/core/testing';
-import {IonicModule} from '@ionic/angular';
+import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
+import { provideRouter } from '@angular/router';
+import { provideIonicAngular } from '@ionic/angular/standalone';
 
-import {ReviewPage} from './review.page';
+import { ReviewPage } from './review.page';
 
 describe('ReviewPage', () => {
   let component: ReviewPage;
@@ -9,13 +10,12 @@ describe('ReviewPage', () => {
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
-      declarations: [ReviewPage],
-      imports: [IonicModule.forRoot()]
+      imports: [ReviewPage],
+      providers: [provideIonicAngular(), provideRouter([])],
     }).compileComponents();
 
     fixture = TestBed.createComponent(ReviewPage);
     component = fixture.componentInstance;
-    fixture.detectChanges();
   }));
 
   it('should create', () => {

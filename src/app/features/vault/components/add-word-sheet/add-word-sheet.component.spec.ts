@@ -1,5 +1,4 @@
 import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
-import { IonicModule } from '@ionic/angular';
 
 import { AddWordSheetComponent } from './add-word-sheet.component';
 
@@ -9,8 +8,7 @@ describe('AddWordSheetComponent', () => {
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
-      declarations: [ AddWordSheetComponent ],
-      imports: [IonicModule.forRoot()]
+      imports: [AddWordSheetComponent]
     }).compileComponents();
 
     fixture = TestBed.createComponent(AddWordSheetComponent);

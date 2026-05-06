@@ -1,5 +1,4 @@
 import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
-import { IonicModule } from '@ionic/angular';
 
 import { ListenComponent } from './listen.component';
 
@@ -9,8 +8,7 @@ describe('ListenComponent', () => {
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
-      declarations: [ ListenComponent ],
-      imports: [IonicModule.forRoot()]
+      imports: [ListenComponent]
     }).compileComponents();
 
     fixture = TestBed.createComponent(ListenComponent);

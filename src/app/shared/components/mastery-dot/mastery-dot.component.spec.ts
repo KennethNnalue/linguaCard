@@ -1,5 +1,4 @@
 import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
-import { IonicModule } from '@ionic/angular';
 
 import { MasteryDotComponent } from './mastery-dot.component';
 
@@ -9,8 +8,7 @@ describe('MasteryDotComponent', () => {
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
-      declarations: [ MasteryDotComponent ],
-      imports: [IonicModule.forRoot()]
+      imports: [MasteryDotComponent]
     }).compileComponents();
 
     fixture = TestBed.createComponent(MasteryDotComponent);
