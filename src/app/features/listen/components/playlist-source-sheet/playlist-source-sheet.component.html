@@ -1,0 +1,96 @@
+<ion-content>
+  <div class="pss-wrap">
+
+    <!-- Header -->
+    <div class="pss-header">
+      <h2 class="pss-title lc-display">Choose what to listen to</h2>
+      <button class="pss-close" (click)="dismiss()" aria-label="Close">
+        <ion-icon name="close-outline"></ion-icon>
+      </button>
+    </div>
+
+    <!-- Source grid -->
+    <div class="pss-grid">
+
+      <button
+        class="pss-source"
+        [class.pss-source--active]="selectedSource() === 'due-today'"
+        (click)="selectSource('due-today')">
+        <div class="pss-source-top">
+          <span class="pss-source-name">Today's due words</span>
+          @if (selectedSource() === 'due-today') {
+            <ion-icon class="pss-check" name="checkmark-outline"></ion-icon>
+          }
+        </div>
+        <span class="pss-source-meta">{{ dueCount() }} words · ~{{ dueMinutes() }} min</span>
+      </button>
+
+      <button
+        class="pss-source"
+        [class.pss-source--active]="selectedSource() === 'mastered'"
+        (click)="selectSource('mastered')">
+        <div class="pss-source-top">
+          <span class="pss-source-name">All mastered words</span>
+          @if (selectedSource() === 'mastered') {
+            <ion-icon class="pss-check" name="checkmark-outline"></ion-icon>
+          }
+        </div>
+        <span class="pss-source-meta">{{ masteredCount() }} words · ~{{ masteredMinutes() }} min</span>
+      </button>
+
+      <button
+        class="pss-source"
+        [class.pss-source--active]="selectedSource() === 'struggling'"
+        (click)="selectSource('struggling')">
+        <div class="pss-source-top">
+          <span class="pss-source-name">Struggling words</span>
+          @if (selectedSource() === 'struggling') {
+            <ion-icon class="pss-check" name="checkmark-outline"></ion-icon>
+          }
+        </div>
+        <span class="pss-source-meta">{{ strugglingCount() }} words · intensive</span>
+      </button>
+
+    </div>
+
+    <!-- Category list -->
+    @if (categories().length) {
+      <p class="pss-section-lbl">By category</p>
+      <div class="pss-categories">
+        @for (cat of categories(); track cat.id) {
+          <button
+            class="pss-cat-chip"
+            [class.pss-cat-chip--active]="isCategorySelected(cat.id)"
+            (click)="selectCategory(cat.id)">
+            <span class="pss-cat-dot" [style.background]="cat.colour"></span>
+            <span class="pss-cat-name">{{ cat.name }}</span>
+            <span class="pss-cat-count">{{ categoryCount(cat.id) }}</span>
+          </button>
+        }
+      </div>
+    }
+
+    <!-- Playback mode -->
+    <div class="pss-divider"></div>
+    <p class="pss-section-lbl">Playback preference</p>
+    <div class="pss-modes">
+      @for (m of MODES; track m.value) {
+        <button
+          class="pss-mode"
+          [class.pss-mode--active]="playbackMode() === m.value"
+          (click)="setMode(m.value)">
+          <span class="pss-mode-name">{{ m.label }}</span>
+          <span class="pss-mode-desc">{{ m.desc }}</span>
+        </button>
+      }
+    </div>
+
+    <!-- CTA -->
+    <button class="pss-cta" (click)="startListening()">
+      Start listening
+    </button>
+
+    <div style="height: 16px;"></div>
+
+  </div>
+</ion-content>

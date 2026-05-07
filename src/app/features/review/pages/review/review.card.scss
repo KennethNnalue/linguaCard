@@ -1,0 +1,250 @@
+// ─── CARD ─────────────────────────────────────────────────────────────────────
+
+.rv-card-scene {
+  flex: 1;
+}
+
+.rv-card {
+  background: var(--lc-card);
+  border: 1px solid var(--lc-border);
+  border-radius: 24px;
+  padding: 20px;
+  box-shadow: var(--lc-shadow-float);
+}
+
+@keyframes cardSlideIn {
+  from { transform: translateX(18px); opacity: 0; }
+  to   { transform: translateX(0);    opacity: 1; }
+}
+
+@keyframes cardFlipIn {
+  from { transform: rotateY(80deg) scale(0.97); opacity: 0.5; }
+  to   { transform: rotateY(0deg)  scale(1);    opacity: 1; }
+}
+
+.rv-card--front {
+  cursor: pointer;
+  animation: cardSlideIn 0.25s ease-out;
+
+  &:active { transform: scale(0.99); }
+}
+
+.rv-card--back {
+  animation: cardFlipIn var(--lc-flip-duration) cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.rv-card-hdr {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 14px;
+}
+
+.rv-side-lbl {
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--lc-text-hint);
+  max-width: 55%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.rv-lang-chip {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--lc-brand-mid);
+  background: var(--lc-brand-light);
+  padding: 3px 10px;
+  border-radius: var(--lc-radius-full);
+}
+
+// ─── FRONT FACE BODY ──────────────────────────────────────────────────────────
+
+.rv-body-front {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 20px 0 24px;
+  gap: 8px;
+}
+
+.rv-front-word {
+  font-size: 34px;
+  font-weight: 600;
+  color: var(--lc-text-primary);
+  text-align: center;
+  line-height: 1.2;
+  margin: 0;
+}
+
+.rv-hint {
+  font-size: 13px;
+  color: var(--lc-text-hint);
+  font-style: italic;
+  text-align: center;
+  margin: 0;
+}
+
+.rv-tap-pill {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  background: var(--lc-brand-light);
+  color: var(--lc-brand);
+  font-size: 13px;
+  font-weight: 600;
+  padding: 10px 20px;
+  border-radius: var(--lc-radius-full);
+  border: none;
+  width: 100%;
+  font-family: var(--lc-font-body);
+  cursor: pointer;
+  transition: var(--lc-transition-fast);
+
+  ion-icon { font-size: 16px; }
+
+  &:active { opacity: 0.8; }
+}
+
+// ─── BACK FACE BODY ───────────────────────────────────────────────────────────
+
+.rv-body-back {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0;
+}
+
+.rv-art-badge {
+  font-size: 11px !important;
+  padding: 3px 12px !important;
+  margin-bottom: 8px;
+}
+
+.rv-back-word {
+  font-size: 34px;
+  font-weight: 600;
+  color: var(--lc-text-primary);
+  text-align: center;
+  line-height: 1.1;
+  margin: 0 0 4px;
+}
+
+.rv-phonetic {
+  font-size: 13px;
+  color: var(--lc-text-hint);
+  font-style: italic;
+  text-align: center;
+  margin: 0 0 14px;
+  font-family: var(--lc-font-display);
+}
+
+.rv-ex-block {
+  background: var(--lc-surface);
+  border-radius: var(--lc-radius-md);
+  padding: 10px 14px;
+  width: 100%;
+  margin-bottom: 7px;
+}
+
+.rv-ex-de {
+  font-size: 13px;
+  color: var(--lc-text-primary);
+  line-height: 1.5;
+  margin: 0 0 3px;
+}
+
+:host ::ng-deep .rv-ex-de strong {
+  color: var(--lc-brand);
+  font-weight: 600;
+}
+
+.rv-ex-en {
+  font-size: 11px;
+  color: var(--lc-text-hint);
+  font-style: italic;
+  margin: 0;
+}
+
+.rv-audio-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  background: var(--lc-brand-light);
+  border: none;
+  border-radius: var(--lc-radius-full);
+  padding: 9px 16px;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--lc-brand);
+  cursor: pointer;
+  font-family: var(--lc-font-body);
+  width: 100%;
+  margin: 4px 0 8px;
+  transition: var(--lc-transition-fast);
+
+  ion-icon { font-size: 15px; }
+
+  &:active { opacity: 0.8; }
+}
+
+.rv-note-pill {
+  display: flex;
+  align-items: flex-start;
+  gap: 7px;
+  background: var(--lc-accent-light);
+  border-radius: var(--lc-radius-md);
+  padding: 9px 12px;
+  width: 100%;
+}
+
+.rv-note-icon {
+  font-size: 14px;
+  flex-shrink: 0;
+  line-height: 1.5;
+}
+
+.rv-note-text {
+  font-size: 12px;
+  color: var(--lc-accent);
+  line-height: 1.5;
+  margin: 0;
+}
+
+// ─── SECONDARY ACTIONS ────────────────────────────────────────────────────────
+
+.rv-secondary {
+  display: flex;
+  justify-content: center;
+  gap: 24px;
+  padding: 10px 0 4px;
+}
+
+.rv-sec-btn {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 12px;
+  color: var(--lc-text-hint);
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-family: var(--lc-font-body);
+  font-weight: 500;
+  padding: 4px 10px;
+  border-radius: var(--lc-radius-sm);
+  transition: var(--lc-transition-fast);
+
+  ion-icon { font-size: 14px; }
+
+  &:active {
+    background: var(--lc-brand-light);
+    color: var(--lc-brand);
+  }
+}

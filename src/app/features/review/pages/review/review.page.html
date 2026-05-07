@@ -1,128 +1,154 @@
 <ion-header class="ion-no-border">
   <ion-toolbar>
-    <div class="review-header-content">
-      <div class="header-left">
-        <ion-icon name="close" class="header-btn" (click)="exitSession()"></ion-icon>
-        <div class="session-info">
-          <span class="session-category">{{ activeCategoryNames() }}</span>
-          <div class="session-count">
-            <span class="current">{{ currentIndex() + 1 }}</span>
-            <span class="total">/ {{ queue().length }}</span>
-          </div>
-        </div>
-      </div>
-
-      <div class="header-right">
-        <ion-icon name="flag-outline" class="header-btn" (click)="flagCard()"></ion-icon>
-      </div>
+    <div class="rv-nav">
+      <button class="rv-icon-btn" (click)="exitSession()" aria-label="Go back">
+        <ion-icon name="chevron-back-outline"></ion-icon>
+      </button>
+      <span class="rv-title lc-display">Review Session</span>
+      <div class="rv-nav-spacer"></div>
     </div>
 
-    <!-- Progress Bar -->
-    <div class="progress-container">
-      <div class="progress-bar" [style.width.%]="progressPercent()"></div>
+    <div class="rv-prog-wrap">
+      <div class="rv-prog-track">
+        <div class="rv-prog-fill" [style.width.%]="progressPercent()"></div>
+      </div>
+      <div class="rv-prog-labels">
+        <span>{{ currentIndex() + 1 }} of {{ queue().length }}</span>
+        <span>{{ activeCategoryNames() }}</span>
+      </div>
     </div>
   </ion-toolbar>
 </ion-header>
 
-<ion-content [fullscreen]="true" class="ion-padding review-content">
+<ion-content>
   @if (!sessionComplete()) {
-    <div class="review-container">
+    @if (queue().length) {
+      <div class="rv-session">
 
-      <!-- Card Container -->
-      <div class="card-container" [class.is-flipped]="isFlipped()" (click)="!isFlipped() && flipCard()">
+        <!-- ── Flashcard ── -->
+        <div class="rv-card-scene">
 
-        <!-- Front Side -->
-        <div class="review-card card-front">
-          <div class="card-inner">
-            <div class="card-header">
-              <span class="card-side-label">{{ currentCard().content.front }}</span>
+          @if (!isFlipped()) {
+            <!-- Front face -->
+            <div class="rv-card rv-card--front" (click)="flipCard()">
+              <div class="rv-card-hdr">
+                <span class="rv-side-lbl">Your language</span>
+                <span class="rv-lang-chip">🇬🇧 English</span>
+              </div>
+              <div class="rv-body-front">
+                <p class="rv-front-word lc-display">{{ currentCard().content.front }}</p>
+                @if (currentCard().tags.length) {
+                  <p class="rv-hint">{{ currentCard().tags[0] }}</p>
+                }
+              </div>
+              <button class="rv-tap-pill" tabindex="-1">
+                <ion-icon name="chevron-down-outline"></ion-icon>
+                Tap to reveal German
+              </button>
             </div>
-            <div class="card-body">
-              <p class="card-front-word lc-display">{{ currentCard().content.front }}</p>
-              <p class="card-hint">{{ currentCard().categoryIds[0] }}</p>
-            </div>
-            <div class="card-footer">
-              <span class="tap-hint">Tap to flip</span>
-            </div>
-          </div>
-        </div>
 
-        <!-- Back Side -->
-        <div class="review-card card-back">
-          <div class="card-inner">
-            <div class="card-header">
-              <span class="card-side-label">{{ currentCard().content.front }}</span>
-              <ion-icon name="volume-medium" class="audio-btn" (click)="playAudio($event)"></ion-icon>
+          } @else {
+            <!-- Back face (revealed) -->
+            <div class="rv-card rv-card--back">
+              <div class="rv-card-hdr">
+                <span class="rv-side-lbl">{{ currentCard().content.front }}</span>
+                <span class="rv-lang-chip">🇩🇪 German</span>
+              </div>
+              <div class="rv-body-back">
+                @if (currentCard().content.article) {
+                  <span class="lc-article-badge lc-article-badge--{{ currentCard().content.article }} rv-art-badge">
+                    {{ currentArticleLabel() }}
+                  </span>
+                }
+                <p class="rv-back-word lc-display">{{ currentCard().content.back }}</p>
+                @if (currentCard().content.phonetic) {
+                  <p class="rv-phonetic">{{ currentCard().content.phonetic }}</p>
+                }
+                @for (ex of currentCard().content.examples; track ex.id) {
+                  <div class="rv-ex-block">
+                    <p class="rv-ex-de" [innerHTML]="highlightWord(ex.target, currentCard().content.back)"></p>
+                    <p class="rv-ex-en">"{{ ex.native }}"</p>
+                  </div>
+                }
+                <button class="rv-audio-btn" (click)="playAudio($event)">
+                  <ion-icon name="volume-high-outline"></ion-icon>
+                  Play pronunciation
+                </button>
+                @if (currentCard().content.notes) {
+                  <div class="rv-note-pill">
+                    <span class="rv-note-icon">💡</span>
+                    <p class="rv-note-text">{{ currentCard().content.notes }}</p>
+                  </div>
+                }
+              </div>
             </div>
-            <div class="card-body">
-              @if (currentCard().content.article) {
-                <app-article-badge [article]="currentCard()!.content.article"
-                                   style="font-size: 0.9rem"></app-article-badge>
-              }
-              <p class="card-back-word lc-display">{{ currentCard().content.back }}</p>
-              @if (currentCard().content.phonetic) {
-                <p class="card-phonetic">{{ currentCard().content.phonetic }}</p>
-              }
-              @if (currentCard().content.examples.length) {
-                <div class="card-examples">
-                  @for (ex of currentCard()!.content.examples; track ex.id) {
-                    <div class="example-item">
-                      <p class="ex-target">{{ ex.target }}</p>
-                      <p class="ex-native">{{ ex.native }}</p>
-                    </div>
-                  }
-                </div>
-              }
-            </div>
-            <div class="card-footer">
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <!-- Rating Controls -->
-      <div class="controls-container" [class.visible]="isFlipped()">
-        <p class="rating-label">How well did you know this?</p>
-        <div class="rating-grid">
-          @for (r of ratings; track r.value) {
-            <button class="rating-btn rating-{{r.value}}" (click)="submitRating(r.value)">
-              <span class="rating-value">{{ r.value }}</span>
-              <span class="rating-text">{{ r.label }}</span>
-            </button>
           }
+
         </div>
+
+        <!-- ── Skip / Flag ── -->
+        <div class="rv-secondary">
+          <button class="rv-sec-btn" (click)="skipCard()">
+            <ion-icon name="chevron-forward-outline"></ion-icon>
+            Skip
+          </button>
+          <button class="rv-sec-btn" (click)="flagCard()">
+            <ion-icon name="flag-outline"></ion-icon>
+            Flag
+          </button>
+        </div>
+
+        <!-- ── Rating row ── -->
+        <div class="rv-rating-area" [class.rv-rating-area--active]="isFlipped()">
+          <p class="rv-rating-prompt">How well did you know this?</p>
+          <div class="rv-rating-row">
+            @for (r of ratings; track r.value) {
+              <button
+                class="rv-rating-btn rv-rating-btn--{{ r.value }}"
+                [disabled]="!isFlipped()"
+                (click)="submitRating(r.value)">
+                <span class="rv-r-num">{{ r.value }}</span>
+                <span class="rv-r-lbl">{{ r.label }}</span>
+              </button>
+            }
+          </div>
+        </div>
+
       </div>
-    </div>
+
+    } @else {
+      <!-- Empty queue -->
+      <div class="lc-empty-state">
+        <span class="lc-empty-icon">🎉</span>
+        <p class="lc-empty-title">All caught up!</p>
+        <p class="lc-empty-sub">No cards due for review right now.</p>
+        <button class="lc-btn-primary rv-exit-btn" (click)="exitSession()">Back to Home</button>
+      </div>
+    }
+
   } @else {
-    <!-- Session Complete View -->
-    <div class="complete-container">
-      <div class="success-icon-container">
-        <div class="success-ring"></div>
-        <ion-icon name="checkmark-circle" class="success-icon"></ion-icon>
+    <!-- ── Session complete ── -->
+    <div class="rv-complete">
+      <div class="rv-complete-badge">
+        <ion-icon name="checkmark-circle-outline"></ion-icon>
       </div>
-
-      <h1 class="complete-title">Session Complete!</h1>
-      <p class="complete-subtitle">Great job! You've reviewed {{ queue().length }} words.</p>
-
-      <div class="stats-grid">
-        <div class="stat-item">
-          <span class="stat-value">{{ sessionStats().reviewed }}</span>
-          <span class="stat-label">Reviewed</span>
+      <h1 class="rv-complete-title lc-display">Session Complete!</h1>
+      <p class="rv-complete-sub">Great job! You reviewed {{ queue().length }} words.</p>
+      <div class="rv-complete-stats">
+        <div class="rv-c-stat">
+          <span class="rv-c-val lc-display">{{ sessionStats().reviewed }}</span>
+          <span class="rv-c-lbl">Reviewed</span>
         </div>
-        <div class="stat-item">
-          <span class="stat-value">{{ sessionStats().newLearned }}</span>
-          <span class="stat-label">New Words</span>
+        <div class="rv-c-stat">
+          <span class="rv-c-val lc-display">{{ sessionStats().newLearned }}</span>
+          <span class="rv-c-lbl">New Words</span>
         </div>
-        <div class="stat-item">
-          <span class="stat-value">{{ sessionStats().mastered }}</span>
-          <span class="stat-label">Mastered</span>
+        <div class="rv-c-stat">
+          <span class="rv-c-val lc-display">{{ sessionStats().mastered }}</span>
+          <span class="rv-c-lbl">Mastered</span>
         </div>
       </div>
-
-      <div class="complete-actions">
-        <button class="lc-btn lc-btn--primary" (click)="exitSession()">Back to Home</button>
-        <button class="lc-btn lc-btn--outline" (click)="ngOnInit()">Review More</button>
-      </div>
+      <button class="lc-btn-primary rv-exit-btn" (click)="exitSession()">Back to Home</button>
     </div>
   }
 </ion-content>

@@ -70,7 +70,7 @@
 }
 
 .hero-count {
-  font-size: 44px;
+  font-size: 40px;
   font-weight: 600;
   color: white;
   line-height: 1;
@@ -108,7 +108,7 @@
 }
 
 .stat-val {
-  font-size: 18px;
+  font-size: 17px;
   font-weight: 600;
   color: var(--lc-text-primary);
   margin: 0;
@@ -146,4 +146,13 @@
   display: flex;
   flex-direction: column;
   gap: 8px;
+}
+
+// Nav FAB is embedded in the toolbar — smaller than a floating FAB
+.home-nav-right .lc-fab {
+  width: 32px;
+  height: 32px;
+  box-shadow: 0 3px 10px rgba(224, 123, 63, 0.35);
+
+  ion-icon { font-size: 17px; }
 }

@@ -1,0 +1,160 @@
+// ─── NAV ─────────────────────────────────────────────────────────────────────
+
+.aw-nav {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 16px 12px;
+}
+
+.aw-title {
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--lc-text-primary);
+}
+
+.aw-nav-spacer {
+  width: 34px;
+}
+
+.aw-close-btn {
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  background: var(--lc-surface);
+  border: 1px solid var(--lc-border);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: var(--lc-transition-fast);
+
+  ion-icon {
+    font-size: 18px;
+    color: var(--lc-text-secondary);
+  }
+
+  &:active { opacity: 0.7; }
+}
+
+// ─── FORM LAYOUT ──────────────────────────────────────────────────────────────
+
+.aw-form {
+  padding: 4px 16px 0;
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.aw-field {
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+}
+
+.aw-lbl {
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+  color: var(--lc-text-hint);
+  margin: 0;
+}
+
+.aw-lbl-hint {
+  font-size: 9px;
+  font-weight: 400;
+  letter-spacing: 0;
+  text-transform: none;
+  color: var(--lc-text-hint);
+  opacity: 0.7;
+}
+
+// ─── LANGUAGE DIRECTION ───────────────────────────────────────────────────────
+
+.aw-lang-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.aw-lang-chip {
+  flex: 1;
+  text-align: center;
+  background: var(--lc-card);
+  border: 1px solid var(--lc-border);
+  border-radius: var(--lc-radius-sm);
+  padding: 9px 12px;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--lc-text-secondary);
+
+  &.aw-lang-chip--active {
+    background: var(--lc-brand);
+    color: var(--lc-text-inverse);
+    border-color: var(--lc-brand);
+  }
+}
+
+.aw-lang-arrow {
+  font-size: 16px;
+  color: var(--lc-text-hint);
+  flex-shrink: 0;
+}
+
+// ─── TEXT INPUT ───────────────────────────────────────────────────────────────
+
+.aw-input {
+  background: var(--lc-card);
+  border: 1.5px solid var(--lc-border);
+  border-radius: var(--lc-radius-sm);
+  padding: 10px 13px;
+  font-size: 13px;
+  color: var(--lc-text-primary);
+  font-family: var(--lc-font-body);
+  width: 100%;
+  outline: none;
+  transition: border-color var(--lc-transition-fast);
+
+  &:focus { border-color: var(--lc-brand); }
+
+  &::placeholder { color: var(--lc-text-hint); }
+
+  &.aw-input--error { border-color: var(--lc-fem-border); }
+
+  &.aw-input--grow { flex: 1; }
+}
+
+// ─── BACK ROW (article badge + word input) ────────────────────────────────────
+
+.aw-back-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.aw-art-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 40px;
+  padding: 0 10px;
+  height: 40px;
+  border-radius: var(--lc-radius-full);
+  border: 1.5px dashed var(--lc-border);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  font-family: var(--lc-font-body);
+  background: var(--lc-surface);
+  color: var(--lc-text-hint);
+  cursor: pointer;
+  flex-shrink: 0;
+  transition: var(--lc-transition-fast);
+
+  &:not(.aw-art-badge--empty) {
+    border-style: solid;
+  }
+
+  &:active { transform: scale(0.95); }
+}

@@ -1,0 +1,138 @@
+// ─── CATEGORY CHIPS ───────────────────────────────────────────────────────────
+
+.aw-chip-row {
+  display: flex;
+  gap: 7px;
+  flex-wrap: wrap;
+}
+
+.aw-cat-chip {
+  padding: 5px 13px;
+  border-radius: var(--lc-radius-full);
+  border: 1px solid var(--lc-border);
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--lc-text-secondary);
+  background: var(--lc-card);
+  cursor: pointer;
+  font-family: var(--lc-font-body);
+  transition: var(--lc-transition-fast);
+
+  &.aw-cat-chip--selected {
+    background: var(--lc-brand-light);
+    color: var(--lc-brand);
+    border-color: var(--lc-brand);
+  }
+
+  &.aw-cat-chip--new {
+    display: inline-flex;
+    align-items: center;
+    gap: 3px;
+    border-style: dashed;
+
+    ion-icon { font-size: 12px; }
+  }
+
+  &:active { opacity: 0.75; }
+}
+
+// ─── EXAMPLE SENTENCE ─────────────────────────────────────────────────────────
+
+.aw-example-wrap {
+  background: var(--lc-card);
+  border: 1.5px solid var(--lc-border);
+  border-radius: var(--lc-radius-sm);
+  overflow: hidden;
+  transition: border-color var(--lc-transition-fast);
+
+  &:focus-within { border-color: var(--lc-brand); }
+}
+
+.aw-textarea {
+  display: block;
+  width: 100%;
+  padding: 10px 13px;
+  font-size: 13px;
+  color: var(--lc-text-primary);
+  font-family: var(--lc-font-body);
+  font-style: italic;
+  background: transparent;
+  border: none;
+  outline: none;
+  resize: none;
+  line-height: 1.5;
+
+  &::placeholder { color: var(--lc-text-hint); }
+
+  &.aw-textarea--translation {
+    color: var(--lc-text-secondary);
+    font-size: 12px;
+  }
+}
+
+.aw-example-sep {
+  height: 1px;
+  background: var(--lc-border);
+  margin: 0 13px;
+}
+
+// ─── PRONUNCIATION ────────────────────────────────────────────────────────────
+
+.aw-pron-row {
+  display: flex;
+  gap: 9px;
+}
+
+.aw-pron-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 9px 16px;
+  border-radius: var(--lc-radius-full);
+  border: 1px solid var(--lc-border);
+  background: var(--lc-card);
+  color: var(--lc-text-secondary);
+  font-size: 12px;
+  font-weight: 600;
+  font-family: var(--lc-font-body);
+  cursor: pointer;
+  transition: var(--lc-transition-fast);
+
+  ion-icon { font-size: 15px; }
+
+  &.aw-pron-btn--tts {
+    background: var(--lc-accent-light);
+    border-color: var(--lc-accent);
+    color: var(--lc-accent);
+  }
+
+  &:active { opacity: 0.8; transform: scale(0.97); }
+}
+
+// ─── SAVE BUTTON ──────────────────────────────────────────────────────────────
+
+.aw-save-btn {
+  background: var(--lc-brand);
+  color: var(--lc-text-inverse);
+  border: none;
+  border-radius: var(--lc-radius-md);
+  padding: 15px;
+  font-size: 15px;
+  font-weight: 600;
+  font-family: var(--lc-font-body);
+  text-align: center;
+  cursor: pointer;
+  width: 100%;
+  transition: var(--lc-transition-fast);
+  margin-top: 4px;
+
+  &:disabled {
+    opacity: 0.55;
+    cursor: not-allowed;
+  }
+
+  &:not(:disabled):active {
+    opacity: 0.85;
+    transform: scale(0.98);
+  }
+}

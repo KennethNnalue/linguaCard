@@ -5,7 +5,7 @@
 //  implementations for real HTTP calls when the backend is ready.
 // ============================================================
 
-import {computed, Injectable, signal} from '@angular/core';
+import {computed, inject, Injectable, signal} from '@angular/core';
 import {delay, Observable, of, throwError} from 'rxjs';
 import {
   Card,
@@ -373,6 +373,244 @@ export class MockSyncService {
   forcSync(): Observable<void> {
     this._processQueue();
     return simulateDelay(undefined as any, 1200);
+  }
+}
+
+// ─── LISTEN SERVICE ───────────────────────────────────────────────────────────
+
+@Injectable({ providedIn: 'root' })
+export class MockListenService {
+  private readonly audioService = inject(MockAudioService);
+  private readonly cardService = inject(MockCardService);
+
+  private _queue = signal<Card[]>([]);
+  private _currentIndex = signal(0);
+  private _isPlaying = signal(false);
+  private _playbackMode = signal<'word-meaning' | 'examples-only' | 'deep-dive'>('word-meaning');
+  private _playbackSpeed = signal<number>(1.0);
+  private _isShuffled = signal(false);
+  private _activeSourceLabel = signal("Today's due words");
+  private _ratingWindowVisible = signal(false);
+  private _ratingCountdown = signal(3);
+  private _playbackCancelled = false;
+  private _ratingTimer: ReturnType<typeof setTimeout> | null = null;
+
+  readonly queue = this._queue.asReadonly();
+  readonly currentIndex = this._currentIndex.asReadonly();
+  readonly isPlaying = this._isPlaying.asReadonly();
+  readonly playbackMode = this._playbackMode.asReadonly();
+  readonly playbackSpeed = this._playbackSpeed.asReadonly();
+  readonly isShuffled = this._isShuffled.asReadonly();
+  readonly activeSourceLabel = this._activeSourceLabel.asReadonly();
+  readonly ratingWindowVisible = this._ratingWindowVisible.asReadonly();
+  readonly ratingCountdown = this._ratingCountdown.asReadonly();
+  readonly currentCard = computed<Card | null>(() => {
+    const q = this._queue();
+    const i = this._currentIndex();
+    return q.length > 0 ? (q[i] ?? null) : null;
+  });
+
+  loadPlaylist(cards: Card[], label: string): void {
+    this.pause();
+    this._queue.set([...cards]);
+    this._currentIndex.set(0);
+    this._activeSourceLabel.set(label);
+  }
+
+  play(): void {
+    if (this._isPlaying()) return;
+    this._playbackCancelled = false;
+    this._isPlaying.set(true);
+    this._playCurrentCard();
+  }
+
+  pause(): void {
+    this._playbackCancelled = true;
+    this._isPlaying.set(false);
+    this.audioService.stop();
+    this._clearRatingTimer();
+    this._ratingWindowVisible.set(false);
+  }
+
+  togglePlay(): void {
+    if (this._isPlaying()) this.pause();
+    else this.play();
+  }
+
+  next(): void {
+    const wasPlaying = this._isPlaying();
+    this.pause();
+    const next = this._currentIndex() + 1;
+    if (next < this._queue().length) {
+      this._currentIndex.set(next);
+      if (wasPlaying) this.play();
+    }
+  }
+
+  prev(): void {
+    const wasPlaying = this._isPlaying();
+    this.pause();
+    const prev = this._currentIndex() - 1;
+    if (prev >= 0) {
+      this._currentIndex.set(prev);
+      if (wasPlaying) this.play();
+    }
+  }
+
+  seekTo(index: number): void {
+    const wasPlaying = this._isPlaying();
+    this.pause();
+    this._currentIndex.set(index);
+    if (wasPlaying) this.play();
+  }
+
+  setMode(mode: 'word-meaning' | 'examples-only' | 'deep-dive'): void {
+    this._playbackMode.set(mode);
+  }
+
+  setSpeed(speed: number): void {
+    this._playbackSpeed.set(speed);
+  }
+
+  toggleShuffle(): void {
+    const enabling = !this._isShuffled();
+    this._isShuffled.set(enabling);
+    if (enabling) {
+      const current = this.currentCard();
+      const q = [...this._queue()];
+      for (let i = q.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [q[i], q[j]] = [q[j], q[i]];
+      }
+      this._queue.set(q);
+      if (current) {
+        const newIdx = q.findIndex(c => c.id === current.id);
+        this._currentIndex.set(newIdx >= 0 ? newIdx : 0);
+      }
+    }
+  }
+
+  rateCurrentCard(rating: ConfidenceRating): void {
+    this._ratingWindowVisible.set(false);
+    this._clearRatingTimer();
+    const card = this.currentCard();
+    if (card) {
+      this.cardService.rateCard(card.id, rating).subscribe();
+    }
+    this._advanceOrComplete();
+  }
+
+  dismissRating(): void {
+    this._ratingWindowVisible.set(false);
+    this._clearRatingTimer();
+    this._advanceOrComplete();
+  }
+
+  private async _playCurrentCard(): Promise<void> {
+    const card = this.currentCard();
+    if (!card || this._playbackCancelled) {
+      this._isPlaying.set(false);
+      return;
+    }
+    const utterances = this._buildUtterances(card, this._playbackMode());
+    for (const utt of utterances) {
+      if (this._playbackCancelled) return;
+      await this._speakPromise(utt.text, utt.lang, this._playbackSpeed());
+      if (utt.pause && !this._playbackCancelled) {
+        await this._sleep(utt.pause);
+      }
+    }
+    if (!this._playbackCancelled) {
+      this._showRatingWindow();
+    }
+  }
+
+  private _buildUtterances(card: Card, mode: 'word-meaning' | 'examples-only' | 'deep-dive'): { text: string; lang: string; pause?: number }[] {
+    const article = card.content.article ?? '';
+    const word = card.content.back;
+    const articleWord = article ? `${article} ${word}` : word;
+    const translation = card.content.front;
+    const example = card.content.examples[0];
+
+    if (mode === 'word-meaning') {
+      return [
+        { text: articleWord, lang: 'de-DE', pause: 800 },
+        { text: translation, lang: 'en-US', pause: 1200 },
+      ];
+    }
+    if (mode === 'examples-only') {
+      const items: { text: string; lang: string; pause?: number }[] = [
+        { text: word, lang: 'de-DE', pause: 600 },
+      ];
+      if (example) {
+        items.push({ text: example.target, lang: 'de-DE', pause: 800 });
+        items.push({ text: example.native, lang: 'en-US', pause: 1200 });
+      }
+      return items;
+    }
+    // deep-dive
+    const items: { text: string; lang: string; pause?: number }[] = [
+      { text: articleWord, lang: 'de-DE', pause: 600 },
+      { text: translation, lang: 'en-US', pause: 600 },
+    ];
+    if (example) {
+      items.push({ text: example.target, lang: 'de-DE', pause: 800 });
+      items.push({ text: example.native, lang: 'en-US', pause: 800 });
+    }
+    if (card.content.notes) {
+      items.push({ text: card.content.notes, lang: 'en-US', pause: 1200 });
+    }
+    return items;
+  }
+
+  private _speakPromise(text: string, lang: string, rate: number): Promise<void> {
+    return new Promise(resolve => {
+      this.audioService.speak(text, lang, rate).subscribe({
+        next: () => resolve(),
+        error: () => resolve(),
+        complete: () => resolve(),
+      });
+    });
+  }
+
+  private _sleep(ms: number): Promise<void> {
+    return new Promise(resolve => setTimeout(resolve, ms));
+  }
+
+  private _showRatingWindow(): void {
+    this._ratingWindowVisible.set(true);
+    this._ratingCountdown.set(3);
+    const tick = () => {
+      const current = this._ratingCountdown();
+      if (current <= 1) {
+        this._ratingWindowVisible.set(false);
+        this._advanceOrComplete();
+      } else {
+        this._ratingCountdown.set(current - 1);
+        this._ratingTimer = setTimeout(tick, 1000);
+      }
+    };
+    this._ratingTimer = setTimeout(tick, 1000);
+  }
+
+  private _clearRatingTimer(): void {
+    if (this._ratingTimer !== null) {
+      clearTimeout(this._ratingTimer);
+      this._ratingTimer = null;
+    }
+  }
+
+  private _advanceOrComplete(): void {
+    const next = this._currentIndex() + 1;
+    if (next >= this._queue().length) {
+      this._isPlaying.set(false);
+      this._currentIndex.set(0);
+    } else {
+      this._currentIndex.set(next);
+      if (this._isPlaying()) {
+        setTimeout(() => this._playCurrentCard(), 500);
+      }
+    }
   }
 }
 

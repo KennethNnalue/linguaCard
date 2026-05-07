@@ -1,3 +1,128 @@
-<p>
-  add-word-sheet works!
-</p>
+<ion-header class="ion-no-border">
+  <ion-toolbar>
+    <div class="aw-nav">
+      <button class="aw-close-btn" (click)="dismiss()" aria-label="Close">
+        <ion-icon name="close-outline"></ion-icon>
+      </button>
+      <span class="aw-title lc-display">Add New Word</span>
+      <div class="aw-nav-spacer"></div>
+    </div>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+  <form [formGroup]="form" (ngSubmit)="save()" class="aw-form">
+
+    <!-- Language direction (visual only) -->
+    <div class="aw-field">
+      <p class="aw-lbl">Language direction</p>
+      <div class="aw-lang-row">
+        <div class="aw-lang-chip aw-lang-chip--active">🇬🇧 English</div>
+        <span class="aw-lang-arrow">→</span>
+        <div class="aw-lang-chip aw-lang-chip--active">🇩🇪 German</div>
+      </div>
+    </div>
+
+    <!-- Front — English -->
+    <div class="aw-field">
+      <p class="aw-lbl">Front — English</p>
+      <input
+        class="aw-input"
+        [class.aw-input--error]="form.get('front')?.invalid && form.get('front')?.touched"
+        type="text"
+        placeholder="e.g. the train"
+        formControlName="front"
+        autocomplete="off" />
+    </div>
+
+    <!-- Back — German -->
+    <div class="aw-field">
+      <p class="aw-lbl">Back — German <span class="aw-lbl-hint">(article auto-detected)</span></p>
+      <div class="aw-back-row">
+        <!-- Tappable article badge — cycles through der / die / das / none -->
+        <button
+          type="button"
+          class="aw-art-badge"
+          [class.lc-article-badge--der]="form.get('article')?.value === 'der'"
+          [class.lc-article-badge--die]="form.get('article')?.value === 'die'"
+          [class.lc-article-badge--das]="form.get('article')?.value === 'das'"
+          [class.aw-art-badge--empty]="!form.get('article')?.value"
+          (click)="selectArticle(
+            form.get('article')?.value === 'der' ? 'die'
+            : form.get('article')?.value === 'die' ? 'das'
+            : form.get('article')?.value === 'das' ? null
+            : 'der'
+          )">
+          {{ form.get('article')?.value || '—' }}
+        </button>
+        <input
+          class="aw-input aw-input--grow"
+          [class.aw-input--error]="form.get('back')?.invalid && form.get('back')?.touched"
+          type="text"
+          placeholder="German word (e.g. Zug)"
+          formControlName="back"
+          autocomplete="off" />
+      </div>
+    </div>
+
+    <!-- Category -->
+    <div class="aw-field">
+      <p class="aw-lbl">Category</p>
+      <div class="aw-chip-row">
+        @for (cat of categories(); track cat.id) {
+          <button
+            type="button"
+            class="aw-cat-chip"
+            [class.aw-cat-chip--selected]="form.get('categoryId')?.value === cat.id"
+            (click)="selectCategory(cat.id)">
+            {{ cat.name }}
+          </button>
+        }
+        <button type="button" class="aw-cat-chip aw-cat-chip--new">
+          <ion-icon name="add-outline"></ion-icon>
+          New
+        </button>
+      </div>
+    </div>
+
+    <!-- Example sentence -->
+    <div class="aw-field">
+      <p class="aw-lbl">Example sentence</p>
+      <div class="aw-example-wrap">
+        <textarea
+          class="aw-textarea"
+          placeholder="German sentence (e.g. Der Zug fährt um 8 Uhr ab.)"
+          formControlName="exampleTarget"
+          rows="2"></textarea>
+        <div class="aw-example-sep"></div>
+        <textarea
+          class="aw-textarea aw-textarea--translation"
+          placeholder='"English translation"'
+          formControlName="exampleNative"
+          rows="2"></textarea>
+      </div>
+    </div>
+
+    <!-- Pronunciation -->
+    <div class="aw-field">
+      <p class="aw-lbl">Pronunciation</p>
+      <div class="aw-pron-row">
+        <button type="button" class="aw-pron-btn">
+          <ion-icon name="mic-outline"></ion-icon>
+          Record
+        </button>
+        <button type="button" class="aw-pron-btn aw-pron-btn--tts" (click)="playTTS()">
+          <ion-icon name="volume-high-outline"></ion-icon>
+          Use TTS
+        </button>
+      </div>
+    </div>
+
+    <!-- Save -->
+    <button type="submit" class="aw-save-btn" [disabled]="saving()">
+      @if (saving()) { Saving… } @else { Save to Vault }
+    </button>
+
+    <div style="height: 40px;"></div>
+  </form>
+</ion-content>

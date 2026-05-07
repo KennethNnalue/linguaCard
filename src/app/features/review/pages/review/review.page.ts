@@ -3,10 +3,18 @@ import { toObservable } from '@angular/core/rxjs-interop';
 import { filter, take } from 'rxjs';
 import { NavController } from '@ionic/angular';
 import { IonContent, IonHeader, IonIcon, IonToolbar } from '@ionic/angular/standalone';
+import { addIcons } from 'ionicons';
+import {
+  checkmarkCircleOutline,
+  chevronBackOutline,
+  chevronDownOutline,
+  chevronForwardOutline,
+  flagOutline,
+  volumeHighOutline,
+} from 'ionicons/icons';
 import { Card, ConfidenceRating } from '../../../../core/models/mock-data';
-import { MockAudioService, MockReviewService } from '../../../../core/services/mock-services';
+import { MockAudioService, MockCategoryService, MockReviewService } from '../../../../core/services/mock-services';
 import { CardStore } from '../../../../core/store/card.store';
-import { ArticleBadgeComponent } from '../../../../shared/components/article-badge/article-badge.component';
 
 const RATINGS: { value: ConfidenceRating; label: string }[] = [
   { value: 0, label: 'Blank' },
@@ -20,15 +28,27 @@ const RATINGS: { value: ConfidenceRating; label: string }[] = [
 @Component({
   selector: 'app-review',
   templateUrl: './review.page.html',
-  styleUrls: ['./review.page.scss'],
-  imports: [IonContent, IonIcon, IonToolbar, IonHeader, ArticleBadgeComponent],
+  styleUrls: ['./review.page.scss', './review.card.scss', './review.rating.scss'],
+  imports: [IonContent, IonIcon, IonToolbar, IonHeader],
 })
 export class ReviewPage implements OnInit {
   private readonly cardStore = inject(CardStore);
   private readonly reviewService = inject(MockReviewService);
   private readonly audioService = inject(MockAudioService);
+  private readonly categoryService = inject(MockCategoryService);
   private readonly navCtrl = inject(NavController);
   private readonly injector = inject(Injector);
+
+  constructor() {
+    addIcons({
+      chevronBackOutline,
+      chevronDownOutline,
+      chevronForwardOutline,
+      flagOutline,
+      volumeHighOutline,
+      checkmarkCircleOutline,
+    });
+  }
 
   readonly ratings = RATINGS;
   readonly queue = signal<Card[]>([]);
@@ -37,19 +57,16 @@ export class ReviewPage implements OnInit {
   readonly sessionComplete = signal(false);
   readonly sessionId = signal<string | null>(null);
 
-  // Non-null by design: the template only accesses currentCard() when the queue is non-empty
-  readonly currentCard = computed<Card>(
-    () => this.queue()[this.currentIndex()],
-  );
+  // Non-null by design: template only accesses this when queue is non-empty
+  readonly currentCard = computed<Card>(() => this.queue()[this.currentIndex()]);
+
   readonly progressPercent = computed(() =>
-    this.queue().length
-      ? (this.currentIndex() / this.queue().length) * 100
-      : 0,
+    this.queue().length ? (this.currentIndex() / this.queue().length) * 100 : 0,
   );
+
   readonly sessionStats = computed(() => {
     const session = this.reviewService.activeSession();
-    const ratingsMap = session?.ratings ?? {};
-    const ratingsArray = Object.values(ratingsMap) as ConfidenceRating[];
+    const ratingsArray = Object.values(session?.ratings ?? {}) as ConfidenceRating[];
     return {
       reviewed: ratingsArray.length,
       newLearned: this.queue().filter(c => c.srsState?.state === 'new').length,
@@ -57,20 +74,36 @@ export class ReviewPage implements OnInit {
     };
   });
 
+  readonly activeCategoryNames = computed(() => {
+    const queue = this.queue();
+    if (!queue.length) return '';
+    const cats = this.categoryService.categories();
+    const ids = [...new Set(queue.flatMap(c => c.categoryIds))];
+    return ids
+      .map(id => cats.find(c => c.id === id)?.name)
+      .filter(Boolean)
+      .slice(0, 3)
+      .join(' · ') as string;
+  });
+
+  readonly currentArticleLabel = computed(() => {
+    const card = this.currentCard();
+    if (!card?.content.article) return '';
+    const genderMap: Record<string, string> = {
+      der: 'masculine', die: 'feminine', das: 'neuter',
+    };
+    const gender = card.content.gender ?? genderMap[card.content.article] ?? '';
+    return `${card.content.article} — ${gender}`;
+  });
+
   ngOnInit(): void {
-    // Wait for the store to finish loading, then seed the review queue
     toObservable(this.cardStore.isLoading, { injector: this.injector })
-      .pipe(
-        filter(loading => !loading),
-        take(1),
-      )
+      .pipe(filter(loading => !loading), take(1))
       .subscribe(() => {
         const dueCards = this.cardStore.dueCards();
         this.queue.set(dueCards);
         if (dueCards.length) {
-          this.reviewService
-            .startSession(dueCards)
-            .subscribe(s => this.sessionId.set(s.id));
+          this.reviewService.startSession(dueCards).subscribe(s => this.sessionId.set(s.id));
         }
       });
   }
@@ -94,22 +127,21 @@ export class ReviewPage implements OnInit {
     event.stopPropagation();
     const card = this.currentCard();
     if (!card) return;
-    const text =
-      (card.content.article ? card.content.article + ' ' : '') +
-      card.content.back;
+    const text = (card.content.article ? card.content.article + ' ' : '') + card.content.back;
     this.audioService.speak(text, 'de-DE').subscribe();
   }
 
   flagCard(): void {
-    /* TODO: implement flag via API */
+    // TODO: implement flag via API
   }
 
   exitSession(): void {
     this.navCtrl.back();
   }
 
-  activeCategoryNames(): string {
-    return 'All categories';
+  highlightWord(sentence: string, word: string): string {
+    const escaped = word.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+    return sentence.replace(new RegExp(`(${escaped})`, 'gi'), '<strong>$1</strong>');
   }
 
   private advance(): void {

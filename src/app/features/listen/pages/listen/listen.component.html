@@ -1,3 +1,238 @@
-<p>
-  listen works!
-</p>
+<ion-header class="ion-no-border">
+  <ion-toolbar>
+    <div class="lt-nav">
+      <button class="lt-icon-btn" (click)="goBack()" aria-label="Go back">
+        <ion-icon name="chevron-back-outline"></ion-icon>
+      </button>
+      <span class="lt-nav-title lc-display">
+        {{ inPlayerView() ? 'Now Playing' : 'Listen & Learn' }}
+      </span>
+      <button class="lt-icon-btn" (click)="openSourceSelector()" aria-label="Choose playlist">
+        <ion-icon name="ellipsis-horizontal-outline"></ion-icon>
+      </button>
+    </div>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+
+  <!-- ══ BROWSER VIEW ══════════════════════════════════════════════════════ -->
+  @if (!inPlayerView()) {
+
+    <!-- Hero card -->
+    <div class="lt-hero">
+      <p class="lt-hero-label">Playing from</p>
+      <h2 class="lt-hero-title lc-display">{{ activeSourceLabel() }}</h2>
+      <p class="lt-hero-meta">{{ activeCategoryNames() }}</p>
+      <div class="lt-hero-actions">
+        <button
+          class="lt-hero-play"
+          (click)="startPlayback()"
+          [disabled]="!queue().length"
+          aria-label="Play playlist">
+          <ion-icon name="play-outline"></ion-icon>
+        </button>
+        <button
+          class="lt-hero-shuffle"
+          (click)="toggleShuffle()"
+          [class.lt-hero-shuffle--active]="isShuffled()">
+          <ion-icon name="shuffle-outline"></ion-icon>
+          Shuffle
+        </button>
+      </div>
+    </div>
+
+    <!-- Playlist type chips -->
+    <div class="lt-mode-section">
+      <p class="lt-section-lbl">Playlist type</p>
+      <div class="lt-mode-chips">
+        @for (m of MODES; track m.value) {
+          <button
+            class="lt-mode-chip"
+            [class.lt-mode-chip--active]="playbackMode() === m.value"
+            (click)="setMode(m.value)">
+            <span class="lt-mode-chip-name">{{ m.label }}</span>
+            <span class="lt-mode-chip-desc">{{ m.desc }}</span>
+          </button>
+        }
+      </div>
+    </div>
+
+    <!-- Queue header -->
+    <div class="lt-queue-hdr">
+      <span class="lt-queue-title">Queue ({{ queue().length }} words)</span>
+      <span class="lt-queue-meta">~{{ estimatedMinutes() }} min</span>
+    </div>
+
+    <!-- Queue list -->
+    <div class="lt-queue-list">
+      @if (!queue().length) {
+        <div class="lc-empty-state">
+          <span class="lc-empty-icon">🎧</span>
+          <p class="lc-empty-title">No words in queue</p>
+          <p class="lc-empty-sub">Tap ⋯ above to choose a playlist source</p>
+        </div>
+      } @else {
+        @for (card of queue(); track card.id; let i = $index) {
+          <div
+            class="lt-q-item"
+            [class.lt-q-item--active]="i === currentIndex()"
+            (click)="seekAndPlay(i)">
+            <span class="lt-q-num">
+              @if (i === currentIndex() && isPlaying()) {
+                <span class="lt-wave" aria-hidden="true">
+                  <span></span><span></span><span></span><span></span><span></span>
+                </span>
+              } @else {
+                {{ i + 1 }}
+              }
+            </span>
+            <div class="lt-q-info">
+              <div class="lt-q-word-row">
+                @if (card.content.article) {
+                  <app-article-badge [article]="card.content.article"></app-article-badge>
+                }
+                <span class="lt-q-word">
+                  {{ card.content.article ? card.content.article + ' ' : '' }}{{ card.content.back }}
+                </span>
+              </div>
+              <span class="lt-q-sub">{{ card.content.front }}</span>
+            </div>
+            <span class="lt-q-dur">
+              ~0:{{ card.content.examples.length ? '09' : '05' }}
+            </span>
+          </div>
+        }
+      }
+    </div>
+
+    <div style="height: 24px;"></div>
+
+  }
+
+  <!-- ══ PLAYER VIEW ═══════════════════════════════════════════════════════ -->
+  @if (inPlayerView()) {
+    <div class="lt-player">
+
+      <!-- Art card -->
+      <div class="lt-art" [class]="playerArtClass()">
+        @if (currentCard()?.content?.article) {
+          <span class="lc-article-badge lc-article-badge--{{ currentCard()!.content.article }} lt-art-article">
+            {{ currentArticleLabel() }}
+          </span>
+        }
+        <p class="lt-art-word lc-display">{{ currentCard()?.content?.back }}</p>
+        @if (currentCard()?.content?.phonetic) {
+          <p class="lt-art-phonetic">{{ currentCard()!.content.phonetic }}</p>
+        }
+        <p class="lt-art-category">{{ currentCardCategory() }}</p>
+      </div>
+
+      <!-- Translation + example -->
+      <div class="lt-player-meta">
+        <p class="lt-translation">{{ currentCard()?.content?.front }}</p>
+        @if (currentCard()?.content?.examples?.length) {
+          <p class="lt-example">
+            <strong>{{ currentCard()!.content.examples[0].target }}</strong>
+          </p>
+          <p class="lt-example-en">"{{ currentCard()!.content.examples[0].native }}"</p>
+        }
+      </div>
+
+      <!-- Speed controls -->
+      <div class="lt-speed-row">
+        <span class="lt-speed-lbl">Speed</span>
+        @for (s of SPEED_OPTIONS; track s) {
+          <button
+            class="lt-speed-chip"
+            [class.lt-speed-chip--active]="playbackSpeed() === s"
+            (click)="setSpeed(s)">
+            {{ s }}×
+          </button>
+        }
+      </div>
+
+      <!-- Mode switcher -->
+      <div class="lt-mode-row">
+        @for (m of MODES; track m.value) {
+          <button
+            class="lt-mode-btn"
+            [class.lt-mode-btn--active]="playbackMode() === m.value"
+            (click)="setMode(m.value)">
+            <span class="lt-mb-name">{{ m.label }}</span>
+            <span class="lt-mb-desc">{{ m.desc }}</span>
+          </button>
+        }
+      </div>
+
+      <!-- Progress track -->
+      <div class="lt-progress">
+        <div class="lt-prog-track">
+          <div class="lt-prog-fill" [style.width.%]="progressPercent()"></div>
+          <div class="lt-prog-thumb" [style.left.%]="progressPercent()"></div>
+        </div>
+        <div class="lt-prog-labels">
+          <span>{{ currentIndex() + 1 }} / {{ queue().length }}</span>
+          <span>~{{ estimatedMinutes() }} min</span>
+        </div>
+      </div>
+
+      <!-- Playback controls -->
+      <div class="lt-controls">
+        <button
+          class="lt-ctrl-btn"
+          [class.lt-ctrl-btn--active]="isShuffled()"
+          (click)="toggleShuffle()"
+          aria-label="Shuffle">
+          <ion-icon name="shuffle-outline"></ion-icon>
+        </button>
+        <button
+          class="lt-ctrl-btn"
+          (click)="prev()"
+          [disabled]="currentIndex() === 0"
+          aria-label="Previous">
+          <ion-icon name="play-skip-back-outline"></ion-icon>
+        </button>
+        <button class="lt-play-large" (click)="togglePlay()" aria-label="Play / Pause">
+          <ion-icon [name]="isPlaying() ? 'pause-outline' : 'play-outline'"></ion-icon>
+        </button>
+        <button
+          class="lt-ctrl-btn"
+          (click)="next()"
+          [disabled]="currentIndex() >= queue().length - 1"
+          aria-label="Next">
+          <ion-icon name="play-skip-forward-outline"></ion-icon>
+        </button>
+        <button class="lt-ctrl-btn" aria-label="Repeat">
+          <ion-icon name="repeat-outline"></ion-icon>
+        </button>
+      </div>
+
+    </div>
+
+    <!-- ── Rating overlay ──────────────────────────────────────────────── -->
+    @if (ratingWindowVisible()) {
+      <div class="lt-rating-overlay" (click)="dismissRating()">
+        <div class="lt-rating-sheet" (click)="$event.stopPropagation()">
+          <div class="lt-rating-hdr">
+            <p class="lt-rating-prompt">How well do you know this?</p>
+            <span class="lt-rating-countdown">{{ ratingCountdown() }}s</span>
+          </div>
+          <div class="lt-rating-row">
+            @for (r of RATINGS; track r.value) {
+              <button
+                class="lt-rating-btn lt-rating-btn--{{ r.value }}"
+                (click)="rateCard(r.value)">
+                <span class="lt-r-num">{{ r.value }}</span>
+                <span class="lt-r-lbl">{{ r.label }}</span>
+              </button>
+            }
+          </div>
+          <button class="lt-rating-skip" (click)="dismissRating()">Skip rating</button>
+        </div>
+      </div>
+    }
+
+  }
+
+</ion-content>

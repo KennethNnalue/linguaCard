@@ -1,0 +1,106 @@
+// ─── NAV ─────────────────────────────────────────────────────────────────────
+
+.vault-nav {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 16px 14px;
+}
+
+.vault-title {
+  font-size: 26px;
+  font-weight: 600;
+  color: var(--lc-text-primary);
+  margin: 0;
+  line-height: 1.2;
+}
+
+// ─── SEARCH ──────────────────────────────────────────────────────────────────
+
+.vault-search {
+  padding: 0 14px 10px;
+}
+
+// ─── CATEGORY CHIPS ──────────────────────────────────────────────────────────
+
+.cat-scroll {
+  display: flex;
+  gap: 8px;
+  padding: 0 14px 12px;
+  overflow-x: auto;
+  scrollbar-width: none;
+
+  &::-webkit-scrollbar { display: none; }
+}
+
+// ─── ARTICLE LEGEND ──────────────────────────────────────────────────────────
+
+.article-legend-sm {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 2px 16px 10px;
+}
+
+.legend-item {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.legend-lbl {
+  font-size: 10px;
+  font-weight: 500;
+  color: var(--lc-text-hint);
+}
+
+.sort-btn {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 11px;
+  font-weight: 500;
+  color: var(--lc-text-hint);
+  cursor: pointer;
+  padding: 4px 8px;
+  border-radius: var(--lc-radius-full);
+  transition: var(--lc-transition-fast);
+
+  ion-icon { font-size: 13px; }
+
+  &:active {
+    background: var(--lc-brand-light);
+    color: var(--lc-brand);
+  }
+}
+
+// ─── WORD LIST ────────────────────────────────────────────────────────────────
+
+.word-list {
+  padding: 0 14px 32px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+// Local overrides — more generous padding + larger typography vs global defaults
+.word-item-padded {
+  padding: 14px 16px;
+  cursor: pointer;
+
+  .lc-word-front {
+    font-size: 15px;
+    font-weight: 600;
+  }
+
+  .lc-word-back {
+    font-size: 12px;
+    margin-top: 2px;
+  }
+}
+
+// Mastery dot slightly larger than the 8px global default
+:host ::ng-deep app-mastery-dot .lc-mastery-dot {
+  width: 10px;
+  height: 10px;
+}

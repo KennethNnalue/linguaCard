@@ -1,3 +1,128 @@
-<p>
-  word-detail works!
-</p>
+<ion-header class="ion-no-border">
+  <ion-toolbar>
+    <div class="wd-nav">
+      <button class="wd-icon-btn" (click)="goBack()" aria-label="Go back">
+        <ion-icon name="chevron-back-outline"></ion-icon>
+      </button>
+      <span class="wd-nav-title lc-display">Word Detail</span>
+      <button class="wd-icon-btn wd-icon-btn--outline" aria-label="More options">
+        <ion-icon name="ellipsis-horizontal-outline"></ion-icon>
+      </button>
+    </div>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+  @if (card(); as word) {
+    <div class="wd-content">
+
+      <!-- Word header -->
+      <div class="wd-header">
+        <div class="wd-word-row">
+          <app-article-badge [article]="word.content.article"></app-article-badge>
+          <h1 class="wd-word lc-display">{{ word.content.back }}</h1>
+        </div>
+        <p class="wd-sub">
+          @if (word.content.phonetic) {
+            {{ word.content.phonetic }} ·
+          }
+          {{ word.content.front }}
+        </p>
+        <div class="wd-meta-row">
+          <div class="wd-status-pill">
+            <span class="wd-status-dot" [style.background]="masteryColor()"></span>
+            {{ masteryLabel() }}
+          </div>
+          @if (categoryName()) {
+            <span class="lc-word-tag">{{ categoryName() }}</span>
+          }
+          @for (tag of word.tags; track tag) {
+            <span class="lc-word-tag">{{ tag }}</span>
+          }
+        </div>
+        <button class="wd-audio-btn" (click)="playPronunciation()">
+          <ion-icon name="volume-high-outline"></ion-icon>
+          Play pronunciation
+        </button>
+      </div>
+
+      <div class="wd-divider"></div>
+
+      <!-- Mastery progress -->
+      <div class="wd-section">
+        <p class="wd-sec-lbl">Mastery progress</p>
+        <div class="lc-progress-track">
+          <div class="lc-progress-fill"
+               [style.width.%]="masteryPercent()"
+               [style.background]="masteryColor()">
+          </div>
+        </div>
+        <div class="wd-mastery-meta">
+          <span>Level {{ word.srsState?.masteryLevel }} — {{ masteryLabel() }}</span>
+          <span>{{ nextReviewText() }}</span>
+        </div>
+        <div class="wd-info-grid">
+          <div class="wd-info-cell lc-card">
+            <p class="wd-info-val lc-display">{{ word.srsState?.repetitions ?? 0 }}</p>
+            <p class="wd-info-lbl">Total reviews</p>
+          </div>
+          <div class="wd-info-cell lc-card">
+            <p class="wd-info-val lc-display">
+              {{ word.srsState?.lastRating != null ? word.srsState!.lastRating + '.0' : '—' }}
+            </p>
+            <p class="wd-info-lbl">Last rating</p>
+          </div>
+          <div class="wd-info-cell lc-card">
+            <p class="wd-info-val lc-display">{{ intervalText() }}</p>
+            <p class="wd-info-lbl">Interval</p>
+          </div>
+          <div class="wd-info-cell lc-card">
+            <p class="wd-info-val lc-display">{{ lastReviewedText() }}</p>
+            <p class="wd-info-lbl">Last reviewed</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="wd-divider"></div>
+
+      <!-- Example sentences -->
+      @if (word.content.examples.length) {
+        <div class="wd-section">
+          <p class="wd-sec-lbl">Your example sentences</p>
+          @for (ex of word.content.examples; track ex.id) {
+            <div class="wd-example-block">
+              <p class="wd-ex-de" [innerHTML]="highlightWord(ex.target, word.content.back)"></p>
+              <p class="wd-ex-en">"{{ ex.native }}"</p>
+            </div>
+          }
+          @if (word.content.notes) {
+            <div class="wd-note-pill">
+              <span class="wd-note-icon">💡</span>
+              <p class="wd-note-text">{{ word.content.notes }}</p>
+            </div>
+          }
+        </div>
+      }
+
+      <div style="height: 88px;"></div>
+    </div>
+  } @else {
+    <div class="lc-empty-state">
+      <span class="lc-empty-icon">🔍</span>
+      <p class="lc-empty-title">Word not found</p>
+      <p class="lc-empty-sub">This word may have been removed from your vault.</p>
+    </div>
+  }
+</ion-content>
+
+<!-- Sticky bottom actions — outside ion-content so they don't scroll -->
+<div class="wd-actions">
+  <button class="wd-act-btn" (click)="openEdit()">
+    <ion-icon name="create-outline"></ion-icon>
+    Edit word
+  </button>
+  <button class="wd-act-btn wd-act-del" (click)="confirmDelete()">
+    <ion-icon name="trash-outline"></ion-icon>
+    Delete
+  </button>
+</div>
