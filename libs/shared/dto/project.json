@@ -1,0 +1,16 @@
+{
+  "$schema": "../../../node_modules/nx/schemas/project-schema.json",
+  "name": "shared-dto",
+  "projectType": "library",
+  "sourceRoot": "libs/shared/dto/src",
+  "tags": ["scope:shared", "type:dto"],
+  "targets": {
+    "lint": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "tsc --noEmit -p tsconfig.json",
+        "cwd": "libs/shared/dto"
+      }
+    }
+  }
+}
