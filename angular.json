@@ -1,9 +1,9 @@
 {
   "$schema": "./node_modules/@angular/cli/lib/config/schema.json",
   "version": 1,
-  "newProjectRoot": "projects",
+  "newProjectRoot": "apps",
   "projects": {
-    "app": {
+    "mobile": {
       "projectType": "application",
       "schematics": {
         "@ionic/angular-toolkit:page": {
@@ -11,8 +11,8 @@
           "standalone": true
         }
       },
-      "root": "",
-      "sourceRoot": "src",
+      "root": "apps/mobile",
+      "sourceRoot": "apps/mobile/src",
       "prefix": "app",
       "architect": {
         "build": {
@@ -22,22 +22,25 @@
               "base": "www",
               "browser": ""
             },
-            "index": "src/index.html",
+            "index": "apps/mobile/src/index.html",
             "polyfills": [
-              "src/polyfills.ts"
+              "apps/mobile/src/polyfills.ts"
             ],
-            "tsConfig": "tsconfig.app.json",
+            "tsConfig": "apps/mobile/tsconfig.app.json",
             "inlineStyleLanguage": "scss",
             "assets": [
               {
                 "glob": "**/*",
-                "input": "src/assets",
+                "input": "apps/mobile/src/assets",
                 "output": "assets"
               }
             ],
-            "styles": ["src/global.scss", "src/theme/variables.scss"],
+            "styles": [
+              "apps/mobile/src/global.scss",
+              "apps/mobile/src/theme/variables.scss"
+            ],
             "scripts": [],
-            "browser": "src/main.ts"
+            "browser": "apps/mobile/src/main.ts"
           },
           "configurations": {
             "production": {
@@ -55,8 +58,8 @@
               ],
               "fileReplacements": [
                 {
-                  "replace": "src/environments/environment.ts",
-                  "with": "src/environments/environment.prod.ts"
+                  "replace": "apps/mobile/src/environments/environment.ts",
+                  "with": "apps/mobile/src/environments/environment.prod.ts"
                 }
               ],
               "outputHashing": "all",
@@ -78,10 +81,10 @@
           "builder": "@angular/build:dev-server",
           "configurations": {
             "production": {
-              "buildTarget": "app:build:production"
+              "buildTarget": "mobile:build:production"
             },
             "development": {
-              "buildTarget": "app:build:development"
+              "buildTarget": "mobile:build:development"
             },
             "ci": {
               "progress": false
@@ -92,13 +95,16 @@
         "extract-i18n": {
           "builder": "@angular/build:extract-i18n",
           "options": {
-            "buildTarget": "app:build"
+            "buildTarget": "mobile:build"
           }
         },
         "lint": {
           "builder": "@angular-eslint/builder:lint",
           "options": {
-            "lintFilePatterns": ["src/**/*.ts", "src/**/*.html"]
+            "lintFilePatterns": [
+              "apps/mobile/src/**/*.ts",
+              "apps/mobile/src/**/*.html"
+            ]
           }
         }
       }
