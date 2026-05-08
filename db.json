@@ -5,8 +5,13 @@
       "deckId": "deck-001",
       "userId": "user-001",
       "contextId": "german-vocab",
-      "categoryIds": ["cat-001"],
-      "tags": ["noun", "animal"],
+      "categoryIds": [
+        "cat-001"
+      ],
+      "tags": [
+        "noun",
+        "animal"
+      ],
       "version": 3,
       "createdAt": "2025-01-15T10:00:00Z",
       "updatedAt": "2025-01-15T10:00:00Z",
@@ -17,8 +22,16 @@
         "gender": "feminine",
         "phonetic": "/ˈkat.sə/",
         "examples": [
-          { "id": "ex-001a", "target": "Die Katze sitzt auf dem Sofa.", "native": "The cat is sitting on the sofa." },
-          { "id": "ex-001b", "target": "Meine Katze heißt Luna.", "native": "My cat is called Luna." }
+          {
+            "id": "ex-001a",
+            "target": "Die Katze sitzt auf dem Sofa.",
+            "native": "The cat is sitting on the sofa."
+          },
+          {
+            "id": "ex-001b",
+            "target": "Meine Katze heißt Luna.",
+            "native": "My cat is called Luna."
+          }
         ],
         "notes": "Always feminine. Plural: die Katzen.",
         "audioAssetId": "audio-001",
@@ -37,15 +50,21 @@
         "nextDueAt": "2026-05-30T00:00:00.000Z",
         "masteryLevel": 5,
         "state": "mastered"
-      }
+      },
+      "collectionId": "col-002"
     },
     {
       "id": "card-002",
       "deckId": "deck-001",
       "userId": "user-001",
       "contextId": "german-vocab",
-      "categoryIds": ["cat-001"],
-      "tags": ["noun", "animal"],
+      "categoryIds": [
+        "cat-001"
+      ],
+      "tags": [
+        "noun",
+        "animal"
+      ],
       "version": 2,
       "createdAt": "2025-01-15T10:05:00Z",
       "updatedAt": "2025-01-15T10:05:00Z",
@@ -56,8 +75,16 @@
         "gender": "masculine",
         "phonetic": "/hʊnt/",
         "examples": [
-          { "id": "ex-002a", "target": "Der Hund bellt laut.", "native": "The dog barks loudly." },
-          { "id": "ex-002b", "target": "Ich gehe mit dem Hund spazieren.", "native": "I am going for a walk with the dog." }
+          {
+            "id": "ex-002a",
+            "target": "Der Hund bellt laut.",
+            "native": "The dog barks loudly."
+          },
+          {
+            "id": "ex-002b",
+            "target": "Ich gehe mit dem Hund spazieren.",
+            "native": "I am going for a walk with the dog."
+          }
         ],
         "notes": "Masculine. Plural: die Hunde.",
         "audioAssetId": "audio-002",
@@ -76,15 +103,21 @@
         "nextDueAt": "2026-05-06T00:00:00.000Z",
         "masteryLevel": 4,
         "state": "review"
-      }
+      },
+      "collectionId": "col-002"
     },
     {
       "id": "card-003",
       "deckId": "deck-001",
       "userId": "user-001",
       "contextId": "german-vocab",
-      "categoryIds": ["cat-001"],
-      "tags": ["noun", "animal"],
+      "categoryIds": [
+        "cat-001"
+      ],
+      "tags": [
+        "noun",
+        "animal"
+      ],
       "version": 1,
       "createdAt": "2025-01-16T09:00:00Z",
       "updatedAt": "2025-01-16T09:00:00Z",
@@ -95,7 +128,11 @@
         "gender": "masculine",
         "phonetic": "/ˈfoː.ɡəl/",
         "examples": [
-          { "id": "ex-003a", "target": "Der Vogel singt im Baum.", "native": "The bird is singing in the tree." }
+          {
+            "id": "ex-003a",
+            "target": "Der Vogel singt im Baum.",
+            "native": "The bird is singing in the tree."
+          }
         ],
         "notes": "Masculine. Plural: die Vögel (umlaut changes!).",
         "audioAssetId": null,
@@ -114,15 +151,21 @@
         "nextDueAt": "2026-05-02T00:00:00.000Z",
         "masteryLevel": 2,
         "state": "learning"
-      }
+      },
+      "collectionId": "col-002"
     },
     {
       "id": "card-004",
       "deckId": "deck-001",
       "userId": "user-001",
       "contextId": "german-vocab",
-      "categoryIds": ["cat-001"],
-      "tags": ["noun", "animal"],
+      "categoryIds": [
+        "cat-001"
+      ],
+      "tags": [
+        "noun",
+        "animal"
+      ],
       "version": 1,
       "createdAt": "2025-01-16T09:10:00Z",
       "updatedAt": "2025-01-16T09:10:00Z",
@@ -133,8 +176,16 @@
         "gender": "neuter",
         "phonetic": "/p͡feːɐ̯t/",
         "examples": [
-          { "id": "ex-004a", "target": "Das Pferd läuft schnell.", "native": "The horse runs fast." },
-          { "id": "ex-004b", "target": "Das Kind reitet auf dem Pferd.", "native": "The child rides on the horse." }
+          {
+            "id": "ex-004a",
+            "target": "Das Pferd läuft schnell.",
+            "native": "The horse runs fast."
+          },
+          {
+            "id": "ex-004b",
+            "target": "Das Kind reitet auf dem Pferd.",
+            "native": "The child rides on the horse."
+          }
         ],
         "notes": "Neuter. Plural: die Pferde.",
         "audioAssetId": null,
@@ -153,15 +204,21 @@
         "nextDueAt": "2026-05-02T00:00:00.000Z",
         "masteryLevel": 0,
         "state": "new"
-      }
+      },
+      "collectionId": "col-002"
     },
     {
       "id": "card-005",
       "deckId": "deck-001",
       "userId": "user-001",
       "contextId": "german-vocab",
-      "categoryIds": ["cat-001"],
-      "tags": ["noun", "animal"],
+      "categoryIds": [
+        "cat-001"
+      ],
+      "tags": [
+        "noun",
+        "animal"
+      ],
       "version": 2,
       "createdAt": "2025-01-17T08:00:00Z",
       "updatedAt": "2025-01-17T08:00:00Z",
@@ -172,7 +229,11 @@
         "gender": "masculine",
         "phonetic": "/fɪʃ/",
         "examples": [
-          { "id": "ex-005a", "target": "Der Fisch schwimmt im Wasser.", "native": "The fish swims in the water." }
+          {
+            "id": "ex-005a",
+            "target": "Der Fisch schwimmt im Wasser.",
+            "native": "The fish swims in the water."
+          }
         ],
         "notes": "Masculine. Plural: die Fische.",
         "audioAssetId": null,
@@ -191,15 +252,21 @@
         "nextDueAt": "2026-05-02T00:00:00.000Z",
         "masteryLevel": 1,
         "state": "learning"
-      }
+      },
+      "collectionId": "col-002"
     },
     {
       "id": "card-006",
       "deckId": "deck-001",
       "userId": "user-001",
       "contextId": "german-vocab",
-      "categoryIds": ["cat-002"],
-      "tags": ["noun", "food"],
+      "categoryIds": [
+        "cat-002"
+      ],
+      "tags": [
+        "noun",
+        "food"
+      ],
       "version": 2,
       "createdAt": "2025-01-17T10:00:00Z",
       "updatedAt": "2025-01-17T10:00:00Z",
@@ -210,8 +277,16 @@
         "gender": "neuter",
         "phonetic": "/bʁoːt/",
         "examples": [
-          { "id": "ex-006a", "target": "Das Brot ist frisch gebacken.", "native": "The bread is freshly baked." },
-          { "id": "ex-006b", "target": "Ich esse Brot zum Frühstück.", "native": "I eat bread for breakfast." }
+          {
+            "id": "ex-006a",
+            "target": "Das Brot ist frisch gebacken.",
+            "native": "The bread is freshly baked."
+          },
+          {
+            "id": "ex-006b",
+            "target": "Ich esse Brot zum Frühstück.",
+            "native": "I eat bread for breakfast."
+          }
         ],
         "notes": "Neuter. Plural: die Brote. Germany is famous for its bread variety!",
         "audioAssetId": "audio-006",
@@ -230,15 +305,22 @@
         "nextDueAt": "2026-05-18T00:00:00.000Z",
         "masteryLevel": 5,
         "state": "mastered"
-      }
+      },
+      "collectionId": "col-001"
     },
     {
       "id": "card-007",
       "deckId": "deck-001",
       "userId": "user-001",
       "contextId": "german-vocab",
-      "categoryIds": ["cat-002"],
-      "tags": ["noun", "food", "drink"],
+      "categoryIds": [
+        "cat-002"
+      ],
+      "tags": [
+        "noun",
+        "food",
+        "drink"
+      ],
       "version": 1,
       "createdAt": "2025-01-18T09:00:00Z",
       "updatedAt": "2025-01-18T09:00:00Z",
@@ -249,8 +331,16 @@
         "gender": "neuter",
         "phonetic": "/ˈvas.ɐ/",
         "examples": [
-          { "id": "ex-007a", "target": "Ich trinke ein Glas Wasser.", "native": "I am drinking a glass of water." },
-          { "id": "ex-007b", "target": "Das Wasser ist kalt.", "native": "The water is cold." }
+          {
+            "id": "ex-007a",
+            "target": "Ich trinke ein Glas Wasser.",
+            "native": "I am drinking a glass of water."
+          },
+          {
+            "id": "ex-007b",
+            "target": "Das Wasser ist kalt.",
+            "native": "The water is cold."
+          }
         ],
         "notes": "Neuter. Uncountable in most contexts.",
         "audioAssetId": null,
@@ -269,15 +359,21 @@
         "nextDueAt": "2026-05-04T00:00:00.000Z",
         "masteryLevel": 3,
         "state": "review"
-      }
+      },
+      "collectionId": "col-001"
     },
     {
       "id": "card-008",
       "deckId": "deck-001",
       "userId": "user-001",
       "contextId": "german-vocab",
-      "categoryIds": ["cat-002"],
-      "tags": ["noun", "food"],
+      "categoryIds": [
+        "cat-002"
+      ],
+      "tags": [
+        "noun",
+        "food"
+      ],
       "version": 2,
       "createdAt": "2025-01-18T10:00:00Z",
       "updatedAt": "2025-01-18T10:00:00Z",
@@ -288,8 +384,16 @@
         "gender": "masculine",
         "phonetic": "/ˈap.fəl/",
         "examples": [
-          { "id": "ex-008a", "target": "Der Apfel ist rot und süß.", "native": "The apple is red and sweet." },
-          { "id": "ex-008b", "target": "Ich esse jeden Tag einen Apfel.", "native": "I eat an apple every day." }
+          {
+            "id": "ex-008a",
+            "target": "Der Apfel ist rot und süß.",
+            "native": "The apple is red and sweet."
+          },
+          {
+            "id": "ex-008b",
+            "target": "Ich esse jeden Tag einen Apfel.",
+            "native": "I eat an apple every day."
+          }
         ],
         "notes": "Masculine. Plural: die Äpfel (umlaut!).",
         "audioAssetId": null,
@@ -308,15 +412,22 @@
         "nextDueAt": "2026-05-04T00:00:00.000Z",
         "masteryLevel": 4,
         "state": "review"
-      }
+      },
+      "collectionId": "col-001"
     },
     {
       "id": "card-009",
       "deckId": "deck-001",
       "userId": "user-001",
       "contextId": "german-vocab",
-      "categoryIds": ["cat-002"],
-      "tags": ["noun", "food", "drink"],
+      "categoryIds": [
+        "cat-002"
+      ],
+      "tags": [
+        "noun",
+        "food",
+        "drink"
+      ],
       "version": 1,
       "createdAt": "2025-01-19T08:00:00Z",
       "updatedAt": "2025-01-19T08:00:00Z",
@@ -327,8 +438,16 @@
         "gender": "masculine",
         "phonetic": "/ˈka.feː/",
         "examples": [
-          { "id": "ex-009a", "target": "Ich trinke morgens immer Kaffee.", "native": "I always drink coffee in the morning." },
-          { "id": "ex-009b", "target": "Darf ich einen Kaffee bestellen?", "native": "May I order a coffee?" }
+          {
+            "id": "ex-009a",
+            "target": "Ich trinke morgens immer Kaffee.",
+            "native": "I always drink coffee in the morning."
+          },
+          {
+            "id": "ex-009b",
+            "target": "Darf ich einen Kaffee bestellen?",
+            "native": "May I order a coffee?"
+          }
         ],
         "notes": "Masculine. Very culturally important in Germany!",
         "audioAssetId": "audio-009",
@@ -347,15 +466,21 @@
         "nextDueAt": "2026-05-02T00:00:00.000Z",
         "masteryLevel": 2,
         "state": "learning"
-      }
+      },
+      "collectionId": "col-001"
     },
     {
       "id": "card-010",
       "deckId": "deck-001",
       "userId": "user-001",
       "contextId": "german-vocab",
-      "categoryIds": ["cat-002"],
-      "tags": ["noun", "food"],
+      "categoryIds": [
+        "cat-002"
+      ],
+      "tags": [
+        "noun",
+        "food"
+      ],
       "version": 1,
       "createdAt": "2025-01-19T09:00:00Z",
       "updatedAt": "2025-01-19T09:00:00Z",
@@ -366,8 +491,16 @@
         "gender": "masculine",
         "phonetic": "/ˈkuː.xən/",
         "examples": [
-          { "id": "ex-010a", "target": "Der Kuchen schmeckt wunderbar.", "native": "The cake tastes wonderful." },
-          { "id": "ex-010b", "target": "Sie backt jeden Sonntag einen Kuchen.", "native": "She bakes a cake every Sunday." }
+          {
+            "id": "ex-010a",
+            "target": "Der Kuchen schmeckt wunderbar.",
+            "native": "The cake tastes wonderful."
+          },
+          {
+            "id": "ex-010b",
+            "target": "Sie backt jeden Sonntag einen Kuchen.",
+            "native": "She bakes a cake every Sunday."
+          }
         ],
         "notes": "Masculine. Kaffee und Kuchen (coffee and cake) is a beloved German tradition!",
         "audioAssetId": null,
@@ -386,15 +519,22 @@
         "nextDueAt": "2026-05-02T00:00:00.000Z",
         "masteryLevel": 0,
         "state": "new"
-      }
+      },
+      "collectionId": "col-001"
     },
     {
       "id": "card-011",
       "deckId": "deck-001",
       "userId": "user-001",
       "contextId": "german-vocab",
-      "categoryIds": ["cat-003"],
-      "tags": ["noun", "travel", "transport"],
+      "categoryIds": [
+        "cat-003"
+      ],
+      "tags": [
+        "noun",
+        "travel",
+        "transport"
+      ],
       "version": 3,
       "createdAt": "2025-01-20T08:00:00Z",
       "updatedAt": "2025-01-20T08:00:00Z",
@@ -405,8 +545,16 @@
         "gender": "masculine",
         "phonetic": "/t͡suːk/",
         "examples": [
-          { "id": "ex-011a", "target": "Der Zug fährt um 8 Uhr ab.", "native": "The train departs at 8 o'clock." },
-          { "id": "ex-011b", "target": "Ich nehme den Zug nach Berlin.", "native": "I am taking the train to Berlin." }
+          {
+            "id": "ex-011a",
+            "target": "Der Zug fährt um 8 Uhr ab.",
+            "native": "The train departs at 8 o'clock."
+          },
+          {
+            "id": "ex-011b",
+            "target": "Ich nehme den Zug nach Berlin.",
+            "native": "I am taking the train to Berlin."
+          }
         ],
         "notes": "Masculine. Germany's rail network (Deutsche Bahn) is extensive.",
         "audioAssetId": "audio-011",
@@ -425,15 +573,21 @@
         "nextDueAt": "2026-05-05T00:00:00.000Z",
         "masteryLevel": 3,
         "state": "review"
-      }
+      },
+      "collectionId": "col-001"
     },
     {
       "id": "card-012",
       "deckId": "deck-001",
       "userId": "user-001",
       "contextId": "german-vocab",
-      "categoryIds": ["cat-003"],
-      "tags": ["noun", "travel"],
+      "categoryIds": [
+        "cat-003"
+      ],
+      "tags": [
+        "noun",
+        "travel"
+      ],
       "version": 1,
       "createdAt": "2025-01-20T09:00:00Z",
       "updatedAt": "2025-01-20T09:00:00Z",
@@ -444,8 +598,16 @@
         "gender": "masculine",
         "phonetic": "/ˈfluːkˌhaː.fən/",
         "examples": [
-          { "id": "ex-012a", "target": "Wir treffen uns am Flughafen.", "native": "We meet at the airport." },
-          { "id": "ex-012b", "target": "Der Flughafen ist sehr groß.", "native": "The airport is very large." }
+          {
+            "id": "ex-012a",
+            "target": "Wir treffen uns am Flughafen.",
+            "native": "We meet at the airport."
+          },
+          {
+            "id": "ex-012b",
+            "target": "Der Flughafen ist sehr groß.",
+            "native": "The airport is very large."
+          }
         ],
         "notes": "Masculine. Compound: Flug (flight) + Hafen (harbour/port).",
         "audioAssetId": null,
@@ -464,15 +626,21 @@
         "nextDueAt": "2026-05-02T00:00:00.000Z",
         "masteryLevel": 1,
         "state": "learning"
-      }
+      },
+      "collectionId": "col-001"
     },
     {
       "id": "card-013",
       "deckId": "deck-001",
       "userId": "user-001",
       "contextId": "german-vocab",
-      "categoryIds": ["cat-003"],
-      "tags": ["noun", "travel"],
+      "categoryIds": [
+        "cat-003"
+      ],
+      "tags": [
+        "noun",
+        "travel"
+      ],
       "version": 1,
       "createdAt": "2025-01-21T08:00:00Z",
       "updatedAt": "2025-01-21T08:00:00Z",
@@ -483,8 +651,16 @@
         "gender": "feminine",
         "phonetic": "/ˈfaːɐ̯ˌkaʁ.tə/",
         "examples": [
-          { "id": "ex-013a", "target": "Wo kann ich eine Fahrkarte kaufen?", "native": "Where can I buy a ticket?" },
-          { "id": "ex-013b", "target": "Die Fahrkarte kostet zehn Euro.", "native": "The ticket costs ten euros." }
+          {
+            "id": "ex-013a",
+            "target": "Wo kann ich eine Fahrkarte kaufen?",
+            "native": "Where can I buy a ticket?"
+          },
+          {
+            "id": "ex-013b",
+            "target": "Die Fahrkarte kostet zehn Euro.",
+            "native": "The ticket costs ten euros."
+          }
         ],
         "notes": "Feminine. Fahr (travel/drive) + Karte (card/ticket). Often also \"Ticket\" informally.",
         "audioAssetId": null,
@@ -503,15 +679,21 @@
         "nextDueAt": "2026-05-02T00:00:00.000Z",
         "masteryLevel": 0,
         "state": "new"
-      }
+      },
+      "collectionId": "col-001"
     },
     {
       "id": "card-014",
       "deckId": "deck-001",
       "userId": "user-001",
       "contextId": "german-vocab",
-      "categoryIds": ["cat-004"],
-      "tags": ["verb", "daily"],
+      "categoryIds": [
+        "cat-004"
+      ],
+      "tags": [
+        "verb",
+        "daily"
+      ],
       "version": 2,
       "createdAt": "2025-01-21T09:00:00Z",
       "updatedAt": "2025-01-21T09:00:00Z",
@@ -522,8 +704,16 @@
         "gender": null,
         "phonetic": "/ˈɛs.ən/",
         "examples": [
-          { "id": "ex-014a", "target": "Was isst du zum Mittagessen?", "native": "What are you eating for lunch?" },
-          { "id": "ex-014b", "target": "Wir essen zusammen.", "native": "We eat together." }
+          {
+            "id": "ex-014a",
+            "target": "Was isst du zum Mittagessen?",
+            "native": "What are you eating for lunch?"
+          },
+          {
+            "id": "ex-014b",
+            "target": "Wir essen zusammen.",
+            "native": "We eat together."
+          }
         ],
         "notes": "Strong verb: ich esse, du isst, er/sie isst. Past: aß. Participle: gegessen.",
         "audioAssetId": null,
@@ -542,15 +732,21 @@
         "nextDueAt": "2026-05-04T00:00:00.000Z",
         "masteryLevel": 3,
         "state": "review"
-      }
+      },
+      "collectionId": "col-001"
     },
     {
       "id": "card-015",
       "deckId": "deck-001",
       "userId": "user-001",
       "contextId": "german-vocab",
-      "categoryIds": ["cat-004"],
-      "tags": ["verb", "daily"],
+      "categoryIds": [
+        "cat-004"
+      ],
+      "tags": [
+        "verb",
+        "daily"
+      ],
       "version": 1,
       "createdAt": "2025-01-22T08:00:00Z",
       "updatedAt": "2025-01-22T08:00:00Z",
@@ -561,8 +757,16 @@
         "gender": null,
         "phonetic": "/ˈɡeː.ən/",
         "examples": [
-          { "id": "ex-015a", "target": "Ich gehe jeden Morgen spazieren.", "native": "I go for a walk every morning." },
-          { "id": "ex-015b", "target": "Gehen wir ins Kino?", "native": "Shall we go to the cinema?" }
+          {
+            "id": "ex-015a",
+            "target": "Ich gehe jeden Morgen spazieren.",
+            "native": "I go for a walk every morning."
+          },
+          {
+            "id": "ex-015b",
+            "target": "Gehen wir ins Kino?",
+            "native": "Shall we go to the cinema?"
+          }
         ],
         "notes": "Irregular. ich gehe, du gehst, er geht. Past: ging. Participle: gegangen.",
         "audioAssetId": null,
@@ -581,15 +785,21 @@
         "nextDueAt": "2026-05-27T00:00:00.000Z",
         "masteryLevel": 5,
         "state": "mastered"
-      }
+      },
+      "collectionId": "col-001"
     },
     {
       "id": "card-016",
       "deckId": "deck-001",
       "userId": "user-001",
       "contextId": "german-vocab",
-      "categoryIds": ["cat-004"],
-      "tags": ["verb", "daily"],
+      "categoryIds": [
+        "cat-004"
+      ],
+      "tags": [
+        "verb",
+        "daily"
+      ],
       "version": 1,
       "createdAt": "2025-01-22T09:00:00Z",
       "updatedAt": "2025-01-22T09:00:00Z",
@@ -600,8 +810,16 @@
         "gender": null,
         "phonetic": "/ˈʃpʁɛ.çən/",
         "examples": [
-          { "id": "ex-016a", "target": "Sprechen Sie Deutsch?", "native": "Do you speak German?" },
-          { "id": "ex-016b", "target": "Er spricht sehr schnell.", "native": "He speaks very fast." }
+          {
+            "id": "ex-016a",
+            "target": "Sprechen Sie Deutsch?",
+            "native": "Do you speak German?"
+          },
+          {
+            "id": "ex-016b",
+            "target": "Er spricht sehr schnell.",
+            "native": "He speaks very fast."
+          }
         ],
         "notes": "Strong verb: ich spreche, du sprichst, er spricht. Past: sprach.",
         "audioAssetId": "audio-016",
@@ -620,15 +838,21 @@
         "nextDueAt": "2026-05-02T00:00:00.000Z",
         "masteryLevel": 2,
         "state": "learning"
-      }
+      },
+      "collectionId": "col-001"
     },
     {
       "id": "card-017",
       "deckId": "deck-001",
       "userId": "user-001",
       "contextId": "german-vocab",
-      "categoryIds": ["cat-004"],
-      "tags": ["adjective", "daily"],
+      "categoryIds": [
+        "cat-004"
+      ],
+      "tags": [
+        "adjective",
+        "daily"
+      ],
       "version": 1,
       "createdAt": "2025-01-23T08:00:00Z",
       "updatedAt": "2025-01-23T08:00:00Z",
@@ -639,8 +863,16 @@
         "gender": null,
         "phonetic": "/ɡʁoːs/",
         "examples": [
-          { "id": "ex-017a", "target": "Das ist ein großes Haus.", "native": "That is a big house." },
-          { "id": "ex-017b", "target": "Er ist sehr groß.", "native": "He is very tall/big." }
+          {
+            "id": "ex-017a",
+            "target": "Das ist ein großes Haus.",
+            "native": "That is a big house."
+          },
+          {
+            "id": "ex-017b",
+            "target": "Er ist sehr groß.",
+            "native": "He is very tall/big."
+          }
         ],
         "notes": "Adjective. Comparative: größer. Superlative: am größten.",
         "audioAssetId": null,
@@ -659,15 +891,21 @@
         "nextDueAt": "2026-05-05T00:00:00.000Z",
         "masteryLevel": 4,
         "state": "review"
-      }
+      },
+      "collectionId": "col-001"
     },
     {
       "id": "card-018",
       "deckId": "deck-001",
       "userId": "user-001",
       "contextId": "german-vocab",
-      "categoryIds": ["cat-005"],
-      "tags": ["noun", "family"],
+      "categoryIds": [
+        "cat-005"
+      ],
+      "tags": [
+        "noun",
+        "family"
+      ],
       "version": 2,
       "createdAt": "2025-01-23T09:00:00Z",
       "updatedAt": "2025-01-23T09:00:00Z",
@@ -678,8 +916,16 @@
         "gender": "neuter",
         "phonetic": "/kɪnt/",
         "examples": [
-          { "id": "ex-018a", "target": "Das Kind spielt im Garten.", "native": "The child plays in the garden." },
-          { "id": "ex-018b", "target": "Sie hat drei Kinder.", "native": "She has three children." }
+          {
+            "id": "ex-018a",
+            "target": "Das Kind spielt im Garten.",
+            "native": "The child plays in the garden."
+          },
+          {
+            "id": "ex-018b",
+            "target": "Sie hat drei Kinder.",
+            "native": "She has three children."
+          }
         ],
         "notes": "Neuter. Plural: die Kinder.",
         "audioAssetId": null,
@@ -698,15 +944,21 @@
         "nextDueAt": "2026-05-23T00:00:00.000Z",
         "masteryLevel": 5,
         "state": "mastered"
-      }
+      },
+      "collectionId": "col-001"
     },
     {
       "id": "card-019",
       "deckId": "deck-001",
       "userId": "user-001",
       "contextId": "german-vocab",
-      "categoryIds": ["cat-005"],
-      "tags": ["noun", "family"],
+      "categoryIds": [
+        "cat-005"
+      ],
+      "tags": [
+        "noun",
+        "family"
+      ],
       "version": 1,
       "createdAt": "2025-01-24T08:00:00Z",
       "updatedAt": "2025-01-24T08:00:00Z",
@@ -717,8 +969,16 @@
         "gender": "feminine",
         "phonetic": "/ˈmʊ.tɐ/",
         "examples": [
-          { "id": "ex-019a", "target": "Meine Mutter kocht sehr gut.", "native": "My mother cooks very well." },
-          { "id": "ex-019b", "target": "Die Mutter liest dem Kind vor.", "native": "The mother reads to the child." }
+          {
+            "id": "ex-019a",
+            "target": "Meine Mutter kocht sehr gut.",
+            "native": "My mother cooks very well."
+          },
+          {
+            "id": "ex-019b",
+            "target": "Die Mutter liest dem Kind vor.",
+            "native": "The mother reads to the child."
+          }
         ],
         "notes": "Feminine. Plural: die Mütter (umlaut!).",
         "audioAssetId": null,
@@ -737,15 +997,21 @@
         "nextDueAt": "2026-05-04T00:00:00.000Z",
         "masteryLevel": 3,
         "state": "review"
-      }
+      },
+      "collectionId": "col-001"
     },
     {
       "id": "card-020",
       "deckId": "deck-001",
       "userId": "user-001",
       "contextId": "german-vocab",
-      "categoryIds": ["cat-005"],
-      "tags": ["noun", "family"],
+      "categoryIds": [
+        "cat-005"
+      ],
+      "tags": [
+        "noun",
+        "family"
+      ],
       "version": 1,
       "createdAt": "2025-01-24T09:00:00Z",
       "updatedAt": "2025-01-24T09:00:00Z",
@@ -756,8 +1022,16 @@
         "gender": "masculine",
         "phonetic": "/ˈbʁuː.dɐ/",
         "examples": [
-          { "id": "ex-020a", "target": "Mein Bruder wohnt in München.", "native": "My brother lives in Munich." },
-          { "id": "ex-020b", "target": "Er ist mein jüngerer Bruder.", "native": "He is my younger brother." }
+          {
+            "id": "ex-020a",
+            "target": "Mein Bruder wohnt in München.",
+            "native": "My brother lives in Munich."
+          },
+          {
+            "id": "ex-020b",
+            "target": "Er ist mein jüngerer Bruder.",
+            "native": "He is my younger brother."
+          }
         ],
         "notes": "Masculine. Plural: die Brüder (umlaut!).",
         "audioAssetId": null,
@@ -776,15 +1050,21 @@
         "nextDueAt": "2026-05-02T00:00:00.000Z",
         "masteryLevel": 0,
         "state": "new"
-      }
+      },
+      "collectionId": "col-001"
     },
     {
       "id": "card-021",
       "deckId": "deck-001",
       "userId": "user-001",
       "contextId": "german-vocab",
-      "categoryIds": ["cat-006"],
-      "tags": ["noun", "home"],
+      "categoryIds": [
+        "cat-006"
+      ],
+      "tags": [
+        "noun",
+        "home"
+      ],
       "version": 1,
       "createdAt": "2025-01-25T08:00:00Z",
       "updatedAt": "2025-01-25T08:00:00Z",
@@ -795,8 +1075,16 @@
         "gender": "feminine",
         "phonetic": "/tyːɐ̯/",
         "examples": [
-          { "id": "ex-021a", "target": "Bitte schließ die Tür!", "native": "Please close the door!" },
-          { "id": "ex-021b", "target": "Die Tür ist offen.", "native": "The door is open." }
+          {
+            "id": "ex-021a",
+            "target": "Bitte schließ die Tür!",
+            "native": "Please close the door!"
+          },
+          {
+            "id": "ex-021b",
+            "target": "Die Tür ist offen.",
+            "native": "The door is open."
+          }
         ],
         "notes": "Feminine. Plural: die Türen.",
         "audioAssetId": null,
@@ -815,15 +1103,21 @@
         "nextDueAt": "2026-05-03T00:00:00.000Z",
         "masteryLevel": 3,
         "state": "review"
-      }
+      },
+      "collectionId": "col-001"
     },
     {
       "id": "card-022",
       "deckId": "deck-001",
       "userId": "user-001",
       "contextId": "german-vocab",
-      "categoryIds": ["cat-006"],
-      "tags": ["noun", "home"],
+      "categoryIds": [
+        "cat-006"
+      ],
+      "tags": [
+        "noun",
+        "home"
+      ],
       "version": 1,
       "createdAt": "2025-01-25T09:00:00Z",
       "updatedAt": "2025-01-25T09:00:00Z",
@@ -834,8 +1128,16 @@
         "gender": "neuter",
         "phonetic": "/ˈfɛns.tɐ/",
         "examples": [
-          { "id": "ex-022a", "target": "Das Fenster ist geschlossen.", "native": "The window is closed." },
-          { "id": "ex-022b", "target": "Ich öffne das Fenster.", "native": "I open the window." }
+          {
+            "id": "ex-022a",
+            "target": "Das Fenster ist geschlossen.",
+            "native": "The window is closed."
+          },
+          {
+            "id": "ex-022b",
+            "target": "Ich öffne das Fenster.",
+            "native": "I open the window."
+          }
         ],
         "notes": "Neuter. Plural: die Fenster (same form!).",
         "audioAssetId": null,
@@ -854,15 +1156,21 @@
         "nextDueAt": "2026-05-03T00:00:00.000Z",
         "masteryLevel": 2,
         "state": "learning"
-      }
+      },
+      "collectionId": "col-001"
     },
     {
       "id": "card-023",
       "deckId": "deck-001",
       "userId": "user-001",
       "contextId": "german-vocab",
-      "categoryIds": ["cat-007"],
-      "tags": ["noun", "work"],
+      "categoryIds": [
+        "cat-007"
+      ],
+      "tags": [
+        "noun",
+        "work"
+      ],
       "version": 1,
       "createdAt": "2025-01-26T08:00:00Z",
       "updatedAt": "2025-01-26T08:00:00Z",
@@ -873,8 +1181,16 @@
         "gender": "feminine",
         "phonetic": "/bəˈʃpʁɛ.çʊŋ/",
         "examples": [
-          { "id": "ex-023a", "target": "Die Besprechung beginnt um neun Uhr.", "native": "The meeting starts at nine o'clock." },
-          { "id": "ex-023b", "target": "Wir haben eine wichtige Besprechung.", "native": "We have an important meeting." }
+          {
+            "id": "ex-023a",
+            "target": "Die Besprechung beginnt um neun Uhr.",
+            "native": "The meeting starts at nine o'clock."
+          },
+          {
+            "id": "ex-023b",
+            "target": "Wir haben eine wichtige Besprechung.",
+            "native": "We have an important meeting."
+          }
         ],
         "notes": "Feminine. Also \"Meeting\" (borrowing) is widely used in German business.",
         "audioAssetId": null,
@@ -893,15 +1209,21 @@
         "nextDueAt": "2026-05-02T00:00:00.000Z",
         "masteryLevel": 1,
         "state": "learning"
-      }
+      },
+      "collectionId": "col-001"
     },
     {
       "id": "card-024",
       "deckId": "deck-001",
       "userId": "user-001",
       "contextId": "german-vocab",
-      "categoryIds": ["cat-007"],
-      "tags": ["noun", "work"],
+      "categoryIds": [
+        "cat-007"
+      ],
+      "tags": [
+        "noun",
+        "work"
+      ],
       "version": 1,
       "createdAt": "2025-01-26T09:00:00Z",
       "updatedAt": "2025-01-26T09:00:00Z",
@@ -912,8 +1234,16 @@
         "gender": "masculine",
         "phonetic": "/kɔmˈpjuː.tɐ/",
         "examples": [
-          { "id": "ex-024a", "target": "Ich arbeite am Computer.", "native": "I am working on the computer." },
-          { "id": "ex-024b", "target": "Der Computer ist zu langsam.", "native": "The computer is too slow." }
+          {
+            "id": "ex-024a",
+            "target": "Ich arbeite am Computer.",
+            "native": "I am working on the computer."
+          },
+          {
+            "id": "ex-024b",
+            "target": "Der Computer ist zu langsam.",
+            "native": "The computer is too slow."
+          }
         ],
         "notes": "Masculine. Loanword from English. Plural: die Computer.",
         "audioAssetId": null,
@@ -932,7 +1262,4454 @@
         "nextDueAt": "2026-05-02T00:00:00.000Z",
         "masteryLevel": 0,
         "state": "new"
-      }
+      },
+      "collectionId": "col-001"
+    },
+    {
+      "deckId": "deck-001",
+      "collectionId": "TURBPqsrBbc",
+      "userId": "user-001",
+      "contextId": "german-vocab",
+      "content": {
+        "front": "to stand up",
+        "back": "aufstehen",
+        "article": null,
+        "gender": null,
+        "examples": [
+          {
+            "id": "b8786e6e-6fd7-4e7b-ac1f-e716077c9d3b",
+            "target": "ich stehe mich um 7 Uhr auf",
+            "native": "I get up at 7 oçlock"
+          }
+        ],
+        "notes": "",
+        "audioAssetId": null,
+        "imageUrl": null,
+        "phonetic": null
+      },
+      "categoryIds": [
+        "cat-004"
+      ],
+      "tags": [],
+      "createdAt": "2026-05-07T20:27:27.468Z",
+      "updatedAt": "2026-05-07T20:27:27.468Z",
+      "version": 1,
+      "srsState": {
+        "id": "a0e00a42-da4f-4206-907c-30be1819f280",
+        "cardId": "",
+        "userId": "user-001",
+        "algorithm": "sm2",
+        "intervalDays": 1,
+        "easeFactor": 2.5,
+        "repetitions": 0,
+        "lastRating": null,
+        "lastReviewedAt": null,
+        "nextDueAt": "2026-05-07T20:27:27.468Z",
+        "masteryLevel": 0,
+        "state": "new"
+      },
+      "id": "NofEE_OQR38"
+    },
+    {
+      "deckId": "deck-001",
+      "collectionId": "aVVZSDORtGU",
+      "userId": "user-001",
+      "contextId": "german-vocab",
+      "content": {
+        "front": "to go on an excursion",
+        "back": "einen Ausflug machen",
+        "article": null,
+        "gender": null,
+        "examples": [
+          {
+            "id": "6dc3439e-1ac6-4263-8f9b-03997120095f",
+            "target": "Wir machen morgen einen Ausflug ans Meer.",
+            "native": "We are going on a trip to the sea tomorrow."
+          }
+        ],
+        "notes": "",
+        "audioAssetId": null,
+        "imageUrl": null,
+        "phonetic": null
+      },
+      "categoryIds": [
+        "Leisure"
+      ],
+      "tags": [],
+      "createdAt": "2026-05-08T07:50:24.912Z",
+      "updatedAt": "2026-05-08T07:50:24.912Z",
+      "version": 1,
+      "srsState": {
+        "id": "8a25e9fc-ef63-4c86-8442-260fd4afc8e9",
+        "cardId": "",
+        "userId": "user-001",
+        "algorithm": "sm2",
+        "intervalDays": 1,
+        "easeFactor": 2.5,
+        "repetitions": 0,
+        "lastRating": null,
+        "lastReviewedAt": null,
+        "nextDueAt": "2026-05-08T07:50:24.912Z",
+        "masteryLevel": 0,
+        "state": "new"
+      },
+      "id": "AVysRxofny4"
+    },
+    {
+      "deckId": "deck-001",
+      "collectionId": "aVVZSDORtGU",
+      "userId": "user-001",
+      "contextId": "german-vocab",
+      "content": {
+        "front": "the cycling tour",
+        "back": "Fahrradtour",
+        "article": "die",
+        "gender": "feminine",
+        "examples": [
+          {
+            "id": "f9eddf55-6938-43d6-8910-49d5cf97761d",
+            "target": "Die Fahrradtour durch den Park hat Spaß gemacht.",
+            "native": "The cycling tour through the park was fun."
+          }
+        ],
+        "notes": "",
+        "audioAssetId": null,
+        "imageUrl": null,
+        "phonetic": null
+      },
+      "categoryIds": [
+        "Leisure"
+      ],
+      "tags": [],
+      "createdAt": "2026-05-08T07:50:24.912Z",
+      "updatedAt": "2026-05-08T07:50:24.912Z",
+      "version": 1,
+      "srsState": {
+        "id": "ba0867b8-f38d-4209-bceb-fcaf601e1044",
+        "cardId": "",
+        "userId": "user-001",
+        "algorithm": "sm2",
+        "intervalDays": 1,
+        "easeFactor": 2.5,
+        "repetitions": 0,
+        "lastRating": null,
+        "lastReviewedAt": null,
+        "nextDueAt": "2026-05-08T07:50:24.912Z",
+        "masteryLevel": 0,
+        "state": "new"
+      },
+      "id": "p5bTuGB3Pdk"
+    },
+    {
+      "deckId": "deck-001",
+      "collectionId": "aVVZSDORtGU",
+      "userId": "user-001",
+      "contextId": "german-vocab",
+      "content": {
+        "front": "the picnic",
+        "back": "Picknick",
+        "article": "das",
+        "gender": "neuter",
+        "examples": [
+          {
+            "id": "cede8111-1978-42c0-b1b4-7ec602c964d7",
+            "target": "Wir machen ein Picknick im Park.",
+            "native": "We are having a picnic in the park."
+          }
+        ],
+        "notes": "",
+        "audioAssetId": null,
+        "imageUrl": null,
+        "phonetic": null
+      },
+      "categoryIds": [
+        "Leisure"
+      ],
+      "tags": [],
+      "createdAt": "2026-05-08T07:50:24.912Z",
+      "updatedAt": "2026-05-08T07:50:24.912Z",
+      "version": 1,
+      "srsState": {
+        "id": "06b20b6f-44d9-4041-a131-92a3aaaf8af2",
+        "cardId": "",
+        "userId": "user-001",
+        "algorithm": "sm2",
+        "intervalDays": 1,
+        "easeFactor": 2.5,
+        "repetitions": 0,
+        "lastRating": null,
+        "lastReviewedAt": null,
+        "nextDueAt": "2026-05-08T07:50:24.912Z",
+        "masteryLevel": 0,
+        "state": "new"
+      },
+      "id": "1hPI-gXbCB8"
+    },
+    {
+      "deckId": "deck-001",
+      "collectionId": "aVVZSDORtGU",
+      "userId": "user-001",
+      "contextId": "german-vocab",
+      "content": {
+        "front": "go to the gym",
+        "back": "ins Fitness-Studio gehen",
+        "article": null,
+        "gender": null,
+        "examples": [
+          {
+            "id": "337bb175-e334-4245-9cad-3a14ea3ff39e",
+            "target": "Ich gehe dreimal pro Woche ins Fitness-Studio.",
+            "native": "I go to the gym three times a week."
+          }
+        ],
+        "notes": "",
+        "audioAssetId": null,
+        "imageUrl": null,
+        "phonetic": null
+      },
+      "categoryIds": [
+        "cat-004"
+      ],
+      "tags": [],
+      "createdAt": "2026-05-08T07:50:24.912Z",
+      "updatedAt": "2026-05-08T07:50:24.912Z",
+      "version": 1,
+      "srsState": {
+        "id": "f31e0696-41d9-4530-8ee9-3094ccfbcc04",
+        "cardId": "",
+        "userId": "user-001",
+        "algorithm": "sm2",
+        "intervalDays": 1,
+        "easeFactor": 2.5,
+        "repetitions": 0,
+        "lastRating": null,
+        "lastReviewedAt": null,
+        "nextDueAt": "2026-05-08T07:50:24.912Z",
+        "masteryLevel": 0,
+        "state": "new"
+      },
+      "id": "aSXRCCzqSmw"
+    },
+    {
+      "deckId": "deck-001",
+      "collectionId": "aVVZSDORtGU",
+      "userId": "user-001",
+      "contextId": "german-vocab",
+      "content": {
+        "front": "the party / celebration",
+        "back": "Fest",
+        "article": "das",
+        "gender": "neuter",
+        "examples": [
+          {
+            "id": "53bb1fc3-3b8d-4746-80b3-d1ce8434f57d",
+            "target": "Das Fest war wunderschön und sehr lustig.",
+            "native": "The celebration was beautiful and very funny."
+          }
+        ],
+        "notes": "",
+        "audioAssetId": null,
+        "imageUrl": null,
+        "phonetic": null
+      },
+      "categoryIds": [
+        "Celebrations"
+      ],
+      "tags": [],
+      "createdAt": "2026-05-08T07:50:24.912Z",
+      "updatedAt": "2026-05-08T07:50:24.912Z",
+      "version": 1,
+      "srsState": {
+        "id": "6a788643-b5ca-49f8-bb76-7f99cdba5edc",
+        "cardId": "",
+        "userId": "user-001",
+        "algorithm": "sm2",
+        "intervalDays": 1,
+        "easeFactor": 2.5,
+        "repetitions": 0,
+        "lastRating": null,
+        "lastReviewedAt": null,
+        "nextDueAt": "2026-05-08T07:50:24.912Z",
+        "masteryLevel": 0,
+        "state": "new"
+      },
+      "id": "iKXA9vHd8MU"
+    },
+    {
+      "deckId": "deck-001",
+      "collectionId": "aVVZSDORtGU",
+      "userId": "user-001",
+      "contextId": "german-vocab",
+      "content": {
+        "front": "to climb",
+        "back": "klettern",
+        "article": null,
+        "gender": null,
+        "examples": [
+          {
+            "id": "0a3ede95-0553-4bda-b85f-72574be647e6",
+            "target": "Er klettert jeden Samstag in der Halle.",
+            "native": "He climbs at the gym every Saturday."
+          }
+        ],
+        "notes": "",
+        "audioAssetId": null,
+        "imageUrl": null,
+        "phonetic": null
+      },
+      "categoryIds": [
+        "Leisure"
+      ],
+      "tags": [],
+      "createdAt": "2026-05-08T07:50:24.912Z",
+      "updatedAt": "2026-05-08T07:50:24.912Z",
+      "version": 1,
+      "srsState": {
+        "id": "644c0554-b14e-46f0-83bb-619d293937d8",
+        "cardId": "",
+        "userId": "user-001",
+        "algorithm": "sm2",
+        "intervalDays": 1,
+        "easeFactor": 2.5,
+        "repetitions": 0,
+        "lastRating": null,
+        "lastReviewedAt": null,
+        "nextDueAt": "2026-05-08T07:50:24.912Z",
+        "masteryLevel": 0,
+        "state": "new"
+      },
+      "id": "J7Pt5lFIkvo"
+    },
+    {
+      "deckId": "deck-001",
+      "collectionId": "aVVZSDORtGU",
+      "userId": "user-001",
+      "contextId": "german-vocab",
+      "content": {
+        "front": "to celebrate",
+        "back": "feiern",
+        "article": null,
+        "gender": null,
+        "examples": [
+          {
+            "id": "31c45bf7-ecec-4f46-86e2-4fdc401e9717",
+            "target": "Wir feiern heute Abend Silvester.",
+            "native": "We are celebrating New Year's Eve tonight."
+          }
+        ],
+        "notes": "",
+        "audioAssetId": null,
+        "imageUrl": null,
+        "phonetic": null
+      },
+      "categoryIds": [
+        "Celebrations"
+      ],
+      "tags": [],
+      "createdAt": "2026-05-08T07:50:24.912Z",
+      "updatedAt": "2026-05-08T07:50:24.912Z",
+      "version": 1,
+      "srsState": {
+        "id": "22374ad3-2ea0-471f-96e5-161f2cb461f7",
+        "cardId": "",
+        "userId": "user-001",
+        "algorithm": "sm2",
+        "intervalDays": 1,
+        "easeFactor": 2.5,
+        "repetitions": 0,
+        "lastRating": null,
+        "lastReviewedAt": null,
+        "nextDueAt": "2026-05-08T07:50:24.912Z",
+        "masteryLevel": 0,
+        "state": "new"
+      },
+      "id": "x6Cv8wM97n0"
+    },
+    {
+      "deckId": "deck-001",
+      "collectionId": "aVVZSDORtGU",
+      "userId": "user-001",
+      "contextId": "german-vocab",
+      "content": {
+        "front": "the birthday",
+        "back": "Geburtstag",
+        "article": "der",
+        "gender": "masculine",
+        "examples": [
+          {
+            "id": "db7d4d4b-60cc-4119-8f07-49efad10f633",
+            "target": "Morgen ist mein Geburtstag.",
+            "native": "Tomorrow is my birthday."
+          }
+        ],
+        "notes": "",
+        "audioAssetId": null,
+        "imageUrl": null,
+        "phonetic": null
+      },
+      "categoryIds": [
+        "Celebrations"
+      ],
+      "tags": [],
+      "createdAt": "2026-05-08T07:50:24.912Z",
+      "updatedAt": "2026-05-08T07:50:24.912Z",
+      "version": 1,
+      "srsState": {
+        "id": "a5765e92-eb77-4b00-8cdd-3e9378df6eb1",
+        "cardId": "",
+        "userId": "user-001",
+        "algorithm": "sm2",
+        "intervalDays": 1,
+        "easeFactor": 2.5,
+        "repetitions": 0,
+        "lastRating": null,
+        "lastReviewedAt": null,
+        "nextDueAt": "2026-05-08T07:50:24.912Z",
+        "masteryLevel": 0,
+        "state": "new"
+      },
+      "id": "us6bBS8a3e8"
+    },
+    {
+      "deckId": "deck-001",
+      "collectionId": "aVVZSDORtGU",
+      "userId": "user-001",
+      "contextId": "german-vocab",
+      "content": {
+        "front": "to become / turn (age)",
+        "back": "werden",
+        "article": null,
+        "gender": null,
+        "examples": [
+          {
+            "id": "4b67e1c7-fe1e-4c7c-9416-c2e2f401e072",
+            "target": "Er wird nächste Woche dreißig Jahre alt.",
+            "native": "He turns thirty next week."
+          }
+        ],
+        "notes": "",
+        "audioAssetId": null,
+        "imageUrl": null,
+        "phonetic": null
+      },
+      "categoryIds": [
+        "cat-004"
+      ],
+      "tags": [],
+      "createdAt": "2026-05-08T07:50:24.912Z",
+      "updatedAt": "2026-05-08T07:50:24.912Z",
+      "version": 1,
+      "srsState": {
+        "id": "1b51bf5a-b95d-4770-8768-56df7a06fccf",
+        "cardId": "",
+        "userId": "user-001",
+        "algorithm": "sm2",
+        "intervalDays": 1,
+        "easeFactor": 2.5,
+        "repetitions": 0,
+        "lastRating": null,
+        "lastReviewedAt": null,
+        "nextDueAt": "2026-05-08T07:50:24.912Z",
+        "masteryLevel": 0,
+        "state": "new"
+      },
+      "id": "gKL-c15-ZgM"
+    },
+    {
+      "deckId": "deck-001",
+      "collectionId": "aVVZSDORtGU",
+      "userId": "user-001",
+      "contextId": "german-vocab",
+      "content": {
+        "front": "to give as a gift",
+        "back": "schenken",
+        "article": null,
+        "gender": null,
+        "examples": [
+          {
+            "id": "df1177d1-4703-46dc-9c27-79bda54843e9",
+            "target": "Was schenkst du ihr zum Geburtstag?",
+            "native": "What are you giving her for her birthday?"
+          }
+        ],
+        "notes": "",
+        "audioAssetId": null,
+        "imageUrl": null,
+        "phonetic": null
+      },
+      "categoryIds": [
+        "Celebrations"
+      ],
+      "tags": [],
+      "createdAt": "2026-05-08T07:50:24.912Z",
+      "updatedAt": "2026-05-08T07:50:24.912Z",
+      "version": 1,
+      "srsState": {
+        "id": "99a45783-8b2d-4fc2-8e90-2592a659eb48",
+        "cardId": "",
+        "userId": "user-001",
+        "algorithm": "sm2",
+        "intervalDays": 1,
+        "easeFactor": 2.5,
+        "repetitions": 0,
+        "lastRating": null,
+        "lastReviewedAt": null,
+        "nextDueAt": "2026-05-08T07:50:24.912Z",
+        "masteryLevel": 0,
+        "state": "new"
+      },
+      "id": "narumb3BJM0"
+    },
+    {
+      "deckId": "deck-001",
+      "collectionId": "aVVZSDORtGU",
+      "userId": "user-001",
+      "contextId": "german-vocab",
+      "content": {
+        "front": "the gift / present",
+        "back": "Geschenk",
+        "article": "das",
+        "gender": "neuter",
+        "examples": [
+          {
+            "id": "64e3c70f-ef3a-46f4-885a-cbffa0afe19e",
+            "target": "Das Geschenk ist sehr schön verpackt.",
+            "native": "The gift is very nicely wrapped."
+          }
+        ],
+        "notes": "",
+        "audioAssetId": null,
+        "imageUrl": null,
+        "phonetic": null
+      },
+      "categoryIds": [
+        "Celebrations"
+      ],
+      "tags": [],
+      "createdAt": "2026-05-08T07:50:24.912Z",
+      "updatedAt": "2026-05-08T07:50:24.912Z",
+      "version": 1,
+      "srsState": {
+        "id": "1e37a78c-8353-4488-a0ee-4304659aa4ff",
+        "cardId": "",
+        "userId": "user-001",
+        "algorithm": "sm2",
+        "intervalDays": 1,
+        "easeFactor": 2.5,
+        "repetitions": 0,
+        "lastRating": null,
+        "lastReviewedAt": null,
+        "nextDueAt": "2026-05-08T07:50:24.912Z",
+        "masteryLevel": 0,
+        "state": "new"
+      },
+      "id": "L7XYrz3WyBU"
+    },
+    {
+      "deckId": "deck-001",
+      "collectionId": "aVVZSDORtGU",
+      "userId": "user-001",
+      "contextId": "german-vocab",
+      "content": {
+        "front": "to invite",
+        "back": "einladen",
+        "article": null,
+        "gender": null,
+        "examples": [
+          {
+            "id": "ef6df415-ce30-4f25-bfde-b09337c647ea",
+            "target": "Ich lade alle meine Freunde zum Fest ein.",
+            "native": "I am inviting all my friends to the party."
+          }
+        ],
+        "notes": "",
+        "audioAssetId": null,
+        "imageUrl": null,
+        "phonetic": null
+      },
+      "categoryIds": [
+        "Celebrations"
+      ],
+      "tags": [],
+      "createdAt": "2026-05-08T07:50:24.912Z",
+      "updatedAt": "2026-05-08T07:50:24.912Z",
+      "version": 1,
+      "srsState": {
+        "id": "0de9d390-36a9-489d-ae87-55601858e62b",
+        "cardId": "",
+        "userId": "user-001",
+        "algorithm": "sm2",
+        "intervalDays": 1,
+        "easeFactor": 2.5,
+        "repetitions": 0,
+        "lastRating": null,
+        "lastReviewedAt": null,
+        "nextDueAt": "2026-05-08T07:50:24.912Z",
+        "masteryLevel": 0,
+        "state": "new"
+      },
+      "id": "MRy_e59CZp0"
+    },
+    {
+      "deckId": "deck-001",
+      "collectionId": "aVVZSDORtGU",
+      "userId": "user-001",
+      "contextId": "german-vocab",
+      "content": {
+        "front": "the date",
+        "back": "Datum",
+        "article": "das",
+        "gender": "neuter",
+        "examples": [
+          {
+            "id": "c84b15ce-9b3b-4386-ab3d-0e6ebbf25653",
+            "target": "Welches Datum ist heute?",
+            "native": "What is today's date?"
+          }
+        ],
+        "notes": "",
+        "audioAssetId": null,
+        "imageUrl": null,
+        "phonetic": null
+      },
+      "categoryIds": [
+        "cat-004"
+      ],
+      "tags": [],
+      "createdAt": "2026-05-08T07:50:24.912Z",
+      "updatedAt": "2026-05-08T07:50:24.912Z",
+      "version": 1,
+      "srsState": {
+        "id": "4ae0deec-fcbe-4ed4-83a8-cca76de2a181",
+        "cardId": "",
+        "userId": "user-001",
+        "algorithm": "sm2",
+        "intervalDays": 1,
+        "easeFactor": 2.5,
+        "repetitions": 0,
+        "lastRating": null,
+        "lastReviewedAt": null,
+        "nextDueAt": "2026-05-08T07:50:24.912Z",
+        "masteryLevel": 0,
+        "state": "new"
+      },
+      "id": "Eo-bRZGqDP0"
+    },
+    {
+      "deckId": "deck-001",
+      "collectionId": "aVVZSDORtGU",
+      "userId": "user-001",
+      "contextId": "german-vocab",
+      "content": {
+        "front": "the surprise",
+        "back": "Überraschung",
+        "article": "die",
+        "gender": "feminine",
+        "examples": [
+          {
+            "id": "d207f0fd-414f-48b4-826e-9903c0046584",
+            "target": "Die Überraschung hat ihr sehr gefallen.",
+            "native": "She really liked the surprise."
+          }
+        ],
+        "notes": "",
+        "audioAssetId": null,
+        "imageUrl": null,
+        "phonetic": null
+      },
+      "categoryIds": [
+        "Celebrations"
+      ],
+      "tags": [],
+      "createdAt": "2026-05-08T07:50:24.912Z",
+      "updatedAt": "2026-05-08T07:50:24.912Z",
+      "version": 1,
+      "srsState": {
+        "id": "4787f53a-bba1-453e-8bff-d09cd0dfd628",
+        "cardId": "",
+        "userId": "user-001",
+        "algorithm": "sm2",
+        "intervalDays": 1,
+        "easeFactor": 2.5,
+        "repetitions": 0,
+        "lastRating": null,
+        "lastReviewedAt": null,
+        "nextDueAt": "2026-05-08T07:50:24.912Z",
+        "masteryLevel": 0,
+        "state": "new"
+      },
+      "id": "eq7V-TrJkuc"
+    },
+    {
+      "deckId": "deck-001",
+      "collectionId": "aVVZSDORtGU",
+      "userId": "user-001",
+      "contextId": "german-vocab",
+      "content": {
+        "front": "to ski",
+        "back": "Ski fahren",
+        "article": null,
+        "gender": null,
+        "examples": [
+          {
+            "id": "b8316d03-84d7-4d66-8d13-791efd1908db",
+            "target": "Im Winter fahre ich gern Ski.",
+            "native": "I like skiing in winter."
+          }
+        ],
+        "notes": "",
+        "audioAssetId": null,
+        "imageUrl": null,
+        "phonetic": null
+      },
+      "categoryIds": [
+        "Leisure"
+      ],
+      "tags": [],
+      "createdAt": "2026-05-08T07:50:24.912Z",
+      "updatedAt": "2026-05-08T07:50:24.912Z",
+      "version": 1,
+      "srsState": {
+        "id": "6c39bafe-32f7-402e-b564-79ea4f9f9286",
+        "cardId": "",
+        "userId": "user-001",
+        "algorithm": "sm2",
+        "intervalDays": 1,
+        "easeFactor": 2.5,
+        "repetitions": 0,
+        "lastRating": null,
+        "lastReviewedAt": null,
+        "nextDueAt": "2026-05-08T07:50:24.912Z",
+        "masteryLevel": 0,
+        "state": "new"
+      },
+      "id": "xbL9zzQrltM"
+    },
+    {
+      "deckId": "deck-001",
+      "collectionId": "aVVZSDORtGU",
+      "userId": "user-001",
+      "contextId": "german-vocab",
+      "content": {
+        "front": "to hike",
+        "back": "wandern",
+        "article": null,
+        "gender": null,
+        "examples": [
+          {
+            "id": "55a2914f-2bca-49a2-b5ab-0efd3dbaa51c",
+            "target": "Wir wandern heute in den Bergen.",
+            "native": "We are hiking in the mountains today."
+          }
+        ],
+        "notes": "",
+        "audioAssetId": null,
+        "imageUrl": null,
+        "phonetic": null
+      },
+      "categoryIds": [
+        "Leisure"
+      ],
+      "tags": [],
+      "createdAt": "2026-05-08T07:50:24.912Z",
+      "updatedAt": "2026-05-08T07:50:24.912Z",
+      "version": 1,
+      "srsState": {
+        "id": "de653b96-cc07-467a-948d-42bb61526f49",
+        "cardId": "",
+        "userId": "user-001",
+        "algorithm": "sm2",
+        "intervalDays": 1,
+        "easeFactor": 2.5,
+        "repetitions": 0,
+        "lastRating": null,
+        "lastReviewedAt": null,
+        "nextDueAt": "2026-05-08T07:50:24.912Z",
+        "masteryLevel": 0,
+        "state": "new"
+      },
+      "id": "r-QG1iWaWKk"
+    },
+    {
+      "deckId": "deck-001",
+      "collectionId": "aVVZSDORtGU",
+      "userId": "user-001",
+      "contextId": "german-vocab",
+      "content": {
+        "front": "Attention! / Watch out!",
+        "back": "Achtung!",
+        "article": null,
+        "gender": null,
+        "examples": [
+          {
+            "id": "1a2dc2de-6afa-4483-9628-1c0075b09554",
+            "target": "Achtung – das ist sehr heiß!",
+            "native": "Attention – that is very hot!"
+          }
+        ],
+        "notes": "",
+        "audioAssetId": null,
+        "imageUrl": null,
+        "phonetic": null
+      },
+      "categoryIds": [
+        "cat-004"
+      ],
+      "tags": [],
+      "createdAt": "2026-05-08T07:50:24.912Z",
+      "updatedAt": "2026-05-08T07:50:24.912Z",
+      "version": 1,
+      "srsState": {
+        "id": "8cd35a9b-ca7d-482a-9490-e4f79ef590d9",
+        "cardId": "",
+        "userId": "user-001",
+        "algorithm": "sm2",
+        "intervalDays": 1,
+        "easeFactor": 2.5,
+        "repetitions": 0,
+        "lastRating": null,
+        "lastReviewedAt": null,
+        "nextDueAt": "2026-05-08T07:50:24.912Z",
+        "masteryLevel": 0,
+        "state": "new"
+      },
+      "id": "Bc96AaLAnkE"
+    },
+    {
+      "deckId": "deck-001",
+      "collectionId": "aVVZSDORtGU",
+      "userId": "user-001",
+      "contextId": "german-vocab",
+      "content": {
+        "front": "to know (a fact)",
+        "back": "wissen",
+        "article": null,
+        "gender": null,
+        "examples": [
+          {
+            "id": "833c1c47-1725-444c-877d-3f2ae6ebb4d3",
+            "target": "Weißt du wo er wohnt?",
+            "native": "Do you know where he lives?"
+          }
+        ],
+        "notes": "",
+        "audioAssetId": null,
+        "imageUrl": null,
+        "phonetic": null
+      },
+      "categoryIds": [
+        "cat-004"
+      ],
+      "tags": [],
+      "createdAt": "2026-05-08T07:50:24.912Z",
+      "updatedAt": "2026-05-08T07:50:24.912Z",
+      "version": 1,
+      "srsState": {
+        "id": "afe31f90-8ebe-4188-b242-ae23c93d177e",
+        "cardId": "",
+        "userId": "user-001",
+        "algorithm": "sm2",
+        "intervalDays": 1,
+        "easeFactor": 2.5,
+        "repetitions": 0,
+        "lastRating": null,
+        "lastReviewedAt": null,
+        "nextDueAt": "2026-05-08T07:50:24.912Z",
+        "masteryLevel": 0,
+        "state": "new"
+      },
+      "id": "Rz96f8Y8dis"
+    },
+    {
+      "deckId": "deck-001",
+      "collectionId": "aVVZSDORtGU",
+      "userId": "user-001",
+      "contextId": "german-vocab",
+      "content": {
+        "front": "to bring along",
+        "back": "mitbringen",
+        "article": null,
+        "gender": null,
+        "examples": [
+          {
+            "id": "d0681692-50c4-4807-97d0-a47f2e41bbd6",
+            "target": "Kannst du etwas zu essen mitbringen?",
+            "native": "Can you bring something to eat?"
+          }
+        ],
+        "notes": "",
+        "audioAssetId": null,
+        "imageUrl": null,
+        "phonetic": null
+      },
+      "categoryIds": [
+        "cat-004"
+      ],
+      "tags": [],
+      "createdAt": "2026-05-08T07:50:24.912Z",
+      "updatedAt": "2026-05-08T07:50:24.912Z",
+      "version": 1,
+      "srsState": {
+        "id": "2cf33ead-c5fa-4534-916f-82ddd96e701b",
+        "cardId": "",
+        "userId": "user-001",
+        "algorithm": "sm2",
+        "intervalDays": 1,
+        "easeFactor": 2.5,
+        "repetitions": 0,
+        "lastRating": null,
+        "lastReviewedAt": null,
+        "nextDueAt": "2026-05-08T07:50:24.912Z",
+        "masteryLevel": 0,
+        "state": "new"
+      },
+      "id": "1rbwLKxWN-s"
+    },
+    {
+      "deckId": "deck-001",
+      "collectionId": "aVVZSDORtGU",
+      "userId": "user-001",
+      "contextId": "german-vocab",
+      "content": {
+        "front": "the trip / excursion",
+        "back": "Ausflug",
+        "article": "der",
+        "gender": "masculine",
+        "examples": [
+          {
+            "id": "8041b8a3-48d9-4bd3-8ea5-e506306f21cb",
+            "target": "Der Ausflug war sehr schön.",
+            "native": "The trip was really lovely."
+          }
+        ],
+        "notes": "",
+        "audioAssetId": null,
+        "imageUrl": null,
+        "phonetic": null
+      },
+      "categoryIds": [
+        "Leisure"
+      ],
+      "tags": [],
+      "createdAt": "2026-05-08T07:50:24.912Z",
+      "updatedAt": "2026-05-08T07:50:24.912Z",
+      "version": 1,
+      "srsState": {
+        "id": "9fd14f22-169f-424e-a80d-975e6c3d54b0",
+        "cardId": "",
+        "userId": "user-001",
+        "algorithm": "sm2",
+        "intervalDays": 1,
+        "easeFactor": 2.5,
+        "repetitions": 0,
+        "lastRating": null,
+        "lastReviewedAt": null,
+        "nextDueAt": "2026-05-08T07:50:24.912Z",
+        "masteryLevel": 0,
+        "state": "new"
+      },
+      "id": "a5oFj1_cd_g"
+    },
+    {
+      "deckId": "deck-001",
+      "collectionId": "aVVZSDORtGU",
+      "userId": "user-001",
+      "contextId": "german-vocab",
+      "content": {
+        "front": "to have fun",
+        "back": "Spaß haben",
+        "article": null,
+        "gender": null,
+        "examples": [
+          {
+            "id": "6cd18725-b4a7-4992-8a2f-ea93b770141e",
+            "target": "Wir haben viel Spaß zusammen.",
+            "native": "We have a lot of fun together."
+          }
+        ],
+        "notes": "",
+        "audioAssetId": null,
+        "imageUrl": null,
+        "phonetic": null
+      },
+      "categoryIds": [
+        "cat-004"
+      ],
+      "tags": [],
+      "createdAt": "2026-05-08T07:50:24.912Z",
+      "updatedAt": "2026-05-08T07:50:24.912Z",
+      "version": 1,
+      "srsState": {
+        "id": "6d948280-cbde-40b4-ba8c-76abb17237ff",
+        "cardId": "",
+        "userId": "user-001",
+        "algorithm": "sm2",
+        "intervalDays": 1,
+        "easeFactor": 2.5,
+        "repetitions": 0,
+        "lastRating": null,
+        "lastReviewedAt": null,
+        "nextDueAt": "2026-05-08T07:50:24.912Z",
+        "masteryLevel": 0,
+        "state": "new"
+      },
+      "id": "szOc-NDCpPc"
+    },
+    {
+      "deckId": "deck-001",
+      "collectionId": "aVVZSDORtGU",
+      "userId": "user-001",
+      "contextId": "german-vocab",
+      "content": {
+        "front": "hopefully",
+        "back": "hoffentlich",
+        "article": null,
+        "gender": null,
+        "examples": [
+          {
+            "id": "6e560f8b-477c-4401-ba48-94a1670963e9",
+            "target": "Hoffentlich kommt ihr pünktlich.",
+            "native": "Hopefully you will come on time."
+          }
+        ],
+        "notes": "",
+        "audioAssetId": null,
+        "imageUrl": null,
+        "phonetic": null
+      },
+      "categoryIds": [
+        "cat-004"
+      ],
+      "tags": [],
+      "createdAt": "2026-05-08T07:50:24.912Z",
+      "updatedAt": "2026-05-08T07:50:24.912Z",
+      "version": 1,
+      "srsState": {
+        "id": "1593a355-f8e5-4311-8d5b-70a29664e894",
+        "cardId": "",
+        "userId": "user-001",
+        "algorithm": "sm2",
+        "intervalDays": 1,
+        "easeFactor": 2.5,
+        "repetitions": 0,
+        "lastRating": null,
+        "lastReviewedAt": null,
+        "nextDueAt": "2026-05-08T07:50:24.912Z",
+        "masteryLevel": 0,
+        "state": "new"
+      },
+      "id": "ZubtV8OE0M0"
+    },
+    {
+      "deckId": "deck-001",
+      "collectionId": "aVVZSDORtGU",
+      "userId": "user-001",
+      "contextId": "german-vocab",
+      "content": {
+        "front": "the email",
+        "back": "Mail",
+        "article": "die",
+        "gender": "feminine",
+        "examples": [
+          {
+            "id": "c8a20a80-6f60-46ab-85cf-041fe0753671",
+            "target": "Ich schicke dir gleich eine Mail.",
+            "native": "I will send you an email right away."
+          }
+        ],
+        "notes": "",
+        "audioAssetId": null,
+        "imageUrl": null,
+        "phonetic": null
+      },
+      "categoryIds": [
+        "Communication"
+      ],
+      "tags": [],
+      "createdAt": "2026-05-08T07:50:24.912Z",
+      "updatedAt": "2026-05-08T07:50:24.912Z",
+      "version": 1,
+      "srsState": {
+        "id": "45f9652c-97de-4eb3-8acb-011ad2c448bf",
+        "cardId": "",
+        "userId": "user-001",
+        "algorithm": "sm2",
+        "intervalDays": 1,
+        "easeFactor": 2.5,
+        "repetitions": 0,
+        "lastRating": null,
+        "lastReviewedAt": null,
+        "nextDueAt": "2026-05-08T07:50:24.912Z",
+        "masteryLevel": 0,
+        "state": "new"
+      },
+      "id": "EL8wf6P-zf0"
+    },
+    {
+      "deckId": "deck-001",
+      "collectionId": "aVVZSDORtGU",
+      "userId": "user-001",
+      "contextId": "german-vocab",
+      "content": {
+        "front": "to send",
+        "back": "schicken",
+        "article": null,
+        "gender": null,
+        "examples": [
+          {
+            "id": "e1fd55fd-5a5f-4406-a4c5-6896dbfde032",
+            "target": "Schick mir bitte die Adresse.",
+            "native": "Please send me the address."
+          }
+        ],
+        "notes": "",
+        "audioAssetId": null,
+        "imageUrl": null,
+        "phonetic": null
+      },
+      "categoryIds": [
+        "Communication"
+      ],
+      "tags": [],
+      "createdAt": "2026-05-08T07:50:24.912Z",
+      "updatedAt": "2026-05-08T07:50:24.912Z",
+      "version": 1,
+      "srsState": {
+        "id": "191ad8a5-8b2c-46b1-8e9f-dc5a7cf6eae7",
+        "cardId": "",
+        "userId": "user-001",
+        "algorithm": "sm2",
+        "intervalDays": 1,
+        "easeFactor": 2.5,
+        "repetitions": 0,
+        "lastRating": null,
+        "lastReviewedAt": null,
+        "nextDueAt": "2026-05-08T07:50:24.912Z",
+        "masteryLevel": 0,
+        "state": "new"
+      },
+      "id": "ZQoQW4cCnew"
+    },
+    {
+      "deckId": "deck-001",
+      "collectionId": "aVVZSDORtGU",
+      "userId": "user-001",
+      "contextId": "german-vocab",
+      "content": {
+        "front": "the subject (of an email)",
+        "back": "Betreff",
+        "article": "der",
+        "gender": "masculine",
+        "examples": [
+          {
+            "id": "996d7897-7ef5-425c-930f-ad540a40095e",
+            "target": "Der Betreff der Mail ist sehr wichtig.",
+            "native": "The subject line of the email is very important."
+          }
+        ],
+        "notes": "",
+        "audioAssetId": null,
+        "imageUrl": null,
+        "phonetic": null
+      },
+      "categoryIds": [
+        "Communication"
+      ],
+      "tags": [],
+      "createdAt": "2026-05-08T07:50:24.912Z",
+      "updatedAt": "2026-05-08T07:50:24.912Z",
+      "version": 1,
+      "srsState": {
+        "id": "4910cab0-e521-4be6-87a5-7ec003f00fbd",
+        "cardId": "",
+        "userId": "user-001",
+        "algorithm": "sm2",
+        "intervalDays": 1,
+        "easeFactor": 2.5,
+        "repetitions": 0,
+        "lastRating": null,
+        "lastReviewedAt": null,
+        "nextDueAt": "2026-05-08T07:50:24.912Z",
+        "masteryLevel": 0,
+        "state": "new"
+      },
+      "id": "eO9EELZKjUc"
+    },
+    {
+      "deckId": "deck-001",
+      "collectionId": "aVVZSDORtGU",
+      "userId": "user-001",
+      "contextId": "german-vocab",
+      "content": {
+        "front": "the greeting / salutation",
+        "back": "Anrede",
+        "article": "die",
+        "gender": "feminine",
+        "examples": [
+          {
+            "id": "89c58ce2-bc79-4e4e-8487-e6fe8d9b72f3",
+            "target": "Die Anrede in einer formellen Mail ist wichtig.",
+            "native": "The salutation in a formal email is important."
+          }
+        ],
+        "notes": "",
+        "audioAssetId": null,
+        "imageUrl": null,
+        "phonetic": null
+      },
+      "categoryIds": [
+        "Communication"
+      ],
+      "tags": [],
+      "createdAt": "2026-05-08T07:50:24.912Z",
+      "updatedAt": "2026-05-08T07:50:24.912Z",
+      "version": 1,
+      "srsState": {
+        "id": "d35fe4ca-58ab-40ff-9a9c-2628d24aa690",
+        "cardId": "",
+        "userId": "user-001",
+        "algorithm": "sm2",
+        "intervalDays": 1,
+        "easeFactor": 2.5,
+        "repetitions": 0,
+        "lastRating": null,
+        "lastReviewedAt": null,
+        "nextDueAt": "2026-05-08T07:50:24.912Z",
+        "masteryLevel": 0,
+        "state": "new"
+      },
+      "id": "JLXFRfe9usQ"
+    },
+    {
+      "deckId": "deck-001",
+      "collectionId": "aVVZSDORtGU",
+      "userId": "user-001",
+      "contextId": "german-vocab",
+      "content": {
+        "front": "warm regards",
+        "back": "herzliche Grüße",
+        "article": null,
+        "gender": null,
+        "examples": [
+          {
+            "id": "9dcd4a63-55b1-49a9-bfb2-910eb227eb4d",
+            "target": "Mit herzlichen Grüßen – dein Thomas.",
+            "native": "With warm regards – yours Thomas."
+          }
+        ],
+        "notes": "",
+        "audioAssetId": null,
+        "imageUrl": null,
+        "phonetic": null
+      },
+      "categoryIds": [
+        "Communication"
+      ],
+      "tags": [],
+      "createdAt": "2026-05-08T07:50:24.912Z",
+      "updatedAt": "2026-05-08T07:50:24.912Z",
+      "version": 1,
+      "srsState": {
+        "id": "cae31008-2177-48ef-9fab-aa0e44ada0cc",
+        "cardId": "",
+        "userId": "user-001",
+        "algorithm": "sm2",
+        "intervalDays": 1,
+        "easeFactor": 2.5,
+        "repetitions": 0,
+        "lastRating": null,
+        "lastReviewedAt": null,
+        "nextDueAt": "2026-05-08T07:50:24.912Z",
+        "masteryLevel": 0,
+        "state": "new"
+      },
+      "id": "aHup15MEVSg"
+    },
+    {
+      "deckId": "deck-001",
+      "collectionId": "aVVZSDORtGU",
+      "userId": "user-001",
+      "contextId": "german-vocab",
+      "content": {
+        "front": "the sparkling water",
+        "back": "Schorle",
+        "article": "die",
+        "gender": "feminine",
+        "examples": [
+          {
+            "id": "9ac0c1d6-9ba5-4cf7-9cb7-8129b2f4acde",
+            "target": "Ich trinke eine Apfelschorle.",
+            "native": "I am drinking an apple spritzer."
+          }
+        ],
+        "notes": "",
+        "audioAssetId": null,
+        "imageUrl": null,
+        "phonetic": null
+      },
+      "categoryIds": [
+        "cat-002"
+      ],
+      "tags": [],
+      "createdAt": "2026-05-08T07:50:24.912Z",
+      "updatedAt": "2026-05-08T07:50:24.912Z",
+      "version": 1,
+      "srsState": {
+        "id": "5b6cc967-22c7-49e6-9b3e-d8d023d7ba2d",
+        "cardId": "",
+        "userId": "user-001",
+        "algorithm": "sm2",
+        "intervalDays": 1,
+        "easeFactor": 2.5,
+        "repetitions": 0,
+        "lastRating": null,
+        "lastReviewedAt": null,
+        "nextDueAt": "2026-05-08T07:50:24.912Z",
+        "masteryLevel": 0,
+        "state": "new"
+      },
+      "id": "6euwHJKEacc"
+    },
+    {
+      "deckId": "deck-001",
+      "collectionId": "aVVZSDORtGU",
+      "userId": "user-001",
+      "contextId": "german-vocab",
+      "content": {
+        "front": "the ice cream",
+        "back": "Eis",
+        "article": "das",
+        "gender": "neuter",
+        "examples": [
+          {
+            "id": "b3827ef2-d2f7-43a0-89c3-d7fbecb350d0",
+            "target": "Ich esse gern Eis im Sommer.",
+            "native": "I like eating ice cream in summer."
+          }
+        ],
+        "notes": "",
+        "audioAssetId": null,
+        "imageUrl": null,
+        "phonetic": null
+      },
+      "categoryIds": [
+        "cat-002"
+      ],
+      "tags": [],
+      "createdAt": "2026-05-08T07:50:24.912Z",
+      "updatedAt": "2026-05-08T07:50:24.912Z",
+      "version": 1,
+      "srsState": {
+        "id": "9333f556-f9d4-43f4-908c-e9e1856700f3",
+        "cardId": "",
+        "userId": "user-001",
+        "algorithm": "sm2",
+        "intervalDays": 1,
+        "easeFactor": 2.5,
+        "repetitions": 0,
+        "lastRating": null,
+        "lastReviewedAt": null,
+        "nextDueAt": "2026-05-08T07:50:24.912Z",
+        "masteryLevel": 0,
+        "state": "new"
+      },
+      "id": "SsswFyrxTbE"
+    },
+    {
+      "deckId": "deck-001",
+      "collectionId": "aVVZSDORtGU",
+      "userId": "user-001",
+      "contextId": "german-vocab",
+      "content": {
+        "front": "the salami",
+        "back": "Salami",
+        "article": "die",
+        "gender": "feminine",
+        "examples": [
+          {
+            "id": "a4f06ba3-057b-424d-b269-0db8248f6f33",
+            "target": "Die Salami auf der Pizza ist sehr gut.",
+            "native": "The salami on the pizza is very good."
+          }
+        ],
+        "notes": "",
+        "audioAssetId": null,
+        "imageUrl": null,
+        "phonetic": null
+      },
+      "categoryIds": [
+        "cat-002"
+      ],
+      "tags": [],
+      "createdAt": "2026-05-08T07:50:24.912Z",
+      "updatedAt": "2026-05-08T07:50:24.912Z",
+      "version": 1,
+      "srsState": {
+        "id": "4f2d0107-d57a-49bc-b3fa-ec6cf965e8dc",
+        "cardId": "",
+        "userId": "user-001",
+        "algorithm": "sm2",
+        "intervalDays": 1,
+        "easeFactor": 2.5,
+        "repetitions": 0,
+        "lastRating": null,
+        "lastReviewedAt": null,
+        "nextDueAt": "2026-05-08T07:50:24.912Z",
+        "masteryLevel": 0,
+        "state": "new"
+      },
+      "id": "1NzgSCd3zIY"
+    },
+    {
+      "deckId": "deck-001",
+      "collectionId": "aVVZSDORtGU",
+      "userId": "user-001",
+      "contextId": "german-vocab",
+      "content": {
+        "front": "the schnitzel",
+        "back": "Schnitzel",
+        "article": "das",
+        "gender": "neuter",
+        "examples": [
+          {
+            "id": "06a1fec7-1e79-4f98-8e94-8e2a5e29f69d",
+            "target": "Das Wiener Schnitzel schmeckt ausgezeichnet.",
+            "native": "The Wiener Schnitzel tastes excellent."
+          }
+        ],
+        "notes": "",
+        "audioAssetId": null,
+        "imageUrl": null,
+        "phonetic": null
+      },
+      "categoryIds": [
+        "cat-002"
+      ],
+      "tags": [],
+      "createdAt": "2026-05-08T07:50:24.912Z",
+      "updatedAt": "2026-05-08T07:50:24.912Z",
+      "version": 1,
+      "srsState": {
+        "id": "3cb33418-2b5a-4fa2-af64-3c933686b66f",
+        "cardId": "",
+        "userId": "user-001",
+        "algorithm": "sm2",
+        "intervalDays": 1,
+        "easeFactor": 2.5,
+        "repetitions": 0,
+        "lastRating": null,
+        "lastReviewedAt": null,
+        "nextDueAt": "2026-05-08T07:50:24.912Z",
+        "masteryLevel": 0,
+        "state": "new"
+      },
+      "id": "vSvavXHuMTs"
+    },
+    {
+      "deckId": "deck-001",
+      "collectionId": "aVVZSDORtGU",
+      "userId": "user-001",
+      "contextId": "german-vocab",
+      "content": {
+        "front": "the tomato soup",
+        "back": "Tomatensuppe",
+        "article": "die",
+        "gender": "feminine",
+        "examples": [
+          {
+            "id": "c029c3f9-f911-4895-b3fb-bcf9726754ee",
+            "target": "Die Tomatensuppe ist heute sehr heiß.",
+            "native": "The tomato soup is very hot today."
+          }
+        ],
+        "notes": "",
+        "audioAssetId": null,
+        "imageUrl": null,
+        "phonetic": null
+      },
+      "categoryIds": [
+        "cat-002"
+      ],
+      "tags": [],
+      "createdAt": "2026-05-08T07:50:24.912Z",
+      "updatedAt": "2026-05-08T07:50:24.912Z",
+      "version": 1,
+      "srsState": {
+        "id": "15d0d9db-ac8f-4a48-b3e8-0072ae941f79",
+        "cardId": "",
+        "userId": "user-001",
+        "algorithm": "sm2",
+        "intervalDays": 1,
+        "easeFactor": 2.5,
+        "repetitions": 0,
+        "lastRating": null,
+        "lastReviewedAt": null,
+        "nextDueAt": "2026-05-08T07:50:24.912Z",
+        "masteryLevel": 0,
+        "state": "new"
+      },
+      "id": "pWBerHmabBE"
+    },
+    {
+      "deckId": "deck-001",
+      "collectionId": "aVVZSDORtGU",
+      "userId": "user-001",
+      "contextId": "german-vocab",
+      "content": {
+        "front": "the sandwich",
+        "back": "Sandwich",
+        "article": "der",
+        "gender": "masculine",
+        "examples": [
+          {
+            "id": "edd4ab7a-c93f-40b7-b030-5e904fc8bd0e",
+            "target": "Er isst jeden Mittag ein Sandwich.",
+            "native": "He eats a sandwich every lunchtime."
+          }
+        ],
+        "notes": "",
+        "audioAssetId": null,
+        "imageUrl": null,
+        "phonetic": null
+      },
+      "categoryIds": [
+        "cat-002"
+      ],
+      "tags": [],
+      "createdAt": "2026-05-08T07:50:24.912Z",
+      "updatedAt": "2026-05-08T07:50:24.912Z",
+      "version": 1,
+      "srsState": {
+        "id": "ad835687-8de5-46ae-a653-b6997ae32bb0",
+        "cardId": "",
+        "userId": "user-001",
+        "algorithm": "sm2",
+        "intervalDays": 1,
+        "easeFactor": 2.5,
+        "repetitions": 0,
+        "lastRating": null,
+        "lastReviewedAt": null,
+        "nextDueAt": "2026-05-08T07:50:24.912Z",
+        "masteryLevel": 0,
+        "state": "new"
+      },
+      "id": "COVPKyrM3eA"
+    },
+    {
+      "deckId": "deck-001",
+      "collectionId": "aVVZSDORtGU",
+      "userId": "user-001",
+      "contextId": "german-vocab",
+      "content": {
+        "front": "the thirst",
+        "back": "Durst",
+        "article": "der",
+        "gender": "masculine",
+        "examples": [
+          {
+            "id": "f210fd63-e420-4b48-b12b-ab6a0195594c",
+            "target": "Nach dem Sport habe ich großen Durst.",
+            "native": "After sport I am very thirsty."
+          }
+        ],
+        "notes": "",
+        "audioAssetId": null,
+        "imageUrl": null,
+        "phonetic": null
+      },
+      "categoryIds": [
+        "cat-002"
+      ],
+      "tags": [],
+      "createdAt": "2026-05-08T07:50:24.912Z",
+      "updatedAt": "2026-05-08T07:50:24.912Z",
+      "version": 1,
+      "srsState": {
+        "id": "77b46c3b-73ae-40fc-bc9f-ab271c10b501",
+        "cardId": "",
+        "userId": "user-001",
+        "algorithm": "sm2",
+        "intervalDays": 1,
+        "easeFactor": 2.5,
+        "repetitions": 0,
+        "lastRating": null,
+        "lastReviewedAt": null,
+        "nextDueAt": "2026-05-08T07:50:24.912Z",
+        "masteryLevel": 0,
+        "state": "new"
+      },
+      "id": "x1D2-9dsYxg"
+    },
+    {
+      "deckId": "deck-001",
+      "collectionId": "aVVZSDORtGU",
+      "userId": "user-001",
+      "contextId": "german-vocab",
+      "content": {
+        "front": "the hunger",
+        "back": "Hunger",
+        "article": "der",
+        "gender": "masculine",
+        "examples": [
+          {
+            "id": "11134aca-5270-463c-bc97-4c85f2fea933",
+            "target": "Ich habe Hunger – wann essen wir?",
+            "native": "I am hungry – when do we eat?"
+          }
+        ],
+        "notes": "",
+        "audioAssetId": null,
+        "imageUrl": null,
+        "phonetic": null
+      },
+      "categoryIds": [
+        "cat-002"
+      ],
+      "tags": [],
+      "createdAt": "2026-05-08T07:50:24.912Z",
+      "updatedAt": "2026-05-08T07:50:24.912Z",
+      "version": 1,
+      "srsState": {
+        "id": "9be7ec21-ce08-41c8-b654-696546f3d28e",
+        "cardId": "",
+        "userId": "user-001",
+        "algorithm": "sm2",
+        "intervalDays": 1,
+        "easeFactor": 2.5,
+        "repetitions": 0,
+        "lastRating": null,
+        "lastReviewedAt": null,
+        "nextDueAt": "2026-05-08T07:50:24.912Z",
+        "masteryLevel": 0,
+        "state": "new"
+      },
+      "id": "_X8Wh7W_36s"
+    },
+    {
+      "deckId": "deck-001",
+      "collectionId": "aVVZSDORtGU",
+      "userId": "user-001",
+      "contextId": "german-vocab",
+      "content": {
+        "front": "the menu",
+        "back": "Speisekarte",
+        "article": "die",
+        "gender": "feminine",
+        "examples": [
+          {
+            "id": "52b74a93-1da8-485b-9332-fd20bc1605e5",
+            "target": "Kann ich bitte die Speisekarte haben?",
+            "native": "Can I have the menu please?"
+          }
+        ],
+        "notes": "",
+        "audioAssetId": null,
+        "imageUrl": null,
+        "phonetic": null
+      },
+      "categoryIds": [
+        "cat-002"
+      ],
+      "tags": [],
+      "createdAt": "2026-05-08T07:50:24.912Z",
+      "updatedAt": "2026-05-08T07:50:24.912Z",
+      "version": 1,
+      "srsState": {
+        "id": "9133389b-a571-409f-b328-25ce9d2d19ce",
+        "cardId": "",
+        "userId": "user-001",
+        "algorithm": "sm2",
+        "intervalDays": 1,
+        "easeFactor": 2.5,
+        "repetitions": 0,
+        "lastRating": null,
+        "lastReviewedAt": null,
+        "nextDueAt": "2026-05-08T07:50:24.912Z",
+        "masteryLevel": 0,
+        "state": "new"
+      },
+      "id": "RAXhV5mHuuY"
+    },
+    {
+      "deckId": "deck-001",
+      "collectionId": "aVVZSDORtGU",
+      "userId": "user-001",
+      "contextId": "german-vocab",
+      "content": {
+        "front": "the order",
+        "back": "Bestellung",
+        "article": "die",
+        "gender": "feminine",
+        "examples": [
+          {
+            "id": "9987800f-a24e-4836-9ea5-e9c3e6b6f688",
+            "target": "Die Bestellung hat lange gedauert.",
+            "native": "The order took a long time."
+          }
+        ],
+        "notes": "",
+        "audioAssetId": null,
+        "imageUrl": null,
+        "phonetic": null
+      },
+      "categoryIds": [
+        "cat-002"
+      ],
+      "tags": [],
+      "createdAt": "2026-05-08T07:50:24.912Z",
+      "updatedAt": "2026-05-08T07:50:24.912Z",
+      "version": 1,
+      "srsState": {
+        "id": "15533fa5-3bf3-4efe-8463-2d77c27fcd0b",
+        "cardId": "",
+        "userId": "user-001",
+        "algorithm": "sm2",
+        "intervalDays": 1,
+        "easeFactor": 2.5,
+        "repetitions": 0,
+        "lastRating": null,
+        "lastReviewedAt": null,
+        "nextDueAt": "2026-05-08T07:50:24.912Z",
+        "masteryLevel": 0,
+        "state": "new"
+      },
+      "id": "cmh3Hso7nsg"
+    },
+    {
+      "deckId": "deck-001",
+      "collectionId": "aVVZSDORtGU",
+      "userId": "user-001",
+      "contextId": "german-vocab",
+      "content": {
+        "front": "to order",
+        "back": "bestellen",
+        "article": null,
+        "gender": null,
+        "examples": [
+          {
+            "id": "e73436d8-c0b2-400e-bd5d-153674cb7329",
+            "target": "Ich möchte bitte einen Kaffee bestellen.",
+            "native": "I would like to order a coffee please."
+          }
+        ],
+        "notes": "",
+        "audioAssetId": null,
+        "imageUrl": null,
+        "phonetic": null
+      },
+      "categoryIds": [
+        "cat-002"
+      ],
+      "tags": [],
+      "createdAt": "2026-05-08T07:50:24.912Z",
+      "updatedAt": "2026-05-08T07:50:24.912Z",
+      "version": 1,
+      "srsState": {
+        "id": "c094f099-90da-493e-9315-76120276a708",
+        "cardId": "",
+        "userId": "user-001",
+        "algorithm": "sm2",
+        "intervalDays": 1,
+        "easeFactor": 2.5,
+        "repetitions": 0,
+        "lastRating": null,
+        "lastReviewedAt": null,
+        "nextDueAt": "2026-05-08T07:50:24.912Z",
+        "masteryLevel": 0,
+        "state": "new"
+      },
+      "id": "SU8yXlryO-I"
+    },
+    {
+      "deckId": "deck-001",
+      "collectionId": "aVVZSDORtGU",
+      "userId": "user-001",
+      "contextId": "german-vocab",
+      "content": {
+        "front": "to bring",
+        "back": "bringen",
+        "article": null,
+        "gender": null,
+        "examples": [
+          {
+            "id": "a22ddb96-b071-4af5-95d7-c71f91de150f",
+            "target": "Können Sie mir bitte die Rechnung bringen?",
+            "native": "Can you please bring me the bill?"
+          }
+        ],
+        "notes": "",
+        "audioAssetId": null,
+        "imageUrl": null,
+        "phonetic": null
+      },
+      "categoryIds": [
+        "cat-004"
+      ],
+      "tags": [],
+      "createdAt": "2026-05-08T07:50:24.912Z",
+      "updatedAt": "2026-05-08T07:50:24.912Z",
+      "version": 1,
+      "srsState": {
+        "id": "8c31f4c9-27e9-47e6-b27f-016105519d4d",
+        "cardId": "",
+        "userId": "user-001",
+        "algorithm": "sm2",
+        "intervalDays": 1,
+        "easeFactor": 2.5,
+        "repetitions": 0,
+        "lastRating": null,
+        "lastReviewedAt": null,
+        "nextDueAt": "2026-05-08T07:50:24.912Z",
+        "masteryLevel": 0,
+        "state": "new"
+      },
+      "id": "kSD4wBjcBpc"
+    },
+    {
+      "deckId": "deck-001",
+      "collectionId": "aVVZSDORtGU",
+      "userId": "user-001",
+      "contextId": "german-vocab",
+      "content": {
+        "front": "For whom is ...?",
+        "back": "Für wen ist ...?",
+        "article": null,
+        "gender": null,
+        "examples": [
+          {
+            "id": "374633a5-565c-44a6-9908-6b77e0b533d9",
+            "target": "Für wen ist die Tomatensuppe?",
+            "native": "Who is the tomato soup for?"
+          }
+        ],
+        "notes": "",
+        "audioAssetId": null,
+        "imageUrl": null,
+        "phonetic": null
+      },
+      "categoryIds": [
+        "cat-002"
+      ],
+      "tags": [],
+      "createdAt": "2026-05-08T07:50:24.912Z",
+      "updatedAt": "2026-05-08T07:50:24.912Z",
+      "version": 1,
+      "srsState": {
+        "id": "252ca73d-6581-4096-9789-d6d3978e8ab8",
+        "cardId": "",
+        "userId": "user-001",
+        "algorithm": "sm2",
+        "intervalDays": 1,
+        "easeFactor": 2.5,
+        "repetitions": 0,
+        "lastRating": null,
+        "lastReviewedAt": null,
+        "nextDueAt": "2026-05-08T07:50:24.912Z",
+        "masteryLevel": 0,
+        "state": "new"
+      },
+      "id": "hCiL6QuinEY"
+    },
+    {
+      "deckId": "deck-001",
+      "collectionId": "aVVZSDORtGU",
+      "userId": "user-001",
+      "contextId": "german-vocab",
+      "content": {
+        "front": "to pay",
+        "back": "bezahlen",
+        "article": null,
+        "gender": null,
+        "examples": [
+          {
+            "id": "c919b198-bdbf-4a45-afca-1e19caddf694",
+            "target": "Ich möchte jetzt bezahlen bitte.",
+            "native": "I would like to pay now please."
+          }
+        ],
+        "notes": "",
+        "audioAssetId": null,
+        "imageUrl": null,
+        "phonetic": null
+      },
+      "categoryIds": [
+        "cat-002"
+      ],
+      "tags": [],
+      "createdAt": "2026-05-08T07:50:24.912Z",
+      "updatedAt": "2026-05-08T07:50:24.912Z",
+      "version": 1,
+      "srsState": {
+        "id": "7db7c182-a960-463a-b3a8-e521f727611b",
+        "cardId": "",
+        "userId": "user-001",
+        "algorithm": "sm2",
+        "intervalDays": 1,
+        "easeFactor": 2.5,
+        "repetitions": 0,
+        "lastRating": null,
+        "lastReviewedAt": null,
+        "nextDueAt": "2026-05-08T07:50:24.912Z",
+        "masteryLevel": 0,
+        "state": "new"
+      },
+      "id": "OtyGTkr3N4w"
+    },
+    {
+      "deckId": "deck-001",
+      "collectionId": "aVVZSDORtGU",
+      "userId": "user-001",
+      "contextId": "german-vocab",
+      "content": {
+        "front": "to pay (numbers)",
+        "back": "zahlen",
+        "article": null,
+        "gender": null,
+        "examples": [
+          {
+            "id": "4ff72fd3-70f5-494b-842b-8c9ba19c5ffa",
+            "target": "Zahlen bitte! – Ja natürlich.",
+            "native": "The bill please! – Yes of course."
+          }
+        ],
+        "notes": "",
+        "audioAssetId": null,
+        "imageUrl": null,
+        "phonetic": null
+      },
+      "categoryIds": [
+        "cat-002"
+      ],
+      "tags": [],
+      "createdAt": "2026-05-08T07:50:24.912Z",
+      "updatedAt": "2026-05-08T07:50:24.912Z",
+      "version": 1,
+      "srsState": {
+        "id": "67d89a75-6e22-454a-a08c-1cafe7b413fb",
+        "cardId": "",
+        "userId": "user-001",
+        "algorithm": "sm2",
+        "intervalDays": 1,
+        "easeFactor": 2.5,
+        "repetitions": 0,
+        "lastRating": null,
+        "lastReviewedAt": null,
+        "nextDueAt": "2026-05-08T07:50:24.912Z",
+        "masteryLevel": 0,
+        "state": "new"
+      },
+      "id": "n_C9IuuKFXg"
+    },
+    {
+      "deckId": "deck-001",
+      "collectionId": "aVVZSDORtGU",
+      "userId": "user-001",
+      "contextId": "german-vocab",
+      "content": {
+        "front": "the bill / invoice",
+        "back": "Rechnung",
+        "article": "die",
+        "gender": "feminine",
+        "examples": [
+          {
+            "id": "15b746c2-e16a-4b77-89e1-1036b29d9793",
+            "target": "Die Rechnung war höher als erwartet.",
+            "native": "The bill was higher than expected."
+          }
+        ],
+        "notes": "",
+        "audioAssetId": null,
+        "imageUrl": null,
+        "phonetic": null
+      },
+      "categoryIds": [
+        "cat-002"
+      ],
+      "tags": [],
+      "createdAt": "2026-05-08T07:50:24.912Z",
+      "updatedAt": "2026-05-08T07:50:24.912Z",
+      "version": 1,
+      "srsState": {
+        "id": "e4bd73b8-7f1a-49c6-b8e6-6eb06de8f04d",
+        "cardId": "",
+        "userId": "user-001",
+        "algorithm": "sm2",
+        "intervalDays": 1,
+        "easeFactor": 2.5,
+        "repetitions": 0,
+        "lastRating": null,
+        "lastReviewedAt": null,
+        "nextDueAt": "2026-05-08T07:50:24.912Z",
+        "masteryLevel": 0,
+        "state": "new"
+      },
+      "id": "eGIdkLbJm_A"
+    },
+    {
+      "deckId": "deck-001",
+      "collectionId": "aVVZSDORtGU",
+      "userId": "user-001",
+      "contextId": "german-vocab",
+      "content": {
+        "front": "Together or separately?",
+        "back": "Zusammen oder getrennt?",
+        "article": null,
+        "gender": null,
+        "examples": [
+          {
+            "id": "7303de98-2c47-4e98-ad7f-cf3e34842826",
+            "target": "Zahlen Sie zusammen oder getrennt?",
+            "native": "Are you paying together or separately?"
+          }
+        ],
+        "notes": "",
+        "audioAssetId": null,
+        "imageUrl": null,
+        "phonetic": null
+      },
+      "categoryIds": [
+        "cat-002"
+      ],
+      "tags": [],
+      "createdAt": "2026-05-08T07:50:24.912Z",
+      "updatedAt": "2026-05-08T07:50:24.912Z",
+      "version": 1,
+      "srsState": {
+        "id": "41508834-8cf5-427a-a5b0-a6ee2599a9a9",
+        "cardId": "",
+        "userId": "user-001",
+        "algorithm": "sm2",
+        "intervalDays": 1,
+        "easeFactor": 2.5,
+        "repetitions": 0,
+        "lastRating": null,
+        "lastReviewedAt": null,
+        "nextDueAt": "2026-05-08T07:50:24.912Z",
+        "masteryLevel": 0,
+        "state": "new"
+      },
+      "id": "A3NU7WiH-90"
+    },
+    {
+      "deckId": "deck-001",
+      "collectionId": "aVVZSDORtGU",
+      "userId": "user-001",
+      "contextId": "german-vocab",
+      "content": {
+        "front": "the tip",
+        "back": "Trinkgeld",
+        "article": "das",
+        "gender": "neuter",
+        "examples": [
+          {
+            "id": "4f3f6df0-322c-4dec-8800-6893e319b39c",
+            "target": "Das Trinkgeld war sehr großzügig.",
+            "native": "The tip was very generous."
+          }
+        ],
+        "notes": "",
+        "audioAssetId": null,
+        "imageUrl": null,
+        "phonetic": null
+      },
+      "categoryIds": [
+        "cat-002"
+      ],
+      "tags": [],
+      "createdAt": "2026-05-08T07:50:24.912Z",
+      "updatedAt": "2026-05-08T07:50:24.912Z",
+      "version": 1,
+      "srsState": {
+        "id": "548e6d84-56a3-4015-bd44-381e0a7c30e0",
+        "cardId": "",
+        "userId": "user-001",
+        "algorithm": "sm2",
+        "intervalDays": 1,
+        "easeFactor": 2.5,
+        "repetitions": 0,
+        "lastRating": null,
+        "lastReviewedAt": null,
+        "nextDueAt": "2026-05-08T07:50:24.912Z",
+        "masteryLevel": 0,
+        "state": "new"
+      },
+      "id": "uvzLhogIklA"
+    },
+    {
+      "deckId": "deck-001",
+      "collectionId": "aVVZSDORtGU",
+      "userId": "user-001",
+      "contextId": "german-vocab",
+      "content": {
+        "front": "he/it gives",
+        "back": "geben",
+        "article": null,
+        "gender": null,
+        "examples": [
+          {
+            "id": "057cea5a-7037-4a37-ac83-6df85c05d067",
+            "target": "Er gibt dem Kellner das Trinkgeld.",
+            "native": "He gives the waiter the tip."
+          }
+        ],
+        "notes": "",
+        "audioAssetId": null,
+        "imageUrl": null,
+        "phonetic": null
+      },
+      "categoryIds": [
+        "cat-004"
+      ],
+      "tags": [],
+      "createdAt": "2026-05-08T07:50:24.912Z",
+      "updatedAt": "2026-05-08T07:50:24.912Z",
+      "version": 1,
+      "srsState": {
+        "id": "e2afb359-a37e-4213-947d-ab68f0335504",
+        "cardId": "",
+        "userId": "user-001",
+        "algorithm": "sm2",
+        "intervalDays": 1,
+        "easeFactor": 2.5,
+        "repetitions": 0,
+        "lastRating": null,
+        "lastReviewedAt": null,
+        "nextDueAt": "2026-05-08T07:50:24.912Z",
+        "masteryLevel": 0,
+        "state": "new"
+      },
+      "id": "hncrug3LVUk"
+    },
+    {
+      "deckId": "deck-001",
+      "collectionId": "aVVZSDORtGU",
+      "userId": "user-001",
+      "contextId": "german-vocab",
+      "content": {
+        "front": "That is correct.",
+        "back": "Stimmt so.",
+        "article": null,
+        "gender": null,
+        "examples": [
+          {
+            "id": "7c5a4cee-1845-4ac0-9f68-7cdb8c2a5036",
+            "target": "Das stimmt so – behalten Sie den Rest!",
+            "native": "That is correct – keep the change!"
+          }
+        ],
+        "notes": "",
+        "audioAssetId": null,
+        "imageUrl": null,
+        "phonetic": null
+      },
+      "categoryIds": [
+        "cat-002"
+      ],
+      "tags": [],
+      "createdAt": "2026-05-08T07:50:24.912Z",
+      "updatedAt": "2026-05-08T07:50:24.912Z",
+      "version": 1,
+      "srsState": {
+        "id": "6ea7d9c4-9316-4fa5-9971-e54d5466177c",
+        "cardId": "",
+        "userId": "user-001",
+        "algorithm": "sm2",
+        "intervalDays": 1,
+        "easeFactor": 2.5,
+        "repetitions": 0,
+        "lastRating": null,
+        "lastReviewedAt": null,
+        "nextDueAt": "2026-05-08T07:50:24.912Z",
+        "masteryLevel": 0,
+        "state": "new"
+      },
+      "id": "YzDiBLIJses"
+    },
+    {
+      "deckId": "deck-001",
+      "collectionId": "aVVZSDORtGU",
+      "userId": "user-001",
+      "contextId": "german-vocab",
+      "content": {
+        "front": "the fork",
+        "back": "Gabel",
+        "article": "die",
+        "gender": "feminine",
+        "examples": [
+          {
+            "id": "a23576b8-22b2-42d2-b8ad-7dba97b77925",
+            "target": "Die Gabel liegt links vom Teller.",
+            "native": "The fork lies to the left of the plate."
+          }
+        ],
+        "notes": "",
+        "audioAssetId": null,
+        "imageUrl": null,
+        "phonetic": null
+      },
+      "categoryIds": [
+        "cat-002"
+      ],
+      "tags": [],
+      "createdAt": "2026-05-08T07:50:24.912Z",
+      "updatedAt": "2026-05-08T07:50:24.912Z",
+      "version": 1,
+      "srsState": {
+        "id": "2be754e4-e40e-4d53-b5e7-347be5cbaef1",
+        "cardId": "",
+        "userId": "user-001",
+        "algorithm": "sm2",
+        "intervalDays": 1,
+        "easeFactor": 2.5,
+        "repetitions": 0,
+        "lastRating": null,
+        "lastReviewedAt": null,
+        "nextDueAt": "2026-05-08T07:50:24.912Z",
+        "masteryLevel": 0,
+        "state": "new"
+      },
+      "id": "8aa6_1fbyCA"
+    },
+    {
+      "deckId": "deck-001",
+      "collectionId": "aVVZSDORtGU",
+      "userId": "user-001",
+      "contextId": "german-vocab",
+      "content": {
+        "front": "the knife",
+        "back": "Messer",
+        "article": "das",
+        "gender": "neuter",
+        "examples": [
+          {
+            "id": "a293963e-33a7-4bf2-b811-8a26a09e2b02",
+            "target": "Das Messer ist sehr scharf.",
+            "native": "The knife is very sharp."
+          }
+        ],
+        "notes": "",
+        "audioAssetId": null,
+        "imageUrl": null,
+        "phonetic": null
+      },
+      "categoryIds": [
+        "cat-002"
+      ],
+      "tags": [],
+      "createdAt": "2026-05-08T07:50:24.912Z",
+      "updatedAt": "2026-05-08T07:50:24.912Z",
+      "version": 1,
+      "srsState": {
+        "id": "cf7c0c17-bab8-4421-a16f-16d9355ec42f",
+        "cardId": "",
+        "userId": "user-001",
+        "algorithm": "sm2",
+        "intervalDays": 1,
+        "easeFactor": 2.5,
+        "repetitions": 0,
+        "lastRating": null,
+        "lastReviewedAt": null,
+        "nextDueAt": "2026-05-08T07:50:24.912Z",
+        "masteryLevel": 0,
+        "state": "new"
+      },
+      "id": "LX_Gf4JYJDk"
+    },
+    {
+      "deckId": "deck-001",
+      "collectionId": "aVVZSDORtGU",
+      "userId": "user-001",
+      "contextId": "german-vocab",
+      "content": {
+        "front": "the spoon",
+        "back": "Löffel",
+        "article": "der",
+        "gender": "masculine",
+        "examples": [
+          {
+            "id": "6e2be418-aaf5-4ca7-8001-413994ab6035",
+            "target": "Kann ich bitte einen Löffel haben?",
+            "native": "Can I please have a spoon?"
+          }
+        ],
+        "notes": "",
+        "audioAssetId": null,
+        "imageUrl": null,
+        "phonetic": null
+      },
+      "categoryIds": [
+        "cat-002"
+      ],
+      "tags": [],
+      "createdAt": "2026-05-08T07:50:24.912Z",
+      "updatedAt": "2026-05-08T07:50:24.912Z",
+      "version": 1,
+      "srsState": {
+        "id": "3dc13ab8-fc03-4959-9584-8b60f8d943b5",
+        "cardId": "",
+        "userId": "user-001",
+        "algorithm": "sm2",
+        "intervalDays": 1,
+        "easeFactor": 2.5,
+        "repetitions": 0,
+        "lastRating": null,
+        "lastReviewedAt": null,
+        "nextDueAt": "2026-05-08T07:50:24.912Z",
+        "masteryLevel": 0,
+        "state": "new"
+      },
+      "id": "PWTcxf2nvzo"
+    },
+    {
+      "deckId": "deck-001",
+      "collectionId": "aVVZSDORtGU",
+      "userId": "user-001",
+      "contextId": "german-vocab",
+      "content": {
+        "front": "the glass",
+        "back": "Glas",
+        "article": "das",
+        "gender": "neuter",
+        "examples": [
+          {
+            "id": "dd786d79-f121-4104-ae79-939b8280e077",
+            "target": "Das Glas Wasser ist kalt und erfrischend.",
+            "native": "The glass of water is cold and refreshing."
+          }
+        ],
+        "notes": "",
+        "audioAssetId": null,
+        "imageUrl": null,
+        "phonetic": null
+      },
+      "categoryIds": [
+        "cat-002"
+      ],
+      "tags": [],
+      "createdAt": "2026-05-08T07:50:24.912Z",
+      "updatedAt": "2026-05-08T07:50:24.912Z",
+      "version": 1,
+      "srsState": {
+        "id": "55282e2d-08fd-45ee-93da-5e1b88106e4d",
+        "cardId": "",
+        "userId": "user-001",
+        "algorithm": "sm2",
+        "intervalDays": 1,
+        "easeFactor": 2.5,
+        "repetitions": 0,
+        "lastRating": null,
+        "lastReviewedAt": null,
+        "nextDueAt": "2026-05-08T07:50:24.912Z",
+        "masteryLevel": 0,
+        "state": "new"
+      },
+      "id": "G8o2R5WIDX4"
+    },
+    {
+      "deckId": "deck-001",
+      "collectionId": "aVVZSDORtGU",
+      "userId": "user-001",
+      "contextId": "german-vocab",
+      "content": {
+        "front": "the cup",
+        "back": "Tasse",
+        "article": "die",
+        "gender": "feminine",
+        "examples": [
+          {
+            "id": "9de7794d-4762-4548-98b1-36b4f5ecbbe1",
+            "target": "Die Tasse Kaffee ist noch warm.",
+            "native": "The cup of coffee is still warm."
+          }
+        ],
+        "notes": "",
+        "audioAssetId": null,
+        "imageUrl": null,
+        "phonetic": null
+      },
+      "categoryIds": [
+        "cat-002"
+      ],
+      "tags": [],
+      "createdAt": "2026-05-08T07:50:24.912Z",
+      "updatedAt": "2026-05-08T07:50:24.912Z",
+      "version": 1,
+      "srsState": {
+        "id": "73a7b38b-204f-43e2-ad73-a3eef97f48b3",
+        "cardId": "",
+        "userId": "user-001",
+        "algorithm": "sm2",
+        "intervalDays": 1,
+        "easeFactor": 2.5,
+        "repetitions": 0,
+        "lastRating": null,
+        "lastReviewedAt": null,
+        "nextDueAt": "2026-05-08T07:50:24.912Z",
+        "masteryLevel": 0,
+        "state": "new"
+      },
+      "id": "pCODbjXE7iY"
+    },
+    {
+      "deckId": "deck-001",
+      "collectionId": "aVVZSDORtGU",
+      "userId": "user-001",
+      "contextId": "german-vocab",
+      "content": {
+        "front": "the plate",
+        "back": "Teller",
+        "article": "der",
+        "gender": "masculine",
+        "examples": [
+          {
+            "id": "2fdbe564-767d-44ed-bf63-1f9fe1590c98",
+            "target": "Der Teller ist schön dekoriert.",
+            "native": "The plate is nicely decorated."
+          }
+        ],
+        "notes": "",
+        "audioAssetId": null,
+        "imageUrl": null,
+        "phonetic": null
+      },
+      "categoryIds": [
+        "cat-002"
+      ],
+      "tags": [],
+      "createdAt": "2026-05-08T07:50:24.912Z",
+      "updatedAt": "2026-05-08T07:50:24.912Z",
+      "version": 1,
+      "srsState": {
+        "id": "3b7d003b-bf23-4ba0-a610-00c86c46af0d",
+        "cardId": "",
+        "userId": "user-001",
+        "algorithm": "sm2",
+        "intervalDays": 1,
+        "easeFactor": 2.5,
+        "repetitions": 0,
+        "lastRating": null,
+        "lastReviewedAt": null,
+        "nextDueAt": "2026-05-08T07:50:24.912Z",
+        "masteryLevel": 0,
+        "state": "new"
+      },
+      "id": "u3_036jnPXA"
+    },
+    {
+      "deckId": "deck-001",
+      "collectionId": "aVVZSDORtGU",
+      "userId": "user-001",
+      "contextId": "german-vocab",
+      "content": {
+        "front": "the napkin",
+        "back": "Serviette",
+        "article": "die",
+        "gender": "feminine",
+        "examples": [
+          {
+            "id": "c7e35053-8bf2-45dd-bdd0-31fc7471271d",
+            "target": "Können Sie mir bitte eine Serviette geben?",
+            "native": "Can you please give me a napkin?"
+          }
+        ],
+        "notes": "",
+        "audioAssetId": null,
+        "imageUrl": null,
+        "phonetic": null
+      },
+      "categoryIds": [
+        "cat-002"
+      ],
+      "tags": [],
+      "createdAt": "2026-05-08T07:50:24.912Z",
+      "updatedAt": "2026-05-08T07:50:24.912Z",
+      "version": 1,
+      "srsState": {
+        "id": "6d29ee8a-bee7-439d-a89f-98d24a4a4a4f",
+        "cardId": "",
+        "userId": "user-001",
+        "algorithm": "sm2",
+        "intervalDays": 1,
+        "easeFactor": 2.5,
+        "repetitions": 0,
+        "lastRating": null,
+        "lastReviewedAt": null,
+        "nextDueAt": "2026-05-08T07:50:24.912Z",
+        "masteryLevel": 0,
+        "state": "new"
+      },
+      "id": "ZYEM23UPxRk"
+    },
+    {
+      "deckId": "deck-001",
+      "collectionId": "aVVZSDORtGU",
+      "userId": "user-001",
+      "contextId": "german-vocab",
+      "content": {
+        "front": "the pub / bar",
+        "back": "Kneipe",
+        "article": "die",
+        "gender": "feminine",
+        "examples": [
+          {
+            "id": "9231e5be-392f-4c1f-8462-33de504f1120",
+            "target": "Wir treffen uns heute Abend in der Kneipe.",
+            "native": "We are meeting at the pub this evening."
+          }
+        ],
+        "notes": "",
+        "audioAssetId": null,
+        "imageUrl": null,
+        "phonetic": null
+      },
+      "categoryIds": [
+        "cat-002"
+      ],
+      "tags": [],
+      "createdAt": "2026-05-08T07:50:24.912Z",
+      "updatedAt": "2026-05-08T07:50:24.912Z",
+      "version": 1,
+      "srsState": {
+        "id": "eed2527e-eff6-4ca8-96e1-edc5dbe214cf",
+        "cardId": "",
+        "userId": "user-001",
+        "algorithm": "sm2",
+        "intervalDays": 1,
+        "easeFactor": 2.5,
+        "repetitions": 0,
+        "lastRating": null,
+        "lastReviewedAt": null,
+        "nextDueAt": "2026-05-08T07:50:24.912Z",
+        "masteryLevel": 0,
+        "state": "new"
+      },
+      "id": "S6IPIu4E-gk"
+    },
+    {
+      "deckId": "deck-001",
+      "collectionId": "aVVZSDORtGU",
+      "userId": "user-001",
+      "contextId": "german-vocab",
+      "content": {
+        "front": "the café",
+        "back": "Kaffeehaus",
+        "article": "das",
+        "gender": "neuter",
+        "examples": [
+          {
+            "id": "23be0b42-da6a-44c8-8a38-a8588b9e679f",
+            "target": "Das Kaffeehaus ist am Wochenende sehr voll.",
+            "native": "The café is very full at the weekend."
+          }
+        ],
+        "notes": "",
+        "audioAssetId": null,
+        "imageUrl": null,
+        "phonetic": null
+      },
+      "categoryIds": [
+        "cat-002"
+      ],
+      "tags": [],
+      "createdAt": "2026-05-08T07:50:24.912Z",
+      "updatedAt": "2026-05-08T07:50:24.912Z",
+      "version": 1,
+      "srsState": {
+        "id": "76f000ef-1a99-4179-92ff-d78b6e0458f1",
+        "cardId": "",
+        "userId": "user-001",
+        "algorithm": "sm2",
+        "intervalDays": 1,
+        "easeFactor": 2.5,
+        "repetitions": 0,
+        "lastRating": null,
+        "lastReviewedAt": null,
+        "nextDueAt": "2026-05-08T07:50:24.912Z",
+        "masteryLevel": 0,
+        "state": "new"
+      },
+      "id": "103LgxgFsGQ"
+    },
+    {
+      "deckId": "deck-001",
+      "collectionId": "aVVZSDORtGU",
+      "userId": "user-001",
+      "contextId": "german-vocab",
+      "content": {
+        "front": "the restaurant / venue",
+        "back": "Lokal",
+        "article": "das",
+        "gender": "neuter",
+        "examples": [
+          {
+            "id": "f6ddea85-93cf-4bc3-a501-d7e7ffbc67fe",
+            "target": "Das Lokal hat sehr gute Bewertungen.",
+            "native": "The restaurant has very good reviews."
+          }
+        ],
+        "notes": "",
+        "audioAssetId": null,
+        "imageUrl": null,
+        "phonetic": null
+      },
+      "categoryIds": [
+        "cat-002"
+      ],
+      "tags": [],
+      "createdAt": "2026-05-08T07:50:24.912Z",
+      "updatedAt": "2026-05-08T07:50:24.912Z",
+      "version": 1,
+      "srsState": {
+        "id": "2caf3817-cfec-4f21-b817-770422546d77",
+        "cardId": "",
+        "userId": "user-001",
+        "algorithm": "sm2",
+        "intervalDays": 1,
+        "easeFactor": 2.5,
+        "repetitions": 0,
+        "lastRating": null,
+        "lastReviewedAt": null,
+        "nextDueAt": "2026-05-08T07:50:24.912Z",
+        "masteryLevel": 0,
+        "state": "new"
+      },
+      "id": "MITWtxHWcPk"
+    },
+    {
+      "deckId": "deck-001",
+      "collectionId": "aVVZSDORtGU",
+      "userId": "user-001",
+      "contextId": "german-vocab",
+      "content": {
+        "front": "the beer garden",
+        "back": "Biergarten",
+        "article": "der",
+        "gender": "masculine",
+        "examples": [
+          {
+            "id": "a50d3e5a-f214-41fc-8590-7093fdc27d0c",
+            "target": "Im Sommer sitzen wir gern im Biergarten.",
+            "native": "In summer we like to sit in the beer garden."
+          }
+        ],
+        "notes": "",
+        "audioAssetId": null,
+        "imageUrl": null,
+        "phonetic": null
+      },
+      "categoryIds": [
+        "cat-002"
+      ],
+      "tags": [],
+      "createdAt": "2026-05-08T07:50:24.912Z",
+      "updatedAt": "2026-05-08T07:50:24.912Z",
+      "version": 1,
+      "srsState": {
+        "id": "a86c760b-5e1d-4a96-a128-08f678c5d6cc",
+        "cardId": "",
+        "userId": "user-001",
+        "algorithm": "sm2",
+        "intervalDays": 1,
+        "easeFactor": 2.5,
+        "repetitions": 0,
+        "lastRating": null,
+        "lastReviewedAt": null,
+        "nextDueAt": "2026-05-08T07:50:24.912Z",
+        "masteryLevel": 0,
+        "state": "new"
+      },
+      "id": "N3miGMnv_yw"
+    },
+    {
+      "deckId": "deck-001",
+      "collectionId": "aVVZSDORtGU",
+      "userId": "user-001",
+      "contextId": "german-vocab",
+      "content": {
+        "front": "the bench / bank",
+        "back": "Bank",
+        "article": "die",
+        "gender": "feminine",
+        "examples": [
+          {
+            "id": "5b092b7e-c0ce-4fcf-8aef-dc452fb61106",
+            "target": "Die Bank am Park ist sehr bequem.",
+            "native": "The bench in the park is very comfortable."
+          }
+        ],
+        "notes": "",
+        "audioAssetId": null,
+        "imageUrl": null,
+        "phonetic": null
+      },
+      "categoryIds": [
+        "cat-004"
+      ],
+      "tags": [],
+      "createdAt": "2026-05-08T07:50:24.912Z",
+      "updatedAt": "2026-05-08T07:50:24.912Z",
+      "version": 1,
+      "srsState": {
+        "id": "a68d2650-ffd8-46b1-ad79-b32dc551ae1c",
+        "cardId": "",
+        "userId": "user-001",
+        "algorithm": "sm2",
+        "intervalDays": 1,
+        "easeFactor": 2.5,
+        "repetitions": 0,
+        "lastRating": null,
+        "lastReviewedAt": null,
+        "nextDueAt": "2026-05-08T07:50:24.912Z",
+        "masteryLevel": 0,
+        "state": "new"
+      },
+      "id": "mj0BFBOpDes"
+    },
+    {
+      "deckId": "deck-001",
+      "collectionId": "aVVZSDORtGU",
+      "userId": "user-001",
+      "contextId": "german-vocab",
+      "content": {
+        "front": "self-service",
+        "back": "Selbstbedienung",
+        "article": "die",
+        "gender": "feminine",
+        "examples": [
+          {
+            "id": "9b4b0b96-c654-4352-b8ab-8d0f67fea1a4",
+            "target": "Bei uns gibt es Selbstbedienung.",
+            "native": "We have self-service here."
+          }
+        ],
+        "notes": "",
+        "audioAssetId": null,
+        "imageUrl": null,
+        "phonetic": null
+      },
+      "categoryIds": [
+        "cat-002"
+      ],
+      "tags": [],
+      "createdAt": "2026-05-08T07:50:24.912Z",
+      "updatedAt": "2026-05-08T07:50:24.912Z",
+      "version": 1,
+      "srsState": {
+        "id": "469a9626-20fb-46cf-b26f-fa3d122ca342",
+        "cardId": "",
+        "userId": "user-001",
+        "algorithm": "sm2",
+        "intervalDays": 1,
+        "easeFactor": 2.5,
+        "repetitions": 0,
+        "lastRating": null,
+        "lastReviewedAt": null,
+        "nextDueAt": "2026-05-08T07:50:24.912Z",
+        "masteryLevel": 0,
+        "state": "new"
+      },
+      "id": "5qjkvgILAjE"
+    },
+    {
+      "deckId": "deck-001",
+      "collectionId": "aVVZSDORtGU",
+      "userId": "user-001",
+      "contextId": "german-vocab",
+      "content": {
+        "front": "open",
+        "back": "geöffnet",
+        "article": null,
+        "gender": null,
+        "examples": [
+          {
+            "id": "9d00ed05-8e05-45f7-9abd-099536b65321",
+            "target": "Das Restaurant ist heute bis 22 Uhr geöffnet.",
+            "native": "The restaurant is open today until 10 pm."
+          }
+        ],
+        "notes": "",
+        "audioAssetId": null,
+        "imageUrl": null,
+        "phonetic": null
+      },
+      "categoryIds": [
+        "cat-004"
+      ],
+      "tags": [],
+      "createdAt": "2026-05-08T07:50:24.912Z",
+      "updatedAt": "2026-05-08T07:50:24.912Z",
+      "version": 1,
+      "srsState": {
+        "id": "1b7b4a11-4fe8-42dd-bda7-347f2231120e",
+        "cardId": "",
+        "userId": "user-001",
+        "algorithm": "sm2",
+        "intervalDays": 1,
+        "easeFactor": 2.5,
+        "repetitions": 0,
+        "lastRating": null,
+        "lastReviewedAt": null,
+        "nextDueAt": "2026-05-08T07:50:24.912Z",
+        "masteryLevel": 0,
+        "state": "new"
+      },
+      "id": "tZoKvANBh5I"
+    },
+    {
+      "deckId": "deck-001",
+      "collectionId": "aVVZSDORtGU",
+      "userId": "user-001",
+      "contextId": "german-vocab",
+      "content": {
+        "front": "outside",
+        "back": "draußen",
+        "article": null,
+        "gender": null,
+        "examples": [
+          {
+            "id": "1d3cf952-43d9-434f-a568-14d5a7e05531",
+            "target": "Man kann draußen sitzen wenn das Wetter gut ist.",
+            "native": "You can sit outside when the weather is good."
+          }
+        ],
+        "notes": "",
+        "audioAssetId": null,
+        "imageUrl": null,
+        "phonetic": null
+      },
+      "categoryIds": [
+        "cat-004"
+      ],
+      "tags": [],
+      "createdAt": "2026-05-08T07:50:24.912Z",
+      "updatedAt": "2026-05-08T07:50:24.912Z",
+      "version": 1,
+      "srsState": {
+        "id": "2ed6913d-1e85-490b-ab2c-ea3d83b7e1d6",
+        "cardId": "",
+        "userId": "user-001",
+        "algorithm": "sm2",
+        "intervalDays": 1,
+        "easeFactor": 2.5,
+        "repetitions": 0,
+        "lastRating": null,
+        "lastReviewedAt": null,
+        "nextDueAt": "2026-05-08T07:50:24.912Z",
+        "masteryLevel": 0,
+        "state": "new"
+      },
+      "id": "p2hL0sKDCWg"
+    },
+    {
+      "deckId": "deck-001",
+      "collectionId": "aVVZSDORtGU",
+      "userId": "user-001",
+      "contextId": "german-vocab",
+      "content": {
+        "front": "the programme / schedule",
+        "back": "Programm",
+        "article": "das",
+        "gender": "neuter",
+        "examples": [
+          {
+            "id": "75b6996a-c87e-4037-ab5e-92e5850b9a3a",
+            "target": "Was steht heute auf dem Programm?",
+            "native": "What is on the programme today?"
+          }
+        ],
+        "notes": "",
+        "audioAssetId": null,
+        "imageUrl": null,
+        "phonetic": null
+      },
+      "categoryIds": [
+        "Events"
+      ],
+      "tags": [],
+      "createdAt": "2026-05-08T07:50:24.912Z",
+      "updatedAt": "2026-05-08T07:50:24.912Z",
+      "version": 1,
+      "srsState": {
+        "id": "b821010d-7e6c-4c51-9868-28d1cf30a276",
+        "cardId": "",
+        "userId": "user-001",
+        "algorithm": "sm2",
+        "intervalDays": 1,
+        "easeFactor": 2.5,
+        "repetitions": 0,
+        "lastRating": null,
+        "lastReviewedAt": null,
+        "nextDueAt": "2026-05-08T07:50:24.912Z",
+        "masteryLevel": 0,
+        "state": "new"
+      },
+      "id": "HdhRhtcyyU8"
+    },
+    {
+      "deckId": "deck-001",
+      "collectionId": "aVVZSDORtGU",
+      "userId": "user-001",
+      "contextId": "german-vocab",
+      "content": {
+        "front": "to be on / what's going on",
+        "back": "los sein",
+        "article": null,
+        "gender": null,
+        "examples": [
+          {
+            "id": "c8aebd1c-2fb8-4047-b193-168ddc743d13",
+            "target": "Was ist hier los? Es ist sehr laut!",
+            "native": "What is going on here? It is very loud!"
+          }
+        ],
+        "notes": "",
+        "audioAssetId": null,
+        "imageUrl": null,
+        "phonetic": null
+      },
+      "categoryIds": [
+        "Events"
+      ],
+      "tags": [],
+      "createdAt": "2026-05-08T07:50:24.912Z",
+      "updatedAt": "2026-05-08T07:50:24.912Z",
+      "version": 1,
+      "srsState": {
+        "id": "ad10fb67-b56f-4401-a959-2f29a0547beb",
+        "cardId": "",
+        "userId": "user-001",
+        "algorithm": "sm2",
+        "intervalDays": 1,
+        "easeFactor": 2.5,
+        "repetitions": 0,
+        "lastRating": null,
+        "lastReviewedAt": null,
+        "nextDueAt": "2026-05-08T07:50:24.912Z",
+        "masteryLevel": 0,
+        "state": "new"
+      },
+      "id": "B5G1u1xATGA"
+    },
+    {
+      "deckId": "deck-001",
+      "collectionId": "aVVZSDORtGU",
+      "userId": "user-001",
+      "contextId": "german-vocab",
+      "content": {
+        "front": "to have no desire",
+        "back": "keine Lust haben",
+        "article": null,
+        "gender": null,
+        "examples": [
+          {
+            "id": "30031248-e1a7-48ac-a0f8-96c46f930d7b",
+            "target": "Ich habe keine Lust auf Sport heute.",
+            "native": "I don't feel like doing sport today."
+          }
+        ],
+        "notes": "",
+        "audioAssetId": null,
+        "imageUrl": null,
+        "phonetic": null
+      },
+      "categoryIds": [
+        "cat-004"
+      ],
+      "tags": [],
+      "createdAt": "2026-05-08T07:50:24.912Z",
+      "updatedAt": "2026-05-08T07:50:24.912Z",
+      "version": 1,
+      "srsState": {
+        "id": "2c3666b3-ab87-446f-94cc-ceb349e35ef4",
+        "cardId": "",
+        "userId": "user-001",
+        "algorithm": "sm2",
+        "intervalDays": 1,
+        "easeFactor": 2.5,
+        "repetitions": 0,
+        "lastRating": null,
+        "lastReviewedAt": null,
+        "nextDueAt": "2026-05-08T07:50:24.912Z",
+        "masteryLevel": 0,
+        "state": "new"
+      },
+      "id": "fz0f8Fyk55U"
+    },
+    {
+      "deckId": "deck-001",
+      "collectionId": "aVVZSDORtGU",
+      "userId": "user-001",
+      "contextId": "german-vocab",
+      "content": {
+        "front": "to come along",
+        "back": "mitkommen",
+        "article": null,
+        "gender": null,
+        "examples": [
+          {
+            "id": "71005925-72dc-4a8f-943d-f463fa99fa91",
+            "target": "Kommst du mit ins Kino?",
+            "native": "Are you coming along to the cinema?"
+          }
+        ],
+        "notes": "",
+        "audioAssetId": null,
+        "imageUrl": null,
+        "phonetic": null
+      },
+      "categoryIds": [
+        "cat-004"
+      ],
+      "tags": [],
+      "createdAt": "2026-05-08T07:50:24.912Z",
+      "updatedAt": "2026-05-08T07:50:24.912Z",
+      "version": 1,
+      "srsState": {
+        "id": "c8aa4627-993e-4cf4-b798-ef91653e6e1c",
+        "cardId": "",
+        "userId": "user-001",
+        "algorithm": "sm2",
+        "intervalDays": 1,
+        "easeFactor": 2.5,
+        "repetitions": 0,
+        "lastRating": null,
+        "lastReviewedAt": null,
+        "nextDueAt": "2026-05-08T07:50:24.912Z",
+        "masteryLevel": 0,
+        "state": "new"
+      },
+      "id": "q9y-qJdt6t4"
+    },
+    {
+      "deckId": "deck-001",
+      "collectionId": "aVVZSDORtGU",
+      "userId": "user-001",
+      "contextId": "german-vocab",
+      "content": {
+        "front": "the meeting point",
+        "back": "Treffpunkt",
+        "article": "der",
+        "gender": "masculine",
+        "examples": [
+          {
+            "id": "3a4f645f-cf33-4224-b58e-23d4c6821cf7",
+            "target": "Der Treffpunkt ist vor dem Hauptbahnhof.",
+            "native": "The meeting point is in front of the main station."
+          }
+        ],
+        "notes": "",
+        "audioAssetId": null,
+        "imageUrl": null,
+        "phonetic": null
+      },
+      "categoryIds": [
+        "Events"
+      ],
+      "tags": [],
+      "createdAt": "2026-05-08T07:50:24.912Z",
+      "updatedAt": "2026-05-08T07:50:24.912Z",
+      "version": 1,
+      "srsState": {
+        "id": "ee91d631-5d2f-43f2-9bd2-8a3480fe2414",
+        "cardId": "",
+        "userId": "user-001",
+        "algorithm": "sm2",
+        "intervalDays": 1,
+        "easeFactor": 2.5,
+        "repetitions": 0,
+        "lastRating": null,
+        "lastReviewedAt": null,
+        "nextDueAt": "2026-05-08T07:50:24.912Z",
+        "masteryLevel": 0,
+        "state": "new"
+      },
+      "id": "qqmWEdAGkcY"
+    },
+    {
+      "deckId": "deck-001",
+      "collectionId": "aVVZSDORtGU",
+      "userId": "user-001",
+      "contextId": "german-vocab",
+      "content": {
+        "front": "the admission / entrance fee",
+        "back": "Eintritt",
+        "article": "der",
+        "gender": "masculine",
+        "examples": [
+          {
+            "id": "bf209d17-719d-46fc-aaaf-f5e11cd525d8",
+            "target": "Der Eintritt kostet zehn Euro.",
+            "native": "Admission costs ten euros."
+          }
+        ],
+        "notes": "",
+        "audioAssetId": null,
+        "imageUrl": null,
+        "phonetic": null
+      },
+      "categoryIds": [
+        "Events"
+      ],
+      "tags": [],
+      "createdAt": "2026-05-08T07:50:24.912Z",
+      "updatedAt": "2026-05-08T07:50:24.912Z",
+      "version": 1,
+      "srsState": {
+        "id": "37d769ce-7f79-4c43-8c00-8a3ac1ca8bc5",
+        "cardId": "",
+        "userId": "user-001",
+        "algorithm": "sm2",
+        "intervalDays": 1,
+        "easeFactor": 2.5,
+        "repetitions": 0,
+        "lastRating": null,
+        "lastReviewedAt": null,
+        "nextDueAt": "2026-05-08T07:50:24.912Z",
+        "masteryLevel": 0,
+        "state": "new"
+      },
+      "id": "sPUUCTnjtVE"
+    },
+    {
+      "deckId": "deck-001",
+      "collectionId": "aVVZSDORtGU",
+      "userId": "user-001",
+      "contextId": "german-vocab",
+      "content": {
+        "front": "the registration",
+        "back": "Anmeldung",
+        "article": "die",
+        "gender": "feminine",
+        "examples": [
+          {
+            "id": "66068569-6e73-4cfe-93a5-09ae4ecb50d6",
+            "target": "Die Anmeldung für den Kurs ist online.",
+            "native": "Registration for the course is online."
+          }
+        ],
+        "notes": "",
+        "audioAssetId": null,
+        "imageUrl": null,
+        "phonetic": null
+      },
+      "categoryIds": [
+        "Events"
+      ],
+      "tags": [],
+      "createdAt": "2026-05-08T07:50:24.912Z",
+      "updatedAt": "2026-05-08T07:50:24.912Z",
+      "version": 1,
+      "srsState": {
+        "id": "a7e44671-013f-4af2-9f4a-e06808f9ca3e",
+        "cardId": "",
+        "userId": "user-001",
+        "algorithm": "sm2",
+        "intervalDays": 1,
+        "easeFactor": 2.5,
+        "repetitions": 0,
+        "lastRating": null,
+        "lastReviewedAt": null,
+        "nextDueAt": "2026-05-08T07:50:24.912Z",
+        "masteryLevel": 0,
+        "state": "new"
+      },
+      "id": "idIS8c84VqM"
+    },
+    {
+      "deckId": "deck-001",
+      "collectionId": "aVVZSDORtGU",
+      "userId": "user-001",
+      "contextId": "german-vocab",
+      "content": {
+        "front": "to begin / start",
+        "back": "beginnen",
+        "article": null,
+        "gender": null,
+        "examples": [
+          {
+            "id": "5eafaae8-cadd-4980-8ac0-4f47ef234e0b",
+            "target": "Das Konzert beginnt um acht Uhr.",
+            "native": "The concert begins at eight o'clock."
+          }
+        ],
+        "notes": "",
+        "audioAssetId": null,
+        "imageUrl": null,
+        "phonetic": null
+      },
+      "categoryIds": [
+        "Events"
+      ],
+      "tags": [],
+      "createdAt": "2026-05-08T07:50:24.912Z",
+      "updatedAt": "2026-05-08T07:50:24.912Z",
+      "version": 1,
+      "srsState": {
+        "id": "959f593d-5ec0-4f11-95ab-c76f54b42560",
+        "cardId": "",
+        "userId": "user-001",
+        "algorithm": "sm2",
+        "intervalDays": 1,
+        "easeFactor": 2.5,
+        "repetitions": 0,
+        "lastRating": null,
+        "lastReviewedAt": null,
+        "nextDueAt": "2026-05-08T07:50:24.912Z",
+        "masteryLevel": 0,
+        "state": "new"
+      },
+      "id": "hJaQ9YV38E4"
+    },
+    {
+      "deckId": "deck-001",
+      "collectionId": "aVVZSDORtGU",
+      "userId": "user-001",
+      "contextId": "german-vocab",
+      "content": {
+        "front": "to end",
+        "back": "enden",
+        "article": null,
+        "gender": null,
+        "examples": [
+          {
+            "id": "d9fb9d37-6307-4539-8e4d-cba83b3f1bac",
+            "target": "Die Veranstaltung endet um Mitternacht.",
+            "native": "The event ends at midnight."
+          }
+        ],
+        "notes": "",
+        "audioAssetId": null,
+        "imageUrl": null,
+        "phonetic": null
+      },
+      "categoryIds": [
+        "Events"
+      ],
+      "tags": [],
+      "createdAt": "2026-05-08T07:50:24.912Z",
+      "updatedAt": "2026-05-08T07:50:24.912Z",
+      "version": 1,
+      "srsState": {
+        "id": "febee30f-ebe6-4cf5-8a66-1be14cdc8b1c",
+        "cardId": "",
+        "userId": "user-001",
+        "algorithm": "sm2",
+        "intervalDays": 1,
+        "easeFactor": 2.5,
+        "repetitions": 0,
+        "lastRating": null,
+        "lastReviewedAt": null,
+        "nextDueAt": "2026-05-08T07:50:24.912Z",
+        "masteryLevel": 0,
+        "state": "new"
+      },
+      "id": "_AURe2YIwxo"
+    },
+    {
+      "deckId": "deck-001",
+      "collectionId": "aVVZSDORtGU",
+      "userId": "user-001",
+      "contextId": "german-vocab",
+      "content": {
+        "front": "the card / ticket",
+        "back": "Karte",
+        "article": "die",
+        "gender": "feminine",
+        "examples": [
+          {
+            "id": "1bf449c2-eccf-4f81-a799-abda5d801a30",
+            "target": "Ich habe zwei Karten für das Konzert.",
+            "native": "I have two tickets for the concert."
+          }
+        ],
+        "notes": "",
+        "audioAssetId": null,
+        "imageUrl": null,
+        "phonetic": null
+      },
+      "categoryIds": [
+        "Events"
+      ],
+      "tags": [],
+      "createdAt": "2026-05-08T07:50:24.912Z",
+      "updatedAt": "2026-05-08T07:50:24.912Z",
+      "version": 1,
+      "srsState": {
+        "id": "bc9ab7a0-3508-458f-9615-02d41cb7d02b",
+        "cardId": "",
+        "userId": "user-001",
+        "algorithm": "sm2",
+        "intervalDays": 1,
+        "easeFactor": 2.5,
+        "repetitions": 0,
+        "lastRating": null,
+        "lastReviewedAt": null,
+        "nextDueAt": "2026-05-08T07:50:24.912Z",
+        "masteryLevel": 0,
+        "state": "new"
+      },
+      "id": "FicBJUxrrxM"
+    },
+    {
+      "deckId": "deck-001",
+      "collectionId": "aVVZSDORtGU",
+      "userId": "user-001",
+      "contextId": "german-vocab",
+      "content": {
+        "front": "to believe / think",
+        "back": "glauben",
+        "article": null,
+        "gender": null,
+        "examples": [
+          {
+            "id": "4007fc11-af69-4cf7-aecc-7c638b4c2343",
+            "target": "Ich glaube das ist eine gute Idee.",
+            "native": "I think that is a good idea."
+          }
+        ],
+        "notes": "",
+        "audioAssetId": null,
+        "imageUrl": null,
+        "phonetic": null
+      },
+      "categoryIds": [
+        "cat-004"
+      ],
+      "tags": [],
+      "createdAt": "2026-05-08T07:50:24.912Z",
+      "updatedAt": "2026-05-08T07:50:24.912Z",
+      "version": 1,
+      "srsState": {
+        "id": "46d04515-ef9a-4c2a-b8a1-5080bae70170",
+        "cardId": "",
+        "userId": "user-001",
+        "algorithm": "sm2",
+        "intervalDays": 1,
+        "easeFactor": 2.5,
+        "repetitions": 0,
+        "lastRating": null,
+        "lastReviewedAt": null,
+        "nextDueAt": "2026-05-08T07:50:24.912Z",
+        "masteryLevel": 0,
+        "state": "new"
+      },
+      "id": "5q_ezwBLfI0"
+    },
+    {
+      "deckId": "deck-001",
+      "collectionId": "aVVZSDORtGU",
+      "userId": "user-001",
+      "contextId": "german-vocab",
+      "content": {
+        "front": "to run / he runs",
+        "back": "laufen",
+        "article": null,
+        "gender": null,
+        "examples": [
+          {
+            "id": "9edf467e-b1bd-496c-8a67-5c48ad3e296c",
+            "target": "Er läuft jeden Morgen fünf Kilometer.",
+            "native": "He runs five kilometres every morning."
+          }
+        ],
+        "notes": "",
+        "audioAssetId": null,
+        "imageUrl": null,
+        "phonetic": null
+      },
+      "categoryIds": [
+        "Leisure"
+      ],
+      "tags": [],
+      "createdAt": "2026-05-08T07:50:24.912Z",
+      "updatedAt": "2026-05-08T07:50:24.912Z",
+      "version": 1,
+      "srsState": {
+        "id": "5bbc78de-c104-4340-8c70-1e5abb7b73ae",
+        "cardId": "",
+        "userId": "user-001",
+        "algorithm": "sm2",
+        "intervalDays": 1,
+        "easeFactor": 2.5,
+        "repetitions": 0,
+        "lastRating": null,
+        "lastReviewedAt": null,
+        "nextDueAt": "2026-05-08T07:50:24.912Z",
+        "masteryLevel": 0,
+        "state": "new"
+      },
+      "id": "EqMOur4L26E"
+    },
+    {
+      "deckId": "deck-001",
+      "collectionId": "aVVZSDORtGU",
+      "userId": "user-001",
+      "contextId": "german-vocab",
+      "content": {
+        "front": "to enjoy",
+        "back": "genießen",
+        "article": null,
+        "gender": null,
+        "examples": [
+          {
+            "id": "8aba4b7c-c82a-400e-8e9b-4ebed1df52c7",
+            "target": "Wir genießen den schönen Abend.",
+            "native": "We are enjoying the lovely evening."
+          }
+        ],
+        "notes": "",
+        "audioAssetId": null,
+        "imageUrl": null,
+        "phonetic": null
+      },
+      "categoryIds": [
+        "cat-004"
+      ],
+      "tags": [],
+      "createdAt": "2026-05-08T07:50:24.912Z",
+      "updatedAt": "2026-05-08T07:50:24.912Z",
+      "version": 1,
+      "srsState": {
+        "id": "434bb4d1-86e1-4ec5-83c4-a69b39489c92",
+        "cardId": "",
+        "userId": "user-001",
+        "algorithm": "sm2",
+        "intervalDays": 1,
+        "easeFactor": 2.5,
+        "repetitions": 0,
+        "lastRating": null,
+        "lastReviewedAt": null,
+        "nextDueAt": "2026-05-08T07:50:24.912Z",
+        "masteryLevel": 0,
+        "state": "new"
+      },
+      "id": "Cr4CQT3pRao"
+    },
+    {
+      "deckId": "deck-001",
+      "collectionId": "aVVZSDORtGU",
+      "userId": "user-001",
+      "contextId": "german-vocab",
+      "content": {
+        "front": "to happen / pass",
+        "back": "passieren",
+        "article": null,
+        "gender": null,
+        "examples": [
+          {
+            "id": "3bf1c5d4-185a-4cd2-a299-4e736a0f7f96",
+            "target": "Was ist passiert? Alles in Ordnung?",
+            "native": "What happened? Is everything alright?"
+          }
+        ],
+        "notes": "",
+        "audioAssetId": null,
+        "imageUrl": null,
+        "phonetic": null
+      },
+      "categoryIds": [
+        "cat-004"
+      ],
+      "tags": [],
+      "createdAt": "2026-05-08T07:50:24.912Z",
+      "updatedAt": "2026-05-08T07:50:24.912Z",
+      "version": 1,
+      "srsState": {
+        "id": "049d70ad-0cff-4f1e-806e-8051eb460f77",
+        "cardId": "",
+        "userId": "user-001",
+        "algorithm": "sm2",
+        "intervalDays": 1,
+        "easeFactor": 2.5,
+        "repetitions": 0,
+        "lastRating": null,
+        "lastReviewedAt": null,
+        "nextDueAt": "2026-05-08T07:50:24.912Z",
+        "masteryLevel": 0,
+        "state": "new"
+      },
+      "id": "l9FwLcVLKKI"
+    },
+    {
+      "deckId": "deck-001",
+      "collectionId": "aVVZSDORtGU",
+      "userId": "user-001",
+      "contextId": "german-vocab",
+      "content": {
+        "front": "at home",
+        "back": "zu Hause",
+        "article": null,
+        "gender": null,
+        "examples": [
+          {
+            "id": "42524364-e395-42e8-a747-95217ea1bee3",
+            "target": "Ich bin heute den ganzen Tag zu Hause.",
+            "native": "I am at home all day today."
+          }
+        ],
+        "notes": "",
+        "audioAssetId": null,
+        "imageUrl": null,
+        "phonetic": null
+      },
+      "categoryIds": [
+        "cat-004"
+      ],
+      "tags": [],
+      "createdAt": "2026-05-08T07:50:24.912Z",
+      "updatedAt": "2026-05-08T07:50:24.912Z",
+      "version": 1,
+      "srsState": {
+        "id": "d5cf8564-1d9f-4c22-839c-83b868b0d9af",
+        "cardId": "",
+        "userId": "user-001",
+        "algorithm": "sm2",
+        "intervalDays": 1,
+        "easeFactor": 2.5,
+        "repetitions": 0,
+        "lastRating": null,
+        "lastReviewedAt": null,
+        "nextDueAt": "2026-05-08T07:50:24.912Z",
+        "masteryLevel": 0,
+        "state": "new"
+      },
+      "id": "8Qrctpnvzjo"
+    },
+    {
+      "deckId": "deck-001",
+      "collectionId": "aVVZSDORtGU",
+      "userId": "user-001",
+      "contextId": "german-vocab",
+      "content": {
+        "front": "cold",
+        "back": "kalt",
+        "article": null,
+        "gender": null,
+        "examples": [
+          {
+            "id": "4ecfe140-96c0-4212-847a-5b741ff5373d",
+            "target": "Das Wasser ist heute sehr kalt.",
+            "native": "The water is very cold today."
+          }
+        ],
+        "notes": "",
+        "audioAssetId": null,
+        "imageUrl": null,
+        "phonetic": null
+      },
+      "categoryIds": [
+        "cat-004"
+      ],
+      "tags": [],
+      "createdAt": "2026-05-08T07:50:24.912Z",
+      "updatedAt": "2026-05-08T07:50:24.912Z",
+      "version": 1,
+      "srsState": {
+        "id": "31d5638f-de24-4cd7-b442-8f3e2b9ae785",
+        "cardId": "",
+        "userId": "user-001",
+        "algorithm": "sm2",
+        "intervalDays": 1,
+        "easeFactor": 2.5,
+        "repetitions": 0,
+        "lastRating": null,
+        "lastReviewedAt": null,
+        "nextDueAt": "2026-05-08T07:50:24.912Z",
+        "masteryLevel": 0,
+        "state": "new"
+      },
+      "id": "F7WSXYWO2dk"
+    },
+    {
+      "deckId": "deck-001",
+      "collectionId": "aVVZSDORtGU",
+      "userId": "user-001",
+      "contextId": "german-vocab",
+      "content": {
+        "front": "warm",
+        "back": "warm",
+        "article": null,
+        "gender": null,
+        "examples": [
+          {
+            "id": "93fd807e-13c6-4192-af41-020cab5228f8",
+            "target": "Die Suppe ist noch warm.",
+            "native": "The soup is still warm."
+          }
+        ],
+        "notes": "",
+        "audioAssetId": null,
+        "imageUrl": null,
+        "phonetic": null
+      },
+      "categoryIds": [
+        "cat-004"
+      ],
+      "tags": [],
+      "createdAt": "2026-05-08T07:50:24.912Z",
+      "updatedAt": "2026-05-08T11:04:08.611Z",
+      "version": 1,
+      "srsState": {
+        "id": "20133750-bfc9-4fbb-ac70-1732e97f650c",
+        "cardId": "",
+        "userId": "user-001",
+        "algorithm": "sm2",
+        "intervalDays": 2,
+        "easeFactor": 2.35,
+        "repetitions": 0,
+        "lastRating": 1,
+        "lastReviewedAt": "2026-05-08T11:04:08.611Z",
+        "nextDueAt": "2026-05-10T11:04:08.611Z",
+        "masteryLevel": 0,
+        "state": "new"
+      },
+      "id": "OzdpFBEpBOQ"
+    },
+    {
+      "deckId": "deck-001",
+      "collectionId": "aVVZSDORtGU",
+      "userId": "user-001",
+      "contextId": "german-vocab",
+      "content": {
+        "front": "again",
+        "back": "wieder",
+        "article": null,
+        "gender": null,
+        "examples": [
+          {
+            "id": "447133c2-a943-493f-b380-a8ab77e2958e",
+            "target": "Wir sehen uns wieder nächste Woche.",
+            "native": "We will see each other again next week."
+          }
+        ],
+        "notes": "",
+        "audioAssetId": null,
+        "imageUrl": null,
+        "phonetic": null
+      },
+      "categoryIds": [
+        "cat-004"
+      ],
+      "tags": [],
+      "createdAt": "2026-05-08T07:50:24.912Z",
+      "updatedAt": "2026-05-08T07:50:24.912Z",
+      "version": 1,
+      "srsState": {
+        "id": "80dd48cc-0cb5-4e97-ba47-13113e66f0fc",
+        "cardId": "",
+        "userId": "user-001",
+        "algorithm": "sm2",
+        "intervalDays": 1,
+        "easeFactor": 2.5,
+        "repetitions": 0,
+        "lastRating": null,
+        "lastReviewedAt": null,
+        "nextDueAt": "2026-05-08T07:50:24.912Z",
+        "masteryLevel": 0,
+        "state": "new"
+      },
+      "id": "p7NxMRxYuyg"
+    },
+    {
+      "deckId": "deck-001",
+      "collectionId": "aVVZSDORtGU",
+      "userId": "user-001",
+      "contextId": "german-vocab",
+      "content": {
+        "front": "typical",
+        "back": "typisch",
+        "article": null,
+        "gender": null,
+        "examples": [
+          {
+            "id": "8a48e6a4-f3e0-4d80-b891-96940f8aad05",
+            "target": "Das ist typisch deutsch.",
+            "native": "That is typically German."
+          }
+        ],
+        "notes": "",
+        "audioAssetId": null,
+        "imageUrl": null,
+        "phonetic": null
+      },
+      "categoryIds": [
+        "cat-004"
+      ],
+      "tags": [],
+      "createdAt": "2026-05-08T07:50:24.912Z",
+      "updatedAt": "2026-05-08T07:50:24.912Z",
+      "version": 1,
+      "srsState": {
+        "id": "c835820c-afef-40b3-8a9e-4ba1a80402e1",
+        "cardId": "",
+        "userId": "user-001",
+        "algorithm": "sm2",
+        "intervalDays": 1,
+        "easeFactor": 2.5,
+        "repetitions": 0,
+        "lastRating": null,
+        "lastReviewedAt": null,
+        "nextDueAt": "2026-05-08T07:50:24.912Z",
+        "masteryLevel": 0,
+        "state": "new"
+      },
+      "id": "pg_LKqAANgo"
+    },
+    {
+      "deckId": "deck-001",
+      "collectionId": "aVVZSDORtGU",
+      "userId": "user-001",
+      "contextId": "german-vocab",
+      "content": {
+        "front": "forbidden / not allowed",
+        "back": "verboten",
+        "article": null,
+        "gender": null,
+        "examples": [
+          {
+            "id": "45fb8977-2026-4366-a235-919d7d2e8eee",
+            "target": "Hier ist Rauchen verboten.",
+            "native": "Smoking is forbidden here."
+          }
+        ],
+        "notes": "",
+        "audioAssetId": null,
+        "imageUrl": null,
+        "phonetic": null
+      },
+      "categoryIds": [
+        "cat-004"
+      ],
+      "tags": [],
+      "createdAt": "2026-05-08T07:50:24.912Z",
+      "updatedAt": "2026-05-08T07:50:24.912Z",
+      "version": 1,
+      "srsState": {
+        "id": "4e14d497-b045-46dc-85a7-ef8073ce0c21",
+        "cardId": "",
+        "userId": "user-001",
+        "algorithm": "sm2",
+        "intervalDays": 1,
+        "easeFactor": 2.5,
+        "repetitions": 0,
+        "lastRating": null,
+        "lastReviewedAt": null,
+        "nextDueAt": "2026-05-08T07:50:24.912Z",
+        "masteryLevel": 0,
+        "state": "new"
+      },
+      "id": "m5cOhvKOwl8"
+    },
+    {
+      "deckId": "deck-001",
+      "collectionId": "aVVZSDORtGU",
+      "userId": "user-001",
+      "contextId": "german-vocab",
+      "content": {
+        "front": "everywhere",
+        "back": "überall",
+        "article": null,
+        "gender": null,
+        "examples": [
+          {
+            "id": "64947595-8a46-4b40-831b-b8f4190f0eb8",
+            "target": "Die Touristen sind überall in der Stadt.",
+            "native": "The tourists are everywhere in the city."
+          }
+        ],
+        "notes": "",
+        "audioAssetId": null,
+        "imageUrl": null,
+        "phonetic": null
+      },
+      "categoryIds": [
+        "cat-004"
+      ],
+      "tags": [],
+      "createdAt": "2026-05-08T07:50:24.912Z",
+      "updatedAt": "2026-05-08T11:04:12.684Z",
+      "version": 1,
+      "srsState": {
+        "id": "f7f280ce-718b-4a73-aa9b-9f8f9e400276",
+        "cardId": "",
+        "userId": "user-001",
+        "algorithm": "sm2",
+        "intervalDays": 2,
+        "easeFactor": 2.35,
+        "repetitions": 0,
+        "lastRating": 1,
+        "lastReviewedAt": "2026-05-08T11:04:12.684Z",
+        "nextDueAt": "2026-05-10T11:04:12.684Z",
+        "masteryLevel": 0,
+        "state": "new"
+      },
+      "id": "qioQtTJ_M5M"
+    },
+    {
+      "deckId": "deck-001",
+      "collectionId": "aVVZSDORtGU",
+      "userId": "user-001",
+      "contextId": "german-vocab",
+      "content": {
+        "front": "especially",
+        "back": "besonders",
+        "article": null,
+        "gender": null,
+        "examples": [
+          {
+            "id": "5640a702-68d2-4a47-a7cd-c30411ac8b96",
+            "target": "Das Essen ist hier besonders gut.",
+            "native": "The food here is especially good."
+          }
+        ],
+        "notes": "",
+        "audioAssetId": null,
+        "imageUrl": null,
+        "phonetic": null
+      },
+      "categoryIds": [
+        "cat-004"
+      ],
+      "tags": [],
+      "createdAt": "2026-05-08T07:50:24.912Z",
+      "updatedAt": "2026-05-08T07:50:24.912Z",
+      "version": 1,
+      "srsState": {
+        "id": "27f32c65-d990-454b-a439-4e200a639324",
+        "cardId": "",
+        "userId": "user-001",
+        "algorithm": "sm2",
+        "intervalDays": 1,
+        "easeFactor": 2.5,
+        "repetitions": 0,
+        "lastRating": null,
+        "lastReviewedAt": null,
+        "nextDueAt": "2026-05-08T07:50:24.912Z",
+        "masteryLevel": 0,
+        "state": "new"
+      },
+      "id": "W0IF8uGWdZ4"
+    },
+    {
+      "deckId": "deck-001",
+      "collectionId": "aVVZSDORtGU",
+      "userId": "user-001",
+      "contextId": "german-vocab",
+      "content": {
+        "front": "the playground",
+        "back": "Spielplatz",
+        "article": "der",
+        "gender": "masculine",
+        "examples": [
+          {
+            "id": "63d5a661-3889-4eb9-8959-6bc5734a48b4",
+            "target": "Die Kinder spielen auf dem Spielplatz.",
+            "native": "The children are playing on the playground."
+          }
+        ],
+        "notes": "",
+        "audioAssetId": null,
+        "imageUrl": null,
+        "phonetic": null
+      },
+      "categoryIds": [
+        "cat-004"
+      ],
+      "tags": [],
+      "createdAt": "2026-05-08T07:50:24.912Z",
+      "updatedAt": "2026-05-08T07:50:24.912Z",
+      "version": 1,
+      "srsState": {
+        "id": "f3a8973b-346c-4092-8983-26b52db8c840",
+        "cardId": "",
+        "userId": "user-001",
+        "algorithm": "sm2",
+        "intervalDays": 1,
+        "easeFactor": 2.5,
+        "repetitions": 0,
+        "lastRating": null,
+        "lastReviewedAt": null,
+        "nextDueAt": "2026-05-08T07:50:24.912Z",
+        "masteryLevel": 0,
+        "state": "new"
+      },
+      "id": "Jdr06U1abGo"
+    },
+    {
+      "deckId": "deck-001",
+      "collectionId": "aVVZSDORtGU",
+      "userId": "user-001",
+      "contextId": "german-vocab",
+      "content": {
+        "front": "early",
+        "back": "früh",
+        "article": null,
+        "gender": null,
+        "examples": [
+          {
+            "id": "8ca5e229-fc43-4f79-8397-d82478c2f978",
+            "target": "Ich stehe morgen früh um sechs Uhr auf.",
+            "native": "I get up early tomorrow at six o'clock."
+          }
+        ],
+        "notes": "",
+        "audioAssetId": null,
+        "imageUrl": null,
+        "phonetic": null
+      },
+      "categoryIds": [
+        "cat-004"
+      ],
+      "tags": [],
+      "createdAt": "2026-05-08T07:50:24.912Z",
+      "updatedAt": "2026-05-08T07:50:24.912Z",
+      "version": 1,
+      "srsState": {
+        "id": "c35d6a2c-306a-4242-a796-ac16a01fdad7",
+        "cardId": "",
+        "userId": "user-001",
+        "algorithm": "sm2",
+        "intervalDays": 1,
+        "easeFactor": 2.5,
+        "repetitions": 0,
+        "lastRating": null,
+        "lastReviewedAt": null,
+        "nextDueAt": "2026-05-08T07:50:24.912Z",
+        "masteryLevel": 0,
+        "state": "new"
+      },
+      "id": "PBt4bZ-CHaU"
+    },
+    {
+      "deckId": "deck-001",
+      "collectionId": "aVVZSDORtGU",
+      "userId": "user-001",
+      "contextId": "german-vocab",
+      "content": {
+        "front": "Why not?",
+        "back": "Warum nicht?",
+        "article": null,
+        "gender": null,
+        "examples": [
+          {
+            "id": "f50ef435-5c6e-4d68-82d4-ddc3d6787518",
+            "target": "Warum nicht – das klingt gut!",
+            "native": "Why not – that sounds good!"
+          }
+        ],
+        "notes": "",
+        "audioAssetId": null,
+        "imageUrl": null,
+        "phonetic": null
+      },
+      "categoryIds": [
+        "cat-004"
+      ],
+      "tags": [],
+      "createdAt": "2026-05-08T07:50:24.912Z",
+      "updatedAt": "2026-05-08T07:50:24.912Z",
+      "version": 1,
+      "srsState": {
+        "id": "1b719f38-461c-43ba-89d4-ae3d26230904",
+        "cardId": "",
+        "userId": "user-001",
+        "algorithm": "sm2",
+        "intervalDays": 1,
+        "easeFactor": 2.5,
+        "repetitions": 0,
+        "lastRating": null,
+        "lastReviewedAt": null,
+        "nextDueAt": "2026-05-08T07:50:24.912Z",
+        "masteryLevel": 0,
+        "state": "new"
+      },
+      "id": "NP2MLHkJ6qQ"
+    },
+    {
+      "deckId": "deck-001",
+      "collectionId": "aVVZSDORtGU",
+      "userId": "user-001",
+      "contextId": "german-vocab",
+      "content": {
+        "front": "Is that clear?",
+        "back": "Alles klar?",
+        "article": null,
+        "gender": null,
+        "examples": [
+          {
+            "id": "cd91d493-8385-4984-91e0-2f3f73881933",
+            "target": "Alles klar – wir sehen uns um acht!",
+            "native": "All clear – we will see each other at eight!"
+          }
+        ],
+        "notes": "",
+        "audioAssetId": null,
+        "imageUrl": null,
+        "phonetic": null
+      },
+      "categoryIds": [
+        "cat-004"
+      ],
+      "tags": [],
+      "createdAt": "2026-05-08T07:50:24.912Z",
+      "updatedAt": "2026-05-08T07:50:24.912Z",
+      "version": 1,
+      "srsState": {
+        "id": "44f77f6d-1dae-4af4-ac99-fbaa6615ee67",
+        "cardId": "",
+        "userId": "user-001",
+        "algorithm": "sm2",
+        "intervalDays": 1,
+        "easeFactor": 2.5,
+        "repetitions": 0,
+        "lastRating": null,
+        "lastReviewedAt": null,
+        "nextDueAt": "2026-05-08T07:50:24.912Z",
+        "masteryLevel": 0,
+        "state": "new"
+      },
+      "id": "XLGXBjTdW30"
+    },
+    {
+      "deckId": "deck-001",
+      "collectionId": "aVVZSDORtGU",
+      "userId": "user-001",
+      "contextId": "german-vocab",
+      "content": {
+        "front": "When then?",
+        "back": "Wann denn?",
+        "article": null,
+        "gender": null,
+        "examples": [
+          {
+            "id": "0f0633a5-30bd-42ec-92cd-3527243f88a8",
+            "target": "Wann denn – heute oder morgen?",
+            "native": "When then – today or tomorrow?"
+          }
+        ],
+        "notes": "",
+        "audioAssetId": null,
+        "imageUrl": null,
+        "phonetic": null
+      },
+      "categoryIds": [
+        "cat-004"
+      ],
+      "tags": [],
+      "createdAt": "2026-05-08T07:50:24.912Z",
+      "updatedAt": "2026-05-08T07:50:24.912Z",
+      "version": 1,
+      "srsState": {
+        "id": "5cc8a802-0cc3-4496-9d21-cd6b2b2174ed",
+        "cardId": "",
+        "userId": "user-001",
+        "algorithm": "sm2",
+        "intervalDays": 1,
+        "easeFactor": 2.5,
+        "repetitions": 0,
+        "lastRating": null,
+        "lastReviewedAt": null,
+        "nextDueAt": "2026-05-08T07:50:24.912Z",
+        "masteryLevel": 0,
+        "state": "new"
+      },
+      "id": "X8rt4DqkUI0"
+    },
+    {
+      "deckId": "deck-001",
+      "collectionId": "aVVZSDORtGU",
+      "userId": "user-001",
+      "contextId": "german-vocab",
+      "content": {
+        "front": "Sounds good.",
+        "back": "Klingt gut.",
+        "article": null,
+        "gender": null,
+        "examples": [
+          {
+            "id": "3bae58f7-3de8-4e86-a961-b39375a5e16a",
+            "target": "Klingt gut – ich komme gerne mit!",
+            "native": "Sounds good – I would love to come along!"
+          }
+        ],
+        "notes": "",
+        "audioAssetId": null,
+        "imageUrl": null,
+        "phonetic": null
+      },
+      "categoryIds": [
+        "cat-004"
+      ],
+      "tags": [],
+      "createdAt": "2026-05-08T07:50:24.912Z",
+      "updatedAt": "2026-05-08T07:50:24.912Z",
+      "version": 1,
+      "srsState": {
+        "id": "1e20e30b-a763-481f-95fe-08819060d4f1",
+        "cardId": "",
+        "userId": "user-001",
+        "algorithm": "sm2",
+        "intervalDays": 1,
+        "easeFactor": 2.5,
+        "repetitions": 0,
+        "lastRating": null,
+        "lastReviewedAt": null,
+        "nextDueAt": "2026-05-08T07:50:24.912Z",
+        "masteryLevel": 0,
+        "state": "new"
+      },
+      "id": "7cOMliFXZ2Q"
+    },
+    {
+      "deckId": "deck-001",
+      "collectionId": "aVVZSDORtGU",
+      "userId": "user-001",
+      "contextId": "german-vocab",
+      "content": {
+        "front": "to pick up / collect",
+        "back": "abholen",
+        "article": null,
+        "gender": null,
+        "examples": [
+          {
+            "id": "ff6f9730-7d4e-473b-afbe-4a426102cced",
+            "target": "Ich hole dich um sieben Uhr ab.",
+            "native": "I will pick you up at seven o'clock."
+          }
+        ],
+        "notes": "",
+        "audioAssetId": null,
+        "imageUrl": null,
+        "phonetic": null
+      },
+      "categoryIds": [
+        "cat-004"
+      ],
+      "tags": [],
+      "createdAt": "2026-05-08T07:50:24.912Z",
+      "updatedAt": "2026-05-08T07:50:24.912Z",
+      "version": 1,
+      "srsState": {
+        "id": "f630c9b6-683d-4cfc-bf3b-f5802834c753",
+        "cardId": "",
+        "userId": "user-001",
+        "algorithm": "sm2",
+        "intervalDays": 1,
+        "easeFactor": 2.5,
+        "repetitions": 0,
+        "lastRating": null,
+        "lastReviewedAt": null,
+        "nextDueAt": "2026-05-08T07:50:24.912Z",
+        "masteryLevel": 0,
+        "state": "new"
+      },
+      "id": "EwlL9iwm9Ss"
+    },
+    {
+      "deckId": "deck-001",
+      "collectionId": "aVVZSDORtGU",
+      "userId": "user-001",
+      "contextId": "german-vocab",
+      "content": {
+        "front": "to begin / start",
+        "back": "anfangen",
+        "article": null,
+        "gender": null,
+        "examples": [
+          {
+            "id": "98ee8920-59d3-45f7-aef4-907ff5a67144",
+            "target": "Wann fängt die Party an?",
+            "native": "When does the party start?"
+          }
+        ],
+        "notes": "",
+        "audioAssetId": null,
+        "imageUrl": null,
+        "phonetic": null
+      },
+      "categoryIds": [
+        "cat-004"
+      ],
+      "tags": [],
+      "createdAt": "2026-05-08T07:50:24.912Z",
+      "updatedAt": "2026-05-08T07:50:24.912Z",
+      "version": 1,
+      "srsState": {
+        "id": "ed3482a5-da00-420e-90d4-8ed669377acf",
+        "cardId": "",
+        "userId": "user-001",
+        "algorithm": "sm2",
+        "intervalDays": 1,
+        "easeFactor": 2.5,
+        "repetitions": 0,
+        "lastRating": null,
+        "lastReviewedAt": null,
+        "nextDueAt": "2026-05-08T07:50:24.912Z",
+        "masteryLevel": 0,
+        "state": "new"
+      },
+      "id": "GoogKSalk_U"
+    },
+    {
+      "deckId": "deck-001",
+      "collectionId": "aVVZSDORtGU",
+      "userId": "user-001",
+      "contextId": "german-vocab",
+      "content": {
+        "front": "to call (phone)",
+        "back": "anrufen",
+        "article": null,
+        "gender": null,
+        "examples": [
+          {
+            "id": "ce43953a-54cc-4194-8290-ce92f197689c",
+            "target": "Ich rufe dich morgen an.",
+            "native": "I will call you tomorrow."
+          }
+        ],
+        "notes": "",
+        "audioAssetId": null,
+        "imageUrl": null,
+        "phonetic": null
+      },
+      "categoryIds": [
+        "Communication"
+      ],
+      "tags": [],
+      "createdAt": "2026-05-08T07:50:24.912Z",
+      "updatedAt": "2026-05-08T07:50:24.912Z",
+      "version": 1,
+      "srsState": {
+        "id": "6240a2c0-5fc2-4627-9e87-65cb9aa6a338",
+        "cardId": "",
+        "userId": "user-001",
+        "algorithm": "sm2",
+        "intervalDays": 1,
+        "easeFactor": 2.5,
+        "repetitions": 0,
+        "lastRating": null,
+        "lastReviewedAt": null,
+        "nextDueAt": "2026-05-08T07:50:24.912Z",
+        "masteryLevel": 0,
+        "state": "new"
+      },
+      "id": "W2yeC8Vzw8w"
+    },
+    {
+      "deckId": "deck-001",
+      "collectionId": "aVVZSDORtGU",
+      "userId": "user-001",
+      "contextId": "german-vocab",
+      "content": {
+        "front": "to stop / listen",
+        "back": "aufhören",
+        "article": null,
+        "gender": null,
+        "examples": [
+          {
+            "id": "0887a174-0a1e-45b6-a493-a8c2d2662e18",
+            "target": "Hör bitte auf mit dem Lärm!",
+            "native": "Please stop making that noise!"
+          }
+        ],
+        "notes": "",
+        "audioAssetId": null,
+        "imageUrl": null,
+        "phonetic": null
+      },
+      "categoryIds": [
+        "cat-004"
+      ],
+      "tags": [],
+      "createdAt": "2026-05-08T07:50:24.912Z",
+      "updatedAt": "2026-05-08T07:50:24.912Z",
+      "version": 1,
+      "srsState": {
+        "id": "e85efb1a-d0db-49b6-9777-6f1333006e13",
+        "cardId": "",
+        "userId": "user-001",
+        "algorithm": "sm2",
+        "intervalDays": 1,
+        "easeFactor": 2.5,
+        "repetitions": 0,
+        "lastRating": null,
+        "lastReviewedAt": null,
+        "nextDueAt": "2026-05-08T07:50:24.912Z",
+        "masteryLevel": 0,
+        "state": "new"
+      },
+      "id": "ny83xf7Jbys"
+    },
+    {
+      "deckId": "deck-001",
+      "collectionId": "aVVZSDORtGU",
+      "userId": "user-001",
+      "contextId": "german-vocab",
+      "content": {
+        "front": "to participate / join in",
+        "back": "mitmachen",
+        "article": null,
+        "gender": null,
+        "examples": [
+          {
+            "id": "ba2b0fc8-dcef-4508-a5da-b050c6f21ba4",
+            "target": "Machst du beim Spiel mit?",
+            "native": "Are you joining in with the game?"
+          }
+        ],
+        "notes": "",
+        "audioAssetId": null,
+        "imageUrl": null,
+        "phonetic": null
+      },
+      "categoryIds": [
+        "cat-004"
+      ],
+      "tags": [],
+      "createdAt": "2026-05-08T07:50:24.912Z",
+      "updatedAt": "2026-05-08T07:50:24.912Z",
+      "version": 1,
+      "srsState": {
+        "id": "70ce461e-de81-4004-b827-4af2fcacf32b",
+        "cardId": "",
+        "userId": "user-001",
+        "algorithm": "sm2",
+        "intervalDays": 1,
+        "easeFactor": 2.5,
+        "repetitions": 0,
+        "lastRating": null,
+        "lastReviewedAt": null,
+        "nextDueAt": "2026-05-08T07:50:24.912Z",
+        "masteryLevel": 0,
+        "state": "new"
+      },
+      "id": "5_81lcJZMu8"
     }
-  ]
+  ],
+  "collections": [
+    {
+      "id": "col-001",
+      "userId": "user-001",
+      "name": "Chapter 6 — Restaurant",
+      "description": "Vocabulary from Netzwerk chapter 6, covering food, ordering and events.",
+      "emoji": "🇩🇪",
+      "colour": "#2D5A4E",
+      "contextId": "german-vocab",
+      "cardCount": 19,
+      "masteredCount": 4,
+      "dueCount": 8,
+      "createdAt": "2025-05-01T09:00:00Z",
+      "updatedAt": "2025-05-07T09:00:00Z",
+      "isDefault": false
+    },
+    {
+      "id": "col-002",
+      "userId": "user-001",
+      "name": "Chapter 3 — Family",
+      "description": "Family and animals vocabulary from chapter 3.",
+      "emoji": "🇩🇪",
+      "colour": "#2D5A4E",
+      "contextId": "german-vocab",
+      "cardCount": 5,
+      "masteredCount": 1,
+      "dueCount": 4,
+      "createdAt": "2025-04-15T09:00:00Z",
+      "updatedAt": "2025-05-06T09:00:00Z",
+      "isDefault": false
+    },
+    {
+      "id": "col-003",
+      "userId": "user-001",
+      "name": "My custom words",
+      "description": "",
+      "emoji": "📚",
+      "colour": "#2D5A4E",
+      "contextId": "german-vocab",
+      "cardCount": 0,
+      "masteredCount": 0,
+      "dueCount": 0,
+      "createdAt": "2025-05-07T09:00:00Z",
+      "updatedAt": "2025-05-07T09:00:00Z",
+      "isDefault": true
+    },
+    {
+      "name": "verbs",
+      "contextId": "german-vocab",
+      "emoji": "📚",
+      "id": "TURBPqsrBbc"
+    },
+    {
+      "name": "chapter 6",
+      "contextId": "german-vocab",
+      "emoji": "📚",
+      "id": "aVVZSDORtGU"
+    }
+  ],
+  "categories": [
+    {
+      "id": "cat-001",
+      "userId": "user-001",
+      "name": "Animals",
+      "colour": "#E07B3F",
+      "cardCount": 5,
+      "createdAt": "2025-01-15T09:00:00Z"
+    },
+    {
+      "id": "cat-002",
+      "userId": "user-001",
+      "name": "Food",
+      "colour": "#E07B3F",
+      "cardCount": 5,
+      "createdAt": "2025-01-15T09:00:00Z"
+    },
+    {
+      "id": "cat-003",
+      "userId": "user-001",
+      "name": "Travel",
+      "colour": "#1A56A3",
+      "cardCount": 3,
+      "createdAt": "2025-01-16T09:00:00Z"
+    },
+    {
+      "id": "cat-004",
+      "userId": "user-001",
+      "name": "Daily Life",
+      "colour": "#2D5A4E",
+      "cardCount": 4,
+      "createdAt": "2025-01-17T09:00:00Z"
+    },
+    {
+      "id": "cat-005",
+      "userId": "user-001",
+      "name": "Family",
+      "colour": "#B91C1C",
+      "cardCount": 3,
+      "createdAt": "2025-01-18T09:00:00Z"
+    },
+    {
+      "id": "cat-006",
+      "userId": "user-001",
+      "name": "Home",
+      "colour": "#5F5E5A",
+      "cardCount": 2,
+      "createdAt": "2025-01-19T09:00:00Z"
+    },
+    {
+      "id": "cat-007",
+      "userId": "user-001",
+      "name": "Work",
+      "colour": "#7C3AED",
+      "cardCount": 2,
+      "createdAt": "2025-01-20T09:00:00Z"
+    },
+    {
+      "id": "cat-008",
+      "userId": "user-001",
+      "name": "Nature",
+      "colour": "#059669",
+      "cardCount": 0,
+      "createdAt": "2025-01-21T09:00:00Z"
+    }
+  ],
+  "$schema": "./node_modules/json-server/schema.json"
 }

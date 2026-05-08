@@ -15,6 +15,39 @@
   line-height: 1.2;
 }
 
+// ─── TAB PILLS ───────────────────────────────────────────────────────────────
+
+.vault-tabs {
+  display: flex;
+  gap: 6px;
+  padding: 0 14px 12px;
+}
+
+.vault-tab {
+  padding: 6px 18px;
+  border-radius: var(--lc-radius-full);
+  border: 1px solid var(--lc-border);
+  background: var(--lc-card);
+  font-size: 12px;
+  font-weight: 600;
+  font-family: var(--lc-font-body);
+  color: var(--lc-text-secondary);
+  cursor: pointer;
+  transition: var(--lc-transition-fast);
+
+  &--active {
+    background: var(--lc-brand);
+    border-color: var(--lc-brand);
+    color: white;
+  }
+
+  &:not(.vault-tab--active):active {
+    background: var(--lc-brand-light);
+    color: var(--lc-brand);
+    border-color: var(--lc-brand);
+  }
+}
+
 // ─── SEARCH ──────────────────────────────────────────────────────────────────
 
 .vault-search {
@@ -103,4 +136,17 @@
 :host ::ng-deep app-mastery-dot .lc-mastery-dot {
   width: 10px;
   height: 10px;
+}
+
+// ─── NAV ACTIONS ─────────────────────────────────────────────────────────────
+
+.vault-nav-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.lc-fab--secondary {
+  background: var(--lc-brand);
+  box-shadow: 0 4px 16px rgba(45, 90, 78, 0.35);
 }

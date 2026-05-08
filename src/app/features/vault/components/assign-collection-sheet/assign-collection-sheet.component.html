@@ -1,0 +1,65 @@
+<ion-header class="ion-no-border">
+  <ion-toolbar>
+    <div class="acs-header">
+      <div class="acs-handle"></div>
+      <div class="acs-title-row">
+        <span class="acs-title lc-display">Add to Collection</span>
+        <button class="acs-close" (click)="dismiss()" aria-label="Close">
+          <ion-icon name="close-outline"></ion-icon>
+        </button>
+      </div>
+    </div>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+  <div class="acs-list">
+
+    @for (col of collections(); track col.id) {
+      <button
+        class="acs-row"
+        [class.acs-row--selected]="selected() === col.id"
+        (click)="select(col.id)">
+        <span class="acs-emoji">{{ col.emoji }}</span>
+        <div class="acs-row-info">
+          <span class="acs-row-name">{{ col.name }}</span>
+          <span class="acs-row-count">{{ col.cardCount }} words</span>
+        </div>
+        @if (selected() === col.id) {
+          <ion-icon name="checkmark-outline" class="acs-check"></ion-icon>
+        }
+      </button>
+    }
+
+    <!-- Create new -->
+    <button class="acs-row acs-row--create" (click)="toggleCreateForm()">
+      <div class="acs-create-icon">
+        <ion-icon name="add-outline"></ion-icon>
+      </div>
+      <span class="acs-create-label">Create new collection…</span>
+    </button>
+
+    @if (showCreateForm()) {
+      <div class="acs-create-form">
+        <input
+          class="acs-name-input"
+          type="text"
+          placeholder="Collection name"
+          [formControl]="newNameCtrl"
+          (keyup.enter)="createAndSelect()" />
+        <button
+          class="acs-create-btn"
+          [disabled]="newNameCtrl.invalid || creating()"
+          (click)="createAndSelect()">
+          @if (creating()) { Creating… } @else { Create }
+        </button>
+      </div>
+    }
+
+  </div>
+
+  <div class="acs-footer">
+    <button class="acs-confirm-btn" (click)="confirm()">Confirm selection</button>
+    <button class="acs-skip-btn" (click)="skip()">Skip for now</button>
+  </div>
+</ion-content>

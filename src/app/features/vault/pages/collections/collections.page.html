@@ -1,0 +1,89 @@
+<ion-header class="ion-no-border">
+  <ion-toolbar>
+    <div class="col-nav">
+      <button class="lc-back-btn" (click)="goBack()" aria-label="Back">
+        <ion-icon name="chevron-back-outline"></ion-icon>
+      </button>
+      <h1 class="col-nav-title lc-display">My Collections</h1>
+      <button class="lc-fab" (click)="openCreateSheet()" aria-label="New collection">
+        <ion-icon name="add-outline"></ion-icon>
+      </button>
+    </div>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+
+  <!-- Hero bar -->
+  <div class="col-hero">
+    <div class="col-hero-inner">
+      <div>
+        <div class="col-hero-lbl">Total across all collections</div>
+        <div class="col-hero-count lc-display">{{ totalCards() }} words</div>
+      </div>
+      <div class="col-hero-right">
+        <div class="col-hero-due-lbl">Due today</div>
+        <div class="col-hero-due lc-display">{{ totalDue() }}</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Collection list -->
+  <div class="col-list">
+
+    @if (store.isLoading()) {
+      @for (i of [1, 2, 3]; track i) {
+        <div class="col-card">
+          <div class="lc-skeleton" style="height:14px;width:60%;border-radius:4px;margin-bottom:6px;"></div>
+          <div class="lc-skeleton" style="height:11px;width:40%;border-radius:4px;margin-bottom:12px;"></div>
+          <div class="lc-skeleton" style="height:3px;border-radius:3px;"></div>
+        </div>
+      }
+    } @else {
+      @for (col of collections(); track col.id) {
+        <div
+          class="col-card"
+          [class.col-card--empty]="col.cardCount === 0"
+          (click)="openDetail(col)">
+
+          <div class="col-card-top">
+            <div class="col-card-left">
+              <div class="col-card-name-row">
+                <span class="col-card-emoji">{{ col.emoji }}</span>
+                <span class="col-card-name lc-display">{{ col.name }}</span>
+              </div>
+              <div class="col-card-meta">
+                {{ col.cardCount }} words
+                @if (col.description) { · {{ col.description | slice:0:40 }} }
+              </div>
+            </div>
+            @if (col.dueCount > 0) {
+              <div class="col-due-badge col-due-badge--amber">{{ col.dueCount }} due</div>
+            } @else if (col.cardCount > 0) {
+              <div class="col-due-badge col-due-badge--green">✓ up to date</div>
+            }
+          </div>
+
+          @if (col.cardCount > 0) {
+            <div class="col-progress-bar">
+              <div class="col-progress-fill" [style.width.%]="progressPercent(col)"></div>
+            </div>
+            <div class="col-progress-meta">
+              <span>{{ col.masteredCount }} mastered</span>
+              <span>{{ progressPercent(col) }}% complete</span>
+            </div>
+          }
+
+        </div>
+      } @empty {
+        <div class="lc-empty-state">
+          <span class="lc-empty-icon">📚</span>
+          <p class="lc-empty-title">No collections yet</p>
+          <p class="lc-empty-sub">Tap + to create your first collection</p>
+        </div>
+      }
+    }
+
+  </div>
+
+</ion-content>

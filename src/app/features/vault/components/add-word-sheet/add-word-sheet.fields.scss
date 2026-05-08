@@ -1,3 +1,39 @@
+// ─── COLLECTION FIELD ─────────────────────────────────────────────────────────
+
+.aw-collection-btn {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 13px;
+  background: var(--lc-card);
+  border: 1.5px solid var(--lc-border);
+  border-radius: var(--lc-radius-sm);
+  font-size: 13px;
+  font-family: var(--lc-font-body);
+  color: var(--lc-text-primary);
+  cursor: pointer;
+  text-align: left;
+  transition: border-color var(--lc-transition-fast);
+
+  &:focus { border-color: var(--lc-brand); outline: none; }
+}
+
+.aw-collection-caret {
+  font-size: 10px;
+  color: var(--lc-text-hint);
+}
+
+.aw-collection-locked {
+  padding: 10px 13px;
+  background: var(--lc-brand-light);
+  border: 1.5px solid var(--lc-brand);
+  border-radius: var(--lc-radius-sm);
+  font-size: 13px;
+  color: var(--lc-brand);
+  font-weight: 600;
+}
+
 // ─── CATEGORY CHIPS ───────────────────────────────────────────────────────────
 
 .aw-chip-row {
@@ -135,4 +171,19 @@
     opacity: 0.85;
     transform: scale(0.98);
   }
+}
+
+// ─── IMPORT LINK ──────────────────────────────────────────────────────────────
+
+.aw-import-link {
+  text-align: center;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--lc-brand-mid);
+  cursor: pointer;
+  padding: 4px 0;
+  margin: 0;
+  transition: var(--lc-transition-fast);
+
+  &:active { opacity: 0.7; }
 }

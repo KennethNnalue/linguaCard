@@ -65,6 +65,19 @@
       </div>
     </div>
 
+    <!-- Collection -->
+    <div class="aw-field">
+      <p class="aw-lbl">Collection <span class="aw-lbl-hint">(optional)</span></p>
+      @if (lockedCollectionId) {
+        <div class="aw-collection-locked">{{ selectedCollectionLabel() }}</div>
+      } @else {
+        <button type="button" class="aw-collection-btn" (click)="openCollectionSheet()">
+          <span>{{ selectedCollectionLabel() }}</span>
+          <span class="aw-collection-caret">▼</span>
+        </button>
+      }
+    </div>
+
     <!-- Category -->
     <div class="aw-field">
       <p class="aw-lbl">Category</p>
@@ -122,6 +135,10 @@
     <button type="submit" class="aw-save-btn" [disabled]="saving()">
       @if (saving()) { Saving… } @else { Save to Vault }
     </button>
+
+    <p class="aw-import-link" (click)="navigateToImport()">
+      Add multiple words? Import a CSV →
+    </p>
 
     <div style="height: 40px;"></div>
   </form>

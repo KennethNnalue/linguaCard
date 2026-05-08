@@ -1,4 +1,5 @@
-import { Component, inject, signal } from '@angular/core';
+import { Component, computed, inject, Input, OnInit, signal } from '@angular/core';
+import { Router } from '@angular/router';
 import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import {
@@ -16,8 +17,12 @@ import {
   volumeHighOutline,
 } from 'ionicons/icons';
 import { ArticleType, CardContent, ExampleSentence } from '../../../../core/models/mock-data';
-import { MockAudioService, MockCardService, MockCategoryService } from '../../../../core/services/mock-services';
+import { CardApiService } from '../../../../core/services/card-api.service';
+import { AudioService } from '../../../../core/services/audio.service';
 import { CardStore } from '../../../../core/store/card.store';
+import { CategoryStore } from '../../../../core/store/category.store';
+import { CollectionStore } from '../../store/collection.store';
+import { AssignCollectionSheetComponent } from '../assign-collection-sheet/assign-collection-sheet.component';
 
 @Component({
   selector: 'app-add-word-sheet',
@@ -26,31 +31,47 @@ import { CardStore } from '../../../../core/store/card.store';
   styleUrls: ['./add-word-sheet.component.scss', './add-word-sheet.fields.scss'],
   imports: [IonHeader, IonToolbar, IonContent, IonIcon, ReactiveFormsModule],
 })
-export class AddWordSheetComponent {
-  private readonly cardService = inject(MockCardService);
-  private readonly categoryService = inject(MockCategoryService);
-  private readonly audioService = inject(MockAudioService);
+export class AddWordSheetComponent implements OnInit {
+  private readonly cardApi = inject(CardApiService);
+  private readonly categoryStore = inject(CategoryStore);
+  private readonly collectionStore = inject(CollectionStore);
+  private readonly audioService = inject(AudioService);
   private readonly cardStore = inject(CardStore);
   private readonly modalCtrl = inject(ModalController);
+  private readonly router = inject(Router);
+
+  @Input() lockedCollectionId: string | null = null;
 
   readonly form = new FormGroup({
     front: new FormControl('', [Validators.required]),
     back: new FormControl('', [Validators.required]),
     article: new FormControl<ArticleType | null>(null),
     categoryId: new FormControl(''),
+    collectionId: new FormControl<string | null>(null),
     exampleTarget: new FormControl(''),
     exampleNative: new FormControl(''),
   });
 
-  readonly categories = this.categoryService.categories;
-  readonly saving = signal(false);
+  readonly selectedCollectionLabel = computed(() => {
+    const id = this.form.get('collectionId')!.value;
+    if (!id) return 'No collection';
+    const col = this.collectionStore.collections().find(c => c.id === id);
+    return col ? `${col.emoji} ${col.name}` : 'No collection';
+  });
 
+  readonly categories = this.categoryStore.categories;
+  readonly saving = signal(false);
   readonly articles: ArticleType[] = ['der', 'die', 'das'];
+
+  ngOnInit(): void {
+    if (this.lockedCollectionId) {
+      this.form.patchValue({ collectionId: this.lockedCollectionId });
+    }
+  }
 
   constructor() {
     addIcons({ closeOutline, micOutline, volumeHighOutline, addOutline });
 
-    // Auto-detect article when user types "der/die/das <word>" in the back field
     this.form.get('back')!.valueChanges.pipe(
       takeUntilDestroyed(),
     ).subscribe(val => {
@@ -84,7 +105,7 @@ export class AddWordSheetComponent {
     const word = this.form.get('back')!.value?.trim();
     if (!word) return;
     const article = this.form.get('article')!.value;
-    this.audioService.speak(article ? `${article} ${word}` : word, 'de-DE').subscribe();
+    this.audioService.speak(article ? `${article} ${word}` : word, 'de-DE').subscribe({ error: () => {} });
   }
 
   save(): void {
@@ -96,7 +117,7 @@ export class AddWordSheetComponent {
     const examples: ExampleSentence[] = [];
     if (v.exampleTarget?.trim()) {
       examples.push({
-        id: Math.random().toString(36).slice(2),
+        id: crypto.randomUUID(),
         target: v.exampleTarget.trim(),
         native: v.exampleNative?.trim() ?? '',
       });
@@ -119,7 +140,34 @@ export class AddWordSheetComponent {
     };
 
     const categoryIds = v.categoryId ? [v.categoryId] : [];
-    this.cardService.createCard(content, categoryIds).subscribe({
+    const now = new Date().toISOString();
+
+    this.cardApi.create({
+      deckId: 'deck-001',
+      collectionId: v.collectionId ?? null,
+      userId: 'user-001',
+      contextId: 'german-vocab',
+      content,
+      categoryIds,
+      tags: [],
+      createdAt: now,
+      updatedAt: now,
+      version: 1,
+      srsState: {
+        id: crypto.randomUUID(),
+        cardId: '',
+        userId: 'user-001',
+        algorithm: 'sm2',
+        intervalDays: 1,
+        easeFactor: 2.5,
+        repetitions: 0,
+        lastRating: null,
+        lastReviewedAt: null,
+        nextDueAt: now,
+        masteryLevel: 0,
+        state: 'new',
+      },
+    }).subscribe({
       next: () => {
         this.cardStore.loadCards();
         this.saving.set(false);
@@ -131,5 +179,25 @@ export class AddWordSheetComponent {
 
   dismiss(): void {
     this.modalCtrl.dismiss();
+  }
+
+  async openCollectionSheet(): Promise<void> {
+    const modal = await this.modalCtrl.create({
+      component: AssignCollectionSheetComponent,
+      breakpoints: [0, 0.6, 0.85],
+      initialBreakpoint: 0.6,
+      handleBehavior: 'cycle',
+      componentProps: { selectedCollectionId: this.form.get('collectionId')!.value },
+    });
+    await modal.present();
+    const { data } = await modal.onWillDismiss();
+    if (data && 'collectionId' in data) {
+      this.form.patchValue({ collectionId: data.collectionId });
+    }
+  }
+
+  navigateToImport(): void {
+    this.modalCtrl.dismiss();
+    this.router.navigate(['/vault/import']);
   }
 }

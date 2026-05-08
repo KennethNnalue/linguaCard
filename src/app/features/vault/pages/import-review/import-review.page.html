@@ -1,0 +1,116 @@
+<ion-header class="ion-no-border">
+  <ion-toolbar>
+    <div class="imp-nav">
+      <button class="imp-back-btn" (click)="goBack()" aria-label="Back">
+        <ion-icon name="arrow-back-outline"></ion-icon>
+      </button>
+      <span class="imp-title lc-display">Review Import</span>
+      <div class="imp-nav-spacer"></div>
+    </div>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+  @if (result()) {
+    <div class="imp-rv-content">
+
+      <!-- File info bar -->
+      <div class="imp-file-bar">
+        <ion-icon name="checkmark-circle-outline" class="imp-file-icon"></ion-icon>
+        <div class="imp-file-text">
+          <p class="imp-file-name">{{ result()!.fileName }}</p>
+          <p class="imp-file-sub">{{ result()!.totalRows }} words detected</p>
+        </div>
+      </div>
+
+      <!-- Summary stats -->
+      <div class="imp-summary-row">
+        <div class="imp-sum-cell">
+          <span class="imp-sum-val">{{ result()!.totalRows }}</span>
+          <span class="imp-sum-lbl">Total</span>
+        </div>
+        <div class="imp-sum-cell imp-sum-cell--ready">
+          <span class="imp-sum-val">{{ readyCount() }}</span>
+          <span class="imp-sum-lbl">Ready</span>
+        </div>
+        @if (warningCount() > 0) {
+          <div class="imp-sum-cell imp-sum-cell--warn">
+            <span class="imp-sum-val">{{ warningCount() }}</span>
+            <span class="imp-sum-lbl">Warnings</span>
+          </div>
+        }
+        @if (errorCount() > 0) {
+          <div class="imp-sum-cell imp-sum-cell--error">
+            <span class="imp-sum-val">{{ errorCount() }}</span>
+            <span class="imp-sum-lbl">Skipped</span>
+          </div>
+        }
+      </div>
+
+      <!-- Warning note -->
+      @if (warningCount() > 0) {
+        <div class="imp-warn-note">
+          <ion-icon name="warning-outline"></ion-icon>
+          <span>{{ warningCount() }} rows have warnings but will still be imported</span>
+        </div>
+      }
+
+      <!-- Collection picker -->
+      <div class="imp-field">
+        <p class="imp-section-lbl">ADD TO COLLECTION</p>
+        <button class="imp-collection-btn" (click)="openCollectionSheet()">
+          <span>{{ selectedCollectionLabel() }}</span>
+          <span class="imp-collection-caret">▼</span>
+        </button>
+      </div>
+
+      <!-- Preview list -->
+      <p class="imp-section-lbl">Preview (first 4 rows)</p>
+      <div class="imp-preview-list">
+        @for (row of first4Rows(); track row.rowIndex) {
+          <div class="imp-preview-row">
+            <div class="imp-preview-top">
+              <span class="imp-row-num">{{ row.rowIndex }}</span>
+              <span class="imp-preview-front">{{ row.front }}</span>
+              @if (row.article) {
+                <span class="imp-art-small lc-article-badge lc-article-badge--{{ row.article }}">
+                  {{ row.article }}
+                </span>
+              }
+              @if (row.status === 'warning') {
+                <div class="imp-row-warn">
+                  <ion-icon name="warning-outline"></ion-icon>
+                </div>
+              } @else {
+                <div class="imp-row-ok">
+                  <ion-icon name="checkmark-circle-outline"></ion-icon>
+                </div>
+              }
+            </div>
+            @if (row.exampleTarget) {
+              <p class="imp-preview-ex">{{ row.exampleTarget }}</p>
+            }
+          </div>
+        }
+      </div>
+
+      <div class="imp-rv-spacer"></div>
+
+      <!-- Import button -->
+      <button
+        class="imp-import-btn"
+        [disabled]="importing() || readyCount() === 0"
+        (click)="confirmImport()">
+        @if (importing()) {
+          Importing…
+        } @else {
+          Import {{ readyCount() }} words to Vault
+        }
+      </button>
+
+      <!-- Cancel -->
+      <button class="imp-cancel-lnk" (click)="cancel()">Cancel</button>
+
+    </div>
+  }
+</ion-content>

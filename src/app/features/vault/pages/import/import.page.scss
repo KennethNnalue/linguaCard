@@ -1,0 +1,207 @@
+// ─── NAV ─────────────────────────────────────────────────────────────────────
+
+.imp-nav {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 16px 12px;
+}
+
+.imp-title {
+  font-size: 20px;
+  font-weight: 600;
+  color: var(--lc-text-primary);
+}
+
+.imp-nav-spacer {
+  width: 38px;
+}
+
+.imp-back-btn {
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  background: var(--lc-brand-light);
+  border: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: var(--lc-transition-fast);
+
+  ion-icon {
+    font-size: 20px;
+    color: var(--lc-brand);
+  }
+
+  &:active { opacity: 0.7; }
+}
+
+// ─── CONTENT ─────────────────────────────────────────────────────────────────
+
+.imp-content {
+  flex: 1;
+  padding: 16px 16px 40px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+// ─── DROP ZONE ────────────────────────────────────────────────────────────────
+
+.imp-drop {
+  flex: 1;
+  border: 2px dashed var(--lc-border);
+  border-radius: 20px;
+  background: var(--lc-card);
+  padding: 32px 20px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 11px;
+  cursor: pointer;
+  transition:
+    border-color var(--lc-transition-base),
+    background var(--lc-transition-base);
+
+  &--active {
+    border-color: var(--lc-brand);
+    background: var(--lc-brand-light);
+  }
+}
+
+.imp-drop-icon-wrap {
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  background: var(--lc-brand-light);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  ion-icon {
+    font-size: 28px;
+    color: var(--lc-brand);
+  }
+}
+
+.imp-drop-title {
+  font-size: 18px;
+  font-weight: 600;
+  color: var(--lc-text-primary);
+  margin: 0;
+  text-align: center;
+}
+
+.imp-drop-sub {
+  font-size: 14px;
+  color: var(--lc-text-hint);
+  margin: 0;
+  text-align: center;
+  line-height: 1.5;
+}
+
+// ─── OR DIVIDER ───────────────────────────────────────────────────────────────
+
+.imp-or {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 0 2px;
+}
+
+.imp-or-line {
+  flex: 1;
+  height: 1px;
+  background: var(--lc-border);
+}
+
+.imp-or-txt {
+  font-size: 13px;
+  color: var(--lc-text-hint);
+  font-weight: 500;
+  white-space: nowrap;
+}
+
+// ─── BUTTONS ─────────────────────────────────────────────────────────────────
+
+.imp-dl-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  background: var(--lc-brand);
+  color: white;
+  border: none;
+  border-radius: 14px;
+  padding: 15px;
+  font-size: 15px;
+  font-weight: 600;
+  font-family: var(--lc-font-body);
+  cursor: pointer;
+  width: 100%;
+  transition: var(--lc-transition-fast);
+
+  ion-icon { font-size: 18px; }
+  &:active { opacity: 0.85; }
+}
+
+.imp-browse-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  background: var(--lc-card);
+  color: var(--lc-brand);
+  border: 1.5px solid var(--lc-brand);
+  border-radius: 14px;
+  padding: 15px;
+  font-size: 15px;
+  font-weight: 600;
+  font-family: var(--lc-font-body);
+  cursor: pointer;
+  width: 100%;
+  transition: var(--lc-transition-fast);
+
+  ion-icon { font-size: 18px; }
+  &:active { background: var(--lc-brand-light); }
+}
+
+// ─── FORMAT BOX ──────────────────────────────────────────────────────────────
+
+.imp-format-box {
+  background: var(--lc-surface);
+  border: 1px solid var(--lc-border);
+  border-radius: 14px;
+  padding: 14px 16px;
+}
+
+.imp-format-title {
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--lc-text-hint);
+  margin: 0 0 8px;
+}
+
+.imp-format-row {
+  font-family: var(--lc-font-mono);
+  font-size: 11px;
+  color: var(--lc-brand);
+  line-height: 1.9;
+  margin: 0;
+}
+
+.imp-format-note {
+  font-size: 13px;
+  color: var(--lc-text-hint);
+  margin: 9px 0 0;
+  line-height: 1.5;
+
+  strong {
+    color: var(--lc-text-secondary);
+    font-weight: 600;
+  }
+}

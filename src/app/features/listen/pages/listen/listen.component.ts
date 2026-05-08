@@ -1,6 +1,7 @@
 import { Component, computed, inject, Injector, OnDestroy, OnInit, signal } from '@angular/core';
 import { toObservable } from '@angular/core/rxjs-interop';
 import { filter, take } from 'rxjs';
+import { ActivatedRoute } from '@angular/router';
 import { NavController } from '@ionic/angular';
 import { IonContent, IonHeader, IonIcon, IonToolbar, ModalController } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
@@ -15,8 +16,9 @@ import {
   repeatOutline,
 } from 'ionicons/icons';
 import { ConfidenceRating } from '../../../../core/models/mock-data';
-import { MockCategoryService, MockListenService } from '../../../../core/services/mock-services';
 import { CardStore } from '../../../../core/store/card.store';
+import { CategoryStore } from '../../../../core/store/category.store';
+import { ListenStore } from '../../store/listen.store';
 import { ArticleBadgeComponent } from '../../../../shared/components/article-badge/article-badge.component';
 import { PlaylistSourceSheetComponent } from '../../components/playlist-source-sheet/playlist-source-sheet.component';
 
@@ -29,12 +31,13 @@ type PlaylistMode = 'word-meaning' | 'examples-only' | 'deep-dive';
   imports: [IonContent, IonHeader, IonIcon, IonToolbar, ArticleBadgeComponent],
 })
 export class ListenComponent implements OnInit, OnDestroy {
-  private readonly listenService = inject(MockListenService);
+  private readonly listenStore = inject(ListenStore);
   private readonly cardStore = inject(CardStore);
-  private readonly categoryService = inject(MockCategoryService);
+  private readonly categoryStore = inject(CategoryStore);
   private readonly modalCtrl = inject(ModalController);
   private readonly navCtrl = inject(NavController);
   private readonly injector = inject(Injector);
+  private readonly route = inject(ActivatedRoute);
 
   constructor() {
     addIcons({
@@ -52,18 +55,18 @@ export class ListenComponent implements OnInit, OnDestroy {
   // ── View state ─────────────────────────────────────────────────────────────
   readonly inPlayerView = signal(false);
 
-  // ── Service state proxies ──────────────────────────────────────────────────
-  readonly queue = this.listenService.queue;
-  readonly currentIndex = this.listenService.currentIndex;
-  readonly isPlaying = this.listenService.isPlaying;
-  readonly playbackMode = this.listenService.playbackMode;
-  readonly playbackSpeed = this.listenService.playbackSpeed;
-  readonly isShuffled = this.listenService.isShuffled;
-  readonly ratingWindowVisible = this.listenService.ratingWindowVisible;
-  readonly ratingCountdown = this.listenService.ratingCountdown;
-  readonly activeSourceLabel = this.listenService.activeSourceLabel;
-  readonly currentCard = this.listenService.currentCard;
-  readonly categories = this.categoryService.categories;
+  // ── Store state proxies ────────────────────────────────────────────────────
+  readonly queue = this.listenStore.queue;
+  readonly currentIndex = this.listenStore.currentIndex;
+  readonly isPlaying = this.listenStore.isPlaying;
+  readonly playbackMode = this.listenStore.playbackMode;
+  readonly playbackSpeed = this.listenStore.playbackSpeed;
+  readonly isShuffled = this.listenStore.isShuffled;
+  readonly ratingWindowVisible = this.listenStore.ratingWindowVisible;
+  readonly ratingCountdown = this.listenStore.ratingCountdown;
+  readonly activeSourceLabel = this.listenStore.activeSourceLabel;
+  readonly currentCard = this.listenStore.currentCard;
+  readonly categories = this.categoryStore.categories;
 
   readonly SPEED_OPTIONS = [0.75, 1, 1.25, 1.5];
   readonly MODES: { value: PlaylistMode; label: string; desc: string }[] = [
@@ -132,69 +135,75 @@ export class ListenComponent implements OnInit, OnDestroy {
 
   // ── Lifecycle ──────────────────────────────────────────────────────────────
   ngOnInit(): void {
+    const collectionId = this.route.snapshot.queryParamMap.get('collectionId');
     toObservable(this.cardStore.isLoading, { injector: this.injector })
       .pipe(filter(loading => !loading), take(1))
       .subscribe(() => {
-        const dueCards = this.cardStore.dueCards();
+        let dueCards = this.cardStore.dueCards();
+        if (collectionId) {
+          dueCards = dueCards.filter(c => c.collectionId === collectionId);
+        }
         if (dueCards.length) {
-          this.listenService.loadPlaylist(dueCards, "Today's due words");
+          this.listenStore.loadPlaylist(dueCards, collectionId ? 'Collection words' : "Today's due words");
         } else {
-          const all = this.cardStore.filteredCards();
-          this.listenService.loadPlaylist(all.slice(0, 20), 'All words');
+          const all = collectionId
+            ? this.cardStore.filteredCards().filter(c => c.collectionId === collectionId)
+            : this.cardStore.filteredCards();
+          this.listenStore.loadPlaylist(all.slice(0, 20), collectionId ? 'Collection words' : 'All words');
         }
       });
   }
 
   ngOnDestroy(): void {
-    this.listenService.pause();
+    this.listenStore.pause();
   }
 
   // ── Actions ────────────────────────────────────────────────────────────────
   startPlayback(): void {
     this.inPlayerView.set(true);
-    this.listenService.play();
+    this.listenStore.play();
   }
 
   togglePlay(): void {
-    this.listenService.togglePlay();
+    this.listenStore.togglePlay();
   }
 
   next(): void {
-    this.listenService.next();
+    this.listenStore.next();
   }
 
   prev(): void {
-    this.listenService.prev();
+    this.listenStore.prev();
   }
 
   seekAndPlay(index: number): void {
     this.inPlayerView.set(true);
-    this.listenService.seekTo(index);
-    if (!this.isPlaying()) this.listenService.play();
+    this.listenStore.seekTo(index);
+    if (!this.isPlaying()) this.listenStore.play();
   }
 
   setMode(mode: PlaylistMode): void {
-    this.listenService.setMode(mode);
+    this.listenStore.setMode(mode);
   }
 
   setSpeed(speed: number): void {
-    this.listenService.setSpeed(speed);
+    this.listenStore.setSpeed(speed);
   }
 
   toggleShuffle(): void {
-    this.listenService.toggleShuffle();
+    this.listenStore.toggleShuffle();
   }
 
   rateCard(rating: ConfidenceRating): void {
-    this.listenService.rateCurrentCard(rating);
+    this.listenStore.rateCurrentCard(rating);
   }
 
   dismissRating(): void {
-    this.listenService.dismissRating();
+    this.listenStore.dismissRating();
   }
 
   backToBrowser(): void {
-    this.listenService.pause();
+    this.listenStore.pause();
     this.inPlayerView.set(false);
   }
 
@@ -216,8 +225,8 @@ export class ListenComponent implements OnInit, OnDestroy {
     await modal.present();
     const { data } = await modal.onWillDismiss();
     if (data?.cards && data?.label) {
-      this.listenService.loadPlaylist(data.cards, data.label);
-      if (data.mode) this.listenService.setMode(data.mode);
+      this.listenStore.loadPlaylist(data.cards, data.label);
+      if (data.mode) this.listenStore.setMode(data.mode);
     }
   }
 }

@@ -38,3 +38,10 @@
 /* @import "@ionic/angular/css/palettes/dark.always.css"; */
 /* @import "@ionic/angular/css/palettes/dark.class.css"; */
 @import '@ionic/angular/css/palettes/dark.system.css';
+
+/* Make import pages fill the full viewport height */
+app-import ion-content::part(scroll),
+app-import-review ion-content::part(scroll) {
+  display: flex;
+  flex-direction: column;
+}

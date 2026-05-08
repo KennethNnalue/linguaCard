@@ -6,17 +6,24 @@
 // ============================================================
 
 import {computed, inject, Injectable, signal} from '@angular/core';
-import {delay, Observable, of, throwError} from 'rxjs';
+import {catchError, delay, forkJoin, map, Observable, of, throwError} from 'rxjs';
 import {
+  BulkCreateResult,
   Card,
   CardContent,
   Category,
+  Collection,
   ConfidenceRating,
+  CreateCollectionDto,
+  ExampleSentence,
+  GenderType,
+  ParsedImportRow,
   GERMAN_VOCAB_CONTEXT,
   LearningContext,
   MasteryLevel,
   MOCK_CARDS,
   MOCK_CATEGORIES,
+  MOCK_COLLECTIONS,
   MOCK_DECK,
   MOCK_PROGRESS_STATS,
   MOCK_USER,
@@ -27,6 +34,7 @@ import {
   SRSStateData,
   SyncOperation,
   SyncStatus,
+  UpdateCollectionDto,
   User,
   UserPreferences,
 } from '../models/mock-data';
@@ -168,7 +176,7 @@ export class MockCardService {
     return simulateDelay(due);
   }
 
-  createCard(content: CardContent, categoryIds: string[], tags: string[] = []): Observable<Card> {
+  createCard(content: CardContent, categoryIds: string[], tags: string[] = [], collectionId: string | null = null): Observable<Card> {
     const initialSRS: SRSStateData = {
       id: uuid(), cardId: '', userId: MOCK_USER.id, algorithm: 'sm2',
       intervalDays: 1, easeFactor: 2.5, repetitions: 0, lastRating: null,
@@ -176,7 +184,7 @@ export class MockCardService {
       masteryLevel: 0, state: 'new',
     };
     const card: Card = {
-      id: uuid(), deckId: MOCK_DECK.id, userId: MOCK_USER.id,
+      id: uuid(), deckId: MOCK_DECK.id, collectionId, userId: MOCK_USER.id,
       contextId: 'german-vocab', content, categoryIds, tags,
       createdAt: new Date().toISOString(), updatedAt: new Date().toISOString(),
       version: 1, srsState: {...initialSRS, cardId: ''},
@@ -215,6 +223,38 @@ export class MockCardService {
     }));
     if (!newState) return throwError(() => new Error(`Card ${cardId} not found`));
     return simulateDelay(newState, 200);
+  }
+
+  bulkCreate(rows: ParsedImportRow[], collectionId: string | null = null): Observable<BulkCreateResult> {
+    if (rows.length === 0) {
+      return of({ created: 0, failed: 0, cards: [] });
+    }
+    const requests = rows.map(row =>
+      this.createCard(this.rowToContent(row), row.categoryId ? [row.categoryId] : [], [], collectionId)
+    );
+    return forkJoin(requests).pipe(
+      map(cards => ({ created: cards.length, failed: 0, cards })),
+      catchError(err => of({
+        created: 0,
+        failed: rows.length,
+        cards: [] as Card[],
+        error: (err as Error).message,
+      }))
+    );
+  }
+
+  private rowToContent(row: ParsedImportRow): CardContent {
+    const gender: GenderType =
+      row.article === 'der' ? 'masculine' :
+      row.article === 'die' ? 'feminine' :
+      row.article === 'das' ? 'neuter' : null;
+    const examples: ExampleSentence[] = row.exampleTarget
+      ? [{ id: Math.random().toString(36).slice(2), target: row.exampleTarget, native: row.exampleNative }]
+      : [];
+    return {
+      front: row.front, back: row.back, article: row.article, gender, examples,
+      notes: '', audioAssetId: null, imageUrl: null, phonetic: null,
+    };
   }
 }
 
@@ -611,6 +651,60 @@ export class MockListenService {
         setTimeout(() => this._playCurrentCard(), 500);
       }
     }
+  }
+}
+
+// ─── COLLECTION SERVICE ───────────────────────────────────────────────────────
+
+@Injectable({ providedIn: 'root' })
+export class MockCollectionService {
+  private _collections = signal<Collection[]>([...MOCK_COLLECTIONS]);
+  readonly collections = this._collections.asReadonly();
+
+  getCollections(): Observable<Collection[]> {
+    return simulateDelay([...this._collections()]);
+  }
+
+  getById(id: string): Observable<Collection> {
+    const col = this._collections().find(c => c.id === id);
+    if (!col) return throwError(() => new Error(`Collection ${id} not found`));
+    return simulateDelay({...col});
+  }
+
+  create(dto: CreateCollectionDto): Observable<Collection> {
+    const col: Collection = {
+      id: uuid(),
+      userId: MOCK_USER.id,
+      name: dto.name,
+      description: dto.description ?? '',
+      emoji: dto.emoji ?? '📚',
+      colour: dto.colour ?? '#2D5A4E',
+      contextId: dto.contextId,
+      cardCount: 0,
+      masteredCount: 0,
+      dueCount: 0,
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString(),
+      isDefault: false,
+    };
+    this._collections.update(cols => [...cols, col]);
+    return simulateDelay(col, 400);
+  }
+
+  update(id: string, dto: UpdateCollectionDto): Observable<Collection> {
+    let updated: Collection | undefined;
+    this._collections.update(cols => cols.map(c => {
+      if (c.id !== id) return c;
+      updated = { ...c, ...dto, updatedAt: new Date().toISOString() };
+      return updated!;
+    }));
+    if (!updated) return throwError(() => new Error(`Collection ${id} not found`));
+    return simulateDelay(updated);
+  }
+
+  delete(id: string): Observable<void> {
+    this._collections.update(cols => cols.filter(c => c.id !== id));
+    return simulateDelay(undefined as any, 200);
   }
 }
 

@@ -19,7 +19,9 @@ import {
   volumeHighOutline,
 } from 'ionicons/icons';
 import { CardStore } from '../../../../core/store/card.store';
-import { MockCardService, MockCategoryService } from '../../../../core/services/mock-services';
+import { CategoryStore } from '../../../../core/store/category.store';
+import { CardApiService } from '../../../../core/services/card-api.service';
+import { AudioService } from '../../../../core/services/audio.service';
 import { ArticleBadgeComponent } from '../../../../shared/components/article-badge/article-badge.component';
 import { AddWordSheetComponent } from '../../components/add-word-sheet/add-word-sheet.component';
 import { getCategoryName } from '../../../../shared/helpers/helpers';
@@ -33,8 +35,9 @@ import { getCategoryName } from '../../../../shared/helpers/helpers';
 })
 export class WordDetailComponent {
   private readonly cardStore = inject(CardStore);
-  private readonly categoryService = inject(MockCategoryService);
-  private readonly cardService = inject(MockCardService);
+  private readonly categoryStore = inject(CategoryStore);
+  private readonly cardApi = inject(CardApiService);
+  private readonly audioService = inject(AudioService);
   private readonly router = inject(Router);
   private readonly route = inject(ActivatedRoute);
   private readonly alertCtrl = inject(AlertController);
@@ -59,7 +62,7 @@ export class WordDetailComponent {
     () => this.cardStore.cards().find((c) => c.id === this.cardId()) ?? null,
   );
 
-  readonly categories = this.categoryService.categories;
+  readonly categories = this.categoryStore.categories;
 
   readonly masteryPercent = computed(() => {
     const lvl = this.card()?.srsState?.masteryLevel ?? 0;
@@ -109,11 +112,7 @@ export class WordDetailComponent {
   playPronunciation(): void {
     const word = this.card()?.content.back;
     if (!word) return;
-    const utterance = new SpeechSynthesisUtterance(word);
-    utterance.lang = 'de-DE';
-    utterance.rate = 0.85;
-    speechSynthesis.cancel();
-    speechSynthesis.speak(utterance);
+    this.audioService.speak(word, 'de-DE', 0.85).subscribe({ error: () => {} });
   }
 
   async openEdit(): Promise<void> {
@@ -149,7 +148,7 @@ export class WordDetailComponent {
   private deleteCard(): void {
     const id = this.cardId();
     if (!id) return;
-    this.cardService.deleteCard(id).subscribe(() => {
+    this.cardApi.remove(id).subscribe(() => {
       this.cardStore.loadCards();
       this.router.navigate(['/vault']);
     });

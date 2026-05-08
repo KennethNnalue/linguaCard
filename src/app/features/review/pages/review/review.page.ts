@@ -1,6 +1,7 @@
 import { Component, computed, inject, Injector, OnInit, signal } from '@angular/core';
 import { toObservable } from '@angular/core/rxjs-interop';
 import { filter, take } from 'rxjs';
+import { ActivatedRoute } from '@angular/router';
 import { NavController } from '@ionic/angular';
 import { IonContent, IonHeader, IonIcon, IonToolbar } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
@@ -13,8 +14,10 @@ import {
   volumeHighOutline,
 } from 'ionicons/icons';
 import { Card, ConfidenceRating } from '../../../../core/models/mock-data';
-import { MockAudioService, MockCategoryService, MockReviewService } from '../../../../core/services/mock-services';
+import { AudioService } from '../../../../core/services/audio.service';
 import { CardStore } from '../../../../core/store/card.store';
+import { CategoryStore } from '../../../../core/store/category.store';
+import { ReviewStore } from '../../store/review.store';
 
 const RATINGS: { value: ConfidenceRating; label: string }[] = [
   { value: 0, label: 'Blank' },
@@ -33,11 +36,12 @@ const RATINGS: { value: ConfidenceRating; label: string }[] = [
 })
 export class ReviewPage implements OnInit {
   private readonly cardStore = inject(CardStore);
-  private readonly reviewService = inject(MockReviewService);
-  private readonly audioService = inject(MockAudioService);
-  private readonly categoryService = inject(MockCategoryService);
+  private readonly reviewStore = inject(ReviewStore);
+  private readonly audioService = inject(AudioService);
+  private readonly categoryStore = inject(CategoryStore);
   private readonly navCtrl = inject(NavController);
   private readonly injector = inject(Injector);
+  private readonly route = inject(ActivatedRoute);
 
   constructor() {
     addIcons({
@@ -55,9 +59,7 @@ export class ReviewPage implements OnInit {
   readonly currentIndex = signal(0);
   readonly isFlipped = signal(false);
   readonly sessionComplete = signal(false);
-  readonly sessionId = signal<string | null>(null);
 
-  // Non-null by design: template only accesses this when queue is non-empty
   readonly currentCard = computed<Card>(() => this.queue()[this.currentIndex()]);
 
   readonly progressPercent = computed(() =>
@@ -65,7 +67,7 @@ export class ReviewPage implements OnInit {
   );
 
   readonly sessionStats = computed(() => {
-    const session = this.reviewService.activeSession();
+    const session = this.reviewStore.activeSession();
     const ratingsArray = Object.values(session?.ratings ?? {}) as ConfidenceRating[];
     return {
       reviewed: ratingsArray.length,
@@ -77,7 +79,7 @@ export class ReviewPage implements OnInit {
   readonly activeCategoryNames = computed(() => {
     const queue = this.queue();
     if (!queue.length) return '';
-    const cats = this.categoryService.categories();
+    const cats = this.categoryStore.categories();
     const ids = [...new Set(queue.flatMap(c => c.categoryIds))];
     return ids
       .map(id => cats.find(c => c.id === id)?.name)
@@ -97,13 +99,17 @@ export class ReviewPage implements OnInit {
   });
 
   ngOnInit(): void {
+    const collectionId = this.route.snapshot.queryParamMap.get('collectionId');
     toObservable(this.cardStore.isLoading, { injector: this.injector })
       .pipe(filter(loading => !loading), take(1))
       .subscribe(() => {
-        const dueCards = this.cardStore.dueCards();
+        let dueCards = this.cardStore.dueCards();
+        if (collectionId) {
+          dueCards = dueCards.filter(c => c.collectionId === collectionId);
+        }
         this.queue.set(dueCards);
         if (dueCards.length) {
-          this.reviewService.startSession(dueCards).subscribe(s => this.sessionId.set(s.id));
+          this.reviewStore.startSession(dueCards);
         }
       });
   }
@@ -114,8 +120,17 @@ export class ReviewPage implements OnInit {
 
   submitRating(rating: ConfidenceRating): void {
     const card = this.currentCard();
-    if (!card || !this.sessionId()) return;
-    this.reviewService.submitRating(this.sessionId()!, card.id, rating).subscribe();
+    if (!card) return;
+    this.reviewStore.rateCard(card, rating).subscribe({
+      next: updated => {
+        const idx = this.queue().findIndex(c => c.id === updated.id);
+        if (idx >= 0) {
+          const next = [...this.queue()];
+          next[idx] = updated;
+          this.queue.set(next);
+        }
+      },
+    });
     this.advance();
   }
 
@@ -128,7 +143,7 @@ export class ReviewPage implements OnInit {
     const card = this.currentCard();
     if (!card) return;
     const text = (card.content.article ? card.content.article + ' ' : '') + card.content.back;
-    this.audioService.speak(text, 'de-DE').subscribe();
+    this.audioService.speak(text, 'de-DE').subscribe({ error: () => {} });
   }
 
   flagCard(): void {
@@ -148,7 +163,7 @@ export class ReviewPage implements OnInit {
     this.isFlipped.set(false);
     const next = this.currentIndex() + 1;
     if (next >= this.queue().length) {
-      this.reviewService.completeSession(this.sessionId()!).subscribe();
+      this.reviewStore.completeSession();
       this.sessionComplete.set(true);
     } else {
       this.currentIndex.set(next);

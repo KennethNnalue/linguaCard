@@ -11,10 +11,10 @@ import {
   ModalController,
 } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
-import { addOutline, funnelOutline } from 'ionicons/icons';
-import { MockCategoryService } from '../../../../core/services/mock-services';
+import { addOutline, cloudUploadOutline, funnelOutline } from 'ionicons/icons';
 import { Card } from '../../../../core/models/mock-data';
 import { CardStore } from '../../../../core/store/card.store';
+import { CategoryStore } from '../../../../core/store/category.store';
 import { getCategoryName } from '../../../../shared/helpers/helpers';
 import { ArticleBadgeComponent } from '../../../../shared/components/article-badge/article-badge.component';
 import { MasteryDotComponent } from '../../../../shared/components/mastery-dot/mastery-dot.component';
@@ -38,17 +38,17 @@ import { AddWordSheetComponent } from '../../components/add-word-sheet/add-word-
 })
 export class VaultPage {
   private readonly cardStore = inject(CardStore);
-  private readonly categoryService = inject(MockCategoryService);
+  private readonly categoryStore = inject(CategoryStore);
   private readonly modalCtrl = inject(ModalController);
   private readonly router = inject(Router);
 
   constructor() {
-    addIcons({ addOutline, funnelOutline });
+    addIcons({ addOutline, cloudUploadOutline, funnelOutline });
   }
 
   readonly loading = this.cardStore.isLoading;
   readonly totalCount = this.cardStore.totalCount;
-  readonly categories = this.categoryService.categories;
+  readonly categories = this.categoryStore.categories;
   readonly activeCategory = computed(() => this.cardStore.filter().categoryId);
 
   readonly sortOrder = signal<'asc' | 'desc'>('desc');
@@ -96,6 +96,14 @@ export class VaultPage {
 
   openDetail(card: Card): void {
     this.router.navigate(['/vault', card.id]);
+  }
+
+  navigateToImport(): void {
+    this.router.navigate(['/vault/import']);
+  }
+
+  navigateToCollections(): void {
+    this.router.navigate(['/vault/collections']);
   }
 
   protected readonly getCategoryName = getCategoryName;

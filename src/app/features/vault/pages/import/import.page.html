@@ -1,0 +1,69 @@
+<ion-header class="ion-no-border">
+  <ion-toolbar>
+    <div class="imp-nav">
+      <button class="imp-back-btn" (click)="goBack()" aria-label="Back">
+        <ion-icon name="arrow-back-outline"></ion-icon>
+      </button>
+      <span class="imp-title lc-display">Import Words</span>
+      <div class="imp-nav-spacer"></div>
+    </div>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+  <div class="imp-content">
+
+    <!-- Drop zone -->
+    <div
+      class="imp-drop"
+      [class.imp-drop--active]="dragActive()"
+      (dragover)="onDragOver($event)"
+      (dragleave)="onDragLeave()"
+      (drop)="onDrop($event)">
+      <div class="imp-drop-icon-wrap">
+        <ion-icon name="cloud-upload-outline"></ion-icon>
+      </div>
+      <p class="imp-drop-title">Drop your CSV file here</p>
+      <p class="imp-drop-sub">Drag and drop a .csv file<br>or tap to browse your files</p>
+    </div>
+
+    <!-- Or divider -->
+    <div class="imp-or">
+      <span class="imp-or-line"></span>
+      <span class="imp-or-txt">or start with our template</span>
+      <span class="imp-or-line"></span>
+    </div>
+
+    <!-- Download template button -->
+    <button class="imp-dl-btn" (click)="downloadTemplate()">
+      <ion-icon name="download-outline"></ion-icon>
+      Download CSV template (95 words)
+    </button>
+
+    <!-- Browse files button -->
+    <button class="imp-browse-btn" (click)="openFilePicker()">
+      <ion-icon name="document-outline"></ion-icon>
+      Browse files
+    </button>
+
+    <!-- Hidden file input -->
+    <input
+      #fileInput
+      type="file"
+      accept=".csv"
+      style="display:none"
+      (change)="onFileSelected($event)" />
+
+    <!-- Format spec -->
+    <div class="imp-format-box">
+      <p class="imp-format-title">Required CSV columns</p>
+      <p class="imp-format-row">front, back, article, categoryId,</p>
+      <p class="imp-format-row">exampleTarget, exampleNative</p>
+      <p class="imp-format-note">
+        <strong>article:</strong> der / die / das or leave empty.<br>
+        <strong>categoryId:</strong> Animals, Food, Travel …
+      </p>
+    </div>
+
+  </div>
+</ion-content>

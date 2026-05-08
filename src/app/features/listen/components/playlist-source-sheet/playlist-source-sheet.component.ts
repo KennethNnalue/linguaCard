@@ -3,8 +3,8 @@ import { IonContent, IonIcon, ModalController } from '@ionic/angular/standalone'
 import { addIcons } from 'ionicons';
 import { closeOutline, checkmarkOutline } from 'ionicons/icons';
 import { Card } from '../../../../core/models/mock-data';
-import { MockCategoryService } from '../../../../core/services/mock-services';
 import { CardStore } from '../../../../core/store/card.store';
+import { CategoryStore } from '../../../../core/store/category.store';
 
 type SourceKey = 'due-today' | 'mastered' | 'struggling' | `category:${string}`;
 type PlaylistMode = 'word-meaning' | 'examples-only' | 'deep-dive';
@@ -17,14 +17,14 @@ type PlaylistMode = 'word-meaning' | 'examples-only' | 'deep-dive';
 })
 export class PlaylistSourceSheetComponent {
   private readonly cardStore = inject(CardStore);
-  private readonly categoryService = inject(MockCategoryService);
+  private readonly categoryStore = inject(CategoryStore);
   private readonly modalCtrl = inject(ModalController);
 
   constructor() {
     addIcons({ closeOutline, checkmarkOutline });
   }
 
-  readonly categories = this.categoryService.categories;
+  readonly categories = this.categoryStore.categories;
   readonly selectedSource = signal<SourceKey>('due-today');
   readonly playbackMode = signal<PlaylistMode>('word-meaning');
 

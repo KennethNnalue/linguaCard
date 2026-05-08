@@ -2,9 +2,14 @@
   <ion-toolbar>
     <div class="vault-nav">
       <h1 class="vault-title lc-display">Vocabulary Vault</h1>
-      <button class="lc-fab" (click)="openAddWord()" aria-label="Add word">
-        <ion-icon name="add-outline"></ion-icon>
-      </button>
+      <div class="vault-nav-actions">
+        <button class="lc-fab lc-fab--secondary" (click)="navigateToImport()" aria-label="Import CSV">
+          <ion-icon name="cloud-upload-outline"></ion-icon>
+        </button>
+        <button class="lc-fab" (click)="openAddWord()" aria-label="Add word">
+          <ion-icon name="add-outline"></ion-icon>
+        </button>
+      </div>
     </div>
   </ion-toolbar>
 </ion-header>
@@ -13,6 +18,12 @@
   <ion-refresher slot="fixed" (ionRefresh)="handleRefresh($event)">
     <ion-refresher-content></ion-refresher-content>
   </ion-refresher>
+
+  <!-- Tab pills -->
+  <div class="vault-tabs">
+    <button class="vault-tab vault-tab--active">All words</button>
+    <button class="vault-tab" (click)="navigateToCollections()">Collections</button>
+  </div>
 
   <!-- Search -->
   <div class="vault-search">

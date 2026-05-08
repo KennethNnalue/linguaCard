@@ -34,13 +34,19 @@
         <p class="hero-count lc-display">{{ stats().dueToday }}</p>
         <p class="hero-meta">{{ stats().newCards }} new
           · {{ stats().dueToday - stats().newCards }} review</p>
+        <button class="hero-collection-pill" (click)="openCollectionPicker()">
+          {{ selectedCollectionLabel() }}
+          <ion-icon name="chevron-down-outline"></ion-icon>
+        </button>
       }
       <div class="hero-actions">
-        <button class="lc-btn-pill" routerLink="/review">
+        <button class="lc-btn-pill" [routerLink]="['/review']"
+                [queryParams]="selectedCollectionId() ? { collectionId: selectedCollectionId() } : {}">
           <ion-icon name="play-outline"></ion-icon>
           Review cards
         </button>
-        <button class="lc-btn-ghost" routerLink="/listen">
+        <button class="lc-btn-ghost" [routerLink]="['/listen']"
+                [queryParams]="selectedCollectionId() ? { collectionId: selectedCollectionId() } : {}">
           <ion-icon name="volume-high-outline"></ion-icon>
           Listen
         </button>

@@ -1,0 +1,211 @@
+.cd-nav {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 6px 14px 10px;
+}
+
+.cd-nav-title {
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--lc-text-primary);
+  flex: 1;
+  text-align: center;
+  padding: 0 8px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.lc-back-btn {
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  background: var(--lc-brand-light);
+  border: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  flex-shrink: 0;
+
+  ion-icon {
+    font-size: 14px;
+    color: var(--lc-brand);
+  }
+}
+
+.cd-menu-btn {
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  background: var(--lc-surface);
+  border: 1px solid var(--lc-border);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  flex-shrink: 0;
+
+  ion-icon {
+    font-size: 16px;
+    color: var(--lc-text-secondary);
+  }
+}
+
+// ─── HERO ─────────────────────────────────────────────────────────────────────
+
+.cd-hero {
+  margin: 0 14px 16px;
+  background: var(--lc-brand);
+  border-radius: 16px;
+  padding: 14px 16px;
+}
+
+.cd-hero-top {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin-bottom: 10px;
+}
+
+.cd-hero-emoji {
+  font-size: 28px;
+  line-height: 1;
+  flex-shrink: 0;
+}
+
+.cd-hero-stats {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex: 1;
+}
+
+.cd-hero-stat {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1px;
+}
+
+.cd-hero-stat-num {
+  font-size: 20px;
+  font-weight: 700;
+  color: white;
+  line-height: 1;
+}
+
+.cd-hero-stat-num--due {
+  color: var(--lc-accent-light, #ffd166);
+}
+
+.cd-hero-stat-lbl {
+  font-size: 10px;
+  color: rgba(255, 255, 255, 0.55);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.cd-hero-divider {
+  width: 1px;
+  height: 24px;
+  background: rgba(255, 255, 255, 0.2);
+  flex-shrink: 0;
+}
+
+.cd-hero-progress {
+  height: 4px;
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.cd-hero-progress-fill {
+  height: 100%;
+  background: white;
+  border-radius: 4px;
+  transition: width 0.4s ease;
+}
+
+// ─── ACTION BUTTONS ──────────────────────────────────────────────────────────
+
+.cd-actions {
+  display: flex;
+  gap: 10px;
+  padding: 0 14px 16px;
+}
+
+.cd-action-btn {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  padding: 12px;
+  border-radius: 12px;
+  border: none;
+  font-size: 13px;
+  font-weight: 600;
+  font-family: var(--lc-font-body);
+  cursor: pointer;
+  transition: opacity 0.15s, transform 0.15s;
+
+  ion-icon { font-size: 16px; }
+
+  &:disabled {
+    opacity: 0.45;
+    cursor: not-allowed;
+  }
+
+  &:not(:disabled):active {
+    opacity: 0.8;
+    transform: scale(0.97);
+  }
+
+  &--primary {
+    background: var(--lc-brand);
+    color: white;
+  }
+
+  &--secondary {
+    background: var(--lc-brand-light);
+    color: var(--lc-brand);
+    border: 1px solid var(--lc-brand);
+  }
+}
+
+// ─── CATEGORY CHIPS ──────────────────────────────────────────────────────────
+
+.cd-cat-scroll {
+  display: flex;
+  gap: 8px;
+  padding: 0 14px 12px;
+  overflow-x: auto;
+  scrollbar-width: none;
+
+  &::-webkit-scrollbar { display: none; }
+}
+
+// ─── WORD LIST ────────────────────────────────────────────────────────────────
+
+.cd-word-list {
+  padding: 0 14px 32px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.cd-word-item {
+  padding: 14px 16px;
+  cursor: default;
+}
+
+// ─── FAB ─────────────────────────────────────────────────────────────────────
+
+.cd-fab {
+  position: fixed;
+  bottom: 90px;
+  right: 20px;
+  z-index: 100;
+}

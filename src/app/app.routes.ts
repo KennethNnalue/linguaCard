@@ -29,6 +29,26 @@ export const routes: Routes = [
           import('./features/vault/pages/vault/vault.page').then(m => m.VaultPage),
       },
       {
+        path: 'vault/import',
+        loadComponent: () =>
+          import('./features/vault/pages/import/import.page').then(m => m.ImportPage),
+      },
+      {
+        path: 'vault/import/review',
+        loadComponent: () =>
+          import('./features/vault/pages/import-review/import-review.page').then(m => m.ImportReviewPage),
+      },
+      {
+        path: 'vault/collections',
+        loadComponent: () =>
+          import('./features/vault/pages/collections/collections.page').then(m => m.CollectionsPage),
+      },
+      {
+        path: 'vault/collections/:id',
+        loadComponent: () =>
+          import('./features/vault/pages/collection-detail/collection-detail.page').then(m => m.CollectionDetailPage),
+      },
+      {
         path: 'vault/:id',
         loadComponent: () =>
           import('./features/vault/pages/word-detail/word-detail.component').then(m => m.WordDetailComponent),

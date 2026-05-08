@@ -14,6 +14,7 @@ import { CardApiService } from '../services/card-api.service';
 
 export interface CardFilter {
   categoryId: string | null;
+  collectionId: string | null;
   search: string;
 }
 
@@ -30,7 +31,7 @@ const initialState: CardState = {
   isLoading: false,
   error: null,
   selectedCardId: null,
-  filter: { categoryId: null, search: '' },
+  filter: { categoryId: null, collectionId: null, search: '' },
 };
 
 export const CardStore = signalStore(
@@ -40,8 +41,9 @@ export const CardStore = signalStore(
   withComputed(({ cards, selectedCardId, filter }) => ({
     filteredCards: computed(() => {
       const all = cards();
-      const { categoryId, search } = filter();
+      const { categoryId, collectionId, search } = filter();
       return all
+        .filter(c => !collectionId || c.collectionId === collectionId)
         .filter(c => !categoryId || c.categoryIds.includes(categoryId))
         .filter(c => {
           if (!search.trim()) return true;
@@ -126,8 +128,12 @@ export const CardStore = signalStore(
         patchState(store, { filter: { ...store.filter(), categoryId } });
       },
 
+      setCollectionFilter(collectionId: string | null): void {
+        patchState(store, { filter: { ...store.filter(), collectionId } });
+      },
+
       clearFilter(): void {
-        patchState(store, { filter: { categoryId: null, search: '' } });
+        patchState(store, { filter: { categoryId: null, collectionId: null, search: '' } });
       },
     };
   }),

@@ -160,6 +160,7 @@ export interface CardContent {
 export interface Card {
   id: string;
   deckId: string;
+  collectionId: string | null;
   userId: string;
   contextId: string;
   content: CardContent;
@@ -193,6 +194,39 @@ export interface Deck {
   cardCount: number;
   isDefault: boolean;
   createdAt: string;
+}
+
+// ─── COLLECTION ───────────────────────────────────────────────────────────────
+
+export interface Collection {
+  id: string;
+  userId: string;
+  name: string;
+  description: string;
+  emoji: string;
+  colour: string;
+  contextId: string;
+  cardCount: number;
+  masteredCount: number;
+  dueCount: number;
+  createdAt: string;
+  updatedAt: string;
+  isDefault: boolean;
+}
+
+export interface CreateCollectionDto {
+  name: string;
+  emoji?: string;
+  colour?: string;
+  contextId: string;
+  description?: string;
+}
+
+export interface UpdateCollectionDto {
+  name?: string;
+  emoji?: string;
+  colour?: string;
+  description?: string;
 }
 
 // ─── USER ─────────────────────────────────────────────────────────────────────
@@ -279,6 +313,54 @@ export interface PaginatedResponse<T> {
 //  MOCK DATA
 // ═════════════════════════════════════════════════════════════════════════════
 
+export const MOCK_COLLECTIONS: Collection[] = [
+  {
+    id: 'col-001',
+    userId: 'user-001',
+    name: 'Chapter 6 — Restaurant',
+    description: 'Vocabulary from Netzwerk chapter 6, covering food, ordering and events.',
+    emoji: '🇩🇪',
+    colour: '#2D5A4E',
+    contextId: 'german-vocab',
+    cardCount: 19,
+    masteredCount: 4,
+    dueCount: 8,
+    createdAt: '2025-05-01T09:00:00Z',
+    updatedAt: '2025-05-07T09:00:00Z',
+    isDefault: false,
+  },
+  {
+    id: 'col-002',
+    userId: 'user-001',
+    name: 'Chapter 3 — Family',
+    description: 'Family and animals vocabulary from chapter 3.',
+    emoji: '🇩🇪',
+    colour: '#2D5A4E',
+    contextId: 'german-vocab',
+    cardCount: 5,
+    masteredCount: 1,
+    dueCount: 4,
+    createdAt: '2025-04-15T09:00:00Z',
+    updatedAt: '2025-05-06T09:00:00Z',
+    isDefault: false,
+  },
+  {
+    id: 'col-003',
+    userId: 'user-001',
+    name: 'My custom words',
+    description: '',
+    emoji: '📚',
+    colour: '#2D5A4E',
+    contextId: 'german-vocab',
+    cardCount: 0,
+    masteredCount: 0,
+    dueCount: 0,
+    createdAt: '2025-05-07T09:00:00Z',
+    updatedAt: '2025-05-07T09:00:00Z',
+    isDefault: true,
+  },
+];
+
 export const MOCK_USER: User = {
   id: 'user-001',
   email: 'jan@example.com',
@@ -355,7 +437,7 @@ function daysAgo(days: number): string {
 export const MOCK_CARDS: Card[] = [
   // ── ANIMALS ────────────────────────────────────────────────────────────────
   {
-    id: 'card-001', deckId: 'deck-001', userId: 'user-001', contextId: 'german-vocab',
+    id: 'card-001', deckId: 'deck-001', collectionId: 'col-002', userId: 'user-001', contextId: 'german-vocab',
     categoryIds: ['cat-001'], tags: ['noun', 'animal'], version: 3,
     createdAt: '2025-01-15T10:00:00Z', updatedAt: '2025-01-15T10:00:00Z',
     content: {
@@ -371,7 +453,7 @@ export const MOCK_CARDS: Card[] = [
     srsState: srsState('card-001', { masteryLevel: 5, state: 'mastered', intervalDays: 30, repetitions: 8, lastRating: 5, lastReviewedAt: daysAgo(2), nextDueAt: daysFromNow(28) }),
   },
   {
-    id: 'card-002', deckId: 'deck-001', userId: 'user-001', contextId: 'german-vocab',
+    id: 'card-002', deckId: 'deck-001', collectionId: 'col-002', userId: 'user-001', contextId: 'german-vocab',
     categoryIds: ['cat-001'], tags: ['noun', 'animal'], version: 2,
     createdAt: '2025-01-15T10:05:00Z', updatedAt: '2025-01-15T10:05:00Z',
     content: {
@@ -387,7 +469,7 @@ export const MOCK_CARDS: Card[] = [
     srsState: srsState('card-002', { masteryLevel: 4, state: 'review', intervalDays: 14, repetitions: 5, lastRating: 4, lastReviewedAt: daysAgo(10), nextDueAt: daysFromNow(4) }),
   },
   {
-    id: 'card-003', deckId: 'deck-001', userId: 'user-001', contextId: 'german-vocab',
+    id: 'card-003', deckId: 'deck-001', collectionId: 'col-002', userId: 'user-001', contextId: 'german-vocab',
     categoryIds: ['cat-001'], tags: ['noun', 'animal'], version: 1,
     createdAt: '2025-01-16T09:00:00Z', updatedAt: '2025-01-16T09:00:00Z',
     content: {
@@ -402,7 +484,7 @@ export const MOCK_CARDS: Card[] = [
     srsState: srsState('card-003', { masteryLevel: 2, state: 'learning', intervalDays: 4, repetitions: 2, lastRating: 2, lastReviewedAt: daysAgo(1), nextDueAt: daysFromNow(0) }),
   },
   {
-    id: 'card-004', deckId: 'deck-001', userId: 'user-001', contextId: 'german-vocab',
+    id: 'card-004', deckId: 'deck-001', collectionId: 'col-002', userId: 'user-001', contextId: 'german-vocab',
     categoryIds: ['cat-001'], tags: ['noun', 'animal'], version: 1,
     createdAt: '2025-01-16T09:10:00Z', updatedAt: '2025-01-16T09:10:00Z',
     content: {
@@ -418,7 +500,7 @@ export const MOCK_CARDS: Card[] = [
     srsState: srsState('card-004', { masteryLevel: 0, state: 'new', nextDueAt: new Date().toISOString() }),
   },
   {
-    id: 'card-005', deckId: 'deck-001', userId: 'user-001', contextId: 'german-vocab',
+    id: 'card-005', deckId: 'deck-001', collectionId: 'col-002', userId: 'user-001', contextId: 'german-vocab',
     categoryIds: ['cat-001'], tags: ['noun', 'animal'], version: 2,
     createdAt: '2025-01-17T08:00:00Z', updatedAt: '2025-01-17T08:00:00Z',
     content: {
@@ -435,7 +517,7 @@ export const MOCK_CARDS: Card[] = [
 
   // ── FOOD ───────────────────────────────────────────────────────────────────
   {
-    id: 'card-006', deckId: 'deck-001', userId: 'user-001', contextId: 'german-vocab',
+    id: 'card-006', deckId: 'deck-001', collectionId: 'col-001', userId: 'user-001', contextId: 'german-vocab',
     categoryIds: ['cat-002'], tags: ['noun', 'food'], version: 2,
     createdAt: '2025-01-17T10:00:00Z', updatedAt: '2025-01-17T10:00:00Z',
     content: {
@@ -451,7 +533,7 @@ export const MOCK_CARDS: Card[] = [
     srsState: srsState('card-006', { masteryLevel: 5, state: 'mastered', intervalDays: 21, repetitions: 7, lastRating: 5, lastReviewedAt: daysAgo(5), nextDueAt: daysFromNow(16) }),
   },
   {
-    id: 'card-007', deckId: 'deck-001', userId: 'user-001', contextId: 'german-vocab',
+    id: 'card-007', deckId: 'deck-001', collectionId: 'col-001', userId: 'user-001', contextId: 'german-vocab',
     categoryIds: ['cat-002'], tags: ['noun', 'food', 'drink'], version: 1,
     createdAt: '2025-01-18T09:00:00Z', updatedAt: '2025-01-18T09:00:00Z',
     content: {
@@ -467,7 +549,7 @@ export const MOCK_CARDS: Card[] = [
     srsState: srsState('card-007', { masteryLevel: 3, state: 'review', intervalDays: 7, repetitions: 3, lastRating: 3, lastReviewedAt: daysAgo(5), nextDueAt: daysFromNow(2) }),
   },
   {
-    id: 'card-008', deckId: 'deck-001', userId: 'user-001', contextId: 'german-vocab',
+    id: 'card-008', deckId: 'deck-001', collectionId: 'col-001', userId: 'user-001', contextId: 'german-vocab',
     categoryIds: ['cat-002'], tags: ['noun', 'food'], version: 2,
     createdAt: '2025-01-18T10:00:00Z', updatedAt: '2025-01-18T10:00:00Z',
     content: {
@@ -483,7 +565,7 @@ export const MOCK_CARDS: Card[] = [
     srsState: srsState('card-008', { masteryLevel: 4, state: 'review', intervalDays: 10, repetitions: 4, lastRating: 4, lastReviewedAt: daysAgo(8), nextDueAt: daysFromNow(2) }),
   },
   {
-    id: 'card-009', deckId: 'deck-001', userId: 'user-001', contextId: 'german-vocab',
+    id: 'card-009', deckId: 'deck-001', collectionId: 'col-001', userId: 'user-001', contextId: 'german-vocab',
     categoryIds: ['cat-002'], tags: ['noun', 'food', 'drink'], version: 1,
     createdAt: '2025-01-19T08:00:00Z', updatedAt: '2025-01-19T08:00:00Z',
     content: {
@@ -499,7 +581,7 @@ export const MOCK_CARDS: Card[] = [
     srsState: srsState('card-009', { masteryLevel: 2, state: 'learning', intervalDays: 3, repetitions: 2, lastRating: 2, lastReviewedAt: daysAgo(2), nextDueAt: new Date().toISOString() }),
   },
   {
-    id: 'card-010', deckId: 'deck-001', userId: 'user-001', contextId: 'german-vocab',
+    id: 'card-010', deckId: 'deck-001', collectionId: 'col-001', userId: 'user-001', contextId: 'german-vocab',
     categoryIds: ['cat-002'], tags: ['noun', 'food'], version: 1,
     createdAt: '2025-01-19T09:00:00Z', updatedAt: '2025-01-19T09:00:00Z',
     content: {
@@ -517,7 +599,7 @@ export const MOCK_CARDS: Card[] = [
 
   // ── TRAVEL ─────────────────────────────────────────────────────────────────
   {
-    id: 'card-011', deckId: 'deck-001', userId: 'user-001', contextId: 'german-vocab',
+    id: 'card-011', deckId: 'deck-001', collectionId: 'col-001', userId: 'user-001', contextId: 'german-vocab',
     categoryIds: ['cat-003'], tags: ['noun', 'travel', 'transport'], version: 3,
     createdAt: '2025-01-20T08:00:00Z', updatedAt: '2025-01-20T08:00:00Z',
     content: {
@@ -533,7 +615,7 @@ export const MOCK_CARDS: Card[] = [
     srsState: srsState('card-011', { masteryLevel: 3, state: 'review', intervalDays: 7, repetitions: 3, lastRating: 3, lastReviewedAt: daysAgo(4), nextDueAt: daysFromNow(3) }),
   },
   {
-    id: 'card-012', deckId: 'deck-001', userId: 'user-001', contextId: 'german-vocab',
+    id: 'card-012', deckId: 'deck-001', collectionId: 'col-001', userId: 'user-001', contextId: 'german-vocab',
     categoryIds: ['cat-003'], tags: ['noun', 'travel'], version: 1,
     createdAt: '2025-01-20T09:00:00Z', updatedAt: '2025-01-20T09:00:00Z',
     content: {
@@ -549,7 +631,7 @@ export const MOCK_CARDS: Card[] = [
     srsState: srsState('card-012', { masteryLevel: 1, state: 'learning', intervalDays: 2, repetitions: 1, lastRating: 1, lastReviewedAt: daysAgo(1), nextDueAt: new Date().toISOString() }),
   },
   {
-    id: 'card-013', deckId: 'deck-001', userId: 'user-001', contextId: 'german-vocab',
+    id: 'card-013', deckId: 'deck-001', collectionId: 'col-001', userId: 'user-001', contextId: 'german-vocab',
     categoryIds: ['cat-003'], tags: ['noun', 'travel'], version: 1,
     createdAt: '2025-01-21T08:00:00Z', updatedAt: '2025-01-21T08:00:00Z',
     content: {
@@ -567,7 +649,7 @@ export const MOCK_CARDS: Card[] = [
 
   // ── DAILY LIFE ─────────────────────────────────────────────────────────────
   {
-    id: 'card-014', deckId: 'deck-001', userId: 'user-001', contextId: 'german-vocab',
+    id: 'card-014', deckId: 'deck-001', collectionId: 'col-001', userId: 'user-001', contextId: 'german-vocab',
     categoryIds: ['cat-004'], tags: ['verb', 'daily'], version: 2,
     createdAt: '2025-01-21T09:00:00Z', updatedAt: '2025-01-21T09:00:00Z',
     content: {
@@ -583,7 +665,7 @@ export const MOCK_CARDS: Card[] = [
     srsState: srsState('card-014', { masteryLevel: 3, state: 'review', intervalDays: 8, repetitions: 3, lastRating: 3, lastReviewedAt: daysAgo(6), nextDueAt: daysFromNow(2) }),
   },
   {
-    id: 'card-015', deckId: 'deck-001', userId: 'user-001', contextId: 'german-vocab',
+    id: 'card-015', deckId: 'deck-001', collectionId: 'col-001', userId: 'user-001', contextId: 'german-vocab',
     categoryIds: ['cat-004'], tags: ['verb', 'daily'], version: 1,
     createdAt: '2025-01-22T08:00:00Z', updatedAt: '2025-01-22T08:00:00Z',
     content: {
@@ -599,7 +681,7 @@ export const MOCK_CARDS: Card[] = [
     srsState: srsState('card-015', { masteryLevel: 5, state: 'mastered', intervalDays: 28, repetitions: 9, lastRating: 5, lastReviewedAt: daysAgo(3), nextDueAt: daysFromNow(25) }),
   },
   {
-    id: 'card-016', deckId: 'deck-001', userId: 'user-001', contextId: 'german-vocab',
+    id: 'card-016', deckId: 'deck-001', collectionId: 'col-001', userId: 'user-001', contextId: 'german-vocab',
     categoryIds: ['cat-004'], tags: ['verb', 'daily'], version: 1,
     createdAt: '2025-01-22T09:00:00Z', updatedAt: '2025-01-22T09:00:00Z',
     content: {
@@ -615,7 +697,7 @@ export const MOCK_CARDS: Card[] = [
     srsState: srsState('card-016', { masteryLevel: 2, state: 'learning', intervalDays: 4, repetitions: 2, lastRating: 2, lastReviewedAt: daysAgo(3), nextDueAt: new Date().toISOString() }),
   },
   {
-    id: 'card-017', deckId: 'deck-001', userId: 'user-001', contextId: 'german-vocab',
+    id: 'card-017', deckId: 'deck-001', collectionId: 'col-001', userId: 'user-001', contextId: 'german-vocab',
     categoryIds: ['cat-004'], tags: ['adjective', 'daily'], version: 1,
     createdAt: '2025-01-23T08:00:00Z', updatedAt: '2025-01-23T08:00:00Z',
     content: {
@@ -633,7 +715,7 @@ export const MOCK_CARDS: Card[] = [
 
   // ── FAMILY ─────────────────────────────────────────────────────────────────
   {
-    id: 'card-018', deckId: 'deck-001', userId: 'user-001', contextId: 'german-vocab',
+    id: 'card-018', deckId: 'deck-001', collectionId: 'col-001', userId: 'user-001', contextId: 'german-vocab',
     categoryIds: ['cat-005'], tags: ['noun', 'family'], version: 2,
     createdAt: '2025-01-23T09:00:00Z', updatedAt: '2025-01-23T09:00:00Z',
     content: {
@@ -649,7 +731,7 @@ export const MOCK_CARDS: Card[] = [
     srsState: srsState('card-018', { masteryLevel: 5, state: 'mastered', intervalDays: 25, repetitions: 7, lastRating: 5, lastReviewedAt: daysAgo(4), nextDueAt: daysFromNow(21) }),
   },
   {
-    id: 'card-019', deckId: 'deck-001', userId: 'user-001', contextId: 'german-vocab',
+    id: 'card-019', deckId: 'deck-001', collectionId: 'col-001', userId: 'user-001', contextId: 'german-vocab',
     categoryIds: ['cat-005'], tags: ['noun', 'family'], version: 1,
     createdAt: '2025-01-24T08:00:00Z', updatedAt: '2025-01-24T08:00:00Z',
     content: {
@@ -665,7 +747,7 @@ export const MOCK_CARDS: Card[] = [
     srsState: srsState('card-019', { masteryLevel: 3, state: 'review', intervalDays: 7, repetitions: 3, lastRating: 3, lastReviewedAt: daysAgo(5), nextDueAt: daysFromNow(2) }),
   },
   {
-    id: 'card-020', deckId: 'deck-001', userId: 'user-001', contextId: 'german-vocab',
+    id: 'card-020', deckId: 'deck-001', collectionId: 'col-001', userId: 'user-001', contextId: 'german-vocab',
     categoryIds: ['cat-005'], tags: ['noun', 'family'], version: 1,
     createdAt: '2025-01-24T09:00:00Z', updatedAt: '2025-01-24T09:00:00Z',
     content: {
@@ -683,7 +765,7 @@ export const MOCK_CARDS: Card[] = [
 
   // ── HOME ───────────────────────────────────────────────────────────────────
   {
-    id: 'card-021', deckId: 'deck-001', userId: 'user-001', contextId: 'german-vocab',
+    id: 'card-021', deckId: 'deck-001', collectionId: 'col-001', userId: 'user-001', contextId: 'german-vocab',
     categoryIds: ['cat-006'], tags: ['noun', 'home'], version: 1,
     createdAt: '2025-01-25T08:00:00Z', updatedAt: '2025-01-25T08:00:00Z',
     content: {
@@ -699,7 +781,7 @@ export const MOCK_CARDS: Card[] = [
     srsState: srsState('card-021', { masteryLevel: 3, state: 'review', intervalDays: 6, repetitions: 3, lastRating: 3, lastReviewedAt: daysAgo(5), nextDueAt: daysFromNow(1) }),
   },
   {
-    id: 'card-022', deckId: 'deck-001', userId: 'user-001', contextId: 'german-vocab',
+    id: 'card-022', deckId: 'deck-001', collectionId: 'col-001', userId: 'user-001', contextId: 'german-vocab',
     categoryIds: ['cat-006'], tags: ['noun', 'home'], version: 1,
     createdAt: '2025-01-25T09:00:00Z', updatedAt: '2025-01-25T09:00:00Z',
     content: {
@@ -717,7 +799,7 @@ export const MOCK_CARDS: Card[] = [
 
   // ── WORK ───────────────────────────────────────────────────────────────────
   {
-    id: 'card-023', deckId: 'deck-001', userId: 'user-001', contextId: 'german-vocab',
+    id: 'card-023', deckId: 'deck-001', collectionId: 'col-001', userId: 'user-001', contextId: 'german-vocab',
     categoryIds: ['cat-007'], tags: ['noun', 'work'], version: 1,
     createdAt: '2025-01-26T08:00:00Z', updatedAt: '2025-01-26T08:00:00Z',
     content: {
@@ -733,7 +815,7 @@ export const MOCK_CARDS: Card[] = [
     srsState: srsState('card-023', { masteryLevel: 1, state: 'learning', intervalDays: 2, repetitions: 1, lastRating: 1, lastReviewedAt: daysAgo(1), nextDueAt: new Date().toISOString() }),
   },
   {
-    id: 'card-024', deckId: 'deck-001', userId: 'user-001', contextId: 'german-vocab',
+    id: 'card-024', deckId: 'deck-001', collectionId: 'col-001', userId: 'user-001', contextId: 'german-vocab',
     categoryIds: ['cat-007'], tags: ['noun', 'work'], version: 1,
     createdAt: '2025-01-26T09:00:00Z', updatedAt: '2025-01-26T09:00:00Z',
     content: {
@@ -812,3 +894,33 @@ export const MASTERY_CONFIG: Record<MasteryLevel, { label: string; colour: strin
   4: { label: 'Good',     colour: '#34D399', cssClass: 'mastery--4' },
   5: { label: 'Mastered', colour: '#059669', cssClass: 'mastery--5' },
 };
+
+// ─── CSV IMPORT ───────────────────────────────────────────────────────────────
+
+export interface ParsedImportRow {
+  rowIndex: number;
+  front: string;
+  back: string;
+  article: ArticleType | null;
+  categoryId: string;
+  exampleTarget: string;
+  exampleNative: string;
+  status: 'valid' | 'warning' | 'error';
+  warningMessages: string[];
+  errorMessages: string[];
+}
+
+export interface ParsedImportResult {
+  fileName: string;
+  totalRows: number;
+  validRows: ParsedImportRow[];
+  errorRows: ParsedImportRow[];
+  warningCount: number;
+}
+
+export interface BulkCreateResult {
+  created: number;
+  failed: number;
+  cards: Card[];
+  error?: string;
+}

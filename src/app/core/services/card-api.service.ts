@@ -9,8 +9,10 @@ export class CardApiService {
   private readonly http = inject(HttpClient);
   private readonly baseUrl = `${environment.apiUrl}/cards`;
 
-  getAll(): Observable<Card[]> {
-    return this.http.get<Card[]>(this.baseUrl);
+  getAll(params?: { collectionId?: string }): Observable<Card[]> {
+    const httpParams: Record<string, string> = {};
+    if (params?.collectionId) httpParams['collectionId'] = params.collectionId;
+    return this.http.get<Card[]>(this.baseUrl, { params: httpParams });
   }
 
   getById(id: string): Observable<Card> {
