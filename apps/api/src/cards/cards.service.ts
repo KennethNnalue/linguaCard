@@ -71,6 +71,11 @@ export class CardsService {
     if (!result.affected) throw new NotFoundException(`Card ${id} not found`);
   }
 
+  async clearByCollection(collectionId: string): Promise<{ deleted: number }> {
+    const result = await this.repo.delete({ collectionId });
+    return { deleted: result.affected ?? 0 };
+  }
+
   private toModel(e: CardEntity): Card {
     return {
       id: e.id,

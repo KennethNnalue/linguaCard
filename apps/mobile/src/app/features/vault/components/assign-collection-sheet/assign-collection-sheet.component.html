@@ -59,7 +59,11 @@
   </div>
 
   <div class="acs-footer">
-    <button class="acs-confirm-btn" (click)="confirm()">Confirm selection</button>
-    <button class="acs-skip-btn" (click)="skip()">Skip for now</button>
+    <button class="acs-confirm-btn" [disabled]="required && !selected()" (click)="confirm()">
+      Confirm selection
+    </button>
+    @if (!required) {
+      <button class="acs-skip-btn" (click)="skip()">Skip for now</button>
+    }
   </div>
 </ion-content>

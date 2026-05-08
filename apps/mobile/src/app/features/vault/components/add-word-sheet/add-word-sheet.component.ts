@@ -47,7 +47,7 @@ export class AddWordSheetComponent implements OnInit {
     back: new FormControl('', [Validators.required]),
     article: new FormControl<ArticleType | null>(null),
     categoryId: new FormControl(''),
-    collectionId: new FormControl<string | null>(null),
+    collectionId: new FormControl<string | null>(null, [Validators.required]),
     exampleTarget: new FormControl(''),
     exampleNative: new FormControl(''),
   });
@@ -187,7 +187,7 @@ export class AddWordSheetComponent implements OnInit {
       breakpoints: [0, 0.6, 0.85],
       initialBreakpoint: 0.6,
       handleBehavior: 'cycle',
-      componentProps: { selectedCollectionId: this.form.get('collectionId')!.value },
+      componentProps: { selectedCollectionId: this.form.get('collectionId')!.value, required: true },
     });
     await modal.present();
     const { data } = await modal.onWillDismiss();

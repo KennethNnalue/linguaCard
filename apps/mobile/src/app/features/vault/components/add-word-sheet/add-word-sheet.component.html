@@ -67,11 +67,15 @@
 
     <!-- Collection -->
     <div class="aw-field">
-      <p class="aw-lbl">Collection <span class="aw-lbl-hint">(optional)</span></p>
+      <p class="aw-lbl">Collection <span class="aw-lbl-hint aw-lbl-hint--required">*required</span></p>
       @if (lockedCollectionId) {
         <div class="aw-collection-locked">{{ selectedCollectionLabel() }}</div>
       } @else {
-        <button type="button" class="aw-collection-btn" (click)="openCollectionSheet()">
+        <button
+          type="button"
+          class="aw-collection-btn"
+          [class.aw-input--error]="form.get('collectionId')?.invalid && form.get('collectionId')?.touched"
+          (click)="openCollectionSheet()">
           <span>{{ selectedCollectionLabel() }}</span>
           <span class="aw-collection-caret">▼</span>
         </button>

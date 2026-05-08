@@ -45,6 +45,12 @@
   gap: 6px;
 }
 
+.imp-required {
+  color: var(--lc-accent);
+  font-weight: 600;
+  margin-left: 4px;
+}
+
 .imp-collection-btn {
   width: 100%;
   display: flex;
@@ -61,6 +67,11 @@
   transition: border-color 0.15s;
 
   &:active { border-color: var(--lc-brand); }
+
+  &--empty {
+    border-color: var(--lc-accent);
+    color: var(--lc-text-hint);
+  }
 }
 
 .imp-collection-caret {

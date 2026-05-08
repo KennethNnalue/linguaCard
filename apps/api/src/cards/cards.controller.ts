@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Patch, Delete, Param, Body, Query } from '@nestjs/common';
+import { Controller, Get, Post, Patch, Delete, Param, Body, Query, BadRequestException } from '@nestjs/common';
 import { CardsService } from './cards.service';
 import { CreateCardDto, UpdateCardDto } from '@lingua-card/shared/dto';
 import type { CardQueryParams } from '@lingua-card/shared/dto';
@@ -25,6 +25,12 @@ export class CardsController {
   @Patch(':id')
   update(@Param('id') id: string, @Body() dto: UpdateCardDto) {
     return this.cardsService.update(id, dto);
+  }
+
+  @Delete('clear')
+  clearByCollection(@Query('collectionId') collectionId: string) {
+    if (!collectionId) throw new BadRequestException('collectionId is required');
+    return this.cardsService.clearByCollection(collectionId);
   }
 
   @Delete(':id')

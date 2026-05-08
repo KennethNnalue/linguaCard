@@ -22,6 +22,7 @@ import { CollectionStore } from '../../store/collection.store';
 })
 export class AssignCollectionSheetComponent implements OnInit {
   @Input() selectedCollectionId: string | null = null;
+  @Input() required = false;
 
   private readonly collectionApi = inject(CollectionApiService);
   private readonly collectionStore = inject(CollectionStore);
@@ -43,7 +44,7 @@ export class AssignCollectionSheetComponent implements OnInit {
   }
 
   select(id: string): void {
-    this.selected.set(this.selected() === id ? null : id);
+    this.selected.set(this.selected() === id && !this.required ? null : id);
     this.showCreateForm.set(false);
   }
 

@@ -146,6 +146,11 @@ export class CollectionDetailPage implements OnInit {
     const alert = await this.alertCtrl.create({
       header: col.name,
       buttons: [
+        ...(col.cardCount > 0 ? [{
+          text: 'Clear all words',
+          role: 'destructive',
+          handler: () => this.confirmClearWords(),
+        }] : []),
         {
           text: 'Delete collection',
           role: 'destructive',
@@ -155,6 +160,33 @@ export class CollectionDetailPage implements OnInit {
       ],
     });
     await alert.present();
+  }
+
+  private async confirmClearWords(): Promise<void> {
+    const col = this.collection();
+    if (!col) return;
+    const alert = await this.alertCtrl.create({
+      header: 'Clear all words?',
+      message: `This will permanently delete all ${col.cardCount} word${col.cardCount === 1 ? '' : 's'} in "${col.name}". This cannot be undone.`,
+      buttons: [
+        {
+          text: 'Clear all',
+          role: 'destructive',
+          handler: () => this.clearAllWords(),
+        },
+        { text: 'Cancel', role: 'cancel' },
+      ],
+    });
+    await alert.present();
+  }
+
+  private clearAllWords(): void {
+    const col = this.collection();
+    if (!col) return;
+    this.collectionApi.clearCards(col.id).subscribe(() => {
+      this.allCards.set([]);
+      this.collectionStore.loadCollections();
+    });
   }
 
   private async confirmDelete(): Promise<void> {

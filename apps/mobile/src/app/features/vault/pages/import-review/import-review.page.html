@@ -57,8 +57,11 @@
 
       <!-- Collection picker -->
       <div class="imp-field">
-        <p class="imp-section-lbl">ADD TO COLLECTION</p>
-        <button class="imp-collection-btn" (click)="openCollectionSheet()">
+        <p class="imp-section-lbl">ADD TO COLLECTION <span class="imp-required">*required</span></p>
+        <button
+          class="imp-collection-btn"
+          [class.imp-collection-btn--empty]="!selectedCollectionId()"
+          (click)="openCollectionSheet()">
           <span>{{ selectedCollectionLabel() }}</span>
           <span class="imp-collection-caret">▼</span>
         </button>
@@ -99,7 +102,7 @@
       <!-- Import button -->
       <button
         class="imp-import-btn"
-        [disabled]="importing() || readyCount() === 0"
+        [disabled]="importing() || readyCount() === 0 || !selectedCollectionId()"
         (click)="confirmImport()">
         @if (importing()) {
           Importing…

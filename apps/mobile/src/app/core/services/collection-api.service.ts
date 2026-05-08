@@ -34,4 +34,10 @@ export class CollectionApiService {
       params: { collectionId },
     });
   }
+
+  clearCards(collectionId: string): Observable<{ deleted: number }> {
+    return this.http.delete<{ deleted: number }>(`${environment.apiUrl}/cards/clear`, {
+      params: { collectionId },
+    });
+  }
 }

@@ -69,6 +69,17 @@ export class ImportReviewPage implements OnInit {
     const rows = this.result()?.validRows;
     if (!rows?.length || this.importing()) return;
 
+    if (!this.selectedCollectionId()) {
+      const toast = await this.toastCtrl.create({
+        message: 'Please select a collection before importing.',
+        duration: 2500,
+        position: 'bottom',
+        color: 'warning',
+      });
+      await toast.present();
+      return;
+    }
+
     this.importing.set(true);
     const collectionId = this.selectedCollectionId();
     const now = new Date().toISOString();
@@ -137,7 +148,7 @@ export class ImportReviewPage implements OnInit {
       breakpoints: [0, 0.6, 0.85],
       initialBreakpoint: 0.6,
       handleBehavior: 'cycle',
-      componentProps: { selectedCollectionId: this.selectedCollectionId() },
+      componentProps: { selectedCollectionId: this.selectedCollectionId(), required: true },
     });
     await modal.present();
     const { data } = await modal.onWillDismiss();
