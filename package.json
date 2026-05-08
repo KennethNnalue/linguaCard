@@ -14,7 +14,7 @@
     "live:android": "concurrently \"ng serve --project=mobile --host 0.0.0.0\" \"npx cap run android --livereload --external\"",
     "live:ios": "concurrently \"ng serve --project=mobile --host 0.0.0.0\" \"npx cap run ios --livereload --external\"",
     "dev:api": "npx ts-node -r tsconfig-paths/register apps/api/src/main.ts",
-    "build:api": "tsc -p apps/api/tsconfig.json",
+    "build:api": "tsc -p apps/api/tsconfig.json && tsc-alias -p apps/api/tsconfig.json",
     "build:web": "node scripts/set-env.mjs && ng build --project=mobile --configuration=production",
     "test": "jest",
     "test:watch": "jest --watch",
@@ -87,6 +87,7 @@
     "jest-environment-jsdom": "^30.3.0",
     "jest-preset-angular": "^16.1.4",
     "nx": "^22.7.1",
+    "tsc-alias": "^1.8.17",
     "typescript": "~5.9.0"
   },
   "description": "An Ionic project"
