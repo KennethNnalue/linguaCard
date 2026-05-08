@@ -146,7 +146,7 @@ export class CollectionDetailPage implements OnInit {
     const alert = await this.alertCtrl.create({
       header: col.name,
       buttons: [
-        ...(col.cardCount > 0 ? [{
+        ...(this.wordCount() > 0 ? [{
           text: 'Clear all words',
           role: 'destructive',
           handler: () => this.confirmClearWords(),
@@ -167,7 +167,7 @@ export class CollectionDetailPage implements OnInit {
     if (!col) return;
     const alert = await this.alertCtrl.create({
       header: 'Clear all words?',
-      message: `This will permanently delete all ${col.cardCount} word${col.cardCount === 1 ? '' : 's'} in "${col.name}". This cannot be undone.`,
+      message: `This will permanently delete all ${this.wordCount()} word${this.wordCount() === 1 ? '' : 's'} in "${col.name}". This cannot be undone.`,
       buttons: [
         {
           text: 'Clear all',
