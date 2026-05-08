@@ -4,13 +4,13 @@ services:
     env: node
     region: oregon
     plan: free
-    buildCommand: npm ci && npx tsc -p apps/api/tsconfig.json
+    buildCommand: npm ci && npm run build:api
     startCommand: node dist/api/apps/api/src/main.js
     healthCheckPath: /api/v1/collections
     envVars:
       - key: NODE_ENV
         value: production
       - key: DATABASE_URL
-        sync: false          # set manually in Render dashboard from Neon
+        sync: false          # paste Neon connection string in Render dashboard
       - key: CORS_ORIGIN
         sync: false          # set after Vercel deploy: https://your-app.vercel.app
