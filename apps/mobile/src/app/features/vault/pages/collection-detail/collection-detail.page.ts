@@ -112,7 +112,9 @@ export class CollectionDetailPage implements OnInit {
   startReview(): void {
     const col = this.collection();
     if (!col) return;
-    this.router.navigate(['/review'], { queryParams: { collectionId: col.id } });
+    const params: Record<string, string> = { collectionId: col.id };
+    if (this.dueCount() === 0) params['mode'] = 'all';
+    this.router.navigate(['/review'], { queryParams: params });
   }
 
   startListen(): void {

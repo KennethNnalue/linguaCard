@@ -32,7 +32,21 @@ export class ReviewStore {
       return { ...s, ratings: { ...s.ratings, [card.id]: rating } };
     });
 
-    const newSrs = this.computeSm2(card.srsState!, rating);
+    const existingSrs: SRSStateData = card.srsState ?? {
+      id: crypto.randomUUID(),
+      cardId: card.id,
+      userId: card.userId,
+      algorithm: 'sm2',
+      intervalDays: 1,
+      easeFactor: 2.5,
+      repetitions: 0,
+      lastRating: null,
+      lastReviewedAt: null,
+      nextDueAt: new Date().toISOString(),
+      masteryLevel: 0,
+      state: 'new',
+    };
+    const newSrs = this.computeSm2(existingSrs, rating);
     return this.cardApi.update(card.id, { srsState: newSrs, updatedAt: new Date().toISOString() });
   }
 

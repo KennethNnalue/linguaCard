@@ -100,16 +100,21 @@ export class ReviewPage implements OnInit {
 
   ngOnInit(): void {
     const collectionId = this.route.snapshot.queryParamMap.get('collectionId');
+    const mode = this.route.snapshot.queryParamMap.get('mode');
     toObservable(this.cardStore.isLoading, { injector: this.injector })
       .pipe(filter(loading => !loading), take(1))
       .subscribe(() => {
-        let dueCards = this.cardStore.dueCards();
-        if (collectionId) {
-          dueCards = dueCards.filter(c => c.collectionId === collectionId);
+        let cards: Card[];
+        if (mode === 'all') {
+          cards = this.cardStore.cards();
+          if (collectionId) cards = cards.filter(c => c.collectionId === collectionId);
+        } else {
+          cards = this.cardStore.dueCards();
+          if (collectionId) cards = cards.filter(c => c.collectionId === collectionId);
         }
-        this.queue.set(dueCards);
-        if (dueCards.length) {
-          this.reviewStore.startSession(dueCards);
+        this.queue.set(cards);
+        if (cards.length) {
+          this.reviewStore.startSession(cards);
         }
       });
   }

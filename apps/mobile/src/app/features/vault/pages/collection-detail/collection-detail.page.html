@@ -46,9 +46,9 @@
   <!-- Action buttons -->
   <div class="cd-actions">
     <button class="cd-action-btn cd-action-btn--primary" (click)="startReview()"
-            [disabled]="dueCount() === 0">
+            [disabled]="wordCount() === 0">
       <ion-icon name="play-outline"></ion-icon>
-      Review {{ dueCount() > 0 ? '(' + dueCount() + ')' : '' }}
+      {{ dueCount() > 0 ? 'Review (' + dueCount() + ')' : 'Review all' }}
     </button>
     <button class="cd-action-btn cd-action-btn--secondary" (click)="startListen()"
             [disabled]="wordCount() === 0">

@@ -2,7 +2,7 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { randomUUID } from 'crypto';
-import type { Card, CardContent, GenderType } from '@lingua-card/shared/domain';
+import type { Card, CardContent, GenderType, SRSStateData } from '@lingua-card/shared/domain';
 import type { CreateCardDto, UpdateCardDto, CardQueryParams } from '@lingua-card/shared/dto';
 import { CardEntity } from './card.entity';
 
@@ -49,7 +49,20 @@ export class CardsService {
       categoryIds: dto.categoryIds ?? [],
       tags: dto.tags ?? [],
       version: 1,
-      srsState: null,
+      srsState: {
+        id: randomUUID(),
+        cardId: '',
+        userId: dto.userId,
+        algorithm: 'sm2',
+        intervalDays: 1,
+        easeFactor: 2.5,
+        repetitions: 0,
+        lastRating: null,
+        lastReviewedAt: null,
+        nextDueAt: now,
+        masteryLevel: 0,
+        state: 'new',
+      } satisfies SRSStateData,
     });
     const saved = await this.repo.save(entity);
     return this.toModel(saved);
@@ -62,6 +75,7 @@ export class CardsService {
     if (dto.categoryIds)  entity.categoryIds = dto.categoryIds;
     if (dto.tags)         entity.tags        = dto.tags;
     if (dto.collectionId !== undefined) entity.collectionId = dto.collectionId ?? null;
+    if (dto.srsState !== undefined) entity.srsState = dto.srsState as unknown as SRSStateData;
     const saved = await this.repo.save(entity);
     return this.toModel(saved);
   }

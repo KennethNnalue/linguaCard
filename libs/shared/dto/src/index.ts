@@ -43,6 +43,7 @@ export class UpdateCardDto {
   @IsOptional() @IsArray() categoryIds?: string[];
   @IsOptional() @IsArray() tags?: string[];
   @IsOptional() @IsString() collectionId?: string | null;
+  @IsOptional() srsState?: Record<string, unknown> | null;
 }
 
 export class RateCardDto {
