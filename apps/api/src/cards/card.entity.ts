@@ -6,7 +6,7 @@ import type { CardContent, SRSStateData } from '@lingua-card/shared/domain';
 
 @Entity('cards')
 export class CardEntity {
-  @PrimaryColumn('uuid')
+  @PrimaryColumn()
   id!: string;
 
   @Column()

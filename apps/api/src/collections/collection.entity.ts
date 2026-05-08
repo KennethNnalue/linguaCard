@@ -5,7 +5,7 @@ import {
 
 @Entity('collections')
 export class CollectionEntity {
-  @PrimaryColumn('uuid')
+  @PrimaryColumn()
   id!: string;
 
   @Column()

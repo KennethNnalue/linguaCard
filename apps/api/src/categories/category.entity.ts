@@ -2,7 +2,7 @@ import { Entity, PrimaryColumn, Column, CreateDateColumn } from 'typeorm';
 
 @Entity('categories')
 export class CategoryEntity {
-  @PrimaryColumn('uuid')
+  @PrimaryColumn()
   id!: string;
 
   @Column()
