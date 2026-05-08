@@ -1,25 +1,30 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
+import { randomUUID } from 'crypto';
 import type { Collection } from '@lingua-card/shared/domain';
 import { CreateCollectionDto, UpdateCollectionDto } from '@lingua-card/shared/dto';
-import { randomUUID } from 'crypto';
+import { CollectionEntity } from './collection.entity';
 
 @Injectable()
 export class CollectionsService {
-  private collections: Collection[] = [];
+  constructor(
+    @InjectRepository(CollectionEntity)
+    private readonly repo: Repository<CollectionEntity>,
+  ) {}
 
-  findAll(): Collection[] {
-    return this.collections;
+  async findAll(): Promise<Collection[]> {
+    return (await this.repo.find()).map(this.toModel);
   }
 
-  findOne(id: string): Collection {
-    const col = this.collections.find(c => c.id === id);
-    if (!col) throw new NotFoundException(`Collection ${id} not found`);
-    return col;
+  async findOne(id: string): Promise<Collection> {
+    const entity = await this.repo.findOneBy({ id });
+    if (!entity) throw new NotFoundException(`Collection ${id} not found`);
+    return this.toModel(entity);
   }
 
-  create(dto: CreateCollectionDto): Collection {
-    const now = new Date().toISOString();
-    const collection: Collection = {
+  async create(dto: CreateCollectionDto): Promise<Collection> {
+    const entity = this.repo.create({
       id: randomUUID(),
       userId: 'user-001',
       name: dto.name,
@@ -30,28 +35,40 @@ export class CollectionsService {
       cardCount: 0,
       masteredCount: 0,
       dueCount: 0,
-      createdAt: now,
-      updatedAt: now,
       isDefault: false,
-    };
-    this.collections.push(collection);
-    return collection;
+    });
+    const saved = await this.repo.save(entity);
+    return this.toModel(saved);
   }
 
-  update(id: string, dto: UpdateCollectionDto): Collection {
-    const index = this.collections.findIndex(c => c.id === id);
-    if (index === -1) throw new NotFoundException(`Collection ${id} not found`);
-    this.collections[index] = {
-      ...this.collections[index],
-      ...dto,
-      updatedAt: new Date().toISOString(),
-    };
-    return this.collections[index];
+  async update(id: string, dto: UpdateCollectionDto): Promise<Collection> {
+    const entity = await this.repo.findOneBy({ id });
+    if (!entity) throw new NotFoundException(`Collection ${id} not found`);
+    Object.assign(entity, dto);
+    const saved = await this.repo.save(entity);
+    return this.toModel(saved);
   }
 
-  remove(id: string): void {
-    const index = this.collections.findIndex(c => c.id === id);
-    if (index === -1) throw new NotFoundException(`Collection ${id} not found`);
-    this.collections.splice(index, 1);
+  async remove(id: string): Promise<void> {
+    const result = await this.repo.delete(id);
+    if (!result.affected) throw new NotFoundException(`Collection ${id} not found`);
+  }
+
+  private toModel(e: CollectionEntity): Collection {
+    return {
+      id: e.id,
+      userId: e.userId,
+      name: e.name,
+      description: e.description,
+      emoji: e.emoji,
+      colour: e.colour,
+      contextId: e.contextId,
+      cardCount: e.cardCount,
+      masteredCount: e.masteredCount,
+      dueCount: e.dueCount,
+      isDefault: e.isDefault,
+      createdAt: e.createdAt instanceof Date ? e.createdAt.toISOString() : e.createdAt,
+      updatedAt: e.updatedAt instanceof Date ? e.updatedAt.toISOString() : e.updatedAt,
+    };
   }
 }

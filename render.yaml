@@ -1,0 +1,16 @@
+services:
+  - type: web
+    name: linguacard-api
+    env: node
+    region: oregon
+    plan: free
+    buildCommand: npm ci && npx tsc -p apps/api/tsconfig.json
+    startCommand: node dist/api/apps/api/src/main.js
+    healthCheckPath: /api/v1/collections
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: DATABASE_URL
+        sync: false          # set manually in Render dashboard from Neon
+      - key: CORS_ORIGIN
+        sync: false          # set after Vercel deploy: https://your-app.vercel.app

@@ -8,7 +8,10 @@ async function bootstrap() {
 
   app.setGlobalPrefix('api/v1');
   app.useGlobalPipes(new ValidationPipe({ whitelist: true, transform: true }));
-  app.enableCors({ origin: ['http://localhost:4200', 'http://localhost:8100'] });
+  const allowedOrigins = process.env['CORS_ORIGIN']
+    ? process.env['CORS_ORIGIN'].split(',')
+    : ['http://localhost:4200', 'http://localhost:8100'];
+  app.enableCors({ origin: allowedOrigins, credentials: true });
 
   const port = process.env['PORT'] ?? 3001;
   await app.listen(port);

@@ -1,45 +1,61 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
+import { randomUUID } from 'crypto';
 import type { Category } from '@lingua-card/shared/domain';
 import { CreateCategoryDto, UpdateCategoryDto } from '@lingua-card/shared/dto';
-import { randomUUID } from 'crypto';
+import { CategoryEntity } from './category.entity';
 
 @Injectable()
 export class CategoriesService {
-  private categories: Category[] = [];
+  constructor(
+    @InjectRepository(CategoryEntity)
+    private readonly repo: Repository<CategoryEntity>,
+  ) {}
 
-  findAll(): Category[] {
-    return this.categories;
+  async findAll(): Promise<Category[]> {
+    return (await this.repo.find()).map(this.toModel);
   }
 
-  findOne(id: string): Category {
-    const cat = this.categories.find(c => c.id === id);
-    if (!cat) throw new NotFoundException(`Category ${id} not found`);
-    return cat;
+  async findOne(id: string): Promise<Category> {
+    const entity = await this.repo.findOneBy({ id });
+    if (!entity) throw new NotFoundException(`Category ${id} not found`);
+    return this.toModel(entity);
   }
 
-  create(dto: CreateCategoryDto): Category {
-    const category: Category = {
+  async create(dto: CreateCategoryDto): Promise<Category> {
+    const entity = this.repo.create({
       id: randomUUID(),
       userId: dto.userId,
       name: dto.name,
       colour: dto.colour ?? '#2D5A4E',
       cardCount: 0,
-      createdAt: new Date().toISOString(),
+    });
+    const saved = await this.repo.save(entity);
+    return this.toModel(saved);
+  }
+
+  async update(id: string, dto: UpdateCategoryDto): Promise<Category> {
+    const entity = await this.repo.findOneBy({ id });
+    if (!entity) throw new NotFoundException(`Category ${id} not found`);
+    Object.assign(entity, dto);
+    const saved = await this.repo.save(entity);
+    return this.toModel(saved);
+  }
+
+  async remove(id: string): Promise<void> {
+    const result = await this.repo.delete(id);
+    if (!result.affected) throw new NotFoundException(`Category ${id} not found`);
+  }
+
+  private toModel(e: CategoryEntity): Category {
+    return {
+      id: e.id,
+      userId: e.userId,
+      name: e.name,
+      colour: e.colour,
+      cardCount: e.cardCount,
+      createdAt: e.createdAt instanceof Date ? e.createdAt.toISOString() : e.createdAt,
     };
-    this.categories.push(category);
-    return category;
-  }
-
-  update(id: string, dto: UpdateCategoryDto): Category {
-    const index = this.categories.findIndex(c => c.id === id);
-    if (index === -1) throw new NotFoundException(`Category ${id} not found`);
-    this.categories[index] = { ...this.categories[index], ...dto };
-    return this.categories[index];
-  }
-
-  remove(id: string): void {
-    const index = this.categories.findIndex(c => c.id === id);
-    if (index === -1) throw new NotFoundException(`Category ${id} not found`);
-    this.categories.splice(index, 1);
   }
 }
