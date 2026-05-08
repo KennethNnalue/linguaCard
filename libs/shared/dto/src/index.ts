@@ -1,4 +1,5 @@
-import { IsString, IsOptional, IsArray, IsBoolean, IsNumber, IsIn, MaxLength, MinLength } from 'class-validator';
+import { IsString, IsOptional, IsArray, IsBoolean, IsNumber, IsIn, MaxLength, MinLength, ValidateNested } from 'class-validator';
+import { Type } from 'class-transformer';
 import type { ArticleType, LanguageCode } from '@lingua-card/shared/domain';
 
 // ─── CARD DTOs ────────────────────────────────────────────────────────────────
@@ -32,7 +33,7 @@ export class CreateCardDto {
   @IsOptional() @IsString() collectionId?: string | null;
   @IsString() userId!: string;
   @IsString() contextId!: string;
-  content!: CreateCardContentDto;
+  @ValidateNested() @Type(() => CreateCardContentDto) content!: CreateCardContentDto;
   @IsOptional() @IsArray() categoryIds?: string[];
   @IsOptional() @IsArray() tags?: string[];
 }
