@@ -31,7 +31,7 @@ export class CreateCardContentDto {
 export class CreateCardDto {
   @IsString() deckId!: string;
   @IsOptional() @IsString() collectionId?: string | null;
-  @IsString() userId!: string;
+  @IsOptional() @IsString() userId?: string;
   @IsString() contextId!: string;
   @ValidateNested() @Type(() => CreateCardContentDto) content!: CreateCardContentDto;
   @IsOptional() @IsArray() categoryIds?: string[];
@@ -72,7 +72,7 @@ export class UpdateCollectionDto {
 export class CreateCategoryDto {
   @IsString() @MinLength(1) @MaxLength(60) name!: string;
   @IsOptional() @IsString() colour?: string;
-  @IsString() userId!: string;
+  @IsOptional() @IsString() userId?: string;
 }
 
 export class UpdateCategoryDto {

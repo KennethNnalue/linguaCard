@@ -18,24 +18,24 @@ export class CollectionsService {
     private readonly cardRepo: Repository<CardEntity>,
   ) {}
 
-  async findAll(): Promise<Collection[]> {
+  async findAll(userId: string): Promise<Collection[]> {
     const [collections, countsMap] = await Promise.all([
-      this.repo.find({ order: { createdAt: 'ASC' } }),
-      this.buildCountsMap(),
+      this.repo.find({ where: { userId }, order: { createdAt: 'ASC' } }),
+      this.buildCountsMap(userId),
     ]);
     return collections.map(col =>
       this.toModel(col, countsMap.get(col.id) ?? { cardCount: 0, masteredCount: 0, dueCount: 0 }),
     );
   }
 
-  async findOne(id: string): Promise<Collection> {
-    const entity = await this.repo.findOneBy({ id });
+  async findOne(userId: string, id: string): Promise<Collection> {
+    const entity = await this.repo.findOneBy({ id, userId });
     if (!entity) throw new NotFoundException(`Collection ${id} not found`);
-    const countsMap = await this.buildCountsMap();
+    const countsMap = await this.buildCountsMap(userId);
     return this.toModel(entity, countsMap.get(id) ?? { cardCount: 0, masteredCount: 0, dueCount: 0 });
   }
 
-  private async buildCountsMap(): Promise<Map<string, LiveCounts>> {
+  private async buildCountsMap(userId: string): Promise<Map<string, LiveCounts>> {
     const now = new Date().toISOString();
     const rows: Array<{ collectionId: string; cardCount: number; masteredCount: number; dueCount: number }> =
       await this.cardRepo.manager.query(
@@ -45,9 +45,9 @@ export class CollectionsService {
            SUM(CASE WHEN "srsState"->>'state' = 'mastered' THEN 1 ELSE 0 END)::int AS "masteredCount",
            SUM(CASE WHEN "srsState" IS NOT NULL AND "srsState"->>'nextDueAt' <= $1 THEN 1 ELSE 0 END)::int AS "dueCount"
          FROM cards
-         WHERE "collectionId" IS NOT NULL
+         WHERE "collectionId" IS NOT NULL AND "userId" = $2
          GROUP BY "collectionId"`,
-        [now],
+        [now, userId],
       );
     const map = new Map<string, LiveCounts>();
     for (const r of rows) {
@@ -56,10 +56,10 @@ export class CollectionsService {
     return map;
   }
 
-  async create(dto: CreateCollectionDto): Promise<Collection> {
+  async create(userId: string, dto: CreateCollectionDto): Promise<Collection> {
     const entity = this.repo.create({
       id: randomUUID(),
-      userId: 'user-001',
+      userId,
       name: dto.name,
       description: dto.description ?? '',
       emoji: dto.emoji ?? '📚',
@@ -74,17 +74,17 @@ export class CollectionsService {
     return this.toModel(saved, { cardCount: 0, masteredCount: 0, dueCount: 0 });
   }
 
-  async update(id: string, dto: UpdateCollectionDto): Promise<Collection> {
-    const entity = await this.repo.findOneBy({ id });
+  async update(userId: string, id: string, dto: UpdateCollectionDto): Promise<Collection> {
+    const entity = await this.repo.findOneBy({ id, userId });
     if (!entity) throw new NotFoundException(`Collection ${id} not found`);
     Object.assign(entity, dto);
     const saved = await this.repo.save(entity);
-    const countsMap = await this.buildCountsMap();
+    const countsMap = await this.buildCountsMap(userId);
     return this.toModel(saved, countsMap.get(id) ?? { cardCount: 0, masteredCount: 0, dueCount: 0 });
   }
 
-  async remove(id: string): Promise<void> {
-    const result = await this.repo.delete(id);
+  async remove(userId: string, id: string): Promise<void> {
+    const result = await this.repo.delete({ id, userId });
     if (!result.affected) throw new NotFoundException(`Collection ${id} not found`);
   }
 

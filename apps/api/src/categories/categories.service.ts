@@ -13,20 +13,20 @@ export class CategoriesService {
     private readonly repo: Repository<CategoryEntity>,
   ) {}
 
-  async findAll(): Promise<Category[]> {
-    return (await this.repo.find()).map(this.toModel);
+  async findAll(userId: string): Promise<Category[]> {
+    return (await this.repo.find({ where: { userId } })).map(this.toModel);
   }
 
-  async findOne(id: string): Promise<Category> {
-    const entity = await this.repo.findOneBy({ id });
+  async findOne(userId: string, id: string): Promise<Category> {
+    const entity = await this.repo.findOneBy({ id, userId });
     if (!entity) throw new NotFoundException(`Category ${id} not found`);
     return this.toModel(entity);
   }
 
-  async create(dto: CreateCategoryDto): Promise<Category> {
+  async create(userId: string, dto: CreateCategoryDto): Promise<Category> {
     const entity = this.repo.create({
       id: randomUUID(),
-      userId: dto.userId,
+      userId,
       name: dto.name,
       colour: dto.colour ?? '#2D5A4E',
       cardCount: 0,
@@ -35,16 +35,16 @@ export class CategoriesService {
     return this.toModel(saved);
   }
 
-  async update(id: string, dto: UpdateCategoryDto): Promise<Category> {
-    const entity = await this.repo.findOneBy({ id });
+  async update(userId: string, id: string, dto: UpdateCategoryDto): Promise<Category> {
+    const entity = await this.repo.findOneBy({ id, userId });
     if (!entity) throw new NotFoundException(`Category ${id} not found`);
     Object.assign(entity, dto);
     const saved = await this.repo.save(entity);
     return this.toModel(saved);
   }
 
-  async remove(id: string): Promise<void> {
-    const result = await this.repo.delete(id);
+  async remove(userId: string, id: string): Promise<void> {
+    const result = await this.repo.delete({ id, userId });
     if (!result.affected) throw new NotFoundException(`Category ${id} not found`);
   }
 

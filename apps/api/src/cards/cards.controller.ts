@@ -2,39 +2,40 @@ import { Controller, Get, Post, Patch, Delete, Param, Body, Query, BadRequestExc
 import { CardsService } from './cards.service';
 import { CreateCardDto, UpdateCardDto } from '@lingua-card/shared/dto';
 import type { CardQueryParams } from '@lingua-card/shared/dto';
+import { CurrentUser } from '../common/decorators/current-user.decorator';
 
 @Controller('cards')
 export class CardsController {
   constructor(private readonly cardsService: CardsService) {}
 
   @Get()
-  findAll(@Query() query: CardQueryParams) {
-    return this.cardsService.findAll(query);
+  findAll(@CurrentUser() userId: string, @Query() query: CardQueryParams) {
+    return this.cardsService.findAll(userId, query);
   }
 
   @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.cardsService.findOne(id);
+  findOne(@CurrentUser() userId: string, @Param('id') id: string) {
+    return this.cardsService.findOne(userId, id);
   }
 
   @Post()
-  create(@Body() dto: CreateCardDto) {
-    return this.cardsService.create(dto);
+  create(@CurrentUser() userId: string, @Body() dto: CreateCardDto) {
+    return this.cardsService.create(userId, dto);
   }
 
   @Patch(':id')
-  update(@Param('id') id: string, @Body() dto: UpdateCardDto) {
-    return this.cardsService.update(id, dto);
+  update(@CurrentUser() userId: string, @Param('id') id: string, @Body() dto: UpdateCardDto) {
+    return this.cardsService.update(userId, id, dto);
   }
 
   @Delete('clear')
-  clearByCollection(@Query('collectionId') collectionId: string) {
+  clearByCollection(@CurrentUser() userId: string, @Query('collectionId') collectionId: string) {
     if (!collectionId) throw new BadRequestException('collectionId is required');
-    return this.cardsService.clearByCollection(collectionId);
+    return this.cardsService.clearByCollection(userId, collectionId);
   }
 
   @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.cardsService.remove(id);
+  remove(@CurrentUser() userId: string, @Param('id') id: string) {
+    return this.cardsService.remove(userId, id);
   }
 }

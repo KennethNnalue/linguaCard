@@ -4,6 +4,7 @@ import {
 import { IsString } from 'class-validator';
 import { AuthService } from './auth.service';
 import { RegisterDto, LoginDto } from '@lingua-card/shared/dto';
+import { Public } from '../common/decorators/public.decorator';
 
 class VerifyPasswordDto {
   @IsString() email!: string;
@@ -18,16 +19,19 @@ class ForgotPasswordDto {
 export class AuthController {
   constructor(private readonly authService: AuthService) {}
 
+  @Public()
   @Post('register')
   register(@Body() dto: RegisterDto) {
     return this.authService.register(dto);
   }
 
+  @Public()
   @Post('login')
   login(@Body() dto: LoginDto) {
     return this.authService.login(dto);
   }
 
+  @Public()
   @Post('verify-password')
   async verifyPassword(@Body() dto: VerifyPasswordDto) {
     const valid = await this.authService.verifyPassword(dto.email, dto.password);
@@ -35,6 +39,7 @@ export class AuthController {
     return { valid: true };
   }
 
+  @Public()
   @Post('forgot-password')
   forgotPassword(@Body() _dto: ForgotPasswordDto) {
     return { message: 'If that email exists, a reset link has been sent.' };

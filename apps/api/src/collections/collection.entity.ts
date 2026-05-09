@@ -1,5 +1,5 @@
 import {
-  Entity, PrimaryColumn, Column,
+  Entity, PrimaryColumn, Column, Index,
   CreateDateColumn, UpdateDateColumn,
 } from 'typeorm';
 
@@ -8,6 +8,7 @@ export class CollectionEntity {
   @PrimaryColumn()
   id!: string;
 
+  @Index('idx_collections_userId')
   @Column()
   userId!: string;
 

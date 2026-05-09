@@ -2,11 +2,13 @@ import { Module } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { TypeOrmModuleOptions } from '@nestjs/typeorm';
+import { APP_GUARD } from '@nestjs/core';
 import { CardsModule } from './cards/cards.module';
 import { CollectionsModule } from './collections/collections.module';
 import { CategoriesModule } from './categories/categories.module';
 import { SeedModule } from './seed/seed.module';
 import { AuthModule } from './auth/auth.module';
+import { JwtAuthGuard } from './auth/guards/jwt-auth.guard';
 import databaseConfig from './config/database.config';
 
 @Module({
@@ -25,6 +27,12 @@ import databaseConfig from './config/database.config';
     CollectionsModule,
     CategoriesModule,
     SeedModule,
+  ],
+  providers: [
+    {
+      provide: APP_GUARD,
+      useClass: JwtAuthGuard,
+    },
   ],
 })
 export class AppModule {}

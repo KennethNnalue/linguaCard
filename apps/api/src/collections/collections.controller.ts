@@ -1,33 +1,34 @@
 import { Controller, Get, Post, Patch, Delete, Param, Body } from '@nestjs/common';
 import { CollectionsService } from './collections.service';
 import { CreateCollectionDto, UpdateCollectionDto } from '@lingua-card/shared/dto';
+import { CurrentUser } from '../common/decorators/current-user.decorator';
 
 @Controller('collections')
 export class CollectionsController {
   constructor(private readonly collectionsService: CollectionsService) {}
 
   @Get()
-  findAll() {
-    return this.collectionsService.findAll();
+  findAll(@CurrentUser() userId: string) {
+    return this.collectionsService.findAll(userId);
   }
 
   @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.collectionsService.findOne(id);
+  findOne(@CurrentUser() userId: string, @Param('id') id: string) {
+    return this.collectionsService.findOne(userId, id);
   }
 
   @Post()
-  create(@Body() dto: CreateCollectionDto) {
-    return this.collectionsService.create(dto);
+  create(@CurrentUser() userId: string, @Body() dto: CreateCollectionDto) {
+    return this.collectionsService.create(userId, dto);
   }
 
   @Patch(':id')
-  update(@Param('id') id: string, @Body() dto: UpdateCollectionDto) {
-    return this.collectionsService.update(id, dto);
+  update(@CurrentUser() userId: string, @Param('id') id: string, @Body() dto: UpdateCollectionDto) {
+    return this.collectionsService.update(userId, id, dto);
   }
 
   @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.collectionsService.remove(id);
+  remove(@CurrentUser() userId: string, @Param('id') id: string) {
+    return this.collectionsService.remove(userId, id);
   }
 }

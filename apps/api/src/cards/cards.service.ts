@@ -13,27 +13,28 @@ export class CardsService {
     private readonly repo: Repository<CardEntity>,
   ) {}
 
-  async findAll(query: CardQueryParams): Promise<Card[]> {
-    const qb = this.repo.createQueryBuilder('card');
+  async findAll(userId: string, query: CardQueryParams): Promise<Card[]> {
+    const qb = this.repo.createQueryBuilder('card')
+      .where('card.userId = :userId', { userId });
     if (query.collectionId) qb.andWhere('card.collectionId = :collectionId', { collectionId: query.collectionId });
     if (query.categoryId)   qb.andWhere(':categoryId = ANY(card.categoryIds)', { categoryId: query.categoryId });
     if (query.state)        qb.andWhere("card.srsState->>'state' = :state", { state: query.state });
     return (await qb.getMany()).map(this.toModel);
   }
 
-  async findOne(id: string): Promise<Card> {
-    const entity = await this.repo.findOneBy({ id });
+  async findOne(userId: string, id: string): Promise<Card> {
+    const entity = await this.repo.findOneBy({ id, userId });
     if (!entity) throw new NotFoundException(`Card ${id} not found`);
     return this.toModel(entity);
   }
 
-  async create(dto: CreateCardDto): Promise<Card> {
+  async create(userId: string, dto: CreateCardDto): Promise<Card> {
     const now = new Date().toISOString();
     const entity = this.repo.create({
       id: randomUUID(),
       deckId: dto.deckId,
       collectionId: dto.collectionId ?? null,
-      userId: dto.userId,
+      userId,
       contextId: dto.contextId,
       content: {
         front: dto.content.front,
@@ -52,7 +53,7 @@ export class CardsService {
       srsState: {
         id: randomUUID(),
         cardId: '',
-        userId: dto.userId,
+        userId,
         algorithm: 'sm2',
         intervalDays: 1,
         easeFactor: 2.5,
@@ -68,8 +69,8 @@ export class CardsService {
     return this.toModel(saved);
   }
 
-  async update(id: string, dto: UpdateCardDto): Promise<Card> {
-    const entity = await this.repo.findOneBy({ id });
+  async update(userId: string, id: string, dto: UpdateCardDto): Promise<Card> {
+    const entity = await this.repo.findOneBy({ id, userId });
     if (!entity) throw new NotFoundException(`Card ${id} not found`);
     if (dto.content)      entity.content    = { ...entity.content, ...dto.content } as CardContent;
     if (dto.categoryIds)  entity.categoryIds = dto.categoryIds;
@@ -80,13 +81,13 @@ export class CardsService {
     return this.toModel(saved);
   }
 
-  async remove(id: string): Promise<void> {
-    const result = await this.repo.delete(id);
+  async remove(userId: string, id: string): Promise<void> {
+    const result = await this.repo.delete({ id, userId });
     if (!result.affected) throw new NotFoundException(`Card ${id} not found`);
   }
 
-  async clearByCollection(collectionId: string): Promise<{ deleted: number }> {
-    const result = await this.repo.delete({ collectionId });
+  async clearByCollection(userId: string, collectionId: string): Promise<{ deleted: number }> {
+    const result = await this.repo.delete({ collectionId, userId });
     return { deleted: result.affected ?? 0 };
   }
 

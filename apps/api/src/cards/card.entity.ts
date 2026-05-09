@@ -1,5 +1,5 @@
 import {
-  Entity, PrimaryColumn, Column,
+  Entity, PrimaryColumn, Column, Index,
   CreateDateColumn, UpdateDateColumn,
 } from 'typeorm';
 import type { CardContent, SRSStateData } from '@lingua-card/shared/domain';
@@ -15,6 +15,7 @@ export class CardEntity {
   @Column({ nullable: true, type: 'varchar' })
   collectionId!: string | null;
 
+  @Index('idx_cards_userId')
   @Column()
   userId!: string;
 

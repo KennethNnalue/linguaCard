@@ -1,10 +1,11 @@
-import { Entity, PrimaryColumn, Column, CreateDateColumn } from 'typeorm';
+import { Entity, PrimaryColumn, Column, Index, CreateDateColumn } from 'typeorm';
 
 @Entity('categories')
 export class CategoryEntity {
   @PrimaryColumn()
   id!: string;
 
+  @Index('idx_categories_userId')
   @Column()
   userId!: string;
 
