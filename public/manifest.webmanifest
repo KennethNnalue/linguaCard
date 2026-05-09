@@ -1,9 +1,15 @@
 {
-  "name": "app",
-  "short_name": "app",
+  "name": "LinguaCard",
+  "short_name": "LinguaCard",
+  "description": "German vocabulary learning with spaced repetition",
+  "lang": "en",
   "display": "standalone",
-  "scope": "./",
-  "start_url": "./",
+  "orientation": "portrait",
+  "scope": "/",
+  "start_url": "/",
+  "theme_color": "#2D5A4E",
+  "background_color": "#E8F2EE",
+  "categories": ["education", "productivity"],
   "icons": [
     {
       "src": "icons/icon-72x72.png",

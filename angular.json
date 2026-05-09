@@ -33,6 +33,16 @@
                 "glob": "**/*",
                 "input": "apps/mobile/src/assets",
                 "output": "assets"
+              },
+              {
+                "glob": "manifest.webmanifest",
+                "input": "public",
+                "output": "/"
+              },
+              {
+                "glob": "**/*",
+                "input": "public/icons",
+                "output": "icons"
               }
             ],
             "styles": [

@@ -4,11 +4,12 @@ import { Network } from '@capacitor/network';
 import { ThemeService } from './core/services/theme.service';
 import { LocalDataService } from './core/services/local-data.service';
 import { SyncService } from './core/services/sync.service';
+import { PwaInstallBannerComponent } from './shared/components/pwa-install-banner/pwa-install-banner.component';
 
 @Component({
   selector: 'app-root',
   templateUrl: 'app.component.html',
-  imports: [IonApp, IonRouterOutlet],
+  imports: [IonApp, IonRouterOutlet, PwaInstallBannerComponent],
 })
 export class AppComponent implements OnInit {
   private readonly themeService = inject(ThemeService);
