@@ -1,0 +1,182 @@
+ion-content {
+  --background: var(--lc-card);
+}
+
+.sheet-body {
+  padding: 0 20px 28px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+/* ── Drag handle ─────────────────────────────────────────────── */
+.sheet-handle {
+  width: 36px;
+  height: 4px;
+  border-radius: 2px;
+  background: var(--lc-border);
+  margin: 12px auto 20px;
+}
+
+/* ── Icon ────────────────────────────────────────────────────── */
+.reset-icon-wrap {
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  background: #FEF2F2;
+  border: 1px solid #FCA5A5;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 14px;
+
+  ion-icon {
+    font-size: 26px;
+    color: #B91C1C;
+  }
+}
+
+/* ── Text ────────────────────────────────────────────────────── */
+.reset-title {
+  font-size: 18px;
+  font-weight: 600;
+  color: var(--lc-text-primary);
+  text-align: center;
+  margin: 0 0 8px;
+}
+
+.reset-body {
+  font-size: 13px;
+  color: var(--lc-text-secondary);
+  text-align: center;
+  line-height: 1.6;
+  margin: 0 0 16px;
+}
+
+/* ── Warning box ─────────────────────────────────────────────── */
+.reset-warning {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  background: #FEF2F2;
+  border: 1px solid #FCA5A5;
+  border-radius: 10px;
+  padding: 11px 12px;
+  margin-bottom: 16px;
+  width: 100%;
+}
+
+.warning-icon {
+  font-size: 16px;
+  color: #B91C1C;
+  flex-shrink: 0;
+  margin-top: 1px;
+}
+
+.warning-text {
+  font-size: 12px;
+  color: #B91C1C;
+  line-height: 1.5;
+  margin: 0;
+
+  strong { font-weight: 600; }
+}
+
+/* ── Password field ──────────────────────────────────────────── */
+.field-group {
+  width: 100%;
+  margin-bottom: 14px;
+}
+
+.field-lbl {
+  display: block;
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+  color: var(--lc-text-hint);
+  margin-bottom: 6px;
+}
+
+.field-input {
+  width: 100%;
+  background: var(--lc-surface);
+  border: 1px solid var(--lc-border);
+  border-radius: 10px;
+  padding: 11px 14px;
+  font-size: 14px;
+  color: var(--lc-text-primary);
+  font-family: var(--lc-font-body);
+  outline: none;
+
+  &:focus {
+    border-color: var(--lc-brand);
+    box-shadow: 0 0 0 3px rgba(45, 90, 78, 0.08);
+  }
+
+  &--error {
+    border-color: #B91C1C;
+    box-shadow: 0 0 0 3px rgba(185, 28, 28, 0.08);
+  }
+}
+
+.field-error {
+  font-size: 11px;
+  color: #B91C1C;
+  margin: 5px 0 0;
+}
+
+/* ── Buttons ─────────────────────────────────────────────────── */
+.reset-confirm-btn {
+  width: 100%;
+  background: #B91C1C;
+  color: white;
+  border: none;
+  border-radius: 12px;
+  padding: 13px;
+  font-size: 14px;
+  font-weight: 600;
+  font-family: var(--lc-font-body);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  margin-bottom: 10px;
+  transition: opacity 0.15s;
+
+  &:disabled {
+    opacity: 0.45;
+    cursor: not-allowed;
+  }
+
+  &:not(:disabled):active {
+    opacity: 0.85;
+  }
+}
+
+.reset-cancel {
+  background: none;
+  border: none;
+  font-size: 13px;
+  color: var(--lc-text-hint);
+  font-family: var(--lc-font-body);
+  cursor: pointer;
+  padding: 6px 0;
+
+  &:active { opacity: 0.6; }
+}
+
+/* ── Loading spinner ─────────────────────────────────────────── */
+.btn-spinner {
+  width: 18px;
+  height: 18px;
+  border: 2px solid rgba(255, 255, 255, 0.35);
+  border-top-color: white;
+  border-radius: 50%;
+  animation: spin 0.7s linear infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}

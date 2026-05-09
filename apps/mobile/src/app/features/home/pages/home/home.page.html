@@ -6,17 +6,25 @@
         <button class="lc-fab" (click)="openAddWord()" aria-label="Add new word">
           <ion-icon name="add-outline"></ion-icon>
         </button>
-        <button class="theme-btn" (click)="themeService.toggle()"
-                [attr.aria-label]="themeService.isDark() ? 'Switch to light mode' : 'Switch to dark mode'">
-       
-          <ion-icon [name]="themeService.isDark() ? 'sunny-outline' : 'moon-outline'"></ion-icon>
-
+        <button
+          class="avatar-btn"
+          (click)="toggleMenu($event)"
+          [attr.aria-expanded]="menuOpen()"
+          aria-label="Open account menu"
+        >
+          {{ user()?.avatarInitials ?? '?' }}
         </button>
-        <div class="avatar">{{ user().avatarInitials }}</div>
       </div>
     </div>
   </ion-toolbar>
 </ion-header>
+
+@if (menuOpen()) {
+  <app-user-menu
+    (closed)="closeMenu()"
+    (resetRequested)="openResetSheet()"
+  ></app-user-menu>
+}
 
 <ion-content>
   <ion-refresher slot="fixed" (ionRefresh)="handleRefresh($event)">

@@ -1,0 +1,63 @@
+<ion-content>
+  <div class="sheet-body">
+    <!-- Drag handle -->
+    <div class="sheet-handle"></div>
+
+    <!-- Icon -->
+    <div class="reset-icon-wrap">
+      <ion-icon name="trash-outline"></ion-icon>
+    </div>
+
+    <!-- Title + body -->
+    <h2 class="reset-title lc-display">Reset all data?</h2>
+    <p class="reset-body">
+      This will permanently delete all your words, collections, review history,
+      and progress. Your account will remain active.
+    </p>
+
+    <!-- Warning box -->
+    <div class="reset-warning">
+      <ion-icon name="alert-circle-outline" class="warning-icon"></ion-icon>
+      <p class="warning-text">
+        <strong>This action cannot be undone.</strong>
+        All {{ wordCount() }} words and {{ collectionCount() }} collections will
+        be deleted permanently.
+      </p>
+    </div>
+
+    <!-- Password field -->
+    <div class="field-group">
+      <label class="field-lbl" for="reset-password">Enter your password to confirm</label>
+      <input
+        id="reset-password"
+        type="password"
+        class="field-input"
+        [class.field-input--error]="passwordError()"
+        placeholder="Your password"
+        autocomplete="current-password"
+        [ngModel]="password()"
+        (ngModelChange)="password.set($event); passwordError.set('')"
+      />
+      @if (passwordError()) {
+        <p class="field-error">{{ passwordError() }}</p>
+      }
+    </div>
+
+    <!-- Confirm button -->
+    <button
+      class="reset-confirm-btn"
+      [class.reset-confirm-btn--loading]="loading()"
+      [disabled]="!canSubmit"
+      (click)="confirm()"
+    >
+      @if (loading()) {
+        <span class="btn-spinner"></span>
+      } @else {
+        Yes, delete everything
+      }
+    </button>
+
+    <!-- Cancel -->
+    <button class="reset-cancel" (click)="dismiss()">Cancel</button>
+  </div>
+</ion-content>

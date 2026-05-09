@@ -15,37 +15,184 @@
   line-height: 1.2;
 }
 
-// ─── TAB PILLS ───────────────────────────────────────────────────────────────
+// ─── SEGMENT TABS ────────────────────────────────────────────────────────────
 
-.vault-tabs {
-  display: flex;
-  gap: 6px;
-  padding: 0 14px 12px;
+.vault-segment {
+  margin: 0 14px 12px;
+  --background: rgba(45, 90, 78, 0.08);
+  border-radius: 10px;
+  padding: 3px;
 }
 
-.vault-tab {
-  padding: 6px 18px;
-  border-radius: var(--lc-radius-full);
-  border: 1px solid var(--lc-border);
-  background: var(--lc-card);
+ion-segment-button {
+  --border-radius: 8px;
+  --color: var(--lc-text-hint);
+  --color-checked: var(--lc-brand);
+  --background-checked: var(--lc-card);
+  --indicator-color: transparent;
+  font-family: var(--lc-font-body);
   font-size: 12px;
   font-weight: 600;
-  font-family: var(--lc-font-body);
-  color: var(--lc-text-secondary);
+  min-height: 34px;
+  text-transform: none;
+  letter-spacing: 0;
+  --box-shadow-checked: 0 1px 4px rgba(0, 0, 0, 0.08);
+}
+
+// ─── COLLECTIONS VIEW ────────────────────────────────────────────────────────
+
+.col-hero {
+  margin: 0 14px 16px;
+  background: var(--lc-brand);
+  border-radius: 16px;
+  padding: 14px 16px;
+  position: relative;
+  overflow: hidden;
+
+  &::before {
+    content: '';
+    position: absolute;
+    top: -16px;
+    right: -16px;
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.06);
+  }
+}
+
+.col-hero-inner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.col-hero-lbl {
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.5);
+  margin-bottom: 4px;
+}
+
+.col-hero-count {
+  font-size: 28px;
+  font-weight: 600;
+  color: white;
+  line-height: 1;
+}
+
+.col-hero-right { text-align: right; }
+
+.col-hero-due-lbl {
+  font-size: 10px;
+  color: rgba(255, 255, 255, 0.5);
+  margin-bottom: 2px;
+}
+
+.col-hero-due {
+  font-size: 20px;
+  font-weight: 600;
+  color: white;
+}
+
+.col-list {
+  padding: 0 14px 32px;
+  display: flex;
+  flex-direction: column;
+  gap: 9px;
+}
+
+.col-card {
+  background: var(--lc-card);
+  border: 1px solid var(--lc-border);
+  border-radius: 14px;
+  padding: 13px 14px;
+  box-shadow: var(--lc-shadow-card);
   cursor: pointer;
-  transition: var(--lc-transition-fast);
+  transition: box-shadow 0.15s;
 
-  &--active {
-    background: var(--lc-brand);
-    border-color: var(--lc-brand);
-    color: white;
+  &--empty {
+    border-style: dashed;
+    box-shadow: none;
   }
 
-  &:not(.vault-tab--active):active {
+  &:active { box-shadow: none; }
+}
+
+.col-card-top {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  margin-bottom: 8px;
+}
+
+.col-card-left { flex: 1; min-width: 0; }
+
+.col-card-name-row {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  margin-bottom: 3px;
+}
+
+.col-card-emoji { font-size: 16px; }
+
+.col-card-name {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--lc-text-primary);
+
+  .col-card--empty & { color: var(--lc-text-hint); }
+}
+
+.col-card-meta {
+  font-size: 10px;
+  color: var(--lc-text-hint);
+}
+
+.col-due-badge {
+  border-radius: 8px;
+  padding: 3px 8px;
+  font-size: 10px;
+  font-weight: 700;
+  white-space: nowrap;
+  flex-shrink: 0;
+
+  &--amber {
+    background: var(--lc-accent-light);
+    border: 1px solid var(--lc-accent);
+    color: var(--lc-accent);
+  }
+
+  &--green {
     background: var(--lc-brand-light);
+    border: 1px solid var(--lc-brand);
     color: var(--lc-brand);
-    border-color: var(--lc-brand);
   }
+}
+
+.col-progress-bar {
+  height: 3px;
+  background: rgba(45, 90, 78, 0.1);
+  border-radius: 3px;
+  overflow: hidden;
+  margin-bottom: 6px;
+}
+
+.col-progress-fill {
+  height: 100%;
+  background: var(--lc-mastery-5);
+  border-radius: 3px;
+  transition: width 0.4s ease;
+}
+
+.col-progress-meta {
+  display: flex;
+  justify-content: space-between;
+  font-size: 9px;
+  color: var(--lc-text-hint);
 }
 
 // ─── SEARCH ──────────────────────────────────────────────────────────────────

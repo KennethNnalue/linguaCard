@@ -1,6 +1,6 @@
-import { isDevMode, provideZoneChangeDetection } from '@angular/core';
+import { importProvidersFrom, isDevMode, provideZoneChangeDetection } from '@angular/core';
 import { bootstrapApplication } from '@angular/platform-browser';
-import { provideHttpClient, withFetch } from '@angular/common/http';
+import { provideHttpClient, withFetch, withInterceptors } from '@angular/common/http';
 import {
   PreloadAllModules,
   provideRouter,
@@ -9,19 +9,28 @@ import {
 } from '@angular/router';
 import { IonicRouteStrategy, provideIonicAngular } from '@ionic/angular/standalone';
 import { provideServiceWorker } from '@angular/service-worker';
+import { Drivers } from '@ionic/storage';
+import { IonicStorageModule } from '@ionic/storage-angular';
 import { routes } from './app/app.routes';
 import { AppComponent } from './app/app.component';
+import { authInterceptor } from './app/core/interceptors/auth.interceptor';
 
 bootstrapApplication(AppComponent, {
   providers: [
     provideZoneChangeDetection(),
     { provide: RouteReuseStrategy, useClass: IonicRouteStrategy },
     provideIonicAngular(),
-    provideHttpClient(withFetch()),
+    provideHttpClient(withFetch(), withInterceptors([authInterceptor])),
     provideRouter(routes, withPreloading(PreloadAllModules)),
     provideServiceWorker('ngsw-worker.js', {
       enabled: !isDevMode(),
       registrationStrategy: 'registerWhenStable:30000',
     }),
+    importProvidersFrom(
+      IonicStorageModule.forRoot({
+        name: 'linguacard_db',
+        driverOrder: [Drivers.IndexedDB, Drivers.LocalStorage],
+      })
+    ),
   ],
 });

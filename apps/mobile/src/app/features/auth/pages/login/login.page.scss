@@ -1,0 +1,238 @@
+ion-content {
+  --background: var(--lc-surface);
+}
+
+.auth-wrap {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  padding: 0 24px 32px;
+  min-height: 100%;
+}
+
+/* ── Logo ─────────────────────────────────────────────────── */
+.auth-logo-area {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 40px 0 20px;
+}
+
+.auth-logo-icon {
+  width: 64px;
+  height: 64px;
+  border-radius: 20px;
+  background: var(--lc-brand);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 14px;
+  box-shadow: 0 4px 20px rgba(45, 90, 78, 0.35);
+}
+
+.auth-app-name {
+  font-size: 26px;
+  font-weight: 600;
+  color: var(--lc-text-primary);
+  margin: 0 0 4px;
+}
+
+.auth-tagline {
+  font-size: 13px;
+  color: var(--lc-text-hint);
+  margin: 0;
+}
+
+/* ── Error pill ───────────────────────────────────────────── */
+.auth-error-pill {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: #FEF2F2;
+  border: 1px solid #FCA5A5;
+  border-radius: var(--lc-radius-sm);
+  padding: 10px 14px;
+  font-size: 13px;
+  color: #B91C1C;
+
+  ion-icon {
+    font-size: 16px;
+    flex-shrink: 0;
+  }
+}
+
+/* ── Fields ───────────────────────────────────────────────── */
+.auth-field {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.auth-field-lbl {
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+  color: var(--lc-text-hint);
+}
+
+.auth-input-wrap {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.auth-input {
+  width: 100%;
+  background: var(--lc-card);
+  border: 1.5px solid var(--lc-border);
+  border-radius: var(--lc-radius-md);
+  padding: 13px 16px;
+  font-size: 14px;
+  font-family: var(--lc-font-body);
+  color: var(--lc-text-primary);
+  outline: none;
+  transition: border-color var(--lc-transition-fast), box-shadow var(--lc-transition-fast);
+
+  &::placeholder {
+    color: var(--lc-text-hint);
+  }
+
+  &:focus {
+    border-color: var(--lc-brand);
+    box-shadow: 0 0 0 3px rgba(45, 90, 78, 0.1);
+  }
+}
+
+.auth-input-wrap .auth-input {
+  padding-right: 44px;
+}
+
+.auth-eye-btn {
+  position: absolute;
+  right: 12px;
+  background: none;
+  border: none;
+  padding: 4px;
+  cursor: pointer;
+  color: var(--lc-text-hint);
+  display: flex;
+  align-items: center;
+
+  ion-icon {
+    font-size: 18px;
+  }
+}
+
+.auth-field-error {
+  font-size: 11px;
+  color: #B91C1C;
+}
+
+/* ── Forgot link ──────────────────────────────────────────── */
+.auth-forgot {
+  text-align: right;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--lc-brand);
+  cursor: pointer;
+  margin-top: -4px;
+  user-select: none;
+}
+
+/* ── Primary button ───────────────────────────────────────── */
+.auth-btn {
+  width: 100%;
+  background: var(--lc-brand);
+  color: white;
+  border: none;
+  border-radius: var(--lc-radius-md);
+  padding: 15px;
+  font-size: 15px;
+  font-weight: 600;
+  font-family: var(--lc-font-body);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 50px;
+  transition: opacity var(--lc-transition-fast);
+
+  ion-spinner {
+    color: white;
+    width: 20px;
+    height: 20px;
+  }
+
+  &:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+  }
+
+  &:active:not(:disabled) {
+    opacity: 0.85;
+  }
+}
+
+/* ── Divider ──────────────────────────────────────────────── */
+.auth-divider {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.auth-divider-line {
+  flex: 1;
+  height: 1px;
+  background: var(--lc-border);
+}
+
+.auth-divider-txt {
+  font-size: 12px;
+  color: var(--lc-text-hint);
+  font-weight: 500;
+}
+
+/* ── Google button ────────────────────────────────────────── */
+.auth-google-btn {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  background: var(--lc-card);
+  border: 1.5px solid var(--lc-border);
+  border-radius: var(--lc-radius-md);
+  padding: 13px;
+  font-size: 14px;
+  font-weight: 600;
+  font-family: var(--lc-font-body);
+  color: var(--lc-text-primary);
+  cursor: pointer;
+  transition: border-color var(--lc-transition-fast), background var(--lc-transition-fast);
+
+  ion-icon {
+    font-size: 18px;
+    color: #DB4437;
+  }
+
+  &:active {
+    background: var(--lc-brand-light);
+    border-color: var(--lc-brand);
+  }
+}
+
+/* ── Footer ───────────────────────────────────────────────── */
+.auth-footer {
+  text-align: center;
+  font-size: 13px;
+  color: var(--lc-text-hint);
+  padding-top: 4px;
+
+  a {
+    color: var(--lc-brand);
+    font-weight: 600;
+    text-decoration: none;
+    cursor: pointer;
+  }
+}

@@ -17,35 +17,11 @@
   gap: 10px;
 }
 
-.theme-btn {
+.avatar-btn {
   width: 36px;
   height: 36px;
   border-radius: 50%;
   border: none;
-  background: var(--lc-brand-dark, #1A3830);
-  color: #ffffff;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-  flex-shrink: 0;
-  transition: opacity var(--lc-transition-fast);
-
-  ion-icon {
-    font-size: 18px;
-    pointer-events: none;
-    display: block;
-  }
-
-  &:active {
-    opacity: 0.75;
-  }
-}
-
-.avatar {
-  width: 36px;
-  height: 36px;
-  border-radius: 50%;
   background: var(--lc-brand);
   color: white;
   font-size: 12px;
@@ -54,6 +30,13 @@
   align-items: center;
   justify-content: center;
   font-family: var(--lc-font-body);
+  cursor: pointer;
+  flex-shrink: 0;
+  transition: opacity var(--lc-transition-fast);
+
+  &:active {
+    opacity: 0.8;
+  }
 }
 
 .home-content {

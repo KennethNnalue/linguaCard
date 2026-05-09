@@ -1,3 +1,15 @@
-<p>
-  sync-status works!
-</p>
+<button
+  class="sync-row"
+  [class.sync-clickable]="sync.syncStatus() === 'error'"
+  [attr.aria-label]="'Sync status: ' + label"
+  (click)="retrySync()"
+>
+  <span
+    class="sync-dot"
+    [class.sync-dot--synced]="sync.syncStatus() === 'synced'"
+    [class.sync-dot--pending]="sync.syncStatus() === 'pending'"
+    [class.sync-dot--syncing]="sync.syncStatus() === 'syncing'"
+    [class.sync-dot--error]="sync.syncStatus() === 'error'"
+  ></span>
+  <span class="sync-label">{{ label }}</span>
+</button>

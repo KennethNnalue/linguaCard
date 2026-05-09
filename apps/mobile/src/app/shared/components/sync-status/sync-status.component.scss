@@ -1,0 +1,44 @@
+.sync-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background: none;
+  border: none;
+  padding: 0;
+  cursor: default;
+  font-family: var(--lc-font-body);
+}
+
+.sync-clickable {
+  cursor: pointer;
+}
+
+/* ── Status dot ─────────────────────────────────────────────── */
+.sync-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  flex-shrink: 0;
+  transition: background-color var(--lc-transition-base);
+
+  &--synced  { background: var(--lc-mastery-5); }
+  &--pending { background: #D97706; }
+  &--error   { background: #B91C1C; }
+
+  &--syncing {
+    background: #D97706;
+    animation: pulse 1.2s ease-in-out infinite;
+  }
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50%       { opacity: 0.35; }
+}
+
+/* ── Label ──────────────────────────────────────────────────── */
+.sync-label {
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--lc-text-secondary);
+}

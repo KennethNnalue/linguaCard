@@ -1,0 +1,56 @@
+<div class="ctx-backdrop" (click)="closed.emit()" aria-hidden="true"></div>
+
+<div class="ctx-menu" role="menu" aria-label="User menu">
+  <!-- User info -->
+  <div class="ctx-user-row">
+    <div class="ctx-user-name">{{ auth.currentUser()?.name ?? 'Account' }}</div>
+    <div class="ctx-user-email">{{ auth.currentUser()?.email }}</div>
+  </div>
+
+  <!-- Dark mode -->
+  <button class="ctx-item" role="menuitem" (click)="theme.toggle()">
+    <div class="ctx-item-left">
+      <ion-icon name="moon-outline"></ion-icon>
+      Dark mode
+    </div>
+    <ion-toggle
+      [checked]="theme.isDark()"
+      aria-label="Toggle dark mode"
+      tabindex="-1"
+    ></ion-toggle>
+  </button>
+
+  <!-- Sync status -->
+  <button
+    class="ctx-item"
+    role="menuitem"
+    [class.ctx-item--clickable]="sync.syncStatus() === 'error'"
+    (click)="onSyncClick()"
+  >
+    <div class="ctx-item-left">
+      <ion-icon name="sync-outline"></ion-icon>
+      Sync status
+    </div>
+    <div class="ctx-sync-right">
+      <span [class]="syncClass"></span>
+      <span class="ctx-sync-label">{{ syncLabel }}</span>
+    </div>
+  </button>
+
+  <!-- Reset all data -->
+  <button class="ctx-item ctx-item--danger" role="menuitem" (click)="onResetClick()">
+    <div class="ctx-item-left">
+      <ion-icon name="trash-outline"></ion-icon>
+      Reset all data
+    </div>
+    <ion-icon name="chevron-forward-outline" class="ctx-chevron"></ion-icon>
+  </button>
+
+  <!-- Sign out -->
+  <button class="ctx-item" role="menuitem" (click)="signOut()">
+    <div class="ctx-item-left">
+      <ion-icon name="log-out-outline"></ion-icon>
+      Sign out
+    </div>
+  </button>
+</div>

@@ -1,6 +1,15 @@
-import { CanActivateFn } from '@angular/router';
-import { of } from 'rxjs';
+import { inject } from '@angular/core';
+import { CanActivateFn, Router } from '@angular/router';
+import { AuthService } from '../services/auth.service';
 
-// Auth is not yet implemented — allow all routes.
-// Replace with a real token check when the backend is ready.
-export const AuthGuard: CanActivateFn = () => of(true);
+export const AuthGuard: CanActivateFn = () => {
+  const auth = inject(AuthService);
+  const router = inject(Router);
+  return auth.isAuthenticated() ? true : router.createUrlTree(['/auth/login']);
+};
+
+export const noAuthGuard: CanActivateFn = () => {
+  const auth = inject(AuthService);
+  const router = inject(Router);
+  return auth.isAuthenticated() ? router.createUrlTree(['/home']) : true;
+};

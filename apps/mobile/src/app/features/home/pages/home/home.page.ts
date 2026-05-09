@@ -11,7 +11,8 @@ import {
   ModalController,
 } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
-import { addOutline, chevronDownOutline, moonOutline, playOutline, sunnyOutline, volumeHighOutline } from 'ionicons/icons';
+import { addOutline, chevronDownOutline, playOutline, volumeHighOutline } from 'ionicons/icons';
+import { AuthService } from '../../../../core/services/auth.service';
 import { ThemeService } from '../../../../core/services/theme.service';
 import { CardStore } from '../../../../core/store/card.store';
 import { CategoryStore } from '../../../../core/store/category.store';
@@ -19,7 +20,9 @@ import { CollectionStore } from '../../../vault/store/collection.store';
 import { getCategoryName } from '../../../../shared/helpers/helpers';
 import { ArticleBadgeComponent } from '../../../../shared/components/article-badge/article-badge.component';
 import { MasteryDotComponent } from '../../../../shared/components/mastery-dot/mastery-dot.component';
+import { UserMenuComponent } from '../../../../shared/components/user-menu/user-menu.component';
 import { AddWordSheetComponent } from '../../../vault/components/add-word-sheet/add-word-sheet.component';
+import { ResetDataSheetComponent } from '../../../auth/components/reset-data-sheet/reset-data-sheet.component';
 
 @Component({
   selector: 'app-home',
@@ -29,6 +32,7 @@ import { AddWordSheetComponent } from '../../../vault/components/add-word-sheet/
     RouterLink,
     MasteryDotComponent,
     ArticleBadgeComponent,
+    UserMenuComponent,
     IonRefresherContent,
     IonRefresher,
     IonContent,
@@ -43,13 +47,15 @@ export class HomePage {
   private readonly collectionStore = inject(CollectionStore);
   private readonly modalCtrl = inject(ModalController);
   private readonly actionSheetCtrl = inject(ActionSheetController);
+  private readonly authService = inject(AuthService);
   readonly themeService = inject(ThemeService);
 
   constructor() {
-    addIcons({ addOutline, playOutline, volumeHighOutline, chevronDownOutline, moonOutline, sunnyOutline });
+    addIcons({ addOutline, playOutline, volumeHighOutline, chevronDownOutline });
   }
 
-  readonly user = signal({ avatarInitials: 'JS' });
+  readonly user = this.authService.currentUser;
+  readonly menuOpen = signal(false);
   readonly loading = this.cardStore.isLoading;
   readonly recent = this.cardStore.recentCards;
   readonly categories = this.categoryStore.categories;
@@ -83,6 +89,15 @@ export class HomePage {
     masteredCards: this.cardStore.masteredCount(),
   }));
 
+  toggleMenu(event: Event): void {
+    event.stopPropagation();
+    this.menuOpen.update(v => !v);
+  }
+
+  closeMenu(): void {
+    this.menuOpen.set(false);
+  }
+
   async openAddWord(): Promise<void> {
     const modal = await this.modalCtrl.create({
       component: AddWordSheetComponent,
@@ -93,6 +108,16 @@ export class HomePage {
     await modal.present();
     const { data } = await modal.onWillDismiss();
     if (data?.created) this.cardStore.loadCards();
+  }
+
+  async openResetSheet(): Promise<void> {
+    const modal = await this.modalCtrl.create({
+      component: ResetDataSheetComponent,
+      breakpoints: [0, 0.65, 0.85],
+      initialBreakpoint: 0.65,
+      handleBehavior: 'cycle',
+    });
+    await modal.present();
   }
 
   async openCollectionPicker(): Promise<void> {

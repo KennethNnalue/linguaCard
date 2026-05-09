@@ -1,24 +1,29 @@
+import { SlicePipe } from '@angular/common';
 import { Component, computed, inject, signal } from '@angular/core';
 import { Router } from '@angular/router';
 import {
   IonContent,
   IonHeader,
   IonIcon,
+  IonLabel,
   IonRefresher,
   IonRefresherContent,
   IonSearchbar,
+  IonSegment,
+  IonSegmentButton,
   IonToolbar,
   ModalController,
 } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
 import { addOutline, cloudUploadOutline, funnelOutline } from 'ionicons/icons';
-import { Card } from '../../../../core/models/mock-data';
+import { Card, Collection } from '../../../../core/models/mock-data';
 import { CardStore } from '../../../../core/store/card.store';
 import { CategoryStore } from '../../../../core/store/category.store';
 import { getCategoryName } from '../../../../shared/helpers/helpers';
 import { ArticleBadgeComponent } from '../../../../shared/components/article-badge/article-badge.component';
 import { MasteryDotComponent } from '../../../../shared/components/mastery-dot/mastery-dot.component';
 import { AddWordSheetComponent } from '../../components/add-word-sheet/add-word-sheet.component';
+import { CollectionStore } from '../../store/collection.store';
 
 @Component({
   selector: 'app-vault',
@@ -32,19 +37,26 @@ import { AddWordSheetComponent } from '../../components/add-word-sheet/add-word-
     IonRefresher,
     IonRefresherContent,
     IonSearchbar,
+    IonSegment,
+    IonSegmentButton,
+    IonLabel,
     MasteryDotComponent,
     ArticleBadgeComponent,
+    SlicePipe,
   ],
 })
 export class VaultPage {
   private readonly cardStore = inject(CardStore);
   private readonly categoryStore = inject(CategoryStore);
+  readonly collectionStore = inject(CollectionStore);
   private readonly modalCtrl = inject(ModalController);
   private readonly router = inject(Router);
 
   constructor() {
     addIcons({ addOutline, cloudUploadOutline, funnelOutline });
   }
+
+  readonly activeTab = signal<'words' | 'collections'>('words');
 
   readonly loading = this.cardStore.isLoading;
   readonly totalCount = this.cardStore.totalCount;
@@ -65,6 +77,14 @@ export class VaultPage {
     });
   });
 
+  readonly collections = this.collectionStore.collections;
+  readonly totalCards = this.collectionStore.totalCards;
+  readonly totalDue = this.collectionStore.totalDue;
+
+  onTabChange(event: CustomEvent): void {
+    this.activeTab.set(event.detail.value as 'words' | 'collections');
+  }
+
   async openAddWord(): Promise<void> {
     const modal = await this.modalCtrl.create({
       component: AddWordSheetComponent,
@@ -79,6 +99,7 @@ export class VaultPage {
 
   handleRefresh(event: any): void {
     this.cardStore.loadCards();
+    this.collectionStore.loadCollections();
     setTimeout(() => event.target.complete(), 800);
   }
 
@@ -98,12 +119,17 @@ export class VaultPage {
     this.router.navigate(['/vault', card.id]);
   }
 
-  navigateToImport(): void {
-    this.router.navigate(['/vault/import']);
+  openCollectionDetail(col: Collection): void {
+    this.router.navigate(['/vault/collections', col.id]);
   }
 
-  navigateToCollections(): void {
-    this.router.navigate(['/vault/collections']);
+  progressPercent(col: Collection): number {
+    if (!col.cardCount) return 0;
+    return Math.round((col.masteredCount / col.cardCount) * 100);
+  }
+
+  navigateToImport(): void {
+    this.router.navigate(['/vault/import']);
   }
 
   protected readonly getCategoryName = getCategoryName;

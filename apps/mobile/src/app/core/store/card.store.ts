@@ -7,10 +7,13 @@ import {
   withMethods,
   withState,
 } from '@ngrx/signals';
-import { rxMethod } from '@ngrx/signals/rxjs-interop';
-import { catchError, EMPTY, pipe, switchMap, tap } from 'rxjs';
+import { firstValueFrom, Observable, of } from 'rxjs';
+import { catchError, tap } from 'rxjs/operators';
 import { Card } from '../models/mock-data';
 import { CardApiService } from '../services/card-api.service';
+import { LocalDataService } from '../services/local-data.service';
+import { SyncService } from '../services/sync.service';
+import { AuthService } from '../services/auth.service';
 
 export interface CardFilter {
   categoryId: string | null;
@@ -43,9 +46,9 @@ export const CardStore = signalStore(
       const all = cards();
       const { categoryId, collectionId, search } = filter();
       return all
-        .filter(c => !collectionId || c.collectionId === collectionId)
-        .filter(c => !categoryId || c.categoryIds.includes(categoryId))
-        .filter(c => {
+        .filter((c) => !collectionId || c.collectionId === collectionId)
+        .filter((c) => !categoryId || c.categoryIds.includes(categoryId))
+        .filter((c) => {
           if (!search.trim()) return true;
           const q = search.toLowerCase();
           return (
@@ -57,13 +60,13 @@ export const CardStore = signalStore(
 
     selectedCard: computed(() => {
       const id = selectedCardId();
-      return id ? (cards().find(c => c.id === id) ?? null) : null;
+      return id ? (cards().find((c) => c.id === id) ?? null) : null;
     }),
 
     dueCards: computed(() => {
       const now = new Date();
       return cards().filter(
-        c => c.srsState && new Date(c.srsState.nextDueAt) <= now,
+        (c) => c.srsState && new Date(c.srsState.nextDueAt) <= now
       );
     }),
 
@@ -71,50 +74,100 @@ export const CardStore = signalStore(
       [...cards()]
         .sort(
           (a, b) =>
-            new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime(),
+            new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
         )
-        .slice(0, 5),
+        .slice(0, 5)
     ),
 
     totalCount: computed(() => cards().length),
-
     masteredCount: computed(() =>
-      cards().filter(c => c.srsState?.state === 'mastered').length,
+      cards().filter((c) => c.srsState?.state === 'mastered').length
     ),
-
     learningCount: computed(() =>
       cards().filter(
-        c =>
-          c.srsState?.state === 'learning' || c.srsState?.state === 'review',
-      ).length,
+        (c) =>
+          c.srsState?.state === 'learning' || c.srsState?.state === 'review'
+      ).length
     ),
-
     newCount: computed(() =>
-      cards().filter(c => c.srsState?.state === 'new').length,
+      cards().filter((c) => c.srsState?.state === 'new').length
     ),
   })),
 
-  withMethods(store => {
+  withMethods((store) => {
     const cardApi = inject(CardApiService);
+    const localData = inject(LocalDataService);
+    const syncService = inject(SyncService);
+    const authService = inject(AuthService);
+
+    function uid(): string | undefined {
+      return authService.currentUser()?.id;
+    }
 
     return {
-      loadCards: rxMethod<void>(
-        pipe(
-          tap(() => patchState(store, { isLoading: true, error: null })),
-          switchMap(() =>
-            cardApi.getAll().pipe(
-              tap(cards => patchState(store, { cards, isLoading: false })),
-              catchError(err => {
-                patchState(store, {
-                  error: err?.message ?? 'Failed to load cards',
-                  isLoading: false,
-                });
-                return EMPTY;
-              }),
-            ),
-          ),
-        ),
-      ),
+      /** Seed the store instantly from local storage before API responds. */
+      hydrate(cards: Card[]): void {
+        patchState(store, { cards });
+      },
+
+      /** Offline-first: show cached data immediately, then refresh from API. */
+      loadCards(): void {
+        void (async () => {
+          patchState(store, { isLoading: true, error: null });
+
+          const userId = uid();
+          if (userId) {
+            const cached = await localData.getCards(userId);
+            if (cached.length > 0) {
+              patchState(store, { cards: cached });
+            }
+          }
+
+          try {
+            const cards = await firstValueFrom(cardApi.getAll());
+            patchState(store, { cards, isLoading: false });
+            if (userId) await localData.setCards(userId, cards);
+          } catch {
+            patchState(store, { isLoading: false });
+          }
+        })();
+      },
+
+      /**
+       * Optimistic create: adds card to store immediately.
+       * Resolves to the server card when online, or temp card when offline.
+       */
+      createCard(dto: Omit<Card, 'id'>): Observable<Card> {
+        const tempId = `temp_${crypto.randomUUID()}`;
+        const tempCard: Card = { ...dto, id: tempId };
+
+        patchState(store, { cards: [...store.cards(), tempCard] });
+
+        if (!navigator.onLine) {
+          void syncService.enqueue({ type: 'CREATE_CARD', payload: dto });
+          const userId = uid();
+          if (userId) void localData.setCards(userId, store.cards());
+          return of(tempCard);
+        }
+
+        return cardApi.create(dto).pipe(
+          tap((serverCard) => {
+            patchState(store, {
+              cards: store.cards().map((c) =>
+                c.id === tempId ? serverCard : c
+              ),
+            });
+            const userId = uid();
+            if (userId) void localData.setCards(userId, store.cards());
+          }),
+          catchError(() => {
+            void syncService.enqueue({ type: 'CREATE_CARD', payload: dto });
+            const userId = uid();
+            if (userId) void localData.setCards(userId, store.cards());
+            return of(tempCard);
+          })
+        );
+      },
 
       selectCard(id: string | null): void {
         patchState(store, { selectedCardId: id });
@@ -133,7 +186,19 @@ export const CardStore = signalStore(
       },
 
       clearFilter(): void {
-        patchState(store, { filter: { categoryId: null, collectionId: null, search: '' } });
+        patchState(store, {
+          filter: { categoryId: null, collectionId: null, search: '' },
+        });
+      },
+
+      reset(): void {
+        patchState(store, {
+          cards: [],
+          isLoading: false,
+          error: null,
+          selectedCardId: null,
+          filter: { categoryId: null, collectionId: null, search: '' },
+        });
       },
     };
   }),
@@ -142,5 +207,5 @@ export const CardStore = signalStore(
     onInit(store) {
       store.loadCards();
     },
-  }),
+  })
 );

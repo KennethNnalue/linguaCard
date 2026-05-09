@@ -8,9 +8,11 @@ import {
   withState,
 } from '@ngrx/signals';
 import { rxMethod } from '@ngrx/signals/rxjs-interop';
-import { catchError, EMPTY, pipe, switchMap, tap } from 'rxjs';
+import { catchError, EMPTY, firstValueFrom, pipe, switchMap, tap } from 'rxjs';
 import { Collection, CreateCollectionDto, UpdateCollectionDto } from '../../../core/models/mock-data';
 import { CollectionApiService } from '../../../core/services/collection-api.service';
+import { LocalDataService } from '../../../core/services/local-data.service';
+import { AuthService } from '../../../core/services/auth.service';
 
 interface CollectionState {
   collections: Collection[];
@@ -33,39 +35,55 @@ export const CollectionStore = signalStore(
   withComputed(({ collections, activeCollectionId }) => ({
     activeCollection: computed(() => {
       const id = activeCollectionId();
-      return id ? (collections().find(c => c.id === id) ?? null) : null;
+      return id ? (collections().find((c) => c.id === id) ?? null) : null;
     }),
 
     totalDue: computed(() =>
-      collections().reduce((sum, c) => sum + (c.dueCount ?? 0), 0),
+      collections().reduce((sum, c) => sum + (c.dueCount ?? 0), 0)
     ),
 
     totalCards: computed(() =>
-      collections().reduce((sum, c) => sum + (c.cardCount ?? 0), 0),
+      collections().reduce((sum, c) => sum + (c.cardCount ?? 0), 0)
     ),
   })),
 
-  withMethods(store => {
+  withMethods((store) => {
     const api = inject(CollectionApiService);
+    const localData = inject(LocalDataService);
+    const authService = inject(AuthService);
+
+    function uid(): string | undefined {
+      return authService.currentUser()?.id;
+    }
 
     return {
-      loadCollections: rxMethod<void>(
-        pipe(
-          tap(() => patchState(store, { isLoading: true, error: null })),
-          switchMap(() =>
-            api.getAll().pipe(
-              tap(collections => patchState(store, { collections, isLoading: false })),
-              catchError(err => {
-                patchState(store, {
-                  error: err?.message ?? 'Failed to load collections',
-                  isLoading: false,
-                });
-                return EMPTY;
-              }),
-            ),
-          ),
-        ),
-      ),
+      /** Seed the store instantly from local storage before API responds. */
+      hydrate(collections: Collection[]): void {
+        patchState(store, { collections });
+      },
+
+      /** Offline-first: show cached data immediately, then refresh from API. */
+      loadCollections(): void {
+        void (async () => {
+          patchState(store, { isLoading: true, error: null });
+
+          const userId = uid();
+          if (userId) {
+            const cached = await localData.getCollections(userId);
+            if (cached.length > 0) {
+              patchState(store, { collections: cached });
+            }
+          }
+
+          try {
+            const collections = await firstValueFrom(api.getAll());
+            patchState(store, { collections, isLoading: false });
+            if (userId) await localData.setCollections(userId, collections);
+          } catch {
+            patchState(store, { isLoading: false });
+          }
+        })();
+      },
 
       setActiveCollection(id: string | null): void {
         patchState(store, { activeCollectionId: id });
@@ -73,44 +91,62 @@ export const CollectionStore = signalStore(
 
       createCollection: rxMethod<CreateCollectionDto>(
         pipe(
-          switchMap(dto =>
+          switchMap((dto) =>
             api.create(dto).pipe(
-              tap(col => patchState(store, { collections: [...store.collections(), col] })),
-              catchError(() => EMPTY),
-            ),
-          ),
-        ),
+              tap(async (col) => {
+                const next = [...store.collections(), col];
+                patchState(store, { collections: next });
+                const userId = uid();
+                if (userId) await localData.setCollections(userId, next);
+              }),
+              catchError(() => EMPTY)
+            )
+          )
+        )
       ),
 
       updateCollection: rxMethod<{ id: string; dto: UpdateCollectionDto }>(
         pipe(
           switchMap(({ id, dto }) =>
             api.update(id, dto).pipe(
-              tap(updated =>
-                patchState(store, {
-                  collections: store.collections().map(c => (c.id === id ? updated : c)),
-                }),
-              ),
-              catchError(() => EMPTY),
-            ),
-          ),
-        ),
+              tap(async (updated) => {
+                const next = store
+                  .collections()
+                  .map((c) => (c.id === id ? updated : c));
+                patchState(store, { collections: next });
+                const userId = uid();
+                if (userId) await localData.setCollections(userId, next);
+              }),
+              catchError(() => EMPTY)
+            )
+          )
+        )
       ),
 
       deleteCollection: rxMethod<string>(
         pipe(
-          switchMap(id =>
+          switchMap((id) =>
             api.remove(id).pipe(
-              tap(() =>
-                patchState(store, {
-                  collections: store.collections().filter(c => c.id !== id),
-                }),
-              ),
-              catchError(() => EMPTY),
-            ),
-          ),
-        ),
+              tap(async () => {
+                const next = store.collections().filter((c) => c.id !== id);
+                patchState(store, { collections: next });
+                const userId = uid();
+                if (userId) await localData.setCollections(userId, next);
+              }),
+              catchError(() => EMPTY)
+            )
+          )
+        )
       ),
+
+      reset(): void {
+        patchState(store, {
+          collections: [],
+          isLoading: false,
+          activeCollectionId: null,
+          error: null,
+        });
+      },
     };
   }),
 
@@ -118,5 +154,5 @@ export const CollectionStore = signalStore(
     onInit(store) {
       store.loadCollections();
     },
-  }),
+  })
 );

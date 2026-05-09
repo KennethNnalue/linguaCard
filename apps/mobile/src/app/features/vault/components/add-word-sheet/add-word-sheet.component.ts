@@ -17,7 +17,6 @@ import {
   volumeHighOutline,
 } from 'ionicons/icons';
 import { ArticleType, CardContent, ExampleSentence } from '../../../../core/models/mock-data';
-import { CardApiService } from '../../../../core/services/card-api.service';
 import { AudioService } from '../../../../core/services/audio.service';
 import { CardStore } from '../../../../core/store/card.store';
 import { CategoryStore } from '../../../../core/store/category.store';
@@ -32,7 +31,6 @@ import { AssignCollectionSheetComponent } from '../assign-collection-sheet/assig
   imports: [IonHeader, IonToolbar, IonContent, IonIcon, ReactiveFormsModule],
 })
 export class AddWordSheetComponent implements OnInit {
-  private readonly cardApi = inject(CardApiService);
   private readonly categoryStore = inject(CategoryStore);
   private readonly collectionStore = inject(CollectionStore);
   private readonly audioService = inject(AudioService);
@@ -142,10 +140,11 @@ export class AddWordSheetComponent implements OnInit {
     const categoryIds = v.categoryId ? [v.categoryId] : [];
     const now = new Date().toISOString();
 
-    this.cardApi.create({
+    const userId = 'user-001'; // replaced by AuthService.currentUser().id in LC-021
+    this.cardStore.createCard({
       deckId: 'deck-001',
       collectionId: v.collectionId ?? null,
-      userId: 'user-001',
+      userId,
       contextId: 'german-vocab',
       content,
       categoryIds,
@@ -156,7 +155,7 @@ export class AddWordSheetComponent implements OnInit {
       srsState: {
         id: crypto.randomUUID(),
         cardId: '',
-        userId: 'user-001',
+        userId,
         algorithm: 'sm2',
         intervalDays: 1,
         easeFactor: 2.5,
@@ -169,7 +168,6 @@ export class AddWordSheetComponent implements OnInit {
       },
     }).subscribe({
       next: () => {
-        this.cardStore.loadCards();
         this.saving.set(false);
         this.modalCtrl.dismiss({ created: true });
       },

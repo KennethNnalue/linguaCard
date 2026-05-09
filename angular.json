@@ -40,7 +40,8 @@
               "apps/mobile/src/theme/variables.scss"
             ],
             "scripts": [],
-            "browser": "apps/mobile/src/main.ts"
+            "browser": "apps/mobile/src/main.ts",
+          "allowedCommonJsDependencies": ["localforage", "localforage-cordovasqlitedriver"]
           },
           "configurations": {
             "production": {

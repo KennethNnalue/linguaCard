@@ -1,6 +1,7 @@
 import { inject, Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Observable } from 'rxjs';
+import { forkJoin, Observable, of, switchMap } from 'rxjs';
+import { map } from 'rxjs/operators';
 import { environment } from '../../../environments/environment';
 import { Card, Collection, CreateCollectionDto, UpdateCollectionDto } from '../models/mock-data';
 
@@ -39,5 +40,15 @@ export class CollectionApiService {
     return this.http.delete<{ deleted: number }>(`${environment.apiUrl}/cards/clear`, {
       params: { collectionId },
     });
+  }
+
+  removeAll(): Observable<void> {
+    return this.getAll().pipe(
+      switchMap(collections =>
+        collections.length === 0
+          ? of(undefined as void)
+          : forkJoin(collections.map(c => this.remove(c.id))).pipe(map(() => undefined as void))
+      )
+    );
   }
 }

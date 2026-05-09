@@ -1,6 +1,7 @@
 import { inject, Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Observable } from 'rxjs';
+import { forkJoin, Observable, of, switchMap } from 'rxjs';
+import { map } from 'rxjs/operators';
 import { environment } from '../../../environments/environment';
 import { Card } from '../models/mock-data';
 
@@ -29,5 +30,15 @@ export class CardApiService {
 
   remove(id: string): Observable<void> {
     return this.http.delete<void>(`${this.baseUrl}/${id}`);
+  }
+
+  removeAll(): Observable<void> {
+    return this.getAll().pipe(
+      switchMap(cards =>
+        cards.length === 0
+          ? of(undefined as void)
+          : forkJoin(cards.map(c => this.remove(c.id))).pipe(map(() => undefined as void))
+      )
+    );
   }
 }

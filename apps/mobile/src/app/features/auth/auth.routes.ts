@@ -1,19 +1,29 @@
 import { Routes } from '@angular/router';
-import { LoginPage } from './pages/login/login.page';
-import { RegisterPage } from './pages/register/register.page';
+import { noAuthGuard } from '../../core/guards/auth.guard';
 
 export const AUTH_ROUTES: Routes = [
   {
     path: 'login',
-    loadComponent: () => import('./pages/login/login.page').then(m => m.LoginPage),
+    canActivate: [noAuthGuard],
+    loadComponent: () =>
+      import('./pages/login/login.page').then((m) => m.LoginPage),
   },
   {
     path: 'register',
-    loadComponent: () => import('./pages/register/register.page').then(m => m.RegisterPage),
+    canActivate: [noAuthGuard],
+    loadComponent: () =>
+      import('./pages/register/register.page').then((m) => m.RegisterPage),
+  },
+  {
+    path: 'forgot-password',
+    loadComponent: () =>
+      import('./pages/forgot-password/forgot-password.page').then(
+        (m) => m.ForgotPasswordPage
+      ),
   },
   {
     path: '',
     redirectTo: 'login',
-    pathMatch: 'full'
-  }
+    pathMatch: 'full',
+  },
 ];
