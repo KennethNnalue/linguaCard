@@ -3,6 +3,15 @@
     <div class="home-nav">
       <span class="home-logo lc-display">LinguaCard</span>
       <div class="home-nav-right">
+        <div class="theme-toggle-wrap" [class.theme-toggle-wrap--dark]="themeService.isDark()">
+          <ion-icon [name]="themeService.isDark() ? 'moon-outline' : 'sunny-outline'" class="theme-icon"></ion-icon>
+          <ion-toggle
+            [checked]="themeService.isDark()"
+            (ionChange)="themeService.toggle()"
+            aria-label="Toggle dark mode"
+            class="theme-toggle">
+          </ion-toggle>
+        </div>
         <button class="lc-fab" (click)="openAddWord()" aria-label="Add new word">
           <ion-icon name="add-outline"></ion-icon>
         </button>

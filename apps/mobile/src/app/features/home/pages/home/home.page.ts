@@ -7,11 +7,13 @@ import {
   IonIcon,
   IonRefresher,
   IonRefresherContent,
+  IonToggle,
   IonToolbar,
   ModalController,
 } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
-import { addOutline, chevronDownOutline, playOutline, volumeHighOutline } from 'ionicons/icons';
+import { addOutline, chevronDownOutline, moonOutline, playOutline, sunnyOutline, volumeHighOutline } from 'ionicons/icons';
+import { ThemeService } from '../../../../core/services/theme.service';
 import { CardStore } from '../../../../core/store/card.store';
 import { CategoryStore } from '../../../../core/store/category.store';
 import { CollectionStore } from '../../../vault/store/collection.store';
@@ -32,6 +34,7 @@ import { AddWordSheetComponent } from '../../../vault/components/add-word-sheet/
     IonRefresher,
     IonContent,
     IonIcon,
+    IonToggle,
     IonToolbar,
     IonHeader,
   ],
@@ -42,9 +45,10 @@ export class HomePage {
   private readonly collectionStore = inject(CollectionStore);
   private readonly modalCtrl = inject(ModalController);
   private readonly actionSheetCtrl = inject(ActionSheetController);
+  readonly themeService = inject(ThemeService);
 
   constructor() {
-    addIcons({ addOutline, playOutline, volumeHighOutline, chevronDownOutline });
+    addIcons({ addOutline, playOutline, volumeHighOutline, chevronDownOutline, moonOutline, sunnyOutline });
   }
 
   readonly user = signal({ avatarInitials: 'JS' });

@@ -17,6 +17,37 @@
   gap: 10px;
 }
 
+.theme-toggle-wrap {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  background: var(--lc-brand-light);
+  border-radius: var(--lc-radius-full);
+  padding: 4px 8px 4px 6px;
+  transition: background var(--lc-transition-base);
+
+  &--dark {
+    background: var(--lc-card);
+  }
+
+  .theme-icon {
+    font-size: 14px;
+    color: var(--lc-brand);
+  }
+
+  .theme-toggle {
+    --handle-width: 16px;
+    --handle-height: 16px;
+    --handle-border-radius: 50%;
+    --track-background: var(--lc-border-strong);
+    --track-background-checked: var(--lc-brand);
+    --handle-background: white;
+    --handle-background-checked: white;
+    width: 36px;
+    height: 20px;
+  }
+}
+
 .avatar {
   width: 36px;
   height: 36px;
