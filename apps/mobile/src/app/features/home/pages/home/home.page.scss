@@ -21,19 +21,20 @@
   width: 36px;
   height: 36px;
   border-radius: 50%;
-  border: 1.5px solid var(--lc-border-strong);
-  background: var(--lc-brand-light);
-  color: var(--lc-brand);
+  border: none;
+  background: var(--lc-brand-dark, #1A3830);
+  color: #ffffff;
   display: flex;
   align-items: center;
   justify-content: center;
   cursor: pointer;
-  transition: background var(--lc-transition-base), border-color var(--lc-transition-base);
   flex-shrink: 0;
+  transition: opacity var(--lc-transition-fast);
 
   ion-icon {
-    font-size: 17px;
+    font-size: 18px;
     pointer-events: none;
+    display: block;
   }
 
   &:active {
