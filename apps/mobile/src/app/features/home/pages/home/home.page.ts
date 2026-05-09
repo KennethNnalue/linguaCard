@@ -7,7 +7,6 @@ import {
   IonIcon,
   IonRefresher,
   IonRefresherContent,
-  IonToggle,
   IonToolbar,
   ModalController,
 } from '@ionic/angular/standalone';
@@ -34,7 +33,6 @@ import { AddWordSheetComponent } from '../../../vault/components/add-word-sheet/
     IonRefresher,
     IonContent,
     IonIcon,
-    IonToggle,
     IonToolbar,
     IonHeader,
   ],
