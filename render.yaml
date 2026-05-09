@@ -6,7 +6,7 @@ services:
     plan: free
     buildCommand: npm install --include=dev && npm run build:api
     startCommand: node dist/api/apps/api/src/main.js
-    healthCheckPath: /api/v1/collections
+    healthCheckPath: /api/v1/health
     envVars:
       - key: NODE_ENV
         value: production

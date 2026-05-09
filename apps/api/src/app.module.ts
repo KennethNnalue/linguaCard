@@ -9,6 +9,7 @@ import { CategoriesModule } from './categories/categories.module';
 import { SeedModule } from './seed/seed.module';
 import { AuthModule } from './auth/auth.module';
 import { JwtAuthGuard } from './auth/guards/jwt-auth.guard';
+import { HealthModule } from './health/health.module';
 import databaseConfig from './config/database.config';
 
 @Module({
@@ -23,6 +24,7 @@ import databaseConfig from './config/database.config';
         config.get<TypeOrmModuleOptions>('database')!,
     }),
     AuthModule,
+    HealthModule,
     CardsModule,
     CollectionsModule,
     CategoriesModule,
