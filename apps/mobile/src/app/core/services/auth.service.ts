@@ -1,7 +1,7 @@
 import { computed, inject, Injectable, signal } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Router } from '@angular/router';
-import { catchError, map, Observable, of, tap } from 'rxjs';
+import { catchError, map, Observable, of, tap, throwError } from 'rxjs';
 import { environment } from '../../../environments/environment';
 
 export interface AuthUser {
@@ -11,9 +11,9 @@ export interface AuthUser {
   avatarInitials: string;
 }
 
-interface StoredUser extends AuthUser {
-  password: string;
-  createdAt: string;
+interface AuthResponse {
+  accessToken: string;
+  user: AuthUser;
 }
 
 export interface LoginPayload {
@@ -34,6 +34,7 @@ const USER_KEY = 'lc-user';
 export class AuthService {
   private readonly http = inject(HttpClient);
   private readonly router = inject(Router);
+  private readonly authUrl = `${environment.apiUrl}/auth`;
 
   private readonly _token = signal<string | null>(localStorage.getItem(TOKEN_KEY));
   private readonly _user = signal<AuthUser | null>(this.loadStoredUser());
@@ -43,55 +44,35 @@ export class AuthService {
   readonly isAuthenticated = computed(() => !!this._token());
 
   login(payload: LoginPayload): Observable<AuthUser> {
-    return this.http
-      .get<StoredUser[]>(`${environment.apiUrl}/users`, {
-        params: { email: payload.email },
-      })
-      .pipe(
-        map((users) => {
-          const user = users.find(
-            (u) => u.email === payload.email && u.password === payload.password
-          );
-          if (!user) throw new Error('Invalid email or password');
-          return user;
-        }),
-        tap((user) => this.persist(user))
-      );
+    return this.http.post<AuthResponse>(`${this.authUrl}/login`, payload).pipe(
+      tap((res) => this.persist(res)),
+      map((res) => res.user),
+      catchError((err) => throwError(() => this.toError(err)))
+    );
   }
 
   register(payload: RegisterPayload): Observable<AuthUser> {
-    const parts = payload.name.trim().split(' ');
-    const initials =
-      parts.length >= 2
-        ? `${parts[0][0]}${parts[parts.length - 1][0]}`.toUpperCase()
-        : parts[0].slice(0, 2).toUpperCase();
-
-    const newUser: Omit<StoredUser, 'id'> = {
-      name: payload.name,
-      email: payload.email,
-      password: payload.password,
-      avatarInitials: initials,
-      createdAt: new Date().toISOString(),
-    };
-
-    return this.http
-      .post<StoredUser>(`${environment.apiUrl}/users`, newUser)
-      .pipe(tap((user) => this.persist(user)));
+    return this.http.post<AuthResponse>(`${this.authUrl}/register`, payload).pipe(
+      tap((res) => this.persist(res)),
+      map((res) => res.user),
+      catchError((err) => throwError(() => this.toError(err)))
+    );
   }
 
   forgotPassword(email: string): Observable<void> {
-    return this.http
-      .get<StoredUser[]>(`${environment.apiUrl}/users`, { params: { email } })
-      .pipe(map(() => void 0));
+    return this.http.post<void>(`${this.authUrl}/forgot-password`, { email });
   }
 
   verifyPassword(password: string): Observable<boolean> {
     const user = this._user();
     if (!user) return of(false);
     return this.http
-      .get<StoredUser[]>(`${environment.apiUrl}/users`, { params: { email: user.email } })
+      .post<{ valid: boolean }>(`${this.authUrl}/verify-password`, {
+        email: user.email,
+        password,
+      })
       .pipe(
-        map(users => users.some(u => u.email === user.email && u.password === password)),
+        map((res) => res.valid),
         catchError(() => of(false))
       );
   }
@@ -104,26 +85,17 @@ export class AuthService {
     this.router.navigateByUrl('/auth/login');
   }
 
-  private persist(user: StoredUser): void {
-    const token = this.mockToken(user);
-    const authUser: AuthUser = {
-      id: user.id,
-      email: user.email,
-      name: user.name,
-      avatarInitials: user.avatarInitials,
-    };
-    this._token.set(token);
-    this._user.set(authUser);
-    localStorage.setItem(TOKEN_KEY, token);
-    localStorage.setItem(USER_KEY, JSON.stringify(authUser));
+  private persist(res: AuthResponse): void {
+    this._token.set(res.accessToken);
+    this._user.set(res.user);
+    localStorage.setItem(TOKEN_KEY, res.accessToken);
+    localStorage.setItem(USER_KEY, JSON.stringify(res.user));
   }
 
-  private mockToken(user: StoredUser): string {
-    const header = btoa(JSON.stringify({ alg: 'HS256', typ: 'JWT' }));
-    const payload = btoa(
-      JSON.stringify({ sub: user.id, email: user.email, exp: Date.now() + 86_400_000 })
-    );
-    return `${header}.${payload}.mock-sig`;
+  private toError(httpErr: { error?: { message?: string | string[] } }): Error {
+    const raw = httpErr?.error?.message;
+    const msg = Array.isArray(raw) ? raw[0] : (raw ?? 'Something went wrong. Please try again.');
+    return new Error(msg);
   }
 
   private loadStoredUser(): AuthUser | null {

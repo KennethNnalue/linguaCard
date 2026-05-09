@@ -13,7 +13,6 @@ import {
 import { addIcons } from 'ionicons';
 import { addOutline, chevronDownOutline, playOutline, volumeHighOutline } from 'ionicons/icons';
 import { AuthService } from '../../../../core/services/auth.service';
-import { ThemeService } from '../../../../core/services/theme.service';
 import { CardStore } from '../../../../core/store/card.store';
 import { CategoryStore } from '../../../../core/store/category.store';
 import { CollectionStore } from '../../../vault/store/collection.store';
@@ -48,7 +47,6 @@ export class HomePage {
   private readonly modalCtrl = inject(ModalController);
   private readonly actionSheetCtrl = inject(ActionSheetController);
   private readonly authService = inject(AuthService);
-  readonly themeService = inject(ThemeService);
 
   constructor() {
     addIcons({ addOutline, playOutline, volumeHighOutline, chevronDownOutline });

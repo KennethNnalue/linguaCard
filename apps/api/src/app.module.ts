@@ -6,6 +6,7 @@ import { CardsModule } from './cards/cards.module';
 import { CollectionsModule } from './collections/collections.module';
 import { CategoriesModule } from './categories/categories.module';
 import { SeedModule } from './seed/seed.module';
+import { AuthModule } from './auth/auth.module';
 import databaseConfig from './config/database.config';
 
 @Module({
@@ -19,6 +20,7 @@ import databaseConfig from './config/database.config';
       useFactory: (config: ConfigService): TypeOrmModuleOptions =>
         config.get<TypeOrmModuleOptions>('database')!,
     }),
+    AuthModule,
     CardsModule,
     CollectionsModule,
     CategoriesModule,

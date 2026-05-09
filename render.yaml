@@ -14,3 +14,5 @@ services:
         sync: false          # paste Neon connection string in Render dashboard
       - key: CORS_ORIGIN
         sync: false          # set after Vercel deploy: https://your-app.vercel.app
+      - key: JWT_SECRET
+        sync: false          # generate a strong random string in the Render dashboard
