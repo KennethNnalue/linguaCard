@@ -5,7 +5,7 @@
   "homepage": "https://ionicframework.com/",
   "scripts": {
     "ng": "ng",
-    "dev": "concurrently \"ng serve --project=mobile\" \"npx json-server db.json\"",
+    "dev": "concurrently \"npx ts-node -r tsconfig-paths/register apps/api/src/main.ts\" \"ng serve --project=mobile\"",
     "start": "ng serve --project=mobile",
     "build": "ng build --project=mobile",
     "watch": "ng build --project=mobile --watch --configuration development",
