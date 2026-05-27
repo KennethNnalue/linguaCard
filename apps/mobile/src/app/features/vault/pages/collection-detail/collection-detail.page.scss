@@ -151,7 +151,9 @@
   cursor: pointer;
   transition: opacity 0.15s, transform 0.15s;
 
-  ion-icon { font-size: 16px; }
+  ion-icon {
+    font-size: 16px;
+  }
 
   &:disabled {
     opacity: 0.45;
@@ -184,7 +186,9 @@
   overflow-x: auto;
   scrollbar-width: none;
 
-  &::-webkit-scrollbar { display: none; }
+  &::-webkit-scrollbar {
+    display: none;
+  }
 }
 
 // ─── WORD LIST ────────────────────────────────────────────────────────────────
@@ -201,11 +205,3 @@
   cursor: default;
 }
 
-// ─── FAB ─────────────────────────────────────────────────────────────────────
-
-.cd-fab {
-  position: fixed;
-  bottom: 90px;
-  right: 20px;
-  z-index: 100;
-}

@@ -2,9 +2,9 @@ import { computed, inject, Injectable, signal } from '@angular/core';
 import { Preferences } from '@capacitor/preferences';
 import { Network } from '@capacitor/network';
 import { firstValueFrom } from 'rxjs';
-import { SyncStatus } from '../models/mock-data';
-import { Card } from '../models/mock-data';
+import { SyncStatus, Card, Collection, CreateCollectionDto, UpdateCollectionDto } from '../models/mock-data';
 import { CardApiService } from './card-api.service';
+import { CollectionApiService } from './collection-api.service';
 import { LocalDataService } from './local-data.service';
 import { AuthService } from './auth.service';
 
@@ -31,6 +31,7 @@ const MAX_RETRIES = 5;
 @Injectable({ providedIn: 'root' })
 export class SyncService {
   private readonly cardApi = inject(CardApiService);
+  private readonly collectionApi = inject(CollectionApiService);
   private readonly localData = inject(LocalDataService);
   private readonly authService = inject(AuthService);
 
@@ -151,7 +152,16 @@ export class SyncService {
       case 'DELETE_CARD':
         await firstValueFrom(this.cardApi.remove(op.payload as string));
         break;
-      default:
+      case 'CREATE_COLLECTION':
+        await firstValueFrom(this.collectionApi.create(op.payload as CreateCollectionDto));
+        break;
+      case 'UPDATE_COLLECTION': {
+        const { id, dto } = op.payload as { id: string; dto: UpdateCollectionDto };
+        await firstValueFrom(this.collectionApi.update(id, dto));
+        break;
+      }
+      case 'DELETE_COLLECTION':
+        await firstValueFrom(this.collectionApi.remove(op.payload as string));
         break;
     }
   }

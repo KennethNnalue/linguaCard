@@ -1,6 +1,6 @@
-import { SlicePipe } from '@angular/common';
-import { Component, computed, inject, signal } from '@angular/core';
-import { Router } from '@angular/router';
+import {SlicePipe} from '@angular/common';
+import {Component, computed, inject, signal} from '@angular/core';
+import {Router} from '@angular/router';
 import {
   IonContent,
   IonHeader,
@@ -14,16 +14,16 @@ import {
   IonToolbar,
   ModalController,
 } from '@ionic/angular/standalone';
-import { addIcons } from 'ionicons';
-import { addOutline, cloudUploadOutline, funnelOutline } from 'ionicons/icons';
-import { Card, Collection } from '../../../../core/models/mock-data';
-import { CardStore } from '../../../../core/store/card.store';
-import { CategoryStore } from '../../../../core/store/category.store';
-import { getCategoryName } from '../../../../shared/helpers/helpers';
-import { ArticleBadgeComponent } from '../../../../shared/components/article-badge/article-badge.component';
-import { MasteryDotComponent } from '../../../../shared/components/mastery-dot/mastery-dot.component';
-import { AddWordSheetComponent } from '../../components/add-word-sheet/add-word-sheet.component';
-import { CollectionStore } from '../../store/collection.store';
+import {addIcons} from 'ionicons';
+import {addOutline, cloudUploadOutline, funnelOutline} from 'ionicons/icons';
+import {Card, Collection} from '../../../../core/models/mock-data';
+import {CardStore} from '../../../../core/store/card.store';
+import {CategoryStore} from '../../../../core/store/category.store';
+import {getCategoryName} from '../../../../shared/helpers/helpers';
+import {ArticleBadgeComponent} from '../../../../shared/components/article-badge/article-badge.component';
+import {MasteryDotComponent} from '../../../../shared/components/mastery-dot/mastery-dot.component';
+import {AddWordSheetComponent} from '../../components/add-word-sheet/add-word-sheet.component';
+import {CollectionStore} from '../../store/collection.store';
 
 @Component({
   selector: 'app-vault',
@@ -53,7 +53,7 @@ export class VaultPage {
   private readonly router = inject(Router);
 
   constructor() {
-    addIcons({ addOutline, cloudUploadOutline, funnelOutline });
+    addIcons({addOutline, cloudUploadOutline, funnelOutline});
   }
 
   readonly activeTab = signal<'words' | 'collections'>('words');
@@ -88,13 +88,16 @@ export class VaultPage {
   async openAddWord(): Promise<void> {
     const modal = await this.modalCtrl.create({
       component: AddWordSheetComponent,
-      breakpoints: [0, 0.85, 1],
-      initialBreakpoint: 0.85,
+      breakpoints: [0, 0.95, 1],
+      initialBreakpoint: 0.95,
       handleBehavior: 'cycle',
     });
     await modal.present();
-    const { data } = await modal.onWillDismiss();
-    if (data?.created) this.cardStore.loadCards();
+    const {data} = await modal.onWillDismiss();
+    if (data?.created) {
+      this.cardStore.loadCards();
+      this.collectionStore.loadCollections();
+    }
   }
 
   handleRefresh(event: any): void {

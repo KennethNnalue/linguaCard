@@ -1,5 +1,5 @@
-import { Component, computed, inject, signal } from '@angular/core';
-import { RouterLink } from '@angular/router';
+import {Component, computed, inject, signal} from '@angular/core';
+import {RouterLink} from '@angular/router';
 import {
   ActionSheetController,
   IonContent,
@@ -10,18 +10,18 @@ import {
   IonToolbar,
   ModalController,
 } from '@ionic/angular/standalone';
-import { addIcons } from 'ionicons';
-import { addOutline, chevronDownOutline, playOutline, volumeHighOutline } from 'ionicons/icons';
-import { AuthService } from '../../../../core/services/auth.service';
-import { CardStore } from '../../../../core/store/card.store';
-import { CategoryStore } from '../../../../core/store/category.store';
-import { CollectionStore } from '../../../vault/store/collection.store';
-import { getCategoryName } from '../../../../shared/helpers/helpers';
-import { ArticleBadgeComponent } from '../../../../shared/components/article-badge/article-badge.component';
-import { MasteryDotComponent } from '../../../../shared/components/mastery-dot/mastery-dot.component';
-import { UserMenuComponent } from '../../../../shared/components/user-menu/user-menu.component';
-import { AddWordSheetComponent } from '../../../vault/components/add-word-sheet/add-word-sheet.component';
-import { ResetDataSheetComponent } from '../../../auth/components/reset-data-sheet/reset-data-sheet.component';
+import {addIcons} from 'ionicons';
+import {addOutline, chevronDownOutline, playOutline, volumeHighOutline} from 'ionicons/icons';
+import {AuthService} from '../../../../core/services/auth.service';
+import {CardStore} from '../../../../core/store/card.store';
+import {CategoryStore} from '../../../../core/store/category.store';
+import {CollectionStore} from '../../../vault/store/collection.store';
+import {getCategoryName} from '../../../../shared/helpers/helpers';
+import {ArticleBadgeComponent} from '../../../../shared/components/article-badge/article-badge.component';
+import {MasteryDotComponent} from '../../../../shared/components/mastery-dot/mastery-dot.component';
+import {UserMenuComponent} from '../../../../shared/components/user-menu/user-menu.component';
+import {AddWordSheetComponent} from '../../../vault/components/add-word-sheet/add-word-sheet.component';
+import {ResetDataSheetComponent} from '../../../auth/components/reset-data-sheet/reset-data-sheet.component';
 
 @Component({
   selector: 'app-home',
@@ -49,7 +49,7 @@ export class HomePage {
   private readonly authService = inject(AuthService);
 
   constructor() {
-    addIcons({ addOutline, playOutline, volumeHighOutline, chevronDownOutline });
+    addIcons({addOutline, playOutline, volumeHighOutline, chevronDownOutline});
   }
 
   readonly user = this.authService.currentUser;
@@ -99,12 +99,12 @@ export class HomePage {
   async openAddWord(): Promise<void> {
     const modal = await this.modalCtrl.create({
       component: AddWordSheetComponent,
-      breakpoints: [0, 0.85, 1],
-      initialBreakpoint: 0.85,
+      breakpoints: [0, 0.95, 1],
+      initialBreakpoint: 0.95,
       handleBehavior: 'cycle',
     });
     await modal.present();
-    const { data } = await modal.onWillDismiss();
+    const {data} = await modal.onWillDismiss();
     if (data?.created) this.cardStore.loadCards();
   }
 
@@ -125,13 +125,17 @@ export class HomePage {
       buttons: [
         {
           text: 'All collections',
-          handler: () => { this.selectedCollectionId.set(null); },
+          handler: () => {
+            this.selectedCollectionId.set(null);
+          },
         },
         ...collections.map(col => ({
           text: `${col.emoji} ${col.name}`,
-          handler: () => { this.selectedCollectionId.set(col.id); },
+          handler: () => {
+            this.selectedCollectionId.set(col.id);
+          },
         })),
-        { text: 'Cancel', role: 'cancel' },
+        {text: 'Cancel', role: 'cancel'},
       ],
     });
     await actionSheet.present();

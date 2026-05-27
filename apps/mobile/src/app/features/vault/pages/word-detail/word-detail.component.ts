@@ -1,16 +1,9 @@
-import { Component, computed, inject } from '@angular/core';
-import { ActivatedRoute, Router } from '@angular/router';
-import { toSignal } from '@angular/core/rxjs-interop';
-import { map } from 'rxjs/operators';
-import {
-  AlertController,
-  IonContent,
-  IonHeader,
-  IonIcon,
-  IonToolbar,
-  ModalController,
-} from '@ionic/angular/standalone';
-import { addIcons } from 'ionicons';
+import {Component, computed, inject} from '@angular/core';
+import {ActivatedRoute, Router} from '@angular/router';
+import {toSignal} from '@angular/core/rxjs-interop';
+import {map} from 'rxjs/operators';
+import {AlertController, IonContent, IonHeader, IonIcon, IonToolbar, ModalController,} from '@ionic/angular/standalone';
+import {addIcons} from 'ionicons';
 import {
   chevronBackOutline,
   createOutline,
@@ -18,13 +11,13 @@ import {
   trashOutline,
   volumeHighOutline,
 } from 'ionicons/icons';
-import { CardStore } from '../../../../core/store/card.store';
-import { CategoryStore } from '../../../../core/store/category.store';
-import { CardApiService } from '../../../../core/services/card-api.service';
-import { AudioService } from '../../../../core/services/audio.service';
-import { ArticleBadgeComponent } from '../../../../shared/components/article-badge/article-badge.component';
-import { AddWordSheetComponent } from '../../components/add-word-sheet/add-word-sheet.component';
-import { getCategoryName } from '../../../../shared/helpers/helpers';
+import {CardStore} from '../../../../core/store/card.store';
+import {CategoryStore} from '../../../../core/store/category.store';
+import {CardApiService} from '../../../../core/services/card-api.service';
+import {AudioService} from '../../../../core/services/audio.service';
+import {ArticleBadgeComponent} from '../../../../shared/components/article-badge/article-badge.component';
+import {AddWordSheetComponent} from '../../components/add-word-sheet/add-word-sheet.component';
+import {getCategoryName} from '../../../../shared/helpers/helpers';
 
 @Component({
   selector: 'app-word-detail',
@@ -55,7 +48,7 @@ export class WordDetailComponent {
 
   private readonly cardId = toSignal(
     this.route.params.pipe(map((p) => p['id'] as string)),
-    { initialValue: '' },
+    {initialValue: ''},
   );
 
   readonly card = computed(
@@ -77,7 +70,7 @@ export class WordDetailComponent {
   readonly masteryLabel = computed(() => {
     const state = this.card()?.srsState?.state;
     if (!state || state === 'new') return 'New';
-    return { learning: 'Learning', review: 'Review', mastered: 'Mastered' }[state] ?? 'New';
+    return {learning: 'Learning', review: 'Review', mastered: 'Mastered'}[state] ?? 'New';
   });
 
   readonly nextReviewText = computed(() => {
@@ -112,18 +105,21 @@ export class WordDetailComponent {
   playPronunciation(): void {
     const word = this.card()?.content.back;
     if (!word) return;
-    this.audioService.speak(word, 'de-DE', 0.85).subscribe({ error: () => {} });
+    this.audioService.speak(word, 'de-DE', 0.85).subscribe({
+      error: () => {
+      }
+    });
   }
 
   async openEdit(): Promise<void> {
     const modal = await this.modalCtrl.create({
       component: AddWordSheetComponent,
-      breakpoints: [0, 0.85, 1],
-      initialBreakpoint: 0.85,
+      breakpoints: [0, 0.95, 1],
+      initialBreakpoint: 0.95,
       handleBehavior: 'cycle',
     });
     await modal.present();
-    const { data } = await modal.onWillDismiss();
+    const {data} = await modal.onWillDismiss();
     if (data?.created) this.cardStore.loadCards();
   }
 
@@ -133,8 +129,8 @@ export class WordDetailComponent {
       header: 'Delete word',
       message: `Remove "${wordBack}" from your vault? This cannot be undone.`,
       buttons: [
-        { text: 'Cancel', role: 'cancel' },
-        { text: 'Delete', role: 'destructive', handler: () => this.deleteCard() },
+        {text: 'Cancel', role: 'cancel'},
+        {text: 'Delete', role: 'destructive', handler: () => this.deleteCard()},
       ],
     });
     await alert.present();

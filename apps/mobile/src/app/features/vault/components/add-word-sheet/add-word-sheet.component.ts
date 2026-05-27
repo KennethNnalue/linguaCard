@@ -18,6 +18,7 @@ import {
 } from 'ionicons/icons';
 import { ArticleType, CardContent, ExampleSentence } from '../../../../core/models/mock-data';
 import { AudioService } from '../../../../core/services/audio.service';
+import { AuthService } from '../../../../core/services/auth.service';
 import { CardStore } from '../../../../core/store/card.store';
 import { CategoryStore } from '../../../../core/store/category.store';
 import { CollectionStore } from '../../store/collection.store';
@@ -34,6 +35,7 @@ export class AddWordSheetComponent implements OnInit {
   private readonly categoryStore = inject(CategoryStore);
   private readonly collectionStore = inject(CollectionStore);
   private readonly audioService = inject(AudioService);
+  private readonly authService = inject(AuthService);
   private readonly cardStore = inject(CardStore);
   private readonly modalCtrl = inject(ModalController);
   private readonly router = inject(Router);
@@ -140,7 +142,7 @@ export class AddWordSheetComponent implements OnInit {
     const categoryIds = v.categoryId ? [v.categoryId] : [];
     const now = new Date().toISOString();
 
-    const userId = 'user-001'; // replaced by AuthService.currentUser().id in LC-021
+    const userId = this.authService.currentUser()?.id ?? '';
     this.cardStore.createCard({
       deckId: 'deck-001',
       collectionId: v.collectionId ?? null,

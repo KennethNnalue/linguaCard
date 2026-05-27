@@ -105,11 +105,6 @@ export const CardStore = signalStore(
     }
 
     return {
-      /** Seed the store instantly from local storage before API responds. */
-      hydrate(cards: Card[]): void {
-        patchState(store, { cards });
-      },
-
       /** Offline-first: show cached data immediately, then refresh from API. */
       loadCards(): void {
         void (async () => {

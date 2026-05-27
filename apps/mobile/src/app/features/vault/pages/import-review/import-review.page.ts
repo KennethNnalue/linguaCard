@@ -16,6 +16,7 @@ import {
 } from 'ionicons/icons';
 import { CardContent, ExampleSentence, GenderType, ParsedImportRow } from '../../../../core/models/mock-data';
 import { CardApiService } from '../../../../core/services/card-api.service';
+import { AuthService } from '../../../../core/services/auth.service';
 import { CardStore } from '../../../../core/store/card.store';
 import { CollectionStore } from '../../store/collection.store';
 import { ImportStateService } from '../../services/import-state.service';
@@ -33,6 +34,7 @@ import { catchError, map } from 'rxjs/operators';
 export class ImportReviewPage implements OnInit {
   private readonly importState = inject(ImportStateService);
   private readonly cardApi = inject(CardApiService);
+  private readonly authService = inject(AuthService);
   private readonly collectionStore = inject(CollectionStore);
   private readonly cardStore = inject(CardStore);
   private readonly router = inject(Router);
@@ -82,13 +84,14 @@ export class ImportReviewPage implements OnInit {
 
     this.importing.set(true);
     const collectionId = this.selectedCollectionId();
+    const userId = this.authService.currentUser()?.id ?? '';
     const now = new Date().toISOString();
 
     const requests = rows.map(row =>
       this.cardApi.create({
         deckId: 'deck-001',
         collectionId,
-        userId: 'user-001',
+        userId,
         contextId: 'german-vocab',
         content: this.rowToContent(row),
         categoryIds: row.categoryId ? [row.categoryId] : [],
@@ -99,7 +102,7 @@ export class ImportReviewPage implements OnInit {
         srsState: {
           id: crypto.randomUUID(),
           cardId: '',
-          userId: 'user-001',
+          userId,
           algorithm: 'sm2',
           intervalDays: 1,
           easeFactor: 2.5,
@@ -120,6 +123,7 @@ export class ImportReviewPage implements OnInit {
         this.importing.set(false);
         this.importState.clear();
         this.cardStore.loadCards();
+        this.collectionStore.loadCollections();
         const toast = await this.toastCtrl.create({
           message: `✓ ${created} words added to your Vault`,
           duration: 3000,

@@ -1,36 +1,24 @@
-import { Component, computed, inject, OnInit, signal } from '@angular/core';
-import { ActivatedRoute, Router } from '@angular/router';
-import {
-  AlertController,
-  IonContent,
-  IonHeader,
-  IonIcon,
-  IonToolbar,
-  ModalController,
-} from '@ionic/angular/standalone';
-import { addIcons } from 'ionicons';
-import {
-  addOutline,
-  chevronBackOutline,
-  ellipsisHorizontalOutline,
-  playOutline,
-  volumeHighOutline,
-} from 'ionicons/icons';
-import { Card, Collection } from '../../../../core/models/mock-data';
-import { CollectionApiService } from '../../../../core/services/collection-api.service';
-import { CategoryStore } from '../../../../core/store/category.store';
-import { CollectionStore } from '../../store/collection.store';
-import { ArticleBadgeComponent } from '../../../../shared/components/article-badge/article-badge.component';
-import { MasteryDotComponent } from '../../../../shared/components/mastery-dot/mastery-dot.component';
-import { AddWordSheetComponent } from '../../components/add-word-sheet/add-word-sheet.component';
-import { getCategoryName } from '../../../../shared/helpers/helpers';
+import {Component, computed, inject, OnInit, signal} from '@angular/core';
+import {ActivatedRoute, Router} from '@angular/router';
+import {AlertController, IonContent, IonHeader, IonIcon, IonToolbar, ModalController,} from '@ionic/angular/standalone';
+import {addIcons} from 'ionicons';
+import {chevronBackOutline, ellipsisHorizontalOutline, playOutline, volumeHighOutline,} from 'ionicons/icons';
+import {Card, Collection} from '../../../../core/models/mock-data';
+import {CollectionApiService} from '../../../../core/services/collection-api.service';
+import {CategoryStore} from '../../../../core/store/category.store';
+import {CollectionStore} from '../../store/collection.store';
+import {ArticleBadgeComponent} from '../../../../shared/components/article-badge/article-badge.component';
+import {MasteryDotComponent} from '../../../../shared/components/mastery-dot/mastery-dot.component';
+import {AddWordSheetComponent} from '../../components/add-word-sheet/add-word-sheet.component';
+import {getCategoryName} from '../../../../shared/helpers/helpers';
+import {FabButtonComponent} from "../../../../shared/components/fab-button/fab-button.component";
 
 @Component({
   selector: 'app-collection-detail',
   standalone: true,
   templateUrl: './collection-detail.page.html',
   styleUrls: ['./collection-detail.page.scss'],
-  imports: [IonHeader, IonToolbar, IonContent, IonIcon, ArticleBadgeComponent, MasteryDotComponent],
+  imports: [IonHeader, IonToolbar, IonContent, IonIcon, ArticleBadgeComponent, MasteryDotComponent, FabButtonComponent],
 })
 export class CollectionDetailPage implements OnInit {
   private readonly route = inject(ActivatedRoute);
@@ -83,7 +71,6 @@ export class CollectionDetailPage implements OnInit {
   constructor() {
     addIcons({
       chevronBackOutline,
-      addOutline,
       playOutline,
       volumeHighOutline,
       ellipsisHorizontalOutline,
@@ -112,15 +99,15 @@ export class CollectionDetailPage implements OnInit {
   startReview(): void {
     const col = this.collection();
     if (!col) return;
-    const params: Record<string, string> = { collectionId: col.id };
+    const params: Record<string, string> = {collectionId: col.id};
     if (this.dueCount() === 0) params['mode'] = 'all';
-    this.router.navigate(['/review'], { queryParams: params });
+    this.router.navigate(['/review'], {queryParams: params});
   }
 
   startListen(): void {
     const col = this.collection();
     if (!col) return;
-    this.router.navigate(['/listen'], { queryParams: { collectionId: col.id } });
+    this.router.navigate(['/listen'], {queryParams: {collectionId: col.id}});
   }
 
   async openAddWord(): Promise<void> {
@@ -128,13 +115,13 @@ export class CollectionDetailPage implements OnInit {
     if (!col) return;
     const modal = await this.modalCtrl.create({
       component: AddWordSheetComponent,
-      breakpoints: [0, 0.85, 1],
-      initialBreakpoint: 0.85,
+      breakpoints: [0, 0.95, 1],
+      initialBreakpoint: 0.95,
       handleBehavior: 'cycle',
-      componentProps: { lockedCollectionId: col.id },
+      componentProps: {lockedCollectionId: col.id},
     });
     await modal.present();
-    const { data } = await modal.onWillDismiss();
+    const {data} = await modal.onWillDismiss();
     if (data?.created) {
       const id = this.route.snapshot.paramMap.get('id')!;
       this.collectionApi.getCards(id).subscribe(cards => this.allCards.set(cards));
@@ -158,7 +145,7 @@ export class CollectionDetailPage implements OnInit {
           role: 'destructive',
           handler: () => this.confirmDelete(),
         },
-        { text: 'Cancel', role: 'cancel' },
+        {text: 'Cancel', role: 'cancel'},
       ],
     });
     await alert.present();
@@ -176,7 +163,7 @@ export class CollectionDetailPage implements OnInit {
           role: 'destructive',
           handler: () => this.clearAllWords(),
         },
-        { text: 'Cancel', role: 'cancel' },
+        {text: 'Cancel', role: 'cancel'},
       ],
     });
     await alert.present();
@@ -202,11 +189,11 @@ export class CollectionDetailPage implements OnInit {
           text: 'Delete',
           role: 'destructive',
           handler: () => {
-            this.collectionStore.deleteCollection(col.id);
+            this.collectionStore.deleteCollection(col.id).subscribe();
             this.router.navigate(['/vault/collections']);
           },
         },
-        { text: 'Cancel', role: 'cancel' },
+        {text: 'Cancel', role: 'cancel'},
       ],
     });
     await alert.present();

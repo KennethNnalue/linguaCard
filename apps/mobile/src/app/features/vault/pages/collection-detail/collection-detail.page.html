@@ -99,7 +99,8 @@
           <app-article-badge [article]="card.content.article"></app-article-badge>
           <div style="flex:1;min-width:0;">
             <p class="lc-word-front">{{ card.content.front }}</p>
-            <p class="lc-word-back">{{ card.content.article ? card.content.article + ' ' : '' }}{{ card.content.back }}</p>
+            <p
+              class="lc-word-back">{{ card.content.article ? card.content.article + ' ' : '' }}{{ card.content.back }}</p>
           </div>
           <span class="lc-word-tag">{{ getCategoryName(card.categoryIds[0], categories()) }}</span>
         </div>
@@ -117,7 +118,4 @@
 
 </ion-content>
 
-<!-- Add word FAB -->
-<button class="cd-fab lc-fab" (click)="openAddWord()" aria-label="Add word">
-  <ion-icon name="add-outline"></ion-icon>
-</button>
+<app-fab-button (clickButton)="openAddWord()"/>

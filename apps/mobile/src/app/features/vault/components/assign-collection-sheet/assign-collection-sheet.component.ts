@@ -10,7 +10,6 @@ import {
 import { addIcons } from 'ionicons';
 import { addOutline, checkmarkOutline, closeOutline } from 'ionicons/icons';
 import { CreateCollectionDto } from '../../../../core/models/mock-data';
-import { CollectionApiService } from '../../../../core/services/collection-api.service';
 import { CollectionStore } from '../../store/collection.store';
 
 @Component({
@@ -24,7 +23,6 @@ export class AssignCollectionSheetComponent implements OnInit {
   @Input() selectedCollectionId: string | null = null;
   @Input() required = false;
 
-  private readonly collectionApi = inject(CollectionApiService);
   private readonly collectionStore = inject(CollectionStore);
   private readonly modalCtrl = inject(ModalController);
 
@@ -63,9 +61,8 @@ export class AssignCollectionSheetComponent implements OnInit {
       contextId: 'german-vocab',
       emoji: '📚',
     };
-    this.collectionApi.create(dto).subscribe({
+    this.collectionStore.createCollection(dto).subscribe({
       next: col => {
-        this.collectionStore.loadCollections();
         this.creating.set(false);
         this.showCreateForm.set(false);
         this.newNameCtrl.reset();
