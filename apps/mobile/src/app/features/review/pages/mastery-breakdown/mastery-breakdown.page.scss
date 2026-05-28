@@ -1,0 +1,153 @@
+.mb-nav {
+  display: flex;
+  align-items: center;
+  padding: 6px 16px 10px;
+  gap: 12px;
+}
+
+.mb-nav-title {
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--lc-text-primary);
+  flex: 1;
+  text-align: center;
+}
+
+.mb-nav-spacer {
+  width: 32px;
+}
+
+.mb-content {
+  padding: 0 0 env(safe-area-inset-bottom, 24px);
+}
+
+.mb-source-wrap {
+  padding: 0 14px 16px;
+}
+
+.mb-source-btn {
+  width: 100%;
+  background: var(--lc-card);
+  border: 1.5px solid var(--lc-border);
+  border-radius: 12px;
+  padding: 11px 14px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  cursor: pointer;
+  font-family: var(--lc-font-body);
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--lc-text-primary);
+
+  ion-icon {
+    font-size: 14px;
+    color: var(--lc-text-hint);
+  }
+}
+
+// ── Bars ──────────────────────────────────────────────────────────
+.mb-bars {
+  padding: 0 16px;
+}
+
+.mb-bars-label {
+  font-size: 9px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--lc-text-hint);
+  margin: 0 0 12px;
+}
+
+.mb-bar-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 5px 0;
+  cursor: pointer;
+}
+
+.mb-bar-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.mb-bar-lbl {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--lc-text-primary);
+  min-width: 56px;
+}
+
+.mb-bar-track {
+  flex: 1;
+  height: 10px;
+  background: rgba(45, 90, 78, 0.06);
+  border-radius: 5px;
+  overflow: hidden;
+}
+
+.mb-bar-fill {
+  height: 100%;
+  border-radius: 5px;
+  transition: width 600ms ease;
+  min-width: 2px;
+}
+
+.mb-bar-count {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--lc-text-secondary);
+  min-width: 30px;
+  text-align: right;
+}
+
+.mb-play-btn {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background: var(--lc-brand-light);
+  border: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  cursor: pointer;
+  color: var(--lc-brand);
+  font-size: 10px;
+
+  &:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+  }
+}
+
+// ── Tip ───────────────────────────────────────────────────────────
+.mb-tip {
+  margin: 16px 14px 0;
+  background: var(--lc-brand-light);
+  border-radius: 12px;
+  padding: 12px 14px;
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+}
+
+.mb-tip-icon {
+  font-size: 14px;
+  flex-shrink: 0;
+}
+
+.mb-tip-text {
+  font-size: 11px;
+  color: var(--lc-brand);
+  line-height: 1.5;
+  margin: 0;
+
+  strong {
+    font-weight: 600;
+  }
+}

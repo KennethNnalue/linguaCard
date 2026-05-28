@@ -20,12 +20,17 @@ export class ReviewStore {
 
   private readonly _activeSession = signal<ReviewSession | null>(null);
   private readonly _completedSession = signal<ReviewSession | null>(null);
+  private readonly _sessionHistory = signal<ReviewSession[]>([]);
+  private readonly _pendingQueue = signal<Card[]>([]);
 
   readonly activeSession = this._activeSession.asReadonly();
   readonly completedSession = this._completedSession.asReadonly();
+  readonly sessionHistory = this._sessionHistory.asReadonly();
+  readonly pendingQueue = this._pendingQueue.asReadonly();
 
   startSession(cards: Card[], collectionId: string | null, collectionName: string | null): void {
     this._completedSession.set(null);
+    this._pendingQueue.set(cards);
     this._activeSession.set({
       id: crypto.randomUUID(),
       startedAt: new Date().toISOString(),
@@ -65,12 +70,15 @@ export class ReviewStore {
   completeSession(finalQueue: Card[]): void {
     const active = this._activeSession();
     if (!active) return;
-    this._completedSession.set({
+    const completed: ReviewSession = {
       ...active,
       completedAt: new Date().toISOString(),
       reviewedCards: finalQueue,
-    });
+    };
+    this._completedSession.set(completed);
     this._activeSession.set(null);
+    this._pendingQueue.set([]);
+    this._sessionHistory.update(history => [completed, ...history]);
   }
 
   clearSession(): void {

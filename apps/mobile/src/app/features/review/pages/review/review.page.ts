@@ -88,6 +88,13 @@ export class ReviewPage implements OnInit {
   });
 
   ngOnInit(): void {
+    // If a session was pre-started (from Review Hub, Custom Study, etc.), use pending queue.
+    const pendingQueue = this.reviewStore.pendingQueue();
+    if (pendingQueue.length > 0) {
+      this.queue.set(pendingQueue);
+      return;
+    }
+
     const collectionId = this.route.snapshot.queryParamMap.get('collectionId');
     const mode = this.route.snapshot.queryParamMap.get('mode');
     const cardIdsParam = this.route.snapshot.queryParamMap.get('cardIds');

@@ -1,7 +1,7 @@
 <ion-header class="ion-no-border">
   <ion-toolbar>
     <div class="ss-nav">
-      <button class="ss-back-btn" (click)="goToVault()" aria-label="Back to vault">
+      <button class="ss-back-btn" (click)="goToHub()" aria-label="Back to vault">
         <ion-icon name="arrow-back-outline"></ion-icon>
       </button>
     </div>
@@ -93,7 +93,7 @@
           Review again ({{ hardCards().length }} {{ hardCards().length === 1 ? 'card' : 'cards' }})
         </button>
       }
-      <button class="lc-btn-primary ss-btn-vault" (click)="goToVault()">
+      <button class="lc-btn-primary ss-btn-vault" (click)="goToHub()">
         Back to vault
       </button>
     </div>

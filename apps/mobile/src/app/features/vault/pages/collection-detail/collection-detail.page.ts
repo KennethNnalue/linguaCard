@@ -12,6 +12,8 @@ import {MasteryDotComponent} from '../../../../shared/components/mastery-dot/mas
 import {AddWordSheetComponent} from '../../components/add-word-sheet/add-word-sheet.component';
 import {getCategoryName} from '../../../../shared/helpers/helpers';
 import {FabButtonComponent} from "../../../../shared/components/fab-button/fab-button.component";
+import {ReviewFilterService} from '../../../review/services/review-filter.service';
+import {ReviewStore} from '../../../review/store/review.store';
 
 @Component({
   selector: 'app-collection-detail',
@@ -28,6 +30,8 @@ export class CollectionDetailPage implements OnInit {
   private readonly categoryStore = inject(CategoryStore);
   private readonly modalCtrl = inject(ModalController);
   private readonly alertCtrl = inject(AlertController);
+  private readonly filterService = inject(ReviewFilterService);
+  private readonly reviewStore = inject(ReviewStore);
 
   readonly collection = signal<Collection | null>(null);
   readonly allCards = signal<Card[]>([]);
@@ -99,9 +103,17 @@ export class CollectionDetailPage implements OnInit {
   startReview(): void {
     const col = this.collection();
     if (!col) return;
-    const params: Record<string, string> = {collectionId: col.id};
-    if (this.dueCount() === 0) params['mode'] = 'all';
-    this.router.navigate(['/review'], {queryParams: params});
+    const useDue = this.dueCount() > 0;
+    const queue = this.filterService.buildQueue({
+      source: col.id,
+      masteryLevels: [0, 1, 2, 3, 4, 5],
+      sortOrder: useDue ? 'due_date' : 'hardest',
+      limit: 50,
+    });
+    if (!queue.length) return;
+    const collectionName = `${col.emoji ?? ''} ${col.name}`.trim();
+    this.reviewStore.startSession(queue, col.id, collectionName);
+    this.router.navigate(['/review/player']);
   }
 
   startListen(): void {

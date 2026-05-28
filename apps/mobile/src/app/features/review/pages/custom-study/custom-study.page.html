@@ -1,0 +1,95 @@
+<ion-header class="ion-no-border">
+  <ion-toolbar>
+    <div class="cs-nav">
+      <button class="lc-back-btn" (click)="goBack()" aria-label="Back">
+        <ion-icon name="chevron-back-outline"></ion-icon>
+      </button>
+      <span class="cs-nav-title lc-display">Custom Study</span>
+      <div class="cs-nav-spacer"></div>
+    </div>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+  <div class="cs-content">
+
+    <!-- ── Source ── -->
+    <div class="cs-section">
+      <p class="cs-sec-lbl">Source</p>
+      <button class="cs-source-btn" (click)="openSourcePicker()">
+        <span>{{ sourceLabel() }}</span>
+        <ion-icon name="chevron-down-outline" class="cs-chevron"></ion-icon>
+      </button>
+    </div>
+
+    <!-- ── Mastery filter ── -->
+    <div class="cs-section">
+      <p class="cs-sec-lbl">Filter by mastery level</p>
+      <div class="cs-mastery-grid">
+        @for (info of masteryInfo; track info.level) {
+          <button
+            class="cs-mastery-opt"
+            [class.selected]="isMasterySelected(info.level)"
+            (click)="toggleMastery(info.level)">
+            <div class="cs-mastery-dot" [style.background]="info.colour"></div>
+            <span class="cs-mastery-num lc-display">{{ masteryCountMap()[info.level] ?? 0 }}</span>
+            <span class="cs-mastery-lbl">{{ info.label }}</span>
+          </button>
+        }
+      </div>
+    </div>
+
+    <!-- ── Sort order ── -->
+    <div class="cs-section">
+      <p class="cs-sec-lbl">Sort order</p>
+      <div class="cs-sort-chips">
+        @for (opt of sortOptions; track opt.value) {
+          <button
+            class="cs-sort-chip"
+            [class.active]="sortOrder() === opt.value"
+            (click)="setSortOrder(opt.value)">
+            {{ opt.label }}
+          </button>
+        }
+      </div>
+    </div>
+
+    <!-- ── Card limit ── -->
+    <div class="cs-section">
+      <p class="cs-sec-lbl">Card limit</p>
+      <div class="cs-slider-row">
+        <ion-range
+          class="cs-range"
+          [min]="10"
+          [max]="100"
+          [step]="5"
+          [value]="limit()"
+          (ionChange)="onLimitChange($event)"
+          color="primary">
+        </ion-range>
+        <span class="cs-slider-val lc-display">{{ limit() }}</span>
+      </div>
+    </div>
+
+    <!-- ── Preview count ── -->
+    <div class="cs-preview">
+      <span class="cs-preview-txt">Cards matching your filters</span>
+      <span class="cs-preview-count lc-display">{{ matchingCount() }}</span>
+    </div>
+
+    <!-- ── Start button ── -->
+    <div class="cs-start-wrap">
+      <button
+        class="cs-start-btn"
+        [disabled]="!masteryLevels().length || sessionCount() === 0"
+        (click)="startSession()">
+        @if (sessionCount() > 0) {
+          Start session ({{ sessionCount() }} cards)
+        } @else {
+          No cards match your filters
+        }
+      </button>
+    </div>
+
+  </div>
+</ion-content>

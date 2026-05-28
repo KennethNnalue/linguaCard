@@ -1,0 +1,57 @@
+<ion-header class="ion-no-border">
+  <ion-toolbar>
+    <div class="mb-nav">
+      <button class="lc-back-btn" (click)="goBack()" aria-label="Back">
+        <ion-icon name="chevron-back-outline"></ion-icon>
+      </button>
+      <span class="mb-nav-title lc-display">Mastery Breakdown</span>
+      <div class="mb-nav-spacer"></div>
+    </div>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+  <div class="mb-content">
+
+    <!-- Source selector -->
+    <div class="mb-source-wrap">
+      <button class="mb-source-btn" (click)="openSourcePicker()">
+        <span>{{ sourceLabel() }}</span>
+        <ion-icon name="chevron-down-outline"></ion-icon>
+      </button>
+    </div>
+
+    <!-- Bars -->
+    <div class="mb-bars">
+      <p class="mb-bars-label">Cards by mastery level</p>
+
+      @for (row of masteryRows; track row.level) {
+        <div class="mb-bar-row" (click)="reviewLevel(row.level)">
+          <div class="mb-bar-dot" [style.background]="row.colour"></div>
+          <span class="mb-bar-lbl">{{ row.label }}</span>
+          <div class="mb-bar-track">
+            <div
+              class="mb-bar-fill"
+              [style.width.%]="barWidth(row.level)"
+              [style.background]="row.colour">
+            </div>
+          </div>
+          <span class="mb-bar-count">{{ count(row.level) }}</span>
+          <button class="mb-play-btn" (click)="$event.stopPropagation(); reviewLevel(row.level)"
+                  [disabled]="count(row.level) === 0" aria-label="Review this level">
+            <ion-icon name="play-outline"></ion-icon>
+          </button>
+        </div>
+      }
+    </div>
+
+    <!-- Tip -->
+    <div class="mb-tip">
+      <span class="mb-tip-icon">💡</span>
+      <p class="mb-tip-text">
+        Tap the <strong>▶ play button</strong> next to any level to start a review session with just those cards.
+      </p>
+    </div>
+
+  </div>
+</ion-content>

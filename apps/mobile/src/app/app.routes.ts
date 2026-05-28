@@ -56,6 +56,11 @@ export const routes: Routes = [
       {
         path: 'review',
         loadComponent: () =>
+          import('./features/review/pages/review-hub/review-hub.page').then(m => m.ReviewHubPage),
+      },
+      {
+        path: 'review/player',
+        loadComponent: () =>
           import('./features/review/pages/review/review.page').then(m => m.ReviewPage),
       },
       {
@@ -63,6 +68,26 @@ export const routes: Routes = [
         loadComponent: () =>
           import('./features/review/pages/session-summary/session-summary.page')
             .then(m => m.SessionSummaryPage),
+      },
+      {
+        path: 'review/custom',
+        loadComponent: () =>
+          import('./features/review/pages/custom-study/custom-study.page').then(m => m.CustomStudyPage),
+      },
+      {
+        path: 'review/mastery',
+        loadComponent: () =>
+          import('./features/review/pages/mastery-breakdown/mastery-breakdown.page').then(m => m.MasteryBreakdownPage),
+      },
+      {
+        path: 'review/history',
+        loadComponent: () =>
+          import('./features/review/pages/session-history/session-history.page').then(m => m.SessionHistoryPage),
+      },
+      {
+        path: 'review/struggling',
+        loadComponent: () =>
+          import('./features/review/pages/struggling-cards/struggling-cards.page').then(m => m.StrugglingCardsPage),
       },
       {
         path: 'listen',

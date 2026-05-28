@@ -1,0 +1,156 @@
+<ion-header class="ion-no-border">
+  <ion-toolbar>
+    <div class="rh-nav">
+      <span class="rh-nav-title lc-display">Review</span>
+      <button class="rh-info-btn" (click)="goToMastery()" aria-label="Mastery breakdown">
+        <ion-icon name="information-circle-outline"></ion-icon>
+      </button>
+    </div>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+  <div class="rh-content">
+
+    <!-- ── Due today hero ── -->
+    <div class="rh-due-hero">
+      <div class="rh-due-top">
+
+        <!-- Donut chart -->
+        <div class="rh-donut">
+          <svg viewBox="0 0 64 64" width="64" height="64">
+            <circle cx="32" cy="32" r="26" fill="none" stroke="rgba(255,255,255,0.12)" stroke-width="6"/>
+            @if (dueTodayCount() === 0) {
+              <circle cx="32" cy="32" r="26" fill="none" stroke="rgba(255,255,255,0.2)" stroke-width="6"/>
+            }
+            @for (seg of donutSegments(); track seg.colour + seg.offset) {
+              <circle
+                cx="32" cy="32" r="26"
+                fill="none"
+                [attr.stroke]="seg.colour"
+                stroke-width="6"
+                [attr.stroke-dasharray]="seg.dash + ' ' + seg.gap"
+                [attr.stroke-dashoffset]="seg.offset"
+                transform="rotate(-90 32 32)"/>
+            }
+          </svg>
+          <div class="rh-donut-center">
+            <span class="rh-donut-num lc-display">{{ dueTodayCount() }}</span>
+            <span class="rh-donut-lbl">due</span>
+          </div>
+        </div>
+
+        <!-- Breakdown text -->
+        <div class="rh-due-info">
+          <p class="rh-due-heading">Cards due today</p>
+          <div class="rh-due-tags">
+            @for (tag of breakdownTags(); track tag.label) {
+              <span class="rh-due-tag">
+                <span class="rh-due-dot" [style.background]="tag.colour"></span>
+                {{ tag.count }} {{ tag.label }}
+              </span>
+            }
+            @if (breakdownTags().length === 0) {
+              <span class="rh-due-tag">All caught up! 🎉</span>
+            }
+          </div>
+        </div>
+      </div>
+
+      <button
+        class="rh-start-btn"
+        [disabled]="dueTodayCount() === 0"
+        (click)="startTodaysReview()">
+        <ion-icon name="play-outline"></ion-icon>
+        {{ dueTodayCount() > 0 ? "Start today's review" : 'Nothing due right now' }}
+      </button>
+    </div>
+
+    <!-- ── Quick study presets ── -->
+    <div class="rh-section-header">
+      <span class="rh-section-title">Quick study</span>
+    </div>
+
+    <div class="rh-presets">
+
+      <!-- Struggling cards -->
+      <div class="rh-preset-card" (click)="goToStruggling()">
+        <div class="rh-preset-icon rh-preset-icon--red">
+          <ion-icon name="alert-circle-outline"></ion-icon>
+        </div>
+        <div class="rh-preset-info">
+          <p class="rh-preset-title">Struggling cards</p>
+          <p class="rh-preset-sub">Cards you've failed 3+ times</p>
+        </div>
+        @if (strugglingCount() > 0) {
+          <span class="rh-preset-count lc-display">{{ strugglingCount() }}</span>
+        } @else {
+          <ion-icon name="chevron-forward-outline" class="rh-chevron"></ion-icon>
+        }
+      </div>
+
+      <!-- New cards only -->
+      <div class="rh-preset-card" (click)="startNewOnly()">
+        <div class="rh-preset-icon rh-preset-icon--accent">
+          <ion-icon name="add-circle-outline"></ion-icon>
+        </div>
+        <div class="rh-preset-info">
+          <p class="rh-preset-title">New cards only</p>
+          <p class="rh-preset-sub">Never-reviewed vocabulary</p>
+        </div>
+        @if (newCount() > 0) {
+          <span class="rh-preset-count lc-display">{{ newCount() }}</span>
+        } @else {
+          <ion-icon name="chevron-forward-outline" class="rh-chevron"></ion-icon>
+        }
+      </div>
+
+      <!-- Custom study -->
+      <div class="rh-preset-card" (click)="goToCustom()">
+        <div class="rh-preset-icon rh-preset-icon--brand">
+          <ion-icon name="play-outline"></ion-icon>
+        </div>
+        <div class="rh-preset-info">
+          <p class="rh-preset-title">Custom study</p>
+          <p class="rh-preset-sub">Build a filtered session</p>
+        </div>
+        <ion-icon name="chevron-forward-outline" class="rh-chevron"></ion-icon>
+      </div>
+
+    </div>
+
+    <!-- ── Recent sessions ── -->
+    <div class="rh-section-header">
+      <span class="rh-section-title">Recent sessions</span>
+      @if (recentSessions().length > 0) {
+        <button class="rh-see-all" (click)="goToHistory()">See all →</button>
+      }
+    </div>
+
+    @if (recentSessions().length > 0) {
+      @for (session of recentSessions(); track session.id) {
+        <div class="rh-session-item">
+          <div class="rh-session-dot" [style.background]="sessionDotColour(session)"></div>
+          <div class="rh-session-info">
+            <p class="rh-session-title">{{ session.collectionName ?? 'All due cards' }}</p>
+            <p class="rh-session-meta">
+              {{ sessionDateLabel(session) }}
+              · {{ session.totalCards }} cards
+              · {{ sessionDuration(session) }}
+            </p>
+          </div>
+          <span class="rh-session-rating lc-display" [style.color]="sessionRatingColour(session)">
+            {{ sessionAvgRating(session) }}
+          </span>
+        </div>
+      }
+    } @else {
+      <div class="rh-empty-sessions">
+        <p class="rh-empty-text">No review sessions yet.</p>
+        <p class="rh-empty-sub">Complete your first review to see history here.</p>
+      </div>
+    }
+
+    <div class="rh-bottom-spacer"></div>
+  </div>
+</ion-content>

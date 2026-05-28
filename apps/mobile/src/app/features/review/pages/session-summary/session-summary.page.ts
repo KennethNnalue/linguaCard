@@ -34,7 +34,7 @@ export class SessionSummaryPage implements OnInit {
 
   ngOnInit(): void {
     if (!this.session()) {
-      void this.navCtrl.navigateBack('/home');
+      void this.navCtrl.navigateBack('/review');
     }
   }
 
@@ -102,20 +102,12 @@ export class SessionSummaryPage implements OnInit {
   reviewHardCards(): void {
     const cards = this.hardCards();
     if (!cards.length) return;
-    const s = this.session();
-    const ids = cards.map(c => c.id).join(',');
-    void this.navCtrl.navigateRoot('/review', {
-      queryParams: {
-        mode: 'retry',
-        cardIds: ids,
-        ...(s?.collectionId ? { collectionId: s.collectionId } : {}),
-      },
-      animated: true,
-    });
+    this.reviewStore.startSession(cards, this.session()?.collectionId ?? null, 'Hard cards retry');
+    void this.navCtrl.navigateForward('/review/player', { animated: true });
   }
 
-  goToVault(): void {
+  goToHub(): void {
     this.reviewStore.clearSession();
-    void this.router.navigate(['/vault']);
+    void this.router.navigate(['/review']);
   }
 }

@@ -1,0 +1,76 @@
+<ion-header class="ion-no-border">
+  <ion-toolbar>
+    <div class="sc-nav">
+      <button class="lc-back-btn" (click)="goBack()" aria-label="Back">
+        <ion-icon name="chevron-back-outline"></ion-icon>
+      </button>
+      <span class="sc-nav-title lc-display">Struggling Cards</span>
+      <div class="sc-nav-spacer"></div>
+    </div>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+  <div class="sc-content">
+
+    @if (strugglingCards().length > 0) {
+
+      <!-- Warning banner -->
+      <div class="sc-banner">
+        <span class="sc-banner-icon">⚠️</span>
+        <div>
+          <p class="sc-banner-title">{{ strugglingCards().length }} cards need extra attention</p>
+          <p class="sc-banner-sub">These cards keep getting failed. Focus on them to break through.</p>
+        </div>
+      </div>
+
+      <!-- Card list -->
+      <div class="sc-list">
+        @for (card of strugglingCards(); track card.id) {
+          <div
+            class="sc-card"
+            [style.background]="articleBg(card)"
+            [style.border-color]="articleBorder(card)"
+            (click)="openWordDetail(card)">
+            <div class="sc-card-top">
+              <div class="sc-card-left">
+                @if (card.content.article) {
+                  <app-article-badge [article]="card.content.article"></app-article-badge>
+                }
+                <span class="sc-word">{{ card.content.back }}</span>
+              </div>
+              <span class="sc-fail-badge" [class]="failBadgeClass(card)">
+                {{ failCount(card) }} {{ failCount(card) === 1 ? 'fail' : 'fails' }}
+              </span>
+            </div>
+            <p class="sc-translation">{{ card.content.front }}</p>
+            <div class="sc-meta">
+              <span>Last reviewed: {{ lastReviewedLabel(card) }}</span>
+              <span>·</span>
+              <span>Mastery: {{ card.srsState?.masteryLevel ?? 0 }}</span>
+            </div>
+          </div>
+        }
+      </div>
+
+      <!-- Review button -->
+      <div class="sc-review-wrap">
+        <button class="sc-review-btn" (click)="startReview()">
+          Review all {{ strugglingCards().length }} struggling cards
+        </button>
+      </div>
+
+    } @else {
+
+      <!-- Empty state -->
+      <div class="sc-empty">
+        <p class="sc-empty-icon">🎉</p>
+        <p class="sc-empty-title">No struggling cards!</p>
+        <p class="sc-empty-sub">You're doing great. Keep it up!</p>
+      </div>
+
+    }
+
+    <div class="sc-bottom-spacer"></div>
+  </div>
+</ion-content>

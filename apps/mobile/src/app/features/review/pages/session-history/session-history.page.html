@@ -1,0 +1,66 @@
+<ion-header class="ion-no-border">
+  <ion-toolbar>
+    <div class="sh-nav">
+      <button class="lc-back-btn" (click)="goBack()" aria-label="Back">
+        <ion-icon name="chevron-back-outline"></ion-icon>
+      </button>
+      <span class="sh-nav-title lc-display">Session History</span>
+      <div class="sh-nav-spacer"></div>
+    </div>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+  <div class="sh-content">
+
+    <!-- Filter chips -->
+    <div class="sh-filters">
+      <button class="sh-filter-chip" [class.active]="filter() === 'all'" (click)="setFilter('all')">All sessions</button>
+      <button class="sh-filter-chip" [class.active]="filter() === 'week'" (click)="setFilter('week')">This week</button>
+      <button class="sh-filter-chip" [class.active]="filter() === 'month'" (click)="setFilter('month')">This month</button>
+    </div>
+
+    @if (filteredSessions().length > 0) {
+      @for (session of filteredSessions(); track session.id) {
+        @let stats = computeStats(session);
+        <div class="sh-session-card">
+          <div class="sh-session-top">
+            <div class="sh-session-info">
+              <p class="sh-session-title">{{ session.collectionName ?? 'All due cards' }}</p>
+              <p class="sh-session-date">{{ dateLabel(session) }}</p>
+            </div>
+            <span class="sh-rating-pill" [class]="ratingPillClass(stats.avgRating)">
+              {{ stats.avgRating }} avg
+            </span>
+          </div>
+          <div class="sh-stats-row">
+            <div class="sh-stat">
+              <span class="sh-stat-val lc-display">{{ stats.totalCards }}</span>
+              <span class="sh-stat-lbl">Cards</span>
+            </div>
+            <div class="sh-stat">
+              <span class="sh-stat-val lc-display">{{ stats.duration }}</span>
+              <span class="sh-stat-lbl">Duration</span>
+            </div>
+            <div class="sh-stat">
+              <span class="sh-stat-val lc-display">{{ stats.struggled }}</span>
+              <span class="sh-stat-lbl">Struggled</span>
+            </div>
+            <div class="sh-stat">
+              <span class="sh-stat-val lc-display">{{ stats.nailed }}</span>
+              <span class="sh-stat-lbl">Nailed</span>
+            </div>
+          </div>
+        </div>
+      }
+    } @else {
+      <div class="sh-empty">
+        <p class="sh-empty-icon">📋</p>
+        <p class="sh-empty-title">No review sessions yet.</p>
+        <p class="sh-empty-sub">Start your first review to see history here!</p>
+      </div>
+    }
+
+    <div class="sh-bottom-spacer"></div>
+  </div>
+</ion-content>
