@@ -6,7 +6,6 @@ import { NavController } from '@ionic/angular';
 import { IonContent, IonHeader, IonIcon, IonToolbar } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
 import {
-  checkmarkCircleOutline,
   chevronBackOutline,
   chevronDownOutline,
   chevronForwardOutline,
@@ -17,6 +16,7 @@ import { Card, ConfidenceRating } from '../../../../core/models/mock-data';
 import { AudioService } from '../../../../core/services/audio.service';
 import { CardStore } from '../../../../core/store/card.store';
 import { CategoryStore } from '../../../../core/store/category.store';
+import { CollectionStore } from '../../../vault/store/collection.store';
 import { ReviewStore } from '../../store/review.store';
 
 const RATINGS: { value: ConfidenceRating; label: string }[] = [
@@ -39,6 +39,7 @@ export class ReviewPage implements OnInit {
   private readonly reviewStore = inject(ReviewStore);
   private readonly audioService = inject(AudioService);
   private readonly categoryStore = inject(CategoryStore);
+  private readonly collectionStore = inject(CollectionStore);
   private readonly navCtrl = inject(NavController);
   private readonly injector = inject(Injector);
   private readonly route = inject(ActivatedRoute);
@@ -50,7 +51,6 @@ export class ReviewPage implements OnInit {
       chevronForwardOutline,
       flagOutline,
       volumeHighOutline,
-      checkmarkCircleOutline,
     });
   }
 
@@ -58,23 +58,12 @@ export class ReviewPage implements OnInit {
   readonly queue = signal<Card[]>([]);
   readonly currentIndex = signal(0);
   readonly isFlipped = signal(false);
-  readonly sessionComplete = signal(false);
 
   readonly currentCard = computed<Card>(() => this.queue()[this.currentIndex()]);
 
   readonly progressPercent = computed(() =>
-    this.queue().length ? (this.currentIndex() / this.queue().length) * 100 : 0,
+    this.queue().length ? ((this.currentIndex() + 1) / this.queue().length) * 100 : 0,
   );
-
-  readonly sessionStats = computed(() => {
-    const session = this.reviewStore.activeSession();
-    const ratingsArray = Object.values(session?.ratings ?? {}) as ConfidenceRating[];
-    return {
-      reviewed: ratingsArray.length,
-      newLearned: this.queue().filter(c => c.srsState?.state === 'new').length,
-      mastered: ratingsArray.filter(r => r >= 4).length,
-    };
-  });
 
   readonly activeCategoryNames = computed(() => {
     const queue = this.queue();
@@ -101,20 +90,31 @@ export class ReviewPage implements OnInit {
   ngOnInit(): void {
     const collectionId = this.route.snapshot.queryParamMap.get('collectionId');
     const mode = this.route.snapshot.queryParamMap.get('mode');
+    const cardIdsParam = this.route.snapshot.queryParamMap.get('cardIds');
+
     toObservable(this.cardStore.isLoading, { injector: this.injector })
       .pipe(filter(loading => !loading), take(1))
       .subscribe(() => {
         let cards: Card[];
-        if (mode === 'all') {
+
+        if (mode === 'retry' && cardIdsParam) {
+          const ids = new Set(cardIdsParam.split(','));
+          cards = this.cardStore.cards().filter(c => ids.has(c.id));
+        } else if (mode === 'all') {
           cards = this.cardStore.cards();
           if (collectionId) cards = cards.filter(c => c.collectionId === collectionId);
         } else {
           cards = this.cardStore.dueCards();
           if (collectionId) cards = cards.filter(c => c.collectionId === collectionId);
         }
+
         this.queue.set(cards);
         if (cards.length) {
-          this.reviewStore.startSession(cards);
+          const col = collectionId
+            ? this.collectionStore.collections().find(c => c.id === collectionId) ?? null
+            : null;
+          const collectionName = col ? `${col.emoji ?? ''} ${col.name}`.trim() : null;
+          this.reviewStore.startSession(cards, collectionId, collectionName);
         }
       });
   }
@@ -126,21 +126,42 @@ export class ReviewPage implements OnInit {
   submitRating(rating: ConfidenceRating): void {
     const card = this.currentCard();
     if (!card) return;
+
+    const isLast = this.currentIndex() + 1 >= this.queue().length;
+
     this.reviewStore.rateCard(card, rating).subscribe({
       next: updated => {
+        // Fix Bug 2: update CardStore so word-detail shows fresh lastReviewedAt
+        this.cardStore.updateCard(updated);
+
         const idx = this.queue().findIndex(c => c.id === updated.id);
         if (idx >= 0) {
           const next = [...this.queue()];
           next[idx] = updated;
           this.queue.set(next);
         }
+
+        // Fix Bug 4: complete session only after HTTP response (queue has updated srsState)
+        if (isLast) {
+          this.reviewStore.completeSession(this.queue());
+          this.navCtrl.navigateForward('/review/summary', { animated: true });
+        }
       },
     });
-    this.advance();
+
+    // Advance index immediately for responsive UX (don't wait for network)
+    this.isFlipped.set(false);
+    if (!isLast) {
+      this.currentIndex.set(this.currentIndex() + 1);
+    }
   }
 
   skipCard(): void {
-    this.advance();
+    this.isFlipped.set(false);
+    const next = this.currentIndex() + 1;
+    if (next < this.queue().length) {
+      this.currentIndex.set(next);
+    }
   }
 
   playAudio(event: Event): void {
@@ -162,16 +183,5 @@ export class ReviewPage implements OnInit {
   highlightWord(sentence: string, word: string): string {
     const escaped = word.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
     return sentence.replace(new RegExp(`(${escaped})`, 'gi'), '<strong>$1</strong>');
-  }
-
-  private advance(): void {
-    this.isFlipped.set(false);
-    const next = this.currentIndex() + 1;
-    if (next >= this.queue().length) {
-      this.reviewStore.completeSession();
-      this.sessionComplete.set(true);
-    } else {
-      this.currentIndex.set(next);
-    }
   }
 }

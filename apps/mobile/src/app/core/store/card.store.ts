@@ -186,6 +186,14 @@ export const CardStore = signalStore(
         });
       },
 
+      updateCard(updated: Card): void {
+        patchState(store, {
+          cards: store.cards().map(c => c.id === updated.id ? updated : c),
+        });
+        const userId = uid();
+        if (userId) void localData.setCards(userId, store.cards());
+      },
+
       reset(): void {
         patchState(store, {
           cards: [],

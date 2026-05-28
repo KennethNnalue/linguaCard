@@ -11,6 +11,7 @@ import {
 import { addIcons } from 'ionicons';
 import { addOutline, chevronBackOutline } from 'ionicons/icons';
 import { Collection } from '../../../../core/models/mock-data';
+import { CardStore } from '../../../../core/store/card.store';
 import { CollectionStore } from '../../store/collection.store';
 import { AssignCollectionSheetComponent } from '../../components/assign-collection-sheet/assign-collection-sheet.component';
 
@@ -24,15 +25,28 @@ import { AssignCollectionSheetComponent } from '../../components/assign-collecti
 export class CollectionsPage {
   private readonly router = inject(Router);
   private readonly modalCtrl = inject(ModalController);
+  private readonly cardStore = inject(CardStore);
   readonly store = inject(CollectionStore);
 
   constructor() {
     addIcons({ addOutline, chevronBackOutline });
   }
 
-  readonly collections = this.store.collections;
   readonly totalCards = this.store.totalCards;
-  readonly totalDue = this.store.totalDue;
+
+  // Live due count derived from card SRS data — updates immediately after a review
+  readonly totalDue = computed(() => this.cardStore.dueCards().length);
+
+  readonly collections = computed(() => {
+    const now = new Date();
+    const cards = this.cardStore.cards();
+    return this.store.collections().map(col => ({
+      ...col,
+      dueCount: cards.filter(
+        c => c.collectionId === col.id && c.srsState && new Date(c.srsState.nextDueAt) <= now,
+      ).length,
+    }));
+  });
 
   openDetail(col: Collection): void {
     this.router.navigate(['/vault/collections', col.id]);

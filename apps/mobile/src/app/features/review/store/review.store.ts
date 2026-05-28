@@ -6,8 +6,12 @@ import { CardApiService } from '../../../core/services/card-api.service';
 export interface ReviewSession {
   id: string;
   startedAt: string;
+  completedAt: string;
   totalCards: number;
   ratings: Record<string, ConfidenceRating>;
+  collectionId: string | null;
+  collectionName: string | null;
+  reviewedCards: Card[];
 }
 
 @Injectable({ providedIn: 'root' })
@@ -15,14 +19,22 @@ export class ReviewStore {
   private readonly cardApi = inject(CardApiService);
 
   private readonly _activeSession = signal<ReviewSession | null>(null);
-  readonly activeSession = this._activeSession.asReadonly();
+  private readonly _completedSession = signal<ReviewSession | null>(null);
 
-  startSession(cards: Card[]): void {
+  readonly activeSession = this._activeSession.asReadonly();
+  readonly completedSession = this._completedSession.asReadonly();
+
+  startSession(cards: Card[], collectionId: string | null, collectionName: string | null): void {
+    this._completedSession.set(null);
     this._activeSession.set({
       id: crypto.randomUUID(),
       startedAt: new Date().toISOString(),
+      completedAt: '',
       totalCards: cards.length,
       ratings: {},
+      collectionId,
+      collectionName,
+      reviewedCards: [],
     });
   }
 
@@ -50,8 +62,19 @@ export class ReviewStore {
     return this.cardApi.update(card.id, { srsState: newSrs, updatedAt: new Date().toISOString() });
   }
 
-  completeSession(): void {
+  completeSession(finalQueue: Card[]): void {
+    const active = this._activeSession();
+    if (!active) return;
+    this._completedSession.set({
+      ...active,
+      completedAt: new Date().toISOString(),
+      reviewedCards: finalQueue,
+    });
     this._activeSession.set(null);
+  }
+
+  clearSession(): void {
+    this._completedSession.set(null);
   }
 
   private computeSm2(state: SRSStateData, rating: ConfidenceRating): SRSStateData {

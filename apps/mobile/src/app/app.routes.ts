@@ -59,6 +59,12 @@ export const routes: Routes = [
           import('./features/review/pages/review/review.page').then(m => m.ReviewPage),
       },
       {
+        path: 'review/summary',
+        loadComponent: () =>
+          import('./features/review/pages/session-summary/session-summary.page')
+            .then(m => m.SessionSummaryPage),
+      },
+      {
         path: 'listen',
         loadComponent: () =>
           import('./features/listen/pages/listen/listen.component').then(m => m.ListenComponent),

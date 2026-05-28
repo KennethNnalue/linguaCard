@@ -1,0 +1,273 @@
+// ── Nav ────────────────────────────────────────────────────────────────────────
+
+.ss-nav {
+  display: flex;
+  align-items: center;
+  padding: 0 8px;
+  height: 48px;
+}
+
+.ss-back-btn {
+  width: 36px;
+  height: 36px;
+  border-radius: var(--lc-radius-full);
+  border: none;
+  background: var(--lc-brand-light);
+  color: var(--lc-brand);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 18px;
+  cursor: pointer;
+}
+
+// ── Hero ───────────────────────────────────────────────────────────────────────
+
+.ss-hero {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 24px 20px 16px;
+  text-align: center;
+}
+
+.ss-hero-icon {
+  width: 72px;
+  height: 72px;
+  border-radius: 50%;
+  background: var(--lc-brand-light);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 16px;
+
+  ion-icon {
+    font-size: 40px;
+    color: var(--lc-brand);
+  }
+}
+
+.ss-title {
+  font-size: 24px;
+  font-weight: 600;
+  color: var(--lc-text-primary);
+  margin: 0 0 6px;
+}
+
+.ss-collection-name {
+  font-size: 13px;
+  color: var(--lc-brand-mid);
+  font-weight: 600;
+  margin: 0 0 4px;
+}
+
+.ss-subtitle {
+  font-size: 13px;
+  color: var(--lc-text-hint);
+  margin: 0;
+}
+
+// ── Stats row ──────────────────────────────────────────────────────────────────
+
+.ss-stats {
+  display: flex;
+  margin: 0 16px 20px;
+  border-radius: var(--lc-radius-lg);
+  overflow: hidden;
+}
+
+.ss-stat {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  padding: 18px 10px;
+
+  &.ss-stat--border {
+    border-left: 1px solid var(--lc-border);
+  }
+}
+
+.ss-stat-val {
+  font-size: 24px;
+  font-weight: 600;
+  color: var(--lc-text-primary);
+  line-height: 1;
+}
+
+.ss-stat-lbl {
+  font-size: 10px;
+  color: var(--lc-text-hint);
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+// ── Sections ───────────────────────────────────────────────────────────────────
+
+.ss-section {
+  padding: 0 16px 20px;
+}
+
+.ss-section-label {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--lc-text-hint);
+  text-transform: uppercase;
+  letter-spacing: 0.07em;
+  margin: 0 0 12px;
+}
+
+// ── Rating bars ────────────────────────────────────────────────────────────────
+
+.ss-bars {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.ss-bar-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.ss-bar-name {
+  font-size: 11px;
+  color: var(--lc-text-secondary);
+  width: 38px;
+  flex-shrink: 0;
+}
+
+.ss-bar-track {
+  flex: 1;
+  height: 8px;
+  background: var(--lc-border);
+  border-radius: var(--lc-radius-full);
+  overflow: hidden;
+}
+
+.ss-bar-fill {
+  height: 100%;
+  border-radius: var(--lc-radius-full);
+  transition: width 0.5s ease;
+  min-width: 2px;
+
+  &--0 { background: var(--lc-mastery-0); }
+  &--1 { background: var(--lc-mastery-1); }
+  &--2 { background: var(--lc-mastery-2); }
+  &--3 { background: var(--lc-mastery-3); }
+  &--4 { background: var(--lc-mastery-4); }
+  &--5 { background: var(--lc-mastery-5); }
+}
+
+.ss-bar-count {
+  font-size: 11px;
+  color: var(--lc-text-hint);
+  width: 20px;
+  text-align: right;
+  flex-shrink: 0;
+}
+
+// ── Word list ──────────────────────────────────────────────────────────────────
+
+.ss-word-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.ss-word-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: var(--lc-card);
+  border: 1px solid var(--lc-border);
+  border-radius: var(--lc-radius-md);
+  padding: 10px 12px;
+  box-shadow: var(--lc-shadow-card);
+}
+
+.ss-word-info {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.ss-word-back {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--lc-text-primary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.ss-word-front {
+  font-size: 11px;
+  color: var(--lc-text-secondary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.ss-dots {
+  display: flex;
+  gap: 3px;
+  flex-shrink: 0;
+
+  .lc-mastery-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+  }
+}
+
+.ss-mastery-lbl {
+  font-size: 11px;
+  color: var(--lc-text-hint);
+  min-width: 56px;
+  text-align: right;
+  flex-shrink: 0;
+}
+
+// ── Actions ────────────────────────────────────────────────────────────────────
+
+.ss-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 4px 16px 48px;
+}
+
+.ss-btn-retry {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  width: 100%;
+  padding: 14px;
+  background: var(--lc-accent);
+  color: var(--lc-text-inverse);
+  border: none;
+  border-radius: var(--lc-radius-lg);
+  font-size: 14px;
+  font-weight: 600;
+  font-family: var(--lc-font-body);
+  cursor: pointer;
+  box-shadow: var(--lc-shadow-fab);
+
+  ion-icon { font-size: 18px; }
+
+  &:active { opacity: 0.88; transform: scale(0.98); }
+}
+
+.ss-btn-vault {
+  background: var(--lc-surface);
+  color: var(--lc-brand);
+  border: 1.5px solid var(--lc-border-strong);
+  box-shadow: none;
+}

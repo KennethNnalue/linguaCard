@@ -21,133 +21,106 @@
 </ion-header>
 
 <ion-content>
-  @if (!sessionComplete()) {
-    @if (queue().length) {
-      <div class="rv-session">
+  @if (queue().length) {
+    <div class="rv-session">
 
-        <!-- ── Flashcard ── -->
-        <div class="rv-card-scene">
+      <!-- ── Flashcard ── -->
+      <div class="rv-card-scene">
 
-          @if (!isFlipped()) {
-            <!-- Front face -->
-            <div class="rv-card rv-card--front" (click)="flipCard()">
-              <div class="rv-card-hdr">
-                <span class="rv-side-lbl">Your language</span>
-                <span class="rv-lang-chip">🇬🇧 English</span>
-              </div>
-              <div class="rv-body-front">
-                <p class="rv-front-word lc-display">{{ currentCard().content.front }}</p>
-                @if (currentCard().tags.length) {
-                  <p class="rv-hint">{{ currentCard().tags[0] }}</p>
-                }
-              </div>
-              <button class="rv-tap-pill" tabindex="-1">
-                <ion-icon name="chevron-down-outline"></ion-icon>
-                Tap to reveal German
-              </button>
+        @if (!isFlipped()) {
+          <!-- Front face -->
+          <div class="rv-card rv-card--front" (click)="flipCard()">
+            <div class="rv-card-hdr">
+              <span class="rv-side-lbl">Your language</span>
+              <span class="rv-lang-chip">🇬🇧 English</span>
             </div>
-
-          } @else {
-            <!-- Back face (revealed) -->
-            <div class="rv-card rv-card--back">
-              <div class="rv-card-hdr">
-                <span class="rv-side-lbl">{{ currentCard().content.front }}</span>
-                <span class="rv-lang-chip">🇩🇪 German</span>
-              </div>
-              <div class="rv-body-back">
-                @if (currentCard().content.article) {
-                  <span class="lc-article-badge lc-article-badge--{{ currentCard().content.article }} rv-art-badge">
-                    {{ currentArticleLabel() }}
-                  </span>
-                }
-                <p class="rv-back-word lc-display">{{ currentCard().content.back }}</p>
-                @if (currentCard().content.phonetic) {
-                  <p class="rv-phonetic">{{ currentCard().content.phonetic }}</p>
-                }
-                @for (ex of currentCard().content.examples; track ex.id) {
-                  <div class="rv-ex-block">
-                    <p class="rv-ex-de" [innerHTML]="highlightWord(ex.target, currentCard().content.back)"></p>
-                    <p class="rv-ex-en">"{{ ex.native }}"</p>
-                  </div>
-                }
-                <button class="rv-audio-btn" (click)="playAudio($event)">
-                  <ion-icon name="volume-high-outline"></ion-icon>
-                  Play pronunciation
-                </button>
-                @if (currentCard().content.notes) {
-                  <div class="rv-note-pill">
-                    <span class="rv-note-icon">💡</span>
-                    <p class="rv-note-text">{{ currentCard().content.notes }}</p>
-                  </div>
-                }
-              </div>
+            <div class="rv-body-front">
+              <p class="rv-front-word lc-display">{{ currentCard().content.front }}</p>
+              @if (currentCard().tags.length) {
+                <p class="rv-hint">{{ currentCard().tags[0] }}</p>
+              }
             </div>
-          }
-
-        </div>
-
-        <!-- ── Skip / Flag ── -->
-        <div class="rv-secondary">
-          <button class="rv-sec-btn" (click)="skipCard()">
-            <ion-icon name="chevron-forward-outline"></ion-icon>
-            Skip
-          </button>
-          <button class="rv-sec-btn" (click)="flagCard()">
-            <ion-icon name="flag-outline"></ion-icon>
-            Flag
-          </button>
-        </div>
-
-        <!-- ── Rating row ── -->
-        <div class="rv-rating-area" [class.rv-rating-area--active]="isFlipped()">
-          <p class="rv-rating-prompt">How well did you know this?</p>
-          <div class="rv-rating-row">
-            @for (r of ratings; track r.value) {
-              <button
-                class="rv-rating-btn rv-rating-btn--{{ r.value }}"
-                [disabled]="!isFlipped()"
-                (click)="submitRating(r.value)">
-                <span class="rv-r-num">{{ r.value }}</span>
-                <span class="rv-r-lbl">{{ r.label }}</span>
-              </button>
-            }
+            <button class="rv-tap-pill" tabindex="-1">
+              <ion-icon name="chevron-down-outline"></ion-icon>
+              Tap to reveal German
+            </button>
           </div>
+
+        } @else {
+          <!-- Back face (revealed) -->
+          <div class="rv-card rv-card--back">
+            <div class="rv-card-hdr">
+              <span class="rv-side-lbl">{{ currentCard().content.front }}</span>
+              <span class="rv-lang-chip">🇩🇪 German</span>
+            </div>
+            <div class="rv-body-back">
+              @if (currentCard().content.article) {
+                <span class="lc-article-badge lc-article-badge--{{ currentCard().content.article }} rv-art-badge">
+                  {{ currentArticleLabel() }}
+                </span>
+              }
+              <p class="rv-back-word lc-display">{{ currentCard().content.back }}</p>
+              @if (currentCard().content.phonetic) {
+                <p class="rv-phonetic">{{ currentCard().content.phonetic }}</p>
+              }
+              @for (ex of currentCard().content.examples; track ex.id) {
+                <div class="rv-ex-block">
+                  <p class="rv-ex-de" [innerHTML]="highlightWord(ex.target, currentCard().content.back)"></p>
+                  <p class="rv-ex-en">"{{ ex.native }}"</p>
+                </div>
+              }
+              <button class="rv-audio-btn" (click)="playAudio($event)">
+                <ion-icon name="volume-high-outline"></ion-icon>
+                Play pronunciation
+              </button>
+              @if (currentCard().content.notes) {
+                <div class="rv-note-pill">
+                  <span class="rv-note-icon">💡</span>
+                  <p class="rv-note-text">{{ currentCard().content.notes }}</p>
+                </div>
+              }
+            </div>
+          </div>
+        }
+
+      </div>
+
+      <!-- ── Skip / Flag ── -->
+      <div class="rv-secondary">
+        <button class="rv-sec-btn" (click)="skipCard()">
+          <ion-icon name="chevron-forward-outline"></ion-icon>
+          Skip
+        </button>
+        <button class="rv-sec-btn" (click)="flagCard()">
+          <ion-icon name="flag-outline"></ion-icon>
+          Flag
+        </button>
+      </div>
+
+      <!-- ── Rating row ── -->
+      <div class="rv-rating-area" [class.rv-rating-area--active]="isFlipped()">
+        <p class="rv-rating-prompt">How well did you know this?</p>
+        <div class="rv-rating-row">
+          @for (r of ratings; track r.value) {
+            <button
+              class="rv-rating-btn rv-rating-btn--{{ r.value }}"
+              [disabled]="!isFlipped()"
+              (click)="submitRating(r.value)">
+              <span class="rv-r-num">{{ r.value }}</span>
+              <span class="rv-r-lbl">{{ r.label }}</span>
+            </button>
+          }
         </div>
-
       </div>
 
-    } @else {
-      <!-- Empty queue -->
-      <div class="lc-empty-state">
-        <span class="lc-empty-icon">🎉</span>
-        <p class="lc-empty-title">All caught up!</p>
-        <p class="lc-empty-sub">No cards due for review right now.</p>
-        <button class="lc-btn-primary rv-exit-btn" (click)="exitSession()">Back to Home</button>
-      </div>
-    }
+    </div>
 
   } @else {
-    <!-- ── Session complete ── -->
-    <div class="rv-complete">
-      <div class="rv-complete-badge">
-        <ion-icon name="checkmark-circle-outline"></ion-icon>
-      </div>
-      <h1 class="rv-complete-title lc-display">Session Complete!</h1>
-      <p class="rv-complete-sub">Great job! You reviewed {{ queue().length }} words.</p>
-      <div class="rv-complete-stats">
-        <div class="rv-c-stat">
-          <span class="rv-c-val lc-display">{{ sessionStats().reviewed }}</span>
-          <span class="rv-c-lbl">Reviewed</span>
-        </div>
-        <div class="rv-c-stat">
-          <span class="rv-c-val lc-display">{{ sessionStats().newLearned }}</span>
-          <span class="rv-c-lbl">New Words</span>
-        </div>
-        <div class="rv-c-stat">
-          <span class="rv-c-val lc-display">{{ sessionStats().mastered }}</span>
-          <span class="rv-c-lbl">Mastered</span>
-        </div>
-      </div>
+    <!-- Empty queue -->
+    <div class="lc-empty-state">
+      <span class="lc-empty-icon">🎉</span>
+      <p class="lc-empty-title">All caught up!</p>
+      <p class="lc-empty-sub">No cards due for review right now.</p>
       <button class="lc-btn-primary rv-exit-btn" (click)="exitSession()">Back to Home</button>
     </div>
   }
