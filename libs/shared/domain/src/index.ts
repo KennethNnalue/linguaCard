@@ -281,3 +281,58 @@ export interface BulkCreateResult {
   cards: Card[];
   error?: string;
 }
+
+// ─── STORY STUDIO ─────────────────────────────────────────────────────────────
+
+export interface StorySentence {
+  index: number;
+  german: string;
+  english: string;
+  vocabWordIds: string[];
+}
+
+export interface WordTimestamp {
+  word: string;
+  startMs: number;
+  endMs: number;
+  isVocab: boolean;
+  cardId?: string;
+}
+
+export interface StoryVocabWord {
+  cardId: string;
+  german: string;
+  germanBase: string;
+  english: string;
+  article: 'der' | 'die' | 'das' | null;
+  sentenceIndices: number[];
+}
+
+export type StoryDifficulty = 'A1' | 'A2' | 'B1' | 'B2';
+export type StoryLength = 'short' | 'medium' | 'long';
+
+export interface Story {
+  id: string;
+  userId: string;
+  title: string;
+  titleTranslation: string;
+  bodyDe: string;
+  bodyEn: string;
+  sentences: StorySentence[];
+  wordTimestamps: WordTimestamp[];
+  vocabWords: StoryVocabWord[];
+  audioUrl: string | null;
+  audioDurationMs: number;
+  sourceCollectionIds: string[];
+  difficultyLevel: StoryDifficulty;
+  lengthType: StoryLength;
+  listenCount: number;
+  lastListenedAt: string | null;
+  generatedAt: string;
+}
+
+export interface GenerateStoryDto {
+  collectionIds: string[];
+  length: StoryLength;
+  difficulty: StoryDifficulty;
+}

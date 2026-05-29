@@ -13,9 +13,9 @@ import {
   volumeHighOutline,
 } from 'ionicons/icons';
 import { Card, ConfidenceRating } from '../../../../core/models/mock-data';
-import { AudioService } from '../../../../core/services/audio.service';
-import { CardStore } from '../../../../core/store/card.store';
-import { CategoryStore } from '../../../../core/store/category.store';
+import { AudioService } from '../../../../shared/audio/audio.service';
+import { CardStore } from '../../../vault/store/card.store';
+import { CategoryStore } from '../../../vault/store/category.store';
 import { CollectionStore } from '../../../vault/store/collection.store';
 import { ReviewStore } from '../../store/review.store';
 

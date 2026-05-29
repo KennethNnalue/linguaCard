@@ -17,10 +17,10 @@ import {
   volumeHighOutline,
 } from 'ionicons/icons';
 import { ArticleType, CardContent, ExampleSentence } from '../../../../core/models/mock-data';
-import { AudioService } from '../../../../core/services/audio.service';
+import { AudioService } from '../../../../shared/audio/audio.service';
 import { AuthService } from '../../../../core/services/auth.service';
-import { CardStore } from '../../../../core/store/card.store';
-import { CategoryStore } from '../../../../core/store/category.store';
+import { CardStore } from '../../store/card.store';
+import { CategoryStore } from '../../store/category.store';
 import { CollectionStore } from '../../store/collection.store';
 import { AssignCollectionSheetComponent } from '../assign-collection-sheet/assign-collection-sheet.component';
 

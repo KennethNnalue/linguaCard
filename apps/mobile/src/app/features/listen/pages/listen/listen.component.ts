@@ -16,8 +16,8 @@ import {
   repeatOutline,
 } from 'ionicons/icons';
 import { ConfidenceRating } from '../../../../core/models/mock-data';
-import { CardStore } from '../../../../core/store/card.store';
-import { CategoryStore } from '../../../../core/store/category.store';
+import { CardStore } from '../../../vault/store/card.store';
+import { CategoryStore } from '../../../vault/store/category.store';
 import { ListenStore } from '../../store/listen.store';
 import { ArticleBadgeComponent } from '../../../../shared/components/article-badge/article-badge.component';
 import { PlaylistSourceSheetComponent } from '../../components/playlist-source-sheet/playlist-source-sheet.component';

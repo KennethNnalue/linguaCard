@@ -20,7 +20,7 @@
     "test:watch": "jest --watch",
     "test:coverage": "jest --coverage",
     "lint": "ng lint --project=mobile",
-    "start-db": "npx json-server db.json"
+    "start-db": "npx json-server db.json --middlewares json-server-middleware.js"
   },
   "private": true,
   "dependencies": {

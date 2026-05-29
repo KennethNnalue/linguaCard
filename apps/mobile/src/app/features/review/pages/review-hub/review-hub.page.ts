@@ -9,7 +9,7 @@ import {
   playOutline,
   informationCircleOutline,
 } from 'ionicons/icons';
-import { CardStore } from '../../../../core/store/card.store';
+import { CardStore } from '../../../vault/store/card.store';
 import { CollectionStore } from '../../../vault/store/collection.store';
 import { ReviewStore } from '../../store/review.store';
 import { ReviewFilterService } from '../../services/review-filter.service';

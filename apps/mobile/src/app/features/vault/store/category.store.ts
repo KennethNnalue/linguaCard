@@ -9,7 +9,7 @@ import {
 } from '@ngrx/signals';
 import { rxMethod } from '@ngrx/signals/rxjs-interop';
 import { catchError, EMPTY, pipe, switchMap, tap } from 'rxjs';
-import { Category } from '../models/mock-data';
+import { Category } from '@lingua-card/shared/domain';
 import { CategoryApiService } from '../services/category-api.service';
 
 interface CategoryState {

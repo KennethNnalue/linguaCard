@@ -1,8 +1,8 @@
 import { inject, Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
-import { environment } from '../../../environments/environment';
-import { Category } from '../models/mock-data';
+import { environment } from '../../../../environments/environment';
+import { Category } from '@lingua-card/shared/domain';
 
 @Injectable({ providedIn: 'root' })
 export class CategoryApiService {

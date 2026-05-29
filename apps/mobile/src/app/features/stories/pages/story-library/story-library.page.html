@@ -1,0 +1,91 @@
+<ion-header class="ion-no-border">
+  <ion-toolbar>
+    <div class="p-nav">
+      <span class="p-nav-title">Story Studio</span>
+      <button class="p-fab" (click)="openGenerateSheet()" aria-label="Generate new story">
+        <ion-icon name="add-outline"></ion-icon>
+      </button>
+    </div>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+  <!-- Hero generate CTA -->
+  <div class="ss-hero">
+    <div class="ss-hero-label">AI-powered reading</div>
+    <div class="ss-hero-title">Stories built from<br>your vocabulary</div>
+    <div class="ss-hero-sub">Every story uses your words in natural everyday context</div>
+    <button class="ss-hero-btn" (click)="openGenerateSheet()">
+      <ion-icon name="sparkles-outline"></ion-icon>
+      Generate a new story
+    </button>
+  </div>
+
+  <!-- Stories list -->
+  @if (loading()) {
+    <div class="loading-state">
+      <div class="skeleton-card"></div>
+      <div class="skeleton-card"></div>
+    </div>
+  } @else if (stories().length === 0) {
+    <div class="empty-state">
+      <div class="empty-icon">
+        <ion-icon name="book-outline"></ion-icon>
+      </div>
+      <div class="empty-title">No stories yet</div>
+      <div class="empty-sub">Generate your first story from your vocabulary collections.</div>
+      <button class="empty-cta" (click)="openGenerateSheet()">
+        <ion-icon name="sparkles-outline"></ion-icon>
+        Generate your first story
+      </button>
+    </div>
+  } @else {
+    <div class="section-header">
+      <span class="section-title">Your stories</span>
+      <span class="section-count">{{ stories().length }} saved</span>
+    </div>
+
+    @for (story of stories(); track story.id) {
+      <div class="ss-story-card" (click)="openStory(story)" role="button" [attr.aria-label]="'Open story: ' + story.title">
+        <div class="ss-story-top">
+          <div class="ss-story-title">{{ story.title }}</div>
+          <div class="ss-story-meta">
+            <span>
+              <ion-icon name="time-outline"></ion-icon>
+              {{ readingTime(story) }} read
+            </span>
+            <span>·</span>
+            <span>{{ story.vocabWords.length }} vocab words</span>
+          </div>
+          <!-- Vocab word chips (first 3) -->
+          <div class="ss-word-chips">
+            @for (vw of story.vocabWords.slice(0, 3); track vw.cardId) {
+              <span class="ss-word-chip" [ngClass]="articleClass(vw.article)">
+                {{ vw.german }}
+              </span>
+            }
+            @if (story.vocabWords.length > 3) {
+              <span class="ss-word-chip chip-more">
+                +{{ story.vocabWords.length - 3 }} more
+              </span>
+            }
+          </div>
+        </div>
+
+        <div class="ss-story-footer">
+          <span class="ss-level-pill"
+                [style.background]="levelStyle(story.difficultyLevel).background"
+                [style.color]="levelStyle(story.difficultyLevel).color">
+            {{ story.difficultyLevel }} · {{ story.lengthType | titlecase }}
+          </span>
+          <div class="ss-story-play">
+            <ion-icon name="play-outline"></ion-icon>
+            Listen · Read
+          </div>
+        </div>
+      </div>
+    }
+  }
+
+  <div style="height: 24px;"></div>
+</ion-content>

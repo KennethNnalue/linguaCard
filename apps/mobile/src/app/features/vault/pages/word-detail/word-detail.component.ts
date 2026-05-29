@@ -11,10 +11,10 @@ import {
   trashOutline,
   volumeHighOutline,
 } from 'ionicons/icons';
-import {CardStore} from '../../../../core/store/card.store';
-import {CategoryStore} from '../../../../core/store/category.store';
-import {CardApiService} from '../../../../core/services/card-api.service';
-import {AudioService} from '../../../../core/services/audio.service';
+import { CardStore } from '../../store/card.store';
+import { CategoryStore } from '../../store/category.store';
+import { CardApiService } from '../../services/card-api.service';
+import { AudioService } from '../../../../shared/audio/audio.service';
 import {ArticleBadgeComponent} from '../../../../shared/components/article-badge/article-badge.component';
 import {AddWordSheetComponent} from '../../components/add-word-sheet/add-word-sheet.component';
 import {getCategoryName} from '../../../../shared/helpers/helpers';

@@ -1,0 +1,306 @@
+// ── Nav ──────────────────────────────────────────────────────────
+.p-nav {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 6px 16px 10px;
+}
+
+.p-nav-title {
+  font-family: var(--lc-font-display);
+  font-size: 19px;
+  font-weight: 600;
+  color: var(--lc-text-primary);
+}
+
+.p-fab {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: var(--lc-accent);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  box-shadow: 0 4px 12px rgba(224, 123, 63, 0.4);
+  cursor: pointer;
+  color: white;
+  font-size: 18px;
+}
+
+// ── Hero ─────────────────────────────────────────────────────────
+.ss-hero {
+  margin: 0 14px 14px;
+  background: linear-gradient(135deg, #1a3830 0%, #2d5a4e 60%, #3d7a66 100%);
+  border-radius: 18px;
+  padding: 18px;
+  position: relative;
+  overflow: hidden;
+
+  &::before {
+    content: '📖';
+    position: absolute;
+    right: 14px;
+    top: 12px;
+    font-size: 42px;
+    opacity: 0.15;
+  }
+}
+
+.ss-hero-label {
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.5);
+  margin-bottom: 5px;
+}
+
+.ss-hero-title {
+  font-family: var(--lc-font-display);
+  font-size: 20px;
+  font-weight: 600;
+  color: white;
+  line-height: 1.2;
+  margin-bottom: 4px;
+}
+
+.ss-hero-sub {
+  font-size: 11px;
+  color: rgba(255, 255, 255, 0.55);
+  margin-bottom: 14px;
+  line-height: 1.4;
+}
+
+.ss-hero-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: white;
+  color: var(--lc-brand);
+  font-size: 12px;
+  font-weight: 700;
+  padding: 9px 16px;
+  border-radius: 20px;
+  border: none;
+  cursor: pointer;
+  font-family: var(--lc-font-body);
+
+  ion-icon {
+    font-size: 14px;
+  }
+}
+
+// ── Section header ────────────────────────────────────────────────
+.section-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 2px 16px 8px;
+}
+
+.section-title {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--lc-text-primary);
+}
+
+.section-count {
+  font-size: 10px;
+  color: var(--lc-brand-mid);
+  font-weight: 500;
+}
+
+// ── Story cards ───────────────────────────────────────────────────
+.ss-story-card {
+  margin: 0 14px 10px;
+  background: var(--lc-card);
+  border: 1px solid var(--lc-border);
+  border-radius: 16px;
+  overflow: hidden;
+  box-shadow: var(--lc-shadow-card);
+  cursor: pointer;
+
+  &:active {
+    opacity: 0.85;
+    transform: scale(0.99);
+  }
+}
+
+.ss-story-top {
+  padding: 13px 14px 10px;
+}
+
+.ss-story-title {
+  font-family: var(--lc-font-display);
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--lc-text-primary);
+  margin-bottom: 4px;
+  line-height: 1.3;
+}
+
+.ss-story-meta {
+  font-size: 10px;
+  color: var(--lc-text-hint);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-bottom: 8px;
+
+  span {
+    display: flex;
+    align-items: center;
+    gap: 3px;
+  }
+
+  ion-icon {
+    font-size: 11px;
+  }
+}
+
+.ss-word-chips {
+  display: flex;
+  gap: 5px;
+  flex-wrap: wrap;
+  padding-bottom: 2px;
+}
+
+.ss-word-chip {
+  font-size: 9px;
+  font-weight: 600;
+  padding: 2px 8px;
+  border-radius: 10px;
+  border: 1px solid var(--lc-border);
+  background: var(--lc-surface);
+  color: var(--lc-text-secondary);
+
+  &.art-der {
+    background: var(--lc-masc-bg);
+    color: var(--lc-masc-text);
+    border-color: var(--lc-masc-border);
+  }
+
+  &.art-die {
+    background: var(--lc-fem-bg);
+    color: var(--lc-fem-text);
+    border-color: var(--lc-fem-border);
+  }
+
+  &.art-das {
+    background: var(--lc-neut-bg);
+    color: var(--lc-neut-text);
+    border-color: var(--lc-neut-border);
+  }
+
+  &.chip-more {
+    background: var(--lc-surface);
+    color: var(--lc-text-hint);
+    border-color: var(--lc-border);
+  }
+}
+
+.ss-story-footer {
+  background: var(--lc-surface);
+  padding: 9px 14px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-top: 1px solid var(--lc-border);
+}
+
+.ss-level-pill {
+  font-size: 10px;
+  font-weight: 700;
+  padding: 3px 8px;
+  border-radius: 8px;
+}
+
+.ss-story-play {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--lc-brand);
+
+  ion-icon {
+    font-size: 13px;
+  }
+}
+
+// ── Empty / loading states ────────────────────────────────────────
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 48px 32px 24px;
+  text-align: center;
+}
+
+.empty-icon {
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  background: var(--lc-brand-light);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 16px;
+
+  ion-icon {
+    font-size: 28px;
+    color: var(--lc-brand);
+  }
+}
+
+.empty-title {
+  font-family: var(--lc-font-display);
+  font-size: 18px;
+  font-weight: 600;
+  color: var(--lc-text-primary);
+  margin-bottom: 8px;
+}
+
+.empty-sub {
+  font-size: 13px;
+  color: var(--lc-text-secondary);
+  line-height: 1.6;
+  margin-bottom: 24px;
+}
+
+.empty-cta {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: var(--lc-brand);
+  color: white;
+  font-size: 13px;
+  font-weight: 600;
+  padding: 11px 20px;
+  border-radius: 20px;
+  border: none;
+  cursor: pointer;
+  font-family: var(--lc-font-body);
+
+  ion-icon {
+    font-size: 14px;
+  }
+}
+
+.loading-state {
+  padding: 0 14px;
+}
+
+.skeleton-card {
+  height: 140px;
+  background: var(--lc-border);
+  border-radius: 16px;
+  margin-bottom: 10px;
+  animation: pulse 1.5s ease-in-out infinite;
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.5; }
+}

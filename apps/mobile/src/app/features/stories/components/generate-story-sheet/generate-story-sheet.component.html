@@ -1,0 +1,108 @@
+<ion-header class="ion-no-border">
+  <ion-toolbar>
+    <div class="gs-nav">
+      <div class="gs-nav-title">Generate Story</div>
+      <button class="gs-close-btn" (click)="dismiss()" aria-label="Close">
+        <ion-icon name="close-outline"></ion-icon>
+      </button>
+    </div>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+  <div class="gs-body">
+
+    <!-- Collections picker -->
+    <div class="gs-section">
+      <div class="gs-section-label">
+        Pick collections
+        @if (selectedCount() > 0) {
+          <span class="gs-section-count">{{ selectedCount() }} selected</span>
+        }
+      </div>
+
+      @if (collections().length === 0) {
+        <div class="gs-empty-collections">
+          No collections yet. Add words to a collection first.
+        </div>
+      } @else {
+        <div class="gs-collections-list">
+          @for (col of collections(); track col.id) {
+            <button
+              class="gs-collection-row"
+              [ngClass]="{ selected: isSelected(col.id) }"
+              (click)="toggleCollection(col.id)"
+            >
+              <span class="gs-col-emoji">{{ col.emoji }}</span>
+              <div class="gs-col-info">
+                <span class="gs-col-name">{{ col.name }}</span>
+                <span class="gs-col-count">{{ col.cardCount }} words</span>
+              </div>
+              <div class="gs-col-check" [ngClass]="{ visible: isSelected(col.id) }">
+                <ion-icon name="checkmark-outline"></ion-icon>
+              </div>
+            </button>
+          }
+        </div>
+      }
+    </div>
+
+    <!-- Length -->
+    <div class="gs-section">
+      <div class="gs-section-label">Story length</div>
+      <div class="gs-chips">
+        @for (opt of lengths; track opt.value) {
+          <button
+            class="gs-chip"
+            [ngClass]="{ active: selectedLength() === opt.value }"
+            (click)="selectedLength.set(opt.value)"
+          >
+            {{ opt.label }}
+          </button>
+        }
+      </div>
+    </div>
+
+    <!-- Difficulty -->
+    <div class="gs-section">
+      <div class="gs-section-label">Difficulty level</div>
+      <div class="gs-chips">
+        @for (opt of difficulties; track opt.value) {
+          <button
+            class="gs-chip gs-chip-level"
+            [ngClass]="{ active: selectedDifficulty() === opt.value }"
+            [attr.data-level]="opt.value.toLowerCase()"
+            (click)="selectedDifficulty.set(opt.value)"
+          >
+            {{ opt.label }}
+          </button>
+        }
+      </div>
+    </div>
+
+    <!-- Error -->
+    @if (generateError()) {
+      <div class="gs-error">{{ generateError() }}</div>
+    }
+
+  </div>
+
+  <!-- Generate button -->
+  <div class="gs-footer">
+    <button
+      class="gs-generate-btn"
+      [ngClass]="{ disabled: !canGenerate() }"
+      [disabled]="!canGenerate()"
+      (click)="generate()"
+    >
+      @if (isGenerating()) {
+        <ion-spinner name="crescent"></ion-spinner>
+        Generating your story…
+      } @else {
+        <ion-icon name="sparkles-outline"></ion-icon>
+        Generate Story
+      }
+    </button>
+  </div>
+
+</ion-content>

@@ -2,9 +2,9 @@ import { computed, inject, Injectable, signal } from '@angular/core';
 import { Preferences } from '@capacitor/preferences';
 import { Network } from '@capacitor/network';
 import { firstValueFrom } from 'rxjs';
-import { SyncStatus, Card, Collection, CreateCollectionDto, UpdateCollectionDto } from '../models/mock-data';
-import { CardApiService } from './card-api.service';
-import { CollectionApiService } from './collection-api.service';
+import { SyncStatus, Card, CreateCollectionDto, UpdateCollectionDto } from '@lingua-card/shared/domain';
+import { CardApiService } from '../../features/vault/services/card-api.service';
+import { CollectionApiService } from '../../features/vault/services/collection-api.service';
 import { LocalDataService } from './local-data.service';
 import { AuthService } from './auth.service';
 

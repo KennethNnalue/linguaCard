@@ -17,8 +17,8 @@ import {
 import {addIcons} from 'ionicons';
 import {addOutline, cloudUploadOutline, funnelOutline} from 'ionicons/icons';
 import {Card, Collection} from '../../../../core/models/mock-data';
-import {CardStore} from '../../../../core/store/card.store';
-import {CategoryStore} from '../../../../core/store/category.store';
+import { CardStore } from '../../store/card.store';
+import { CategoryStore } from '../../store/category.store';
 import {getCategoryName} from '../../../../shared/helpers/helpers';
 import {ArticleBadgeComponent} from '../../../../shared/components/article-badge/article-badge.component';
 import {MasteryDotComponent} from '../../../../shared/components/mastery-dot/mastery-dot.component';

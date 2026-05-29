@@ -4,8 +4,8 @@ import {AlertController, IonContent, IonHeader, IonIcon, IonToolbar, ModalContro
 import {addIcons} from 'ionicons';
 import {chevronBackOutline, ellipsisHorizontalOutline, playOutline, volumeHighOutline,} from 'ionicons/icons';
 import {Card, Collection} from '../../../../core/models/mock-data';
-import {CollectionApiService} from '../../../../core/services/collection-api.service';
-import {CategoryStore} from '../../../../core/store/category.store';
+import { CollectionApiService } from '../../services/collection-api.service';
+import { CategoryStore } from '../../store/category.store';
 import {CollectionStore} from '../../store/collection.store';
 import {ArticleBadgeComponent} from '../../../../shared/components/article-badge/article-badge.component';
 import {MasteryDotComponent} from '../../../../shared/components/mastery-dot/mastery-dot.component';

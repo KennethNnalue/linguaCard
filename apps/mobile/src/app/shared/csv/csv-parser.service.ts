@@ -4,12 +4,12 @@ import {
   Category,
   ParsedImportResult,
   ParsedImportRow,
-} from '../models/mock-data';
+} from '@lingua-card/shared/domain';
 
 const VALID_ARTICLES = new Set(['der', 'die', 'das']);
 
 @Injectable({ providedIn: 'root' })
-export class CsvImportService {
+export class CsvParserService {
   parse(csvText: string, fileName: string, categories: Category[]): ParsedImportResult {
     const lines = csvText.replace(/\r\n/g, '\n').replace(/\r/g, '\n').split('\n');
     if (lines.length < 2) {

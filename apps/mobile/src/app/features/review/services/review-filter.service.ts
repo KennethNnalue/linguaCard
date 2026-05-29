@@ -1,6 +1,6 @@
 import { inject, Injectable } from '@angular/core';
 import { Card, MasteryLevel } from '../../../core/models/mock-data';
-import { CardStore } from '../../../core/store/card.store';
+import { CardStore } from '../../vault/store/card.store';
 
 export interface ReviewFilters {
   source: 'all' | string;

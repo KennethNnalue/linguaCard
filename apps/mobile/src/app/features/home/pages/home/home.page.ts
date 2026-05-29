@@ -13,8 +13,8 @@ import {
 import {addIcons} from 'ionicons';
 import {addOutline, chevronDownOutline, playOutline, volumeHighOutline} from 'ionicons/icons';
 import {AuthService} from '../../../../core/services/auth.service';
-import {CardStore} from '../../../../core/store/card.store';
-import {CategoryStore} from '../../../../core/store/category.store';
+import { CardStore } from '../../../vault/store/card.store';
+import { CategoryStore } from '../../../vault/store/category.store';
 import {CollectionStore} from '../../../vault/store/collection.store';
 import {getCategoryName} from '../../../../shared/helpers/helpers';
 import {ArticleBadgeComponent} from '../../../../shared/components/article-badge/article-badge.component';

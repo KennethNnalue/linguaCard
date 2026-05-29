@@ -1,0 +1,232 @@
+// ── Nav ───────────────────────────────────────────────────────────
+.sc-nav {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 6px 16px 10px;
+}
+
+.sc-back-btn {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: var(--lc-surface);
+  border: 1px solid var(--lc-border);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  color: var(--lc-text-secondary);
+  font-size: 18px;
+}
+
+.sc-nav-title {
+  font-family: var(--lc-font-display);
+  font-size: 17px;
+  font-weight: 600;
+  color: var(--lc-text-primary);
+}
+
+// ── Banner ────────────────────────────────────────────────────────
+.sc-banner {
+  margin: 0 14px 20px;
+  background: linear-gradient(135deg, #1a3830 0%, #2d5a4e 60%, #3d7a66 100%);
+  border-radius: 20px;
+  padding: 24px 20px 20px;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+}
+
+.sc-banner-icon {
+  font-size: 48px;
+  color: #6EE7B7;
+  line-height: 1;
+  margin-bottom: 4px;
+
+  ion-icon {
+    font-size: 48px;
+  }
+}
+
+.sc-banner-title {
+  font-family: var(--lc-font-display);
+  font-size: 24px;
+  font-weight: 700;
+  color: white;
+}
+
+.sc-banner-sub {
+  font-size: 13px;
+  color: rgba(255, 255, 255, 0.65);
+  margin-bottom: 6px;
+}
+
+.sc-banner-stats {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin-top: 10px;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 14px;
+  padding: 10px 20px;
+}
+
+.sc-stat {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+}
+
+.sc-stat-value {
+  font-size: 20px;
+  font-weight: 700;
+  color: white;
+  font-family: var(--lc-font-display);
+}
+
+.sc-stat-label {
+  font-size: 10px;
+  color: rgba(255, 255, 255, 0.55);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.sc-stat-divider {
+  width: 1px;
+  height: 28px;
+  background: rgba(255, 255, 255, 0.2);
+}
+
+// ── Section header ─────────────────────────────────────────────────
+.sc-section-header {
+  padding: 0 16px 10px;
+}
+
+.sc-section-title {
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--lc-text-hint);
+}
+
+// ── Vocab list ─────────────────────────────────────────────────────
+.sc-vocab-list {
+  padding: 0 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.sc-vocab-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: var(--lc-card);
+  border: 1px solid var(--lc-border);
+  border-radius: 12px;
+  padding: 10px 12px;
+}
+
+.sc-article-badge {
+  font-size: 10px;
+  font-weight: 700;
+  padding: 2px 7px;
+  border-radius: 8px;
+  border: 1px solid transparent;
+  flex-shrink: 0;
+
+  &.art-der {
+    background: #EAF2FC;
+    color: #1A56A3;
+    border-color: #85B7EB;
+  }
+
+  &.art-die {
+    background: #FEF2F2;
+    color: #B91C1C;
+    border-color: #FCA5A5;
+  }
+
+  &.art-das {
+    background: #F1EFE8;
+    color: #5F5E5A;
+    border-color: #B4B2A9;
+  }
+}
+
+.sc-vocab-info {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  min-width: 0;
+}
+
+.sc-vocab-de {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--lc-text-primary);
+}
+
+.sc-vocab-en {
+  font-size: 11px;
+  color: var(--lc-text-hint);
+}
+
+.sc-vocab-base {
+  font-size: 11px;
+  color: var(--lc-brand-mid);
+  font-weight: 500;
+  flex-shrink: 0;
+}
+
+// ── Actions ────────────────────────────────────────────────────────
+.sc-actions {
+  display: flex;
+  gap: 10px;
+  padding: 20px 14px 0;
+}
+
+.sc-btn-replay,
+.sc-btn-library {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  font-size: 14px;
+  font-weight: 600;
+  padding: 13px;
+  border-radius: 14px;
+  border: none;
+  cursor: pointer;
+  font-family: var(--lc-font-body);
+
+  ion-icon {
+    font-size: 16px;
+  }
+}
+
+.sc-btn-replay {
+  background: var(--lc-surface);
+  color: var(--lc-text-secondary);
+  border: 1px solid var(--lc-border);
+}
+
+.sc-btn-library {
+  background: var(--lc-brand);
+  color: white;
+}
+
+// ── Loading ────────────────────────────────────────────────────────
+.sc-loading {
+  padding: 48px 20px;
+  text-align: center;
+  font-size: 14px;
+  color: var(--lc-text-hint);
+}

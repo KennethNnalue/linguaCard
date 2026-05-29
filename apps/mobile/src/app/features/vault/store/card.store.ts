@@ -9,11 +9,11 @@ import {
 } from '@ngrx/signals';
 import { firstValueFrom, Observable, of } from 'rxjs';
 import { catchError, tap } from 'rxjs/operators';
-import { Card } from '../models/mock-data';
+import { Card } from '@lingua-card/shared/domain';
 import { CardApiService } from '../services/card-api.service';
-import { LocalDataService } from '../services/local-data.service';
-import { SyncService } from '../services/sync.service';
-import { AuthService } from '../services/auth.service';
+import { LocalDataService } from '../../../core/services/local-data.service';
+import { SyncService } from '../../../core/services/sync.service';
+import { AuthService } from '../../../core/services/auth.service';
 
 export interface CardFilter {
   categoryId: string | null;

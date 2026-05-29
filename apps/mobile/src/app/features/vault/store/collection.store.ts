@@ -8,8 +8,8 @@ import {
   withState,
 } from '@ngrx/signals';
 import { catchError, firstValueFrom, Observable, of, tap } from 'rxjs';
-import { Collection, CreateCollectionDto, UpdateCollectionDto } from '../../../core/models/mock-data';
-import { CollectionApiService } from '../../../core/services/collection-api.service';
+import { Collection, CreateCollectionDto, UpdateCollectionDto } from '@lingua-card/shared/domain';
+import { CollectionApiService } from '../services/collection-api.service';
 import { LocalDataService } from '../../../core/services/local-data.service';
 import { SyncService } from '../../../core/services/sync.service';
 import { AuthService } from '../../../core/services/auth.service';

@@ -1,7 +1,8 @@
 import { computed, inject, Injectable, signal } from '@angular/core';
-import { Card, ConfidenceRating, MasteryLevel, SRSStateData } from '../../../core/models/mock-data';
-import { CardApiService } from '../../../core/services/card-api.service';
-import { AudioService } from '../../../core/services/audio.service';
+import { Card, ConfidenceRating } from '@lingua-card/shared/domain';
+import { CardApiService } from '../../vault/services/card-api.service';
+import { AudioService } from '../../../shared/audio/audio.service';
+import { Sm2Service } from '../../../shared/srs/sm2.service';
 
 type PlaylistMode = 'word-meaning' | 'examples-only' | 'deep-dive';
 
@@ -9,6 +10,7 @@ type PlaylistMode = 'word-meaning' | 'examples-only' | 'deep-dive';
 export class ListenStore {
   private readonly cardApi = inject(CardApiService);
   private readonly audio = inject(AudioService);
+  private readonly sm2 = inject(Sm2Service);
 
   private readonly _queue = signal<Card[]>([]);
   private readonly _currentIndex = signal(0);
@@ -123,8 +125,9 @@ export class ListenStore {
     this._ratingWindowVisible.set(false);
     this._clearRatingTimer();
     const card = this.currentCard();
-    if (card?.srsState) {
-      const newSrs = this._computeSm2(card.srsState, rating);
+    if (card) {
+      const existingSrs = card.srsState ?? this.sm2.freshState(card.id, card.userId);
+      const newSrs = this.sm2.compute(existingSrs, rating);
       this.cardApi.update(card.id, { srsState: newSrs, updatedAt: new Date().toISOString() }).subscribe();
     }
     this._advanceOrComplete();
@@ -243,38 +246,4 @@ export class ListenStore {
     }
   }
 
-  private _computeSm2(state: SRSStateData, rating: ConfidenceRating): SRSStateData {
-    let { intervalDays, easeFactor, repetitions } = state;
-
-    if (rating < 3) {
-      repetitions = 0;
-      intervalDays = rating === 0 ? 1 : 2;
-      easeFactor = Math.max(1.3, easeFactor - (rating === 0 ? 0.2 : 0.15));
-    } else {
-      repetitions += 1;
-      if (repetitions === 1) intervalDays = 1;
-      else if (repetitions === 2) intervalDays = 6;
-      else intervalDays = Math.round(intervalDays * easeFactor);
-      const easeAdjust = 0.1 - (5 - rating) * (0.08 + (5 - rating) * 0.02);
-      easeFactor = Math.max(1.3, easeFactor + easeAdjust);
-    }
-
-    const masteryLevel = Math.min(5, Math.floor(repetitions / 2)) as MasteryLevel;
-    const nextDueAt = new Date(Date.now() + intervalDays * 86_400_000).toISOString();
-    const srsStateVal = repetitions === 0 ? 'new'
-      : masteryLevel >= 4 ? 'mastered'
-      : repetitions <= 2 ? 'learning' : 'review';
-
-    return {
-      ...state,
-      intervalDays,
-      easeFactor,
-      repetitions,
-      lastRating: rating,
-      lastReviewedAt: new Date().toISOString(),
-      nextDueAt,
-      masteryLevel,
-      state: srsStateVal as SRSStateData['state'],
-    };
-  }
 }

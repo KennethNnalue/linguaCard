@@ -1,0 +1,239 @@
+// ── Nav ───────────────────────────────────────────────────────────
+.gs-nav {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 6px 16px 10px;
+}
+
+.gs-nav-title {
+  font-family: var(--lc-font-display);
+  font-size: 17px;
+  font-weight: 600;
+  color: var(--lc-text-primary);
+}
+
+.gs-close-btn {
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  background: var(--lc-surface);
+  border: 1px solid var(--lc-border);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  color: var(--lc-text-secondary);
+  font-size: 18px;
+}
+
+// ── Body ─────────────────────────────────────────────────────────
+.gs-body {
+  padding: 4px 16px 0;
+}
+
+.gs-section {
+  margin-bottom: 22px;
+}
+
+.gs-section-label {
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--lc-text-hint);
+  margin-bottom: 10px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.gs-section-count {
+  font-size: 10px;
+  font-weight: 600;
+  color: var(--lc-brand-mid);
+  background: var(--lc-brand-light);
+  padding: 2px 7px;
+  border-radius: 8px;
+  letter-spacing: 0;
+  text-transform: none;
+}
+
+// ── Collections list ─────────────────────────────────────────────
+.gs-empty-collections {
+  font-size: 13px;
+  color: var(--lc-text-hint);
+  background: var(--lc-surface);
+  padding: 14px;
+  border-radius: 12px;
+  border: 1px solid var(--lc-border);
+  text-align: center;
+}
+
+.gs-collections-list {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.gs-collection-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 11px 12px;
+  background: var(--lc-surface);
+  border: 1.5px solid var(--lc-border);
+  border-radius: 13px;
+  cursor: pointer;
+  width: 100%;
+  text-align: left;
+  transition: border-color 0.15s, background 0.15s;
+
+  &.selected {
+    border-color: var(--lc-brand);
+    background: var(--lc-brand-light);
+  }
+}
+
+.gs-col-emoji {
+  font-size: 22px;
+  line-height: 1;
+  flex-shrink: 0;
+}
+
+.gs-col-info {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  min-width: 0;
+}
+
+.gs-col-name {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--lc-text-primary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.gs-col-count {
+  font-size: 11px;
+  color: var(--lc-text-hint);
+}
+
+.gs-col-check {
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: var(--lc-border);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: transparent;
+  font-size: 13px;
+  flex-shrink: 0;
+  transition: background 0.15s, color 0.15s;
+
+  &.visible {
+    background: var(--lc-brand);
+    color: white;
+  }
+}
+
+// ── Chips ─────────────────────────────────────────────────────────
+.gs-chips {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.gs-chip {
+  font-size: 13px;
+  font-weight: 600;
+  padding: 8px 18px;
+  border-radius: 20px;
+  border: 1.5px solid var(--lc-border);
+  background: var(--lc-surface);
+  color: var(--lc-text-secondary);
+  cursor: pointer;
+  font-family: var(--lc-font-body);
+  transition: border-color 0.15s, background 0.15s, color 0.15s;
+
+  &.active {
+    border-color: var(--lc-brand);
+    background: var(--lc-brand-light);
+    color: var(--lc-brand);
+  }
+
+  // Level-specific active states
+  &.gs-chip-level {
+    &[data-level="a2"].active {
+      border-color: #059669;
+      background: #D1FAE5;
+      color: #059669;
+    }
+
+    &[data-level="b1"].active {
+      border-color: #D97706;
+      background: #FEF3C7;
+      color: #D97706;
+    }
+
+    &[data-level="b2"].active {
+      border-color: #1A56A3;
+      background: #EAF2FC;
+      color: #1A56A3;
+    }
+  }
+}
+
+// ── Error ─────────────────────────────────────────────────────────
+.gs-error {
+  font-size: 13px;
+  color: #B91C1C;
+  background: #FEF2F2;
+  border: 1px solid #FCA5A5;
+  padding: 10px 14px;
+  border-radius: 10px;
+  margin-bottom: 12px;
+}
+
+// ── Footer ────────────────────────────────────────────────────────
+.gs-footer {
+  padding: 12px 16px 24px;
+}
+
+.gs-generate-btn {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  background: var(--lc-brand);
+  color: white;
+  font-size: 15px;
+  font-weight: 700;
+  padding: 15px;
+  border-radius: 16px;
+  border: none;
+  cursor: pointer;
+  font-family: var(--lc-font-body);
+  transition: opacity 0.15s;
+
+  ion-icon {
+    font-size: 17px;
+  }
+
+  ion-spinner {
+    width: 18px;
+    height: 18px;
+    color: white;
+  }
+
+  &.disabled {
+    opacity: 0.45;
+    cursor: not-allowed;
+  }
+}

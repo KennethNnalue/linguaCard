@@ -1,13 +1,14 @@
-import { Injectable, signal } from '@angular/core';
+import {Injectable, signal} from '@angular/core';
 
 interface BeforeInstallPromptEvent extends Event {
   prompt(): Promise<void>;
+
   readonly userChoice: Promise<{ outcome: 'accepted' | 'dismissed' }>;
 }
 
 const IOS_DISMISSED_KEY = 'lc_pwa_ios_dismissed';
 
-@Injectable({ providedIn: 'root' })
+@Injectable({providedIn: 'root'})
 export class PwaInstallService {
   private deferredPrompt: BeforeInstallPromptEvent | null = null;
 
@@ -47,7 +48,7 @@ export class PwaInstallService {
     // Already installed as home-screen app on iOS
     const isIosStandalone =
       'standalone' in window.navigator &&
-      (window.navigator as unknown as { standalone: boolean }).standalone === true;
+      (window.navigator as unknown as { standalone: boolean }).standalone;
 
     const dismissed = localStorage.getItem(IOS_DISMISSED_KEY) === 'true';
 
@@ -60,7 +61,7 @@ export class PwaInstallService {
     if (!this.deferredPrompt) return false;
 
     await this.deferredPrompt.prompt();
-    const { outcome } = await this.deferredPrompt.userChoice;
+    const {outcome} = await this.deferredPrompt.userChoice;
 
     this.deferredPrompt = null;
     this.canInstall.set(false);

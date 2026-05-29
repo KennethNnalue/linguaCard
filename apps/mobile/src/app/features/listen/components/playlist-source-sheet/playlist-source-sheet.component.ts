@@ -3,8 +3,8 @@ import { IonContent, IonIcon, ModalController } from '@ionic/angular/standalone'
 import { addIcons } from 'ionicons';
 import { closeOutline, checkmarkOutline } from 'ionicons/icons';
 import { Card } from '../../../../core/models/mock-data';
-import { CardStore } from '../../../../core/store/card.store';
-import { CategoryStore } from '../../../../core/store/category.store';
+import { CardStore } from '../../../vault/store/card.store';
+import { CategoryStore } from '../../../vault/store/category.store';
 
 type SourceKey = 'due-today' | 'mastered' | 'struggling' | `category:${string}`;
 type PlaylistMode = 'word-meaning' | 'examples-only' | 'deep-dive';

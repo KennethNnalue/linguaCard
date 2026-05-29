@@ -22864,5 +22864,234 @@
       "createdAt": "2025-01-21T09:00:00Z"
     }
   ],
+  "stories": [
+    {
+      "id": "story-001",
+      "userId": "user-001",
+      "title": "Ein Abend im Biergarten",
+      "titleTranslation": "An Evening at the Beer Garden",
+      "bodyDe": "Es war ein warmer Sommerabend als Thomas und Maria beschlossen, in den Biergarten zu gehen. Ich habe großen Hunger und Durst, sagte Thomas lachend. Der Kellner brachte ihnen sofort die Speisekarte. Maria betrachtete sie sorgfältig. Ich bestelle das Schnitzel, sagte sie. Thomas wählte die Tomatensuppe und eine Schorle. Am Ende des Abends bezahlten sie die Rechnung und gaben dem Kellner ein großzügiges Trinkgeld. Es war ein wunderschöner Abend.",
+      "bodyEn": "It was a warm summer evening when Thomas and Maria decided to go to the beer garden. I am very hungry and thirsty, said Thomas, laughing. The waiter immediately brought them the menu. Maria looked at it carefully. I will order the schnitzel, she said. Thomas chose the tomato soup and a sparkling water. At the end of the evening they paid the bill and gave the waiter a generous tip. It was a beautiful evening.",
+      "sentences": [
+        {
+          "index": 0,
+          "german": "Es war ein warmer Sommerabend als Thomas und Maria beschlossen, in den Biergarten zu gehen.",
+          "english": "It was a warm summer evening when Thomas and Maria decided to go to the beer garden.",
+          "vocabWordIds": ["card-biergarten"]
+        },
+        {
+          "index": 1,
+          "german": "Ich habe großen Hunger und Durst, sagte Thomas lachend.",
+          "english": "I am very hungry and thirsty, said Thomas, laughing.",
+          "vocabWordIds": ["card-hunger", "card-durst"]
+        },
+        {
+          "index": 2,
+          "german": "Der Kellner brachte ihnen sofort die Speisekarte.",
+          "english": "The waiter immediately brought them the menu.",
+          "vocabWordIds": ["card-speisekarte"]
+        },
+        {
+          "index": 3,
+          "german": "Maria betrachtete sie sorgfältig.",
+          "english": "Maria looked at it carefully.",
+          "vocabWordIds": []
+        },
+        {
+          "index": 4,
+          "german": "Ich bestelle das Schnitzel, sagte sie.",
+          "english": "I will order the schnitzel, she said.",
+          "vocabWordIds": ["card-schnitzel", "card-bestellen"]
+        },
+        {
+          "index": 5,
+          "german": "Thomas wählte die Tomatensuppe und eine Schorle.",
+          "english": "Thomas chose the tomato soup and a sparkling water.",
+          "vocabWordIds": ["card-tomatensuppe", "card-schorle"]
+        },
+        {
+          "index": 6,
+          "german": "Am Ende des Abends bezahlten sie die Rechnung und gaben dem Kellner ein großzügiges Trinkgeld.",
+          "english": "At the end of the evening they paid the bill and gave the waiter a generous tip.",
+          "vocabWordIds": ["card-rechnung", "card-trinkgeld", "card-bezahlen"]
+        },
+        {
+          "index": 7,
+          "german": "Es war ein wunderschöner Abend.",
+          "english": "It was a beautiful evening.",
+          "vocabWordIds": []
+        }
+      ],
+      "wordTimestamps": [
+        { "word": "Es", "startMs": 0, "endMs": 220, "isVocab": false },
+        { "word": "war", "startMs": 240, "endMs": 450, "isVocab": false },
+        { "word": "ein", "startMs": 470, "endMs": 580, "isVocab": false },
+        { "word": "warmer", "startMs": 600, "endMs": 780, "isVocab": false },
+        { "word": "Sommerabend", "startMs": 800, "endMs": 1100, "isVocab": false },
+        { "word": "als", "startMs": 1120, "endMs": 1280, "isVocab": false },
+        { "word": "Thomas", "startMs": 1300, "endMs": 1550, "isVocab": false },
+        { "word": "und", "startMs": 1570, "endMs": 1680, "isVocab": false },
+        { "word": "Maria", "startMs": 1700, "endMs": 1950, "isVocab": false },
+        { "word": "beschlossen,", "startMs": 1970, "endMs": 2350, "isVocab": false },
+        { "word": "in", "startMs": 2370, "endMs": 2450, "isVocab": false },
+        { "word": "den", "startMs": 2470, "endMs": 2600, "isVocab": false },
+        { "word": "Biergarten", "startMs": 2620, "endMs": 3100, "isVocab": true, "cardId": "card-biergarten" },
+        { "word": "zu", "startMs": 3120, "endMs": 3220, "isVocab": false },
+        { "word": "gehen.", "startMs": 3240, "endMs": 3600, "isVocab": false },
+        { "word": "Ich", "startMs": 3800, "endMs": 3950, "isVocab": false },
+        { "word": "habe", "startMs": 3970, "endMs": 4150, "isVocab": false },
+        { "word": "großen", "startMs": 4170, "endMs": 4400, "isVocab": false },
+        { "word": "Hunger", "startMs": 4420, "endMs": 4750, "isVocab": true, "cardId": "card-hunger" },
+        { "word": "und", "startMs": 4770, "endMs": 4880, "isVocab": false },
+        { "word": "Durst,", "startMs": 4900, "endMs": 5180, "isVocab": true, "cardId": "card-durst" },
+        { "word": "sagte", "startMs": 5200, "endMs": 5420, "isVocab": false },
+        { "word": "Thomas", "startMs": 5440, "endMs": 5700, "isVocab": false },
+        { "word": "lachend.", "startMs": 5720, "endMs": 6100, "isVocab": false },
+        { "word": "Der", "startMs": 6300, "endMs": 6430, "isVocab": false },
+        { "word": "Kellner", "startMs": 6450, "endMs": 6750, "isVocab": false },
+        { "word": "brachte", "startMs": 6770, "endMs": 7050, "isVocab": false },
+        { "word": "ihnen", "startMs": 7070, "endMs": 7270, "isVocab": false },
+        { "word": "sofort", "startMs": 7290, "endMs": 7570, "isVocab": false },
+        { "word": "die", "startMs": 7590, "endMs": 7700, "isVocab": false },
+        { "word": "Speisekarte.", "startMs": 7720, "endMs": 8300, "isVocab": true, "cardId": "card-speisekarte" },
+        { "word": "Ich", "startMs": 8700, "endMs": 8840, "isVocab": false },
+        { "word": "bestelle", "startMs": 8860, "endMs": 9200, "isVocab": true, "cardId": "card-bestellen" },
+        { "word": "das", "startMs": 9220, "endMs": 9340, "isVocab": false },
+        { "word": "Schnitzel,", "startMs": 9360, "endMs": 9750, "isVocab": true, "cardId": "card-schnitzel" },
+        { "word": "sagte", "startMs": 9770, "endMs": 9990, "isVocab": false },
+        { "word": "sie.", "startMs": 10010, "endMs": 10300, "isVocab": false },
+        { "word": "Thomas", "startMs": 10500, "endMs": 10760, "isVocab": false },
+        { "word": "wählte", "startMs": 10780, "endMs": 11060, "isVocab": false },
+        { "word": "die", "startMs": 11080, "endMs": 11180, "isVocab": false },
+        { "word": "Tomatensuppe", "startMs": 11200, "endMs": 11780, "isVocab": true, "cardId": "card-tomatensuppe" },
+        { "word": "und", "startMs": 11800, "endMs": 11910, "isVocab": false },
+        { "word": "eine", "startMs": 11930, "endMs": 12050, "isVocab": false },
+        { "word": "Schorle.", "startMs": 12070, "endMs": 12500, "isVocab": true, "cardId": "card-schorle" },
+        { "word": "Am", "startMs": 12700, "endMs": 12820, "isVocab": false },
+        { "word": "Ende", "startMs": 12840, "endMs": 13060, "isVocab": false },
+        { "word": "bezahlten", "startMs": 13080, "endMs": 13480, "isVocab": true, "cardId": "card-bezahlen" },
+        { "word": "die", "startMs": 13500, "endMs": 13600, "isVocab": false },
+        { "word": "Rechnung", "startMs": 13620, "endMs": 14050, "isVocab": true, "cardId": "card-rechnung" },
+        { "word": "und", "startMs": 14070, "endMs": 14180, "isVocab": false },
+        { "word": "Trinkgeld.", "startMs": 14200, "endMs": 14800, "isVocab": true, "cardId": "card-trinkgeld" }
+      ],
+      "vocabWords": [
+        { "cardId": "card-biergarten", "german": "der Biergarten", "germanBase": "Biergarten", "english": "the beer garden", "article": "der", "sentenceIndices": [0] },
+        { "cardId": "card-hunger", "german": "der Hunger", "germanBase": "Hunger", "english": "the hunger", "article": "der", "sentenceIndices": [1] },
+        { "cardId": "card-durst", "german": "der Durst", "germanBase": "Durst", "english": "the thirst", "article": "der", "sentenceIndices": [1] },
+        { "cardId": "card-speisekarte", "german": "die Speisekarte", "germanBase": "Speisekarte", "english": "the menu", "article": "die", "sentenceIndices": [2] },
+        { "cardId": "card-bestellen", "german": "bestellen", "germanBase": "bestellen", "english": "to order", "article": null, "sentenceIndices": [4] },
+        { "cardId": "card-schnitzel", "german": "das Schnitzel", "germanBase": "Schnitzel", "english": "the schnitzel", "article": "das", "sentenceIndices": [4] },
+        { "cardId": "card-tomatensuppe", "german": "die Tomatensuppe", "germanBase": "Tomatensuppe", "english": "the tomato soup", "article": "die", "sentenceIndices": [5] },
+        { "cardId": "card-schorle", "german": "die Schorle", "germanBase": "Schorle", "english": "the sparkling water", "article": "die", "sentenceIndices": [5] },
+        { "cardId": "card-bezahlen", "german": "bezahlen", "germanBase": "bezahlen", "english": "to pay", "article": null, "sentenceIndices": [6] },
+        { "cardId": "card-rechnung", "german": "die Rechnung", "germanBase": "Rechnung", "english": "the bill", "article": "die", "sentenceIndices": [6] },
+        { "cardId": "card-trinkgeld", "german": "das Trinkgeld", "germanBase": "Trinkgeld", "english": "the tip", "article": "das", "sentenceIndices": [6] }
+      ],
+      "audioUrl": null,
+      "audioDurationMs": 15000,
+      "sourceCollectionIds": ["col-001"],
+      "difficultyLevel": "A2",
+      "lengthType": "medium",
+      "listenCount": 2,
+      "lastListenedAt": "2025-05-27T10:15:00Z",
+      "generatedAt": "2025-05-27T09:00:00Z"
+    },
+    {
+      "id": "story-002",
+      "userId": "user-001",
+      "title": "Der Geburtstag",
+      "titleTranslation": "The Birthday",
+      "bodyDe": "Heute ist der Geburtstag von Anna. Ihre Freunde haben eine große Überraschung geplant. Sie haben ein Fest organisiert und viele Geschenke gekauft. Anna freut sich sehr. Wir feiern heute Abend, sagte ihr Freund Peter. Das Programm beginnt um acht Uhr. Alles klar, antwortete Anna lachend. Hoffentlich wird es ein schöner Abend.",
+      "bodyEn": "Today is Anna's birthday. Her friends have planned a big surprise. They have organised a party and bought many gifts. Anna is very happy. We are celebrating this evening, said her friend Peter. The programme begins at eight o'clock. All clear, answered Anna, laughing. Hopefully it will be a lovely evening.",
+      "sentences": [
+        {
+          "index": 0,
+          "german": "Heute ist der Geburtstag von Anna.",
+          "english": "Today is Anna's birthday.",
+          "vocabWordIds": ["card-geburtstag"]
+        },
+        {
+          "index": 1,
+          "german": "Ihre Freunde haben eine große Überraschung geplant.",
+          "english": "Her friends have planned a big surprise.",
+          "vocabWordIds": ["card-ueberraschung"]
+        },
+        {
+          "index": 2,
+          "german": "Sie haben ein Fest organisiert und viele Geschenke gekauft.",
+          "english": "They have organised a party and bought many gifts.",
+          "vocabWordIds": ["card-fest", "card-geschenk"]
+        },
+        {
+          "index": 3,
+          "german": "Wir feiern heute Abend, sagte ihr Freund Peter.",
+          "english": "We are celebrating this evening, said her friend Peter.",
+          "vocabWordIds": ["card-feiern"]
+        },
+        {
+          "index": 4,
+          "german": "Das Programm beginnt um acht Uhr.",
+          "english": "The programme begins at eight o'clock.",
+          "vocabWordIds": ["card-programm", "card-beginnen"]
+        },
+        {
+          "index": 5,
+          "german": "Alles klar, antwortete Anna lachend.",
+          "english": "All clear, answered Anna, laughing.",
+          "vocabWordIds": ["card-alles-klar"]
+        },
+        {
+          "index": 6,
+          "german": "Hoffentlich wird es ein schöner Abend.",
+          "english": "Hopefully it will be a lovely evening.",
+          "vocabWordIds": ["card-hoffentlich"]
+        }
+      ],
+      "wordTimestamps": [
+        { "word": "Heute", "startMs": 0, "endMs": 320, "isVocab": false },
+        { "word": "ist", "startMs": 340, "endMs": 460, "isVocab": false },
+        { "word": "der", "startMs": 480, "endMs": 580, "isVocab": false },
+        { "word": "Geburtstag", "startMs": 600, "endMs": 1050, "isVocab": true, "cardId": "card-geburtstag" },
+        { "word": "von", "startMs": 1070, "endMs": 1200, "isVocab": false },
+        { "word": "Anna.", "startMs": 1220, "endMs": 1580, "isVocab": false },
+        { "word": "Ihre", "startMs": 1780, "endMs": 1950, "isVocab": false },
+        { "word": "Freunde", "startMs": 1970, "endMs": 2280, "isVocab": false },
+        { "word": "eine", "startMs": 2300, "endMs": 2430, "isVocab": false },
+        { "word": "große", "startMs": 2450, "endMs": 2700, "isVocab": false },
+        { "word": "Überraschung", "startMs": 2720, "endMs": 3250, "isVocab": true, "cardId": "card-ueberraschung" },
+        { "word": "geplant.", "startMs": 3270, "endMs": 3650, "isVocab": false },
+        { "word": "Sie", "startMs": 3850, "endMs": 3970, "isVocab": false },
+        { "word": "Fest", "startMs": 4200, "endMs": 4520, "isVocab": true, "cardId": "card-fest" },
+        { "word": "Geschenke", "startMs": 4950, "endMs": 5380, "isVocab": true, "cardId": "card-geschenk" },
+        { "word": "Wir", "startMs": 6000, "endMs": 6150, "isVocab": false },
+        { "word": "feiern", "startMs": 6170, "endMs": 6490, "isVocab": true, "cardId": "card-feiern" },
+        { "word": "Programm", "startMs": 7500, "endMs": 7920, "isVocab": true, "cardId": "card-programm" },
+        { "word": "beginnt", "startMs": 7940, "endMs": 8260, "isVocab": true, "cardId": "card-beginnen" },
+        { "word": "Alles", "startMs": 9000, "endMs": 9220, "isVocab": false },
+        { "word": "klar,", "startMs": 9240, "endMs": 9480, "isVocab": true, "cardId": "card-alles-klar" },
+        { "word": "Hoffentlich", "startMs": 10200, "endMs": 10680, "isVocab": true, "cardId": "card-hoffentlich" }
+      ],
+      "vocabWords": [
+        { "cardId": "card-geburtstag", "german": "der Geburtstag", "germanBase": "Geburtstag", "english": "the birthday", "article": "der", "sentenceIndices": [0] },
+        { "cardId": "card-ueberraschung", "german": "die Überraschung", "germanBase": "Überraschung", "english": "the surprise", "article": "die", "sentenceIndices": [1] },
+        { "cardId": "card-fest", "german": "das Fest", "germanBase": "Fest", "english": "the party / celebration", "article": "das", "sentenceIndices": [2] },
+        { "cardId": "card-geschenk", "german": "das Geschenk", "germanBase": "Geschenk", "english": "the gift", "article": "das", "sentenceIndices": [2] },
+        { "cardId": "card-feiern", "german": "feiern", "germanBase": "feiern", "english": "to celebrate", "article": null, "sentenceIndices": [3] },
+        { "cardId": "card-programm", "german": "das Programm", "germanBase": "Programm", "english": "the programme", "article": "das", "sentenceIndices": [4] },
+        { "cardId": "card-beginnen", "german": "beginnen", "germanBase": "beginnen", "english": "to begin", "article": null, "sentenceIndices": [4] },
+        { "cardId": "card-alles-klar", "german": "Alles klar!", "germanBase": "Alles klar", "english": "All clear! / Got it!", "article": null, "sentenceIndices": [5] },
+        { "cardId": "card-hoffentlich", "german": "hoffentlich", "germanBase": "hoffentlich", "english": "hopefully", "article": null, "sentenceIndices": [6] }
+      ],
+      "audioUrl": null,
+      "audioDurationMs": 11000,
+      "sourceCollectionIds": ["col-001"],
+      "difficultyLevel": "B1",
+      "lengthType": "short",
+      "listenCount": 0,
+      "lastListenedAt": null,
+      "generatedAt": "2025-05-28T08:00:00Z"
+    }
+  ],
   "$schema": "./node_modules/json-server/schema.json"
 }

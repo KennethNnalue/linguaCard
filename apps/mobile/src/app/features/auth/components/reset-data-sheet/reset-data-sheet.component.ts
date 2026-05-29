@@ -10,10 +10,10 @@ import { firstValueFrom } from 'rxjs';
 import { addIcons } from 'ionicons';
 import { alertCircleOutline, trashOutline } from 'ionicons/icons';
 import { AuthService } from '../../../../core/services/auth.service';
-import { CardApiService } from '../../../../core/services/card-api.service';
-import { CollectionApiService } from '../../../../core/services/collection-api.service';
+import { CardApiService } from '../../../vault/services/card-api.service';
+import { CollectionApiService } from '../../../vault/services/collection-api.service';
 import { LocalDataService } from '../../../../core/services/local-data.service';
-import { CardStore } from '../../../../core/store/card.store';
+import { CardStore } from '../../../vault/store/card.store';
 import { CollectionStore } from '../../../vault/store/collection.store';
 
 @Component({

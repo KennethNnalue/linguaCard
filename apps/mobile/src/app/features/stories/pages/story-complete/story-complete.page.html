@@ -1,0 +1,80 @@
+<ion-header class="ion-no-border">
+  <ion-toolbar>
+    <div class="sc-nav">
+      <button class="sc-back-btn" (click)="goToLibrary()" aria-label="Back to library">
+        <ion-icon name="arrow-back-outline"></ion-icon>
+      </button>
+      <span class="sc-nav-title">Story Complete</span>
+      <div style="width: 32px;"></div>
+    </div>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+  @if (story(); as s) {
+
+    <!-- Completion banner -->
+    <div class="sc-banner">
+      <div class="sc-banner-icon">
+        <ion-icon name="checkmark-circle-outline"></ion-icon>
+      </div>
+      <div class="sc-banner-title">Great read!</div>
+      <div class="sc-banner-sub">You finished "{{ s.title }}"</div>
+      <div class="sc-banner-stats">
+        <div class="sc-stat">
+          <span class="sc-stat-value">{{ s.vocabWords.length }}</span>
+          <span class="sc-stat-label">vocab words</span>
+        </div>
+        <div class="sc-stat-divider"></div>
+        <div class="sc-stat">
+          <span class="sc-stat-value">{{ s.sentences.length }}</span>
+          <span class="sc-stat-label">sentences</span>
+        </div>
+        <div class="sc-stat-divider"></div>
+        <div class="sc-stat">
+          <span class="sc-stat-value">{{ s.listenCount }}</span>
+          <span class="sc-stat-label">{{ s.listenCount === 1 ? 'listen' : 'listens' }}</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Vocab words -->
+    <div class="sc-section-header">
+      <span class="sc-section-title">Words in this story</span>
+    </div>
+
+    <div class="sc-vocab-list">
+      @for (vw of s.vocabWords; track vw.cardId) {
+        <div class="sc-vocab-row">
+          @if (vw.article) {
+            <span class="sc-article-badge" [ngClass]="articleClass(vw.article)">
+              {{ vw.article }}
+            </span>
+          }
+          <div class="sc-vocab-info">
+            <span class="sc-vocab-de">{{ vw.german }}</span>
+            <span class="sc-vocab-en">{{ vw.english }}</span>
+          </div>
+          <span class="sc-vocab-base">{{ vw.germanBase }}</span>
+        </div>
+      }
+    </div>
+
+    <!-- Actions -->
+    <div class="sc-actions">
+      <button class="sc-btn-replay" (click)="replayStory()">
+        <ion-icon name="play-outline"></ion-icon>
+        Read again
+      </button>
+      <button class="sc-btn-library" (click)="goToLibrary()">
+        <ion-icon name="sparkles-outline"></ion-icon>
+        More stories
+      </button>
+    </div>
+
+  } @else {
+    <div class="sc-loading">Loading…</div>
+  }
+
+  <div style="height: 32px;"></div>
+</ion-content>

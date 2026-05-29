@@ -1,0 +1,83 @@
+<ion-header class="ion-no-border">
+  <ion-toolbar>
+    <div class="sr-nav">
+      <button class="sr-back-btn" (click)="goBack()" aria-label="Back">
+        <ion-icon name="arrow-back-outline"></ion-icon>
+      </button>
+      <div class="sr-nav-title">{{ story()?.title ?? '' }}</div>
+      <button class="sr-translate-btn" (click)="toggleTranslation()" [class.active]="showTranslation()" aria-label="Toggle translation">
+        <ion-icon name="language-outline"></ion-icon>
+      </button>
+    </div>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+  @if (story(); as s) {
+
+    <!-- Karaoke word view -->
+    @if (!showTranslation()) {
+      <div class="sr-karaoke">
+        @for (wt of words(); track wt.idx) {
+          <span
+            class="sr-word"
+            [ngClass]="{
+              active: wt.idx === activeWordIdx(),
+              vocab: wt.isVocab,
+              'vocab-active': isVocabActive(wt)
+            }"
+          >{{ wt.word }}</span><span class="sr-space"> </span>
+        }
+      </div>
+    }
+
+    <!-- Translation view -->
+    @if (showTranslation()) {
+      <div class="sr-translation">
+        @for (sent of s.sentences; track sent.index) {
+          <div class="sr-sent-pair">
+            <p class="sr-sent-de">{{ sent.german }}</p>
+            <p class="sr-sent-en">{{ sent.english }}</p>
+          </div>
+        }
+      </div>
+    }
+
+    <!-- No audio notice -->
+    @if (!s.audioUrl) {
+      <div class="sr-no-audio">
+        <ion-icon name="language-outline"></ion-icon>
+        Audio not available for this story yet. Read mode only.
+      </div>
+    }
+
+  } @else {
+    <div class="sr-loading">Loading story…</div>
+  }
+
+  <div style="height: 120px;"></div>
+</ion-content>
+
+<!-- Player bar -->
+@if (story(); as s) {
+  <div class="sr-player" [class.no-audio]="!s.audioUrl">
+    <!-- Progress bar -->
+    <div class="sr-progress-track">
+      <div class="sr-progress-fill" [style.width.%]="progressPct()"></div>
+    </div>
+
+    <div class="sr-controls">
+      <button class="sr-ctrl-btn secondary" (click)="restart()" [disabled]="!s.audioUrl" aria-label="Restart">
+        <ion-icon name="play-skip-back-outline"></ion-icon>
+      </button>
+
+      <button class="sr-play-btn" (click)="togglePlay()" [disabled]="!s.audioUrl" [attr.aria-label]="isPlaying() ? 'Pause' : 'Play'">
+        <ion-icon [name]="isPlaying() ? 'pause-outline' : 'play-outline'"></ion-icon>
+      </button>
+
+      <button class="sr-ctrl-btn secondary sr-speed-btn" (click)="cycleSpeed()" [disabled]="!s.audioUrl">
+        {{ speedLabel() }}
+      </button>
+    </div>
+  </div>
+}

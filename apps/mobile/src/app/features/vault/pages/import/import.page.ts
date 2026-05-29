@@ -14,8 +14,8 @@ import {
   documentOutline,
   downloadOutline,
 } from 'ionicons/icons';
-import { CsvImportService } from '../../../../core/services/csv-import.service';
-import { CategoryStore } from '../../../../core/store/category.store';
+import { CsvParserService } from '../../../../shared/csv/csv-parser.service';
+import { CategoryStore } from '../../store/category.store';
 import { ImportStateService } from '../../services/import-state.service';
 
 @Component({
@@ -28,7 +28,7 @@ import { ImportStateService } from '../../services/import-state.service';
 export class ImportPage {
   @ViewChild('fileInput') fileInput!: ElementRef<HTMLInputElement>;
 
-  private readonly csvService = inject(CsvImportService);
+  private readonly csvService = inject(CsvParserService);
   private readonly categoryStore = inject(CategoryStore);
   private readonly importState = inject(ImportStateService);
   private readonly router = inject(Router);

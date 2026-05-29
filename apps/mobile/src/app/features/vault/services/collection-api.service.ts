@@ -2,8 +2,8 @@ import { inject, Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { forkJoin, Observable, of, switchMap } from 'rxjs';
 import { map } from 'rxjs/operators';
-import { environment } from '../../../environments/environment';
-import { Card, Collection, CreateCollectionDto, UpdateCollectionDto } from '../models/mock-data';
+import { environment } from '../../../../environments/environment';
+import { Card, Collection, CreateCollectionDto, UpdateCollectionDto } from '@lingua-card/shared/domain';
 
 @Injectable({ providedIn: 'root' })
 export class CollectionApiService {

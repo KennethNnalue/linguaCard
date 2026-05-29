@@ -95,6 +95,21 @@ export const routes: Routes = [
           import('./features/listen/pages/listen/listen.component').then(m => m.ListenComponent),
       },
       {
+        path: 'stories',
+        loadComponent: () =>
+          import('./features/stories/pages/story-library/story-library.page').then(m => m.StoryLibraryPage),
+      },
+      {
+        path: 'stories/:id',
+        loadComponent: () =>
+          import('./features/stories/pages/story-reader/story-reader.page').then(m => m.StoryReaderPage),
+      },
+      {
+        path: 'stories/:id/complete',
+        loadComponent: () =>
+          import('./features/stories/pages/story-complete/story-complete.page').then(m => m.StoryCompletePage),
+      },
+      {
         path: 'progress',
         loadComponent: () =>
           import('./features/progress/pages/progress/progress.component').then(m => m.ProgressComponent),

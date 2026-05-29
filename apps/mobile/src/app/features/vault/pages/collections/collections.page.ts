@@ -11,7 +11,7 @@ import {
 import { addIcons } from 'ionicons';
 import { addOutline, chevronBackOutline } from 'ionicons/icons';
 import { Collection } from '../../../../core/models/mock-data';
-import { CardStore } from '../../../../core/store/card.store';
+import { CardStore } from '../../store/card.store';
 import { CollectionStore } from '../../store/collection.store';
 import { AssignCollectionSheetComponent } from '../../components/assign-collection-sheet/assign-collection-sheet.component';
 

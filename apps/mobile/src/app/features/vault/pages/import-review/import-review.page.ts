@@ -15,9 +15,9 @@ import {
   warningOutline,
 } from 'ionicons/icons';
 import { CardContent, ExampleSentence, GenderType, ParsedImportRow } from '../../../../core/models/mock-data';
-import { CardApiService } from '../../../../core/services/card-api.service';
+import { CardApiService } from '../../services/card-api.service';
 import { AuthService } from '../../../../core/services/auth.service';
-import { CardStore } from '../../../../core/store/card.store';
+import { CardStore } from '../../store/card.store';
 import { CollectionStore } from '../../store/collection.store';
 import { ImportStateService } from '../../services/import-state.service';
 import { AssignCollectionSheetComponent } from '../../components/assign-collection-sheet/assign-collection-sheet.component';
