@@ -7,8 +7,10 @@ import {
   withState,
 } from '@ngrx/signals';
 import { firstValueFrom } from 'rxjs';
-import { GenerateStoryDto, Story } from '../../../core/models/mock-data';
+import type { GenerateStoryDto, Story } from '@lingua-card/shared/domain';
 import { StoryApiService } from '../services/story-api.service';
+import { AiAudioCacheService } from '../../ai/audio/ai-audio-cache.service';
+import { SyncService } from '../../../core/services/sync.service';
 
 interface StoryState {
   stories: Story[];
@@ -41,6 +43,8 @@ export const StoryStore = signalStore(
 
   withMethods((store) => {
     const api = inject(StoryApiService);
+    const audioCache = inject(AiAudioCacheService);
+    const syncService = inject(SyncService);
 
     return {
       loadStories(): void {
@@ -64,13 +68,26 @@ export const StoryStore = signalStore(
             isGenerating: false,
           });
           return story;
-        } catch {
+        } catch (err: unknown) {
+          // Queue for retry if this looks like a network error
+          const isNetworkError =
+            err instanceof TypeError ||
+            (err as { status?: number })?.status === 0;
+          if (isNetworkError) {
+            void syncService.enqueue({ type: 'GENERATE_STORY', payload: dto });
+          }
           patchState(store, {
             isGenerating: false,
-            generateError: 'Story generation failed. Please try again.',
+            generateError: isNetworkError
+              ? 'No internet connection. Your request has been queued.'
+              : 'Story generation failed. Please try again.',
           });
           return null;
         }
+      },
+
+      addStory(story: Story): void {
+        patchState(store, { stories: [story, ...store.stories()] });
       },
 
       getById(id: string): Story | null {
@@ -90,6 +107,7 @@ export const StoryStore = signalStore(
 
       deleteStory(id: string): void {
         patchState(store, { stories: store.stories().filter(s => s.id !== id) });
+        void audioCache.evict(id);
         void firstValueFrom(api.remove(id)).catch(() => null);
       },
 

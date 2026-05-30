@@ -1,4 +1,4 @@
-import { Component, inject, signal, computed } from '@angular/core';
+import { Component, inject, signal, computed, OnDestroy } from '@angular/core';
 import { NgClass } from '@angular/common';
 import {
   IonHeader,
@@ -10,9 +10,11 @@ import {
 } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
 import { sparklesOutline, closeOutline, checkmarkOutline } from 'ionicons/icons';
-import { Collection, GenerateStoryDto, StoryDifficulty, StoryLength } from '../../../../core/models/mock-data';
+import type { GenerateStoryDto, StoryDifficulty, StoryLength } from '@lingua-card/shared/domain';
 import { CollectionStore } from '../../../vault/store/collection.store';
 import { StoryStore } from '../../store/story.store';
+
+type GenerationStep = 0 | 1 | 2 | 3;
 
 @Component({
   selector: 'app-generate-story-sheet',
@@ -20,7 +22,7 @@ import { StoryStore } from '../../store/story.store';
   styleUrls: ['./generate-story-sheet.component.scss'],
   imports: [IonHeader, IonToolbar, IonContent, IonIcon, IonSpinner, NgClass],
 })
-export class GenerateStorySheetComponent {
+export class GenerateStorySheetComponent implements OnDestroy {
   private readonly collectionStore = inject(CollectionStore);
   private readonly storyStore = inject(StoryStore);
   private readonly modalCtrl = inject(ModalController);
@@ -32,23 +34,51 @@ export class GenerateStorySheetComponent {
   readonly selectedIds = signal<Set<string>>(new Set());
   readonly selectedLength = signal<StoryLength>('medium');
   readonly selectedDifficulty = signal<StoryDifficulty>('B1');
+  readonly generationStep = signal<GenerationStep>(0);
+  readonly retryCount = signal(0);
 
   readonly canGenerate = computed(() => this.selectedIds().size > 0 && !this.isGenerating());
 
-  readonly lengths: { value: StoryLength; label: string }[] = [
+  readonly lengths: Array<{ value: StoryLength; label: string; badge?: string }> = [
     { value: 'short', label: 'Short' },
     { value: 'medium', label: 'Medium' },
     { value: 'long', label: 'Long' },
+    { value: 'very-long', label: 'Very Long' },
+    { value: 'extra-long', label: 'Extra Long', badge: 'Podcast' },
   ];
 
+  readonly isLongFormat = computed(() =>
+    this.selectedLength() === 'very-long' || this.selectedLength() === 'extra-long'
+  );
+
   readonly difficulties: { value: StoryDifficulty; label: string }[] = [
+    { value: 'A1', label: 'A1' },
     { value: 'A2', label: 'A2' },
     { value: 'B1', label: 'B1' },
     { value: 'B2', label: 'B2' },
   ];
 
+  readonly stepMessage = computed(() => [
+    '',
+    'Writing your story…',
+    'Narrating the audio…',
+    'Almost ready…',
+  ][this.generationStep()]);
+
+  readonly estimatedWait = computed(() =>
+    this.isLongFormat() ? 'Usually 25–40 seconds' : 'Usually 10–20 seconds'
+  );
+
+  readonly showSupportLink = computed(() => this.retryCount() >= 3);
+
+  private stepTimers: ReturnType<typeof setTimeout>[] = [];
+
   constructor() {
     addIcons({ sparklesOutline, closeOutline, checkmarkOutline });
+  }
+
+  ngOnDestroy(): void {
+    this.clearStepTimers();
   }
 
   toggleCollection(id: string): void {
@@ -70,12 +100,15 @@ export class GenerateStorySheetComponent {
   }
 
   dismiss(): void {
+    if (this.isGenerating()) return;
     void this.modalCtrl.dismiss(null);
   }
 
   async generate(): Promise<void> {
     if (!this.canGenerate()) return;
     this.storyStore.clearGenerateError();
+    this.generationStep.set(0);
+    this.startStepTimers();
 
     const dto: GenerateStoryDto = {
       collectionIds: Array.from(this.selectedIds()),
@@ -84,8 +117,30 @@ export class GenerateStorySheetComponent {
     };
 
     const story = await this.storyStore.generateStory(dto);
+    this.clearStepTimers();
+    this.generationStep.set(0);
+
     if (story) {
       void this.modalCtrl.dismiss({ story });
     }
+  }
+
+  async retry(): Promise<void> {
+    this.retryCount.update(n => n + 1);
+    await this.generate();
+  }
+
+  private startStepTimers(): void {
+    this.clearStepTimers();
+    this.stepTimers = [
+      setTimeout(() => { if (this.isGenerating()) this.generationStep.set(1); }, 1000),
+      setTimeout(() => { if (this.isGenerating()) this.generationStep.set(2); }, 10000),
+      setTimeout(() => { if (this.isGenerating()) this.generationStep.set(3); }, 22000),
+    ];
+  }
+
+  private clearStepTimers(): void {
+    this.stepTimers.forEach(t => clearTimeout(t));
+    this.stepTimers = [];
   }
 }

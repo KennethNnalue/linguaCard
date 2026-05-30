@@ -2,7 +2,7 @@
   <ion-toolbar>
     <div class="gs-nav">
       <div class="gs-nav-title">Generate Story</div>
-      <button class="gs-close-btn" (click)="dismiss()" aria-label="Close">
+      <button class="gs-close-btn" (click)="dismiss()" [disabled]="isGenerating()" aria-label="Close">
         <ion-icon name="close-outline"></ion-icon>
       </button>
     </div>
@@ -58,9 +58,15 @@
             (click)="selectedLength.set(opt.value)"
           >
             {{ opt.label }}
+            @if (opt.badge) {
+              <span class="gs-chip-badge">{{ opt.badge }}</span>
+            }
           </button>
         }
       </div>
+      @if (isLongFormat()) {
+        <div class="gs-length-warning">This may take up to 45 seconds</div>
+      }
     </div>
 
     <!-- Difficulty -->
@@ -80,9 +86,26 @@
       </div>
     </div>
 
-    <!-- Error -->
-    @if (generateError()) {
-      <div class="gs-error">{{ generateError() }}</div>
+    <!-- Generation progress -->
+    @if (isGenerating()) {
+      <div class="gs-progress">
+        <div class="gs-progress-dot"></div>
+        <div class="gs-progress-text">{{ stepMessage() }}</div>
+        <div class="gs-progress-hint">{{ estimatedWait() }}</div>
+      </div>
+    }
+
+    <!-- Error state -->
+    @if (generateError() && !isGenerating()) {
+      <div class="gs-error-block">
+        <div class="gs-error-msg">{{ generateError() }}</div>
+        <div class="gs-error-actions">
+          <button class="gs-retry-btn" (click)="retry()">Try again</button>
+          @if (showSupportLink()) {
+            <a class="gs-support-link" href="mailto:kennethnnalue@gmail.com">Contact support</a>
+          }
+        </div>
+      </div>
     }
 
   </div>
@@ -97,7 +120,7 @@
     >
       @if (isGenerating()) {
         <ion-spinner name="crescent"></ion-spinner>
-        Generating your story…
+        {{ stepMessage() || 'Generating your story…' }}
       } @else {
         <ion-icon name="sparkles-outline"></ion-icon>
         Generate Story

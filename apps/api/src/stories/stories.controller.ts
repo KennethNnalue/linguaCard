@@ -31,4 +31,13 @@ export class StoriesController {
   recordListen(@CurrentUser() userId: string, @Param('id') id: string) {
     return this.storiesService.recordListen(userId, id);
   }
+
+  /** Dev-only: seeds a static story without calling AI APIs */
+  @Post('seed')
+  seedStory(@CurrentUser() userId: string) {
+    if (process.env['NODE_ENV'] === 'production') {
+      return { message: 'Not available in production' };
+    }
+    return this.storiesService.seedStory(userId);
+  }
 }

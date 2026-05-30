@@ -14,7 +14,8 @@ export type SyncOperationType =
   | 'DELETE_CARD'
   | 'CREATE_COLLECTION'
   | 'UPDATE_COLLECTION'
-  | 'DELETE_COLLECTION';
+  | 'DELETE_COLLECTION'
+  | 'GENERATE_STORY';
 
 export interface SyncOperation {
   id: string;

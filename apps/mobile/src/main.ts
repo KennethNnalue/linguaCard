@@ -14,6 +14,7 @@ import { IonicStorageModule } from '@ionic/storage-angular';
 import { routes } from './app/app.routes';
 import { AppComponent } from './app/app.component';
 import { authInterceptor } from './app/core/interceptors/auth.interceptor';
+import { provideAi } from './app/features/ai/ai.providers';
 
 bootstrapApplication(AppComponent, {
   providers: [
@@ -32,5 +33,6 @@ bootstrapApplication(AppComponent, {
         driverOrder: [Drivers.IndexedDB, Drivers.LocalStorage],
       })
     ),
+    provideAi(),
   ],
 });

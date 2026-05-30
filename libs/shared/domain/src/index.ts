@@ -309,7 +309,15 @@ export interface StoryVocabWord {
 }
 
 export type StoryDifficulty = 'A1' | 'A2' | 'B1' | 'B2';
-export type StoryLength = 'short' | 'medium' | 'long';
+export type StoryLength = 'short' | 'medium' | 'long' | 'very-long' | 'extra-long';
+export type AIProviderType = 'anthropic' | 'openai' | 'gemini';
+
+export interface PronunciationRequest {
+  cardId: string;
+  word: string;
+  language: string;
+  voice?: string;
+}
 
 export interface Story {
   id: string;
@@ -335,4 +343,5 @@ export interface GenerateStoryDto {
   collectionIds: string[];
   length: StoryLength;
   difficulty: StoryDifficulty;
+  provider?: AIProviderType;
 }

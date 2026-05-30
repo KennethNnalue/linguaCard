@@ -24,9 +24,10 @@ import {
   playSkipBackOutline,
   languageOutline,
 } from 'ionicons/icons';
-import { Story, WordTimestamp } from '../../../../core/models/mock-data';
+import type { Story, WordTimestamp } from '@lingua-card/shared/domain';
 import { StoryStore } from '../../store/story.store';
 import { StoryApiService } from '../../services/story-api.service';
+import { AiAudioCacheService } from '../../../ai/audio/ai-audio-cache.service';
 import { firstValueFrom } from 'rxjs';
 
 @Component({
@@ -42,6 +43,7 @@ export class StoryReaderPage implements OnInit, OnDestroy {
   private readonly router = inject(Router);
   private readonly storyStore = inject(StoryStore);
   private readonly api = inject(StoryApiService);
+  private readonly aiAudioCache = inject(AiAudioCacheService);
 
   readonly story = signal<Story | null>(null);
   readonly showTranslation = signal(false);
@@ -49,6 +51,7 @@ export class StoryReaderPage implements OnInit, OnDestroy {
   readonly activeWordIdx = signal(-1);
   readonly speed = signal(1.0);
   readonly progressPct = signal(0);
+  readonly audioLoading = signal(false);
 
   private audio: HTMLAudioElement | null = null;
   private timeupdateHandler: (() => void) | null = null;
@@ -85,10 +88,15 @@ export class StoryReaderPage implements OnInit, OnDestroy {
         return;
       }
     }
-    this.story.set(s);
+    // Resolve audio to local cache or remote fallback
+    this.audioLoading.set(true);
+    const resolvedUrl = await this.aiAudioCache.getOrDownload(s.id, s.audioUrl);
+    this.audioLoading.set(false);
 
-    if (s.audioUrl) {
-      this.initAudio(s.audioUrl, s.wordTimestamps);
+    this.story.set({ ...s, audioUrl: resolvedUrl });
+
+    if (resolvedUrl) {
+      this.initAudio(resolvedUrl, s.wordTimestamps);
     }
   }
 

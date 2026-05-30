@@ -12,12 +12,14 @@ import { AuthModule } from './auth/auth.module';
 import { JwtAuthGuard } from './auth/guards/jwt-auth.guard';
 import { HealthModule } from './health/health.module';
 import databaseConfig from './config/database.config';
+import { aiConfig } from './config/ai.config';
 
 @Module({
   imports: [
     ConfigModule.forRoot({
       isGlobal: true,
-      load: [databaseConfig],
+      envFilePath: ['.env', '../../.env'],
+      load: [databaseConfig, aiConfig],
     }),
     TypeOrmModule.forRootAsync({
       inject: [ConfigService],

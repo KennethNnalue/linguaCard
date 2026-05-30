@@ -15,6 +15,7 @@ import { CardStore } from '../../store/card.store';
 import { CategoryStore } from '../../store/category.store';
 import { CardApiService } from '../../services/card-api.service';
 import { AudioService } from '../../../../shared/audio/audio.service';
+import { PronunciationService } from '../../../ai/audio/pronunciation.service';
 import {ArticleBadgeComponent} from '../../../../shared/components/article-badge/article-badge.component';
 import {AddWordSheetComponent} from '../../components/add-word-sheet/add-word-sheet.component';
 import {getCategoryName} from '../../../../shared/helpers/helpers';
@@ -31,6 +32,7 @@ export class WordDetailComponent {
   private readonly categoryStore = inject(CategoryStore);
   private readonly cardApi = inject(CardApiService);
   private readonly audioService = inject(AudioService);
+  private readonly pronunciationService = inject(PronunciationService);
   private readonly router = inject(Router);
   private readonly route = inject(ActivatedRoute);
   private readonly alertCtrl = inject(AlertController);
@@ -102,13 +104,12 @@ export class WordDetailComponent {
     this.router.navigate(['/vault']);
   }
 
+  readonly isPronunciationLoading = this.pronunciationService.isLoading;
+
   playPronunciation(): void {
-    const word = this.card()?.content.back;
-    if (!word) return;
-    this.audioService.speak(word, 'de-DE', 0.85).subscribe({
-      error: () => {
-      }
-    });
+    const card = this.card();
+    if (!card) return;
+    void this.pronunciationService.play(card);
   }
 
   async openEdit(): Promise<void> {

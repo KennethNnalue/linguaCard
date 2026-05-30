@@ -59,7 +59,7 @@
           </div>
           <!-- Vocab word chips (first 3) -->
           <div class="ss-word-chips">
-            @for (vw of story.vocabWords.slice(0, 3); track vw.cardId) {
+            @for (vw of story.vocabWords.slice(0, 3); track $index) {
               <span class="ss-word-chip" [ngClass]="articleClass(vw.article)">
                 {{ vw.german }}
               </span>
