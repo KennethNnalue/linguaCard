@@ -69,9 +69,14 @@
                   <p class="rv-ex-en">"{{ ex.native }}"</p>
                 </div>
               }
-              <button class="rv-audio-btn" (click)="playAudio($event)">
-                <ion-icon name="volume-high-outline"></ion-icon>
-                Play pronunciation
+              <button class="rv-audio-btn" (click)="playAudio($event)" [disabled]="isPronunciationLoading()">
+                @if (isPronunciationLoading()) {
+                  <div class="rv-audio-spinner"></div>
+                  Generating…
+                } @else {
+                  <ion-icon name="volume-high-outline"></ion-icon>
+                  Play pronunciation
+                }
               </button>
               @if (currentCard().content.notes) {
                 <div class="rv-note-pill">

@@ -162,7 +162,7 @@ export class ListenStore {
     const utterances = this._buildUtterances(card, this._playbackMode());
     for (const utt of utterances) {
       if (this._playbackCancelled) return;
-      await this._speakPromise(utt.text, utt.lang, this._playbackSpeed(), utt.cacheKey);
+      await this._speakPromise(utt.text, utt.lang, this._playbackSpeed(), utt.cardId);
       if (utt.pause && !this._playbackCancelled) {
         await this._sleep(utt.pause);
       }
@@ -172,24 +172,22 @@ export class ListenStore {
     }
   }
 
-  private _buildUtterances(card: Card, mode: PlaylistMode): { text: string; lang: string; pause?: number; cacheKey?: string }[] {
+  private _buildUtterances(card: Card, mode: PlaylistMode): { text: string; lang: string; pause?: number; cardId?: string }[] {
     const article = card.content.article ?? '';
     const word = card.content.back;
     const articleWord = article ? `${article} ${word}` : word;
     const translation = card.content.front;
     const example = card.content.examples[0];
-    // Stable cache key reused across review, vault, and listen for the same card
-    const wordCacheKey = `pronunciation-${card.id}`;
 
     if (mode === 'word-meaning') {
       return [
-        { text: articleWord, lang: 'de-DE', pause: 800, cacheKey: wordCacheKey },
+        { text: articleWord, lang: 'de-DE', pause: 800, cardId: card.id },
         { text: translation, lang: 'en-US', pause: 1200 },
       ];
     }
     if (mode === 'examples-only') {
-      const items: { text: string; lang: string; pause?: number; cacheKey?: string }[] = [
-        { text: word, lang: 'de-DE', pause: 600, cacheKey: wordCacheKey },
+      const items: { text: string; lang: string; pause?: number; cardId?: string }[] = [
+        { text: word, lang: 'de-DE', pause: 600, cardId: card.id },
       ];
       if (example) {
         items.push({ text: example.target, lang: 'de-DE', pause: 800 });
@@ -198,8 +196,8 @@ export class ListenStore {
       return items;
     }
     // deep-dive
-    const items: { text: string; lang: string; pause?: number; cacheKey?: string }[] = [
-      { text: articleWord, lang: 'de-DE', pause: 600, cacheKey: wordCacheKey },
+    const items: { text: string; lang: string; pause?: number; cardId?: string }[] = [
+      { text: articleWord, lang: 'de-DE', pause: 600, cardId: card.id },
       { text: translation, lang: 'en-US', pause: 600 },
     ];
     if (example) {
@@ -212,9 +210,9 @@ export class ListenStore {
     return items;
   }
 
-  private _speakPromise(text: string, lang: string, _rate: number, cacheKey?: string): Promise<void> {
+  private _speakPromise(text: string, lang: string, _rate: number, cardId?: string): Promise<void> {
     if (lang === 'de-DE') {
-      return this.pronunciation.playTextAsPromise(text, 'de-DE', cacheKey);
+      return this.pronunciation.playTextAsPromise(text, 'de-DE', cardId);
     }
     return new Promise(resolve => {
       this.audio.speak(text, lang, _rate).subscribe({

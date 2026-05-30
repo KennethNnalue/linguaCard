@@ -116,6 +116,24 @@
   ion-icon { font-size: 16px; }
 
   &:active { opacity: 0.8; transform: scale(0.98); }
+
+  &:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+  }
+}
+
+.wd-audio-spinner {
+  width: 14px;
+  height: 14px;
+  border: 2px solid rgba(45, 90, 78, 0.3);
+  border-top-color: var(--lc-brand);
+  border-radius: 50%;
+  animation: wd-spin 0.7s linear infinite;
+}
+
+@keyframes wd-spin {
+  to { transform: rotate(360deg); }
 }
 
 // ─── DIVIDER & SECTION ───────────────────────────────────────────────────────

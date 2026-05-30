@@ -11,11 +11,17 @@ import type {
   AISpeechResponse,
 } from './ai-provider.interface';
 
+export interface PronunciationResult {
+  audioUrl: string;
+  durationMs: number;
+}
+
 @Injectable({ providedIn: 'root' })
 export class GeminiAdapter implements AIProvider {
   readonly name = 'gemini' as const;
   private readonly http = inject(HttpClient);
   private readonly ttsUrl = `${environment.apiUrl}/ai/tts`;
+  private readonly pronunciationUrl = `${environment.apiUrl}/ai/pronunciation`;
 
   generateText(_request: AITextRequest): Promise<AITextResponse> {
     throw new Error('GeminiAdapter (Angular) does not support text generation. Use AnthropicAdapter.');
@@ -37,6 +43,21 @@ export class GeminiAdapter implements AIProvider {
     const durationMs = Math.round((audioBuffer.byteLength / bytesPerSecond) * 1000);
 
     return { audioBuffer, durationMs };
+  }
+
+  /**
+   * Generates pronunciation audio for a card and persists it to R2 via the
+   * backend. Returns a permanent public URL so it survives app restarts and
+   * is shared across all devices for the same user.
+   */
+  generatePronunciationUrl(cardId: string, text: string, language = 'de-DE'): Promise<PronunciationResult> {
+    return firstValueFrom(
+      this.http.post<PronunciationResult>(this.pronunciationUrl, {
+        cardId,
+        text,
+        language,
+      }),
+    );
   }
 
   transcribeWithTimestamps(_audioBuffer: ArrayBuffer): Promise<WordTimestamp[]> {

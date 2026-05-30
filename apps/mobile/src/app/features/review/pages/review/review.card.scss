@@ -192,6 +192,24 @@
   ion-icon { font-size: 15px; }
 
   &:active { opacity: 0.8; }
+
+  &:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+  }
+}
+
+.rv-audio-spinner {
+  width: 13px;
+  height: 13px;
+  border: 2px solid rgba(45, 90, 78, 0.3);
+  border-top-color: var(--lc-brand);
+  border-radius: 50%;
+  animation: rv-spin 0.7s linear infinite;
+}
+
+@keyframes rv-spin {
+  to { transform: rotate(360deg); }
 }
 
 .rv-note-pill {

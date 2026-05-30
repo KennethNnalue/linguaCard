@@ -58,6 +58,7 @@ export class ReviewPage implements OnInit {
   readonly queue = signal<Card[]>([]);
   readonly currentIndex = signal(0);
   readonly isFlipped = signal(false);
+  readonly isPronunciationLoading = this.pronunciationService.isLoading;
 
   readonly currentCard = computed<Card>(() => this.queue()[this.currentIndex()]);
 

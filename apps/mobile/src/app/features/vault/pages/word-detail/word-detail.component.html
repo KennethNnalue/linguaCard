@@ -40,9 +40,14 @@
             <span class="lc-word-tag">{{ tag }}</span>
           }
         </div>
-        <button class="wd-audio-btn" (click)="playPronunciation()">
-          <ion-icon name="volume-high-outline"></ion-icon>
-          Play pronunciation
+        <button class="wd-audio-btn" (click)="playPronunciation()" [disabled]="isPronunciationLoading()">
+          @if (isPronunciationLoading()) {
+            <div class="wd-audio-spinner"></div>
+            Generating…
+          } @else {
+            <ion-icon name="volume-high-outline"></ion-icon>
+            Play pronunciation
+          }
         </button>
       </div>
 
