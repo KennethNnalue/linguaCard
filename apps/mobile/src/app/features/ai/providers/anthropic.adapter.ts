@@ -1,6 +1,8 @@
-import { Injectable } from '@angular/core';
-import Anthropic from '@anthropic-ai/sdk';
+import { inject, Injectable } from '@angular/core';
+import { HttpClient } from '@angular/common/http';
+import { firstValueFrom } from 'rxjs';
 import type { WordTimestamp } from '@lingua-card/shared/domain';
+import { environment } from '../../../../environments/environment';
 import type {
   AIProvider,
   AITextRequest,
@@ -12,33 +14,13 @@ import type {
 @Injectable({ providedIn: 'root' })
 export class AnthropicAdapter implements AIProvider {
   readonly name = 'anthropic' as const;
-  private client: Anthropic;
-
-  constructor() {
-    // API key is empty on the Angular side — all AI calls are proxied through NestJS.
-    // This adapter is registered in DI but generateText() is only called server-side.
-    this.client = new Anthropic({ apiKey: '', dangerouslyAllowBrowser: true });
-  }
+  private readonly http = inject(HttpClient);
+  private readonly baseUrl = `${environment.apiUrl}/ai`;
 
   async generateText(request: AITextRequest): Promise<AITextResponse> {
-    const response = await this.client.messages.create({
-      model: 'claude-sonnet-4-20250514',
-      max_tokens: request.maxTokens ?? 2000,
-      messages: request.messages,
-    });
-
-    const text = response.content
-      .filter((b): b is Anthropic.TextBlock => b.type === 'text')
-      .map(b => b.text)
-      .join('');
-
-    return {
-      text,
-      provider: 'anthropic',
-      model: response.model,
-      inputTokens: response.usage.input_tokens,
-      outputTokens: response.usage.output_tokens,
-    };
+    return firstValueFrom(
+      this.http.post<AITextResponse>(`${this.baseUrl}/generate-text`, request),
+    );
   }
 
   generateSpeech(_request: AISpeechRequest): Promise<AISpeechResponse> {

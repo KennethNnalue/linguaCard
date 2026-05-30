@@ -1,7 +1,7 @@
 export const environment = {
   production: true,
   // Replaced at build time — set API_URL in the Vercel project environment variables
-  apiUrl: '%%API_URL%%',
+  apiUrl: 'https://linguacard-api.onrender.com/api/v1',
   ai: {
     defaultProvider: 'anthropic' as const,
     pronunciationEnabled: true,
