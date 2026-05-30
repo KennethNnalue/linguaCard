@@ -24,7 +24,19 @@ services:
         sync: false          # optional — leave blank until Whisper is needed
       - key: AI_DEFAULT_PROVIDER
         value: gemini
-      - key: AI_STORAGE_BUCKET
-        value: lingua-card-audio-dev  # keep as-is to use local disk on Render
       - key: API_PUBLIC_URL
-        value: https://linguacard-api.onrender.com  # used to build audio file URLs
+        value: https://linguacard-api.onrender.com  # fallback for local-disk mode
+      # ── Cloudflare R2 (audio file storage) ─────────────────────────────────
+      # Create a bucket at dash.cloudflare.com → R2, then generate an API token
+      # with "Object Read & Write" permissions for this bucket.
+      - key: R2_ACCOUNT_ID
+        sync: false          # Cloudflare account ID (40-char hex)
+      - key: R2_ACCESS_KEY_ID
+        sync: false          # R2 API token → Access Key ID
+      - key: R2_SECRET_ACCESS_KEY
+        sync: false          # R2 API token → Secret Access Key
+      - key: R2_BUCKET
+        sync: false          # bucket name, e.g. linguacard-audio
+      - key: R2_PUBLIC_URL
+        sync: false          # public URL for the bucket, e.g. https://audio.linguacard.app
+                             # or the r2.dev subdomain: https://pub-<hash>.r2.dev

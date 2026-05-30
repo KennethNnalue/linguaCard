@@ -1,26 +1,54 @@
 import { Injectable, Logger } from '@nestjs/common';
-import { ConfigService } from '@nestjs/config';
+import { S3Client, PutObjectCommand } from '@aws-sdk/client-s3';
 import { writeFile, mkdir } from 'fs/promises';
 import { join } from 'path';
-import type { AiConfig } from '../config/ai.config';
 
 @Injectable()
 export class StorageService {
   private readonly logger = new Logger(StorageService.name);
-  private readonly useLocalDisk: boolean;
+  private readonly s3: S3Client | null;
+  private readonly bucket: string;
+  private readonly publicBaseUrl: string;
   private readonly uploadsDir = join(process.cwd(), 'uploads');
 
-  constructor(private readonly config: ConfigService) {
-    const bucket = config.get<AiConfig>('ai')!.storageBucket;
-    this.useLocalDisk = !bucket || bucket === 'lingua-card-audio-dev';
+  constructor() {
+    const accountId = process.env['R2_ACCOUNT_ID'] ?? '';
+    const accessKeyId = process.env['R2_ACCESS_KEY_ID'] ?? '';
+    const secretAccessKey = process.env['R2_SECRET_ACCESS_KEY'] ?? '';
+    this.bucket = process.env['R2_BUCKET'] ?? '';
+    this.publicBaseUrl = (process.env['R2_PUBLIC_URL'] ?? '').replace(/\/$/, '');
+
+    if (accountId && accessKeyId && secretAccessKey && this.bucket) {
+      this.s3 = new S3Client({
+        region: 'auto',
+        endpoint: `https://${accountId}.r2.cloudflarestorage.com`,
+        credentials: { accessKeyId, secretAccessKey },
+      });
+      this.logger.log(`Storage: Cloudflare R2 bucket "${this.bucket}"`);
+    } else {
+      this.s3 = null;
+      this.logger.log('Storage: local disk (R2 not configured)');
+    }
   }
 
-  async upload(buffer: Buffer, path: string, _contentType: string): Promise<string> {
-    if (this.useLocalDisk) {
-      return this.saveToLocalDisk(buffer, path);
+  async upload(buffer: Buffer, path: string, contentType: string): Promise<string> {
+    if (this.s3) {
+      return this.uploadToR2(buffer, path, contentType);
     }
-    // TODO: replace with real S3 upload when bucket is configured
     return this.saveToLocalDisk(buffer, path);
+  }
+
+  private async uploadToR2(buffer: Buffer, path: string, contentType: string): Promise<string> {
+    await this.s3!.send(new PutObjectCommand({
+      Bucket: this.bucket,
+      Key: path,
+      Body: buffer,
+      ContentType: contentType,
+    }));
+
+    // R2_PUBLIC_URL is your bucket's public domain, e.g. https://audio.linguacard.app
+    // or the r2.dev subdomain Cloudflare provides on the free plan.
+    return `${this.publicBaseUrl}/${path}`;
   }
 
   private async saveToLocalDisk(buffer: Buffer, path: string): Promise<string> {
@@ -28,8 +56,6 @@ export class StorageService {
     const dir = fullPath.substring(0, fullPath.lastIndexOf('/'));
     await mkdir(dir, { recursive: true });
     await writeFile(fullPath, buffer);
-    // API_PUBLIC_URL must be set to the public HTTPS base URL in production
-    // (e.g. https://linguacard-api.onrender.com). Falls back to localhost for dev.
     const baseUrl = process.env['API_PUBLIC_URL']?.replace(/\/$/, '') ?? 'http://localhost:3001';
     return `${baseUrl}/uploads/${path}`;
   }
