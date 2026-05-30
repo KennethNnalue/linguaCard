@@ -16,3 +16,15 @@ services:
         sync: false          # set after Vercel deploy: https://your-app.vercel.app
       - key: JWT_SECRET
         sync: false          # generate a strong random string in the Render dashboard
+      - key: GEMINI_API_KEY
+        sync: false          # paste Gemini API key from aistudio.google.com
+      - key: ANTHROPIC_API_KEY
+        sync: false          # optional — leave blank if not using Anthropic
+      - key: OPENAI_API_KEY
+        sync: false          # optional — leave blank until Whisper is needed
+      - key: AI_DEFAULT_PROVIDER
+        value: gemini
+      - key: AI_STORAGE_BUCKET
+        value: lingua-card-audio-dev  # keep as-is to use local disk on Render
+      - key: API_PUBLIC_URL
+        value: https://linguacard-api.onrender.com  # used to build audio file URLs

@@ -28,7 +28,9 @@ export class StorageService {
     const dir = fullPath.substring(0, fullPath.lastIndexOf('/'));
     await mkdir(dir, { recursive: true });
     await writeFile(fullPath, buffer);
-    const baseUrl = 'http://localhost:3001';
+    // API_PUBLIC_URL must be set to the public HTTPS base URL in production
+    // (e.g. https://linguacard-api.onrender.com). Falls back to localhost for dev.
+    const baseUrl = process.env['API_PUBLIC_URL']?.replace(/\/$/, '') ?? 'http://localhost:3001';
     return `${baseUrl}/uploads/${path}`;
   }
 }
