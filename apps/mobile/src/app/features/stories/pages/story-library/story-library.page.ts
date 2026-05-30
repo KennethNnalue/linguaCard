@@ -2,6 +2,7 @@ import { Component, inject, OnInit } from '@angular/core';
 import { NgClass, TitleCasePipe } from '@angular/common';
 import { Router } from '@angular/router';
 import {
+  AlertController,
   IonContent,
   IonHeader,
   IonIcon,
@@ -15,6 +16,7 @@ import {
   playOutline,
   timeOutline,
   sparklesOutline,
+  trashOutline,
 } from 'ionicons/icons';
 import type { Story } from '@lingua-card/shared/domain';
 import { StoryStore } from '../../store/story.store';
@@ -30,12 +32,13 @@ export class StoryLibraryPage implements OnInit {
   private readonly storyStore = inject(StoryStore);
   private readonly router = inject(Router);
   private readonly modalCtrl = inject(ModalController);
+  private readonly alertCtrl = inject(AlertController);
 
   readonly stories = this.storyStore.sortedStories;
   readonly loading = this.storyStore.isLoading;
 
   constructor() {
-    addIcons({ bookOutline, addOutline, playOutline, timeOutline, sparklesOutline });
+    addIcons({ bookOutline, addOutline, playOutline, timeOutline, sparklesOutline, trashOutline });
   }
 
   ngOnInit(): void {
@@ -79,5 +82,22 @@ export class StoryLibraryPage implements OnInit {
     if (article === 'die') return 'art-die';
     if (article === 'das') return 'art-das';
     return '';
+  }
+
+  async confirmDelete(event: Event, story: Story): Promise<void> {
+    event.stopPropagation();
+    const alert = await this.alertCtrl.create({
+      header: 'Delete story',
+      message: `Remove "${story.title}"? The audio will also be deleted.`,
+      buttons: [
+        { text: 'Cancel', role: 'cancel' },
+        {
+          text: 'Delete',
+          role: 'destructive',
+          handler: () => this.storyStore.deleteStory(story.id),
+        },
+      ],
+    });
+    await alert.present();
   }
 }

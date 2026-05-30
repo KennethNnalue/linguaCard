@@ -1,6 +1,6 @@
 import { Injectable, Logger } from '@nestjs/common';
-import { S3Client, PutObjectCommand } from '@aws-sdk/client-s3';
-import { writeFile, mkdir } from 'fs/promises';
+import { S3Client, PutObjectCommand, DeleteObjectCommand } from '@aws-sdk/client-s3';
+import { writeFile, mkdir, unlink } from 'fs/promises';
 import { join } from 'path';
 
 @Injectable()
@@ -49,6 +49,22 @@ export class StorageService {
     // R2_PUBLIC_URL is your bucket's public domain, e.g. https://audio.linguacard.app
     // or the r2.dev subdomain Cloudflare provides on the free plan.
     return `${this.publicBaseUrl}/${path}`;
+  }
+
+  async delete(path: string): Promise<void> {
+    if (this.s3) {
+      try {
+        await this.s3.send(new DeleteObjectCommand({ Bucket: this.bucket, Key: path }));
+      } catch (err) {
+        this.logger.warn(`R2 delete failed for "${path}":`, err);
+      }
+    } else {
+      try {
+        await unlink(join(this.uploadsDir, path));
+      } catch {
+        // File may not exist — ignore
+      }
+    }
   }
 
   private async saveToLocalDisk(buffer: Buffer, path: string): Promise<string> {

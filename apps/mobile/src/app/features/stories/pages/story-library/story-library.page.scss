@@ -216,6 +216,12 @@
   border-radius: 8px;
 }
 
+.ss-story-footer-right {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
 .ss-story-play {
   display: flex;
   align-items: center;
@@ -226,6 +232,27 @@
 
   ion-icon {
     font-size: 13px;
+  }
+}
+
+.ss-delete-btn {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: transparent;
+  border: 1px solid var(--lc-border);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  color: var(--lc-text-hint);
+  font-size: 14px;
+  transition: background 0.15s, color 0.15s, border-color 0.15s;
+
+  &:active {
+    background: #FEE2E2;
+    color: #B91C1C;
+    border-color: #FCA5A5;
   }
 }
 

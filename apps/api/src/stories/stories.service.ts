@@ -7,6 +7,7 @@ import { StoryEntity } from './story.entity';
 import { StoryGenerationService } from './story-generation.service';
 import { StoryAudioService } from './story-audio.service';
 import { StoryVocabMapper } from './story-vocab.mapper';
+import { StorageService } from '../storage/storage.service';
 import { SEED_STORY } from './seed/seed-story';
 
 @Injectable()
@@ -17,6 +18,7 @@ export class StoriesService {
     private readonly generation: StoryGenerationService,
     private readonly audioService: StoryAudioService,
     private readonly vocabMapper: StoryVocabMapper,
+    private readonly storage: StorageService,
   ) {}
 
   async findAll(userId: string): Promise<Story[]> {
@@ -51,8 +53,30 @@ export class StoriesService {
   }
 
   async remove(userId: string, id: string): Promise<void> {
-    const result = await this.repo.delete({ id, userId });
-    if (!result.affected) throw new NotFoundException(`Story ${id} not found`);
+    const entity = await this.repo.findOneBy({ id, userId });
+    if (!entity) throw new NotFoundException(`Story ${id} not found`);
+
+    // Delete audio file from R2 / local disk before removing the DB row
+    if (entity.audioUrl) {
+      const storagePath = this.extractStoragePath(entity.audioUrl);
+      if (storagePath) await this.storage.delete(storagePath);
+    }
+
+    await this.repo.delete({ id, userId });
+  }
+
+  // Extracts the relative storage key from a full URL.
+  // e.g. "https://pub-xxx.r2.dev/stories/abc.wav" → "stories/abc.wav"
+  //      "http://localhost:3001/uploads/stories/abc.wav" → "stories/abc.wav"
+  private extractStoragePath(audioUrl: string): string | null {
+    try {
+      const url = new URL(audioUrl);
+      // Strip leading /uploads/ prefix (local disk) or just leading / (R2)
+      const pathname = url.pathname.replace(/^\/uploads\//, '').replace(/^\//, '');
+      return pathname || null;
+    } catch {
+      return null;
+    }
   }
 
   async generateAudio(userId: string, id: string): Promise<Story> {

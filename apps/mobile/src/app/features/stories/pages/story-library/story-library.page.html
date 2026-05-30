@@ -78,9 +78,14 @@
                 [style.color]="levelStyle(story.difficultyLevel).color">
             {{ story.difficultyLevel }} · {{ story.lengthType | titlecase }}
           </span>
-          <div class="ss-story-play">
-            <ion-icon name="play-outline"></ion-icon>
-            Listen · Read
+          <div class="ss-story-footer-right">
+            <div class="ss-story-play">
+              <ion-icon name="play-outline"></ion-icon>
+              Listen · Read
+            </div>
+            <button class="ss-delete-btn" (click)="confirmDelete($event, story)" aria-label="Delete story">
+              <ion-icon name="trash-outline"></ion-icon>
+            </button>
           </div>
         </div>
       </div>
