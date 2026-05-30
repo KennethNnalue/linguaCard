@@ -25,6 +25,10 @@ export class StoryApiService {
     return this.http.delete<void>(`${this.baseUrl}/${id}`);
   }
 
+  generateAudio(id: string): Observable<Story> {
+    return this.http.post<Story>(`${this.baseUrl}/${id}/generate-audio`, {});
+  }
+
   recordListen(id: string): Observable<void> {
     return this.http.patch<void>(`${this.baseUrl}/${id}/listen`, {});
   }

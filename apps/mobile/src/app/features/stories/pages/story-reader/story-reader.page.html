@@ -5,15 +5,51 @@
         <ion-icon name="arrow-back-outline"></ion-icon>
       </button>
       <div class="sr-nav-title">{{ story()?.title ?? '' }}</div>
-      <button class="sr-translate-btn" (click)="toggleTranslation()" [class.active]="showTranslation()" aria-label="Toggle translation">
-        <ion-icon name="language-outline"></ion-icon>
-      </button>
+      <div class="sr-nav-right">
+        @if (story()?.difficultyLevel; as level) {
+          <span class="sr-level-badge">{{ level }}</span>
+        }
+      </div>
     </div>
   </ion-toolbar>
 </ion-header>
 
 <ion-content>
   @if (story(); as s) {
+
+    <!-- Language / Translation tab switcher -->
+    <div class="sr-tab-bar">
+      <button
+        class="sr-tab"
+        [class.active]="!showTranslation()"
+        (click)="showTranslation.set(false)"
+      >
+        🇩🇪 German
+      </button>
+      <button
+        class="sr-tab"
+        [class.active]="showTranslation()"
+        (click)="showTranslation.set(true)"
+      >
+        🇬🇧 Translation
+      </button>
+    </div>
+
+    <!-- Audio generating banner -->
+    @if (audioGenerating()) {
+      <div class="sr-audio-generating">
+        <div class="sr-generating-pulse"></div>
+        <span>Generating audio narration…</span>
+      </div>
+    }
+
+    <!-- Audio loading (cache download) -->
+    @if (audioLoading() && !audioGenerating()) {
+      <div class="sr-audio-generating">
+        <div class="sr-generating-pulse"></div>
+        <span>Preparing audio…</span>
+      </div>
+    }
 
     <!-- Karaoke word view -->
     @if (!showTranslation()) {
@@ -27,6 +63,9 @@
               'vocab-active': isVocabActive(wt)
             }"
           >{{ wt.word }}</span><span class="sr-space"> </span>
+        }
+        @if (!words().length && !audioGenerating()) {
+          <p class="sr-body-fallback">{{ s.bodyDe }}</p>
         }
       </div>
     }
@@ -43,39 +82,45 @@
       </div>
     }
 
-    <!-- No audio notice -->
-    @if (!s.audioUrl) {
-      <div class="sr-no-audio">
-        <ion-icon name="language-outline"></ion-icon>
-        Audio not available for this story yet. Read mode only.
-      </div>
-    }
-
   } @else {
     <div class="sr-loading">Loading story…</div>
   }
 
-  <div style="height: 120px;"></div>
+  <div style="height: 140px;"></div>
 </ion-content>
 
 <!-- Player bar -->
 @if (story(); as s) {
-  <div class="sr-player" [class.no-audio]="!s.audioUrl">
+  <div class="sr-player">
     <!-- Progress bar -->
-    <div class="sr-progress-track">
+    <div class="sr-progress-track" (click)="seekToPercent($event)">
       <div class="sr-progress-fill" [style.width.%]="progressPct()"></div>
     </div>
 
+    <div class="sr-time-row">
+      <span class="sr-time">{{ currentTimeLabel() }}</span>
+      <span class="sr-time">{{ durationLabel() }}</span>
+    </div>
+
     <div class="sr-controls">
-      <button class="sr-ctrl-btn secondary" (click)="restart()" [disabled]="!s.audioUrl" aria-label="Restart">
+      <button class="sr-ctrl-btn secondary" (click)="restart()" [disabled]="!s.audioUrl || audioGenerating() || audioLoading()" aria-label="Restart">
         <ion-icon name="play-skip-back-outline"></ion-icon>
       </button>
 
-      <button class="sr-play-btn" (click)="togglePlay()" [disabled]="!s.audioUrl" [attr.aria-label]="isPlaying() ? 'Pause' : 'Play'">
-        <ion-icon [name]="isPlaying() ? 'pause-outline' : 'play-outline'"></ion-icon>
+      <button
+        class="sr-play-btn"
+        (click)="togglePlay()"
+        [disabled]="!s.audioUrl || audioGenerating() || audioLoading()"
+        [attr.aria-label]="isPlaying() ? 'Pause' : 'Play'"
+      >
+        @if (audioGenerating() || audioLoading()) {
+          <div class="sr-spinner"></div>
+        } @else {
+          <ion-icon [name]="isPlaying() ? 'pause-outline' : 'play-outline'"></ion-icon>
+        }
       </button>
 
-      <button class="sr-ctrl-btn secondary sr-speed-btn" (click)="cycleSpeed()" [disabled]="!s.audioUrl">
+      <button class="sr-ctrl-btn secondary sr-speed-btn" (click)="cycleSpeed()" [disabled]="!s.audioUrl || audioGenerating() || audioLoading()">
         {{ speedLabel() }}
       </button>
     </div>

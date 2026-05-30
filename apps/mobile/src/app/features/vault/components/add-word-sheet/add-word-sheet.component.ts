@@ -17,7 +17,7 @@ import {
   volumeHighOutline,
 } from 'ionicons/icons';
 import { ArticleType, CardContent, ExampleSentence } from '../../../../core/models/mock-data';
-import { AudioService } from '../../../../shared/audio/audio.service';
+import { PronunciationService } from '../../../ai/audio/pronunciation.service';
 import { AuthService } from '../../../../core/services/auth.service';
 import { CardStore } from '../../store/card.store';
 import { CategoryStore } from '../../store/category.store';
@@ -34,7 +34,7 @@ import { AssignCollectionSheetComponent } from '../assign-collection-sheet/assig
 export class AddWordSheetComponent implements OnInit {
   private readonly categoryStore = inject(CategoryStore);
   private readonly collectionStore = inject(CollectionStore);
-  private readonly audioService = inject(AudioService);
+  private readonly pronunciationService = inject(PronunciationService);
   private readonly authService = inject(AuthService);
   private readonly cardStore = inject(CardStore);
   private readonly modalCtrl = inject(ModalController);
@@ -105,7 +105,7 @@ export class AddWordSheetComponent implements OnInit {
     const word = this.form.get('back')!.value?.trim();
     if (!word) return;
     const article = this.form.get('article')!.value;
-    this.audioService.speak(article ? `${article} ${word}` : word, 'de-DE').subscribe({ error: () => {} });
+    void this.pronunciationService.playText(article ? `${article} ${word}` : word, 'de-DE');
   }
 
   save(): void {

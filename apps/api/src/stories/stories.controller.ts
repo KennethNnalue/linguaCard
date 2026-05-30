@@ -27,6 +27,11 @@ export class StoriesController {
     return this.storiesService.remove(userId, id);
   }
 
+  @Post(':id/generate-audio')
+  generateAudio(@CurrentUser() userId: string, @Param('id') id: string) {
+    return this.storiesService.generateAudio(userId, id);
+  }
+
   @Patch(':id/listen')
   recordListen(@CurrentUser() userId: string, @Param('id') id: string) {
     return this.storiesService.recordListen(userId, id);

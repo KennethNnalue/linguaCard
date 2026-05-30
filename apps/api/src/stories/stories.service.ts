@@ -5,6 +5,8 @@ import { randomUUID } from 'crypto';
 import type { Story, GenerateStoryDto } from '@lingua-card/shared/domain';
 import { StoryEntity } from './story.entity';
 import { StoryGenerationService } from './story-generation.service';
+import { StoryAudioService } from './story-audio.service';
+import { StoryVocabMapper } from './story-vocab.mapper';
 import { SEED_STORY } from './seed/seed-story';
 
 @Injectable()
@@ -13,6 +15,8 @@ export class StoriesService {
     @InjectRepository(StoryEntity)
     private readonly repo: Repository<StoryEntity>,
     private readonly generation: StoryGenerationService,
+    private readonly audioService: StoryAudioService,
+    private readonly vocabMapper: StoryVocabMapper,
   ) {}
 
   async findAll(userId: string): Promise<Story[]> {
@@ -49,6 +53,23 @@ export class StoriesService {
   async remove(userId: string, id: string): Promise<void> {
     const result = await this.repo.delete({ id, userId });
     if (!result.affected) throw new NotFoundException(`Story ${id} not found`);
+  }
+
+  async generateAudio(userId: string, id: string): Promise<Story> {
+    const entity = await this.repo.findOneBy({ id, userId });
+    if (!entity) throw new NotFoundException(`Story ${id} not found`);
+
+    const { audioUrl, timestamps, durationMs } =
+      await this.audioService.generateAudioWithTimestamps(entity.bodyDe, id);
+
+    const markedTimestamps = this.vocabMapper.markVocabWords(timestamps, entity.vocabWords ?? []);
+
+    entity.audioUrl = audioUrl;
+    entity.audioDurationMs = durationMs;
+    entity.wordTimestamps = markedTimestamps;
+
+    const saved = await this.repo.save(entity);
+    return this.toModel(saved);
   }
 
   async recordListen(userId: string, id: string): Promise<void> {

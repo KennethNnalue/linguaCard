@@ -12,11 +12,16 @@ import type {
 @Injectable({ providedIn: 'root' })
 export class OpenAIAdapter implements AIProvider {
   readonly name = 'openai' as const;
+  // Client is null when no API key is configured — methods fail fast with a
+  // clear message rather than crashing the entire DI graph at construction.
   private client: OpenAI;
 
   constructor() {
-    // API key is empty on Angular side — speech generation is proxied through NestJS.
-    this.client = new OpenAI({ apiKey: '', dangerouslyAllowBrowser: true });
+    // All real OpenAI calls (Whisper transcription) go through the NestJS backend.
+    // The Angular-side client is never used in production — only instantiated when
+    // an explicit key is injected via the environment (e.g. for local testing).
+    // Using a placeholder prevents the SDK from throwing at construction time.
+    this.client = new OpenAI({ apiKey: 'not-configured', dangerouslyAllowBrowser: true });
   }
 
   async generateSpeech(request: AISpeechRequest): Promise<AISpeechResponse> {

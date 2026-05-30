@@ -12,8 +12,8 @@ import {
   flagOutline,
   volumeHighOutline,
 } from 'ionicons/icons';
-import { Card, ConfidenceRating } from '../../../../core/models/mock-data';
-import { AudioService } from '../../../../shared/audio/audio.service';
+import type { Card, ConfidenceRating } from '@lingua-card/shared/domain';
+import { PronunciationService } from '../../../ai/audio/pronunciation.service';
 import { CardStore } from '../../../vault/store/card.store';
 import { CategoryStore } from '../../../vault/store/category.store';
 import { CollectionStore } from '../../../vault/store/collection.store';
@@ -37,7 +37,7 @@ const RATINGS: { value: ConfidenceRating; label: string }[] = [
 export class ReviewPage implements OnInit {
   private readonly cardStore = inject(CardStore);
   private readonly reviewStore = inject(ReviewStore);
-  private readonly audioService = inject(AudioService);
+  private readonly pronunciationService = inject(PronunciationService);
   private readonly categoryStore = inject(CategoryStore);
   private readonly collectionStore = inject(CollectionStore);
   private readonly navCtrl = inject(NavController);
@@ -175,8 +175,7 @@ export class ReviewPage implements OnInit {
     event.stopPropagation();
     const card = this.currentCard();
     if (!card) return;
-    const text = (card.content.article ? card.content.article + ' ' : '') + card.content.back;
-    this.audioService.speak(text, 'de-DE').subscribe({ error: () => {} });
+    void this.pronunciationService.play(card);
   }
 
   flagCard(): void {

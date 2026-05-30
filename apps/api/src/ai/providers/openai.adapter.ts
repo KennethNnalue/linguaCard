@@ -41,8 +41,9 @@ export class OpenAIAdapter {
     return { audioBuffer, durationMs };
   }
 
-  async transcribeWithTimestamps(audioBuffer: ArrayBuffer): Promise<WordTimestamp[]> {
-    const file = new File([audioBuffer], 'audio.mp3', { type: 'audio/mp3' });
+  async transcribeWithTimestamps(audioBuffer: ArrayBuffer, mimeType = 'audio/mp3'): Promise<WordTimestamp[]> {
+    const ext = mimeType.includes('wav') || mimeType.includes('pcm') ? 'wav' : 'mp3';
+    const file = new File([audioBuffer], `audio.${ext}`, { type: mimeType });
     const transcription = await this.client.audio.transcriptions.create({
       model: 'whisper-1',
       file,

@@ -5,7 +5,7 @@
 >
 > **Prerequisites:** Stories feature scaffold complete (LC-043). `StoryStore`, `StoryApiService`, `story-reader`, `story-library`, `generate-story-sheet` all exist. `StoriesService` on NestJS with seed payload active.
 >
-> **Ticket numbering:** LC-050 through LC-068 (continuing from LC-043).
+> **Ticket numbering:** LC-050 through LC-068 (continuing from LC-043). Gemini TTS work: LC-069 through LC-071.
 
 ---
 
@@ -32,6 +32,9 @@
 | 10 — Polish | LC-066 | Error handling & retry UI | 2 |
 | 11 — Future hooks | LC-067 | Pronunciation cache & reuse across features | 3 |
 | 11 — Future hooks | LC-068 | AI usage tracking service | 2 |
+| 12 — Gemini TTS | LC-069 | Gemini TTS adapter — NestJS (generateSpeech + /ai/tts endpoint) | 3 |
+| 12 — Gemini TTS | LC-070 | Gemini TTS adapter — Angular (proxy client) | 2 |
+| 12 — Gemini TTS | LC-071 | Wire Gemini TTS into story audio pipeline and pronunciation service | 3 |
 
 ---
 
@@ -1430,6 +1433,78 @@ Work through these in exactly this sequence to avoid blocked dependencies:
 17. **LC-066** — Error handling
 18. **LC-067** — Cross-feature pronunciation cache
 19. **LC-068** — Usage tracking
+20. **LC-069** — Gemini TTS adapter (NestJS)
+21. **LC-070** — Gemini TTS adapter (Angular)
+22. **LC-071** — Wire Gemini TTS into audio pipeline
+
+---
+
+## LC-069 · Gemini TTS adapter — NestJS
+
+**Epic:** 7 — AI Platform
+**Phase:** 12 — Gemini TTS
+**Points:** 3
+**Depends on:** LC-064
+
+### What was implemented
+
+Added `generateSpeech()` to the NestJS `GeminiAdapter` (`apps/api/src/ai/providers/gemini.adapter.ts`).
+
+Uses `gemini-2.5-flash-preview-tts` model with `responseModalities: [Modality.AUDIO]` and `speechConfig` for language + voice selection. Returns `{ audioBuffer, durationMs, mimeType }` where `mimeType` is `audio/wav` or `audio/pcm` from the Gemini response.
+
+Added `POST /ai/tts` endpoint (`apps/api/src/ai/ai.controller.ts`) that accepts `{ text, voice?, language? }` and returns the raw audio bytes with correct `Content-Type`. Endpoint is JWT-protected. `AiModule` registered in `AppModule`.
+
+**Default voice:** `Kore` (neutral, suitable for German narration).
+**Default language:** `de-DE`.
+
+---
+
+## LC-070 · Gemini TTS adapter — Angular
+
+**Epic:** 7 — AI Platform
+**Phase:** 12 — Gemini TTS
+**Points:** 2
+**Depends on:** LC-069
+
+### What was implemented
+
+Created `apps/mobile/src/app/features/ai/providers/gemini.adapter.ts` — an Angular service that `POST`s to `${apiUrl}/ai/tts` and returns the audio blob as an `ArrayBuffer` matching the `AISpeechResponse` interface.
+
+`GeminiAdapter` implements `AIProvider` (throws on `generateText` and `transcribeWithTimestamps` since those are not Gemini's responsibility on the Angular side).
+
+Registered in `ai.providers.ts` (`provideAi()`), exported from `providers/index.ts` and `features/ai/index.ts`. `AiProviderFactory` updated to handle `'gemini'` case.
+
+---
+
+## LC-071 · Wire Gemini TTS into story audio pipeline and pronunciation
+
+**Epic:** 7 — AI Platform
+**Phase:** 12 — Gemini TTS
+**Points:** 3
+**Depends on:** LC-069, LC-070
+
+### What was implemented
+
+**NestJS** — `StoryAudioService` now calls `GeminiAdapter.generateSpeech()` instead of `OpenAIAdapter.generateSpeech()` for story narration. `OpenAIAdapter.transcribeWithTimestamps()` remains in use for Whisper word-level timestamps (Gemini has no equivalent). File extension and `Content-Type` are now dynamic based on the returned `mimeType`.
+
+**Angular** — `AiOrchestrationService` updated: `generateSpeechWithTimestamps()` routes audio generation to `GeminiAdapter`, timestamp transcription remains with `OpenAIAdapter`. `generatePronunciation()` now calls `GeminiAdapter.generateSpeech()` — all card pronunciation in vault and review uses Gemini TTS.
+
+### Key files changed
+
+| File | Change |
+|------|--------|
+| `apps/api/src/ai/providers/gemini.adapter.ts` | Added `generateSpeech()` |
+| `apps/api/src/ai/ai.controller.ts` | New — `POST /ai/tts` endpoint |
+| `apps/api/src/ai/ai.module.ts` | Added `AiController` |
+| `apps/api/src/app.module.ts` | Registered `AiModule` |
+| `apps/api/src/stories/story-audio.service.ts` | Routes TTS to Gemini; Whisper stays for timestamps |
+| `apps/api/src/ai/providers/openai.adapter.ts` | `transcribeWithTimestamps` accepts `mimeType` param |
+| `apps/mobile/src/app/features/ai/providers/gemini.adapter.ts` | New Angular adapter |
+| `apps/mobile/src/app/features/ai/orchestration/ai-orchestration.service.ts` | Routes speech to Gemini |
+| `apps/mobile/src/app/features/ai/ai.providers.ts` | Registers `GeminiAdapter` |
+| `apps/mobile/src/app/features/ai/providers/ai-provider.factory.ts` | Handles `'gemini'` case |
+| `apps/mobile/src/app/features/ai/providers/index.ts` | Exports `GeminiAdapter` |
+| `apps/mobile/src/app/features/ai/index.ts` | Exports `GeminiAdapter` |
 
 ---
 

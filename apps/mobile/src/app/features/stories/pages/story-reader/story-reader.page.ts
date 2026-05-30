@@ -17,13 +17,7 @@ import {
   IonToolbar,
 } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
-import {
-  arrowBackOutline,
-  playOutline,
-  pauseOutline,
-  playSkipBackOutline,
-  languageOutline,
-} from 'ionicons/icons';
+import { arrowBackOutline, playOutline, pauseOutline, playSkipBackOutline } from 'ionicons/icons';
 import type { Story, WordTimestamp } from '@lingua-card/shared/domain';
 import { StoryStore } from '../../store/story.store';
 import { StoryApiService } from '../../services/story-api.service';
@@ -52,6 +46,7 @@ export class StoryReaderPage implements OnInit, OnDestroy {
   readonly speed = signal(1.0);
   readonly progressPct = signal(0);
   readonly audioLoading = signal(false);
+  readonly audioGenerating = signal(false);
 
   private audio: HTMLAudioElement | null = null;
   private timeupdateHandler: (() => void) | null = null;
@@ -73,7 +68,6 @@ export class StoryReaderPage implements OnInit, OnDestroy {
       playOutline,
       pauseOutline,
       playSkipBackOutline,
-      languageOutline,
     });
   }
 
@@ -88,6 +82,21 @@ export class StoryReaderPage implements OnInit, OnDestroy {
         return;
       }
     }
+
+    // If story has no audio yet, generate it now via the backend
+    if (!s.audioUrl) {
+      this.story.set(s);
+      this.audioGenerating.set(true);
+      const updated = await this.storyStore.generateAudio(s.id);
+      this.audioGenerating.set(false);
+      if (updated) {
+        s = updated;
+      } else {
+        // Generation failed — stay in read-only mode
+        return;
+      }
+    }
+
     // Resolve audio to local cache or remote fallback
     this.audioLoading.set(true);
     const resolvedUrl = await this.aiAudioCache.getOrDownload(s.id, s.audioUrl);
@@ -165,8 +174,30 @@ export class StoryReaderPage implements OnInit, OnDestroy {
     if (this.audio) this.audio.playbackRate = next;
   }
 
-  toggleTranslation(): void {
-    this.showTranslation.update(v => !v);
+  seekToPercent(event: MouseEvent): void {
+    if (!this.audio || !this.audio.duration) return;
+    const bar = event.currentTarget as HTMLElement;
+    const ratio = event.offsetX / bar.clientWidth;
+    this.audio.currentTime = ratio * this.audio.duration;
+  }
+
+  currentTimeLabel(): string {
+    if (!this.audio) return '0:00';
+    return this.formatTime(this.audio.currentTime);
+  }
+
+  durationLabel(): string {
+    if (!this.audio || !this.audio.duration) {
+      const ms = this.story()?.audioDurationMs ?? 0;
+      return ms > 0 ? this.formatTime(ms / 1000) : '0:00';
+    }
+    return this.formatTime(this.audio.duration);
+  }
+
+  private formatTime(seconds: number): string {
+    const m = Math.floor(seconds / 60);
+    const s = Math.floor(seconds % 60);
+    return `${m}:${s.toString().padStart(2, '0')}`;
   }
 
   goBack(): void {

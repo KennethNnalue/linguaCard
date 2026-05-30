@@ -1,7 +1,8 @@
-import { computed, inject, Injectable, signal } from '@angular/core';
+import { computed, inject, Injectable, Injector, signal } from '@angular/core';
 import { Card, ConfidenceRating } from '@lingua-card/shared/domain';
 import { CardApiService } from '../../vault/services/card-api.service';
 import { AudioService } from '../../../shared/audio/audio.service';
+import { PronunciationService } from '../../ai/audio/pronunciation.service';
 import { Sm2Service } from '../../../shared/srs/sm2.service';
 
 type PlaylistMode = 'word-meaning' | 'examples-only' | 'deep-dive';
@@ -10,7 +11,20 @@ type PlaylistMode = 'word-meaning' | 'examples-only' | 'deep-dive';
 export class ListenStore {
   private readonly cardApi = inject(CardApiService);
   private readonly audio = inject(AudioService);
+  private readonly injector = inject(Injector);
   private readonly sm2 = inject(Sm2Service);
+
+  // Lazy getter breaks the root-injector initialization cycle: both ListenStore
+  // and PronunciationService are providedIn:'root', so eagerly injecting one
+  // inside the other's constructor triggers NG0200. Deferring to first use
+  // (after both are fully constructed) resolves the cycle.
+  private _pronunciation: PronunciationService | null = null;
+  private get pronunciation(): PronunciationService {
+    if (!this._pronunciation) {
+      this._pronunciation = this.injector.get(PronunciationService);
+    }
+    return this._pronunciation;
+  }
 
   private readonly _queue = signal<Card[]>([]);
   private readonly _currentIndex = signal(0);
@@ -148,7 +162,7 @@ export class ListenStore {
     const utterances = this._buildUtterances(card, this._playbackMode());
     for (const utt of utterances) {
       if (this._playbackCancelled) return;
-      await this._speakPromise(utt.text, utt.lang, this._playbackSpeed());
+      await this._speakPromise(utt.text, utt.lang, this._playbackSpeed(), utt.cacheKey);
       if (utt.pause && !this._playbackCancelled) {
         await this._sleep(utt.pause);
       }
@@ -158,22 +172,24 @@ export class ListenStore {
     }
   }
 
-  private _buildUtterances(card: Card, mode: PlaylistMode): { text: string; lang: string; pause?: number }[] {
+  private _buildUtterances(card: Card, mode: PlaylistMode): { text: string; lang: string; pause?: number; cacheKey?: string }[] {
     const article = card.content.article ?? '';
     const word = card.content.back;
     const articleWord = article ? `${article} ${word}` : word;
     const translation = card.content.front;
     const example = card.content.examples[0];
+    // Stable cache key reused across review, vault, and listen for the same card
+    const wordCacheKey = `pronunciation-${card.id}`;
 
     if (mode === 'word-meaning') {
       return [
-        { text: articleWord, lang: 'de-DE', pause: 800 },
+        { text: articleWord, lang: 'de-DE', pause: 800, cacheKey: wordCacheKey },
         { text: translation, lang: 'en-US', pause: 1200 },
       ];
     }
     if (mode === 'examples-only') {
-      const items: { text: string; lang: string; pause?: number }[] = [
-        { text: word, lang: 'de-DE', pause: 600 },
+      const items: { text: string; lang: string; pause?: number; cacheKey?: string }[] = [
+        { text: word, lang: 'de-DE', pause: 600, cacheKey: wordCacheKey },
       ];
       if (example) {
         items.push({ text: example.target, lang: 'de-DE', pause: 800 });
@@ -182,8 +198,8 @@ export class ListenStore {
       return items;
     }
     // deep-dive
-    const items: { text: string; lang: string; pause?: number }[] = [
-      { text: articleWord, lang: 'de-DE', pause: 600 },
+    const items: { text: string; lang: string; pause?: number; cacheKey?: string }[] = [
+      { text: articleWord, lang: 'de-DE', pause: 600, cacheKey: wordCacheKey },
       { text: translation, lang: 'en-US', pause: 600 },
     ];
     if (example) {
@@ -196,9 +212,12 @@ export class ListenStore {
     return items;
   }
 
-  private _speakPromise(text: string, lang: string, rate: number): Promise<void> {
+  private _speakPromise(text: string, lang: string, _rate: number, cacheKey?: string): Promise<void> {
+    if (lang === 'de-DE') {
+      return this.pronunciation.playTextAsPromise(text, 'de-DE', cacheKey);
+    }
     return new Promise(resolve => {
-      this.audio.speak(text, lang, rate).subscribe({
+      this.audio.speak(text, lang, _rate).subscribe({
         next: () => resolve(),
         error: () => resolve(),
         complete: () => resolve(),

@@ -1,5 +1,6 @@
 import { Injectable, Logger } from '@nestjs/common';
-import type { WordTimestamp } from '@lingua-card/shared/domain';
+import type { Story, WordTimestamp } from '@lingua-card/shared/domain';
+import { GeminiAdapter } from '../ai/providers/gemini.adapter';
 import { OpenAIAdapter } from '../ai/providers/openai.adapter';
 import { StorageService } from '../storage/storage.service';
 
@@ -8,6 +9,7 @@ export class StoryAudioService {
   private readonly logger = new Logger(StoryAudioService.name);
 
   constructor(
+    private readonly gemini: GeminiAdapter,
     private readonly openai: OpenAIAdapter,
     private readonly storage: StorageService,
   ) {}
@@ -18,25 +20,32 @@ export class StoryAudioService {
   ): Promise<{ audioUrl: string | null; timestamps: WordTimestamp[]; durationMs: number }> {
     let audioBuffer: ArrayBuffer;
     let durationMs: number;
+    let mimeType: string;
 
     try {
-      const speech = await this.openai.generateSpeech({ text: storyText, speed: 0.9 });
+      const speech = await this.gemini.generateSpeech({ text: storyText, language: 'de-DE' });
       audioBuffer = speech.audioBuffer;
       durationMs = speech.durationMs;
+      mimeType = speech.mimeType;
     } catch (err) {
-      this.logger.error(`TTS failed for story ${storyId}`, err);
+      this.logger.error(`Gemini TTS failed for story ${storyId}`, err);
       return { audioUrl: null, timestamps: [], durationMs: 0 };
     }
 
+    // Determine file extension from mime type (pcm → wav, otherwise wav)
+    const ext = mimeType.includes('mp3') ? 'mp3' : 'wav';
+    const contentType = mimeType.includes('mp3') ? 'audio/mpeg' : 'audio/wav';
+
     const audioUrl = await this.storage.upload(
       Buffer.from(audioBuffer),
-      `stories/${storyId}.mp3`,
-      'audio/mpeg',
+      `stories/${storyId}.${ext}`,
+      contentType,
     );
 
+    // Whisper transcription for word-level timestamps (handles wav and pcm)
     let timestamps: WordTimestamp[];
     try {
-      timestamps = await this.openai.transcribeWithTimestamps(audioBuffer);
+      timestamps = await this.openai.transcribeWithTimestamps(audioBuffer, mimeType);
     } catch (err) {
       this.logger.error(`Whisper failed for story ${storyId}`, err);
       return { audioUrl, timestamps: [], durationMs };

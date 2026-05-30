@@ -16,7 +16,7 @@ import {
   timeOutline,
   sparklesOutline,
 } from 'ionicons/icons';
-import { Story } from '../../../../core/models/mock-data';
+import type { Story } from '@lingua-card/shared/domain';
 import { StoryStore } from '../../store/story.store';
 import { GenerateStorySheetComponent } from '../../components/generate-story-sheet/generate-story-sheet.component';
 
