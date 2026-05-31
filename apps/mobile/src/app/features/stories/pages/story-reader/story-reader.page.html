@@ -1,128 +1,219 @@
-<ion-header class="ion-no-border">
-  <ion-toolbar>
-    <div class="sr-nav">
-      <button class="sr-back-btn" (click)="goBack()" aria-label="Back">
-        <ion-icon name="arrow-back-outline"></ion-icon>
-      </button>
-      <div class="sr-nav-title">{{ story()?.title ?? '' }}</div>
-      <div class="sr-nav-right">
-        @if (story()?.difficultyLevel; as level) {
-          <span class="sr-level-badge">{{ level }}</span>
-        }
-      </div>
-    </div>
-  </ion-toolbar>
-</ion-header>
-
-<ion-content>
+<ion-content [fullscreen]="true">
   @if (story(); as s) {
 
-    <!-- Language / Translation tab switcher -->
-    <div class="sr-tab-bar">
-      <button
-        class="sr-tab"
-        [class.active]="!showTranslation()"
-        (click)="showTranslation.set(false)"
-      >
-        🇩🇪 German
-      </button>
-      <button
-        class="sr-tab"
-        [class.active]="showTranslation()"
-        (click)="showTranslation.set(true)"
-      >
-        🇬🇧 Translation
-      </button>
+    <!-- ── Cover image + top nav overlay ─────────────────────────── -->
+    <div class="sr2-cover">
+      @if (s.coverImageUrl) {
+        <img [src]="s.coverImageUrl" class="sr2-cover-img" alt="" />
+      }
+      <div class="sr2-cover-overlay"></div>
+
+      <div class="sr2-top-bar">
+        <button class="sr2-back-btn" (click)="goBack()" aria-label="Back">
+          <ion-icon name="arrow-back-outline"></ion-icon>
+        </button>
+        <div class="sr2-top-actions">
+          <button
+            class="sr2-learned-btn"
+            [class.active]="isLearned()"
+            (click)="toggleLearned()"
+          >
+            <svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" width="10" height="10">
+              <polyline points="20,6 9,17 4,12"/>
+            </svg>
+            {{ isLearned() ? 'Learned' : 'Mark as learned' }}
+          </button>
+        </div>
+      </div>
     </div>
 
-    <!-- Audio generating banner -->
-    @if (audioGenerating()) {
-      <div class="sr-audio-generating">
-        <div class="sr-generating-pulse"></div>
-        <span>Generating audio narration…</span>
-      </div>
-    }
+    <!-- ── Four-tab section navigation ───────────────────────────── -->
+    <div class="sr2-section-tabs">
+      <button
+        class="sr2-section-tab"
+        [class.active]="activeTab() === 'story'"
+        (click)="activeTab.set('story')"
+      >Story</button>
+      <button
+        class="sr2-section-tab"
+        [class.active]="activeTab() === 'quiz'"
+        (click)="activeTab.set('quiz')"
+      >Quiz</button>
+      <button
+        class="sr2-section-tab"
+        [class.active]="activeTab() === 'keywords'"
+        (click)="activeTab.set('keywords')"
+      >Keywords</button>
+      <button
+        class="sr2-section-tab"
+        [class.active]="activeTab() === 'grammar'"
+        (click)="activeTab.set('grammar')"
+      >Grammar</button>
+    </div>
 
-    <!-- Audio loading (cache download) -->
-    @if (audioLoading() && !audioGenerating()) {
-      <div class="sr-audio-generating">
-        <div class="sr-generating-pulse"></div>
-        <span>Preparing audio…</span>
-      </div>
-    }
+    <!-- ── TAB CONTENT ────────────────────────────────────────────── -->
 
-    <!-- Karaoke word view -->
-    @if (!showTranslation()) {
-      <div class="sr-karaoke">
-        @for (wt of words(); track wt.idx) {
-          <span
-            class="sr-word"
-            [ngClass]="{
-              active: wt.idx === activeWordIdx(),
-              vocab: wt.isVocab,
-              'vocab-active': isVocabActive(wt)
-            }"
-          >{{ wt.word }}</span><span class="sr-space"> </span>
-        }
-        @if (!words().length && !audioGenerating()) {
-          <p class="sr-body-fallback">{{ s.bodyDe }}</p>
-        }
-      </div>
-    }
+    <!-- STORY TAB -->
+    @if (activeTab() === 'story') {
 
-    <!-- Translation view -->
-    @if (showTranslation()) {
-      <div class="sr-translation">
-        @for (sent of s.sentences; track sent.index) {
-          <div class="sr-sent-pair">
-            <p class="sr-sent-de">{{ sent.german }}</p>
-            <p class="sr-sent-en">{{ sent.english }}</p>
+      <div class="sr2-story-meta">
+        <div class="sr2-story-title">{{ s.title }}</div>
+        <div class="sr2-meta-row">
+          @if (s.difficultyLevel; as lvl) {
+            <span class="sr2-level-pill" [ngClass]="'level-' + lvl">{{ lvl }}</span>
+          }
+          <!-- Translation toggle — globe/translate icon -->
+          <button
+            class="sr2-icon-btn"
+            [class.active]="showTranslation()"
+            (click)="showTranslation.update(v => !v)"
+            title="Toggle translation"
+            aria-label="Toggle translation"
+          >
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="14" height="14">
+              <circle cx="12" cy="12" r="10"/>
+              <line x1="2" y1="12" x2="22" y2="12"/>
+              <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/>
+            </svg>
+          </button>
+        </div>
+      </div>
+
+      <!-- Audio generating/loading banner -->
+      @if (audioGenerating()) {
+        <div class="sr-audio-generating">
+          <div class="sr-generating-pulse"></div>
+          <span>Generating audio narration…</span>
+        </div>
+      }
+      @if (audioLoading() && !audioGenerating()) {
+        <div class="sr-audio-generating">
+          <div class="sr-generating-pulse"></div>
+          <span>Preparing audio…</span>
+        </div>
+      }
+
+      <!-- Story text: sentence-by-sentence with optional inline translation -->
+      <div class="sr2-text-block">
+
+        @if (s.sentences.length) {
+          @for (sent of s.sentences; track sent.index) {
+            <div class="sr2-sent-block">
+              <p class="sr2-sent-de">{{ sent.german }}</p>
+              @if (showTranslation()) {
+                <p class="sr2-sent-en">{{ sent.english }}</p>
+              }
+            </div>
+          }
+        } @else if (!audioGenerating()) {
+          <!-- Fallback: story has no sentences array yet — render bodyDe as karaoke -->
+          <div class="sr2-karaoke">
+            @for (wt of words(); track wt.idx) {
+              <span
+                class="sr-word"
+                [ngClass]="{
+                  active: wt.idx === activeWordIdx(),
+                  vocab: wt.isVocab,
+                  'vocab-active': isVocabActive(wt)
+                }"
+              >{{ wt.word }}</span><span class="sr-space"> </span>
+            }
+            @if (!words().length) {
+              <p class="sr-body-fallback">{{ s.bodyDe }}</p>
+            }
           </div>
         }
+
       </div>
+
+      <div style="height: 140px;"></div>
+    }
+
+    <!-- QUIZ TAB -->
+    @if (activeTab() === 'quiz') {
+      <lc-quiz-tab
+        [questions]="s.quizQuestions ?? []"
+        [loading]="enriching()"
+        [pronunciationLoading]="pronunciationLoading()"
+        [(currentIdx)]="quizCurrentIdx"
+        [(answered)]="quizAnswered"
+        (quizPlayAudio)="onQuizPlayAudio($event)"
+      />
+    }
+
+    <!-- KEYWORDS TAB -->
+    @if (activeTab() === 'keywords') {
+      <lc-keywords-tab
+        [keywords]="s.keywords ?? []"
+        [loading]="enriching()"
+        [pronunciationLoading]="pronunciationLoading()"
+        (playWord)="onKeywordsPlayWord($event)"
+        (addToTraining)="onAddToTraining($event)"
+        (memorizeAll)="onMemorizeAll()"
+      />
+    }
+
+    <!-- GRAMMAR TAB -->
+    @if (activeTab() === 'grammar') {
+      <lc-grammar-tab
+        [grammarNotes]="s.grammarNotes ?? []"
+        [loading]="enriching()"
+      />
     }
 
   } @else {
     <div class="sr-loading">Loading story…</div>
   }
-
-  <div style="height: 140px;"></div>
 </ion-content>
 
-<!-- Player bar -->
+<!-- ── Mini player bar — only on Story tab ─────────────────────── -->
 @if (story(); as s) {
-  <div class="sr-player">
-    <!-- Progress bar -->
-    <div class="sr-progress-track" (click)="seekToPercent($event)">
-      <div class="sr-progress-fill" [style.width.%]="progressPct()"></div>
+  @if (activeTab() === 'story') {
+    <div class="sr2-mini-player">
+      <!-- Progress track -->
+      <div class="sr-progress-track" (click)="seekToPercent($event)">
+        <div class="sr-progress-fill" [style.width.%]="progressPct()"></div>
+      </div>
+
+      <div class="sr2-player-row">
+        <div class="sr2-player-times">
+          <span class="sr-time">{{ currentTimeLabel() }}</span>
+          <span class="sr-time">{{ durationLabel() }}</span>
+        </div>
+
+        <div class="sr2-player-controls">
+          <!-- Restart -->
+          <button
+            class="sr2-ctrl-btn"
+            (click)="restart()"
+            [disabled]="!s.audioUrl || audioGenerating() || audioLoading()"
+            aria-label="Restart"
+          >
+            <ion-icon name="play-skip-back-outline"></ion-icon>
+          </button>
+
+          <!-- Play/Pause -->
+          <button
+            class="sr2-play-btn"
+            (click)="togglePlay()"
+            [disabled]="!s.audioUrl || audioGenerating() || audioLoading()"
+            [attr.aria-label]="isPlaying() ? 'Pause' : 'Play'"
+          >
+            @if (audioGenerating() || audioLoading()) {
+              <div class="sr-spinner"></div>
+            } @else {
+              <ion-icon [name]="isPlaying() ? 'pause-outline' : 'play-outline'"></ion-icon>
+            }
+          </button>
+
+          <!-- Speed -->
+          <button
+            class="sr2-speed-btn"
+            (click)="cycleSpeed()"
+            [disabled]="!s.audioUrl || audioGenerating() || audioLoading()"
+          >{{ speedLabel() }}</button>
+        </div>
+      </div>
     </div>
-
-    <div class="sr-time-row">
-      <span class="sr-time">{{ currentTimeLabel() }}</span>
-      <span class="sr-time">{{ durationLabel() }}</span>
-    </div>
-
-    <div class="sr-controls">
-      <button class="sr-ctrl-btn secondary" (click)="restart()" [disabled]="!s.audioUrl || audioGenerating() || audioLoading()" aria-label="Restart">
-        <ion-icon name="play-skip-back-outline"></ion-icon>
-      </button>
-
-      <button
-        class="sr-play-btn"
-        (click)="togglePlay()"
-        [disabled]="!s.audioUrl || audioGenerating() || audioLoading()"
-        [attr.aria-label]="isPlaying() ? 'Pause' : 'Play'"
-      >
-        @if (audioGenerating() || audioLoading()) {
-          <div class="sr-spinner"></div>
-        } @else {
-          <ion-icon [name]="isPlaying() ? 'pause-outline' : 'play-outline'"></ion-icon>
-        }
-      </button>
-
-      <button class="sr-ctrl-btn secondary sr-speed-btn" (click)="cycleSpeed()" [disabled]="!s.audioUrl || audioGenerating() || audioLoading()">
-        {{ speedLabel() }}
-      </button>
-    </div>
-  </div>
+  }
 }

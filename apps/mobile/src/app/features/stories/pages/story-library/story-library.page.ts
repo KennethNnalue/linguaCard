@@ -59,8 +59,14 @@ export class StoryLibraryPage implements OnInit {
     }
   }
 
-  openStory(story: Story): void {
+  openStory(event: Event | null, story: Story): void {
+    event?.stopPropagation();
     this.router.navigate(['/stories', story.id]);
+  }
+
+  listenStory(event: Event, story: Story): void {
+    event.stopPropagation();
+    this.router.navigate(['/stories', story.id], { queryParams: { autoPlay: '1' } });
   }
 
   readingTime(story: Story): string {

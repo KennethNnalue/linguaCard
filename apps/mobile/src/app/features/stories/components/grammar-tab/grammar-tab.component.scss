@@ -1,0 +1,172 @@
+.grammar-tab {
+  overflow-y: auto;
+  flex: 1;
+}
+
+// ── Grammar card ──────────────────────────────────────────────────
+.grammar-card {
+  margin: 12px 14px 0;
+  border-radius: 14px;
+  overflow: hidden;
+  border: 1px solid var(--lc-border);
+  box-shadow: var(--lc-shadow-card);
+}
+
+.grammar-card-title {
+  background: var(--lc-brand);
+  padding: 12px 14px;
+  font-size: 13px;
+  font-weight: 600;
+  color: white;
+  line-height: 1.4;
+}
+
+// ── Section inside card ───────────────────────────────────────────
+.grammar-section {
+  padding: 12px 14px;
+  border-top: 1px solid var(--lc-border);
+  background: var(--lc-card);
+}
+
+.grammar-section-label {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--lc-brand-mid);
+  margin-bottom: 6px;
+}
+
+.grammar-example-de {
+  font-size: 13px;
+  color: var(--lc-text-primary);
+  line-height: 1.6;
+  margin-bottom: 4px;
+
+  strong {
+    color: var(--lc-brand);
+  }
+}
+
+.grammar-example-en {
+  font-size: 12px;
+  color: var(--lc-text-hint);
+  font-style: italic;
+  line-height: 1.5;
+}
+
+.grammar-description {
+  font-size: 12px;
+  color: var(--lc-text-secondary);
+  line-height: 1.7;
+  white-space: pre-line;
+
+  strong {
+    color: var(--lc-text-primary);
+    font-weight: 600;
+  }
+}
+
+// ── Conjugation table ─────────────────────────────────────────────
+.grammar-table {
+  background: var(--lc-surface);
+  border-radius: 10px;
+  padding: 10px 12px;
+  margin: 10px 0;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 3px 0;
+}
+
+.grammar-table-row {
+  display: contents;
+}
+
+.grammar-table-pronoun {
+  font-size: 12px;
+  color: var(--lc-text-secondary);
+  padding: 3px 0;
+}
+
+.grammar-table-form {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--lc-text-primary);
+  padding: 3px 0;
+}
+
+// ── Additional example cards ──────────────────────────────────────
+.grammar-example-card {
+  background: var(--lc-surface);
+  border-radius: 10px;
+  padding: 10px 12px;
+  margin-top: 8px;
+}
+
+.grammar-ex-de {
+  font-size: 12px;
+  color: var(--lc-text-primary);
+  line-height: 1.5;
+  margin-bottom: 5px;
+  padding-bottom: 5px;
+  border-bottom: 1px solid var(--lc-border);
+
+  strong {
+    color: var(--lc-brand);
+  }
+}
+
+.grammar-ex-en {
+  font-size: 11px;
+  color: var(--lc-text-hint);
+  font-style: italic;
+  line-height: 1.4;
+}
+
+// ── Loading state ─────────────────────────────────────────────────
+.tab-loading-spinner {
+  width: 36px;
+  height: 36px;
+  border: 3px solid var(--lc-brand-light);
+  border-top-color: var(--lc-brand);
+  border-radius: 50%;
+  animation: tab-spin 0.8s linear infinite;
+  margin-bottom: 12px;
+}
+
+.tab-loading-text {
+  font-size: 13px;
+  color: var(--lc-text-hint);
+  font-weight: 500;
+}
+
+@keyframes tab-spin {
+  to { transform: rotate(360deg); }
+}
+
+// ── Empty state ───────────────────────────────────────────────────
+.grammar-empty {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 48px 24px;
+  text-align: center;
+  gap: 8px;
+}
+
+.grammar-empty-icon {
+  font-size: 40px;
+  margin-bottom: 8px;
+}
+
+.grammar-empty p {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--lc-text-hint);
+}
+
+.grammar-empty-sub {
+  font-size: 12px;
+  color: var(--lc-text-hint);
+  font-weight: 400 !important;
+}

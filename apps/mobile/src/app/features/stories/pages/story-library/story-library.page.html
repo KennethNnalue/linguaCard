@@ -46,7 +46,7 @@
     </div>
 
     @for (story of stories(); track story.id) {
-      <div class="ss-story-card" (click)="openStory(story)" role="button" [attr.aria-label]="'Open story: ' + story.title">
+      <div class="ss-story-card" (click)="openStory(null, story)" role="button" [attr.aria-label]="'Open story: ' + story.title">
         <div class="ss-story-top">
           <div class="ss-story-title">{{ story.title }}</div>
           <div class="ss-story-meta">
@@ -79,10 +79,14 @@
             {{ story.difficultyLevel }} · {{ story.lengthType | titlecase }}
           </span>
           <div class="ss-story-footer-right">
-            <div class="ss-story-play">
+            <button class="ss-story-action-btn ss-listen-btn" (click)="listenStory($event, story)" aria-label="Listen to story">
               <ion-icon name="play-outline"></ion-icon>
-              Listen · Read
-            </div>
+              Listen
+            </button>
+            <button class="ss-story-action-btn ss-read-btn" (click)="openStory($event, story)" aria-label="Read story">
+              <ion-icon name="book-outline"></ion-icon>
+              Read
+            </button>
             <button class="ss-delete-btn" (click)="confirmDelete($event, story)" aria-label="Delete story">
               <ion-icon name="trash-outline"></ion-icon>
             </button>

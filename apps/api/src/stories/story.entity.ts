@@ -5,6 +5,7 @@ import {
 import type {
   StorySentence, WordTimestamp, StoryVocabWord,
   StoryDifficulty, StoryLength,
+  StoryQuizQuestion, StoryGrammarNote, StoryKeyword,
 } from '@lingua-card/shared/domain';
 
 @Entity('stories')
@@ -57,6 +58,21 @@ export class StoryEntity {
 
   @Column({ nullable: true, type: 'varchar' })
   lastListenedAt!: string | null;
+
+  @Column({ nullable: true, type: 'varchar' })
+  coverImageUrl!: string | null;
+
+  @Column('jsonb', { default: [] })
+  quizQuestions!: StoryQuizQuestion[];
+
+  @Column('jsonb', { default: [] })
+  grammarNotes!: StoryGrammarNote[];
+
+  @Column('jsonb', { default: [] })
+  keywords!: StoryKeyword[];
+
+  @Column({ default: false })
+  isLearned!: boolean;
 
   @CreateDateColumn()
   generatedAt!: Date;

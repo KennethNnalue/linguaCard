@@ -222,17 +222,36 @@
   gap: 10px;
 }
 
-.ss-story-play {
+.ss-story-action-btn {
   display: flex;
   align-items: center;
-  gap: 5px;
+  gap: 4px;
   font-size: 11px;
   font-weight: 600;
-  color: var(--lc-brand);
+  border-radius: 20px;
+  padding: 5px 10px;
+  cursor: pointer;
+  font-family: var(--lc-font-body);
+  border: none;
+  transition: opacity 0.15s;
 
   ion-icon {
-    font-size: 13px;
+    font-size: 12px;
   }
+
+  &:active {
+    opacity: 0.75;
+  }
+}
+
+.ss-listen-btn {
+  background: var(--lc-brand);
+  color: white;
+}
+
+.ss-read-btn {
+  background: var(--lc-brand-light);
+  color: var(--lc-brand);
 }
 
 .ss-delete-btn {

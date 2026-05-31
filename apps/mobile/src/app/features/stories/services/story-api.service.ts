@@ -32,4 +32,12 @@ export class StoryApiService {
   recordListen(id: string): Observable<void> {
     return this.http.patch<void>(`${this.baseUrl}/${id}/listen`, {});
   }
+
+  markLearned(id: string, isLearned: boolean): Observable<Story> {
+    return this.http.patch<Story>(`${this.baseUrl}/${id}/learned`, { isLearned });
+  }
+
+  enrich(id: string): Observable<Story> {
+    return this.http.post<Story>(`${this.baseUrl}/${id}/enrich`, {});
+  }
 }

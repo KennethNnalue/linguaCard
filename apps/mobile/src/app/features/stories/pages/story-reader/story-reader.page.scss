@@ -1,14 +1,165 @@
-// ── Nav ───────────────────────────────────────────────────────────
-.sr-nav {
-  display: flex;
-  align-items: center;
-  padding: 6px 16px 10px;
-  gap: 10px;
+// ── Remove Ionic's default content padding so we control all spacing ──
+:host {
+  ion-content {
+    --padding-start: 0;
+    --padding-end: 0;
+    --padding-top: 0;
+    --padding-bottom: 0;
+  }
+
+  ion-content::part(scroll) {
+    display: block;
+    width: 100%;
+    box-sizing: border-box;
+  }
 }
 
-.sr-back-btn {
-  width: 32px;
-  height: 32px;
+// ── Cover image ───────────────────────────────────────────────────
+.sr2-cover {
+  width: 100%;
+  height: 160px;
+  position: relative;
+  overflow: hidden;
+  flex-shrink: 0;
+  // Gradient fallback when no cover image
+  background: linear-gradient(160deg, #1a3830 0%, #2D5A4E 50%, #3d7a66 100%);
+}
+
+.sr2-cover-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  filter: brightness(0.75);
+}
+
+.sr2-cover-overlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(to bottom, rgba(0, 0, 0, 0.25) 0%, rgba(0, 0, 0, 0) 60%);
+}
+
+// ── Top nav overlay (over cover image) ───────────────────────────
+.sr2-top-bar {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 44px 14px 12px; // 44px for iOS status bar
+}
+
+.sr2-back-btn {
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  background: rgba(0, 0, 0, 0.35);
+  border: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  color: white;
+  font-size: 18px;
+}
+
+.sr2-top-actions {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.sr2-learned-btn {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  background: rgba(0, 0, 0, 0.35);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  border-radius: 20px;
+  padding: 5px 10px;
+  font-size: 10px;
+  font-weight: 600;
+  color: white;
+  cursor: pointer;
+  font-family: var(--lc-font-body);
+  transition: background 0.2s, border-color 0.2s;
+
+  &.active {
+    background: var(--lc-brand);
+    border-color: var(--lc-brand);
+  }
+}
+
+// ── Four-tab section navigation ───────────────────────────────────
+.sr2-section-tabs {
+  display: flex;
+  padding: 0 10px;
+  background: white;
+  border-bottom: 1px solid var(--lc-border);
+  position: sticky;
+  top: 0;
+  z-index: 10;
+}
+
+.sr2-section-tab {
+  flex: 1;
+  padding: 9px 2px;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--lc-text-secondary);
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  font-family: var(--lc-font-body);
+  border-radius: 20px;
+  margin: 4px 2px;
+  transition: background 0.15s, color 0.15s;
+
+  &.active {
+    background: var(--lc-brand);
+    color: white;
+    font-weight: 600;
+  }
+}
+
+// ── Story tab meta row ────────────────────────────────────────────
+.sr2-story-meta {
+  padding: 12px 16px 6px;
+}
+
+.sr2-story-title {
+  font-family: var(--lc-font-display);
+  font-size: 17px;
+  font-weight: 600;
+  color: var(--lc-text-primary);
+  line-height: 1.3;
+  margin-bottom: 8px;
+}
+
+.sr2-meta-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 4px;
+}
+
+.sr2-level-pill {
+  font-size: 10px;
+  font-weight: 700;
+  font-family: var(--lc-font-body);
+  padding: 2px 9px;
+  border-radius: 8px;
+
+  &.level-A1, &.level-A2 { background: #D1FAE5; color: #059669; }
+  &.level-B1              { background: #FEF3C7; color: #D97706; }
+  &.level-B2              { background: #EAF2FC; color: #1A56A3; }
+}
+
+.sr2-icon-btn {
+  width: 28px;
+  height: 28px;
   border-radius: 50%;
   background: var(--lc-surface);
   border: 1px solid var(--lc-border);
@@ -16,64 +167,12 @@
   align-items: center;
   justify-content: center;
   cursor: pointer;
-  color: var(--lc-text-secondary);
-  font-size: 18px;
-  flex-shrink: 0;
-}
-
-.sr-nav-title {
-  flex: 1;
-  font-family: var(--lc-font-display);
-  font-size: 16px;
-  font-weight: 600;
-  color: var(--lc-text-primary);
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  text-align: center;
-}
-
-.sr-nav-right {
-  flex-shrink: 0;
-  min-width: 32px;
-  display: flex;
-  justify-content: flex-end;
-}
-
-.sr-level-badge {
-  font-size: 11px;
-  font-weight: 700;
-  font-family: var(--lc-font-body);
-  padding: 2px 8px;
-  border-radius: 8px;
-  background: #FEF3C7;
-  color: #D97706;
-}
-
-// ── Tab bar ───────────────────────────────────────────────────────
-.sr-tab-bar {
-  display: flex;
-  gap: 8px;
-  padding: 0 16px 12px;
-}
-
-.sr-tab {
-  flex: 1;
-  padding: 8px 0;
-  border-radius: 10px;
-  border: 1px solid var(--lc-border);
-  background: var(--lc-surface);
-  font-size: 13px;
-  font-family: var(--lc-font-body);
-  font-weight: 500;
-  color: var(--lc-text-secondary);
-  cursor: pointer;
-  transition: background 0.15s, border-color 0.15s, color 0.15s;
+  color: var(--lc-text-hint);
 
   &.active {
-    background: var(--lc-brand);
+    background: var(--lc-brand-light);
     border-color: var(--lc-brand);
-    color: white;
+    color: var(--lc-brand);
   }
 }
 
@@ -103,25 +202,64 @@
 
 @keyframes pulse {
   0%, 100% { opacity: 1; transform: scale(1); }
-  50% { opacity: 0.4; transform: scale(0.7); }
+  50%       { opacity: 0.4; transform: scale(0.7); }
 }
 
-// ── Karaoke ──────────────────────────────────────────────────────
-.sr-karaoke {
-  padding: 4px 20px 16px;
+// ── Story text block ──────────────────────────────────────────────
+.sr2-text-block {
+  display: block;
+  width: 100%;
+  box-sizing: border-box;
+  padding: 8px 20px 16px;
+}
+
+.sr2-sent-block {
+  display: block;
+  width: 100%;
+  box-sizing: border-box;
+  margin-bottom: 16px;
+}
+
+.sr2-sent-de {
+  display: block;
+  width: 100%;
+  box-sizing: border-box;
   font-family: var(--lc-font-display);
-  font-size: 20px;
+  font-size: clamp(16px, 4.5vw, 20px);
+  line-height: 1.75;
+  color: var(--lc-text-primary);
+  margin: 0;
+  word-break: normal;
+  overflow-wrap: break-word;
+  white-space: normal;
+}
+
+.sr2-sent-en {
+  display: block;
+  width: 100%;
+  box-sizing: border-box;
+  font-size: clamp(13px, 3.5vw, 16px);
+  color: var(--lc-brand-mid);
+  font-style: italic;
+  line-height: 1.5;
+  margin: 4px 0 0;
+  word-break: normal;
+  overflow-wrap: break-word;
+  white-space: normal;
+}
+
+// ── Karaoke fallback (stories without sentences array) ────────────
+.sr2-karaoke {
+  display: block;
+  width: 100%;
+  box-sizing: border-box;
+  font-family: var(--lc-font-display);
+  font-size: clamp(16px, 4.5vw, 20px);
   line-height: 1.9;
-  color: var(--lc-text-secondary);
+  color: var(--lc-text-primary);
 }
 
-.sr-body-fallback {
-  font-family: var(--lc-font-display);
-  font-size: 18px;
-  line-height: 1.8;
-  color: var(--lc-text-secondary);
-}
-
+// ── Karaoke word tokens ───────────────────────────────────────────
 .sr-word {
   display: inline;
   border-radius: 4px;
@@ -152,35 +290,11 @@
   display: inline;
 }
 
-// ── Translation view ──────────────────────────────────────────────
-.sr-translation {
-  padding: 4px 20px 16px;
-}
-
-.sr-sent-pair {
-  margin-bottom: 18px;
-  padding-bottom: 16px;
-  border-bottom: 1px solid var(--lc-border);
-
-  &:last-child {
-    border-bottom: none;
-  }
-}
-
-.sr-sent-de {
+.sr-body-fallback {
   font-family: var(--lc-font-display);
-  font-size: 16px;
-  font-weight: 600;
-  color: var(--lc-text-primary);
-  line-height: 1.5;
-  margin-bottom: 6px;
-}
-
-.sr-sent-en {
-  font-size: 14px;
+  font-size: 18px;
+  line-height: 1.8;
   color: var(--lc-text-secondary);
-  line-height: 1.5;
-  font-style: italic;
 }
 
 // ── Loading ───────────────────────────────────────────────────────
@@ -191,8 +305,8 @@
   color: var(--lc-text-hint);
 }
 
-// ── Player bar ────────────────────────────────────────────────────
-.sr-player {
+// ── Mini player bar ───────────────────────────────────────────────
+.sr2-mini-player {
   position: fixed;
   bottom: 0;
   left: 0;
@@ -216,10 +330,14 @@
   border-radius: 0 2px 2px 0;
 }
 
-.sr-time-row {
+.sr2-player-row {
+  padding: 6px 16px 12px;
+}
+
+.sr2-player-times {
   display: flex;
   justify-content: space-between;
-  padding: 4px 16px 0;
+  margin-bottom: 4px;
 }
 
 .sr-time {
@@ -228,17 +346,16 @@
   font-family: var(--lc-font-body);
 }
 
-.sr-controls {
+.sr2-player-controls {
   display: flex;
   align-items: center;
   justify-content: center;
   gap: 24px;
-  padding: 10px 16px 16px;
 }
 
-.sr-ctrl-btn {
-  width: 40px;
-  height: 40px;
+.sr2-ctrl-btn {
+  width: 38px;
+  height: 38px;
   border-radius: 50%;
   background: var(--lc-surface);
   border: 1px solid var(--lc-border);
@@ -249,24 +366,27 @@
   color: var(--lc-text-secondary);
   font-size: 18px;
 
-  &:disabled {
-    opacity: 0.4;
-    cursor: not-allowed;
-  }
+  &:disabled { opacity: 0.4; cursor: not-allowed; }
 }
 
-.sr-speed-btn {
+.sr2-speed-btn {
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  background: var(--lc-brand-light);
+  border: 1px solid var(--lc-brand-light);
   font-size: 11px;
   font-weight: 700;
   font-family: var(--lc-font-body);
   color: var(--lc-brand);
-  border-color: var(--lc-brand-light);
-  background: var(--lc-brand-light);
+  cursor: pointer;
+
+  &:disabled { opacity: 0.4; cursor: not-allowed; }
 }
 
-.sr-play-btn {
-  width: 56px;
-  height: 56px;
+.sr2-play-btn {
+  width: 52px;
+  height: 52px;
   border-radius: 50%;
   background: var(--lc-brand);
   border: none;
@@ -275,19 +395,16 @@
   justify-content: center;
   cursor: pointer;
   color: white;
-  font-size: 24px;
+  font-size: 22px;
   box-shadow: 0 4px 14px rgba(45, 90, 78, 0.35);
 
-  &:disabled {
-    opacity: 0.7;
-    cursor: not-allowed;
-  }
+  &:disabled { opacity: 0.7; cursor: not-allowed; }
 }
 
 // ── Spinner inside play button ────────────────────────────────────
 .sr-spinner {
-  width: 22px;
-  height: 22px;
+  width: 20px;
+  height: 20px;
   border: 3px solid rgba(255, 255, 255, 0.4);
   border-top-color: white;
   border-radius: 50%;

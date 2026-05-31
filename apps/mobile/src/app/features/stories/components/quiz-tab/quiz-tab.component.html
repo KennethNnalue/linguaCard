@@ -1,0 +1,101 @@
+@if (loading() && questions().length === 0) {
+  <div class="quiz-empty">
+    <div class="tab-loading-spinner"></div>
+    <p class="tab-loading-text">Generating quiz…</p>
+  </div>
+} @else if (questions().length === 0) {
+  <div class="quiz-empty">
+    <div class="quiz-empty-icon">📝</div>
+    <p>No quiz available for this story.</p>
+    <p class="quiz-empty-sub">Quizzes are generated for new stories going forward.</p>
+  </div>
+
+} @else if (isComplete()) {
+
+  <!-- Completion screen -->
+  <div class="quiz-complete">
+    <div class="quiz-complete-emoji">
+      {{ correctCount() === questions().length ? '🎉' : correctCount() >= questions().length / 2 ? '👍' : '💪' }}
+    </div>
+    <div class="quiz-complete-score">
+      {{ correctCount() }} / {{ questions().length }}
+    </div>
+    <div class="quiz-complete-label">correct</div>
+    <button class="quiz-retake-btn" (click)="retake()">Retake quiz</button>
+  </div>
+
+} @else {
+
+  <!-- Progress ring header -->
+  <div class="quiz-header">
+    <div class="quiz-blob">
+      <svg class="quiz-ring-svg" viewBox="0 0 72 72">
+        <circle
+          cx="36" cy="36" r="30"
+          fill="none"
+          stroke="rgba(255,255,255,0.2)"
+          stroke-width="3"
+          stroke-dasharray="188.5"
+        />
+        <circle
+          cx="36" cy="36" r="30"
+          fill="none"
+          stroke="white"
+          stroke-width="3"
+          stroke-linecap="round"
+          [attr.stroke-dasharray]="188.5"
+          [attr.stroke-dashoffset]="progressDashOffset()"
+          style="transform:rotate(-90deg); transform-origin:center"
+        />
+      </svg>
+      <span class="quiz-progress-label">{{ progressLabel() }}</span>
+    </div>
+  </div>
+
+  <!-- Quiz content -->
+  <div class="quiz-content">
+    <!-- Audio button -->
+    @if (currentQuestion()?.audioSentence) {
+      <button
+        class="quiz-audio-btn"
+        [class.quiz-audio-loading]="pronunciationLoading()"
+        [disabled]="pronunciationLoading()"
+        (click)="playAudio()"
+      >
+        @if (pronunciationLoading()) {
+          <div class="quiz-audio-spinner"></div>
+          Generating…
+        } @else {
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+            <polygon points="11,5 6,9 2,9 2,15 6,15 11,19 11,5"/>
+            <path d="M15.54,8.46a5,5,0,0,1,0,7.07"/>
+            <path d="M19.07,4.93a10,10,0,0,1,0,14.14"/>
+          </svg>
+          Play sentence
+        }
+      </button>
+    }
+
+    <!-- Question sentence -->
+    <p class="quiz-sentence">{{ currentQuestion()?.sentenceTemplate }}</p>
+
+    <!-- Answer choices -->
+    <div class="quiz-choices">
+      @for (choice of choices(); track choice) {
+        <button
+          class="choice-btn"
+          [ngClass]="choiceClass(choice)"
+          [disabled]="!!getChosenAnswer()"
+          (click)="selectAnswer(choice)"
+        >
+          {{ choice }}
+        </button>
+      }
+    </div>
+
+    <!-- Grammar hint after wrong answer -->
+    @if (showFeedback() && getChosenAnswer() !== currentQuestion()?.correctAnswer && currentQuestion()?.hint) {
+      <p class="quiz-hint">💡 {{ currentQuestion()!.hint }}</p>
+    }
+  </div>
+}

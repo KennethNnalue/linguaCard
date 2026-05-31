@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import type { GenerateStoryDto, StoryDifficulty, StoryLength } from '@lingua-card/shared/domain';
+import type { GenerateStoryDto, StoryDifficulty, StoryLength, StorySentence } from '@lingua-card/shared/domain';
 import type { CardEntity } from '../cards/card.entity';
 
 @Injectable()
@@ -24,6 +24,111 @@ export class StoryPromptBuilder {
       return this.buildExtraLongPrompt(dto, cards);
     }
     return this.buildStandardPrompt(dto, cards);
+  }
+
+  buildQuizPrompt(sentences: StorySentence[], difficulty: StoryDifficulty): string {
+    const sentenceList = sentences
+      .map((s, i) => `${i + 1}. DE: "${s.german}" | EN: "${s.english}"`)
+      .join('\n');
+
+    return `You are a German language teacher creating fill-in-the-blank quiz questions for a learner at ${difficulty} level.
+
+STORY SENTENCES:
+${sentenceList}
+
+RULES:
+1. Generate exactly 4 fill-in-the-blank questions from the sentences above.
+2. The blank must replace a single word that demonstrates a grammar rule (German article case: der/die/das/dem/den, modal verb form, preposition, adjective ending, verb conjugation).
+3. The correct answer must come from the actual story sentence.
+4. Generate exactly 2 distractors that are plausible but grammatically wrong. For article blanks, use other German articles/cases. For verbs, use wrong conjugations.
+5. Distractors should test the SAME grammatical dimension (e.g. der/die/das/dem/den for case; kann/kannst/können for modal verbs).
+6. Include a short 1-sentence hint (in English) explaining the grammar rule — shown only after a wrong answer.
+7. The sentenceTemplate must have the blanked word replaced by the literal string "___".
+
+OUTPUT: valid JSON array only, no markdown fences:
+[
+  {
+    "id": "uuid-string",
+    "sentenceTemplate": "Man kann auch unter ___ Sternenhimmel schlafen.",
+    "audioSentence": "Man kann auch unter dem Sternenhimmel schlafen.",
+    "correctAnswer": "dem",
+    "distractors": ["das", "den"],
+    "hint": "Use \\"dem\\" (dative) after \\"unter\\" when expressing location."
+  }
+]`;
+  }
+
+  buildGrammarPrompt(sentences: StorySentence[], difficulty: StoryDifficulty): string {
+    const sentenceList = sentences
+      .map((s, i) => `${i + 1}. DE: "${s.german}" | EN: "${s.english}"`)
+      .join('\n');
+
+    return `You are a German language teacher writing grammar notes for a learner at ${difficulty} level.
+
+STORY SENTENCES:
+${sentenceList}
+
+TASK: Identify 2–3 grammar topics that are ACTUALLY USED in the story above and that a ${difficulty} learner should understand.
+
+For each topic:
+1. Write a clear, concise title (e.g. "Modal verb \\"können\\"", "Use of \\"manche\\"")
+2. Pick the BEST example sentence FROM THE STORY (copy it exactly)
+3. Write a 2–3 paragraph description in plain English — no jargon without explanation
+4. If it's a verb: include a present-tense conjugation table (6 rows: ich/du/er-sie-es/wir/ihr/sie)
+5. If it's an article/declension pattern: include a small usage table
+6. Provide EXACTLY 2 additional example sentences (German + English translation) — different from the story
+7. Generate a unique UUID for each note's id field
+
+OUTPUT: valid JSON array only, no markdown fences:
+[
+  {
+    "id": "uuid-string",
+    "title": "Modal verb \\"können\\"",
+    "exampleDe": "Man kann auf hohe Sanddünen wandern.",
+    "exampleEn": "You can hike on high sand dunes.",
+    "description": "Modal verbs usually stand with a second verb...",
+    "conjugationTable": [
+      { "pronoun": "ich", "form": "kann" },
+      { "pronoun": "du", "form": "kannst" },
+      { "pronoun": "er/sie/es", "form": "kann" },
+      { "pronoun": "wir", "form": "können" },
+      { "pronoun": "ihr", "form": "könnt" },
+      { "pronoun": "sie", "form": "können" }
+    ],
+    "additionalExamples": [
+      { "de": "Ich kann Klavier spielen.", "en": "I can play the piano." },
+      { "de": "Du kannst hier nicht parken.", "en": "You cannot park here." }
+    ]
+  }
+]`;
+  }
+
+  buildKeywordsPrompt(sentences: StorySentence[], difficulty: StoryDifficulty): string {
+    const sentenceList = sentences
+      .map(s => s.german)
+      .join(' ');
+
+    return `You are a German language expert. Extract the key vocabulary words from this German story for a ${difficulty} learner.
+
+STORY TEXT:
+${sentenceList}
+
+TASK: Identify 8–15 important vocabulary words from the text above. Include nouns, verbs, and adjectives that are useful for the learner to know.
+
+For each word provide:
+- "german": the word with article if a noun (e.g. "der Biergarten"), or base infinitive if a verb (e.g. "wandern"), or base form if adjective
+- "germanBase": the word without article (e.g. "Biergarten", "wandern", "trocken")
+- "english": clear English translation
+- "article": "der", "die", "das", or null for non-nouns
+- "wordType": one of "noun", "verb", "adjective", "adverb", "other"
+- "level": CEFR level "A1", "A2", "B1", "B2", "C1", or "C2"
+
+Sort by level ascending (A1 first, C2 last).
+
+OUTPUT: valid JSON array only, no markdown fences:
+[
+  { "german": "wandern", "germanBase": "wandern", "english": "to hike, to wander", "article": null, "wordType": "verb", "level": "A1" }
+]`;
   }
 
   private buildVocabList(cards: CardEntity[]): string {

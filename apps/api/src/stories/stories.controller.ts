@@ -22,6 +22,15 @@ export class StoriesController {
     return this.storiesService.generate(userId, dto);
   }
 
+  /** Dev-only: seeds a static story without calling AI APIs */
+  @Post('seed')
+  seedStory(@CurrentUser() userId: string) {
+    if (process.env['NODE_ENV'] === 'production') {
+      return { message: 'Not available in production' };
+    }
+    return this.storiesService.seedStory(userId);
+  }
+
   @Delete(':id')
   remove(@CurrentUser() userId: string, @Param('id') id: string) {
     return this.storiesService.remove(userId, id);
@@ -32,17 +41,22 @@ export class StoriesController {
     return this.storiesService.generateAudio(userId, id);
   }
 
+  @Post(':id/enrich')
+  enrich(@CurrentUser() userId: string, @Param('id') id: string) {
+    return this.storiesService.enrich(userId, id);
+  }
+
   @Patch(':id/listen')
   recordListen(@CurrentUser() userId: string, @Param('id') id: string) {
     return this.storiesService.recordListen(userId, id);
   }
 
-  /** Dev-only: seeds a static story without calling AI APIs */
-  @Post('seed')
-  seedStory(@CurrentUser() userId: string) {
-    if (process.env['NODE_ENV'] === 'production') {
-      return { message: 'Not available in production' };
-    }
-    return this.storiesService.seedStory(userId);
+  @Patch(':id/learned')
+  setLearned(
+    @CurrentUser() userId: string,
+    @Param('id') id: string,
+    @Body('isLearned') isLearned: boolean,
+  ) {
+    return this.storiesService.setLearned(userId, id, isLearned ?? true);
   }
 }

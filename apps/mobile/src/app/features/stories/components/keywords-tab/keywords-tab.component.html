@@ -1,0 +1,65 @@
+@if (loading() && keywords().length === 0) {
+  <div class="kw-empty">
+    <div class="tab-loading-spinner"></div>
+    <p class="tab-loading-text">Extracting keywords…</p>
+  </div>
+} @else if (keywords().length === 0) {
+  <div class="kw-empty">
+    <div class="kw-empty-icon">📚</div>
+    <p>No keywords available for this story.</p>
+  </div>
+} @else {
+
+  <!-- Memorize CTA -->
+  <button class="kw-memorize-btn" (click)="memorizeAll.emit()">
+    <span class="kw-memorize-icon">📋</span>
+    <span class="kw-memorize-text">Memorize keywords</span>
+    <span class="kw-memorize-arrow">→</span>
+  </button>
+
+  <!-- Keyword list -->
+  <div class="kw-list">
+    @for (kw of keywords(); track kw.germanBase) {
+      <div class="kw-item">
+        <span
+          class="kw-level-badge"
+          [style.background]="levelStyle(kw.level).background"
+          [style.color]="levelStyle(kw.level).color"
+        >{{ kw.level }}</span>
+
+        <div class="kw-body">
+          <div class="kw-word-row">
+            <span class="kw-word">{{ kw.german }}</span>
+            <span class="kw-type"> - {{ kw.wordType }}</span>
+          </div>
+          <div class="kw-translation">{{ kw.english }}</div>
+        </div>
+
+        <div class="kw-actions">
+          <button class="kw-action-btn" (click)="addToTraining.emit(kw)" title="Add to training">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round">
+              <path d="M6.5 6.5h11M12 2v20M5 12H2m20 0h-3"/>
+              <circle cx="12" cy="12" r="3"/>
+            </svg>
+          </button>
+          <button
+            class="kw-action-btn"
+            [class.kw-playing]="isThisPlaying(kw)"
+            [disabled]="isThisPlaying(kw)"
+            (click)="onPlayWord(kw)"
+            title="Play pronunciation"
+          >
+            @if (isThisPlaying(kw)) {
+              <div class="kw-btn-spinner"></div>
+            } @else {
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round">
+                <polygon points="11,5 6,9 2,9 2,15 6,15 11,19 11,5"/>
+                <path d="M15.54,8.46a5,5,0,0,1,0,7.07"/>
+              </svg>
+            }
+          </button>
+        </div>
+      </div>
+    }
+  </div>
+}

@@ -104,6 +104,18 @@ export class StoriesService {
     await this.repo.save(entity);
   }
 
+  async enrich(userId: string, id: string): Promise<Story> {
+    return this.generation.enrichExisting(userId, id);
+  }
+
+  async setLearned(userId: string, id: string, isLearned: boolean): Promise<Story> {
+    const entity = await this.repo.findOneBy({ id, userId });
+    if (!entity) throw new NotFoundException(`Story ${id} not found`);
+    entity.isLearned = isLearned;
+    const saved = await this.repo.save(entity);
+    return this.toModel(saved);
+  }
+
   private toModel(e: StoryEntity): Story {
     return {
       id: e.id,
@@ -123,6 +135,11 @@ export class StoriesService {
       listenCount: e.listenCount,
       lastListenedAt: e.lastListenedAt,
       generatedAt: e.generatedAt instanceof Date ? e.generatedAt.toISOString() : e.generatedAt,
+      coverImageUrl: e.coverImageUrl ?? null,
+      quizQuestions: e.quizQuestions ?? [],
+      grammarNotes: e.grammarNotes ?? [],
+      keywords: e.keywords ?? [],
+      isLearned: e.isLearned ?? false,
     };
   }
 }

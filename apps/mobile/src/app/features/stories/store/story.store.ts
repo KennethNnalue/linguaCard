@@ -117,6 +117,18 @@ export const StoryStore = signalStore(
         }
       },
 
+      async enrichStory(id: string): Promise<Story | null> {
+        try {
+          const story = await firstValueFrom(api.enrich(id));
+          patchState(store, {
+            stories: store.stories().map(s => (s.id === id ? story : s)),
+          });
+          return story;
+        } catch {
+          return null;
+        }
+      },
+
       deleteStory(id: string): void {
         patchState(store, { stories: store.stories().filter(s => s.id !== id) });
         void audioCache.evict(id);

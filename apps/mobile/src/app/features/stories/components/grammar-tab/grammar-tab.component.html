@@ -1,0 +1,59 @@
+<div class="grammar-tab">
+
+  @if (loading() && grammarNotes().length === 0) {
+    <div class="grammar-empty">
+      <div class="tab-loading-spinner"></div>
+      <p class="tab-loading-text">Generating grammar notes…</p>
+    </div>
+  } @else if (grammarNotes().length === 0) {
+    <div class="grammar-empty">
+      <div class="grammar-empty-icon">📖</div>
+      <p>No grammar notes available for this story.</p>
+      <p class="grammar-empty-sub">Grammar notes are generated for new stories.</p>
+    </div>
+  }
+
+  @for (note of grammarNotes(); track note.id) {
+    <div class="grammar-card">
+
+      <!-- Title — brand green background -->
+      <div class="grammar-card-title">{{ note.title }}</div>
+
+      <!-- Example section -->
+      <div class="grammar-section">
+        <div class="grammar-section-label">Example</div>
+        <p class="grammar-example-de" [innerHTML]="boldKeywords(note.exampleDe)"></p>
+        <p class="grammar-example-en">{{ note.exampleEn }}</p>
+      </div>
+
+      <!-- Description section -->
+      <div class="grammar-section">
+        <div class="grammar-section-label">Description</div>
+        <p class="grammar-description" [innerHTML]="boldKeywords(note.description)"></p>
+
+        <!-- Conjugation table if present -->
+        @if (note.conjugationTable && note.conjugationTable.length > 0) {
+          <div class="grammar-table">
+            @for (row of note.conjugationTable; track row.pronoun) {
+              <div class="grammar-table-row">
+                <span class="grammar-table-pronoun">{{ row.pronoun }}</span>
+                <span class="grammar-table-form">{{ row.form }}</span>
+              </div>
+            }
+          </div>
+        }
+
+        <!-- Additional example sentences -->
+        @for (ex of note.additionalExamples; track $index) {
+          <div class="grammar-example-card">
+            <p class="grammar-ex-de" [innerHTML]="boldKeywords(ex.de)"></p>
+            <p class="grammar-ex-en">{{ ex.en }}</p>
+          </div>
+        }
+      </div>
+
+    </div>
+  }
+
+  <div style="height: 16px;"></div>
+</div>

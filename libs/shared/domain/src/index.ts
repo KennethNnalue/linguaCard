@@ -284,6 +284,35 @@ export interface BulkCreateResult {
 
 // ─── STORY STUDIO ─────────────────────────────────────────────────────────────
 
+export interface StoryQuizQuestion {
+  id: string;
+  sentenceTemplate: string;    // "Man kann auch unter ___ Sternenhimmel schlafen."
+  correctAnswer: string;       // "dem"
+  distractors: string[];       // ["das", "den"]  (2 distractors → 3 choices total)
+  audioSentence?: string;      // full sentence text for TTS playback
+  hint?: string;               // grammar hint shown after wrong answer
+}
+
+export interface StoryGrammarNote {
+  id: string;
+  title: string;               // "Modal verb \"können\""
+  exampleDe: string;           // Story sentence used as example
+  exampleEn: string;           // English translation of example
+  description: string;         // Multi-paragraph plain text explanation
+  conjugationTable?: Array<{ pronoun: string; form: string }>;
+  additionalExamples: Array<{ de: string; en: string }>;
+}
+
+export interface StoryKeyword {
+  cardId: string | null;       // null if not in user's vault
+  german: string;              // "der Sternenhimmel" (with article)
+  germanBase: string;          // "Sternenhimmel"
+  english: string;             // "starry sky"
+  article: 'der' | 'die' | 'das' | null;
+  wordType: 'noun' | 'verb' | 'adjective' | 'adverb' | 'other';
+  level: 'A1' | 'A2' | 'B1' | 'B2' | 'C1' | 'C2';
+}
+
 export interface StorySentence {
   index: number;
   german: string;
@@ -337,6 +366,11 @@ export interface Story {
   listenCount: number;
   lastListenedAt: string | null;
   generatedAt: string;
+  coverImageUrl?: string | null;
+  quizQuestions?: StoryQuizQuestion[];
+  grammarNotes?: StoryGrammarNote[];
+  keywords?: StoryKeyword[];
+  isLearned?: boolean;
 }
 
 export interface GenerateStoryDto {
