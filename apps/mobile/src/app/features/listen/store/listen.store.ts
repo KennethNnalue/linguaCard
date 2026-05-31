@@ -37,6 +37,7 @@ export class ListenStore {
   private readonly _ratingCountdown = signal(3);
 
   private _playbackCancelled = false;
+  private _playbackEpoch = 0;
   private _ratingTimer: ReturnType<typeof setTimeout> | null = null;
 
   readonly queue = this._queue.asReadonly();
@@ -65,8 +66,9 @@ export class ListenStore {
   play(): void {
     if (this._isPlaying()) return;
     this._playbackCancelled = false;
+    this._playbackEpoch++;
     this._isPlaying.set(true);
-    this._playCurrentCard();
+    this._playCurrentCard(this._playbackEpoch);
   }
 
   pause(): void {
@@ -136,6 +138,7 @@ export class ListenStore {
   }
 
   rateCurrentCard(rating: ConfidenceRating): void {
+    const epoch = this._playbackEpoch;
     this._ratingWindowVisible.set(false);
     this._clearRatingTimer();
     const card = this.currentCard();
@@ -144,31 +147,32 @@ export class ListenStore {
       const newSrs = this.sm2.compute(existingSrs, rating);
       this.cardApi.update(card.id, { srsState: newSrs, updatedAt: new Date().toISOString() }).subscribe();
     }
-    this._advanceOrComplete();
+    this._advanceOrComplete(epoch);
   }
 
   dismissRating(): void {
+    const epoch = this._playbackEpoch;
     this._ratingWindowVisible.set(false);
     this._clearRatingTimer();
-    this._advanceOrComplete();
+    this._advanceOrComplete(epoch);
   }
 
-  private async _playCurrentCard(): Promise<void> {
+  private async _playCurrentCard(epoch: number): Promise<void> {
     const card = this.currentCard();
-    if (!card || this._playbackCancelled) {
+    if (!card || this._playbackCancelled || epoch !== this._playbackEpoch) {
       this._isPlaying.set(false);
       return;
     }
     const utterances = this._buildUtterances(card, this._playbackMode());
     for (const utt of utterances) {
-      if (this._playbackCancelled) return;
+      if (this._playbackCancelled || epoch !== this._playbackEpoch) return;
       await this._speakPromise(utt.text, utt.lang, this._playbackSpeed(), utt.cardId);
-      if (utt.pause && !this._playbackCancelled) {
+      if (utt.pause && !this._playbackCancelled && epoch === this._playbackEpoch) {
         await this._sleep(utt.pause);
       }
     }
-    if (!this._playbackCancelled) {
-      this._showRatingWindow();
+    if (!this._playbackCancelled && epoch === this._playbackEpoch) {
+      this._showRatingWindow(epoch);
     }
   }
 
@@ -227,14 +231,15 @@ export class ListenStore {
     return new Promise(resolve => setTimeout(resolve, ms));
   }
 
-  private _showRatingWindow(): void {
+  private _showRatingWindow(epoch: number): void {
     this._ratingWindowVisible.set(true);
     this._ratingCountdown.set(3);
     const tick = () => {
+      if (epoch !== this._playbackEpoch) return;
       const current = this._ratingCountdown();
       if (current <= 1) {
         this._ratingWindowVisible.set(false);
-        this._advanceOrComplete();
+        this._advanceOrComplete(epoch);
       } else {
         this._ratingCountdown.set(current - 1);
         this._ratingTimer = setTimeout(tick, 1000);
@@ -250,7 +255,8 @@ export class ListenStore {
     }
   }
 
-  private _advanceOrComplete(): void {
+  private _advanceOrComplete(epoch: number): void {
+    if (epoch !== this._playbackEpoch) return;
     const next = this._currentIndex() + 1;
     if (next >= this._queue().length) {
       this._isPlaying.set(false);
@@ -258,7 +264,7 @@ export class ListenStore {
     } else {
       this._currentIndex.set(next);
       if (this._isPlaying()) {
-        setTimeout(() => this._playCurrentCard(), 500);
+        setTimeout(() => this._playCurrentCard(epoch), 500);
       }
     }
   }

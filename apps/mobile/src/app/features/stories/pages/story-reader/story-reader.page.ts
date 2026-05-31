@@ -13,6 +13,7 @@ import { ActivatedRoute, Router } from '@angular/router';
 import {
   IonContent,
   IonIcon,
+  ViewWillLeave,
 } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
 import { arrowBackOutline, playOutline, pauseOutline, playSkipBackOutline, repeatOutline } from 'ionicons/icons';
@@ -41,7 +42,7 @@ export type ReaderTab = 'story' | 'quiz' | 'keywords' | 'grammar';
     GrammarTabComponent,
   ],
 })
-export class StoryReaderPage implements OnInit, OnDestroy {
+export class StoryReaderPage implements OnInit, OnDestroy, ViewWillLeave {
   @ViewChild('audioEl') audioElRef!: ElementRef<HTMLAudioElement>;
 
   private readonly route = inject(ActivatedRoute);
@@ -168,8 +169,24 @@ export class StoryReaderPage implements OnInit, OnDestroy {
     }
   }
 
+  ionViewWillLeave(): void {
+    this.pauseAudio();
+  }
+
   ngOnDestroy(): void {
     this.destroyAudio();
+  }
+
+  setTab(tab: ReaderTab): void {
+    if (tab !== 'story') this.pauseAudio();
+    this.activeTab.set(tab);
+  }
+
+  private pauseAudio(): void {
+    if (this.audio && !this.audio.paused) {
+      this.audio.pause();
+      this.isPlaying.set(false);
+    }
   }
 
   private initAudio(url: string, timestamps: WordTimestamp[]): void {
@@ -334,14 +351,6 @@ export class StoryReaderPage implements OnInit, OnDestroy {
     } catch {
       this.isLearned.set(!newState); // revert on failure
     }
-  }
-
-  // ── Quiz audio — on-demand AI TTS for the full sentence ──────────
-
-  onQuizPlayAudio(sentence: string): void {
-    // Quiz sentences are story-specific — generate on-demand via /ai/tts
-    // (no cardId → ephemeral object URL, no persistence needed)
-    void this.pronunciation.playText(sentence, 'de-DE');
   }
 
   // ── Keywords audio — persisted by cardId when in vault ───────────

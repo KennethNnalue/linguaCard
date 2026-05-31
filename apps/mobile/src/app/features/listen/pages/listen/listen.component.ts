@@ -3,7 +3,7 @@ import { toObservable } from '@angular/core/rxjs-interop';
 import { filter, take } from 'rxjs';
 import { ActivatedRoute } from '@angular/router';
 import { NavController } from '@ionic/angular';
-import { IonContent, IonHeader, IonIcon, IonToolbar, ModalController } from '@ionic/angular/standalone';
+import { IonContent, IonHeader, IonIcon, IonToolbar, ModalController, ViewWillLeave } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
 import {
   chevronBackOutline,
@@ -30,7 +30,7 @@ type PlaylistMode = 'word-meaning' | 'examples-only' | 'deep-dive';
   styleUrls: ['./listen.component.scss', './listen.browser.scss', './listen.player.scss', './listen.controls.scss'],
   imports: [IonContent, IonHeader, IonIcon, IonToolbar, ArticleBadgeComponent],
 })
-export class ListenComponent implements OnInit, OnDestroy {
+export class ListenComponent implements OnInit, OnDestroy, ViewWillLeave {
   private readonly listenStore = inject(ListenStore);
   private readonly cardStore = inject(CardStore);
   private readonly categoryStore = inject(CategoryStore);
@@ -152,6 +152,10 @@ export class ListenComponent implements OnInit, OnDestroy {
           this.listenStore.loadPlaylist(all.slice(0, 20), collectionId ? 'Collection words' : 'All words');
         }
       });
+  }
+
+  ionViewWillLeave(): void {
+    this.listenStore.pause();
   }
 
   ngOnDestroy(): void {

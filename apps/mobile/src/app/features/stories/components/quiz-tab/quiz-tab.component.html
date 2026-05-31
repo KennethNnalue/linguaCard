@@ -26,7 +26,7 @@
 
 } @else {
 
-  <!-- Progress ring header -->
+  <!-- Progress ring header + audio toggle -->
   <div class="quiz-header">
     <div class="quiz-blob">
       <svg class="quiz-ring-svg" viewBox="0 0 72 72">
@@ -50,31 +50,34 @@
       </svg>
       <span class="quiz-progress-label">{{ progressLabel() }}</span>
     </div>
+
+    <!-- Audio toggle -->
+    <button
+      class="quiz-audio-toggle"
+      [class.muted]="!autoSpeak()"
+      (click)="autoSpeak.update(v => !v)"
+      [attr.aria-label]="autoSpeak() ? 'Mute answer audio' : 'Unmute answer audio'"
+    >
+      @if (pronunciationLoading()) {
+        <div class="quiz-audio-spinner"></div>
+      } @else if (autoSpeak()) {
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <polygon points="11,5 6,9 2,9 2,15 6,15 11,19 11,5"/>
+          <path d="M15.54,8.46a5,5,0,0,1,0,7.07"/>
+          <path d="M19.07,4.93a10,10,0,0,1,0,14.14"/>
+        </svg>
+      } @else {
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <polygon points="11,5 6,9 2,9 2,15 6,15 11,19 11,5"/>
+          <line x1="23" y1="9" x2="17" y2="15"/>
+          <line x1="17" y1="9" x2="23" y2="15"/>
+        </svg>
+      }
+    </button>
   </div>
 
   <!-- Quiz content -->
   <div class="quiz-content">
-    <!-- Audio button -->
-    @if (currentQuestion()?.audioSentence) {
-      <button
-        class="quiz-audio-btn"
-        [class.quiz-audio-loading]="pronunciationLoading()"
-        [disabled]="pronunciationLoading()"
-        (click)="playAudio()"
-      >
-        @if (pronunciationLoading()) {
-          <div class="quiz-audio-spinner"></div>
-          Generating…
-        } @else {
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
-            <polygon points="11,5 6,9 2,9 2,15 6,15 11,19 11,5"/>
-            <path d="M15.54,8.46a5,5,0,0,1,0,7.07"/>
-            <path d="M19.07,4.93a10,10,0,0,1,0,14.14"/>
-          </svg>
-          Play sentence
-        }
-      </button>
-    }
 
     <!-- Question sentence -->
     <p class="quiz-sentence">{{ currentQuestion()?.sentenceTemplate }}</p>
@@ -93,9 +96,38 @@
       }
     </div>
 
-    <!-- Grammar hint after wrong answer -->
-    @if (showFeedback() && getChosenAnswer() !== currentQuestion()?.correctAnswer && currentQuestion()?.hint) {
-      <p class="quiz-hint">💡 {{ currentQuestion()!.hint }}</p>
+    <!-- Wrong-answer feedback block (hint + Next button) -->
+    @if (showFeedback() && isWrongAnswer()) {
+      <div class="quiz-feedback-block">
+        @if (currentQuestion()?.hint) {
+          <p class="quiz-hint">💡 {{ currentQuestion()!.hint }}</p>
+        }
+        @if (waitingForNext()) {
+          <button class="quiz-next-btn" (click)="next()">
+            Next
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" width="14" height="14">
+              <polyline points="9,18 15,12 9,6"/>
+            </svg>
+          </button>
+        }
+      </div>
     }
+
+    <!-- Settings row -->
+    <div class="quiz-settings">
+      <div class="quiz-settings-row">
+        <div class="quiz-settings-label">
+          <span class="quiz-settings-title">Manual advance on wrong</span>
+          <span class="quiz-settings-sub">Read the hint before moving on</span>
+        </div>
+        <ion-toggle
+          [checked]="manualAdvance()"
+          (ionChange)="manualAdvance.set($any($event).detail.checked)"
+          mode="ios"
+          color="success"
+        />
+      </div>
+    </div>
+
   </div>
 }

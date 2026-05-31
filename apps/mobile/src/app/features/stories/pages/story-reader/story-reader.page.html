@@ -32,22 +32,22 @@
       <button
         class="sr2-section-tab"
         [class.active]="activeTab() === 'story'"
-        (click)="activeTab.set('story')"
+        (click)="setTab('story')"
       >Story</button>
       <button
         class="sr2-section-tab"
         [class.active]="activeTab() === 'quiz'"
-        (click)="activeTab.set('quiz')"
+        (click)="setTab('quiz')"
       >Quiz</button>
       <button
         class="sr2-section-tab"
         [class.active]="activeTab() === 'keywords'"
-        (click)="activeTab.set('keywords')"
+        (click)="setTab('keywords')"
       >Keywords</button>
       <button
         class="sr2-section-tab"
         [class.active]="activeTab() === 'grammar'"
-        (click)="activeTab.set('grammar')"
+        (click)="setTab('grammar')"
       >Grammar</button>
     </div>
 
@@ -137,7 +137,6 @@
         [pronunciationLoading]="pronunciationLoading()"
         [(currentIdx)]="quizCurrentIdx"
         [(answered)]="quizAnswered"
-        (quizPlayAudio)="onQuizPlayAudio($event)"
       />
     }
 
