@@ -78,10 +78,16 @@
 
     <!-- ── Actions ── -->
     <div class="ss-actions">
-      @if (hasHardCards()) {
-        <button class="ss-btn-retry" (click)="reviewHardCards()">
+      @if (hasNonMasteredCards()) {
+        <button class="ss-btn-retry" (click)="reviewNonMastered()">
           <ion-icon name="repeat-outline"></ion-icon>
-          Review again ({{ hardCards().length }} {{ hardCards().length === 1 ? 'card' : 'cards' }})
+          Retry struggled cards ({{ nonMasteredCards().length }} {{ nonMasteredCards().length === 1 ? 'card' : 'cards' }})
+        </button>
+      }
+      @if (allReviewedCards().length) {
+        <button class="ss-btn-retry ss-btn-retry--secondary" (click)="reviewAllAgain()">
+          <ion-icon name="refresh-outline"></ion-icon>
+          Review all again ({{ allReviewedCards().length }} {{ allReviewedCards().length === 1 ? 'card' : 'cards' }})
         </button>
       }
       <button class="lc-btn-primary ss-btn-vault" (click)="goToHub()">

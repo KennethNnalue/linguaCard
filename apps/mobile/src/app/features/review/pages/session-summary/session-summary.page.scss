@@ -54,5 +54,9 @@
   font-family: t.$lc-font-body; cursor: pointer; box-shadow: var(--lc-shadow-fab);
   ion-icon { font-size: 18px; }
   &:active { opacity: 0.88; transform: scale(0.98); }
+  &--secondary {
+    background: var(--lc-surface); color: var(--lc-accent);
+    border: 1.5px solid var(--lc-accent); box-shadow: none;
+  }
 }
 .ss-btn-vault { background: var(--lc-surface); color: var(--lc-brand); border: 1.5px solid var(--lc-border-strong); box-shadow: none; }

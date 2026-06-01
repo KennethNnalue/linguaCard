@@ -3,7 +3,7 @@ import { Router } from '@angular/router';
 import { NavController } from '@ionic/angular';
 import { IonContent, IonHeader, IonIcon, IonToolbar } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
-import { arrowBackOutline, checkmarkCircleOutline, repeatOutline } from 'ionicons/icons';
+import { arrowBackOutline, checkmarkCircleOutline, repeatOutline, refreshOutline } from 'ionicons/icons';
 import {Card, ConfidenceRating} from '@lingua-card/shared/domain';
 import {ReviewStore} from '../../store/review.store';
 import {CategoryStore} from '../../../vault/store/category.store';
@@ -27,7 +27,7 @@ export class SessionSummaryPage implements OnInit {
   private readonly router = inject(Router);
 
   constructor() {
-    addIcons({ arrowBackOutline, checkmarkCircleOutline, repeatOutline });
+    addIcons({ arrowBackOutline, checkmarkCircleOutline, repeatOutline, refreshOutline });
   }
 
   readonly session = this.reviewStore.completedSession;
@@ -93,16 +93,28 @@ export class SessionSummaryPage implements OnInit {
       .sort((a, b) => a.rating - b.rating);
   });
 
-  readonly hardCards = computed((): Card[] =>
+  readonly allReviewedCards = computed((): Card[] =>
+    this.reviewedCardRows().map(r => r.card)
+  );
+
+  // Cards rated below "Good" (< 3) in this session — needs another pass
+  readonly nonMasteredCards = computed((): Card[] =>
     this.reviewedCardRows().filter(r => r.rating < 3).map(r => r.card)
   );
 
-  readonly hasHardCards = computed(() => this.hardCards().length > 0);
+  readonly hasNonMasteredCards = computed(() => this.nonMasteredCards().length > 0);
 
-  reviewHardCards(): void {
-    const cards = this.hardCards();
+  reviewAllAgain(): void {
+    const cards = this.allReviewedCards();
     if (!cards.length) return;
-    this.reviewStore.startSession(cards, this.session()?.collectionId ?? null, 'Hard cards retry');
+    this.reviewStore.startSession(cards, this.session()?.collectionId ?? null, this.session()?.collectionName ?? null);
+    void this.navCtrl.navigateForward('/review/player', { animated: true });
+  }
+
+  reviewNonMastered(): void {
+    const cards = this.nonMasteredCards();
+    if (!cards.length) return;
+    this.reviewStore.startSession(cards, this.session()?.collectionId ?? null, 'Struggled cards retry');
     void this.navCtrl.navigateForward('/review/player', { animated: true });
   }
 

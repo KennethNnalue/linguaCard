@@ -1,5 +1,5 @@
 import { Controller, Get, Post, Patch, Delete, Param, Body, Query, BadRequestException } from '@nestjs/common';
-import { CardsService } from './cards.service';
+import { CardsService, PendingSrsRating } from './cards.service';
 import { CreateCardDto, UpdateCardDto } from '@lingua-card/shared/dto';
 import type { CardQueryParams } from '@lingua-card/shared/dto';
 import { CurrentUser } from '../common/decorators/current-user.decorator';
@@ -11,6 +11,12 @@ export class CardsController {
   @Get()
   findAll(@CurrentUser() userId: string, @Query() query: CardQueryParams) {
     return this.cardsService.findAll(userId, query);
+  }
+
+  // Must be before @Get(':id') so 'srs' is not matched as a card id
+  @Post('srs/batch')
+  batchRateSrs(@CurrentUser() userId: string, @Body() ratings: PendingSrsRating[]) {
+    return this.cardsService.batchRateSrs(userId, ratings);
   }
 
   @Get(':id')

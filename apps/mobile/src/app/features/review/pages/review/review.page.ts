@@ -92,6 +92,23 @@ export class ReviewPage implements OnInit {
   });
 
   ngOnInit(): void {
+    this.initQueue();
+  }
+
+  ionViewWillEnter(): void {
+    // Ionic may reuse the component without calling ngOnInit when navigating
+    // forward to a page already in the stack — re-init to pick up a new pending queue.
+    const pendingQueue = this.reviewStore.pendingQueue();
+    if (pendingQueue.length > 0) {
+      this.queue.set(pendingQueue);
+      this.currentIndex.set(0);
+      this.isFlipped.set(false);
+      this.highestIndexReached = 0;
+      this.reviewStore.clearPendingQueue();
+    }
+  }
+
+  private initQueue(): void {
     // If a session was pre-started (from Review Hub, Custom Study, etc.), use pending queue.
     const pendingQueue = this.reviewStore.pendingQueue();
     if (pendingQueue.length > 0) {

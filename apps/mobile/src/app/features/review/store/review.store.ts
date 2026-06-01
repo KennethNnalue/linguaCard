@@ -144,6 +144,10 @@ export class ReviewStore {
     this._completedSession.set(null);
   }
 
+  clearPendingQueue(): void {
+    this._pendingQueue.set([]);
+  }
+
   private async persistHistory(sessions: ReviewSession[]): Promise<void> {
     const userId = this.authService.currentUser()?.id;
     if (!userId) return;
