@@ -31,9 +31,6 @@ export class AppComponent implements OnInit {
     await this.localData.init();
     await this.syncService.init();
 
-    // Init notifications before first sync so it can observe the first transition
-    this.syncNotification.init();
-
     const { connected } = await Network.getStatus();
     if (connected) {
       void this.syncService.forceSync();

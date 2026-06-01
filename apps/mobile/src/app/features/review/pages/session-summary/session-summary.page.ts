@@ -6,7 +6,6 @@ import { addIcons } from 'ionicons';
 import { arrowBackOutline, checkmarkCircleOutline, repeatOutline } from 'ionicons/icons';
 import { Card, ConfidenceRating } from '../../../../core/models/mock-data';
 import { ArticleBadgeComponent } from '../../../../shared/components/article-badge/article-badge.component';
-import { MasteryDotComponent } from '../../../../shared/components/mastery-dot/mastery-dot.component';
 import { ReviewStore } from '../../store/review.store';
 
 const MASTERY_LABELS = ['New', 'Beginner', 'Learning', 'Familiar', 'Good', 'Mastered'];
@@ -17,7 +16,7 @@ const RATING_LABELS = ['Blank', 'Hard', 'Hmm', 'Good', 'Easy', 'Nailed'];
   standalone: true,
   templateUrl: './session-summary.page.html',
   styleUrls: ['./session-summary.page.scss'],
-  imports: [IonContent, IonHeader, IonToolbar, IonIcon, ArticleBadgeComponent, MasteryDotComponent],
+  imports: [IonContent, IonHeader, IonToolbar, IonIcon, ArticleBadgeComponent],
 })
 export class SessionSummaryPage implements OnInit {
   private readonly reviewStore = inject(ReviewStore);

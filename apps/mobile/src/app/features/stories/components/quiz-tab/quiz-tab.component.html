@@ -80,7 +80,7 @@
   <div class="quiz-content">
 
     <!-- Question sentence -->
-    <p class="quiz-sentence">{{ currentQuestion()?.sentenceTemplate }}</p>
+    <p class="quiz-sentence">{{ currentQuestion().sentenceTemplate }}</p>
 
     <!-- Answer choices -->
     <div class="quiz-choices">
@@ -99,8 +99,8 @@
     <!-- Wrong-answer feedback block (hint + Next button) -->
     @if (showFeedback() && isWrongAnswer()) {
       <div class="quiz-feedback-block">
-        @if (currentQuestion()?.hint) {
-          <p class="quiz-hint">💡 {{ currentQuestion()!.hint }}</p>
+        @if (currentQuestion().hint) {
+          <p class="quiz-hint">💡 {{ currentQuestion().hint }}</p>
         }
         @if (waitingForNext()) {
           <button class="quiz-next-btn" (click)="next()">

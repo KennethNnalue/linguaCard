@@ -32,7 +32,7 @@
             [class.selected]="isMasterySelected(info.level)"
             (click)="toggleMastery(info.level)">
             <div class="cs-mastery-dot" [style.background]="info.colour"></div>
-            <span class="cs-mastery-num lc-display">{{ masteryCountMap()[info.level] ?? 0 }}</span>
+            <span class="cs-mastery-num lc-display">{{ masteryCountMap()[info.level] }}</span>
             <span class="cs-mastery-lbl">{{ info.label }}</span>
           </button>
         }

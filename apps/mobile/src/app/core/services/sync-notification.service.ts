@@ -16,7 +16,7 @@ export class SyncNotificationService {
   private previousStatus: SyncStatus = 'synced';
   private activeErrorToast: HTMLIonToastElement | null = null;
 
-  init(): void {
+  constructor() {
     effect(() => {
       const current = this.syncService.syncStatus();
       const result = this.syncService.lastSyncResult();
