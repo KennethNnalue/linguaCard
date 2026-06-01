@@ -19,8 +19,8 @@ All UI must be built exclusively using LDS tokens and shared components. Never i
 Every component `.scss` file starts with:
 
 ```scss
-@use '../../../../theme/tokens' as t;
-@use '../../../../theme/utils' as u;
+@use 'theme/tokens' as t;
+@use 'theme/utils' as u;
 ```
 
 Adjust the relative path depth (`../../../../`) to match the file's location. The `t` and `u` aliases are always used — never import individual partials or use a different alias.
@@ -31,17 +31,17 @@ Adjust the relative path depth (`../../../../`) to match the file's location. Th
 
 These are **non-negotiable**. Violating any of them is a bug.
 
-| Rule | Wrong ❌ | Right ✅ |
-|---|---|---|
-| No raw hex colours | `color: #1A2B26` | `color: t.$lc-text-primary` |
-| No raw `px` for spacing | `padding: 16px 12px` | `padding: t.$lc-space-4 t.$lc-space-3` |
-| No raw `px` for radius | `border-radius: 12px` | `border-radius: t.$lc-radius-md` |
-| No raw `px` for font-size | `font-size: 13px` | `@include u.lc-font('sm')` |
-| No raw font families | `font-family: 'DM Sans'` | `font-family: t.$lc-font-body` |
-| No raw box-shadow | `box-shadow: 0 2px 12px …` | `box-shadow: t.$lc-shadow-card` |
-| No raw transitions | `transition: 150ms ease` | `transition: var(--lc-transition-fast)` |
-| No raw z-index | `z-index: 100` | `z-index: t.$lc-z-fab` |
-| No Ionic overrides in components | `--ion-toolbar-background: white` in component | Use `_ionic-map.scss` only |
+| Rule                             | Wrong ❌                                        | Right ✅                                 |
+|----------------------------------|------------------------------------------------|-----------------------------------------|
+| No raw hex colours               | `color: #1A2B26`                               | `color: t.$lc-text-primary`             |
+| No raw `px` for spacing          | `padding: 16px 12px`                           | `padding: t.$lc-space-4 t.$lc-space-3`  |
+| No raw `px` for radius           | `border-radius: 12px`                          | `border-radius: t.$lc-radius-md`        |
+| No raw `px` for font-size        | `font-size: 13px`                              | `@include u.lc-font('sm')`              |
+| No raw font families             | `font-family: 'DM Sans'`                       | `font-family: t.$lc-font-body`          |
+| No raw box-shadow                | `box-shadow: 0 2px 12px …`                     | `box-shadow: t.$lc-shadow-card`         |
+| No raw transitions               | `transition: 150ms ease`                       | `transition: var(--lc-transition-fast)` |
+| No raw z-index                   | `z-index: 100`                                 | `z-index: t.$lc-z-fab`                  |
+| No Ionic overrides in components | `--ion-toolbar-background: white` in component | Use `_ionic-map.scss` only              |
 
 ### CSS class naming
 
@@ -49,14 +49,30 @@ These are **non-negotiable**. Violating any of them is a bug.
 
 ```scss
 // ✅ correct
-.header { … }
-.title { … }
-.word-row { … }
-.action-btn { … }
+.header {
+  …
+}
+
+.title {
+  …
+}
+
+.word-row {
+  …
+}
+
+.action-btn {
+  …
+}
 
 // ❌ wrong — BEM is unnecessary
-.word-item__title--active { … }
-.card__footer--loading { … }
+.word-item__title--active {
+  …
+}
+
+.card__footer--loading {
+  …
+}
 ```
 
 ---
@@ -65,16 +81,16 @@ These are **non-negotiable**. Violating any of them is a bug.
 
 ### Spacing scale (`t.$lc-space-*`)
 
-| Variable | Value | Common use |
-|---|---|---|
-| `t.$lc-space-1` | 4px | Icon gaps, badge padding |
-| `t.$lc-space-2` | 8px | Chip padding, tight element gap |
-| `t.$lc-space-3` | 12px | Standard inner padding |
-| `t.$lc-space-4` | 16px | Card padding, section gap |
-| `t.$lc-space-5` | 20px | Button vertical padding |
-| `t.$lc-space-6` | 24px | Page section spacing |
-| `t.$lc-space-8` | 32px | Large section gap |
-| `t.$lc-space-12` | 48px | Empty state padding |
+| Variable         | Value | Common use                      |
+|------------------|-------|---------------------------------|
+| `t.$lc-space-1`  | 4px   | Icon gaps, badge padding        |
+| `t.$lc-space-2`  | 8px   | Chip padding, tight element gap |
+| `t.$lc-space-3`  | 12px  | Standard inner padding          |
+| `t.$lc-space-4`  | 16px  | Card padding, section gap       |
+| `t.$lc-space-5`  | 20px  | Button vertical padding         |
+| `t.$lc-space-6`  | 24px  | Page section spacing            |
+| `t.$lc-space-8`  | 32px  | Large section gap               |
+| `t.$lc-space-12` | 48px  | Empty state padding             |
 
 ### Colours
 
@@ -87,6 +103,7 @@ Brand: `t.$lc-brand`, `t.$lc-brand-light`, `t.$lc-brand-mid`, `t.$lc-brand-dark`
 Accent: `t.$lc-accent`, `t.$lc-accent-light`, `t.$lc-accent-dark`
 
 Article gender:
+
 - Masculine (der): `t.$lc-masc-bg` / `t.$lc-masc-text` / `t.$lc-masc-border`
 - Feminine (die): `t.$lc-fem-bg` / `t.$lc-fem-text` / `t.$lc-fem-border`
 - Neuter (das): `t.$lc-neut-bg` / `t.$lc-neut-text` / `t.$lc-neut-border`
@@ -95,13 +112,13 @@ Mastery (0–5): `t.$lc-mastery-0` … `t.$lc-mastery-5`
 
 ### Border radius
 
-| Variable | Value | Use for |
-|---|---|---|
-| `t.$lc-radius-sm` | 8px | Tags, small chips |
-| `t.$lc-radius-md` | 12px | Cards, inputs, list rows |
-| `t.$lc-radius-lg` | 20px | Bottom sheets, hero cards |
-| `t.$lc-radius-xl` | 28px | Flashcards, large modals |
-| `t.$lc-radius-full` | 9999px | Pills, dots, avatar, FAB |
+| Variable            | Value  | Use for                   |
+|---------------------|--------|---------------------------|
+| `t.$lc-radius-sm`   | 8px    | Tags, small chips         |
+| `t.$lc-radius-md`   | 12px   | Cards, inputs, list rows  |
+| `t.$lc-radius-lg`   | 20px   | Bottom sheets, hero cards |
+| `t.$lc-radius-xl`   | 28px   | Flashcards, large modals  |
+| `t.$lc-radius-full` | 9999px | Pills, dots, avatar, FAB  |
 
 ### Typography
 
@@ -112,8 +129,8 @@ Font weights: `t.$lc-font-weight-regular(400)` · `medium(500)` · `semibold(600
 **Always use the mixin** instead of `font-size` directly:
 
 ```scss
-@include u.lc-font('sm');         // 13px, weight 400
-@include u.lc-font('md', t.$lc-font-weight-semibold);  // 14px, weight 600
+@include u.lc-font('sm'); // 13px, weight 400
+@include u.lc-font('md', t.$lc-font-weight-semibold); // 14px, weight 600
 ```
 
 Available size keys: `xxs(10px)` · `xs(11px)` · `sm(13px)` · `md(14px)` · `lg(15px)` · `xl(16px)` · `2xl(18px)` · `3xl(20px)` · `4xl(24px)`
@@ -123,7 +140,7 @@ Available size keys: `xxs(10px)` · `xs(11px)` · `sm(13px)` · `md(14px)` · `l
 `t.$lc-shadow-card` — standard card lift  
 `t.$lc-shadow-float` — flashcard, FAB, modal  
 `t.$lc-shadow-fab` — orange FAB button shadow  
-`t.$lc-shadow-modal` — full modal dialogs  
+`t.$lc-shadow-modal` — full modal dialogs
 
 ### Animation
 
@@ -141,22 +158,22 @@ Available size keys: `xxs(10px)` · `xs(11px)` · `sm(13px)` · `md(14px)` · `l
 
 ```scss
 // Flexbox shortcuts
-@include u.flex-center();        // display:flex; align+justify: center
-@include u.flex-between();       // display:flex; align:center; justify:space-between
+@include u.flex-center(); // display:flex; align+justify: center
+@include u.flex-between(); // display:flex; align:center; justify:space-between
 
 // Text
-@include u.text-overflow();      // single-line truncation with ellipsis
+@include u.text-overflow(); // single-line truncation with ellipsis
 
 // Geometry
-@include u.square(40px);         // equal width+height
-@include u.circle(40px);         // square + border-radius: 50%
+@include u.square(40px); // equal width+height
+@include u.circle(40px); // square + border-radius: 50%
 
 // Card surface shorthand
-@include u.lc-card();                        // default md radius
-@include u.lc-card(t.$lc-radius-lg);        // custom radius
+@include u.lc-card(); // default md radius
+@include u.lc-card(t.$lc-radius-lg); // custom radius
 
 // Touch state
-@include u.touch-state();        // :active → opacity 0.82, scale 0.97
+@include u.touch-state(); // :active → opacity 0.82, scale 0.97
 ```
 
 ---
@@ -168,12 +185,12 @@ All components live in `apps/mobile/src/app/shared/ui/`. Import each directly �
 ### `<lc-article-badge>` — ArticleBadgeComponent
 
 ```typescript
-import { ArticleBadgeComponent } from '../../../shared/components/article-badge/article-badge.component';
+import {ArticleBadgeComponent} from '../../../shared/components/article-badge/article-badge.component';
 ```
 
 ```html
 <!-- Renders der/die/das badge with correct gender colour. Renders nothing for null. -->
-<lc-article-badge [article]="card.article" />
+<lc-article-badge [article]="card.article"/>
 ```
 
 **Never** write your own article colour CSS. **Never** use the old `.lc-article-badge--der` class directly.
@@ -183,11 +200,12 @@ import { ArticleBadgeComponent } from '../../../shared/components/article-badge/
 ### `<lc-mastery-dot>` — MasteryDotComponent
 
 ```typescript
-import { MasteryDotComponent } from '../../../shared/components/mastery-dot/mastery-dot.component';
+import {MasteryDotComponent} from '../../../shared/components/mastery-dot/mastery-dot.component';
 ```
 
 ```html
-<lc-mastery-dot [level]="card.srsState?.masteryLevel ?? 0" />
+
+<lc-mastery-dot [level]="card.srsState?.masteryLevel ?? 0"/>
 ```
 
 **Never** use `.lc-mastery-dot--*` classes directly in feature templates.
@@ -197,6 +215,7 @@ import { MasteryDotComponent } from '../../../shared/components/mastery-dot/mast
 ### `<lc-word-item>` — WordItemComponent
 
 ```html
+
 <lc-word-item
   [card]="card"
   [showMastery]="true"
@@ -234,6 +253,7 @@ Use this for every word row in lists. It internally uses `lc-article-badge` and 
 ### `<lc-category-chip>` — CategoryChipComponent
 
 ```html
+
 <lc-category-chip
   label="Animals"
   [count]="5"
@@ -247,6 +267,7 @@ Use this for every word row in lists. It internally uses `lc-article-badge` and 
 ### `<lc-empty-state>` — EmptyStateComponent
 
 ```html
+
 <lc-empty-state
   icon="📚"
   title="No words yet"
@@ -354,16 +375,16 @@ If you use SCSS token variables (e.g. `t.$lc-card`) in a context where you need 
 
 ```scss
 .card {
-  background: #FFFFFF;             // ❌ raw hex
-  border-radius: 20px;             // ❌ raw px
-  padding: 16px;                   // ❌ raw px
+  background: #FFFFFF; // ❌ raw hex
+  border-radius: 20px; // ❌ raw px
+  padding: 16px; // ❌ raw px
   box-shadow: 0 2px 8px #00000020; // ❌ raw shadow
 }
 
 .title {
-  font-size: 15px;                 // ❌ raw font-size
-  font-family: 'DM Sans';          // ❌ raw font family
-  font-weight: 600;                // ❌ raw weight (use t.$lc-font-weight-semibold)
-  color: #1A2B26;                  // ❌ raw hex
+  font-size: 15px; // ❌ raw font-size
+  font-family: 'DM Sans'; // ❌ raw font family
+  font-weight: 600; // ❌ raw weight (use t.$lc-font-weight-semibold)
+  color: #1A2B26; // ❌ raw hex
 }
 ```

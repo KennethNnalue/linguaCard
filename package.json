@@ -101,6 +101,7 @@
     "jest-environment-jsdom": "^30.3.0",
     "jest-preset-angular": "^16.1.4",
     "nx": "^22.7.1",
+    "sharp": "^0.34.5",
     "tsc-alias": "^1.8.17",
     "typescript": "~5.9.0"
   },

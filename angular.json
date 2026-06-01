@@ -39,13 +39,8 @@
               },
               {
                 "glob": "manifest.webmanifest",
-                "input": "public",
+                "input": "apps/mobile/src",
                 "output": "/"
-              },
-              {
-                "glob": "**/*",
-                "input": "public/icons",
-                "output": "icons"
               }
             ],
             "styles": [
