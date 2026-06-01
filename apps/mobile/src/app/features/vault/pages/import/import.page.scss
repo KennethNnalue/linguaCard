@@ -29,7 +29,7 @@
 .imp-or-txt { @include u.lc-font('sm', t.$lc-font-weight-medium); color: var(--lc-text-hint); white-space: nowrap; }
 
 .imp-image-btn {
-  display: flex; align-items: center; gap: t.$lc-space-3;
+  display: flex; align-items: center; justify-content: center; gap: t.$lc-space-3;
   background: var(--lc-brand-light); color: var(--lc-brand);
   border: 1.5px solid var(--lc-brand); border-radius: t.$lc-radius-md;
   padding: 14px t.$lc-space-4; font-family: t.$lc-font-body; cursor: pointer; width: 100%;
@@ -37,7 +37,7 @@
   ion-icon { font-size: 28px; flex-shrink: 0; }
   &:active { background: var(--lc-brand-light); opacity: 0.85; }
 }
-.imp-image-btn-text { display: flex; flex-direction: column; align-items: flex-start; gap: 2px; }
+.imp-image-btn-text { display: flex; flex-direction: column; align-items: center; gap: 2px; }
 .imp-image-btn-title { @include u.lc-font('lg', t.$lc-font-weight-semibold); }
 .imp-image-btn-sub { @include u.lc-font('xs'); opacity: 0.7; }
 
