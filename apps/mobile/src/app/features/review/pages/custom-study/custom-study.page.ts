@@ -36,6 +36,7 @@ export class CustomStudyPage {
   private readonly reviewStore = inject(ReviewStore);
   private readonly collectionStore = inject(CollectionStore);
   private readonly navCtrl = inject(NavController);
+  private readonly router = inject(Router);
   private readonly toastCtrl = inject(ToastController);
   private readonly actionSheetCtrl = inject(ActionSheetController);
 
@@ -136,6 +137,6 @@ export class CustomStudyPage {
   }
 
   goBack(): void {
-    this.navCtrl.back();
+    void this.router.navigate(['/review']);
   }
 }

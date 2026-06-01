@@ -21,7 +21,7 @@
   cursor: pointer;
   @include u.touch-state;
 
-  ion-icon { font-size: 14px; color: t.$lc-brand; }
+  ion-icon { font-size: 14px; color: var(--lc-brand); }
 }
 
 .wd-icon-btn--outline {
@@ -84,6 +84,26 @@
   border-radius: t.$lc-radius-full;
 }
 
+// Mastery-level pill variants — all use CSS custom properties so dark mode applies
+.wd2-mastery-pill--0 { background: var(--lc-rating-0-bg); color: var(--lc-text-secondary); border: 1px solid var(--lc-border); }
+.wd2-mastery-pill--1 { background: var(--lc-rating-1-bg); color: var(--lc-fem-text); }
+.wd2-mastery-pill--2 { background: var(--lc-rating-2-bg); color: #9A7000; }
+.wd2-mastery-pill--3 { background: var(--lc-rating-3-bg); color: #1A7A55; }
+.wd2-mastery-pill--4 { background: var(--lc-rating-4-bg); color: #16835A; }
+.wd2-mastery-pill--5 { background: var(--lc-rating-5-bg); color: var(--lc-mastery-5); }
+
+// Mastery dot inside the pill — matches the mastery color scale
+.wd2-mastery-dot--0 { background: var(--lc-mastery-0); }
+.wd2-mastery-dot--1 { background: var(--lc-mastery-1); }
+.wd2-mastery-dot--2 { background: var(--lc-mastery-2); }
+.wd2-mastery-dot--3 { background: var(--lc-mastery-3); }
+.wd2-mastery-dot--4 { background: var(--lc-mastery-4); }
+.wd2-mastery-dot--5 { background: var(--lc-mastery-5); }
+
+// Category and tag pills
+.wd2-pill--category { background: var(--lc-brand-light); color: var(--lc-brand-mid); border: 1px solid var(--lc-border); }
+.wd2-pill--tag { background: var(--lc-surface); color: var(--lc-text-secondary); border: 1px solid var(--lc-border); }
+
 .wd2-status-dot {
   @include u.circle(6px);
 }
@@ -104,7 +124,7 @@
   border-radius: t.$lc-radius-md;
   padding: t.$lc-space-2 + 2px t.$lc-space-3;
   @include u.lc-font('xs', t.$lc-font-weight-semibold);
-  color: t.$lc-brand;
+  color: var(--lc-brand);
   cursor: pointer;
   font-family: t.$lc-font-body;
   @include u.touch-state;
@@ -112,9 +132,9 @@
   ion-icon { font-size: 14px; }
 
   &--accent {
-    background: t.$lc-accent-light;
-    color: t.$lc-accent;
-    ion-icon { color: t.$lc-accent; }
+    background: var(--lc-accent-light);
+    color: var(--lc-accent);
+    ion-icon { color: var(--lc-accent); }
   }
 
   &:disabled { opacity: 0.6; cursor: not-allowed; }
@@ -249,7 +269,7 @@
 }
 
 :host ::ng-deep .wd2-ex-de strong {
-  color: t.$lc-brand;
+  color: var(--lc-brand);
   font-weight: t.$lc-font-weight-semibold;
 }
 
@@ -263,7 +283,7 @@
 // ─── NOTES ───────────────────────────────────────────────────────────────────
 .wd2-notes {
   margin: 0 t.$lc-space-4 t.$lc-space-3;
-  background: t.$lc-accent-light;
+  background: var(--lc-accent-light);
   border: 1px solid rgba(224, 123, 63, 0.2);
   border-radius: t.$lc-radius-md;
   padding: t.$lc-space-3 t.$lc-space-3;
@@ -325,7 +345,7 @@
   align-items: center;
   justify-content: center;
   gap: t.$lc-space-1 + 2px;
-  background: t.$lc-brand;
+  background: var(--lc-brand);
   color: white;
   border: none;
   border-radius: t.$lc-radius-md;
@@ -351,6 +371,6 @@
 }
 
 .wd2-btn-delete {
-  ion-icon { color: t.$lc-fem-text; }
-  &:active { background: t.$lc-fem-bg; }
+  ion-icon { color: var(--lc-fem-text); }
+  &:active { background: var(--lc-fem-bg); }
 }

@@ -1,5 +1,6 @@
 import { Component, computed, inject, signal } from '@angular/core';
-import { NavController, IonContent, IonHeader, IonIcon, IonToolbar } from '@ionic/angular/standalone';
+import { Router } from '@angular/router';
+import { IonContent, IonHeader, IonIcon, IonToolbar } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
 import { chevronBackOutline } from 'ionicons/icons';
 import { ReviewStore, ReviewSession } from '../../store/review.store';
@@ -22,7 +23,7 @@ export interface SessionStats {
 })
 export class SessionHistoryPage {
   private readonly reviewStore = inject(ReviewStore);
-  private readonly navCtrl = inject(NavController);
+  private readonly router = inject(Router);
 
   constructor() {
     addIcons({ chevronBackOutline });
@@ -88,6 +89,6 @@ export class SessionHistoryPage {
   }
 
   goBack(): void {
-    this.navCtrl.back();
+    void this.router.navigate(['/review']);
   }
 }

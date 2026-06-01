@@ -83,6 +83,6 @@ export class StrugglingCardsPage {
   }
 
   goBack(): void {
-    this.navCtrl.back();
+    void this.router.navigate(['/review']);
   }
 }

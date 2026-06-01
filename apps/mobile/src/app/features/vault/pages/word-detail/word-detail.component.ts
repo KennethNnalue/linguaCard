@@ -63,12 +63,11 @@ export class WordDetailComponent {
 
   readonly masteryLevel = computed(() => this.card()?.srsState?.masteryLevel ?? 0);
 
-  readonly masteryColor = computed(() =>
-    ['#D1D5DB', '#FCA5A5', '#FCD34D', '#6EE7B7', '#34D399', '#059669'][this.masteryLevel()]
-  );
 
-  readonly masteryBgColor = computed(() =>
-    ['#F3F4F6', '#FEF2F2', '#FFFBEA', '#F0FDF9', '#ECFDF5', '#D1FAE5'][this.masteryLevel()]
+  // Used only for the SVG ring stroke — mastery colors are the same in both modes
+  readonly masteryColor = computed(() =>
+    ['var(--lc-mastery-0)', 'var(--lc-mastery-1)', 'var(--lc-mastery-2)',
+     'var(--lc-mastery-3)', 'var(--lc-mastery-4)', 'var(--lc-mastery-5)'][this.masteryLevel()]
   );
 
   readonly masteryLabel = computed(() => {

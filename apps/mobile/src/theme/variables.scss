@@ -122,38 +122,54 @@
 // ─── DARK MODE ───────────────────────────────────────────────────────────────
 // Applied by ThemeService via body.ion-palette-dark class.
 body.ion-palette-dark {
-  // Brand (lighter for dark surfaces)
+  // Brand — brighter teal for dark surfaces so it reads at full contrast
   --lc-brand:           #5ABFA3;
-  --lc-brand-light:     #1A2E28;
-  --lc-brand-mid:       #3D8A74;
+  --lc-brand-mid:       #4DAF90;
+  --lc-brand-dark:      #2D7A66;
+  // brand-light is used for category tags, mastery pills, and tinted backgrounds.
+  // It needs to be visibly distinct from the card surface — a mid-teal tint.
+  --lc-brand-light:     #1E3830;
+
+  // Accent
   --lc-accent:          #E09060;
-  --lc-accent-light:    #2A1F14;
+  --lc-accent-light:    #2D1F10;
 
-  // Surfaces
-  --lc-surface:         #141918;
-  --lc-card:            #1E2520;
-  --lc-border:          rgba(90, 191, 163, 0.12);
-  --lc-border-strong:   rgba(90, 191, 163, 0.24);
+  // Surfaces — enough step difference so cards visually lift off the page
+  --lc-surface:         #111614;   // page background: near-black with a hint of green
+  --lc-card:            #1E2924;   // card: noticeably lighter than surface
+  --lc-card-elevated:   #253028;   // elevated cards (hero, modal): one step above card
 
-  // Text
-  --lc-text-primary:    #E8F2EE;
-  --lc-text-secondary:  #8BADA4;
-  --lc-text-hint:       #5A7870;
+  // Borders — visible enough to define card edges without being garish
+  --lc-border:          rgba(90, 191, 163, 0.18);
+  --lc-border-strong:   rgba(90, 191, 163, 0.32);
 
-  // Shadows
-  --lc-shadow-card:     0 2px 12px rgba(0, 0, 0, 0.3);
-  --lc-shadow-float:    0 8px 32px rgba(0, 0, 0, 0.4);
+  // Text — all three levels readable on #1E2924
+  --lc-text-primary:    #E4F0EC;   // headlines, word text
+  --lc-text-secondary:  #92B3AB;   // translations, meta text
+  --lc-text-hint:       #6B9088;   // phonetics, intervals, placeholders (lifted from #5A7870)
 
-  // Article gender colours (adjusted for dark surfaces)
-  --lc-masc-bg:         #1E2D45;
-  --lc-masc-text:       #60A5FA;
-  --lc-masc-border:     #3B6EA8;
-  --lc-fem-bg:          #3A1515;
-  --lc-fem-text:        #F87171;
-  --lc-fem-border:      #8B2020;
-  --lc-neut-bg:         #252620;
-  --lc-neut-text:       #9BAAA6;
-  --lc-neut-border:     #5F5E5A;
+  // Shadows — stronger black shadows so cards read as elevated surfaces
+  --lc-shadow-card:     0 2px 8px rgba(0, 0, 0, 0.45), 0 1px 2px rgba(0, 0, 0, 0.3);
+  --lc-shadow-float:    0 8px 32px rgba(0, 0, 0, 0.55), 0 2px 8px rgba(0, 0, 0, 0.3);
+
+  // Rating / mastery pill backgrounds — dark-surface equivalents of the light pastel tints
+  --lc-rating-0-bg:     #252825;  // neutral grey tint on dark
+  --lc-rating-1-bg:     #321414;  // red tint (same as fem-bg)
+  --lc-rating-2-bg:     #2D2610;  // amber tint
+  --lc-rating-3-bg:     #162A22;  // light green tint
+  --lc-rating-4-bg:     #122A20;  // medium green tint
+  --lc-rating-5-bg:     #0E2A1C;  // deep green tint
+
+  // Article gender colours — keep hues, lift background and border for dark surfaces
+  --lc-masc-bg:         #1A2B42;
+  --lc-masc-text:       #7BB8F8;
+  --lc-masc-border:     #2D4F7A;
+  --lc-fem-bg:          #321414;
+  --lc-fem-text:        #F98080;
+  --lc-fem-border:      #6B2020;
+  --lc-neut-bg:         #272820;
+  --lc-neut-text:       #A8B8B4;
+  --lc-neut-border:     #4A4E48;
 
   // Ionic surfaces follow LDS tokens automatically
   --ion-background-color:    var(--lc-surface);

@@ -28,17 +28,17 @@
         <div class="wd2-trans">{{ word.content.front }}@if (word.content.article) { · noun, {{ word.content.article === 'der' ? 'masculine' : word.content.article === 'die' ? 'feminine' : 'neuter' }}}</div>
 
         <div class="wd2-pills">
-          <div class="wd2-status-pill" [style.background]="masteryBgColor()" [style.color]="masteryColor()">
-            <div class="wd2-status-dot" [style.background]="masteryColor()"></div>
+          <div class="wd2-status-pill wd2-mastery-pill--{{ masteryLevel() }}">
+            <div class="wd2-status-dot wd2-mastery-dot--{{ masteryLevel() }}"></div>
             {{ masteryLabel() }}
           </div>
           @if (categoryName()) {
-            <div class="wd2-status-pill" style="background: var(--lc-brand-light); color: var(--lc-brand-mid);">
+            <div class="wd2-status-pill wd2-pill--category">
               {{ categoryName() }}
             </div>
           }
           @for (tag of word.tags; track tag) {
-            <div class="wd2-status-pill" style="background: var(--lc-surface); color: var(--lc-text-secondary);">
+            <div class="wd2-status-pill wd2-pill--tag">
               {{ tag }}
             </div>
           }

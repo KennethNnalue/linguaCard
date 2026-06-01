@@ -1,4 +1,5 @@
 import { Component, computed, inject, signal } from '@angular/core';
+import { Router } from '@angular/router';
 import { NavController, IonContent, IonHeader, IonIcon, IonToolbar, ActionSheetController } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
 import { chevronBackOutline, chevronDownOutline, playOutline } from 'ionicons/icons';
@@ -27,6 +28,7 @@ export class MasteryBreakdownPage {
   private readonly reviewStore = inject(ReviewStore);
   private readonly collectionStore = inject(CollectionStore);
   private readonly navCtrl = inject(NavController);
+  private readonly router = inject(Router);
   private readonly actionSheetCtrl = inject(ActionSheetController);
 
   constructor() {
@@ -94,6 +96,6 @@ export class MasteryBreakdownPage {
   }
 
   goBack(): void {
-    this.navCtrl.back();
+    void this.router.navigate(['/review']);
   }
 }

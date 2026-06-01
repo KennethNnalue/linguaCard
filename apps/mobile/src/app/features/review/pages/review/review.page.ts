@@ -1,7 +1,7 @@
 import { Component, computed, inject, Injector, OnInit, signal } from '@angular/core';
 import { toObservable } from '@angular/core/rxjs-interop';
 import { filter, take } from 'rxjs';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { NavController } from '@ionic/angular';
 import { IonContent, IonHeader, IonIcon, IonToolbar } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
@@ -41,6 +41,7 @@ export class ReviewPage implements OnInit {
   private readonly categoryStore = inject(CategoryStore);
   private readonly collectionStore = inject(CollectionStore);
   private readonly navCtrl = inject(NavController);
+  private readonly router = inject(Router);
   private readonly injector = inject(Injector);
   private readonly route = inject(ActivatedRoute);
 
@@ -184,7 +185,7 @@ export class ReviewPage implements OnInit {
   }
 
   exitSession(): void {
-    this.navCtrl.back();
+    void this.router.navigate(['/review']);
   }
 
   highlightWord(sentence: string, word: string): string {

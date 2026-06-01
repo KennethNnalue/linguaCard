@@ -124,10 +124,10 @@
   flex-shrink: 0;
   border-radius: 2px 0 0 2px;
 
-  &--der { background: t.$lc-masc-text; }
-  &--die { background: t.$lc-fem-text; }
-  &--das { background: t.$lc-neut-text; }
-  &--none { background: t.$lc-mastery-0; }
+  &--der { background: var(--lc-masc-text); }
+  &--die { background: var(--lc-fem-text); }
+  &--das { background: var(--lc-neut-text); }
+  &--none { background: var(--lc-mastery-0); }
 }
 
 .sc-vocab-content {
@@ -165,7 +165,7 @@
 
 .sc-vocab-base {
   @include u.lc-font('xxs', t.$lc-font-weight-medium);
-  color: t.$lc-brand-mid;
+  color: var(--lc-brand-mid);
   flex-shrink: 0;
 }
 
@@ -199,7 +199,7 @@
 }
 
 .sc-btn-library {
-  background: t.$lc-brand;
+  background: var(--lc-brand);
   color: white;
 }
 

@@ -29,21 +29,21 @@
 .vault-icon-btn {
   @include u.square(32px);
   border-radius: t.$lc-radius-full;
-  background: t.$lc-brand-light;
+  background: var(--lc-brand-light);
   border: none;
   @include u.flex-center;
   cursor: pointer;
 
   ion-icon {
     font-size: 14px;
-    color: t.$lc-brand;
+    color: var(--lc-brand);
   }
 }
 
 .vault-fab {
   @include u.square(32px);
   border-radius: t.$lc-radius-full;
-  background: t.$lc-accent;
+  background: var(--lc-accent);
   border: none;
   box-shadow: t.$lc-shadow-fab;
   @include u.flex-center;
@@ -133,9 +133,9 @@ ion-segment-button {
   transition: var(--lc-transition-fast);
 
   &.v2-filter-on {
-    background: t.$lc-brand;
+    background: var(--lc-brand);
     color: white;
-    border-color: t.$lc-brand;
+    border-color: var(--lc-brand);
   }
 
   &.v2-filter-off {

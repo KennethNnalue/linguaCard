@@ -38,14 +38,15 @@
 .wc-word {
   font-family: t.$lc-font-display;
   @include u.lc-font('xl', t.$lc-font-weight-semibold);
-  color: t.$lc-text-primary;
+  // CSS custom property so dark-mode override applies at runtime
+  color: var(--lc-text-primary);
   line-height: 1.2;
 }
 
 .wc-phonetic {
   font-family: t.$lc-font-mono;
   @include u.lc-font('xxs');
-  color: t.$lc-text-hint;
+  color: var(--lc-text-hint);
 }
 
 .wc-mid {
@@ -57,7 +58,7 @@
 
 .wc-trans {
   @include u.lc-font('sm');
-  color: t.$lc-text-secondary;
+  color: var(--lc-text-secondary);
   flex: 1;
   @include u.text-overflow;
 }
@@ -66,8 +67,8 @@
   @include u.lc-font('xxs', t.$lc-font-weight-bold);
   letter-spacing: 0.05em;
   text-transform: uppercase;
-  color: t.$lc-brand-mid;
-  background: t.$lc-brand-light;
+  color: var(--lc-brand-mid);
+  background: var(--lc-brand-light);
   padding: 2px t.$lc-space-1 + 2px;
   border-radius: t.$lc-radius-full;
   flex-shrink: 0;
@@ -75,14 +76,14 @@
 
 .wc-example {
   @include u.lc-font('xs');
-  color: t.$lc-text-hint;
+  color: var(--lc-text-hint);
   font-style: italic;
   line-height: 1.4;
   @include u.text-overflow;
   margin-bottom: t.$lc-space-1 + 2px;
 
   :global(strong) {
-    color: t.$lc-brand;
+    color: var(--lc-brand);
     font-style: normal;
   }
 }
@@ -98,20 +99,20 @@
   align-items: center;
   gap: t.$lc-space-1;
   @include u.lc-font('xxs', t.$lc-font-weight-semibold);
-  color: t.$lc-text-hint;
+  color: var(--lc-text-hint);
 }
 
 .wc-due {
   @include u.lc-font('xxs', t.$lc-font-weight-bold);
-  color: t.$lc-accent;
-  background: t.$lc-accent-light;
+  color: var(--lc-accent);
+  background: var(--lc-accent-light);
   padding: 2px t.$lc-space-1 + 2px;
   border-radius: t.$lc-radius-full;
 }
 
 .wc-interval {
   @include u.lc-font('xxs');
-  color: t.$lc-text-hint;
+  color: var(--lc-text-hint);
 }
 
 .wc-spacer {
@@ -128,6 +129,6 @@
 
   ion-icon {
     font-size: 12px;
-    color: t.$lc-text-secondary;
+    color: var(--lc-text-secondary);
   }
 }
