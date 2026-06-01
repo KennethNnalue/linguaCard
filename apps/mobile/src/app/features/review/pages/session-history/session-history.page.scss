@@ -1,46 +1,60 @@
+@use 'theme/tokens' as t;
+@use 'theme/utils' as u;
+
+// ── Nav ────────────────────────────────────────────────────────────
 .sh-nav {
   display: flex;
   align-items: center;
-  padding: 6px 16px 10px;
-  gap: 12px;
+  padding: t.$lc-space-1 t.$lc-space-4 t.$lc-space-2;
+  gap: t.$lc-space-3;
+}
+
+.sh-back-btn {
+  @include u.circle(30px);
+  @include u.flex-center;
+  background: var(--lc-brand-light);
+  border: none;
+  cursor: pointer;
+  flex-shrink: 0;
+  @include u.touch-state;
+
+  ion-icon { font-size: 14px; color: var(--lc-brand); }
 }
 
 .sh-nav-title {
-  font-size: 15px;
-  font-weight: 600;
+  font-family: t.$lc-font-display;
+  @include u.lc-font('md', t.$lc-font-weight-semibold);
   color: var(--lc-text-primary);
   flex: 1;
   text-align: center;
 }
 
-.sh-nav-spacer {
-  width: 32px;
-}
+.sh-nav-spacer { width: 30px; }
 
-.sh-content {
-  padding-bottom: env(safe-area-inset-bottom, 24px);
-}
+.sh-content { padding-bottom: env(safe-area-inset-bottom, t.$lc-space-6); }
 
 // ── Filter chips ──────────────────────────────────────────────────
 .sh-filters {
   display: flex;
-  gap: 7px;
-  padding: 4px 14px 12px;
+  gap: t.$lc-space-2;
+  padding: t.$lc-space-1 t.$lc-space-4 t.$lc-space-3;
   overflow-x: auto;
+  scrollbar-width: none;
+  &::-webkit-scrollbar { display: none; }
 }
 
 .sh-filter-chip {
   flex: 0 0 auto;
-  padding: 5px 12px;
-  border-radius: 20px;
-  font-size: 10px;
-  font-weight: 600;
+  padding: 5px t.$lc-space-3;
+  border-radius: t.$lc-radius-full;
+  @include u.lc-font('xxs', t.$lc-font-weight-semibold);
   border: 1px solid var(--lc-border);
   background: var(--lc-card);
   color: var(--lc-text-secondary);
   cursor: pointer;
-  font-family: var(--lc-font-body);
-  transition: all 0.15s;
+  font-family: t.$lc-font-body;
+  transition: var(--lc-transition-fast);
+  @include u.touch-state;
 
   &.active {
     background: var(--lc-brand);
@@ -51,92 +65,70 @@
 
 // ── Session card ──────────────────────────────────────────────────
 .sh-session-card {
-  margin: 0 14px 8px;
-  background: var(--lc-card);
-  border: 1px solid var(--lc-border);
-  border-radius: 14px;
-  padding: 13px 14px;
-  box-shadow: var(--lc-shadow-card);
+  margin: 0 t.$lc-space-4 t.$lc-space-2;
+  @include u.lc-card(t.$lc-radius-md);
+  padding: t.$lc-space-3 t.$lc-space-4;
   cursor: pointer;
-
-  &:active {
-    transform: scale(0.98);
-  }
+  @include u.touch-state;
 }
 
 .sh-session-top {
   display: flex;
   align-items: flex-start;
   justify-content: space-between;
-  margin-bottom: 8px;
+  margin-bottom: t.$lc-space-2;
 }
 
 .sh-session-info {
   flex: 1;
   min-width: 0;
-  margin-right: 8px;
+  margin-right: t.$lc-space-2;
 }
 
 .sh-session-title {
-  font-size: 13px;
-  font-weight: 600;
+  @include u.lc-font('sm', t.$lc-font-weight-semibold);
   color: var(--lc-text-primary);
   margin: 0 0 2px;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
+  @include u.text-overflow;
 }
 
 .sh-session-date {
-  font-size: 10px;
+  @include u.lc-font('xxs');
   color: var(--lc-text-hint);
   margin: 0;
 }
 
-// ── Rating pill ───────────────────────────────────────────────────
+// ── Rating pill — uses CSS custom properties so dark mode applies ──
 .sh-rating-pill {
-  font-size: 11px;
-  font-weight: 700;
-  padding: 3px 9px;
-  border-radius: 8px;
+  @include u.lc-font('xxs', t.$lc-font-weight-bold);
+  padding: 3px t.$lc-space-2 + 2px;
+  border-radius: t.$lc-radius-sm;
   flex-shrink: 0;
 
-  &.pill--green {
-    background: #D1FAE5;
-    color: #059669;
-  }
-  &.pill--amber {
-    background: #FEF3C7;
-    color: #D97706;
-  }
-  &.pill--red {
-    background: #FEF2F2;
-    color: #B91C1C;
-  }
-  &.pill--neutral {
-    background: var(--lc-border);
-    color: var(--lc-text-hint);
-  }
+  &.pill--green  { background: var(--lc-rating-5-bg); color: var(--lc-mastery-5); }
+  &.pill--amber  { background: var(--lc-rating-2-bg); color: #9A7000; }
+  &.pill--red    { background: var(--lc-rating-1-bg); color: var(--lc-fem-text); }
+  &.pill--neutral { background: var(--lc-rating-0-bg); color: var(--lc-text-hint); border: 1px solid var(--lc-border); }
 }
 
 // ── Stats row ─────────────────────────────────────────────────────
 .sh-stats-row {
   display: flex;
-  gap: 6px;
+  gap: t.$lc-space-1 + 2px;
 }
 
 .sh-stat {
   flex: 1;
   background: var(--lc-surface);
-  border-radius: 8px;
-  padding: 6px 8px;
+  border-radius: t.$lc-radius-sm;
+  padding: t.$lc-space-1 + 2px t.$lc-space-2;
   text-align: center;
 }
 
 .sh-stat-val {
   display: block;
-  font-size: 13px;
-  font-weight: 600;
+  font-family: t.$lc-font-display;
+  @include u.lc-font('sm', t.$lc-font-weight-semibold);
   color: var(--lc-text-primary);
   line-height: 1;
   margin-bottom: 2px;
@@ -144,35 +136,18 @@
 
 .sh-stat-lbl {
   display: block;
-  font-size: 8px;
+  @include u.lc-font('xxs', t.$lc-font-weight-medium);
   color: var(--lc-text-hint);
-  font-weight: 500;
 }
 
 // ── Empty state ───────────────────────────────────────────────────
 .sh-empty {
-  padding: 48px 24px;
+  padding: t.$lc-space-12 t.$lc-space-6;
   text-align: center;
 }
 
-.sh-empty-icon {
-  font-size: 40px;
-  margin: 0 0 12px;
-}
+.sh-empty-icon { font-size: 40px; margin: 0 0 t.$lc-space-3; display: block; }
+.sh-empty-title { @include u.lc-font('xl', t.$lc-font-weight-semibold); color: var(--lc-text-primary); margin: 0 0 t.$lc-space-1; }
+.sh-empty-sub   { @include u.lc-font('sm'); color: var(--lc-text-hint); margin: 0; }
 
-.sh-empty-title {
-  font-size: 16px;
-  font-weight: 600;
-  color: var(--lc-text-primary);
-  margin: 0 0 6px;
-}
-
-.sh-empty-sub {
-  font-size: 13px;
-  color: var(--lc-text-hint);
-  margin: 0;
-}
-
-.sh-bottom-spacer {
-  height: 20px;
-}
+.sh-bottom-spacer { height: 20px; }
