@@ -1,10 +1,11 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable, Logger, NotFoundException, Optional } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { randomUUID } from 'crypto';
 import type { Card, CardContent, ConfidenceRating, GenderType, MasteryLevel, SRSStateData } from '@lingua-card/shared/domain';
 import type { CreateCardDto, UpdateCardDto, CardQueryParams } from '@lingua-card/shared/dto';
 import { CardEntity } from './card.entity';
+import { WordAudioService } from '../word-audio/word-audio.service';
 
 export interface PendingSrsRating {
   cardId: string;
@@ -15,9 +16,12 @@ export interface PendingSrsRating {
 
 @Injectable()
 export class CardsService {
+  private readonly logger = new Logger(CardsService.name);
+
   constructor(
     @InjectRepository(CardEntity)
     private readonly repo: Repository<CardEntity>,
+    @Optional() private readonly wordAudioService?: WordAudioService,
   ) {}
 
   async findAll(userId: string, query: CardQueryParams): Promise<Card[]> {
@@ -73,6 +77,15 @@ export class CardsService {
       } satisfies SRSStateData,
     });
     const saved = await this.repo.save(entity);
+
+    // Fire-and-forget: pre-generate audio for the new word so it's ready before user taps play
+    if (this.wordAudioService) {
+      const text = (dto.content.article ? `${dto.content.article} ` : '') + dto.content.back;
+      this.wordAudioService.resolve(text, 'de-DE').catch(err => {
+        this.logger.warn(`Pre-generation failed for "${text}":`, err);
+      });
+    }
+
     return this.toModel(saved);
   }
 

@@ -65,6 +65,25 @@
       </div>
     </div>
 
+    <!-- Duplicate warning -->
+    @if (showDuplicateWarning()) {
+      <div class="aw-duplicate-warning">
+        <span class="aw-duplicate-icon">⚠</span>
+        <span class="aw-duplicate-msg">
+          "{{ (duplicateResult()?.input?.article ? duplicateResult()?.input?.article + ' ' : '') + duplicateResult()?.input?.back }}"
+          already exists in your vault.
+        </span>
+        <div class="aw-duplicate-actions">
+          <button type="button" class="aw-duplicate-btn aw-duplicate-btn--dismiss" (click)="dismissDuplicateWarning()">Add anyway</button>
+          <button type="button" class="aw-duplicate-btn aw-duplicate-btn--go" (click)="goToExisting()">Go to existing</button>
+        </div>
+      </div>
+    }
+
+    @if (duplicateCheckPending()) {
+      <div class="aw-duplicate-checking">Checking for duplicates…</div>
+    }
+
     <!-- Collection -->
     <div class="aw-field">
       <p class="aw-lbl">Collection <span class="aw-lbl-hint aw-lbl-hint--required">*required</span></p>

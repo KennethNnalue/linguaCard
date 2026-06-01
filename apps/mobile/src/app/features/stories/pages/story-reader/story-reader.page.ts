@@ -23,7 +23,7 @@ import { StoryApiService } from '../../services/story-api.service';
 import { ReviewStore } from '../../../review/store/review.store';
 import { CardStore } from '../../../vault/store/card.store';
 import { AiAudioCacheService } from '../../../ai/audio/ai-audio-cache.service';
-import { PronunciationService } from '../../../ai/audio/pronunciation.service';
+import { WordAudioService } from '../../../../shared/audio/word-audio.service';
 import { QuizTabComponent } from '../../components/quiz-tab/quiz-tab.component';
 import { KeywordsTabComponent } from '../../components/keywords-tab/keywords-tab.component';
 import { GrammarTabComponent } from '../../components/grammar-tab/grammar-tab.component';
@@ -54,7 +54,7 @@ export class StoryReaderPage implements OnInit, OnDestroy, ViewWillLeave {
   private readonly cardStore = inject(CardStore);
   private readonly api = inject(StoryApiService);
   private readonly aiAudioCache = inject(AiAudioCacheService);
-  private readonly pronunciation = inject(PronunciationService);
+  private readonly wordAudio = inject(WordAudioService);
 
   // ── Story state ─────────────────────────────────────────────────
   readonly story = signal<Story | null>(null);
@@ -77,8 +77,8 @@ export class StoryReaderPage implements OnInit, OnDestroy, ViewWillLeave {
   // ── Enrichment state ─────────────────────────────────────────────
   readonly enriching = signal(false);
 
-  // ── Pronunciation loading (forwarded from PronunciationService) ──
-  readonly pronunciationLoading = computed(() => this.pronunciation.isLoading());
+  // ── Pronunciation loading (forwarded from WordAudioService) ──
+  readonly pronunciationLoading = computed(() => this.wordAudio.isLoading());
 
   // ── Audio player ─────────────────────────────────────────────────
   readonly isPlaying = signal(false);
@@ -361,11 +361,14 @@ export class StoryReaderPage implements OnInit, OnDestroy, ViewWillLeave {
   // ── Keywords audio — persisted by cardId when in vault ───────────
 
   onKeywordsPlayWord(keyword: StoryKeyword): void {
-    // Use the full form with article when available (e.g. "der Sternenhimmel")
     const text = keyword.german || keyword.germanBase;
-    // cardId present → persisted to R2 as pronunciation/{cardId}.wav and reused
-    // cardId absent  → on-demand /ai/tts ephemeral object URL
-    void this.pronunciation.playText(text, 'de-DE', keyword.cardId ?? undefined);
+    void this.wordAudio.play(text, 'de-DE');
+  }
+
+  onKeywordCardClick(keyword: StoryKeyword): void {
+    if (keyword.cardId) {
+      void this.router.navigate(['/vault', keyword.cardId]);
+    }
   }
 
   // ── Navigation ───────────────────────────────────────────────────

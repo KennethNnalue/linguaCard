@@ -20,7 +20,11 @@
   <!-- Keyword list -->
   <div class="kw-list">
     @for (kw of keywords(); track kw.germanBase) {
-      <div class="kw-item">
+      <div
+        class="kw-item"
+        [class.kw-item--tappable]="!!kw.cardId"
+        (click)="kw.cardId && cardClick.emit(kw)"
+      >
         <span
           class="kw-level-badge"
           [style.background]="levelStyle(kw.level).background"
@@ -40,7 +44,7 @@
             class="kw-action-btn"
             [class.kw-playing]="isThisPlaying(kw)"
             [disabled]="isThisPlaying(kw)"
-            (click)="onPlayWord(kw)"
+            (click)="$event.stopPropagation(); onPlayWord(kw)"
             title="Play pronunciation"
           >
             @if (isThisPlaying(kw)) {

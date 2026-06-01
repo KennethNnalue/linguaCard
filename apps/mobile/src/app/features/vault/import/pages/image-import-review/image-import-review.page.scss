@@ -327,3 +327,37 @@
 
   &:active { color: var(--lc-fem-text); }
 }
+
+// ─── DUPLICATE DETECTION ──────────────────────────────────────────────────────
+
+.imp-dedup-banner {
+  margin: 0 0 8px;
+  padding: 10px 14px;
+  border-radius: 10px;
+  font-size: 13px;
+  font-family: var(--lc-font-body);
+
+  &--loading {
+    background: var(--lc-surface-2);
+    color: var(--lc-text-secondary);
+  }
+
+  &--warn {
+    background: color-mix(in srgb, var(--lc-warning, #f59e0b) 12%, transparent);
+    color: var(--lc-text-primary);
+    border: 1px solid color-mix(in srgb, var(--lc-warning, #f59e0b) 30%, transparent);
+  }
+}
+
+.imp-row-duplicate-badge {
+  font-size: 11px;
+  font-weight: 600;
+  font-family: var(--lc-font-body);
+  color: #92400e;
+  background: #fef3c7;
+  border: 1px solid #fcd34d;
+  border-radius: 4px;
+  padding: 1px 6px;
+  white-space: nowrap;
+  flex-shrink: 0;
+}

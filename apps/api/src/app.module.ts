@@ -13,6 +13,7 @@ import { JwtAuthGuard } from './auth/guards/jwt-auth.guard';
 import { HealthModule } from './health/health.module';
 import { AiModule } from './ai/ai.module';
 import { ImportModule } from './import/import.module';
+import { WordAudioModule } from './word-audio/word-audio.module';
 import databaseConfig from './config/database.config';
 import { aiConfig } from './config/ai.config';
 
@@ -36,6 +37,7 @@ import { aiConfig } from './config/ai.config';
     CollectionsModule,
     CategoriesModule,
     StoriesModule,
+    WordAudioModule,
     SeedModule,
   ],
   providers: [

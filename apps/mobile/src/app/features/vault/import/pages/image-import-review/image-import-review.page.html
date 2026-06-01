@@ -30,6 +30,18 @@
       <ion-icon name="checkmark-circle-outline" style="color: var(--lc-brand); font-size: 22px; flex-shrink:0;"></ion-icon>
     </div>
 
+    <!-- Duplicate summary banner -->
+    @if (duplicateCheckLoading()) {
+      <div class="imp-dedup-banner imp-dedup-banner--loading">
+        Checking for duplicates in your vault…
+      </div>
+    }
+    @if (!duplicateCheckLoading() && duplicateCount() > 0) {
+      <div class="imp-dedup-banner imp-dedup-banner--warn">
+        ⚠ {{ duplicateCount() }} of {{ wordList().length }} words already in your vault (deselected)
+      </div>
+    }
+
     <!-- Summary stats + select all (LC-089) -->
     <div class="imp-summary-row">
       <div class="imp-sum-cell">
@@ -40,6 +52,12 @@
         <span class="imp-sum-val">{{ selectedCount() }}</span>
         <span class="imp-sum-lbl">Selected</span>
       </div>
+      @if (duplicateCount() > 0) {
+        <div class="imp-sum-cell imp-sum-cell--warn">
+          <span class="imp-sum-val">{{ duplicateCount() }}</span>
+          <span class="imp-sum-lbl">Duplicates</span>
+        </div>
+      }
       @if (warningCount() > 0) {
         <div class="imp-sum-cell imp-sum-cell--warn">
           <span class="imp-sum-val">{{ warningCount() }}</span>
@@ -95,6 +113,11 @@
 
             <span class="imp-preview-front">{{ word.back }}</span>
             <span class="imp-preview-translation">{{ word.front }}</span>
+
+            <!-- Duplicate badge -->
+            @if (word.isDuplicate) {
+              <span class="imp-row-duplicate-badge">Duplicate</span>
+            }
 
             <!-- Confidence indicator -->
             @if (word.confidence < 0.7) {

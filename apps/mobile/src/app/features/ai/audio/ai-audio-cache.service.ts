@@ -51,10 +51,10 @@ export class AiAudioCacheService {
     }
   }
 
-  async saveBuffer(cacheKey: string, audioBuffer: ArrayBuffer): Promise<string | null> {
+  async saveBuffer(cacheKey: string, audioBuffer: ArrayBuffer, ext: 'wav' | 'mp3' = 'wav'): Promise<string | null> {
     if (!this.isNative) return null;
 
-    const path = `${this.CACHE_DIR}/${cacheKey}.mp3`;
+    const path = `${this.CACHE_DIR}/${cacheKey}.${ext}`;
     try {
       await Filesystem.mkdir({
         path: this.CACHE_DIR,
@@ -80,15 +80,18 @@ export class AiAudioCacheService {
   async getFromCache(cacheKey: string): Promise<string | null> {
     if (!this.isNative) return null;
 
-    const path = `${this.CACHE_DIR}/${cacheKey}.mp3`;
-    try {
-      const stat = await Filesystem.stat({ path, directory: Directory.Data });
-      if (stat.size > 0) {
-        const result = await Filesystem.getUri({ path, directory: Directory.Data });
-        return Capacitor.convertFileSrc(result.uri);
+    // Check both extensions: word audio is .wav, older story audio may be .mp3.
+    for (const ext of ['wav', 'mp3'] as const) {
+      const path = `${this.CACHE_DIR}/${cacheKey}.${ext}`;
+      try {
+        const stat = await Filesystem.stat({ path, directory: Directory.Data });
+        if (stat.size > 0) {
+          const result = await Filesystem.getUri({ path, directory: Directory.Data });
+          return Capacitor.convertFileSrc(result.uri);
+        }
+      } catch {
+        // Not found with this extension — try next
       }
-    } catch {
-      // Not cached
     }
     return null;
   }

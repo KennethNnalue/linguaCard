@@ -47,6 +47,16 @@
   border-radius: 12px;
   padding: 10px 12px;
   box-shadow: var(--lc-shadow-card);
+
+  &--tappable {
+    cursor: pointer;
+    transition: background 0.15s, border-color 0.15s;
+
+    &:active {
+      background: var(--lc-surface);
+      border-color: var(--lc-brand);
+    }
+  }
 }
 
 .kw-level-badge {

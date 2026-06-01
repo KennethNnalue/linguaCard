@@ -52,6 +52,9 @@
             } @else {
               <ion-icon name="volume-high-outline"></ion-icon>
               Listen
+              @if (isAudioReady()) {
+                <span class="wd2-audio-ready-dot" title="AI audio ready"></span>
+              }
             }
           </button>
           <button class="wd2-audio-btn wd2-audio-btn--accent" (click)="playPronunciation()">

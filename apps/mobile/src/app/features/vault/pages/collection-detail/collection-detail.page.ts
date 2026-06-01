@@ -13,7 +13,7 @@ import {FabButtonComponent} from '../../../../shared/components/fab-button/fab-b
 import {ReviewFilterService} from '../../../review/services/review-filter.service';
 import {ReviewStore} from '../../../review/store/review.store';
 import {WordCardComponent} from '../../../../shared/ui/word-card/word-card.component';
-import {PronunciationService} from '../../../ai/audio/pronunciation.service';
+import {WordAudioService} from '../../../../shared/audio/word-audio.service';
 
 @Component({
   selector: 'lc-collection-detail',
@@ -32,7 +32,7 @@ export class CollectionDetailPage implements OnInit {
   private readonly alertCtrl = inject(AlertController);
   private readonly filterService = inject(ReviewFilterService);
   private readonly reviewStore = inject(ReviewStore);
-  private readonly pronunciationService = inject(PronunciationService);
+  private readonly wordAudio = inject(WordAudioService);
 
   readonly collection = signal<Collection | null>(null);
   readonly allCards = signal<Card[]>([]);
@@ -222,6 +222,6 @@ export class CollectionDetailPage implements OnInit {
   }
 
   playAudio(card: Card): void {
-    void this.pronunciationService.play(card);
+    void this.wordAudio.playCard(card);
   }
 }

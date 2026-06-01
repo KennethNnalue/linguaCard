@@ -71,6 +71,7 @@ export interface SRSStateData {
 
 // ─── MEDIA ────────────────────────────────────────────────────────────────────
 
+/** @deprecated Will be superseded by WordAudio in the Global Word Audio Registry epic */
 export interface AudioAsset {
   id: string;
   url: string;
@@ -78,6 +79,62 @@ export interface AudioAsset {
   language: LanguageCode;
   text: string;
   durationSeconds: number;
+}
+
+// ─── WORD AUDIO REGISTRY ──────────────────────────────────────────────────────
+
+export type WordAudioStatus = 'pending' | 'ready' | 'failed';
+
+export interface WordAudio {
+  id: string;
+  normalizedText: string;
+  displayText: string;
+  language: string;
+  audioUrl: string | null;
+  storagePath: string | null;
+  durationMs: number;
+  status: WordAudioStatus;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface WordAudioResolveRequest {
+  text: string;
+  language?: string;
+}
+
+export interface WordAudioResolveResponse {
+  wordAudio: WordAudio;
+  /** true if audio already existed — no TTS call was made */
+  cached: boolean;
+  /** set when generation was blocked by rate limit — client should back off for this many ms */
+  retryAfterMs?: number;
+}
+
+export interface WordAudioBatchResolveRequest {
+  words: WordAudioResolveRequest[];
+}
+
+export interface WordAudioBatchResolveResponse {
+  results: WordAudioResolveResponse[];
+  generated: number;
+  reused: number;
+}
+
+export interface DuplicateCheckWord {
+  back: string;
+  article?: string | null;
+}
+
+export interface DuplicateCheckResult {
+  input: DuplicateCheckWord;
+  existingCard: {
+    id: string;
+    back: string;
+    article: string | null;
+    collectionId: string | null;
+    collectionName: string | null;
+  } | null;
 }
 
 // ─── CARD ─────────────────────────────────────────────────────────────────────
@@ -95,6 +152,7 @@ export interface CardContent {
   gender: GenderType;
   examples: ExampleSentence[];
   notes: string;
+  /** @deprecated Will be replaced by wordAudioId (Global Word Audio Registry) */
   audioAssetId: string | null;
   imageUrl: string | null;
   phonetic: string | null;

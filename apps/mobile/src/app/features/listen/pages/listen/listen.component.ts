@@ -1,7 +1,7 @@
 import { Component, computed, inject, Injector, OnDestroy, OnInit, signal } from '@angular/core';
 import { toObservable } from '@angular/core/rxjs-interop';
 import { filter, take } from 'rxjs';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { NavController } from '@ionic/angular';
 import { IonContent, IonHeader, IonIcon, IonToolbar, ModalController, ViewWillLeave } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
@@ -23,6 +23,7 @@ import {ArticleBadgeComponent} from '../../../../shared/components/article-badge
 import {PlaylistSourceSheetComponent} from '../../components/playlist-source-sheet/playlist-source-sheet.component';
 import {WordCardComponent} from '../../../../shared/ui/word-card/word-card.component';
 import {getCategoryName} from '../../../../shared/helpers/helpers';
+import {WordAudioService} from '../../../../shared/audio/word-audio.service';
 
 type PlaylistMode = 'word-meaning' | 'examples-only' | 'deep-dive';
 
@@ -38,8 +39,10 @@ export class ListenComponent implements OnInit, OnDestroy, ViewWillLeave {
   private readonly categoryStore = inject(CategoryStore);
   private readonly modalCtrl = inject(ModalController);
   private readonly navCtrl = inject(NavController);
+  private readonly router = inject(Router);
   private readonly injector = inject(Injector);
   private readonly route = inject(ActivatedRoute);
+  private readonly wordAudio = inject(WordAudioService);
 
   constructor() {
     addIcons({
@@ -206,6 +209,14 @@ export class ListenComponent implements OnInit, OnDestroy, ViewWillLeave {
 
   getCategoryLabel(card: Card): string {
     return getCategoryName(card.categoryIds?.[0], this.categories());
+  }
+
+  openCardDetail(card: Card): void {
+    this.router.navigate(['/vault', card.id]);
+  }
+
+  playCardAudio(card: Card): void {
+    void this.wordAudio.playCard(card);
   }
 
   goBack(): void {

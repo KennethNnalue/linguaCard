@@ -30,11 +30,14 @@ import { CollectionStore } from '../../../store/collection.store';
 import { CategoryStore } from '../../../store/category.store';
 import { AssignCollectionSheetComponent } from '../../../components/assign-collection-sheet/assign-collection-sheet.component';
 import { ImageImportStateService } from '../../image-import-state.service';
+import { WordDedupApiService } from '../../../services/word-dedup-api.service';
 
 interface SelectableWord extends ParsedImportRow {
   id: number;
   selected: boolean;
   confidence: number;
+  isDuplicate?: boolean;
+  duplicateCollectionName?: string | null;
 }
 
 @Component({
@@ -54,6 +57,7 @@ export class ImageImportReviewPage implements OnInit {
   private readonly router = inject(Router);
   private readonly toastCtrl = inject(ToastController);
   private readonly modalCtrl = inject(ModalController);
+  private readonly wordDedupApi = inject(WordDedupApiService);
 
   readonly image = this.importImageState.image;
   readonly result = this.importImageState.result;
@@ -68,6 +72,8 @@ export class ImageImportReviewPage implements OnInit {
     return col ? `${col.emoji} ${col.name}` : 'Select collection';
   });
 
+  readonly duplicateCheckLoading = signal(false);
+  readonly duplicateCount = computed(() => this.wordList().filter(w => w.isDuplicate).length);
   readonly selectedWords = computed(() => this.wordList().filter(w => w.selected));
   readonly selectedCount = computed(() => this.selectedWords().length);
   readonly allSelected = computed(() => this.wordList().every(w => w.selected));
@@ -77,18 +83,62 @@ export class ImageImportReviewPage implements OnInit {
     addIcons({ arrowBackOutline, checkmarkCircleOutline, warningOutline });
   }
 
-  ngOnInit(): void {
+  async ngOnInit(): Promise<void> {
     if (!this.result()) {
       this.router.navigate(['/vault/import/image']);
       return;
     }
     const words = this.result()!.words;
-    this.wordList.set(words.map((w, i) => ({
+    const rows: SelectableWord[] = words.map((w, i) => ({
       ...this.toImportRow(w, i),
       id: i,
       selected: true,
       confidence: w.confidence,
-    })));
+    }));
+
+    // Within-batch dedup: mark second occurrence of same word
+    const seen = new Map<string, number>();
+    for (const row of rows) {
+      const key = `${row.article ?? ''}:${row.back.toLowerCase().trim()}`;
+      if (seen.has(key)) {
+        row.status = 'warning';
+        row.warningMessages.push(`Duplicate of row ${seen.get(key)! + 1} in this import`);
+      } else {
+        seen.set(key, row.id);
+      }
+    }
+
+    this.wordList.set(rows);
+    await this._checkVaultDuplicates(rows);
+  }
+
+  private async _checkVaultDuplicates(rows: SelectableWord[]): Promise<void> {
+    this.duplicateCheckLoading.set(true);
+    try {
+      const results = await this.wordDedupApi.checkDuplicates(
+        rows.map(r => ({ back: r.back, article: r.article ?? undefined })),
+      );
+      this.wordList.update(ws =>
+        ws.map((w, i) => {
+          const match = results[i];
+          const isDuplicate = !!match?.existingCard;
+          return {
+            ...w,
+            isDuplicate,
+            duplicateCollectionName: match?.existingCard?.collectionId ?? null,
+            selected: isDuplicate ? false : w.selected,
+            status: isDuplicate ? 'warning' : w.status,
+            warningMessages: isDuplicate
+              ? [...w.warningMessages, 'Already in your vault']
+              : w.warningMessages,
+          };
+        }),
+      );
+    } catch {
+      // Dedup check failure is non-fatal — import continues without it
+    } finally {
+      this.duplicateCheckLoading.set(false);
+    }
   }
 
   toggleWord(id: number): void {

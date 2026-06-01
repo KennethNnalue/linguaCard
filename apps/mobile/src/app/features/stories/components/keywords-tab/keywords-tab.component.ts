@@ -17,6 +17,7 @@ export class KeywordsTabComponent {
   readonly playWord = output<StoryKeyword>();
   readonly addToTraining = output<StoryKeyword>();
   readonly memorizeAll = output<void>();
+  readonly cardClick = output<StoryKeyword>();
 
   onPlayWord(kw: StoryKeyword): void {
     this.playingGermanBase.set(kw.germanBase);

@@ -76,8 +76,7 @@
         @for (card of queue(); track card.id; let i = $index) {
           <div
             class="lt-q-card-wrap"
-            [class.lt-q-card-wrap--active]="i === currentIndex()"
-            (click)="seekAndPlay(i)">
+            [class.lt-q-card-wrap--active]="i === currentIndex()">
             @if (i === currentIndex() && isPlaying()) {
               <div class="lt-q-playing-badge">
                 <span class="lt-wave" aria-hidden="true">
@@ -89,8 +88,8 @@
               [card]="card"
               [categoryName]="getCategoryLabel(card)"
               [compact]="true"
-              (cardClick)="seekAndPlay(i)"
-              (playAudio)="seekAndPlay(i)"
+              (cardClick)="openCardDetail(card)"
+              (playAudio)="playCardAudio(card)"
             />
           </div>
         }

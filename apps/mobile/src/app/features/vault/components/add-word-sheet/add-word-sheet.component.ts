@@ -2,6 +2,7 @@ import { Component, computed, inject, Input, OnInit, signal } from '@angular/cor
 import { Router } from '@angular/router';
 import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { debounceTime, distinctUntilChanged } from 'rxjs/operators';
 import {
   IonContent,
   IonHeader,
@@ -17,12 +18,14 @@ import {
   volumeHighOutline,
 } from 'ionicons/icons';
 import { ArticleType, CardContent, ExampleSentence } from '../../../../core/models/mock-data';
-import { PronunciationService } from '../../../ai/audio/pronunciation.service';
+import { WordAudioService } from '../../../../shared/audio/word-audio.service';
 import { AuthService } from '../../../../core/services/auth.service';
 import { CardStore } from '../../store/card.store';
 import { CategoryStore } from '../../store/category.store';
 import { CollectionStore } from '../../store/collection.store';
 import { AssignCollectionSheetComponent } from '../assign-collection-sheet/assign-collection-sheet.component';
+import { WordDedupApiService } from '../../services/word-dedup-api.service';
+import type { DuplicateCheckResult } from '@lingua-card/shared/domain';
 
 @Component({
   selector: 'lc-add-word-sheet',
@@ -34,11 +37,12 @@ import { AssignCollectionSheetComponent } from '../assign-collection-sheet/assig
 export class AddWordSheetComponent implements OnInit {
   private readonly categoryStore = inject(CategoryStore);
   private readonly collectionStore = inject(CollectionStore);
-  private readonly pronunciationService = inject(PronunciationService);
+  private readonly wordAudio = inject(WordAudioService);
   private readonly authService = inject(AuthService);
   private readonly cardStore = inject(CardStore);
   private readonly modalCtrl = inject(ModalController);
   private readonly router = inject(Router);
+  private readonly wordDedupApi = inject(WordDedupApiService);
 
   @Input() lockedCollectionId: string | null = null;
 
@@ -62,6 +66,9 @@ export class AddWordSheetComponent implements OnInit {
   readonly categories = this.categoryStore.categories;
   readonly saving = signal(false);
   readonly articles: ArticleType[] = ['der', 'die', 'das'];
+  readonly duplicateResult = signal<DuplicateCheckResult | null>(null);
+  readonly duplicateCheckPending = signal(false);
+  readonly suppressDuplicateWarning = signal(false);
 
   ngOnInit(): void {
     if (this.lockedCollectionId) {
@@ -71,6 +78,17 @@ export class AddWordSheetComponent implements OnInit {
 
   constructor() {
     addIcons({ closeOutline, micOutline, volumeHighOutline, addOutline });
+
+    // Debounced duplicate check: fires after user stops typing in "back" field
+    this.form.get('back')!.valueChanges.pipe(
+      takeUntilDestroyed(),
+      debounceTime(400),
+      distinctUntilChanged(),
+    ).subscribe(() => this._checkDuplicate());
+
+    this.form.get('article')!.valueChanges.pipe(
+      takeUntilDestroyed(),
+    ).subscribe(() => this._checkDuplicate());
 
     this.form.get('back')!.valueChanges.pipe(
       takeUntilDestroyed(),
@@ -101,11 +119,46 @@ export class AddWordSheetComponent implements OnInit {
     this.form.patchValue({ categoryId: current === id ? '' : id });
   }
 
+  private async _checkDuplicate(): Promise<void> {
+    const back = this.form.get('back')!.value?.trim();
+    if (!back) {
+      this.duplicateResult.set(null);
+      return;
+    }
+    const article = this.form.get('article')!.value ?? undefined;
+    this.duplicateCheckPending.set(true);
+    this.suppressDuplicateWarning.set(false);
+    try {
+      const results = await this.wordDedupApi.checkDuplicates([{ back, article }]);
+      const match = results[0];
+      this.duplicateResult.set(match?.existingCard ? match : null);
+    } catch {
+      this.duplicateResult.set(null);
+    } finally {
+      this.duplicateCheckPending.set(false);
+    }
+  }
+
+  dismissDuplicateWarning(): void {
+    this.suppressDuplicateWarning.set(true);
+  }
+
+  goToExisting(): void {
+    const id = this.duplicateResult()?.existingCard?.id;
+    if (!id) return;
+    this.modalCtrl.dismiss();
+    this.router.navigate(['/vault/word', id]);
+  }
+
+  readonly showDuplicateWarning = computed(() =>
+    !this.suppressDuplicateWarning() && !!this.duplicateResult()?.existingCard,
+  );
+
   playTTS(): void {
     const word = this.form.get('back')!.value?.trim();
     if (!word) return;
     const article = this.form.get('article')!.value;
-    void this.pronunciationService.playText(article ? `${article} ${word}` : word, 'de-DE');
+    void this.wordAudio.play(article ? `${article} ${word}` : word, 'de-DE');
   }
 
   save(): void {

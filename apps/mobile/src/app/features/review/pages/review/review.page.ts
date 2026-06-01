@@ -13,7 +13,7 @@ import {
   volumeHighOutline,
 } from 'ionicons/icons';
 import type { Card, ConfidenceRating } from '@lingua-card/shared/domain';
-import { PronunciationService } from '../../../ai/audio/pronunciation.service';
+import { WordAudioService } from '../../../../shared/audio/word-audio.service';
 import { CardStore } from '../../../vault/store/card.store';
 import { CategoryStore } from '../../../vault/store/category.store';
 import { CollectionStore } from '../../../vault/store/collection.store';
@@ -37,7 +37,7 @@ const RATINGS: { value: ConfidenceRating; label: string }[] = [
 export class ReviewPage implements OnInit {
   private readonly cardStore = inject(CardStore);
   private readonly reviewStore = inject(ReviewStore);
-  private readonly pronunciationService = inject(PronunciationService);
+  private readonly wordAudio = inject(WordAudioService);
   private readonly categoryStore = inject(CategoryStore);
   private readonly collectionStore = inject(CollectionStore);
   private readonly navCtrl = inject(NavController);
@@ -59,7 +59,7 @@ export class ReviewPage implements OnInit {
   readonly queue = signal<Card[]>([]);
   readonly currentIndex = signal(0);
   readonly isFlipped = signal(false);
-  readonly isPronunciationLoading = this.pronunciationService.isLoading;
+  readonly isPronunciationLoading = this.wordAudio.isLoading;
   // Track the furthest index reached so going back and re-rating doesn't end the session early
   private highestIndexReached = 0;
 
@@ -210,7 +210,7 @@ export class ReviewPage implements OnInit {
     event.stopPropagation();
     const card = this.currentCard();
     if (!card) return;
-    void this.pronunciationService.play(card);
+    void this.wordAudio.playCard(card);
   }
 
   flagCard(): void {

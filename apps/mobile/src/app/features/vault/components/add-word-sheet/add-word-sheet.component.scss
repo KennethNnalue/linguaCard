@@ -37,6 +37,27 @@
   &.aw-input--grow { flex: 1; }
 }
 
+.aw-duplicate-warning {
+  background: var(--lc-warning-bg, rgba(255, 165, 0, 0.1));
+  border: 1.5px solid var(--lc-warning-border, rgba(255, 165, 0, 0.4));
+  border-radius: t.$lc-radius-sm;
+  padding: t.$lc-space-3;
+  display: flex; flex-direction: column; gap: t.$lc-space-2;
+}
+.aw-duplicate-icon { font-size: t.$lc-text-sm; }
+.aw-duplicate-msg { @include u.lc-font('xs'); color: var(--lc-text-secondary); }
+.aw-duplicate-actions { display: flex; gap: t.$lc-space-2; }
+.aw-duplicate-btn {
+  flex: 1; padding: t.$lc-space-2 t.$lc-space-3;
+  border-radius: t.$lc-radius-sm; border: 1px solid var(--lc-border);
+  @include u.lc-font('xs', t.$lc-font-weight-semibold);
+  font-family: t.$lc-font-body; cursor: pointer; transition: var(--lc-transition-fast);
+  &--dismiss { background: var(--lc-surface); color: var(--lc-text-secondary); }
+  &--go { background: var(--lc-brand); color: t.$lc-text-inverse; border-color: var(--lc-brand); }
+  &:active { opacity: 0.8; }
+}
+.aw-duplicate-checking { @include u.lc-font('xxs'); color: var(--lc-text-hint); text-align: center; }
+
 .aw-back-row { display: flex; align-items: center; gap: t.$lc-space-2; }
 .aw-art-badge {
   @include u.flex-center;

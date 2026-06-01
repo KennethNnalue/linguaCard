@@ -140,6 +140,14 @@
   &:disabled { opacity: 0.6; cursor: not-allowed; }
 }
 
+.wd2-audio-ready-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--lc-brand);
+  flex-shrink: 0;
+}
+
 .wd-audio-spinner {
   @include u.circle(14px);
   border: 2px solid rgba(45, 90, 78, 0.3);

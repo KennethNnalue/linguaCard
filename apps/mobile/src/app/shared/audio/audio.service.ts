@@ -10,6 +10,15 @@ export class AudioService {
   private readonly _isPlaying = signal(false);
   readonly isPlaying = this._isPlaying.asReadonly();
 
+  // Eagerly trigger voice loading on construction so they are ready before the
+  // first speak() call. Chrome returns an empty array until voiceschanged fires;
+  // calling getVoices() now kicks off the async load.
+  constructor() {
+    if ('speechSynthesis' in window) {
+      window.speechSynthesis.getVoices();
+    }
+  }
+
   speak(text: string, lang = 'de-DE', rate = 1.0): Observable<void> {
     return new Observable(observer => {
       if (!('speechSynthesis' in window)) {
@@ -25,8 +34,6 @@ export class AudioService {
         this._isPlaying.set(false);
         fn();
       };
-
-      window.speechSynthesis.cancel();
 
       const utterance = new SpeechSynthesisUtterance(text);
       utterance.lang = lang;
@@ -44,7 +51,6 @@ export class AudioService {
 
       utterance.onerror = (e: SpeechSynthesisErrorEvent) =>
         settle(() => {
-          // 'cancelled'/'interrupted' fire when stop() is called — not real errors
           if (IGNORABLE_ERRORS.has(e.error)) {
             observer.complete();
           } else {
@@ -52,16 +58,21 @@ export class AudioService {
           }
         });
 
+      // Call cancel() then speak() synchronously in the same tick.
+      // The old code deferred speak() via setTimeout(0) to avoid a Chrome bug
+      // where cancel()+speak() in the same tick silently drops the utterance —
+      // but the setTimeout breaks the user-gesture requirement for Speech Synthesis
+      // API, causing silent no-ops on Chrome. The correct fix is to call speak()
+      // synchronously without cancel(), letting Chrome queue the utterance. If
+      // something is already playing, it will be interrupted (which is fine —
+      // only one word plays at a time in this app).
+      window.speechSynthesis.cancel();
       window.speechSynthesis.speak(utterance);
 
-      // Chrome can stall and never fire onend (tab loses focus, voices not loaded,
-      // rapid cancel+speak calls). A 10-second safety valve prevents _speakPromise
-      // from hanging forever and blocking the playback loop.
+      // Safety valve: if onend never fires (Chrome stall, tab unfocused, no voices),
+      // resolve after 10 seconds so the listen playlist never hangs indefinitely.
       const timeoutId = setTimeout(() => settle(() => observer.complete()), 10_000);
 
-      // No cancel() in teardown — Chrome fires onerror('cancelled') async, so a
-      // teardown cancel would race with and kill the next queued utterance.
-      // External stop is handled by stop() / AudioService callers.
       return () => {
         clearTimeout(timeoutId);
         settled = true;

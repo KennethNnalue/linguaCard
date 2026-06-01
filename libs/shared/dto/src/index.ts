@@ -125,6 +125,34 @@ export interface CategoryQueryParams {
   userId?: string;
 }
 
+// ─── WORD AUDIO DTOs ─────────────────────────────────────────────────────────
+
+export class ResolveWordAudioDto {
+  @IsString() @MinLength(1) @MaxLength(500) text!: string;
+  @IsOptional() @IsString() language?: string;
+}
+
+export class BatchResolveWordAudioDto {
+  @IsArray()
+  @ValidateNested({ each: true })
+  @Type(() => ResolveWordAudioDto)
+  words!: ResolveWordAudioDto[];
+}
+
+// ─── DEDUP DTOs ───────────────────────────────────────────────────────────────
+
+export class DuplicateCheckWordDto {
+  @IsString() @MinLength(1) back!: string;
+  @IsOptional() @IsString() article?: string | null;
+}
+
+export class CheckDuplicatesDto {
+  @IsArray()
+  @ValidateNested({ each: true })
+  @Type(() => DuplicateCheckWordDto)
+  words!: DuplicateCheckWordDto[];
+}
+
 // ─── PLAIN INTERFACES (for Angular use without class-validator) ───────────────
 
 export interface ICreateCollectionDto {

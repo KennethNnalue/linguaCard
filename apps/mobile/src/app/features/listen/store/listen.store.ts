@@ -2,10 +2,17 @@ import { computed, inject, Injectable, Injector, signal } from '@angular/core';
 import { Card, ConfidenceRating } from '@lingua-card/shared/domain';
 import { CardApiService } from '../../vault/services/card-api.service';
 import { AudioService } from '../../../shared/audio/audio.service';
-import { PronunciationService } from '../../ai/audio/pronunciation.service';
+import { WordAudioService } from '../../../shared/audio/word-audio.service';
 import { Sm2Service } from '../../../shared/srs/sm2.service';
 
 type PlaylistMode = 'word-meaning' | 'examples-only' | 'deep-dive';
+
+interface Utterance {
+  text: string;
+  lang: string;
+  pause?: number;
+  useAi: boolean;
+}
 
 @Injectable({ providedIn: 'root' })
 export class ListenStore {
@@ -14,16 +21,14 @@ export class ListenStore {
   private readonly injector = inject(Injector);
   private readonly sm2 = inject(Sm2Service);
 
-  // Lazy getter breaks the root-injector initialization cycle: both ListenStore
-  // and PronunciationService are providedIn:'root', so eagerly injecting one
-  // inside the other's constructor triggers NG0200. Deferring to first use
-  // (after both are fully constructed) resolves the cycle.
-  private _pronunciation: PronunciationService | null = null;
-  private get pronunciation(): PronunciationService {
-    if (!this._pronunciation) {
-      this._pronunciation = this.injector.get(PronunciationService);
+  // Lazy getter preserves the existing deferred-injection pattern to avoid
+  // NG0200 root-injector cycle between ListenStore and WordAudioService.
+  private _wordAudio: WordAudioService | null = null;
+  private get wordAudio(): WordAudioService {
+    if (!this._wordAudio) {
+      this._wordAudio = this.injector.get(WordAudioService);
     }
-    return this._pronunciation;
+    return this._wordAudio;
   }
 
   private readonly _queue = signal<Card[]>([]);
@@ -61,6 +66,19 @@ export class ListenStore {
     this._queue.set([...cards]);
     this._currentIndex.set(0);
     this._activeSourceLabel.set(label);
+
+    // LC-SA02: Pre-warm AI audio for all German words and first example sentences
+    // in the playlist so audio is cached before the user reaches each card.
+    const texts = cards.flatMap(c => {
+      const word = c.content.article
+        ? `${c.content.article} ${c.content.back}`
+        : c.content.back;
+      const sentence = c.content.examples?.[0]?.target;
+      return sentence
+        ? [{ text: word }, { text: sentence }]
+        : [{ text: word }];
+    });
+    void this.wordAudio.preWarm(texts);
   }
 
   play(): void {
@@ -166,7 +184,7 @@ export class ListenStore {
     const utterances = this._buildUtterances(card, this._playbackMode());
     for (const utt of utterances) {
       if (this._playbackCancelled || epoch !== this._playbackEpoch) return;
-      await this._speakPromise(utt.text, utt.lang, this._playbackSpeed(), utt.cardId);
+      await this._speakPromise(utt);
       if (utt.pause && !this._playbackCancelled && epoch === this._playbackEpoch) {
         await this._sleep(utt.pause);
       }
@@ -176,7 +194,7 @@ export class ListenStore {
     }
   }
 
-  private _buildUtterances(card: Card, mode: PlaylistMode): { text: string; lang: string; pause?: number; cardId?: string }[] {
+  private _buildUtterances(card: Card, mode: PlaylistMode): Utterance[] {
     const article = card.content.article ?? '';
     const word = card.content.back;
     const articleWord = article ? `${article} ${word}` : word;
@@ -185,41 +203,41 @@ export class ListenStore {
 
     if (mode === 'word-meaning') {
       return [
-        { text: articleWord, lang: 'de-DE', pause: 800, cardId: card.id },
-        { text: translation, lang: 'en-US', pause: 1200 },
+        { text: articleWord, lang: 'de-DE', pause: 800, useAi: true },
+        { text: translation, lang: 'en-US', pause: 1200, useAi: false },
       ];
     }
     if (mode === 'examples-only') {
-      const items: { text: string; lang: string; pause?: number; cardId?: string }[] = [
-        { text: word, lang: 'de-DE', pause: 600, cardId: card.id },
+      const items: Utterance[] = [
+        { text: word, lang: 'de-DE', pause: 600, useAi: true },
       ];
       if (example) {
-        items.push({ text: example.target, lang: 'de-DE', pause: 800 });
-        items.push({ text: example.native, lang: 'en-US', pause: 1200 });
+        items.push({ text: example.target, lang: 'de-DE', pause: 800, useAi: true });
+        items.push({ text: example.native, lang: 'en-US', pause: 1200, useAi: false });
       }
       return items;
     }
     // deep-dive
-    const items: { text: string; lang: string; pause?: number; cardId?: string }[] = [
-      { text: articleWord, lang: 'de-DE', pause: 600, cardId: card.id },
-      { text: translation, lang: 'en-US', pause: 600 },
+    const items: Utterance[] = [
+      { text: articleWord, lang: 'de-DE', pause: 600, useAi: true },
+      { text: translation, lang: 'en-US', pause: 600, useAi: false },
     ];
     if (example) {
-      items.push({ text: example.target, lang: 'de-DE', pause: 800 });
-      items.push({ text: example.native, lang: 'en-US', pause: 800 });
+      items.push({ text: example.target, lang: 'de-DE', pause: 800, useAi: true });
+      items.push({ text: example.native, lang: 'en-US', pause: 800, useAi: false });
     }
     if (card.content.notes) {
-      items.push({ text: card.content.notes, lang: 'en-US', pause: 1200 });
+      items.push({ text: card.content.notes, lang: 'en-US', pause: 1200, useAi: false });
     }
     return items;
   }
 
-  private _speakPromise(text: string, lang: string, _rate: number, cardId?: string): Promise<void> {
-    if (lang === 'de-DE') {
-      return this.pronunciation.playTextAsPromise(text, 'de-DE', cardId);
+  private _speakPromise(utt: Utterance): Promise<void> {
+    if (utt.useAi) {
+      return this.wordAudio.playAsPromise(utt.text, utt.lang);
     }
     return new Promise(resolve => {
-      this.audio.speak(text, lang, _rate).subscribe({
+      this.audio.speak(utt.text, utt.lang, this._playbackSpeed()).subscribe({
         next: () => resolve(),
         error: () => resolve(),
         complete: () => resolve(),

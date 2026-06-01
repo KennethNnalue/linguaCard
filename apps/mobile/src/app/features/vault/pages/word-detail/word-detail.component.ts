@@ -2,7 +2,7 @@ import {Component, computed, inject} from '@angular/core';
 import {ActivatedRoute, Router, RouterLink} from '@angular/router';
 import {toSignal} from '@angular/core/rxjs-interop';
 import {map} from 'rxjs/operators';
-import {AlertController, IonContent, IonHeader, IonIcon, IonToolbar, ModalController,} from '@ionic/angular/standalone';
+import {AlertController, IonContent, IonHeader, IonIcon, IonToolbar, ModalController, NavController,} from '@ionic/angular/standalone';
 import {addIcons} from 'ionicons';
 import {
   chevronBackOutline,
@@ -16,7 +16,7 @@ import {
 import {CardStore} from '../../store/card.store';
 import {CategoryStore} from '../../store/category.store';
 import {CardApiService} from '../../services/card-api.service';
-import {PronunciationService} from '../../../ai/audio/pronunciation.service';
+import {WordAudioService} from '../../../../shared/audio/word-audio.service';
 import {ArticleBadgeComponent} from '../../../../shared/components/article-badge/article-badge.component';
 import {AddWordSheetComponent} from '../../components/add-word-sheet/add-word-sheet.component';
 import {getCategoryName} from '../../../../shared/helpers/helpers';
@@ -32,11 +32,12 @@ export class WordDetailComponent {
   private readonly cardStore = inject(CardStore);
   private readonly categoryStore = inject(CategoryStore);
   private readonly cardApi = inject(CardApiService);
-  private readonly pronunciationService = inject(PronunciationService);
+  private readonly wordAudio = inject(WordAudioService);
   private readonly router = inject(Router);
   private readonly route = inject(ActivatedRoute);
   private readonly alertCtrl = inject(AlertController);
   private readonly modalCtrl = inject(ModalController);
+  private readonly navCtrl = inject(NavController);
 
   constructor() {
     addIcons({
@@ -124,15 +125,24 @@ export class WordDetailComponent {
   });
 
   goBack(): void {
-    this.router.navigate(['/vault']);
+    this.navCtrl.back();
   }
 
-  readonly isPronunciationLoading = this.pronunciationService.isLoading;
+  readonly isPronunciationLoading = this.wordAudio.isLoading;
+
+  // True when the AI audio URL is already in the in-memory cache for this session.
+  // Becomes true after the first successful tap — used to show the "ready" dot.
+  readonly isAudioReady = computed(() => {
+    const card = this.card();
+    if (!card) return false;
+    const text = (card.content.article ? `${card.content.article} ` : '') + card.content.back;
+    return this.wordAudio.hasCached(text, 'de-DE');
+  });
 
   playPronunciation(): void {
     const card = this.card();
     if (!card) return;
-    void this.pronunciationService.play(card);
+    void this.wordAudio.playCard(card);
   }
 
   async openEdit(): Promise<void> {

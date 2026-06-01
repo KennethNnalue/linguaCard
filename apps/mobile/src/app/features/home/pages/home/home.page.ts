@@ -22,7 +22,7 @@ import {UserMenuComponent} from '../../../../shared/components/user-menu/user-me
 import {AddWordSheetComponent} from '../../../vault/components/add-word-sheet/add-word-sheet.component';
 import {ResetDataSheetComponent} from '../../../auth/components/reset-data-sheet/reset-data-sheet.component';
 import {WordCardComponent} from '../../../../shared/ui/word-card/word-card.component';
-import {PronunciationService} from '../../../ai/audio/pronunciation.service';
+import {WordAudioService} from '../../../../shared/audio/word-audio.service';
 import {Card} from '@lingua-card/shared/domain';
 
 @Component({
@@ -46,7 +46,7 @@ export class HomePage {
   private readonly categoryStore = inject(CategoryStore);
   private readonly collectionStore = inject(CollectionStore);
   private readonly reviewStore = inject(ReviewStore);
-  private readonly pronunciationService = inject(PronunciationService);
+  private readonly wordAudio = inject(WordAudioService);
   private readonly modalCtrl = inject(ModalController);
   private readonly actionSheetCtrl = inject(ActionSheetController);
   private readonly authService = inject(AuthService);
@@ -246,11 +246,11 @@ export class HomePage {
   playWotd(): void {
     const card = this.wordOfTheDay();
     if (!card) return;
-    void this.pronunciationService.play(card);
+    void this.wordAudio.playCard(card);
   }
 
   playAudio(card: Card): void {
-    void this.pronunciationService.play(card);
+    void this.wordAudio.playCard(card);
   }
 
   navigateToCard(card: Card): void {

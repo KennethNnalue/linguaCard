@@ -24,7 +24,7 @@ import {getCategoryName} from '../../../../shared/helpers/helpers';
 import {AddWordSheetComponent} from '../../components/add-word-sheet/add-word-sheet.component';
 import {CollectionStore} from '../../store/collection.store';
 import {WordCardComponent} from '../../../../shared/ui/word-card/word-card.component';
-import {PronunciationService} from '../../../ai/audio/pronunciation.service';
+import {WordAudioService} from '../../../../shared/audio/word-audio.service';
 
 type VaultMasteryFilter = 'all' | 'due' | 'new' | 'learning' | 'mastered';
 type VaultSortMode = 'newest' | 'alphabetical' | 'mastery' | 'due-date';
@@ -54,7 +54,7 @@ export class VaultPage {
   private readonly syncService = inject(SyncService);
   private readonly modalCtrl = inject(ModalController);
   private readonly actionSheetCtrl = inject(ActionSheetController);
-  private readonly pronunciationService = inject(PronunciationService);
+  private readonly wordAudio = inject(WordAudioService);
   private readonly router = inject(Router);
 
   constructor() {
@@ -173,7 +173,7 @@ export class VaultPage {
   }
 
   playAudio(card: Card): void {
-    void this.pronunciationService.play(card);
+    void this.wordAudio.playCard(card);
   }
 
   openCollectionDetail(col: Collection): void {

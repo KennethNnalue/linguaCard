@@ -1,7 +1,8 @@
-import { Body, Controller, HttpException, Logger, Post, Res } from '@nestjs/common';
+import { Body, Controller, forwardRef, HttpException, Inject, Logger, Post, Res } from '@nestjs/common';
 import { Response } from 'express';
 import { GeminiAdapter } from './providers/gemini.adapter';
 import { StorageService } from '../storage/storage.service';
+import { WordAudioService } from '../word-audio/word-audio.service';
 
 interface TtsRequestDto {
   text: string;
@@ -23,6 +24,8 @@ export class AiController {
   constructor(
     private readonly gemini: GeminiAdapter,
     private readonly storage: StorageService,
+    @Inject(forwardRef(() => WordAudioService))
+    private readonly wordAudio: WordAudioService,
   ) {}
 
   @Post('tts')
@@ -47,11 +50,12 @@ export class AiController {
   }
 
   /**
-   * Generates pronunciation audio for a vocabulary card and persists it to
-   * R2 (or local disk in dev). Returns a permanent public URL so the client
-   * can store it and avoid regenerating on every session.
+   * Pronunciation endpoint — now delegates to the global word audio registry.
+   * cardId is accepted for backward compatibility but ignored; audio is keyed
+   * by normalized text so identical words share one R2 file across all cards.
    *
-   * Storage key: pronunciation/{cardId}.wav
+   * Response is backward-compatible (audioUrl + durationMs) with two new
+   * optional fields: wordAudioId and cached.
    */
   @Post('pronunciation')
   async pronunciation(
@@ -59,20 +63,13 @@ export class AiController {
     @Res() res: Response,
   ): Promise<void> {
     try {
-      const speech = await this.gemini.generateSpeech({
-        text: dto.text,
-        voice: dto.voice,
-        language: dto.language ?? 'de-DE',
+      const result = await this.wordAudio.resolve(dto.text, dto.language ?? 'de-DE');
+      res.json({
+        audioUrl: result.wordAudio.audioUrl,
+        durationMs: result.wordAudio.durationMs,
+        wordAudioId: result.wordAudio.id,
+        cached: result.cached,
       });
-
-      const storagePath = `pronunciation/${dto.cardId}.wav`;
-      const audioUrl = await this.storage.upload(
-        Buffer.from(speech.audioBuffer),
-        storagePath,
-        'audio/wav',
-      );
-
-      res.json({ audioUrl, durationMs: speech.durationMs });
     } catch (err) {
       this.handleTtsError(err, res);
     }

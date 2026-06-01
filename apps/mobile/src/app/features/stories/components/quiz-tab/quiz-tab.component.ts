@@ -9,7 +9,7 @@ import {
 import { NgClass } from '@angular/common';
 import { IonToggle } from '@ionic/angular/standalone';
 import type { StoryQuizQuestion } from '@lingua-card/shared/domain';
-import { PronunciationService } from '../../../ai/audio/pronunciation.service';
+import { WordAudioService } from '../../../../shared/audio/word-audio.service';
 
 function shuffle<T>(arr: T[]): T[] {
   const a = [...arr];
@@ -27,7 +27,7 @@ function shuffle<T>(arr: T[]): T[] {
   imports: [NgClass, IonToggle],
 })
 export class QuizTabComponent {
-  private readonly pronunciation = inject(PronunciationService);
+  private readonly wordAudio = inject(WordAudioService);
 
   readonly questions = input<StoryQuizQuestion[]>([]);
   readonly loading = input<boolean>(false);
@@ -120,7 +120,7 @@ export class QuizTabComponent {
       // Still play audio so they hear the correct pronunciation.
       this.waitingForNext.set(true);
       if (this.autoSpeak()) {
-        void this.pronunciation.playTextAsPromise(choice, 'de-DE');
+        void this.wordAudio.playAsPromise(choice, 'de-DE');
       }
     } else {
       void this.advanceAfterAudio(choice);
@@ -135,7 +135,7 @@ export class QuizTabComponent {
 
   private async advanceAfterAudio(choice: string): Promise<void> {
     if (this.autoSpeak()) {
-      await this.pronunciation.playTextAsPromise(choice, 'de-DE');
+      await this.wordAudio.playAsPromise(choice, 'de-DE');
     } else {
       await new Promise<void>(r => setTimeout(r, 1500));
     }
