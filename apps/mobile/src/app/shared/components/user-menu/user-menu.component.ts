@@ -13,7 +13,7 @@ import { SyncService } from '../../../core/services/sync.service';
 import { ThemeService } from '../../../core/services/theme.service';
 
 @Component({
-  selector: 'app-user-menu',
+  selector: 'lc-user-menu',
   standalone: true,
   templateUrl: './user-menu.component.html',
   styleUrls: ['./user-menu.component.scss'],

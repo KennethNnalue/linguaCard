@@ -7,7 +7,7 @@ import { alertCircleOutline, eyeOffOutline, eyeOutline, logoGoogle } from 'ionic
 import { AuthService } from '../../../../core/services/auth.service';
 
 @Component({
-  selector: 'app-register',
+  selector: 'lc-register',
   templateUrl: './register.page.html',
   styleUrls: ['./register.page.scss'],
   standalone: true,

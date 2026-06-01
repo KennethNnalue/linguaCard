@@ -1,160 +1,50 @@
-// ─── NAV ─────────────────────────────────────────────────────────────────────
+@use 'theme/tokens' as t;
+@use 'theme/utils' as u;
 
-.aw-nav {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 8px 16px 12px;
-}
-
-.aw-title {
-  font-size: 16px;
-  font-weight: 600;
-  color: var(--lc-text-primary);
-}
-
-.aw-nav-spacer {
-  width: 34px;
-}
+.aw-nav { @include u.flex-between; padding: t.$lc-space-2 t.$lc-space-4 t.$lc-space-3; }
+.aw-title { @include u.lc-font('xl', t.$lc-font-weight-semibold); color: var(--lc-text-primary); }
+.aw-nav-spacer { width: 34px; }
 
 .aw-close-btn {
-  width: 34px;
-  height: 34px;
-  border-radius: 50%;
-  background: var(--lc-surface);
-  border: 1px solid var(--lc-border);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-  transition: var(--lc-transition-fast);
-
-  ion-icon {
-    font-size: 18px;
-    color: var(--lc-text-secondary);
-  }
-
+  @include u.circle(34px); @include u.flex-center;
+  background: var(--lc-surface); border: 1px solid var(--lc-border);
+  cursor: pointer; transition: var(--lc-transition-fast);
+  ion-icon { font-size: 18px; color: var(--lc-text-secondary); }
   &:active { opacity: 0.7; }
 }
 
-// ─── FORM LAYOUT ──────────────────────────────────────────────────────────────
+.aw-form { padding: t.$lc-space-1 t.$lc-space-4 0; display: flex; flex-direction: column; gap: 18px; }
+.aw-field { display: flex; flex-direction: column; gap: 7px; }
+.aw-lbl { @include u.lc-font('xxs', t.$lc-font-weight-semibold); letter-spacing: 0.07em; text-transform: uppercase; color: var(--lc-text-hint); margin: 0; }
+.aw-lbl-hint { @include u.lc-font('xxs'); letter-spacing: 0; text-transform: none; color: var(--lc-text-hint); opacity: 0.7; }
 
-.aw-form {
-  padding: 4px 16px 0;
-  display: flex;
-  flex-direction: column;
-  gap: 18px;
-}
-
-.aw-field {
-  display: flex;
-  flex-direction: column;
-  gap: 7px;
-}
-
-.aw-lbl {
-  font-size: 10px;
-  font-weight: 600;
-  letter-spacing: 0.07em;
-  text-transform: uppercase;
-  color: var(--lc-text-hint);
-  margin: 0;
-}
-
-.aw-lbl-hint {
-  font-size: 9px;
-  font-weight: 400;
-  letter-spacing: 0;
-  text-transform: none;
-  color: var(--lc-text-hint);
-  opacity: 0.7;
-}
-
-// ─── LANGUAGE DIRECTION ───────────────────────────────────────────────────────
-
-.aw-lang-row {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-}
-
+.aw-lang-row { display: flex; align-items: center; gap: t.$lc-space-3; }
 .aw-lang-chip {
-  flex: 1;
-  text-align: center;
-  background: var(--lc-card);
-  border: 1px solid var(--lc-border);
-  border-radius: var(--lc-radius-sm);
-  padding: 9px 12px;
-  font-size: 12px;
-  font-weight: 600;
-  color: var(--lc-text-secondary);
-
-  &.aw-lang-chip--active {
-    background: var(--lc-brand);
-    color: var(--lc-text-inverse);
-    border-color: var(--lc-brand);
-  }
+  flex: 1; text-align: center;
+  background: var(--lc-card); border: 1px solid var(--lc-border); border-radius: t.$lc-radius-sm;
+  padding: 9px t.$lc-space-3; @include u.lc-font('xs', t.$lc-font-weight-semibold); color: var(--lc-text-secondary);
+  &.aw-lang-chip--active { background: var(--lc-brand); color: t.$lc-text-inverse; border-color: var(--lc-brand); }
 }
-
-.aw-lang-arrow {
-  font-size: 16px;
-  color: var(--lc-text-hint);
-  flex-shrink: 0;
-}
-
-// ─── TEXT INPUT ───────────────────────────────────────────────────────────────
+.aw-lang-arrow { font-size: t.$lc-text-xl; color: var(--lc-text-hint); flex-shrink: 0; }
 
 .aw-input {
-  background: var(--lc-card);
-  border: 1.5px solid var(--lc-border);
-  border-radius: var(--lc-radius-sm);
-  padding: 10px 13px;
-  font-size: 13px;
-  color: var(--lc-text-primary);
-  font-family: var(--lc-font-body);
-  width: 100%;
-  outline: none;
-  transition: border-color var(--lc-transition-fast);
-
+  background: var(--lc-card); border: 1.5px solid var(--lc-border); border-radius: t.$lc-radius-sm;
+  padding: t.$lc-space-3 13px; @include u.lc-font('sm'); color: var(--lc-text-primary);
+  font-family: t.$lc-font-body; width: 100%; outline: none; transition: border-color var(--lc-transition-fast);
   &:focus { border-color: var(--lc-brand); }
-
   &::placeholder { color: var(--lc-text-hint); }
-
   &.aw-input--error { border-color: var(--lc-fem-border); }
-
   &.aw-input--grow { flex: 1; }
 }
 
-// ─── BACK ROW (article badge + word input) ────────────────────────────────────
-
-.aw-back-row {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
-
+.aw-back-row { display: flex; align-items: center; gap: t.$lc-space-2; }
 .aw-art-badge {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  min-width: 40px;
-  padding: 0 10px;
-  height: 40px;
-  border-radius: var(--lc-radius-full);
-  border: 1.5px dashed var(--lc-border);
-  font-size: 11px;
-  font-weight: 700;
-  letter-spacing: 0.04em;
-  font-family: var(--lc-font-body);
-  background: var(--lc-surface);
-  color: var(--lc-text-hint);
-  cursor: pointer;
-  flex-shrink: 0;
-  transition: var(--lc-transition-fast);
-
-  &:not(.aw-art-badge--empty) {
-    border-style: solid;
-  }
-
+  @include u.flex-center;
+  min-width: 40px; padding: 0 t.$lc-space-3; height: 40px;
+  border-radius: t.$lc-radius-full; border: 1.5px dashed var(--lc-border);
+  @include u.lc-font('xs', t.$lc-font-weight-bold); letter-spacing: 0.04em;
+  font-family: t.$lc-font-body; background: var(--lc-surface); color: var(--lc-text-hint);
+  cursor: pointer; flex-shrink: 0; transition: var(--lc-transition-fast);
+  &:not(.aw-art-badge--empty) { border-style: solid; }
   &:active { transform: scale(0.95); }
 }

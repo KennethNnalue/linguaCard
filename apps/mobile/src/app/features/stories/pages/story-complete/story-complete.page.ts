@@ -20,7 +20,7 @@ import { StoryApiService } from '../../services/story-api.service';
 import { firstValueFrom } from 'rxjs';
 
 @Component({
-  selector: 'app-story-complete',
+  selector: 'lc-story-complete',
   templateUrl: './story-complete.page.html',
   styleUrls: ['./story-complete.page.scss'],
   imports: [IonContent, IonHeader, IonToolbar, IonIcon, NgClass],

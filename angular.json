@@ -13,7 +13,7 @@
       },
       "root": "apps/mobile",
       "sourceRoot": "apps/mobile/src",
-      "prefix": "app",
+      "prefix": "lc",
       "architect": {
         "build": {
           "builder": "@angular/build:application",
@@ -28,6 +28,9 @@
             ],
             "tsConfig": "apps/mobile/tsconfig.app.json",
             "inlineStyleLanguage": "scss",
+            "stylePreprocessorOptions": {
+              "includePaths": ["apps/mobile/src"]
+            },
             "assets": [
               {
                 "glob": "**/*",

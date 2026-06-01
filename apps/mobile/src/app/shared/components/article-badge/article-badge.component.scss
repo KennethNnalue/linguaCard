@@ -1,0 +1,19 @@
+@use 'theme/tokens' as t;
+
+.badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-family: t.$lc-font-body;
+  font-size: t.$lc-text-xxs;
+  font-weight: t.$lc-font-weight-bold;
+  letter-spacing: 0.04em;
+  padding: 2px t.$lc-space-2;
+  border-radius: t.$lc-radius-full;
+  border: 1px solid transparent;
+  white-space: nowrap;
+
+  &--der { background: t.$lc-masc-bg; color: t.$lc-masc-text; border-color: t.$lc-masc-border; }
+  &--die { background: t.$lc-fem-bg;  color: t.$lc-fem-text;  border-color: t.$lc-fem-border; }
+  &--das { background: t.$lc-neut-bg; color: t.$lc-neut-text; border-color: t.$lc-neut-border; }
+}

@@ -1,0 +1,13 @@
+@use 'theme/tokens' as t;
+@use 'theme/utils' as u;
+
+.dot {
+  @include u.circle(8px);
+
+  &--0 { background: t.$lc-mastery-0; }
+  &--1 { background: t.$lc-mastery-1; }
+  &--2 { background: t.$lc-mastery-2; }
+  &--3 { background: t.$lc-mastery-3; }
+  &--4 { background: t.$lc-mastery-4; }
+  &--5 { background: t.$lc-mastery-5; }
+}

@@ -11,7 +11,7 @@ import {
 } from 'ionicons/icons';
 
 @Component({
-  selector: 'app-tabs',
+  selector: 'lc-tabs',
   templateUrl: 'tabs.page.html',
   styleUrls: ['tabs.page.scss'],
   imports: [IonTabs, IonTabBar, IonTabButton, IonIcon, IonLabel],

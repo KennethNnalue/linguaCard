@@ -1,0 +1,32 @@
+@use 'theme/tokens' as t;
+@use 'theme/utils' as u;
+
+.empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: t.$lc-space-12 t.$lc-space-6;
+  text-align: center;
+  gap: t.$lc-space-3;
+}
+
+.empty-icon {
+  font-size: 48px;
+  opacity: 0.4;
+}
+
+.empty-title {
+  font-family: t.$lc-font-display;
+  @include u.lc-font('2xl', t.$lc-font-weight-semibold);
+  color: var(--lc-text-primary);
+  margin: 0;
+}
+
+.empty-sub {
+  @include u.lc-font('sm');
+  color: var(--lc-text-secondary);
+  max-width: 260px;
+  line-height: 1.5;
+  margin: 0;
+}

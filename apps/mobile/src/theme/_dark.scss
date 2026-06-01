@@ -1,0 +1,46 @@
+// Dark mode token overrides.
+// Applied by ThemeService via body.ion-palette-dark class.
+// Never set raw component colours here — only override CSS custom properties
+// so every component picks them up automatically.
+
+body.ion-palette-dark {
+  // Brand (lighter for dark surfaces)
+  --lc-brand:           #5ABFA3;
+  --lc-brand-light:     #1A2E28;
+  --lc-brand-mid:       #3D8A74;
+  --lc-accent:          #E09060;
+  --lc-accent-light:    #2A1F14;
+
+  // Surfaces
+  --lc-surface:         #141918;
+  --lc-card:            #1E2520;
+  --lc-border:          rgba(90, 191, 163, 0.12);
+  --lc-border-strong:   rgba(90, 191, 163, 0.24);
+
+  // Text
+  --lc-text-primary:    #E8F2EE;
+  --lc-text-secondary:  #8BADA4;
+  --lc-text-hint:       #5A7870;
+
+  // Shadows (stronger on dark)
+  --lc-shadow-card:     0 2px 12px rgba(0, 0, 0, 0.3);
+  --lc-shadow-float:    0 8px 32px rgba(0, 0, 0, 0.4);
+
+  // Article gender colours (adjusted for dark surfaces)
+  --lc-masc-bg:         #1E2D45;
+  --lc-masc-text:       #60A5FA;
+  --lc-masc-border:     #3B6EA8;
+  --lc-fem-bg:          #3A1515;
+  --lc-fem-text:        #F87171;
+  --lc-fem-border:      #8B2020;
+  --lc-neut-bg:         #252620;
+  --lc-neut-text:       #9BAAA6;
+  --lc-neut-border:     #5F5E5A;
+
+  // Ionic surfaces follow LDS tokens automatically
+  --ion-background-color:    var(--lc-surface);
+  --ion-text-color:          var(--lc-text-primary);
+  --ion-item-background:     var(--lc-card);
+  --ion-toolbar-background:  var(--lc-card);
+  --ion-tab-bar-background:  var(--lc-card);
+}

@@ -20,7 +20,7 @@ import { CategoryStore } from '../../store/category.store';
 import { ImportStateService } from '../../services/import-state.service';
 
 @Component({
-  selector: 'app-import',
+  selector: 'lc-import',
   standalone: true,
   templateUrl: './import.page.html',
   styleUrls: ['./import.page.scss'],

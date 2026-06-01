@@ -27,7 +27,7 @@ import {AddWordSheetComponent} from '../../components/add-word-sheet/add-word-sh
 import {CollectionStore} from '../../store/collection.store';
 
 @Component({
-  selector: 'app-vault',
+  selector: 'lc-vault',
   templateUrl: './vault.page.html',
   styleUrls: ['./vault.page.scss'],
   imports: [

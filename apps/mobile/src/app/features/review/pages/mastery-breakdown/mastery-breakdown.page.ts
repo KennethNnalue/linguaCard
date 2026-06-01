@@ -17,7 +17,7 @@ const MASTERY_ROWS: { level: MasteryLevel; label: string; colour: string }[] = [
 ];
 
 @Component({
-  selector: 'app-mastery-breakdown',
+  selector: 'lc-mastery-breakdown',
   templateUrl: './mastery-breakdown.page.html',
   styleUrls: ['./mastery-breakdown.page.scss'],
   imports: [IonContent, IonHeader, IonToolbar, IonIcon],

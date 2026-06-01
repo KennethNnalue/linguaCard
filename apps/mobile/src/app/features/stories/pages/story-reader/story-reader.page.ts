@@ -30,7 +30,7 @@ import { firstValueFrom } from 'rxjs';
 export type ReaderTab = 'story' | 'quiz' | 'keywords' | 'grammar';
 
 @Component({
-  selector: 'app-story-reader',
+  selector: 'lc-story-reader',
   templateUrl: './story-reader.page.html',
   styleUrls: ['./story-reader.page.scss'],
   imports: [

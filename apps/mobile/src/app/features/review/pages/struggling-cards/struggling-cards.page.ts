@@ -9,7 +9,7 @@ import { ReviewStore } from '../../store/review.store';
 import { ReviewFilterService } from '../../services/review-filter.service';
 
 @Component({
-  selector: 'app-struggling-cards',
+  selector: 'lc-struggling-cards',
   templateUrl: './struggling-cards.page.html',
   styleUrls: ['./struggling-cards.page.scss'],
   imports: [IonContent, IonHeader, IonToolbar, IonIcon, ArticleBadgeComponent],

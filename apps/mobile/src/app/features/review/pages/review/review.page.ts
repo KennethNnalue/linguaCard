@@ -29,7 +29,7 @@ const RATINGS: { value: ConfidenceRating; label: string }[] = [
 ];
 
 @Component({
-  selector: 'app-review',
+  selector: 'lc-review',
   templateUrl: './review.page.html',
   styleUrls: ['./review.page.scss', './review.card.scss', './review.rating.scss'],
   imports: [IonContent, IonIcon, IonToolbar, IonHeader],

@@ -15,7 +15,7 @@ const STATUS_COPY = [
 ] as const;
 
 @Component({
-  selector: 'app-image-processing',
+  selector: 'lc-image-processing',
   standalone: true,
   templateUrl: './image-processing.page.html',
   styleUrls: ['./image-processing.page.scss'],

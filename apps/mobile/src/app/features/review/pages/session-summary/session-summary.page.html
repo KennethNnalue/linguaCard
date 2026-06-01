@@ -65,7 +65,7 @@
         <div class="ss-word-list">
           @for (row of reviewedCardRows(); track row.card.id) {
             <div class="ss-word-row">
-              <app-article-badge [article]="row.card.content.article"></app-article-badge>
+              <lc-article-badge [article]="row.card.content.article"></lc-article-badge>
               <div class="ss-word-info">
                 <span class="ss-word-back lc-display">{{ row.card.content.back }}</span>
                 <span class="ss-word-front">{{ row.card.content.front }}</span>

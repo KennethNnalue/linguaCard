@@ -13,7 +13,7 @@ import { CreateCollectionDto } from '../../../../core/models/mock-data';
 import { CollectionStore } from '../../store/collection.store';
 
 @Component({
-  selector: 'app-assign-collection-sheet',
+  selector: 'lc-assign-collection-sheet',
   standalone: true,
   templateUrl: './assign-collection-sheet.component.html',
   styleUrls: ['./assign-collection-sheet.component.scss'],

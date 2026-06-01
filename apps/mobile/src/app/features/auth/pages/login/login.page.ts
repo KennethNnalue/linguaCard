@@ -7,7 +7,7 @@ import { alertCircleOutline, eyeOffOutline, eyeOutline, logoGoogle } from 'ionic
 import { AuthService } from '../../../../core/services/auth.service';
 
 @Component({
-  selector: 'app-login',
+  selector: 'lc-login',
   templateUrl: './login.page.html',
   styleUrls: ['./login.page.scss'],
   standalone: true,

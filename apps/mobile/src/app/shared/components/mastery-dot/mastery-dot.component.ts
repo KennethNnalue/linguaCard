@@ -1,18 +1,13 @@
-import {Component, computed, Input, signal} from '@angular/core';
-import {MasteryLevel} from "../../../core/models/mock-data";
+import { Component, ChangeDetectionStrategy, input } from '@angular/core';
+import { MasteryLevel } from '../../../core/models/mock-data';
 
 @Component({
-  selector: 'app-mastery-dot',
-  templateUrl: './mastery-dot.component.html',
-  styleUrls: ['./mastery-dot.component.scss'],
+  selector: 'lc-mastery-dot',
+  standalone: true,
+  template: `<span class="dot" [class]="'dot--' + level()"></span>`,
+  styleUrl: './mastery-dot.component.scss',
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class MasteryDotComponent {
-
-  private _level = signal<MasteryLevel>(0);
-  @Input() set level(val: MasteryLevel) {
-    this._level.set(val);
-  }
-
-  dotClass = computed(() => `lc-mastery-dot--${this._level()}`);
-
+  level = input<MasteryLevel>(0);
 }

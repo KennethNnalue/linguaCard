@@ -27,7 +27,7 @@ import { SyncService } from '../../../../core/services/sync.service';
 import { GenerateStorySheetComponent } from '../../components/generate-story-sheet/generate-story-sheet.component';
 
 @Component({
-  selector: 'app-story-library',
+  selector: 'lc-story-library',
   templateUrl: './story-library.page.html',
   styleUrls: ['./story-library.page.scss'],
   imports: [IonContent, IonHeader, IonToolbar, IonIcon, IonRefresher, IonRefresherContent, NgClass, TitleCasePipe],

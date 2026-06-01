@@ -26,7 +26,7 @@ const SORT_OPTIONS: { value: ReviewFilters['sortOrder']; label: string }[] = [
 ];
 
 @Component({
-  selector: 'app-custom-study',
+  selector: 'lc-custom-study',
   templateUrl: './custom-study.page.html',
   styleUrls: ['./custom-study.page.scss'],
   imports: [IonContent, IonHeader, IonToolbar, IonIcon, IonRange, FormsModule],

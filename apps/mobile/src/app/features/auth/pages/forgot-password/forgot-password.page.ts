@@ -13,7 +13,7 @@ import { alertCircleOutline, arrowBackOutline, checkmarkCircleOutline, mailOutli
 import { AuthService } from '../../../../core/services/auth.service';
 
 @Component({
-  selector: 'app-forgot-password',
+  selector: 'lc-forgot-password',
   templateUrl: './forgot-password.page.html',
   styleUrls: ['./forgot-password.page.scss'],
   standalone: true,

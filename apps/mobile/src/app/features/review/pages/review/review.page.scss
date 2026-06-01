@@ -1,81 +1,22 @@
-// ─── NAV ─────────────────────────────────────────────────────────────────────
+@use 'theme/tokens' as t;
+@use 'theme/utils' as u;
 
-.rv-nav {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 6px 14px 8px;
-}
-
-.rv-title {
-  font-size: 16px;
-  font-weight: 600;
-  color: var(--lc-text-primary);
-}
-
-.rv-nav-spacer {
-  width: 34px;
-}
+.rv-nav { @include u.flex-between; padding: t.$lc-space-2 14px t.$lc-space-2; }
+.rv-title { @include u.lc-font('xl', t.$lc-font-weight-semibold); color: var(--lc-text-primary); }
+.rv-nav-spacer { width: 34px; }
 
 .rv-icon-btn {
-  width: 34px;
-  height: 34px;
-  border-radius: 50%;
-  background: var(--lc-brand-light);
-  border: none;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-  transition: var(--lc-transition-fast);
-
-  ion-icon {
-    font-size: 17px;
-    color: var(--lc-brand);
-  }
-
+  @include u.circle(34px); @include u.flex-center;
+  background: var(--lc-brand-light); border: none; cursor: pointer; transition: var(--lc-transition-fast);
+  ion-icon { font-size: 17px; color: var(--lc-brand); }
   &:active { opacity: 0.7; }
 }
 
-// ─── PROGRESS BAR ─────────────────────────────────────────────────────────────
+.rv-prog-wrap { padding: 0 t.$lc-space-4 t.$lc-space-3; }
+.rv-prog-track { height: t.$lc-space-1; background: var(--lc-border); border-radius: t.$lc-space-1; overflow: hidden; margin-bottom: t.$lc-space-2; }
+.rv-prog-fill { height: 100%; background: var(--lc-brand); border-radius: t.$lc-space-1; transition: width 0.4s ease; }
+.rv-prog-labels { @include u.flex-between; @include u.lc-font('xs', t.$lc-font-weight-medium); color: var(--lc-text-hint); }
 
-.rv-prog-wrap {
-  padding: 0 16px 10px;
-}
+ion-content::part(scroll) { display: flex; flex-direction: column; }
 
-.rv-prog-track {
-  height: 4px;
-  background: var(--lc-border);
-  border-radius: 4px;
-  overflow: hidden;
-  margin-bottom: 6px;
-}
-
-.rv-prog-fill {
-  height: 100%;
-  background: var(--lc-brand);
-  border-radius: 4px;
-  transition: width 0.4s ease;
-}
-
-.rv-prog-labels {
-  display: flex;
-  justify-content: space-between;
-  font-size: 11px;
-  color: var(--lc-text-hint);
-  font-weight: 500;
-}
-
-// ─── SESSION LAYOUT ───────────────────────────────────────────────────────────
-
-ion-content::part(scroll) {
-  display: flex;
-  flex-direction: column;
-}
-
-.rv-session {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  padding: 6px 14px 16px;
-}
+.rv-session { flex: 1; display: flex; flex-direction: column; padding: t.$lc-space-2 14px t.$lc-space-4; }

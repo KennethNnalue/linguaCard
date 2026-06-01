@@ -20,10 +20,10 @@
 </ion-header>
 
 @if (menuOpen()) {
-  <app-user-menu
+  <lc-user-menu
     (closed)="closeMenu()"
     (resetRequested)="openResetSheet()"
-  ></app-user-menu>
+  ></lc-user-menu>
 }
 
 <ion-content>
@@ -136,8 +136,8 @@
       } @else {
         @for (card of recent(); track card.id) {
           <div class="lc-word-item" [routerLink]="['/vault', card.id]">
-            <app-mastery-dot [level]="card.srsState?.masteryLevel ?? 0"></app-mastery-dot>
-            <app-article-badge [article]="card.content.article"></app-article-badge>
+            <lc-mastery-dot [level]="card.srsState?.masteryLevel ?? 0"></lc-mastery-dot>
+            <lc-article-badge [article]="card.content.article"></lc-article-badge>
             <div style="flex:1">
               <p class="lc-word-front">{{ card.content.front }}</p>
               <p

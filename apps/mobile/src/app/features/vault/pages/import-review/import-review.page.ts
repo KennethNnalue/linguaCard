@@ -25,7 +25,7 @@ import { forkJoin, of } from 'rxjs';
 import { catchError, map } from 'rxjs/operators';
 
 @Component({
-  selector: 'app-import-review',
+  selector: 'lc-import-review',
   standalone: true,
   templateUrl: './import-review.page.html',
   styleUrls: ['./import-review.page.scss'],

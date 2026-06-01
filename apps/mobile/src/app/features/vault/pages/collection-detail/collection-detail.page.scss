@@ -1,207 +1,66 @@
-.cd-nav {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 6px 14px 10px;
-}
+@use 'theme/tokens' as t;
+@use 'theme/utils' as u;
 
+.cd-nav { @include u.flex-between; padding: t.$lc-space-2 14px t.$lc-space-3; }
 .cd-nav-title {
-  font-size: 16px;
-  font-weight: 600;
+  @include u.lc-font('xl', t.$lc-font-weight-semibold);
   color: var(--lc-text-primary);
   flex: 1;
   text-align: center;
-  padding: 0 8px;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
+  padding: 0 t.$lc-space-2;
+  @include u.text-overflow;
 }
 
 .lc-back-btn {
-  width: 30px;
-  height: 30px;
-  border-radius: 50%;
+  @include u.circle(30px);
+  @include u.flex-center;
   background: var(--lc-brand-light);
   border: none;
-  display: flex;
-  align-items: center;
-  justify-content: center;
   cursor: pointer;
   flex-shrink: 0;
-
-  ion-icon {
-    font-size: 14px;
-    color: var(--lc-brand);
-  }
+  ion-icon { font-size: t.$lc-text-md; color: var(--lc-brand); }
 }
 
 .cd-menu-btn {
-  width: 30px;
-  height: 30px;
-  border-radius: 50%;
+  @include u.circle(30px);
+  @include u.flex-center;
   background: var(--lc-surface);
   border: 1px solid var(--lc-border);
-  display: flex;
-  align-items: center;
-  justify-content: center;
   cursor: pointer;
   flex-shrink: 0;
-
-  ion-icon {
-    font-size: 16px;
-    color: var(--lc-text-secondary);
-  }
+  ion-icon { font-size: t.$lc-text-xl; color: var(--lc-text-secondary); }
 }
 
 // ─── HERO ─────────────────────────────────────────────────────────────────────
-
-.cd-hero {
-  margin: 0 14px 16px;
-  background: var(--lc-brand);
-  border-radius: 16px;
-  padding: 14px 16px;
-}
-
-.cd-hero-top {
-  display: flex;
-  align-items: center;
-  gap: 14px;
-  margin-bottom: 10px;
-}
-
-.cd-hero-emoji {
-  font-size: 28px;
-  line-height: 1;
-  flex-shrink: 0;
-}
-
-.cd-hero-stats {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  flex: 1;
-}
-
-.cd-hero-stat {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 1px;
-}
-
-.cd-hero-stat-num {
-  font-size: 20px;
-  font-weight: 700;
-  color: white;
-  line-height: 1;
-}
-
-.cd-hero-stat-num--due {
-  color: var(--lc-accent-light, #ffd166);
-}
-
-.cd-hero-stat-lbl {
-  font-size: 10px;
-  color: rgba(255, 255, 255, 0.55);
-  text-transform: uppercase;
-  letter-spacing: 0.04em;
-}
-
-.cd-hero-divider {
-  width: 1px;
-  height: 24px;
-  background: rgba(255, 255, 255, 0.2);
-  flex-shrink: 0;
-}
-
-.cd-hero-progress {
-  height: 4px;
-  background: rgba(255, 255, 255, 0.2);
-  border-radius: 4px;
-  overflow: hidden;
-}
-
-.cd-hero-progress-fill {
-  height: 100%;
-  background: white;
-  border-radius: 4px;
-  transition: width 0.4s ease;
-}
+.cd-hero { margin: 0 14px t.$lc-space-4; background: var(--lc-brand); border-radius: t.$lc-radius-lg - 4; padding: 14px t.$lc-space-4; }
+.cd-hero-top { display: flex; align-items: center; gap: 14px; margin-bottom: t.$lc-space-3; }
+.cd-hero-emoji { font-size: 28px; line-height: 1; flex-shrink: 0; }
+.cd-hero-stats { display: flex; align-items: center; gap: t.$lc-space-3; flex: 1; }
+.cd-hero-stat { display: flex; flex-direction: column; align-items: center; gap: 1px; }
+.cd-hero-stat-num { @include u.lc-font('3xl', t.$lc-font-weight-bold); color: white; line-height: 1; }
+.cd-hero-stat-num--due { color: var(--lc-accent-light); }
+.cd-hero-stat-lbl { @include u.lc-font('xxs'); color: rgba(255, 255, 255, 0.55); text-transform: uppercase; letter-spacing: 0.04em; }
+.cd-hero-divider { width: 1px; height: 24px; background: rgba(255, 255, 255, 0.2); flex-shrink: 0; }
+.cd-hero-progress { height: t.$lc-space-1; background: rgba(255, 255, 255, 0.2); border-radius: t.$lc-space-1; overflow: hidden; }
+.cd-hero-progress-fill { height: 100%; background: white; border-radius: t.$lc-space-1; transition: width 0.4s ease; }
 
 // ─── ACTION BUTTONS ──────────────────────────────────────────────────────────
-
-.cd-actions {
-  display: flex;
-  gap: 10px;
-  padding: 0 14px 16px;
-}
-
+.cd-actions { display: flex; gap: t.$lc-space-3; padding: 0 14px t.$lc-space-4; }
 .cd-action-btn {
-  flex: 1;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 7px;
-  padding: 12px;
-  border-radius: 12px;
-  border: none;
-  font-size: 13px;
-  font-weight: 600;
-  font-family: var(--lc-font-body);
-  cursor: pointer;
-  transition: opacity 0.15s, transform 0.15s;
-
-  ion-icon {
-    font-size: 16px;
-  }
-
-  &:disabled {
-    opacity: 0.45;
-    cursor: not-allowed;
-  }
-
-  &:not(:disabled):active {
-    opacity: 0.8;
-    transform: scale(0.97);
-  }
-
-  &--primary {
-    background: var(--lc-brand);
-    color: white;
-  }
-
-  &--secondary {
-    background: var(--lc-brand-light);
-    color: var(--lc-brand);
-    border: 1px solid var(--lc-brand);
-  }
+  flex: 1; @include u.flex-center; gap: 7px;
+  padding: t.$lc-space-3; border-radius: t.$lc-radius-md; border: none;
+  @include u.lc-font('sm', t.$lc-font-weight-semibold); font-family: t.$lc-font-body;
+  cursor: pointer; transition: opacity t.$lc-duration-fast, transform t.$lc-duration-fast;
+  ion-icon { font-size: t.$lc-text-xl; }
+  &:disabled { opacity: 0.45; cursor: not-allowed; }
+  &:not(:disabled):active { opacity: 0.8; transform: scale(0.97); }
+  &--primary   { background: var(--lc-brand); color: white; }
+  &--secondary { background: var(--lc-brand-light); color: var(--lc-brand); border: 1px solid var(--lc-brand); }
 }
 
 // ─── CATEGORY CHIPS ──────────────────────────────────────────────────────────
-
-.cd-cat-scroll {
-  display: flex;
-  gap: 8px;
-  padding: 0 14px 12px;
-  overflow-x: auto;
-  scrollbar-width: none;
-
-  &::-webkit-scrollbar {
-    display: none;
-  }
-}
+.cd-cat-scroll { display: flex; gap: t.$lc-space-2; padding: 0 14px t.$lc-space-3; overflow-x: auto; scrollbar-width: none; &::-webkit-scrollbar { display: none; } }
 
 // ─── WORD LIST ────────────────────────────────────────────────────────────────
-
-.cd-word-list {
-  padding: 0 14px 32px;
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-}
-
-.cd-word-item {
-  padding: 14px 16px;
-  cursor: default;
-}
-
+.cd-word-list { padding: 0 14px t.$lc-space-8; display: flex; flex-direction: column; gap: t.$lc-space-2; }
+.cd-word-item { padding: t.$lc-space-4 t.$lc-space-4; cursor: default; }

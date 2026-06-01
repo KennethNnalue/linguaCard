@@ -10,7 +10,7 @@ type SourceKey = 'due-today' | 'mastered' | 'struggling' | `category:${string}`;
 type PlaylistMode = 'word-meaning' | 'examples-only' | 'deep-dive';
 
 @Component({
-  selector: 'app-playlist-source-sheet',
+  selector: 'lc-playlist-source-sheet',
   templateUrl: './playlist-source-sheet.component.html',
   styleUrls: ['./playlist-source-sheet.component.scss'],
   imports: [IonContent, IonIcon],

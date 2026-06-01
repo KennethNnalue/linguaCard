@@ -15,7 +15,7 @@ export interface SessionStats {
 }
 
 @Component({
-  selector: 'app-session-history',
+  selector: 'lc-session-history',
   templateUrl: './session-history.page.html',
   styleUrls: ['./session-history.page.scss'],
   imports: [IonContent, IonHeader, IonToolbar, IonIcon],

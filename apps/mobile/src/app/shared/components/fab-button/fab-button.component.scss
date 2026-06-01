@@ -1,8 +1,8 @@
-// ─── FAB ─────────────────────────────────────────────────────────────────────
+@use 'theme/tokens' as t;
 
 .cd-fab {
   position: fixed;
   bottom: 90px;
   right: 20px;
-  z-index: 100;
+  z-index: t.$lc-z-fab;
 }

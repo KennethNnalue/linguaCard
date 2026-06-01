@@ -4,7 +4,7 @@ import {addIcons} from "ionicons";
 import {addOutline} from "ionicons/icons";
 
 @Component({
-  selector: 'app-fab-button',
+  selector: 'lc-fab-button',
   templateUrl: './fab-button.component.html',
   styleUrls: ['./fab-button.component.scss'],
   imports: [

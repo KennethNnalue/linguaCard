@@ -21,7 +21,7 @@ import {AddWordSheetComponent} from '../../components/add-word-sheet/add-word-sh
 import {getCategoryName} from '../../../../shared/helpers/helpers';
 
 @Component({
-  selector: 'app-word-detail',
+  selector: 'lc-word-detail',
   standalone: true,
   templateUrl: './word-detail.component.html',
   styleUrls: ['./word-detail.component.scss'],

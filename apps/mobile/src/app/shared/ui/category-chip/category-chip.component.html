@@ -1,0 +1,10 @@
+<button
+  class="chip"
+  [class.chip--active]="active()"
+  (click)="chipClick.emit()"
+>
+  <span class="chip-label">{{ label() }}</span>
+  @if (count() !== undefined) {
+    <span class="chip-count">{{ count() }}</span>
+  }
+</button>

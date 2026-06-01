@@ -1,5 +1,5 @@
-@if (article) {
-  <span class="lc-article-badge" [class]="badgeClass()">
-        {{ article }}
+@if (article()) {
+  <span class="badge" [class]="'badge--' + article()">
+    {{ article() }}
   </span>
 }

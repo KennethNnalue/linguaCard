@@ -38,7 +38,7 @@ interface SelectableWord extends ParsedImportRow {
 }
 
 @Component({
-  selector: 'app-image-import-review',
+  selector: 'lc-image-import-review',
   standalone: true,
   templateUrl: './image-import-review.page.html',
   styleUrls: ['./image-import-review.page.scss'],

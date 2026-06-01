@@ -1,0 +1,12 @@
+<div class="item" [class.item--interactive]="interactive()">
+  @if (showMastery()) {
+    <lc-mastery-dot [level]="card().srsState?.masteryLevel ?? 0" />
+  }
+  <div class="item-content">
+    <div class="item-front">
+      <lc-article-badge [article]="card().content.article" />
+      <span class="front-text">{{ card().content.front }}</span>
+    </div>
+    <div class="item-back">{{ card().content.back }}</div>
+  </div>
+</div>

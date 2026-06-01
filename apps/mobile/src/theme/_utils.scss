@@ -1,0 +1,73 @@
+// Usage: @use '../../../theme/utils' as u; then @include u.flex-center;
+@use 'tokens' as t;
+
+// ─── FLEX ────────────────────────────────────────────────────────────────────
+@mixin flex-center {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+@mixin flex-between {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+// ─── TEXT TRUNCATION ────────────────────────────────────────────────────────
+@mixin text-overflow {
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+// ─── GEOMETRY ───────────────────────────────────────────────────────────────
+// Usage: @include u.square(44px);
+@mixin square($size) {
+  width: $size;
+  height: $size;
+  flex-shrink: 0;
+}
+
+// Usage: @include u.circle(8px);
+@mixin circle($size) {
+  @include square($size);
+  border-radius: 50%;
+}
+
+// ─── TYPOGRAPHY SHORTHAND ───────────────────────────────────────────────────
+// Usage: @include u.lc-font('sm', 600);
+@mixin lc-font($size-key, $weight: t.$lc-font-weight-regular) {
+  $sizes: (
+    'xxs': t.$lc-text-xxs,
+    'xs':  t.$lc-text-xs,
+    'sm':  t.$lc-text-sm,
+    'md':  t.$lc-text-md,
+    'lg':  t.$lc-text-lg,
+    'xl':  t.$lc-text-xl,
+    '2xl': t.$lc-text-2xl,
+    '3xl': t.$lc-text-3xl,
+    '4xl': t.$lc-text-4xl,
+  );
+  font-size: map-get($sizes, $size-key);
+  font-weight: $weight;
+}
+
+// ─── CARD SURFACE ────────────────────────────────────────────────────────────
+// Usage: @include u.lc-card(); or @include u.lc-card(t.$lc-radius-lg);
+@mixin lc-card($radius: t.$lc-radius-md) {
+  background: var(--lc-card);
+  border: 1px solid var(--lc-border);
+  border-radius: $radius;
+  box-shadow: var(--lc-shadow-card);
+}
+
+// ─── TOUCH STATE ────────────────────────────────────────────────────────────
+// Usage: @include u.touch-state;
+@mixin touch-state {
+  &:active {
+    opacity: 0.82;
+    transform: scale(0.97);
+    transition: opacity t.$lc-duration-fast, transform t.$lc-duration-fast;
+  }
+}

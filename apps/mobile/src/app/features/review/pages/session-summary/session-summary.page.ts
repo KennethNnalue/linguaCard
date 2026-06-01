@@ -13,7 +13,7 @@ const MASTERY_LABELS = ['New', 'Beginner', 'Learning', 'Familiar', 'Good', 'Mast
 const RATING_LABELS = ['Blank', 'Hard', 'Hmm', 'Good', 'Easy', 'Nailed'];
 
 @Component({
-  selector: 'app-session-summary',
+  selector: 'lc-session-summary',
   standalone: true,
   templateUrl: './session-summary.page.html',
   styleUrls: ['./session-summary.page.scss'],

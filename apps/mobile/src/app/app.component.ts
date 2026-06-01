@@ -12,7 +12,7 @@ import { PwaInstallBannerComponent } from './shared/components/pwa-install-banne
 import { OfflineBannerComponent } from './shared/components/offline-banner/offline-banner.component';
 
 @Component({
-  selector: 'app-root',
+  selector: 'lc-root',
   templateUrl: 'app.component.html',
   imports: [IonApp, IonRouterOutlet, PwaInstallBannerComponent, OfflineBannerComponent],
 })

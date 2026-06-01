@@ -1,0 +1,67 @@
+@use 'theme/tokens' as t;
+@use 'theme/utils' as u;
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: t.$lc-space-2;
+  font-family: t.$lc-font-body;
+  font-weight: t.$lc-font-weight-semibold;
+  border: 1px solid transparent;
+  border-radius: t.$lc-radius-md;
+  cursor: pointer;
+  @include u.touch-state;
+
+  &:disabled {
+    opacity: 0.45;
+    pointer-events: none;
+  }
+
+  &--full { width: 100%; }
+
+  // ─── SIZES ──────────────────────────────────────────────────────────────────
+  &--sm { @include u.lc-font('sm', t.$lc-font-weight-semibold); padding: t.$lc-space-2 t.$lc-space-3; }
+  &--md { @include u.lc-font('md', t.$lc-font-weight-semibold); padding: t.$lc-space-3 t.$lc-space-5; }
+  &--lg { @include u.lc-font('lg', t.$lc-font-weight-semibold); padding: t.$lc-space-4 t.$lc-space-6; }
+
+  // ─── VARIANTS ───────────────────────────────────────────────────────────────
+  &--filled-primary {
+    background: t.$lc-brand;
+    color: t.$lc-text-inverse;
+    border-color: t.$lc-brand;
+  }
+
+  &--filled-accent {
+    background: t.$lc-accent;
+    color: t.$lc-text-inverse;
+    border-color: t.$lc-accent;
+  }
+
+  &--outline-primary {
+    background: transparent;
+    color: t.$lc-brand;
+    border-color: t.$lc-brand;
+  }
+
+  &--ghost-primary {
+    background: t.$lc-brand-light;
+    color: t.$lc-brand;
+    border-color: transparent;
+  }
+
+  &--destructive {
+    background: t.$lc-fem-bg;
+    color: t.$lc-fem-text;
+    border-color: t.$lc-fem-border;
+  }
+}
+
+.btn-spinner {
+  @include u.circle(16px);
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  border-top-color: #fff;
+  animation: lc-spin t.$lc-duration-slow linear infinite;
+}
+
+@keyframes lc-spin { to { transform: rotate(360deg); } }

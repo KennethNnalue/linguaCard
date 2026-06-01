@@ -16,7 +16,7 @@ import { CollectionStore } from '../../store/collection.store';
 import { AssignCollectionSheetComponent } from '../../components/assign-collection-sheet/assign-collection-sheet.component';
 
 @Component({
-  selector: 'app-collections',
+  selector: 'lc-collections',
   standalone: true,
   templateUrl: './collections.page.html',
   styleUrls: ['./collections.page.scss'],

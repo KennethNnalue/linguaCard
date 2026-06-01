@@ -1,158 +1,54 @@
-/* ── Transparent backdrop — captures outside clicks ──────────── */
-.ctx-backdrop {
-  position: fixed;
-  inset: 0;
-  z-index: 200;
-  background: transparent;
-}
+@use 'theme/tokens' as t;
+@use 'theme/utils' as u;
 
-/* ── Floating menu card ──────────────────────────────────────── */
+.ctx-backdrop { position: fixed; inset: 0; z-index: t.$lc-z-header; background: transparent; }
+
 .ctx-menu {
-  position: fixed;
-  top: 58px;
-  right: 14px;
-  z-index: 201;
-  min-width: 220px;
-  background: var(--lc-card);
-  border: 1px solid var(--lc-border);
-  border-radius: 14px;
-  box-shadow: var(--lc-shadow-float);
-  overflow: hidden;
-  animation: ctx-enter 150ms ease-out forwards;
-  transform-origin: top right;
+  position: fixed; top: 58px; right: 14px;
+  z-index: t.$lc-z-header + 1;
+  min-width: 220px; background: var(--lc-card); border: 1px solid var(--lc-border);
+  border-radius: t.$lc-radius-md + 2; box-shadow: var(--lc-shadow-float); overflow: hidden;
+  animation: ctx-enter t.$lc-duration-fast ease-out forwards; transform-origin: top right;
 
-  @media (max-width: 359px) {
-    left: 14px;
-    right: 14px;
-  }
+  @media (max-width: 359px) { left: 14px; right: 14px; }
 }
 
 @keyframes ctx-enter {
-  from {
-    opacity: 0;
-    transform: scale(0.95) translateY(-4px);
-  }
-  to {
-    opacity: 1;
-    transform: scale(1) translateY(0);
-  }
+  from { opacity: 0; transform: scale(0.95) translateY(-4px); }
+  to   { opacity: 1; transform: scale(1) translateY(0); }
 }
 
-/* ── User info header ────────────────────────────────────────── */
-.ctx-user-row {
-  padding: 14px 16px 12px;
-  border-bottom: 1px solid var(--lc-border);
-}
+.ctx-user-row { padding: 14px t.$lc-space-4 t.$lc-space-3; border-bottom: 1px solid var(--lc-border); }
+.ctx-user-name { @include u.lc-font('sm', t.$lc-font-weight-semibold); color: var(--lc-text-primary); margin-bottom: 2px; }
+.ctx-user-email { @include u.lc-font('xxs'); color: var(--lc-text-hint); }
 
-.ctx-user-name {
-  font-size: 13px;
-  font-weight: 600;
-  color: var(--lc-text-primary);
-  margin-bottom: 2px;
-}
-
-.ctx-user-email {
-  font-size: 10px;
-  color: var(--lc-text-hint);
-}
-
-/* ── Menu rows ───────────────────────────────────────────────── */
 .ctx-item {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  width: 100%;
-  padding: 11px 16px;
-  border: none;
-  border-bottom: 1px solid var(--lc-border);
-  background: none;
-  font-size: 12px;
-  font-weight: 500;
-  font-family: var(--lc-font-body);
-  color: var(--lc-text-primary);
-  cursor: pointer;
-  text-align: left;
-
-  &:last-child {
-    border-bottom: none;
-  }
-
-  &:active {
-    background: var(--lc-surface);
-  }
-
-  &--danger {
-    color: #B91C1C;
-
-    .ctx-item-left ion-icon { color: #B91C1C; }
-    .ctx-chevron { color: var(--lc-text-hint); }
-  }
-
-  &--clickable {
-    cursor: pointer;
-  }
+  @include u.flex-between; width: 100%; padding: 11px t.$lc-space-4; border: none;
+  border-bottom: 1px solid var(--lc-border); background: none;
+  @include u.lc-font('xs', t.$lc-font-weight-medium); font-family: t.$lc-font-body;
+  color: var(--lc-text-primary); cursor: pointer; text-align: left;
+  &:last-child { border-bottom: none; }
+  &:active { background: var(--lc-surface); }
+  &--danger { color: var(--lc-fem-text); .ctx-item-left ion-icon { color: var(--lc-fem-text); } .ctx-chevron { color: var(--lc-text-hint); } }
 }
 
-.ctx-item-left {
-  display: flex;
-  align-items: center;
-  gap: 9px;
+.ctx-item-left { display: flex; align-items: center; gap: 9px; ion-icon { @include u.lc-font('lg'); color: var(--lc-text-hint); flex-shrink: 0; } }
+.ctx-sync-right { display: flex; align-items: center; gap: 5px; }
+.ctx-sync-label { @include u.lc-font('xxs', t.$lc-font-weight-semibold); color: var(--lc-text-secondary); }
 
-  ion-icon {
-    font-size: 15px;
-    color: var(--lc-text-hint);
-    flex-shrink: 0;
-  }
-}
-
-/* ── Sync status right side ──────────────────────────────────── */
-.ctx-sync-right {
-  display: flex;
-  align-items: center;
-  gap: 5px;
-}
-
-.ctx-sync-label {
-  font-size: 10px;
-  font-weight: 600;
-  color: var(--lc-text-secondary);
-}
-
-/* ── Sync dot — reuses same states as sync-status component ──── */
 .sync-dot {
-  width: 7px;
-  height: 7px;
-  border-radius: 50%;
-  flex-shrink: 0;
-
+  @include u.circle(7px);
   &--synced  { background: var(--lc-mastery-5); }
   &--pending { background: #D97706; }
-  &--error   { background: #B91C1C; }
-
-  &--syncing {
-    background: #D97706;
-    animation: pulse 1.2s ease-in-out infinite;
-  }
+  &--error   { background: var(--lc-fem-text); }
+  &--syncing { background: #D97706; animation: pulse 1.2s ease-in-out infinite; }
 }
+@keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.35; } }
 
-@keyframes pulse {
-  0%, 100% { opacity: 1; }
-  50%       { opacity: 0.35; }
-}
-
-/* ── Dark mode toggle ────────────────────────────────────────── */
 ion-toggle {
   --track-background: var(--lc-border);
   --track-background-checked: var(--lc-brand);
   --handle-background: white;
-  height: 22px;
-  width: 40px;
-  padding: 0;
-  flex-shrink: 0;
-  pointer-events: none; /* row button handles click */
+  height: 22px; width: 40px; padding: 0; flex-shrink: 0; pointer-events: none;
 }
-
-.ctx-chevron {
-  font-size: 12px;
-  color: var(--lc-text-hint);
-}
+.ctx-chevron { @include u.lc-font('xs'); color: var(--lc-text-hint); }

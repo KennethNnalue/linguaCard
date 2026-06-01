@@ -24,7 +24,7 @@ import {AddWordSheetComponent} from '../../../vault/components/add-word-sheet/ad
 import {ResetDataSheetComponent} from '../../../auth/components/reset-data-sheet/reset-data-sheet.component';
 
 @Component({
-  selector: 'app-home',
+  selector: 'lc-home',
   templateUrl: './home.page.html',
   styleUrls: ['./home.page.scss'],
   imports: [

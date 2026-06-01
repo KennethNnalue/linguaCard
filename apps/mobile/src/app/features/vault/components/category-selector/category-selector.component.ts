@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 
 @Component({
-  selector: 'app-category-selector',
+  selector: 'lc-category-selector',
   templateUrl: './category-selector.component.html',
   styleUrls: ['./category-selector.component.scss'],
 })

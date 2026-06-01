@@ -96,8 +96,8 @@
       } @else {
         @for (card of cards(); track card.id) {
           <div class="lc-word-item word-item-padded" (click)="openDetail(card)">
-            <app-mastery-dot [level]="card.srsState?.masteryLevel ?? 0"></app-mastery-dot>
-            <app-article-badge [article]="card.content.article"></app-article-badge>
+            <lc-mastery-dot [level]="card.srsState?.masteryLevel ?? 0"></lc-mastery-dot>
+            <lc-article-badge [article]="card.content.article"></lc-article-badge>
             <div style="flex:1;min-width:0;">
               <p class="lc-word-front">{{ card.content.front }}</p>
               <p class="lc-word-back">{{ card.content.article ? card.content.article + ' ' : '' }}{{ card.content.back }}</p>

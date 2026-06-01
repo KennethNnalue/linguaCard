@@ -2,7 +2,7 @@ import { Component, inject } from '@angular/core';
 import { SyncService } from '../../../core/services/sync.service';
 
 @Component({
-  selector: 'app-sync-status',
+  selector: 'lc-sync-status',
   templateUrl: './sync-status.component.html',
   styleUrls: ['./sync-status.component.scss'],
   standalone: true,

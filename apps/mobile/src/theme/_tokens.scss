@@ -1,0 +1,116 @@
+// ─── BRAND PALETTE ──────────────────────────────────────────────────────────
+$lc-brand:           #2D5A4E;
+$lc-brand-light:     #E8F2EE;
+$lc-brand-mid:       #4A8C7A;
+$lc-brand-dark:      #1A3830;
+$lc-accent:          #E07B3F;
+$lc-accent-light:    #FDF0E6;
+$lc-accent-dark:     #B55E28;
+
+// ─── ARTICLE GENDER COLOURS ─────────────────────────────────────────────────
+$lc-masc-bg:         #EAF2FC;
+$lc-masc-text:       #1A56A3;
+$lc-masc-border:     #85B7EB;
+$lc-fem-bg:          #FEF2F2;
+$lc-fem-text:        #B91C1C;
+$lc-fem-border:      #FCA5A5;
+$lc-neut-bg:         #F1EFE8;
+$lc-neut-text:       #5F5E5A;
+$lc-neut-border:     #B4B2A9;
+
+// ─── MASTERY COLOURS ────────────────────────────────────────────────────────
+$lc-mastery-0:       #D1D5DB;
+$lc-mastery-1:       #FCA5A5;
+$lc-mastery-2:       #FCD34D;
+$lc-mastery-3:       #6EE7B7;
+$lc-mastery-4:       #34D399;
+$lc-mastery-5:       #059669;
+
+// ─── RATING COLOURS ─────────────────────────────────────────────────────────
+$lc-rating-0-bg:     #F3F4F6;
+$lc-rating-1-bg:     #FEF2F2;
+$lc-rating-2-bg:     #FFFBEA;
+$lc-rating-3-bg:     #F0FDF9;
+$lc-rating-4-bg:     #ECFDF5;
+$lc-rating-5-bg:     #D1FAE5;
+$lc-rating-0-border: #E5E7EB;
+$lc-rating-1-border: #FCA5A5;
+$lc-rating-2-border: #FCD34D;
+$lc-rating-3-border: #6EE7B7;
+$lc-rating-4-border: #34D399;
+$lc-rating-5-border: #059669;
+
+// ─── SURFACES ───────────────────────────────────────────────────────────────
+$lc-surface:         #FAFAF8;
+$lc-card:            #FFFFFF;
+$lc-border:          rgba(45, 90, 78, 0.12);
+$lc-border-strong:   rgba(45, 90, 78, 0.24);
+
+// ─── TEXT ───────────────────────────────────────────────────────────────────
+$lc-text-primary:    #1A2B26;
+$lc-text-secondary:  #6B7C78;
+$lc-text-hint:       #9BAAA6;
+$lc-text-inverse:    #FFFFFF;
+
+// ─── SPACING SCALE (base 4px) ───────────────────────────────────────────────
+$lc-space-1:  4px;
+$lc-space-2:  8px;
+$lc-space-3:  12px;
+$lc-space-4:  16px;
+$lc-space-5:  20px;
+$lc-space-6:  24px;
+$lc-space-8:  32px;
+$lc-space-10: 40px;
+$lc-space-12: 48px;
+$lc-space-16: 64px;
+
+// ─── BORDER RADIUS ──────────────────────────────────────────────────────────
+$lc-radius-sm:   8px;
+$lc-radius-md:   12px;
+$lc-radius-lg:   20px;
+$lc-radius-xl:   28px;
+$lc-radius-full: 9999px;
+
+// ─── SHADOWS ────────────────────────────────────────────────────────────────
+$lc-shadow-card:  0 2px 12px rgba(45, 90, 78, 0.08), 0 1px 3px rgba(0, 0, 0, 0.04);
+$lc-shadow-float: 0 8px 32px rgba(45, 90, 78, 0.14), 0 2px 8px rgba(0, 0, 0, 0.06);
+$lc-shadow-fab:   0 4px 16px rgba(224, 123, 63, 0.40);
+$lc-shadow-modal: 0 20px 60px rgba(0, 0, 0, 0.15);
+
+// ─── TYPOGRAPHY ─────────────────────────────────────────────────────────────
+$lc-font-display: 'Lora', Georgia, serif;
+$lc-font-body:    'DM Sans', system-ui, sans-serif;
+$lc-font-mono:    'Fira Code', 'Courier New', monospace;
+
+$lc-font-weight-regular:   400;
+$lc-font-weight-medium:    500;
+$lc-font-weight-semibold:  600;
+$lc-font-weight-bold:      700;
+$lc-font-weight-extrabold: 800;
+
+$lc-text-xxs: 0.625rem;   // 10px
+$lc-text-xs:  0.6875rem;  // 11px
+$lc-text-sm:  0.8125rem;  // 13px
+$lc-text-md:  0.875rem;   // 14px
+$lc-text-lg:  0.9375rem;  // 15px
+$lc-text-xl:  1rem;       // 16px
+$lc-text-2xl: 1.125rem;   // 18px
+$lc-text-3xl: 1.25rem;    // 20px
+$lc-text-4xl: 1.5rem;     // 24px
+
+// ─── ANIMATION ──────────────────────────────────────────────────────────────
+$lc-duration-fast:   150ms;
+$lc-duration-base:   250ms;
+$lc-duration-slow:   350ms;
+$lc-duration-flip:   300ms;
+$lc-easing-standard: cubic-bezier(0.4, 0, 0.2, 1);
+$lc-easing-spring:   cubic-bezier(0.34, 1.56, 0.64, 1);
+
+// ─── Z-INDEX SCALE ──────────────────────────────────────────────────────────
+$lc-z-base:    0;
+$lc-z-raised:  10;
+$lc-z-fab:     100;
+$lc-z-header:  200;
+$lc-z-drawer:  300;
+$lc-z-modal:   400;
+$lc-z-toast:   500;

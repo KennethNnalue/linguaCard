@@ -19,7 +19,7 @@ import {
 const MAX_FILE_SIZE_BYTES = 5 * 1024 * 1024;
 
 @Component({
-  selector: 'app-image-import',
+  selector: 'lc-image-import',
   standalone: true,
   templateUrl: './image-import.page.html',
   styleUrls: ['./image-import.page.scss'],

@@ -25,7 +25,7 @@ import { PlaylistSourceSheetComponent } from '../../components/playlist-source-s
 type PlaylistMode = 'word-meaning' | 'examples-only' | 'deep-dive';
 
 @Component({
-  selector: 'app-listen',
+  selector: 'lc-listen',
   templateUrl: './listen.component.html',
   styleUrls: ['./listen.component.scss', './listen.browser.scss', './listen.player.scss', './listen.controls.scss'],
   imports: [IonContent, IonHeader, IonIcon, IonToolbar, ArticleBadgeComponent],

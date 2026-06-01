@@ -18,7 +18,7 @@ const MASTERY_COLOURS = ['#D1D5DB', '#FCA5A5', '#FCD34D', '#6EE7B7', '#34D399', 
 const MASTERY_LABELS = ['New', 'Beginner', 'Learning', 'Familiar', 'Good', 'Mastered'];
 
 @Component({
-  selector: 'app-review-hub',
+  selector: 'lc-review-hub',
   templateUrl: './review-hub.page.html',
   styleUrls: ['./review-hub.page.scss'],
   imports: [IonContent, IonHeader, IonToolbar, IonIcon],

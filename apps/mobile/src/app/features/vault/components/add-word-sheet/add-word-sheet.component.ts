@@ -25,7 +25,7 @@ import { CollectionStore } from '../../store/collection.store';
 import { AssignCollectionSheetComponent } from '../assign-collection-sheet/assign-collection-sheet.component';
 
 @Component({
-  selector: 'app-add-word-sheet',
+  selector: 'lc-add-word-sheet',
   standalone: true,
   templateUrl: './add-word-sheet.component.html',
   styleUrls: ['./add-word-sheet.component.scss', './add-word-sheet.fields.scss'],

@@ -95,8 +95,8 @@
     } @else {
       @for (card of filteredCards(); track card.id) {
         <div class="lc-word-item cd-word-item" (click)="openDetail(card)">
-          <app-mastery-dot [level]="card.srsState?.masteryLevel ?? 0"></app-mastery-dot>
-          <app-article-badge [article]="card.content.article"></app-article-badge>
+          <lc-mastery-dot [level]="card.srsState?.masteryLevel ?? 0"></lc-mastery-dot>
+          <lc-article-badge [article]="card.content.article"></lc-article-badge>
           <div style="flex:1;min-width:0;">
             <p class="lc-word-front">{{ card.content.front }}</p>
             <p
@@ -118,4 +118,4 @@
 
 </ion-content>
 
-<app-fab-button (clickButton)="openAddWord()"/>
+<lc-fab-button (clickButton)="openAddWord()"/>

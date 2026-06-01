@@ -17,7 +17,7 @@ import { CardStore } from '../../../vault/store/card.store';
 import { CollectionStore } from '../../../vault/store/collection.store';
 
 @Component({
-  selector: 'app-reset-data-sheet',
+  selector: 'lc-reset-data-sheet',
   standalone: true,
   templateUrl: './reset-data-sheet.component.html',
   styleUrls: ['./reset-data-sheet.component.scss'],

@@ -1,0 +1,43 @@
+@use 'theme/tokens' as t;
+@use 'theme/utils' as u;
+
+.item {
+  @include u.flex-between;
+  gap: t.$lc-space-3;
+  padding: t.$lc-space-3 t.$lc-space-4;
+  @include u.lc-card;
+  transition: var(--lc-transition-fast);
+
+  &--interactive {
+    @include u.touch-state;
+
+    &:active {
+      background: var(--lc-brand-light);
+      border-color: var(--lc-brand);
+    }
+  }
+}
+
+.item-content {
+  flex: 1;
+  min-width: 0;
+}
+
+.item-front {
+  display: flex;
+  align-items: center;
+  gap: t.$lc-space-2;
+  margin-bottom: t.$lc-space-1;
+}
+
+.front-text {
+  @include u.lc-font('sm', t.$lc-font-weight-medium);
+  @include u.text-overflow;
+  color: var(--lc-text-primary);
+}
+
+.item-back {
+  @include u.lc-font('xs');
+  @include u.text-overflow;
+  color: var(--lc-text-secondary);
+}

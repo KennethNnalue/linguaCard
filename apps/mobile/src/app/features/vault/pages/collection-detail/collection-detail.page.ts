@@ -16,7 +16,7 @@ import {ReviewFilterService} from '../../../review/services/review-filter.servic
 import {ReviewStore} from '../../../review/store/review.store';
 
 @Component({
-  selector: 'app-collection-detail',
+  selector: 'lc-collection-detail',
   standalone: true,
   templateUrl: './collection-detail.page.html',
   styleUrls: ['./collection-detail.page.scss'],

@@ -1,207 +1,60 @@
-.cs-nav {
-  display: flex;
-  align-items: center;
-  padding: 6px 16px 10px;
-  gap: 12px;
-}
+@use 'theme/tokens' as t;
+@use 'theme/utils' as u;
 
-.cs-nav-title {
-  font-size: 15px;
-  font-weight: 600;
-  color: var(--lc-text-primary);
-  flex: 1;
-  text-align: center;
-}
+.cs-nav { display: flex; align-items: center; padding: t.$lc-space-2 t.$lc-space-4 t.$lc-space-3; gap: t.$lc-space-3; }
+.cs-nav-title { @include u.lc-font('lg', t.$lc-font-weight-semibold); color: var(--lc-text-primary); flex: 1; text-align: center; }
+.cs-nav-spacer { width: 32px; }
 
-.cs-nav-spacer {
-  width: 32px;
-}
+.cs-content { padding-bottom: env(safe-area-inset-bottom, t.$lc-space-6); }
 
-.cs-content {
-  padding-bottom: env(safe-area-inset-bottom, 24px);
-}
+.cs-section { padding: 0 14px 14px; }
+.cs-sec-lbl { @include u.lc-font('xxs', t.$lc-font-weight-semibold); letter-spacing: 0.08em; text-transform: uppercase; color: var(--lc-text-hint); margin: 0 0 t.$lc-space-2; }
 
-// ── Section ───────────────────────────────────────────────────────
-.cs-section {
-  padding: 0 14px 14px;
-}
-
-.cs-sec-lbl {
-  font-size: 9px;
-  font-weight: 600;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-  color: var(--lc-text-hint);
-  margin: 0 0 8px;
-}
-
-// ── Source btn ────────────────────────────────────────────────────
 .cs-source-btn {
-  width: 100%;
-  background: var(--lc-card);
-  border: 1.5px solid var(--lc-border);
-  border-radius: 12px;
-  padding: 11px 14px;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  cursor: pointer;
-  font-family: var(--lc-font-body);
-  font-size: 13px;
-  font-weight: 600;
-  color: var(--lc-text-primary);
-  text-align: left;
+  width: 100%; @include u.lc-card(t.$lc-radius-md);
+  border: 1.5px solid var(--lc-border); padding: 11px 14px;
+  @include u.flex-between; cursor: pointer;
+  font-family: t.$lc-font-body; @include u.lc-font('sm', t.$lc-font-weight-semibold); color: var(--lc-text-primary); text-align: left;
 }
+.cs-chevron { color: var(--lc-text-hint); font-size: t.$lc-text-md; flex-shrink: 0; }
 
-.cs-chevron {
-  color: var(--lc-text-hint);
-  font-size: 14px;
-  flex-shrink: 0;
-}
-
-// ── Mastery grid ─────────────────────────────────────────────────
-.cs-mastery-grid {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 7px;
-}
-
+.cs-mastery-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 7px; }
 .cs-mastery-opt {
-  background: var(--lc-card);
-  border: 1.5px solid var(--lc-border);
-  border-radius: 10px;
-  padding: 10px 8px;
-  text-align: center;
-  cursor: pointer;
-  transition: all 0.15s;
-  font-family: var(--lc-font-body);
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 4px;
-
-  &.selected {
-    border-color: var(--lc-brand);
-    background: var(--lc-brand-light);
-  }
+  @include u.lc-card(t.$lc-radius-sm + 2);
+  border: 1.5px solid var(--lc-border); padding: t.$lc-space-3 t.$lc-space-2;
+  text-align: center; cursor: pointer; transition: all t.$lc-duration-fast;
+  font-family: t.$lc-font-body; display: flex; flex-direction: column; align-items: center; gap: t.$lc-space-1;
+  &.selected { border-color: var(--lc-brand); background: var(--lc-brand-light); }
 }
+.cs-mastery-dot { @include u.circle(10px); }
+.cs-mastery-num { @include u.lc-font('lg', t.$lc-font-weight-semibold); color: var(--lc-text-primary); line-height: 1; }
+.cs-mastery-lbl { @include u.lc-font('xxs', t.$lc-font-weight-semibold); text-transform: uppercase; letter-spacing: 0.04em; color: var(--lc-text-hint); }
 
-.cs-mastery-dot {
-  width: 10px;
-  height: 10px;
-  border-radius: 50%;
-}
-
-.cs-mastery-num {
-  font-size: 15px;
-  font-weight: 600;
-  color: var(--lc-text-primary);
-  line-height: 1;
-}
-
-.cs-mastery-lbl {
-  font-size: 8px;
-  font-weight: 600;
-  text-transform: uppercase;
-  letter-spacing: 0.04em;
-  color: var(--lc-text-hint);
-}
-
-// ── Sort chips ────────────────────────────────────────────────────
-.cs-sort-chips {
-  display: flex;
-  gap: 7px;
-  flex-wrap: wrap;
-}
-
+.cs-sort-chips { display: flex; gap: 7px; flex-wrap: wrap; }
 .cs-sort-chip {
-  padding: 6px 12px;
-  border-radius: 20px;
-  font-size: 11px;
-  font-weight: 600;
-  border: 1px solid var(--lc-border);
-  background: var(--lc-card);
-  color: var(--lc-text-secondary);
-  cursor: pointer;
-  font-family: var(--lc-font-body);
-  transition: all 0.15s;
-
-  &.active {
-    background: var(--lc-brand);
-    color: white;
-    border-color: var(--lc-brand);
-  }
+  padding: t.$lc-space-2 t.$lc-space-3; border-radius: t.$lc-space-5;
+  @include u.lc-font('xs', t.$lc-font-weight-semibold);
+  border: 1px solid var(--lc-border); background: var(--lc-card); color: var(--lc-text-secondary);
+  cursor: pointer; font-family: t.$lc-font-body; transition: all t.$lc-duration-fast;
+  &.active { background: var(--lc-brand); color: white; border-color: var(--lc-brand); }
 }
 
-// ── Slider ────────────────────────────────────────────────────────
-.cs-slider-row {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-}
+.cs-slider-row { display: flex; align-items: center; gap: t.$lc-space-3; }
+.cs-range { flex: 1; --bar-background: var(--lc-border); --bar-background-active: var(--lc-brand); --knob-background: var(--lc-brand); --knob-border-radius: 50%; padding: 0; }
+.cs-slider-val { @include u.lc-font('3xl', t.$lc-font-weight-semibold); color: var(--lc-text-primary); min-width: 36px; text-align: center; }
 
-.cs-range {
-  flex: 1;
-  --bar-background: var(--lc-border);
-  --bar-background-active: var(--lc-brand);
-  --knob-background: var(--lc-brand);
-  --knob-border-radius: 50%;
-  padding: 0;
-}
-
-.cs-slider-val {
-  font-size: 20px;
-  font-weight: 600;
-  color: var(--lc-text-primary);
-  min-width: 36px;
-  text-align: center;
-}
-
-// ── Preview ───────────────────────────────────────────────────────
 .cs-preview {
-  margin: 0 14px 12px;
-  background: var(--lc-brand-light);
-  border: 1px solid var(--lc-brand);
-  border-radius: 12px;
-  padding: 10px 14px;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
+  margin: 0 14px t.$lc-space-3;
+  background: var(--lc-brand-light); border: 1px solid var(--lc-brand); border-radius: t.$lc-radius-md;
+  padding: t.$lc-space-3 14px; @include u.flex-between;
 }
+.cs-preview-txt   { @include u.lc-font('xs', t.$lc-font-weight-semibold); color: var(--lc-brand); }
+.cs-preview-count { @include u.lc-font('xl', t.$lc-font-weight-semibold); color: var(--lc-brand); }
 
-.cs-preview-txt {
-  font-size: 12px;
-  font-weight: 600;
-  color: var(--lc-brand);
-}
-
-.cs-preview-count {
-  font-size: 16px;
-  font-weight: 600;
-  color: var(--lc-brand);
-}
-
-// ── Start btn ─────────────────────────────────────────────────────
-.cs-start-wrap {
-  padding: 0 14px;
-}
-
+.cs-start-wrap { padding: 0 14px; }
 .cs-start-btn {
-  background: var(--lc-brand);
-  color: white;
-  border: none;
-  border-radius: 12px;
-  padding: 13px;
-  font-size: 14px;
-  font-weight: 600;
-  font-family: var(--lc-font-body);
-  cursor: pointer;
-  width: 100%;
-  text-align: center;
-  transition: opacity 0.15s;
-
-  &:disabled {
-    opacity: 0.5;
-    cursor: not-allowed;
-  }
+  background: var(--lc-brand); color: white; border: none; border-radius: t.$lc-radius-md;
+  padding: 13px; @include u.lc-font('md', t.$lc-font-weight-semibold); font-family: t.$lc-font-body;
+  cursor: pointer; width: 100%; text-align: center; transition: opacity t.$lc-duration-fast;
+  &:disabled { opacity: 0.5; cursor: not-allowed; }
 }

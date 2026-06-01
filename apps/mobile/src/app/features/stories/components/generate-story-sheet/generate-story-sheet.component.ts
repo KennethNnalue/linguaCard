@@ -17,7 +17,7 @@ import { StoryStore } from '../../store/story.store';
 type GenerationStep = 0 | 1 | 2 | 3;
 
 @Component({
-  selector: 'app-generate-story-sheet',
+  selector: 'lc-generate-story-sheet',
   templateUrl: './generate-story-sheet.component.html',
   styleUrls: ['./generate-story-sheet.component.scss'],
   imports: [IonHeader, IonToolbar, IonContent, IonIcon, IonSpinner, NgClass],
