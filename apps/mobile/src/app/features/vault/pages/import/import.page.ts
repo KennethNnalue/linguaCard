@@ -10,6 +10,7 @@ import {
 import { addIcons } from 'ionicons';
 import {
   arrowBackOutline,
+  cameraOutline,
   cloudUploadOutline,
   documentOutline,
   downloadOutline,
@@ -37,7 +38,7 @@ export class ImportPage {
   readonly dragActive = signal(false);
 
   constructor() {
-    addIcons({ arrowBackOutline, cloudUploadOutline, documentOutline, downloadOutline });
+    addIcons({ arrowBackOutline, cameraOutline, cloudUploadOutline, documentOutline, downloadOutline });
   }
 
   onDragOver(event: DragEvent): void {
@@ -78,6 +79,10 @@ export class ImportPage {
         a.click();
         URL.revokeObjectURL(url);
       });
+  }
+
+  navigateToImageImport(): void {
+    this.router.navigate(['/vault/import/image']);
   }
 
   goBack(): void {

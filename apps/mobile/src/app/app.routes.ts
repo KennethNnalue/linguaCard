@@ -39,6 +39,21 @@ export const routes: Routes = [
           import('./features/vault/pages/import-review/import-review.page').then(m => m.ImportReviewPage),
       },
       {
+        path: 'vault/import/image',
+        loadComponent: () =>
+          import('./features/vault/import/pages/image-import/image-import.page').then(m => m.ImageImportPage),
+      },
+      {
+        path: 'vault/import/image/processing',
+        loadComponent: () =>
+          import('./features/vault/import/pages/image-processing/image-processing.page').then(m => m.ImageProcessingPage),
+      },
+      {
+        path: 'vault/import/image/review',
+        loadComponent: () =>
+          import('./features/vault/import/pages/image-import-review/image-import-review.page').then(m => m.ImageImportReviewPage),
+      },
+      {
         path: 'vault/collections',
         loadComponent: () =>
           import('./features/vault/pages/collections/collections.page').then(m => m.CollectionsPage),

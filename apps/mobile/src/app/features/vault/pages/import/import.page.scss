@@ -126,6 +126,45 @@
 
 // ─── BUTTONS ─────────────────────────────────────────────────────────────────
 
+.imp-image-btn {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  background: var(--lc-brand-light);
+  color: var(--lc-brand);
+  border: 1.5px solid var(--lc-brand);
+  border-radius: var(--lc-radius-md, 12px);
+  padding: 14px 16px;
+  font-family: var(--lc-font-body);
+  cursor: pointer;
+  width: 100%;
+  transition: var(--lc-transition-fast);
+
+  ion-icon {
+    font-size: 28px;
+    flex-shrink: 0;
+  }
+
+  &:active { background: #d3e9e3; }
+}
+
+.imp-image-btn-text {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 2px;
+}
+
+.imp-image-btn-title {
+  font-size: 15px;
+  font-weight: 600;
+}
+
+.imp-image-btn-sub {
+  font-size: 12px;
+  opacity: 0.7;
+}
+
 .imp-dl-btn {
   display: flex;
   align-items: center;

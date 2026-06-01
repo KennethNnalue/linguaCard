@@ -1,0 +1,33 @@
+<ion-content class="proc-page">
+  <div class="proc-content">
+
+    <h1 class="proc-heading lc-display">{{ statusCopy[statusPhase()] }}</h1>
+
+    <!-- Image thumbnail with scan overlay -->
+    @if (image()) {
+      <div class="proc-img-wrap">
+        <img
+          class="proc-img"
+          [src]="'data:' + image()!.mimeType + ';base64,' + image()!.base64"
+          alt="Scanning image" />
+        <div class="scan-overlay"></div>
+      </div>
+    }
+
+    <!-- Status text -->
+    <p class="proc-status">{{ statusCopy[statusPhase()] }}</p>
+
+    <!-- Skeleton word chips -->
+    <div class="proc-skeletons">
+      <div class="proc-skel proc-skel--1"></div>
+      <div class="proc-skel proc-skel--2"></div>
+      <div class="proc-skel proc-skel--3"></div>
+      <div class="proc-skel proc-skel--4"></div>
+      <div class="proc-skel proc-skel--5"></div>
+      <div class="proc-skel proc-skel--6"></div>
+    </div>
+
+    <button class="proc-cancel" (click)="cancel()">Cancel</button>
+
+  </div>
+</ion-content>

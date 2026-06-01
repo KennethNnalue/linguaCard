@@ -12,6 +12,7 @@ import { AuthModule } from './auth/auth.module';
 import { JwtAuthGuard } from './auth/guards/jwt-auth.guard';
 import { HealthModule } from './health/health.module';
 import { AiModule } from './ai/ai.module';
+import { ImportModule } from './import/import.module';
 import databaseConfig from './config/database.config';
 import { aiConfig } from './config/ai.config';
 
@@ -30,6 +31,7 @@ import { aiConfig } from './config/ai.config';
     AuthModule,
     HealthModule,
     AiModule,
+    ImportModule,
     CardsModule,
     CollectionsModule,
     CategoriesModule,

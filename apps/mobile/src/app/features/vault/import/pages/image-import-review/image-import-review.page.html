@@ -1,0 +1,135 @@
+<ion-header class="ion-no-border">
+  <ion-toolbar>
+    <div class="imp-nav">
+      <button class="imp-back-btn" (click)="goBack()" aria-label="Back">
+        <ion-icon name="arrow-back-outline"></ion-icon>
+      </button>
+      <span class="imp-title lc-display">Review Import</span>
+      <div class="imp-nav-spacer"></div>
+    </div>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+  <div class="imp-rv-content">
+
+    <!-- File info bar with thumbnail (LC-091) -->
+    <div class="imp-file-bar">
+      @if (image()) {
+        <img
+          class="imp-thumb"
+          [src]="'data:' + image()!.mimeType + ';base64,' + image()!.base64"
+          alt="Uploaded image" />
+      } @else {
+        <ion-icon name="checkmark-circle-outline" class="imp-file-icon"></ion-icon>
+      }
+      <div style="flex:1;min-width:0;">
+        <p class="imp-file-name">{{ result()?.totalFound }} words detected</p>
+        <p class="imp-file-sub">AI-scanned · {{ image()?.mimeType }}</p>
+      </div>
+      <ion-icon name="checkmark-circle-outline" style="color: var(--lc-brand); font-size: 22px; flex-shrink:0;"></ion-icon>
+    </div>
+
+    <!-- Summary stats + select all (LC-089) -->
+    <div class="imp-summary-row">
+      <div class="imp-sum-cell">
+        <span class="imp-sum-val">{{ wordList().length }}</span>
+        <span class="imp-sum-lbl">Total</span>
+      </div>
+      <div class="imp-sum-cell imp-sum-cell--ready">
+        <span class="imp-sum-val">{{ selectedCount() }}</span>
+        <span class="imp-sum-lbl">Selected</span>
+      </div>
+      @if (warningCount() > 0) {
+        <div class="imp-sum-cell imp-sum-cell--warn">
+          <span class="imp-sum-val">{{ warningCount() }}</span>
+          <span class="imp-sum-lbl">Low conf.</span>
+        </div>
+      }
+    </div>
+
+    <!-- Select all toggle -->
+    <div class="imp-select-all-row">
+      <button class="imp-select-all-btn" (click)="toggleAll()">
+        @if (allSelected()) {
+          Deselect all
+        } @else {
+          Select all
+        }
+      </button>
+    </div>
+
+    <!-- Collection picker -->
+    <div class="imp-field">
+      <p class="imp-section-lbl">ADD TO COLLECTION <span class="imp-required">*required</span></p>
+      <button
+        class="imp-collection-btn"
+        [class.imp-collection-btn--empty]="!selectedCollectionId()"
+        (click)="openCollectionSheet()">
+        <span>{{ selectedCollectionLabel() }}</span>
+        <span class="imp-collection-caret">▼</span>
+      </button>
+    </div>
+
+    <!-- Word list (LC-089: checkboxes, dimming) -->
+    <p class="imp-section-lbl">Extracted words</p>
+    <div class="imp-preview-list">
+      @for (word of wordList(); track word.id) {
+        <div
+          class="imp-preview-row"
+          [class.imp-preview-row--deselected]="!word.selected"
+          (click)="toggleWord(word.id)">
+          <div class="imp-preview-top">
+            <!-- Checkbox -->
+            <div class="imp-checkbox" [class.imp-checkbox--checked]="word.selected">
+              @if (word.selected) {
+                <ion-icon name="checkmark-circle-outline"></ion-icon>
+              }
+            </div>
+
+            @if (word.article) {
+              <span class="imp-art-small lc-article-badge lc-article-badge--{{ word.article }}">
+                {{ word.article }}
+              </span>
+            }
+
+            <span class="imp-preview-front">{{ word.back }}</span>
+            <span class="imp-preview-translation">{{ word.front }}</span>
+
+            <!-- Confidence indicator -->
+            @if (word.confidence < 0.7) {
+              <div class="imp-row-warn" title="Low confidence — please verify">
+                <ion-icon name="warning-outline"></ion-icon>
+              </div>
+            } @else {
+              <div class="imp-row-ok">
+                <ion-icon name="checkmark-circle-outline"></ion-icon>
+              </div>
+            }
+          </div>
+
+          @if (word.exampleTarget) {
+            <p class="imp-preview-ex">{{ word.exampleTarget }}</p>
+          }
+        </div>
+      }
+    </div>
+
+    <div class="imp-rv-spacer"></div>
+
+    <!-- Import button -->
+    <button
+      class="imp-import-btn"
+      [disabled]="importing() || selectedCount() === 0 || !selectedCollectionId()"
+      (click)="confirmImport()">
+      @if (importing()) {
+        Importing…
+      } @else {
+        Import {{ selectedCount() }} words to Vault
+      }
+    </button>
+
+    <button class="imp-cancel-lnk" (click)="cancel()">Cancel</button>
+
+  </div>
+</ion-content>

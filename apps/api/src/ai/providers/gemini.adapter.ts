@@ -61,6 +61,44 @@ export class GeminiAdapter {
     return false;
   }
 
+  async generateVision(opts: {
+    imageBase64: string;
+    mimeType: string;
+    prompt: string;
+    maxTokens?: number;
+  }): Promise<string> {
+    try {
+      const response = await this.ai.models.generateContent({
+        model: TEXT_MODEL,
+        contents: [
+          {
+            role: 'user',
+            parts: [
+              { inlineData: { mimeType: opts.mimeType, data: opts.imageBase64 } },
+              { text: opts.prompt },
+            ],
+          },
+        ],
+        config: {
+          maxOutputTokens: opts.maxTokens ?? 4096,
+          thinkingConfig: { thinkingBudget: 0 },
+        },
+      });
+      return response.text ?? '';
+    } catch (err: any) {
+      if (err?.status === 429) {
+        const retryMatch = String(err?.message ?? '').match(/"retryDelay"\s*:\s*"(\d+)s"/);
+        const retryAfterMs = retryMatch ? parseInt(retryMatch[1], 10) * 1000 : 60_000;
+        this.logger.warn(`Gemini vision 429: retry after ${retryAfterMs}ms`);
+        throw new HttpException(
+          { message: 'AI quota exceeded. Please try again later.', retryAfterMs },
+          429,
+        );
+      }
+      throw err;
+    }
+  }
+
   async generateText(request: AITextRequest): Promise<AITextResponse> {
     const prompt = request.messages.map(m => m.content).join('\n\n');
 

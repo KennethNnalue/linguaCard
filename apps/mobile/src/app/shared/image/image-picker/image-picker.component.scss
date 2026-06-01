@@ -1,0 +1,57 @@
+.lc-img-picker {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  width: 100%;
+}
+
+%picker-btn-base {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  border-radius: var(--lc-radius-xl, 28px);
+  padding: 28px 20px;
+  font-family: var(--lc-font-body);
+  cursor: pointer;
+  transition: opacity 0.15s, transform 0.1s;
+
+  ion-icon {
+    font-size: 36px;
+    margin-bottom: 4px;
+  }
+
+  &:active {
+    opacity: 0.85;
+    transform: scale(0.98);
+  }
+}
+
+.lc-img-picker__camera {
+  @extend %picker-btn-base;
+  background: var(--lc-accent, #E07B3F);
+  color: white;
+  border: none;
+  box-shadow: 0 4px 16px rgba(224, 123, 63, 0.35);
+}
+
+.lc-img-picker__gallery {
+  @extend %picker-btn-base;
+  background: var(--lc-brand-light, #E8F2EE);
+  color: var(--lc-brand, #2D5A4E);
+  border: 1.5px solid var(--lc-brand, #2D5A4E);
+}
+
+.lc-img-picker__label {
+  font-size: 17px;
+  font-weight: 600;
+  line-height: 1;
+}
+
+.lc-img-picker__sub {
+  font-size: 13px;
+  opacity: 0.75;
+  line-height: 1;
+}

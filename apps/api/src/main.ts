@@ -10,6 +10,10 @@ import { AppModule } from './app.module';
 async function bootstrap() {
   const app = await NestFactory.create<NestExpressApplication>(AppModule);
 
+  // Image import sends base64-encoded images in JSON.
+  // 5 MB raw file → ~6.7 MB base64 + JSON overhead; set limit with headroom.
+  app.use(require('express').json({ limit: '10mb' }));
+
   app.setGlobalPrefix('api/v1');
   app.useGlobalPipes(new ValidationPipe({ whitelist: true, transform: true }));
   app.useStaticAssets(join(process.cwd(), 'uploads'), { prefix: '/uploads' });

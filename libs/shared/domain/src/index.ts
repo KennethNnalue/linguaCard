@@ -379,3 +379,33 @@ export interface GenerateStoryDto {
   difficulty: StoryDifficulty;
   provider?: AIProviderType;
 }
+
+// ─── IMAGE IMPORT ─────────────────────────────────────────────────────────────
+
+export interface ImageExtractedWord {
+  front: string;
+  back: string;
+  article: ArticleType | null;
+  categoryName: string;
+  exampleTarget: string;
+  exampleNative: string;
+  confidence: number;
+  boundingBoxHint?: string;
+}
+
+export interface ImageImportRequest {
+  imageBase64: string;
+  mimeType: 'image/jpeg' | 'image/png' | 'image/webp';
+  targetLanguage: string;
+  nativeLanguage: string;
+  userId: string;
+  contextId: string;
+}
+
+export interface ImageImportResult {
+  words: ImageExtractedWord[];
+  totalFound: number;
+  imageDescription: string;
+  processingMs: number;
+  modelUsed: string;
+}

@@ -1,0 +1,58 @@
+<ion-header class="ion-no-border">
+  <ion-toolbar>
+    <div class="imp-nav">
+      <button class="imp-back-btn" (click)="goBack()" aria-label="Back">
+        <ion-icon name="arrow-back-outline"></ion-icon>
+      </button>
+      <span class="imp-title lc-display">Import from Image</span>
+      <div class="imp-nav-spacer"></div>
+    </div>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+  <div class="img-imp-content">
+
+    <!-- Error banner -->
+    @if (error()) {
+      <div class="img-imp-error-banner">
+        <div class="img-imp-error-body">
+          <span class="img-imp-error-icon">⚠️</span>
+          <div class="img-imp-error-text">
+            <p class="img-imp-error-title">{{ errorMessage(error()) }}</p>
+            <p class="img-imp-error-sub">{{ errorSuggestion(error()) }}</p>
+          </div>
+          <button class="img-imp-error-dismiss" (click)="dismissError()" aria-label="Dismiss">
+            <ion-icon name="close-circle-outline"></ion-icon>
+          </button>
+        </div>
+        <div class="img-imp-error-actions">
+          <button class="img-imp-error-action-btn" (click)="retryPick()">Try again</button>
+          @if (error() === 'no_words' || error() === 'blurry') {
+            <button class="img-imp-error-action-btn img-imp-error-action-btn--outline" (click)="goToCsvImport()">
+              <ion-icon name="document-outline"></ion-icon>
+              Use CSV
+            </button>
+          }
+        </div>
+      </div>
+    }
+
+    <p class="img-imp-subtitle">What would you like to scan?</p>
+
+    <!-- Picker buttons -->
+    <lc-image-picker
+      (imagePicked)="onImagePicked($event)"
+      (pickCancelled)="void(0)"
+      (pickError)="onPickError($event)">
+    </lc-image-picker>
+
+    <!-- Tips -->
+    <div class="img-imp-tips">
+      <div class="img-imp-tip-chip">📋 Menus</div>
+      <div class="img-imp-tip-chip">💡 Good light</div>
+      <div class="img-imp-tip-chip">🔤 German text</div>
+    </div>
+
+  </div>
+</ion-content>

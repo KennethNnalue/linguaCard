@@ -1,0 +1,329 @@
+// ─── NAV ──────────────────────────────────────────────────────────────────────
+
+.imp-nav {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 16px 12px;
+}
+
+.imp-title {
+  font-size: 20px;
+  font-weight: 600;
+  color: var(--lc-text-primary);
+}
+
+.imp-nav-spacer { width: 38px; }
+
+.imp-back-btn {
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  background: var(--lc-brand-light);
+  border: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: var(--lc-transition-fast);
+
+  ion-icon { font-size: 20px; color: var(--lc-brand); }
+  &:active { opacity: 0.7; }
+}
+
+// ─── CONTENT ──────────────────────────────────────────────────────────────────
+
+.imp-rv-content {
+  flex: 1;
+  padding: 16px 16px 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+// ─── FILE INFO BAR + THUMBNAIL (LC-091) ───────────────────────────────────────
+
+.imp-file-bar {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  background: var(--lc-brand-light);
+  border: 1px solid var(--lc-brand);
+  border-radius: 14px;
+  padding: 12px 16px;
+}
+
+.imp-thumb {
+  width: 60px;
+  height: 60px;
+  border-radius: 10px;
+  object-fit: cover;
+  flex-shrink: 0;
+  border: 1px solid var(--lc-brand);
+}
+
+.imp-file-icon {
+  font-size: 26px;
+  color: var(--lc-brand);
+  flex-shrink: 0;
+}
+
+.imp-file-name {
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--lc-text-primary);
+  margin: 0;
+}
+
+.imp-file-sub {
+  font-size: 12px;
+  color: var(--lc-text-secondary);
+  margin: 3px 0 0;
+}
+
+// ─── SUMMARY STATS ────────────────────────────────────────────────────────────
+
+.imp-summary-row {
+  display: flex;
+  gap: 8px;
+}
+
+.imp-sum-cell {
+  flex: 1;
+  background: var(--lc-card);
+  border: 1px solid var(--lc-border);
+  border-radius: 12px;
+  padding: 12px;
+  box-shadow: var(--lc-shadow-card);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 3px;
+
+  &--ready .imp-sum-val { color: var(--lc-mastery-5); }
+  &--warn  .imp-sum-val { color: #D97706; }
+}
+
+.imp-sum-val {
+  font-family: var(--lc-font-display);
+  font-size: 24px;
+  font-weight: 600;
+  color: var(--lc-text-primary);
+  line-height: 1;
+}
+
+.imp-sum-lbl {
+  font-size: 11px;
+  color: var(--lc-text-hint);
+  font-weight: 500;
+  margin-top: 2px;
+}
+
+// ─── SELECT ALL ───────────────────────────────────────────────────────────────
+
+.imp-select-all-row {
+  display: flex;
+  justify-content: flex-end;
+}
+
+.imp-select-all-btn {
+  background: transparent;
+  border: none;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--lc-brand);
+  font-family: var(--lc-font-body);
+  cursor: pointer;
+  padding: 4px 0;
+
+  &:active { opacity: 0.7; }
+}
+
+// ─── COLLECTION PICKER ────────────────────────────────────────────────────────
+
+.imp-field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.imp-required {
+  color: var(--lc-accent);
+  font-weight: 600;
+  margin-left: 4px;
+}
+
+.imp-collection-btn {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 11px 13px;
+  background: var(--lc-card);
+  border: 1.5px solid var(--lc-border);
+  border-radius: 10px;
+  font-size: 13px;
+  font-family: var(--lc-font-body);
+  color: var(--lc-text-primary);
+  cursor: pointer;
+  transition: border-color 0.15s;
+
+  &:active { border-color: var(--lc-brand); }
+  &--empty { border-color: var(--lc-accent); color: var(--lc-text-hint); }
+}
+
+.imp-collection-caret {
+  font-size: 10px;
+  color: var(--lc-text-hint);
+}
+
+// ─── SECTION LABEL ────────────────────────────────────────────────────────────
+
+.imp-section-lbl {
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--lc-text-hint);
+  margin: 0;
+}
+
+// ─── WORD LIST (LC-089) ───────────────────────────────────────────────────────
+
+.imp-preview-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.imp-preview-row {
+  background: var(--lc-card);
+  border: 1px solid var(--lc-border);
+  border-radius: 12px;
+  padding: 12px 14px;
+  box-shadow: var(--lc-shadow-card);
+  cursor: pointer;
+  transition: opacity 0.2s;
+
+  &--deselected {
+    opacity: 0.4;
+  }
+
+  &:active { opacity: 0.7; }
+}
+
+.imp-preview-top {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+// ─── CHECKBOX ─────────────────────────────────────────────────────────────────
+
+.imp-checkbox {
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  border: 2px solid var(--lc-border);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  transition: border-color 0.15s, background 0.15s;
+
+  &--checked {
+    background: var(--lc-brand);
+    border-color: var(--lc-brand);
+
+    ion-icon { font-size: 14px; color: white; }
+  }
+}
+
+.imp-art-small {
+  font-size: 10px !important;
+  padding: 2px 7px !important;
+}
+
+.imp-preview-front {
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--lc-text-primary);
+}
+
+.imp-preview-translation {
+  font-size: 13px;
+  color: var(--lc-text-secondary);
+  flex: 1;
+}
+
+.imp-preview-ex {
+  font-size: 12px;
+  color: var(--lc-text-hint);
+  font-style: italic;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  margin: 6px 0 0 30px;
+}
+
+.imp-row-ok {
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: #D1FAE5;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+
+  ion-icon { font-size: 13px; color: #059669; }
+}
+
+.imp-row-warn {
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: #FEF3C7;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+
+  ion-icon { font-size: 13px; color: #D97706; }
+}
+
+.imp-rv-spacer { flex: 1; }
+
+// ─── ACTIONS ─────────────────────────────────────────────────────────────────
+
+.imp-import-btn {
+  background: var(--lc-brand);
+  color: white;
+  border: none;
+  border-radius: 14px;
+  padding: 16px;
+  font-size: 16px;
+  font-weight: 600;
+  font-family: var(--lc-font-body);
+  text-align: center;
+  cursor: pointer;
+  width: 100%;
+  transition: var(--lc-transition-fast);
+
+  &:disabled { opacity: 0.5; cursor: not-allowed; }
+  &:not(:disabled):active { opacity: 0.85; }
+}
+
+.imp-cancel-lnk {
+  text-align: center;
+  padding: 10px 0 4px;
+  font-size: 14px;
+  color: var(--lc-text-hint);
+  cursor: pointer;
+  background: transparent;
+  border: none;
+  font-family: var(--lc-font-body);
+  width: 100%;
+
+  &:active { color: var(--lc-fem-text); }
+}
