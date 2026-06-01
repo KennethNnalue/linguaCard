@@ -36,12 +36,6 @@
         </div>
 
         <div class="kw-actions">
-          <button class="kw-action-btn" (click)="addToTraining.emit(kw)" title="Add to training">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round">
-              <path d="M6.5 6.5h11M12 2v20M5 12H2m20 0h-3"/>
-              <circle cx="12" cy="12" r="3"/>
-            </svg>
-          </button>
           <button
             class="kw-action-btn"
             [class.kw-playing]="isThisPlaying(kw)"

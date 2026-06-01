@@ -265,4 +265,9 @@
     background: var(--lc-brand-light);
     color: var(--lc-brand);
   }
+
+  &:disabled {
+    opacity: 0.3;
+    cursor: not-allowed;
+  }
 }

@@ -2,6 +2,7 @@ import {inject, Injectable, signal} from '@angular/core';
 import {firstValueFrom, Observable} from 'rxjs';
 import {Card, ConfidenceRating} from '@lingua-card/shared/domain';
 import {CardApiService} from '../../vault/services/card-api.service';
+import {CardStore} from '../../vault/store/card.store';
 import {Sm2Service} from '../../../shared/srs/sm2.service';
 import {LocalDataService, PendingSrsRating} from '../../../core/services/local-data.service';
 import {AuthService} from '../../../core/services/auth.service';
@@ -21,9 +22,15 @@ export interface ReviewSession {
 // Keep at most this many sessions in local storage to avoid unbounded growth
 const MAX_HISTORY = 50;
 
+// Disk format — stores card IDs instead of full Card objects
+interface PersistedSession extends Omit<ReviewSession, 'reviewedCards'> {
+  reviewedCardIds: string[];
+}
+
 @Injectable({providedIn: 'root'})
 export class ReviewStore {
   private readonly cardApi = inject(CardApiService);
+  private readonly cardStore = inject(CardStore);
   private readonly sm2 = inject(Sm2Service);
   private readonly localData = inject(LocalDataService);
   private readonly authService = inject(AuthService);
@@ -39,14 +46,25 @@ export class ReviewStore {
   readonly sessionHistory = this._sessionHistory.asReadonly();
   readonly pendingQueue = this._pendingQueue.asReadonly();
 
-  // Called once at app startup (from a root-level initializer or the review feature init)
+  // Called once at app startup after cards are loaded
   async loadHistory(): Promise<void> {
     const userId = this.authService.currentUser()?.id;
     if (!userId) return;
-    const stored = await this.localData.getSessionHistory(userId) as ReviewSession[];
-    if (stored?.length) {
-      this._sessionHistory.set(stored);
-    }
+    const stored = await this.localData.getSessionHistory(userId) as PersistedSession[];
+    if (!stored?.length) return;
+
+    // Hydrate reviewedCards from CardStore using stored card IDs
+    const allCards = this.cardStore.cards();
+    const cardById = new Map(allCards.map(c => [c.id, c]));
+
+    const sessions: ReviewSession[] = stored.map(s => ({
+      ...s,
+      reviewedCards: (s.reviewedCardIds ?? [])
+        .map(id => cardById.get(id))
+        .filter((c): c is Card => c !== undefined),
+    }));
+
+    this._sessionHistory.set(sessions);
   }
 
   startSession(cards: Card[], collectionId: string | null, collectionName: string | null): void {
@@ -129,9 +147,12 @@ export class ReviewStore {
   private async persistHistory(sessions: ReviewSession[]): Promise<void> {
     const userId = this.authService.currentUser()?.id;
     if (!userId) return;
-    // Strip reviewedCards from each session before persisting to keep storage lean
-    // (reviewedCards are large Card objects — not needed for the history list display)
-    const slim = sessions.map(({reviewedCards: _, ...rest}) => rest);
+    // Persist card IDs instead of full Card objects — lean storage, but allows
+    // re-hydration on next launch so "Review again" works after a refresh
+    const slim: PersistedSession[] = sessions.map(({reviewedCards, ...rest}) => ({
+      ...rest,
+      reviewedCardIds: reviewedCards.map(c => c.id),
+    }));
     await this.localData.setSessionHistory(userId, slim);
   }
 

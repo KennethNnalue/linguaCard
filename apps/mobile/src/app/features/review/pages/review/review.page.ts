@@ -60,6 +60,8 @@ export class ReviewPage implements OnInit {
   readonly currentIndex = signal(0);
   readonly isFlipped = signal(false);
   readonly isPronunciationLoading = this.pronunciationService.isLoading;
+  // Track the furthest index reached so going back and re-rating doesn't end the session early
+  private highestIndexReached = 0;
 
   readonly currentCard = computed<Card>(() => this.queue()[this.currentIndex()]);
 
@@ -136,33 +138,47 @@ export class ReviewPage implements OnInit {
     const card = this.currentCard();
     if (!card) return;
 
-    const isLast = this.currentIndex() + 1 >= this.queue().length;
+    const idx = this.currentIndex();
+    const queueLength = this.queue().length;
+
+    // Update highest-index tracker
+    if (idx > this.highestIndexReached) this.highestIndexReached = idx;
+    // Session is only complete when we rate the final card for the first time
+    const isLast = idx + 1 >= queueLength && this.highestIndexReached >= queueLength - 1;
 
     this.reviewStore.rateCard(card, rating).subscribe({
       next: updated => {
-        // Fix Bug 2: update CardStore so word-detail shows fresh lastReviewedAt
         this.cardStore.updateCard(updated);
 
-        const idx = this.queue().findIndex(c => c.id === updated.id);
-        if (idx >= 0) {
+        const qIdx = this.queue().findIndex(c => c.id === updated.id);
+        if (qIdx >= 0) {
           const next = [...this.queue()];
-          next[idx] = updated;
+          next[qIdx] = updated;
           this.queue.set(next);
         }
 
-        // Fix Bug 4: complete session only after HTTP response (queue has updated srsState)
         if (isLast) {
           this.reviewStore.completeSession(this.queue());
-          this.navCtrl.navigateForward('/review/summary', { animated: true });
+          this.navCtrl.navigateForward('/review/summary', {animated: true});
         }
       },
     });
 
-    // Advance index immediately for responsive UX (don't wait for network)
+    // Advance immediately for responsive UX
     this.isFlipped.set(false);
     if (!isLast) {
-      this.currentIndex.set(this.currentIndex() + 1);
+      this.currentIndex.set(idx + 1);
     }
+  }
+
+  goToPrevious(): void {
+    const prev = this.currentIndex() - 1;
+    if (prev < 0) return;
+    this.currentIndex.set(prev);
+    // Show the back face if this card was already rated — user can see their answer again
+    const card = this.queue()[prev];
+    const alreadyRated = this.reviewStore.activeSession()?.ratings[card?.id] !== undefined;
+    this.isFlipped.set(alreadyRated);
   }
 
   skipCard(): void {

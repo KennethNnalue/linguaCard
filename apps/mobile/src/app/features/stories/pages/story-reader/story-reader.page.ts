@@ -20,6 +20,8 @@ import { arrowBackOutline, playOutline, pauseOutline, playSkipBackOutline, repea
 import type { Story, StoryKeyword, WordTimestamp } from '@lingua-card/shared/domain';
 import { StoryStore } from '../../store/story.store';
 import { StoryApiService } from '../../services/story-api.service';
+import { ReviewStore } from '../../../review/store/review.store';
+import { CardStore } from '../../../vault/store/card.store';
 import { AiAudioCacheService } from '../../../ai/audio/ai-audio-cache.service';
 import { PronunciationService } from '../../../ai/audio/pronunciation.service';
 import { QuizTabComponent } from '../../components/quiz-tab/quiz-tab.component';
@@ -48,6 +50,8 @@ export class StoryReaderPage implements OnInit, OnDestroy, ViewWillLeave {
   private readonly route = inject(ActivatedRoute);
   private readonly router = inject(Router);
   private readonly storyStore = inject(StoryStore);
+  private readonly reviewStore = inject(ReviewStore);
+  private readonly cardStore = inject(CardStore);
   private readonly api = inject(StoryApiService);
   private readonly aiAudioCache = inject(AiAudioCacheService);
   private readonly pronunciation = inject(PronunciationService);
@@ -320,22 +324,23 @@ export class StoryReaderPage implements OnInit, OnDestroy, ViewWillLeave {
     return ranges;
   }
 
-  onAddToTraining(keyword: StoryKeyword): void {
-    // Navigate to vault with pre-filter, or no-op for now
-    if (keyword.cardId) {
-      void this.router.navigate(['/vault'], { queryParams: { highlight: keyword.cardId } });
-    }
+  onAddToTraining(_keyword: StoryKeyword): void {
+    // Intentionally empty — button removed from template
   }
 
   onMemorizeAll(): void {
     const s = this.story();
     if (!s) return;
-    const cardIds = (s.keywords ?? [])
-      .map(k => k.cardId)
-      .filter((id): id is string => !!id);
-    if (cardIds.length > 0) {
-      void this.router.navigate(['/review'], { queryParams: { cardIds: cardIds.join(',') } });
-    }
+    const cardIds = new Set(
+      (s.keywords ?? []).map(k => k.cardId).filter((id): id is string => !!id)
+    );
+    if (cardIds.size === 0) return;
+
+    const cards = this.cardStore.cards().filter(c => cardIds.has(c.id));
+    if (cards.length === 0) return;
+
+    this.reviewStore.startSession(cards, null, `📖 ${s.title}`);
+    void this.router.navigate(['/review/player']);
   }
 
   // ── Mark as learned ──────────────────────────────────────────────

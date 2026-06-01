@@ -90,15 +90,15 @@
 
       </div>
 
-      <!-- ── Skip / Flag ── -->
+      <!-- ── Secondary actions ── -->
       <div class="rv-secondary">
+        <button class="rv-sec-btn" (click)="goToPrevious()" [disabled]="currentIndex() === 0">
+          <ion-icon name="chevron-back-outline"></ion-icon>
+          Previous
+        </button>
         <button class="rv-sec-btn" (click)="skipCard()">
           <ion-icon name="chevron-forward-outline"></ion-icon>
           Skip
-        </button>
-        <button class="rv-sec-btn" (click)="flagCard()">
-          <ion-icon name="flag-outline"></ion-icon>
-          Flag
         </button>
       </div>
 
