@@ -11,6 +11,8 @@ import { WordEnrichPromptBuilder } from './word-enrich-prompt.builder';
 import { recoverJsonArray } from './json-recovery.util';
 
 const DEFAULT_BATCH_SIZE = 10;
+// 20 RPM free tier = 1 req per 3s. 3 500ms gives headroom for the request itself taking ~0.5–1s.
+const INTER_BATCH_DELAY_MS = 3_500;
 
 @Injectable()
 export class WordEnrichService {
@@ -29,6 +31,7 @@ export class WordEnrichService {
     let processedCount = 0;
 
     for (let i = 0; i < batches.length; i++) {
+      if (i > 0) await this.sleep(INTER_BATCH_DELAY_MS);
       const batch = batches[i];
       try {
         const batchResult = await this.enrichBatch(batch, dto.targetLanguage, dto.nativeLanguage);
@@ -68,11 +71,14 @@ export class WordEnrichService {
     nativeLanguage: string,
   ): Promise<ImageExtractedWord[]> {
     const prompt = this.promptBuilder.build(words, targetLanguage, nativeLanguage);
+
     const result = await this.openRouter.generateText({
       messages: [{ role: 'user', content: prompt }],
       maxTokens: 2048,
     });
-    return this.parseEnrichmentResponse(result.text);
+    const rawText = result.text;
+
+    return this.parseEnrichmentResponse(rawText);
   }
 
   private parseEnrichmentResponse(raw: string): ImageExtractedWord[] {
@@ -93,6 +99,10 @@ export class WordEnrichService {
   private parseArticle(value: unknown): ArticleType | null {
     if (value === 'der' || value === 'die' || value === 'das') return value;
     return null;
+  }
+
+  private sleep(ms: number): Promise<void> {
+    return new Promise(resolve => setTimeout(resolve, ms));
   }
 
   private chunk<T>(arr: T[], size: number): T[][] {
