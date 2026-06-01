@@ -10,6 +10,19 @@
 </ion-header>
 
 <ion-content>
+  <!-- Pull-to-refresh -->
+  <ion-refresher slot="fixed" (ionRefresh)="onRefresh($event)" [disabled]="isGenerating()">
+    <ion-refresher-content
+      pullingIcon="chevron-down-circle-outline"
+      refreshingSpinner="crescent">
+    </ion-refresher-content>
+  </ion-refresher>
+
+  <!-- Silent background-refresh indicator (2px linear progress bar) -->
+  @if (isRefreshing()) {
+    <div class="ss-refresh-bar"></div>
+  }
+
   <!-- Hero generate CTA -->
   <div class="ss-hero">
     <div class="ss-hero-label">AI-powered reading</div>
@@ -21,8 +34,8 @@
     </button>
   </div>
 
-  <!-- Stories list -->
-  @if (loading()) {
+  <!-- Full skeleton: only on first-ever load with no cache -->
+  @if (isLoading() && stories().length === 0) {
     <div class="loading-state">
       <div class="skeleton-card"></div>
       <div class="skeleton-card"></div>

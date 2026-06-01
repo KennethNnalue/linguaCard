@@ -41,4 +41,8 @@ export class CardApiService {
       )
     );
   }
+
+  batchRateSrs(ratings: import('../../../core/services/local-data.service').PendingSrsRating[]): Observable<void> {
+    return this.http.post<void>(`${this.baseUrl}/srs/batch`, ratings);
+  }
 }

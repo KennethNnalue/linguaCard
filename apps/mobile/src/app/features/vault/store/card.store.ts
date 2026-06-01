@@ -24,6 +24,8 @@ export interface CardFilter {
 interface CardState {
   cards: Card[];
   isLoading: boolean;
+  isRefreshing: boolean;
+  hasEverLoaded: boolean;
   error: string | null;
   selectedCardId: string | null;
   filter: CardFilter;
@@ -32,6 +34,8 @@ interface CardState {
 const initialState: CardState = {
   cards: [],
   isLoading: false,
+  isRefreshing: false,
+  hasEverLoaded: false,
   error: null,
   selectedCardId: null,
   filter: { categoryId: null, collectionId: null, search: '' },
@@ -105,25 +109,32 @@ export const CardStore = signalStore(
     }
 
     return {
-      /** Offline-first: show cached data immediately, then refresh from API. */
+      /** Cache-first: show cached data immediately, then refresh from API silently. */
       loadCards(): void {
         void (async () => {
-          patchState(store, { isLoading: true, error: null });
-
           const userId = uid();
+
+          // 1. Show cache immediately
           if (userId) {
             const cached = await localData.getCards(userId);
             if (cached.length > 0) {
-              patchState(store, { cards: cached });
+              patchState(store, { cards: cached, hasEverLoaded: true });
             }
+          }
+
+          // 2. Block with skeleton only if truly nothing to show
+          if (!store.hasEverLoaded()) {
+            patchState(store, { isLoading: true, error: null });
+          } else {
+            patchState(store, { isRefreshing: true });
           }
 
           try {
             const cards = await firstValueFrom(cardApi.getAll());
-            patchState(store, { cards, isLoading: false });
+            patchState(store, { cards, isLoading: false, isRefreshing: false, hasEverLoaded: true });
             if (userId) await localData.setCards(userId, cards);
           } catch {
-            patchState(store, { isLoading: false });
+            patchState(store, { isLoading: false, isRefreshing: false });
           }
         })();
       },
@@ -192,6 +203,10 @@ export const CardStore = signalStore(
         });
         const userId = uid();
         if (userId) void localData.setCards(userId, store.cards());
+      },
+
+      setCardsFromSync(cards: Card[]): void {
+        patchState(store, { cards });
       },
 
       reset(): void {

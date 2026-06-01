@@ -15,6 +15,9 @@ import { routes } from './app/app.routes';
 import { AppComponent } from './app/app.component';
 import { authInterceptor } from './app/core/interceptors/auth.interceptor';
 import { provideAi } from './app/features/ai/ai.providers';
+import { provideVault } from './app/features/vault/vault.providers';
+import { provideStories } from './app/features/stories/stories.providers';
+import { provideReview } from './app/features/review/review.providers';
 
 bootstrapApplication(AppComponent, {
   providers: [
@@ -34,5 +37,8 @@ bootstrapApplication(AppComponent, {
       })
     ),
     provideAi(),
+    provideVault(),
+    provideStories(),
+    provideReview(),
   ],
 });

@@ -17,6 +17,8 @@ import { AuthService } from '../../../core/services/auth.service';
 interface CollectionState {
   collections: Collection[];
   isLoading: boolean;
+  isRefreshing: boolean;
+  hasEverLoaded: boolean;
   activeCollectionId: string | null;
   error: string | null;
 }
@@ -24,6 +26,8 @@ interface CollectionState {
 const initialState: CollectionState = {
   collections: [],
   isLoading: false,
+  isRefreshing: false,
+  hasEverLoaded: false,
   activeCollectionId: null,
   error: null,
 };
@@ -58,25 +62,32 @@ export const CollectionStore = signalStore(
     }
 
     return {
-      /** Offline-first: show cached data immediately, then refresh from API. */
+      /** Cache-first: show cached data immediately, then refresh from API silently. */
       loadCollections(): void {
         void (async () => {
-          patchState(store, { isLoading: true, error: null });
-
           const userId = uid();
+
+          // 1. Show cache immediately
           if (userId) {
             const cached = await localData.getCollections(userId);
             if (cached.length > 0) {
-              patchState(store, { collections: cached });
+              patchState(store, { collections: cached, hasEverLoaded: true });
             }
+          }
+
+          // 2. Block with skeleton only if nothing to show
+          if (!store.hasEverLoaded()) {
+            patchState(store, { isLoading: true, error: null });
+          } else {
+            patchState(store, { isRefreshing: true });
           }
 
           try {
             const collections = await firstValueFrom(api.getAll());
-            patchState(store, { collections, isLoading: false });
+            patchState(store, { collections, isLoading: false, isRefreshing: false, hasEverLoaded: true });
             if (userId) await localData.setCollections(userId, collections);
           } catch {
-            patchState(store, { isLoading: false });
+            patchState(store, { isLoading: false, isRefreshing: false });
           }
         })();
       },
@@ -182,6 +193,10 @@ export const CollectionStore = signalStore(
             return of(undefined as void);
           })
         );
+      },
+
+      setCollectionsFromSync(collections: Collection[]): void {
+        patchState(store, { collections });
       },
 
       reset(): void {

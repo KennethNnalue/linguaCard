@@ -11,21 +11,27 @@ import type { GenerateStoryDto, Story } from '@lingua-card/shared/domain';
 import { StoryApiService } from '../services/story-api.service';
 import { AiAudioCacheService } from '../../ai/audio/ai-audio-cache.service';
 import { SyncService } from '../../../core/services/sync.service';
+import { LocalDataService } from '../../../core/services/local-data.service';
+import { AuthService } from '../../../core/services/auth.service';
 
 interface StoryState {
   stories: Story[];
   isLoading: boolean;
+  isRefreshing: boolean;
   isGenerating: boolean;
   error: string | null;
   generateError: string | null;
+  hasEverLoaded: boolean;
 }
 
 const initialState: StoryState = {
   stories: [],
   isLoading: false,
+  isRefreshing: false,
   isGenerating: false,
   error: null,
   generateError: null,
+  hasEverLoaded: false,
 };
 
 export const StoryStore = signalStore(
@@ -45,18 +51,55 @@ export const StoryStore = signalStore(
     const api = inject(StoryApiService);
     const audioCache = inject(AiAudioCacheService);
     const syncService = inject(SyncService);
+    const localData = inject(LocalDataService);
+    const authService = inject(AuthService);
+
+    function uid(): string | undefined {
+      return authService.currentUser()?.id;
+    }
 
     return {
       loadStories(): void {
         void (async () => {
-          patchState(store, { isLoading: true, error: null });
+          const userId = uid();
+
+          // 1. Show cache immediately — zero delay to user
+          if (userId) {
+            const cached = await localData.getStories(userId);
+            if (cached.length > 0) {
+              patchState(store, { stories: cached, hasEverLoaded: true });
+            }
+          }
+
+          // 2. Determine whether to block (no cache) or silently refresh
+          if (!store.hasEverLoaded()) {
+            patchState(store, { isLoading: true, error: null });
+          } else {
+            patchState(store, { isRefreshing: true });
+          }
+
+          // 3. Background network refresh
           try {
             const stories = await firstValueFrom(api.getAll());
-            patchState(store, { stories, isLoading: false });
+            patchState(store, {
+              stories,
+              isLoading: false,
+              isRefreshing: false,
+              hasEverLoaded: true,
+            });
+            if (userId) await localData.setStories(userId, stories);
+            await localData.setLastSyncedAt('stories', new Date().toISOString());
           } catch {
-            patchState(store, { isLoading: false, error: 'Failed to load stories' });
+            patchState(store, { isLoading: false, isRefreshing: false });
+            if (!store.hasEverLoaded()) {
+              patchState(store, { error: 'Could not load stories. Check your connection.' });
+            }
           }
         })();
+      },
+
+      setStoriesFromSync(stories: Story[]): void {
+        patchState(store, { stories, hasEverLoaded: true });
       },
 
       async generateStory(dto: GenerateStoryDto): Promise<Story | null> {
@@ -69,7 +112,6 @@ export const StoryStore = signalStore(
           });
           return story;
         } catch (err: unknown) {
-          // Queue for retry if this looks like a network error
           const isNetworkError =
             err instanceof TypeError ||
             (err as { status?: number })?.status === 0;
@@ -130,9 +172,20 @@ export const StoryStore = signalStore(
       },
 
       deleteStory(id: string): void {
-        patchState(store, { stories: store.stories().filter(s => s.id !== id) });
+        const next = store.stories().filter(s => s.id !== id);
+        patchState(store, { stories: next });
         void audioCache.evict(id);
-        void firstValueFrom(api.remove(id)).catch(() => null);
+
+        const userId = uid();
+        if (userId) void localData.setStories(userId, next);
+
+        if (!navigator.onLine) {
+          void syncService.enqueue({ type: 'DELETE_STORY', payload: { storyId: id } });
+          return;
+        }
+        void firstValueFrom(api.remove(id)).catch(() => {
+          void syncService.enqueue({ type: 'DELETE_STORY', payload: { storyId: id } });
+        });
       },
 
       clearGenerateError(): void {

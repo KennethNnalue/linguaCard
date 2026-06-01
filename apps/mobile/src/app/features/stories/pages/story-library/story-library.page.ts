@@ -6,6 +6,8 @@ import {
   IonContent,
   IonHeader,
   IonIcon,
+  IonRefresher,
+  IonRefresherContent,
   IonToolbar,
   ModalController,
 } from '@ionic/angular/standalone';
@@ -17,32 +19,46 @@ import {
   timeOutline,
   sparklesOutline,
   trashOutline,
+  chevronDownCircleOutline,
 } from 'ionicons/icons';
 import type { Story } from '@lingua-card/shared/domain';
 import { StoryStore } from '../../store/story.store';
+import { SyncService } from '../../../../core/services/sync.service';
 import { GenerateStorySheetComponent } from '../../components/generate-story-sheet/generate-story-sheet.component';
 
 @Component({
   selector: 'app-story-library',
   templateUrl: './story-library.page.html',
   styleUrls: ['./story-library.page.scss'],
-  imports: [IonContent, IonHeader, IonToolbar, IonIcon, NgClass, TitleCasePipe],
+  imports: [IonContent, IonHeader, IonToolbar, IonIcon, IonRefresher, IonRefresherContent, NgClass, TitleCasePipe],
 })
 export class StoryLibraryPage implements OnInit {
   private readonly storyStore = inject(StoryStore);
+  private readonly syncService = inject(SyncService);
   private readonly router = inject(Router);
   private readonly modalCtrl = inject(ModalController);
   private readonly alertCtrl = inject(AlertController);
 
   readonly stories = this.storyStore.sortedStories;
-  readonly loading = this.storyStore.isLoading;
+  readonly isLoading = this.storyStore.isLoading;
+  readonly isRefreshing = this.storyStore.isRefreshing;
+  readonly isGenerating = this.storyStore.isGenerating;
 
   constructor() {
-    addIcons({ bookOutline, addOutline, playOutline, timeOutline, sparklesOutline, trashOutline });
+    addIcons({ bookOutline, addOutline, playOutline, timeOutline, sparklesOutline, trashOutline, chevronDownCircleOutline });
   }
 
   ngOnInit(): void {
     this.storyStore.loadStories();
+  }
+
+  async onRefresh(event: Event): Promise<void> {
+    if (!navigator.onLine) {
+      setTimeout(() => (event.target as HTMLIonRefresherElement).complete(), 1000);
+      return;
+    }
+    await this.syncService.forceSync();
+    (event.target as HTMLIonRefresherElement).complete();
   }
 
   async openGenerateSheet(): Promise<void> {

@@ -1,3 +1,21 @@
+// ── Refresh indicator ────────────────────────────────────────────
+.ss-refresh-bar {
+  position: sticky;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: linear-gradient(90deg, var(--lc-brand) 0%, var(--lc-accent) 100%);
+  animation: shimmer 1.5s ease-in-out infinite;
+  z-index: 10;
+}
+
+@keyframes shimmer {
+  0%   { opacity: 0.4; }
+  50%  { opacity: 1; }
+  100% { opacity: 0.4; }
+}
+
 // ── Nav ──────────────────────────────────────────────────────────
 .p-nav {
   display: flex;

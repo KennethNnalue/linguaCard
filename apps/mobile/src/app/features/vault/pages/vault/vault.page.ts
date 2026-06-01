@@ -1,5 +1,5 @@
 import {SlicePipe} from '@angular/common';
-import {Component, computed, inject, signal} from '@angular/core';
+import {Component, computed, inject, signal, OnDestroy} from '@angular/core';
 import {Router} from '@angular/router';
 import {
   IonContent,
@@ -18,6 +18,7 @@ import {addIcons} from 'ionicons';
 import {addOutline, cloudUploadOutline, funnelOutline} from 'ionicons/icons';
 import {Card, Collection} from '../../../../core/models/mock-data';
 import { CardStore } from '../../store/card.store';
+import { SyncService } from '../../../../core/services/sync.service';
 import { CategoryStore } from '../../store/category.store';
 import {getCategoryName} from '../../../../shared/helpers/helpers';
 import {ArticleBadgeComponent} from '../../../../shared/components/article-badge/article-badge.component';
@@ -49,6 +50,7 @@ export class VaultPage {
   private readonly cardStore = inject(CardStore);
   private readonly categoryStore = inject(CategoryStore);
   readonly collectionStore = inject(CollectionStore);
+  private readonly syncService = inject(SyncService);
   private readonly modalCtrl = inject(ModalController);
   private readonly router = inject(Router);
 
@@ -58,7 +60,7 @@ export class VaultPage {
 
   readonly activeTab = signal<'words' | 'collections'>('words');
 
-  readonly loading = this.cardStore.isLoading;
+  readonly loading = computed(() => this.cardStore.isLoading() && this.cardStore.cards().length === 0);
   readonly totalCount = this.cardStore.totalCount;
   readonly categories = this.categoryStore.categories;
   readonly activeCategory = computed(() => this.cardStore.filter().categoryId);
@@ -100,10 +102,9 @@ export class VaultPage {
     }
   }
 
-  handleRefresh(event: any): void {
-    this.cardStore.loadCards();
-    this.collectionStore.loadCollections();
-    setTimeout(() => event.target.complete(), 800);
+  async handleRefresh(event: Event): Promise<void> {
+    await this.syncService.forceSync();
+    (event.target as HTMLIonRefresherElement).complete();
   }
 
   onSearch(event: any): void {
