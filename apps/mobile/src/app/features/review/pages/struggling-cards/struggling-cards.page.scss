@@ -1,20 +1,33 @@
+@use 'theme/tokens' as t;
+@use 'theme/utils' as u;
+
 .sc-nav {
   display: flex;
   align-items: center;
-  padding: 6px 16px 10px;
-  gap: 12px;
+  padding: t.$lc-space-1 t.$lc-space-4 t.$lc-space-2;
+  gap: t.$lc-space-3;
 }
 
 .sc-nav-title {
-  font-size: 15px;
-  font-weight: 600;
+  font-family: t.$lc-font-display;
+  @include u.lc-font('md', t.$lc-font-weight-semibold);
   color: var(--lc-text-primary);
   flex: 1;
   text-align: center;
 }
 
-.sc-nav-spacer {
-  width: 32px;
+.sc-nav-spacer { width: 30px; }
+
+.sc-back-btn {
+  @include u.circle(30px);
+  @include u.flex-center;
+  background: t.$lc-brand-light;
+  border: none;
+  cursor: pointer;
+  flex-shrink: 0;
+  @include u.touch-state;
+
+  ion-icon { font-size: 14px; color: t.$lc-brand; }
 }
 
 .sc-content {
@@ -23,152 +36,78 @@
 
 // ── Banner ────────────────────────────────────────────────────────
 .sc-banner {
-  margin: 0 14px 14px;
-  background: #FEF2F2;
-  border: 1px solid #FCA5A5;
-  border-radius: 14px;
-  padding: 12px 14px;
+  margin: 0 t.$lc-space-4 t.$lc-space-3;
+  background: t.$lc-fem-bg;
+  border: 1px solid t.$lc-fem-border;
+  border-radius: t.$lc-radius-md;
+  padding: t.$lc-space-3 t.$lc-space-3;
   display: flex;
   align-items: flex-start;
-  gap: 10px;
+  gap: t.$lc-space-2 + 2px;
 }
 
-.sc-banner-icon {
-  font-size: 18px;
-  flex-shrink: 0;
-}
-
-.sc-banner-title {
-  font-size: 12px;
-  font-weight: 600;
-  color: #B91C1C;
-  margin: 0 0 3px;
-}
-
-.sc-banner-sub {
-  font-size: 11px;
-  color: #B91C1C;
-  opacity: 0.75;
-  line-height: 1.5;
-  margin: 0;
-}
+.sc-banner-icon { font-size: t.$lc-text-xl; flex-shrink: 0; }
+.sc-banner-title { @include u.lc-font('xs', t.$lc-font-weight-semibold); color: t.$lc-fem-text; margin: 0 0 3px; }
+.sc-banner-sub { @include u.lc-font('xxs'); color: t.$lc-fem-text; opacity: 0.75; line-height: 1.5; margin: 0; }
 
 // ── Card list ─────────────────────────────────────────────────────
 .sc-list {
-  padding: 0 14px;
+  padding: 0 t.$lc-space-4;
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: t.$lc-space-2;
 }
 
-.sc-card {
-  border: 1px solid;
-  border-radius: 12px;
-  padding: 11px 13px;
-  cursor: pointer;
-  transition: transform 0.1s;
-
-  &:active {
-    transform: scale(0.98);
-  }
-}
-
-.sc-card-top {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  margin-bottom: 4px;
-}
-
-.sc-card-left {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-}
-
-.sc-word {
-  font-size: 13px;
-  font-weight: 600;
-  color: var(--lc-text-primary);
+// Wrapper positions the fail badge over the word card
+.sc-card-wrap {
+  position: relative;
 }
 
 .sc-fail-badge {
-  font-size: 9px;
-  font-weight: 700;
-  padding: 2px 7px;
-  border-radius: 8px;
-  flex-shrink: 0;
+  position: absolute;
+  top: t.$lc-space-2;
+  right: 44px; // sit left of the audio button
+  @include u.lc-font('xxs', t.$lc-font-weight-bold);
+  padding: 2px t.$lc-space-1 + 2px;
+  border-radius: t.$lc-radius-full;
+  background: t.$lc-accent-light;
+  border: 1px solid t.$lc-accent;
+  color: t.$lc-accent;
+  pointer-events: none;
+  z-index: 1;
 
   &--red {
-    background: #FEF2F2;
-    border: 1px solid #FCA5A5;
-    color: #B91C1C;
+    background: t.$lc-fem-bg;
+    border-color: t.$lc-fem-border;
+    color: t.$lc-fem-text;
   }
-
-  &--amber {
-    background: #FEF3C7;
-    border: 1px solid #FCD34D;
-    color: #D97706;
-  }
-}
-
-.sc-translation {
-  font-size: 12px;
-  color: var(--lc-text-secondary);
-  margin: 0 0 4px;
-}
-
-.sc-meta {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  font-size: 10px;
-  color: var(--lc-text-hint);
 }
 
 // ── Review button ─────────────────────────────────────────────────
-.sc-review-wrap {
-  padding: 16px 14px 0;
-}
+.sc-review-wrap { padding: t.$lc-space-4 t.$lc-space-4 0; }
 
 .sc-review-btn {
   width: 100%;
-  background: #B91C1C;
+  background: t.$lc-fem-text;
   color: white;
   border: none;
-  border-radius: 12px;
-  padding: 12px;
-  font-size: 13px;
-  font-weight: 600;
-  font-family: var(--lc-font-body);
+  border-radius: t.$lc-radius-md;
+  padding: t.$lc-space-3;
+  @include u.lc-font('sm', t.$lc-font-weight-semibold);
+  font-family: t.$lc-font-body;
   text-align: center;
   cursor: pointer;
+  @include u.touch-state;
 }
 
 // ── Empty state ───────────────────────────────────────────────────
 .sc-empty {
-  padding: 60px 24px;
+  padding: t.$lc-space-12 t.$lc-space-6;
   text-align: center;
 }
 
-.sc-empty-icon {
-  font-size: 48px;
-  margin: 0 0 16px;
-}
+.sc-empty-icon { font-size: 48px; margin: 0 0 t.$lc-space-4; display: block; }
+.sc-empty-title { @include u.lc-font('3xl', t.$lc-font-weight-semibold); color: var(--lc-text-primary); margin: 0 0 t.$lc-space-2; }
+.sc-empty-sub { @include u.lc-font('sm'); color: var(--lc-text-hint); margin: 0; }
 
-.sc-empty-title {
-  font-size: 18px;
-  font-weight: 600;
-  color: var(--lc-text-primary);
-  margin: 0 0 8px;
-}
-
-.sc-empty-sub {
-  font-size: 13px;
-  color: var(--lc-text-hint);
-  margin: 0;
-}
-
-.sc-bottom-spacer {
-  height: 20px;
-}
+.sc-bottom-spacer { height: 20px; }

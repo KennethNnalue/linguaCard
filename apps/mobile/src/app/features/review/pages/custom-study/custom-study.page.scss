@@ -1,9 +1,34 @@
 @use 'theme/tokens' as t;
 @use 'theme/utils' as u;
 
-.cs-nav { display: flex; align-items: center; padding: t.$lc-space-2 t.$lc-space-4 t.$lc-space-3; gap: t.$lc-space-3; }
-.cs-nav-title { @include u.lc-font('lg', t.$lc-font-weight-semibold); color: var(--lc-text-primary); flex: 1; text-align: center; }
-.cs-nav-spacer { width: 32px; }
+.cs-nav {
+  display: flex;
+  align-items: center;
+  padding: t.$lc-space-1 t.$lc-space-4 t.$lc-space-2;
+  gap: t.$lc-space-3;
+}
+
+.cs-nav-title {
+  font-family: t.$lc-font-display;
+  @include u.lc-font('md', t.$lc-font-weight-semibold);
+  color: var(--lc-text-primary);
+  flex: 1;
+  text-align: center;
+}
+
+.cs-nav-spacer { width: 30px; }
+
+.cs-back-btn {
+  @include u.circle(30px);
+  @include u.flex-center;
+  background: t.$lc-brand-light;
+  border: none;
+  cursor: pointer;
+  flex-shrink: 0;
+  @include u.touch-state;
+
+  ion-icon { font-size: 14px; color: t.$lc-brand; }
+}
 
 .cs-content { padding-bottom: env(safe-area-inset-bottom, t.$lc-space-6); }
 

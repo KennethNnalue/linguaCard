@@ -1,15 +1,16 @@
-import { Component, inject, OnInit } from '@angular/core';
-import { IonApp, IonRouterOutlet } from '@ionic/angular/standalone';
-import { App } from '@capacitor/app';
-import { Capacitor } from '@capacitor/core';
-import { Network } from '@capacitor/network';
-import { ThemeService } from './core/services/theme.service';
-import { LocalDataService } from './core/services/local-data.service';
-import { SyncService } from './core/services/sync.service';
-import { SyncNotificationService } from './core/services/sync-notification.service';
-import { NetworkService } from './core/services/network.service';
-import { PwaInstallBannerComponent } from './shared/components/pwa-install-banner/pwa-install-banner.component';
-import { OfflineBannerComponent } from './shared/components/offline-banner/offline-banner.component';
+import {Component, inject, OnInit} from '@angular/core';
+import {IonApp, IonRouterOutlet} from '@ionic/angular/standalone';
+import {App} from '@capacitor/app';
+import {Capacitor} from '@capacitor/core';
+import {Network} from '@capacitor/network';
+import {ThemeService} from './core/services/theme.service';
+import {LocalDataService} from './core/services/local-data.service';
+import {SyncService} from './core/services/sync.service';
+import {SyncNotificationService} from './core/services/sync-notification.service';
+import {NetworkService} from './core/services/network.service';
+import {ReviewStore} from './features/review/store/review.store';
+import {PwaInstallBannerComponent} from './shared/components/pwa-install-banner/pwa-install-banner.component';
+import {OfflineBannerComponent} from './shared/components/offline-banner/offline-banner.component';
 
 @Component({
   selector: 'lc-root',
@@ -22,6 +23,7 @@ export class AppComponent implements OnInit {
   private readonly syncService = inject(SyncService);
   private readonly syncNotification = inject(SyncNotificationService);
   private readonly networkService = inject(NetworkService);
+  private readonly reviewStore = inject(ReviewStore);
 
   constructor() {
     this.themeService.initialize();
@@ -29,9 +31,13 @@ export class AppComponent implements OnInit {
 
   async ngOnInit(): Promise<void> {
     await this.localData.init();
+
+    // Load persisted session history before any UI renders
+    await this.reviewStore.loadHistory();
+
     await this.syncService.init();
 
-    const { connected } = await Network.getStatus();
+    const {connected} = await Network.getStatus();
     if (connected) {
       void this.syncService.forceSync();
     }
@@ -43,7 +49,7 @@ export class AppComponent implements OnInit {
     this.syncService.startPeriodicSync();
 
     if (Capacitor.isNativePlatform()) {
-      App.addListener('appStateChange', async ({ isActive }) => {
+      App.addListener('appStateChange', async ({isActive}) => {
         if (isActive && navigator.onLine) {
           await this.syncService.forceSync();
         }

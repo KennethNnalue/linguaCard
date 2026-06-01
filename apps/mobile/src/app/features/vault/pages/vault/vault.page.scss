@@ -4,22 +4,62 @@
 // ─── NAV ─────────────────────────────────────────────────────────────────────
 .vault-nav {
   @include u.flex-between;
-  padding: t.$lc-space-2 t.$lc-space-4 14px;
+  padding: t.$lc-space-1 t.$lc-space-4 t.$lc-space-3;
 }
 
 .vault-title {
+  font-family: t.$lc-font-display;
   @include u.lc-font('4xl', t.$lc-font-weight-semibold);
   color: var(--lc-text-primary);
   margin: 0;
   line-height: 1.2;
-  font-size: 26px;
+}
+
+.vault-title-count {
+  @include u.lc-font('md', t.$lc-font-weight-regular);
+  color: var(--lc-text-hint);
+}
+
+.vault-nav-actions {
+  display: flex;
+  align-items: center;
+  gap: t.$lc-space-2;
+}
+
+.vault-icon-btn {
+  @include u.square(32px);
+  border-radius: t.$lc-radius-full;
+  background: t.$lc-brand-light;
+  border: none;
+  @include u.flex-center;
+  cursor: pointer;
+
+  ion-icon {
+    font-size: 14px;
+    color: t.$lc-brand;
+  }
+}
+
+.vault-fab {
+  @include u.square(32px);
+  border-radius: t.$lc-radius-full;
+  background: t.$lc-accent;
+  border: none;
+  box-shadow: t.$lc-shadow-fab;
+  @include u.flex-center;
+  cursor: pointer;
+
+  ion-icon {
+    font-size: 16px;
+    color: white;
+  }
 }
 
 // ─── SEGMENT TABS ────────────────────────────────────────────────────────────
 .vault-segment {
-  margin: 0 14px t.$lc-space-3;
-  --background: rgba(45, 90, 78, 0.08);
-  border-radius: t.$lc-radius-sm + 2;
+  margin: 0 t.$lc-space-4 t.$lc-space-2;
+  --background: rgba(45, 90, 78, 0.06);
+  border-radius: t.$lc-radius-sm + 2px;
   padding: 3px;
 }
 
@@ -37,12 +77,150 @@ ion-segment-button {
   --box-shadow-checked: 0 1px 4px rgba(0, 0, 0, 0.08);
 }
 
+// ─── SEARCH ──────────────────────────────────────────────────────────────────
+.v2-search {
+  margin: 0 t.$lc-space-4 t.$lc-space-2;
+  @include u.lc-card;
+  padding: t.$lc-space-2 + 2px t.$lc-space-3;
+  display: flex;
+  align-items: center;
+  gap: t.$lc-space-2;
+
+  svg {
+    width: 14px;
+    height: 14px;
+    color: var(--lc-text-hint);
+    flex-shrink: 0;
+  }
+}
+
+.v2-search-input {
+  flex: 1;
+  border: none;
+  background: transparent;
+  outline: none;
+  @include u.lc-font('sm');
+  color: var(--lc-text-primary);
+  font-family: t.$lc-font-body;
+
+  &::placeholder {
+    color: var(--lc-text-hint);
+  }
+}
+
+// ─── FILTER CHIPS ────────────────────────────────────────────────────────────
+.v2-filter-row {
+  display: flex;
+  align-items: center;
+  gap: t.$lc-space-2;
+  padding: 0 t.$lc-space-4 t.$lc-space-2;
+  overflow-x: auto;
+  scrollbar-width: none;
+  &::-webkit-scrollbar { display: none; }
+}
+
+.v2-filter-chip {
+  display: flex;
+  align-items: center;
+  gap: t.$lc-space-1;
+  flex-shrink: 0;
+  padding: 5px t.$lc-space-3;
+  border-radius: t.$lc-radius-full;
+  @include u.lc-font('xs', t.$lc-font-weight-semibold);
+  border: 1px solid;
+  cursor: pointer;
+  font-family: t.$lc-font-body;
+  transition: var(--lc-transition-fast);
+
+  &.v2-filter-on {
+    background: t.$lc-brand;
+    color: white;
+    border-color: t.$lc-brand;
+  }
+
+  &.v2-filter-off {
+    background: var(--lc-card);
+    color: var(--lc-text-secondary);
+    border-color: var(--lc-border);
+  }
+}
+
+.v2-filter-count {
+  @include u.lc-font('xxs', t.$lc-font-weight-bold);
+  background: rgba(255, 255, 255, 0.25);
+  border-radius: t.$lc-radius-full;
+  padding: 1px 5px;
+
+  .v2-filter-off & {
+    background: rgba(45, 90, 78, 0.08);
+    color: var(--lc-text-hint);
+  }
+}
+
+// ─── ARTICLE LEGEND ──────────────────────────────────────────────────────────
+.v2-article-legend {
+  display: flex;
+  align-items: center;
+  gap: t.$lc-space-1;
+  padding: 0 t.$lc-space-4 t.$lc-space-2;
+}
+
+.v2-art-pill {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  @include u.lc-font('xxs');
+  color: var(--lc-text-hint);
+  padding: 3px t.$lc-space-2;
+  border-radius: t.$lc-radius-md;
+  border: 1px solid transparent;
+  cursor: pointer;
+}
+
+.v2-art-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+}
+
+.v2-art-spacer {
+  flex: 1;
+}
+
+.v2-sort-btn {
+  display: flex;
+  align-items: center;
+  gap: 3px;
+  @include u.lc-font('xxs', t.$lc-font-weight-semibold);
+  color: var(--lc-text-hint);
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  font-family: t.$lc-font-body;
+  padding: 3px t.$lc-space-1;
+
+  svg { color: var(--lc-text-hint); }
+}
+
+// ─── WORD LIST ────────────────────────────────────────────────────────────────
+.word-list {
+  padding: 0 t.$lc-space-4 t.$lc-space-8;
+  display: flex;
+  flex-direction: column;
+  gap: t.$lc-space-2;
+}
+
+.word-skeleton {
+  @include u.lc-card;
+  height: 100px;
+}
+
 // ─── COLLECTIONS VIEW ────────────────────────────────────────────────────────
 .col-hero {
-  margin: 0 14px t.$lc-space-4;
+  margin: 0 t.$lc-space-4 t.$lc-space-4;
   background: var(--lc-brand);
-  border-radius: t.$lc-radius-lg - 4;
-  padding: 14px t.$lc-space-4;
+  border-radius: t.$lc-radius-lg - 4px;
+  padding: t.$lc-space-3 t.$lc-space-4;
   position: relative;
   overflow: hidden;
 
@@ -67,25 +245,34 @@ ion-segment-button {
   margin-bottom: t.$lc-space-1;
 }
 
-.col-hero-count { @include u.lc-font('4xl', t.$lc-font-weight-semibold); color: white; line-height: 1; font-size: 28px; }
+.col-hero-count {
+  font-family: t.$lc-font-display;
+  @include u.lc-font('4xl', t.$lc-font-weight-semibold);
+  color: white;
+  line-height: 1;
+}
+
 .col-hero-due-lbl { @include u.lc-font('xxs'); color: rgba(255, 255, 255, 0.5); margin-bottom: 2px; }
-.col-hero-due { @include u.lc-font('3xl', t.$lc-font-weight-semibold); color: white; }
+.col-hero-due {
+  font-family: t.$lc-font-display;
+  @include u.lc-font('3xl', t.$lc-font-weight-semibold);
+  color: white;
+}
 
 .col-list {
-  padding: 0 14px t.$lc-space-8;
+  padding: 0 t.$lc-space-4 t.$lc-space-8;
   display: flex;
   flex-direction: column;
   gap: 9px;
 }
 
 .col-card {
-  @include u.lc-card(t.$lc-radius-md + 2);
-  padding: 13px 14px;
+  @include u.lc-card(t.$lc-radius-md);
+  padding: 13px t.$lc-space-4;
   cursor: pointer;
-  transition: box-shadow t.$lc-duration-fast;
+  @include u.touch-state;
 
   &--empty { border-style: dashed; box-shadow: none; }
-  &:active { box-shadow: none; }
 }
 
 .col-card-top { @include u.flex-between; align-items: flex-start; margin-bottom: t.$lc-space-2; }
@@ -93,9 +280,9 @@ ion-segment-button {
 .col-card-name-row { display: flex; align-items: center; gap: 7px; margin-bottom: 3px; }
 .col-card-emoji { font-size: t.$lc-text-xl; }
 .col-card-name {
+  font-family: t.$lc-font-display;
   @include u.lc-font('md', t.$lc-font-weight-semibold);
   color: var(--lc-text-primary);
-  .col-card--empty & { color: var(--lc-text-hint); }
 }
 .col-card-meta { @include u.lc-font('xxs'); color: var(--lc-text-hint); }
 
@@ -113,59 +300,3 @@ ion-segment-button {
 .col-progress-bar { height: 3px; background: rgba(45, 90, 78, 0.1); border-radius: 3px; overflow: hidden; margin-bottom: t.$lc-space-2; }
 .col-progress-fill { height: 100%; background: var(--lc-mastery-5); border-radius: 3px; transition: width 0.4s ease; }
 .col-progress-meta { @include u.flex-between; @include u.lc-font('xxs'); color: var(--lc-text-hint); }
-
-// ─── SEARCH ──────────────────────────────────────────────────────────────────
-.vault-search { padding: 0 14px t.$lc-space-3; }
-
-// ─── CATEGORY CHIPS ──────────────────────────────────────────────────────────
-.cat-scroll {
-  display: flex;
-  gap: t.$lc-space-2;
-  padding: 0 14px t.$lc-space-3;
-  overflow-x: auto;
-  scrollbar-width: none;
-  &::-webkit-scrollbar { display: none; }
-}
-
-// ─── ARTICLE LEGEND ──────────────────────────────────────────────────────────
-.article-legend-sm { display: flex; align-items: center; gap: t.$lc-space-3; padding: 2px t.$lc-space-4 t.$lc-space-3; }
-.legend-item { display: flex; align-items: center; gap: 5px; }
-.legend-lbl { @include u.lc-font('xxs', t.$lc-font-weight-medium); color: var(--lc-text-hint); }
-
-.sort-btn {
-  display: flex;
-  align-items: center;
-  gap: t.$lc-space-1;
-  @include u.lc-font('xs', t.$lc-font-weight-medium);
-  color: var(--lc-text-hint);
-  cursor: pointer;
-  padding: t.$lc-space-1 t.$lc-space-2;
-  border-radius: t.$lc-radius-full;
-  transition: var(--lc-transition-fast);
-  ion-icon { font-size: t.$lc-text-sm; }
-  &:active { background: var(--lc-brand-light); color: var(--lc-brand); }
-}
-
-// ─── WORD LIST ────────────────────────────────────────────────────────────────
-.word-list {
-  padding: 0 14px t.$lc-space-8;
-  display: flex;
-  flex-direction: column;
-  gap: t.$lc-space-2;
-}
-
-.word-item-padded {
-  padding: t.$lc-space-4 t.$lc-space-4;
-  cursor: pointer;
-
-  .lc-word-front { @include u.lc-font('lg', t.$lc-font-weight-semibold); }
-  .lc-word-back  { @include u.lc-font('xs'); margin-top: 2px; }
-}
-
-:host ::ng-deep lc-mastery-dot .dot {
-  @include u.circle(10px);
-}
-
-// ─── NAV ACTIONS ─────────────────────────────────────────────────────────────
-.vault-nav-actions { display: flex; align-items: center; gap: t.$lc-space-3; }
-.lc-fab--secondary { background: var(--lc-brand); box-shadow: 0 4px 16px rgba(45, 90, 78, 0.35); }

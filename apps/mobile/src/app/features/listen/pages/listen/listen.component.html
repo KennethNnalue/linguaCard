@@ -75,32 +75,23 @@
       } @else {
         @for (card of queue(); track card.id; let i = $index) {
           <div
-            class="lt-q-item"
-            [class.lt-q-item--active]="i === currentIndex()"
+            class="lt-q-card-wrap"
+            [class.lt-q-card-wrap--active]="i === currentIndex()"
             (click)="seekAndPlay(i)">
-            <span class="lt-q-num">
-              @if (i === currentIndex() && isPlaying()) {
+            @if (i === currentIndex() && isPlaying()) {
+              <div class="lt-q-playing-badge">
                 <span class="lt-wave" aria-hidden="true">
                   <span></span><span></span><span></span><span></span><span></span>
                 </span>
-              } @else {
-                {{ i + 1 }}
-              }
-            </span>
-            <div class="lt-q-info">
-              <div class="lt-q-word-row">
-                @if (card.content.article) {
-                  <lc-article-badge [article]="card.content.article"></lc-article-badge>
-                }
-                <span class="lt-q-word">
-                  {{ card.content.article ? card.content.article + ' ' : '' }}{{ card.content.back }}
-                </span>
               </div>
-              <span class="lt-q-sub">{{ card.content.front }}</span>
-            </div>
-            <span class="lt-q-dur">
-              ~0:{{ card.content.examples.length ? '09' : '05' }}
-            </span>
+            }
+            <lc-word-card
+              [card]="card"
+              [categoryName]="getCategoryLabel(card)"
+              [compact]="true"
+              (cardClick)="seekAndPlay(i)"
+              (playAudio)="seekAndPlay(i)"
+            />
           </div>
         }
       }
@@ -117,9 +108,7 @@
       <!-- Art card -->
       <div class="lt-art" [class]="playerArtClass()">
         @if (currentCard()?.content?.article) {
-          <span class="lc-article-badge lc-article-badge--{{ currentCard()!.content.article }} lt-art-article">
-            {{ currentArticleLabel() }}
-          </span>
+          <lc-article-badge [article]="currentCard()!.content.article" class="lt-art-article" />
         }
         <p class="lt-art-word lc-display">{{ currentCard()?.content?.back }}</p>
         @if (currentCard()?.content?.phonetic) {

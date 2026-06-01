@@ -4,9 +4,11 @@ import { NavController } from '@ionic/angular';
 import { IonContent, IonHeader, IonIcon, IonToolbar } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
 import { arrowBackOutline, checkmarkCircleOutline, repeatOutline } from 'ionicons/icons';
-import { Card, ConfidenceRating } from '../../../../core/models/mock-data';
-import { ArticleBadgeComponent } from '../../../../shared/components/article-badge/article-badge.component';
-import { ReviewStore } from '../../store/review.store';
+import {Card, ConfidenceRating} from '@lingua-card/shared/domain';
+import {ReviewStore} from '../../store/review.store';
+import {CategoryStore} from '../../../vault/store/category.store';
+import {WordCardComponent} from '../../../../shared/ui/word-card/word-card.component';
+import {getCategoryName} from '../../../../shared/helpers/helpers';
 
 const MASTERY_LABELS = ['New', 'Beginner', 'Learning', 'Familiar', 'Good', 'Mastered'];
 const RATING_LABELS = ['Blank', 'Hard', 'Hmm', 'Good', 'Easy', 'Nailed'];
@@ -16,14 +18,13 @@ const RATING_LABELS = ['Blank', 'Hard', 'Hmm', 'Good', 'Easy', 'Nailed'];
   standalone: true,
   templateUrl: './session-summary.page.html',
   styleUrls: ['./session-summary.page.scss'],
-  imports: [IonContent, IonHeader, IonToolbar, IonIcon, ArticleBadgeComponent],
+  imports: [IonContent, IonHeader, IonToolbar, IonIcon, WordCardComponent],
 })
 export class SessionSummaryPage implements OnInit {
   private readonly reviewStore = inject(ReviewStore);
+  private readonly categoryStore = inject(CategoryStore);
   private readonly navCtrl = inject(NavController);
   private readonly router = inject(Router);
-
-  readonly dotIndices = [0, 1, 2, 3, 4] as const;
 
   constructor() {
     addIcons({ arrowBackOutline, checkmarkCircleOutline, repeatOutline });
@@ -103,6 +104,14 @@ export class SessionSummaryPage implements OnInit {
     if (!cards.length) return;
     this.reviewStore.startSession(cards, this.session()?.collectionId ?? null, 'Hard cards retry');
     void this.navCtrl.navigateForward('/review/player', { animated: true });
+  }
+
+  navigateToCard(card: Card): void {
+    void this.router.navigate(['/vault', card.id]);
+  }
+
+  getCategoryLabel(card: Card): string {
+    return getCategoryName(card.categoryIds?.[0], this.categoryStore.categories());
   }
 
   goToHub(): void {

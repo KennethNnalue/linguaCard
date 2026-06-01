@@ -1,20 +1,15 @@
 <ion-header class="ion-no-border">
   <ion-toolbar>
     <div class="home-nav">
-      <span class="home-logo lc-display">LinguaCard</span>
-      <div class="home-nav-right">
-        <button class="lc-fab" (click)="openAddWord()" aria-label="Add new word">
-          <ion-icon name="add-outline"></ion-icon>
-        </button>
-        <button
-          class="avatar-btn"
-          (click)="toggleMenu($event)"
-          [attr.aria-expanded]="menuOpen()"
-          aria-label="Open account menu"
-        >
-          {{ user()?.avatarInitials ?? '?' }}
-        </button>
-      </div>
+      <span class="home-logo">LinguaCard</span>
+      <button
+        class="home-avatar"
+        (click)="toggleMenu($event)"
+        [attr.aria-expanded]="menuOpen()"
+        aria-label="Open account menu"
+      >
+        {{ user()?.avatarInitials ?? '?' }}
+      </button>
     </div>
   </ion-toolbar>
 </ion-header>
@@ -33,127 +28,163 @@
 
   <div class="home-content">
 
-    <!-- Greeting -->
-    <div class="greeting">
-      <p class="greeting-sub">{{ greeting() }}</p>
-      <h1 class="greeting-name lc-display">Ready to<br>learn today?</h1>
-    </div>
+    <!-- ── Hero card ── -->
+    <div class="hero-card">
+      <div class="hero-greeting">{{ greeting() }}</div>
+      <div class="hero-title">Ready to learn today?</div>
 
-    <!-- Hero card -->
-    <div class="lc-hero-card hero-card">
-      <p class="hero-label">Cards due today</p>
-      @if (loading()) {
-        <div class="lc-skeleton" style="width:80px;height:52px;margin-bottom:4px;border-radius:8px;"></div>
-      } @else {
-        <p class="hero-count lc-display">{{ stats().dueToday }}</p>
-        <p class="hero-meta">{{ stats().newCards }} new
-          · {{ stats().dueToday - stats().newCards }} review</p>
-        <button class="hero-collection-pill" (click)="openCollectionPicker()">
-          {{ selectedCollectionLabel() }}
-          <ion-icon name="chevron-down-outline"></ion-icon>
-        </button>
-      }
+      <div class="hero-ring-row">
+        <div class="hero-ring">
+          <svg viewBox="0 0 64 64">
+            <circle class="ring-bg" cx="32" cy="32" r="28"/>
+            <circle
+              class="ring-fill"
+              cx="32" cy="32" r="28"
+              stroke-dasharray="175.93"
+              [attr.stroke-dashoffset]="ringOffset()"
+            />
+          </svg>
+          <div class="ring-text">
+            <div class="ring-num">{{ totalDue() }}</div>
+            <div class="ring-lbl">due</div>
+          </div>
+        </div>
+
+        <div class="hero-meta">
+          <div class="hero-stat-row">
+            <span class="hero-stat-num">{{ newCardsCount() }}</span>
+            <span class="hero-stat-lbl">new cards</span>
+          </div>
+          <div class="hero-stat-row">
+            <span class="hero-stat-num">{{ reviewsCount() }}</span>
+            <span class="hero-stat-lbl">reviews</span>
+          </div>
+          <button class="hero-col-pill" (click)="openCollectionPicker()">
+            {{ selectedCollectionLabel() }}
+          </button>
+        </div>
+      </div>
+
       <div class="hero-actions">
-        <button class="lc-btn-pill" [routerLink]="['/review']"
-                [queryParams]="selectedCollectionId() ? { collectionId: selectedCollectionId() } : {}">
+        <button class="hero-btn-start" [routerLink]="['/review']">
           <ion-icon name="play-outline"></ion-icon>
-          Review cards
+          Start session
         </button>
-        <button class="lc-btn-ghost" [routerLink]="['/listen']"
-                [queryParams]="selectedCollectionId() ? { collectionId: selectedCollectionId() } : {}">
-          <ion-icon name="volume-high-outline"></ion-icon>
-          Listen
+        <button class="hero-btn-filter" (click)="openCollectionPicker()">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round"><path d="M4 6h16M4 12h10M4 18h6"/></svg>
+          Filter
         </button>
       </div>
     </div>
 
-    <!-- Stats row -->
+    <!-- ── Stats row ── -->
     <div class="stats-row">
-      <div class="stat-card lc-card">
+      <div class="stat-card">
         <span class="stat-icon">🔥</span>
-        @if (loading()) {
-          <div class="lc-skeleton" style="width:36px;height:24px;border-radius:4px;"></div>
-        } @else {
-          <p class="stat-val lc-display">{{ stats().dayStreak }}</p>
-        }
-        <p class="stat-lbl">Day streak</p>
+        <div class="stat-val">{{ dayStreak() }}</div>
+        <div class="stat-lbl">Day streak</div>
+        <div class="streak-dots">
+          @for (active of last7DaysActivity(); track $index) {
+            <div class="streak-dot" [class.streak-dot--active]="active"></div>
+          }
+        </div>
       </div>
-      <div class="stat-card lc-card">
+      <div class="stat-card">
         <span class="stat-icon">📚</span>
-        @if (loading()) {
-          <div class="lc-skeleton" style="width:36px;height:24px;border-radius:4px;"></div>
-        } @else {
-          <p class="stat-val lc-display">{{ stats().totalCards }}</p>
-        }
-        <p class="stat-lbl">Words</p>
+        <div class="stat-val">{{ totalCards() }}</div>
+        <div class="stat-lbl">Words</div>
       </div>
-      <div class="stat-card lc-card">
+      <div class="stat-card">
         <span class="stat-icon">⭐</span>
-        @if (loading()) {
-          <div class="lc-skeleton" style="width:36px;height:24px;border-radius:4px;"></div>
-        } @else {
-          <p class="stat-val lc-display">{{ stats().masteredCards }}</p>
-        }
-        <p class="stat-lbl">Mastered</p>
+        <div class="stat-val">{{ masteredCount() }}</div>
+        <div class="stat-lbl">Mastered</div>
       </div>
     </div>
 
-    <!-- Recent words -->
-    <div class="lc-section-header">
-      <span class="lc-section-title">Recent words</span>
-      <span class="lc-section-link" routerLink="/vault">See all →</span>
-    </div>
+    <!-- ── Word of the Day ── -->
+    @if (wordOfTheDay(); as wotd) {
+      <div class="wotd-card">
+        <div class="wotd-header">
+          <span class="wotd-label">✦ Word of the Day</span>
+          <button class="wotd-play" (click)="playWotd()" aria-label="Play pronunciation">
+            <ion-icon name="play-outline"></ion-icon>
+          </button>
+        </div>
+        <div class="wotd-body">
+          <div class="wotd-word">{{ (wotd.content.article ? wotd.content.article + ' ' : '') + wotd.content.back }}</div>
+          <div class="wotd-trans">{{ wotd.content.front }}@if (wotdGrammarInfo) { — <em>{{ wotdGrammarInfo }}</em>}</div>
+          @if (wotd.content.examples[0]) {
+            <div class="wotd-example"><em>{{ wotd.content.examples[0].target }}</em></div>
+          }
+        </div>
+      </div>
+    }
 
-    <!-- Article legend -->
-    <div class="article-legend">
-      <div class="legend-item">
-        <span class="lc-article-badge lc-article-badge--der">der</span>
-        <span class="legend-lbl">Masc.</span>
-      </div>
-      <div class="legend-item">
-        <span class="lc-article-badge lc-article-badge--die">die</span>
-        <span class="legend-lbl">Fem.</span>
-      </div>
-      <div class="legend-item">
-        <span class="lc-article-badge lc-article-badge--das">das</span>
-        <span class="legend-lbl">Neut.</span>
-      </div>
+    <!-- ── This week ── -->
+    <div class="sec-header">
+      <span class="sec-title">This week</span>
+      <span class="sec-link" [routerLink]="['/review/history']">Details →</span>
     </div>
-
-    <!-- Word list -->
-    <div class="word-list-home">
-      @if (loading()) {
-        @for (i of [1, 2, 3]; track i) {
-          <div class="lc-card" style="padding:12px;display:flex;gap:10px;align-items:center;">
-            <div class="lc-skeleton" style="width:7px;height:7px;border-radius:50%;"></div>
-            <div class="lc-skeleton" style="width:36px;height:18px;border-radius:8px;"></div>
-            <div style="flex:1;">
-              <div class="lc-skeleton" style="width:80px;height:14px;border-radius:4px;margin-bottom:4px;"></div>
-              <div class="lc-skeleton" style="width:60px;height:11px;border-radius:4px;"></div>
-            </div>
+    <div class="weekly-card">
+      <div class="weekly-bars">
+        @for (day of weeklyData(); track day.label) {
+          <div class="weekly-bar-wrap">
+            <div
+              class="weekly-bar"
+              [class.weekly-bar--filled]="day.isPast"
+              [class.weekly-bar--today]="day.isToday"
+              [style.height.px]="day.heightPct"
+            ></div>
+            <span class="weekly-day" [class.weekly-day--today]="day.isToday">{{ day.label }}</span>
           </div>
         }
-      } @else {
-        @for (card of recent(); track card.id) {
-          <div class="lc-word-item" [routerLink]="['/vault', card.id]">
-            <lc-mastery-dot [level]="card.srsState?.masteryLevel ?? 0"></lc-mastery-dot>
-            <lc-article-badge [article]="card.content.article"></lc-article-badge>
-            <div style="flex:1">
-              <p class="lc-word-front">{{ card.content.front }}</p>
-              <p
-                class="lc-word-back">{{ card.content.article ? card.content.article + ' ' : '' }}{{ card.content.back }}</p>
-            </div>
-            <span class="lc-word-tag">{{ getCategory(card.categoryIds[0]) }}</span>
-          </div>
-        } @empty {
-          <div class="lc-empty-state">
-            <span class="lc-empty-icon">📖</span>
-            <p class="lc-empty-title">No words yet</p>
-            <p class="lc-empty-sub">Tap the + button to add your first word</p>
-          </div>
-        }
-      }
+      </div>
+      <div class="weekly-legend">
+        <span class="weekly-total"><strong>{{ weeklyTotal() }}</strong> cards reviewed</span>
+        <span class="weekly-goal">Goal: <strong>150</strong></span>
+      </div>
     </div>
+
+    <!-- ── Quick actions ── -->
+    <div class="sec-header">
+      <span class="sec-title">Quick actions</span>
+    </div>
+    <div class="quick-actions">
+      <button class="quick-action" [routerLink]="['/vault/import/image']">
+        <span class="quick-icon">📸</span>
+        <div class="quick-lbl">Scan</div>
+        <div class="quick-sub">Import words</div>
+      </button>
+      <button class="quick-action" [routerLink]="['/stories']">
+        <span class="quick-icon">📖</span>
+        <div class="quick-lbl">Story</div>
+        <div class="quick-sub">Generate new</div>
+      </button>
+      <button class="quick-action" [routerLink]="['/listen']">
+        <span class="quick-icon">🎧</span>
+        <div class="quick-lbl">Listen</div>
+        <div class="quick-sub">Audio playlist</div>
+      </button>
+    </div>
+
+    <!-- ── Recently added ── -->
+    @if (recentCards().length > 0) {
+      <div class="sec-header">
+        <span class="sec-title">Recently added</span>
+        <span class="sec-link" [routerLink]="['/vault']">See all →</span>
+      </div>
+      <div class="recent-list">
+        @for (card of recentCards(); track card.id) {
+          <lc-word-card
+            [card]="card"
+            [categoryName]="getCategoryLabel(card)"
+            [compact]="true"
+            (cardClick)="navigateToCard(card)"
+            (playAudio)="playAudio(card)"
+          />
+        }
+      </div>
+    }
 
     <div style="height: 24px;"></div>
   </div>

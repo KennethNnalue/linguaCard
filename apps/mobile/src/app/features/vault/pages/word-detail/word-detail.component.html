@@ -4,7 +4,7 @@
       <button class="wd-icon-btn" (click)="goBack()" aria-label="Go back">
         <ion-icon name="chevron-back-outline"></ion-icon>
       </button>
-      <span class="wd-nav-title lc-display">Word Detail</span>
+      <span class="wd-nav-title">Word Detail</span>
       <button class="wd-icon-btn wd-icon-btn--outline" aria-label="More options">
         <ion-icon name="ellipsis-horizontal-outline"></ion-icon>
       </button>
@@ -16,100 +16,129 @@
   @if (card(); as word) {
     <div class="wd-content">
 
-      <!-- Word header -->
-      <div class="wd-header">
-        <div class="wd-word-row">
-          <lc-article-badge [article]="word.content.article"></lc-article-badge>
-          <h1 class="wd-word lc-display">{{ word.content.back }}</h1>
+      <!-- ── Header card ── -->
+      <div class="wd2-header">
+        <div class="wd2-word-row">
+          <lc-article-badge [article]="word.content.article" />
+          <h1 class="wd2-word">{{ word.content.back }}</h1>
         </div>
-        <p class="wd-sub">
-          @if (word.content.phonetic) {
-            {{ word.content.phonetic }} ·
-          }
-          {{ word.content.front }}
-        </p>
-        <div class="wd-meta-row">
-          <div class="wd-status-pill">
-            <span class="wd-status-dot" [style.background]="masteryColor()"></span>
+        @if (word.content.phonetic) {
+          <div class="wd2-phonetic">{{ word.content.phonetic }}</div>
+        }
+        <div class="wd2-trans">{{ word.content.front }}@if (word.content.article) { · noun, {{ word.content.article === 'der' ? 'masculine' : word.content.article === 'die' ? 'feminine' : 'neuter' }}}</div>
+
+        <div class="wd2-pills">
+          <div class="wd2-status-pill" [style.background]="masteryBgColor()" [style.color]="masteryColor()">
+            <div class="wd2-status-dot" [style.background]="masteryColor()"></div>
             {{ masteryLabel() }}
           </div>
           @if (categoryName()) {
-            <span class="lc-word-tag">{{ categoryName() }}</span>
-          }
-          @for (tag of word.tags; track tag) {
-            <span class="lc-word-tag">{{ tag }}</span>
-          }
-        </div>
-        <button class="wd-audio-btn" (click)="playPronunciation()" [disabled]="isPronunciationLoading()">
-          @if (isPronunciationLoading()) {
-            <div class="wd-audio-spinner"></div>
-            Generating…
-          } @else {
-            <ion-icon name="volume-high-outline"></ion-icon>
-            Play pronunciation
-          }
-        </button>
-      </div>
-
-      <div class="wd-divider"></div>
-
-      <!-- Mastery progress -->
-      <div class="wd-section">
-        <p class="wd-sec-lbl">Mastery progress</p>
-        <div class="lc-progress-track">
-          <div class="lc-progress-fill"
-               [style.width.%]="masteryPercent()"
-               [style.background]="masteryColor()">
-          </div>
-        </div>
-        <div class="wd-mastery-meta">
-          <span>Level {{ word.srsState?.masteryLevel }} — {{ masteryLabel() }}</span>
-          <span>{{ nextReviewText() }}</span>
-        </div>
-        <div class="wd-info-grid">
-          <div class="wd-info-cell lc-card">
-            <p class="wd-info-val lc-display">{{ word.srsState?.repetitions ?? 0 }}</p>
-            <p class="wd-info-lbl">Total reviews</p>
-          </div>
-          <div class="wd-info-cell lc-card">
-            <p class="wd-info-val lc-display">
-              {{ word.srsState?.lastRating != null ? word.srsState!.lastRating + '.0' : '—' }}
-            </p>
-            <p class="wd-info-lbl">Last rating</p>
-          </div>
-          <div class="wd-info-cell lc-card">
-            <p class="wd-info-val lc-display">{{ intervalText() }}</p>
-            <p class="wd-info-lbl">Interval</p>
-          </div>
-          <div class="wd-info-cell lc-card">
-            <p class="wd-info-val lc-display">{{ lastReviewedText() }}</p>
-            <p class="wd-info-lbl">Last reviewed</p>
-          </div>
-        </div>
-      </div>
-
-      <div class="wd-divider"></div>
-
-      <!-- Example sentences -->
-      @if (word.content.examples.length) {
-        <div class="wd-section">
-          <p class="wd-sec-lbl">Your example sentences</p>
-          @for (ex of word.content.examples; track ex.id) {
-            <div class="wd-example-block">
-              <p class="wd-ex-de" [innerHTML]="highlightWord(ex.target, word.content.back)"></p>
-              <p class="wd-ex-en">"{{ ex.native }}"</p>
+            <div class="wd2-status-pill" style="background: var(--lc-brand-light); color: var(--lc-brand-mid);">
+              {{ categoryName() }}
             </div>
           }
-          @if (word.content.notes) {
-            <div class="wd-note-pill">
-              <span class="wd-note-icon">💡</span>
-              <p class="wd-note-text">{{ word.content.notes }}</p>
+          @for (tag of word.tags; track tag) {
+            <div class="wd2-status-pill" style="background: var(--lc-surface); color: var(--lc-text-secondary);">
+              {{ tag }}
+            </div>
+          }
+        </div>
+
+        <div class="wd2-audio-row">
+          <button class="wd2-audio-btn" (click)="playPronunciation()" [disabled]="isPronunciationLoading()">
+            @if (isPronunciationLoading()) {
+              <div class="wd-audio-spinner"></div>
+              Generating…
+            } @else {
+              <ion-icon name="volume-high-outline"></ion-icon>
+              Listen
+            }
+          </button>
+          <button class="wd2-audio-btn wd2-audio-btn--accent" (click)="playPronunciation()">
+            <ion-icon name="mic-outline"></ion-icon>
+            Record
+          </button>
+        </div>
+      </div>
+
+      <!-- ── Mastery progress card ── -->
+      <div class="wd2-section">
+        <div class="wd2-sec-lbl">Mastery Progress</div>
+        <div class="wd2-mastery-visual">
+          <div class="wd2-mastery-ring">
+            <svg viewBox="0 0 52 52">
+              <circle class="mastery-ring-bg" cx="26" cy="26" r="22"/>
+              <circle
+                class="mastery-ring-fill"
+                cx="26" cy="26" r="22"
+                [attr.stroke]="masteryColor()"
+                stroke-dasharray="138.23"
+                [attr.stroke-dashoffset]="masteryRingOffset()"
+              />
+            </svg>
+            <div class="wd2-mastery-ring-num">{{ word.srsState?.masteryLevel ?? 0 }}</div>
+          </div>
+          <div class="wd2-mastery-info">
+            <div class="wd2-mastery-level">Level {{ word.srsState?.masteryLevel ?? 0 }} — {{ masteryLabel() }}</div>
+            <div class="wd2-mastery-next">{{ nextReviewText() }}</div>
+          </div>
+        </div>
+        <div class="wd2-stats-grid">
+          <div class="wd2-stat-cell">
+            <div class="wd2-stat-val">{{ word.srsState?.repetitions ?? 0 }}</div>
+            <div class="wd2-stat-lbl">Reviews</div>
+          </div>
+          <div class="wd2-stat-cell">
+            <div class="wd2-stat-val">{{ word.srsState?.lastRating != null ? word.srsState!.lastRating + '.0' : '—' }}</div>
+            <div class="wd2-stat-lbl">Avg rating</div>
+          </div>
+          <div class="wd2-stat-cell">
+            <div class="wd2-stat-val">{{ intervalText() }}</div>
+            <div class="wd2-stat-lbl">Interval</div>
+          </div>
+          <div class="wd2-stat-cell">
+            <div class="wd2-stat-val">{{ lastReviewedText() }}</div>
+            <div class="wd2-stat-lbl">Last seen</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ── Examples card ── -->
+      @if (word.content.examples.length) {
+        <div class="wd2-section">
+          <div class="wd2-sec-lbl">Example Sentences</div>
+          @for (ex of word.content.examples; track ex.id; let last = $last) {
+            <div class="wd2-example-block" [class.wd2-example-block--last]="last">
+              <p class="wd2-ex-de" [innerHTML]="highlightWord(ex.target, word.content.back)"></p>
+              <p class="wd2-ex-en">"{{ ex.native }}"</p>
             </div>
           }
         </div>
       }
 
-      <div style="height: 88px;"></div>
+      <!-- ── Notes card ── -->
+      @if (word.content.notes) {
+        <div class="wd2-notes">
+          <span class="wd2-notes-icon">💡</span>
+          <div class="wd2-notes-text">{{ word.content.notes }}</div>
+        </div>
+      }
+
+      <!-- ── Related words card ── -->
+      @if (relatedWords().length > 0) {
+        <div class="wd2-section">
+          <div class="wd2-sec-lbl">Related Words</div>
+          @for (related of relatedWords(); track related.id; let last = $last) {
+            <div class="wd2-related-item" [class.wd2-related-item--last]="last" [routerLink]="['/vault', related.id]">
+              <lc-article-badge [article]="related.content.article" />
+              <span class="wd2-related-word">{{ related.content.back }}</span>
+              <span class="wd2-related-trans">{{ related.content.front }}</span>
+            </div>
+          }
+        </div>
+      }
+
+      <div style="height: 100px;"></div>
     </div>
   } @else {
     <div class="lc-empty-state">
@@ -120,14 +149,16 @@
   }
 </ion-content>
 
-<!-- Sticky bottom actions — outside ion-content so they don't scroll -->
-<div class="wd-actions">
-  <button class="wd-act-btn" (click)="openEdit()">
-    <ion-icon name="create-outline"></ion-icon>
-    Edit word
+<!-- Bottom actions -->
+<div class="wd2-actions">
+  <button class="wd2-btn-review" [routerLink]="['/review']">
+    <ion-icon name="play-outline"></ion-icon>
+    Review this word
   </button>
-  <button class="wd-act-btn wd-act-del" (click)="confirmDelete()">
+  <button class="wd2-btn-icon" (click)="openEdit()">
+    <ion-icon name="create-outline"></ion-icon>
+  </button>
+  <button class="wd2-btn-icon wd2-btn-delete" (click)="confirmDelete()">
     <ion-icon name="trash-outline"></ion-icon>
-    Delete
   </button>
 </div>

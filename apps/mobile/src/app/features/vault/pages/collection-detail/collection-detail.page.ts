@@ -2,25 +2,25 @@ import {Component, computed, inject, OnInit, signal} from '@angular/core';
 import {ActivatedRoute, Router} from '@angular/router';
 import {AlertController, IonContent, IonHeader, IonIcon, IonToolbar, ModalController,} from '@ionic/angular/standalone';
 import {addIcons} from 'ionicons';
-import {chevronBackOutline, ellipsisHorizontalOutline, playOutline, volumeHighOutline,} from 'ionicons/icons';
-import {Card, Collection} from '../../../../core/models/mock-data';
-import { CollectionApiService } from '../../services/collection-api.service';
-import { CategoryStore } from '../../store/category.store';
+import {chevronBackOutline, chevronForwardOutline, ellipsisHorizontalOutline, playOutline, volumeHighOutline,} from 'ionicons/icons';
+import {Card, Collection} from '@lingua-card/shared/domain';
+import {CollectionApiService} from '../../services/collection-api.service';
+import {CategoryStore} from '../../store/category.store';
 import {CollectionStore} from '../../store/collection.store';
-import {ArticleBadgeComponent} from '../../../../shared/components/article-badge/article-badge.component';
-import {MasteryDotComponent} from '../../../../shared/components/mastery-dot/mastery-dot.component';
 import {AddWordSheetComponent} from '../../components/add-word-sheet/add-word-sheet.component';
 import {getCategoryName} from '../../../../shared/helpers/helpers';
-import {FabButtonComponent} from "../../../../shared/components/fab-button/fab-button.component";
+import {FabButtonComponent} from '../../../../shared/components/fab-button/fab-button.component';
 import {ReviewFilterService} from '../../../review/services/review-filter.service';
 import {ReviewStore} from '../../../review/store/review.store';
+import {WordCardComponent} from '../../../../shared/ui/word-card/word-card.component';
+import {PronunciationService} from '../../../ai/audio/pronunciation.service';
 
 @Component({
   selector: 'lc-collection-detail',
   standalone: true,
   templateUrl: './collection-detail.page.html',
   styleUrls: ['./collection-detail.page.scss'],
-  imports: [IonHeader, IonToolbar, IonContent, IonIcon, ArticleBadgeComponent, MasteryDotComponent, FabButtonComponent],
+  imports: [IonHeader, IonToolbar, IonContent, IonIcon, FabButtonComponent, WordCardComponent],
 })
 export class CollectionDetailPage implements OnInit {
   private readonly route = inject(ActivatedRoute);
@@ -32,6 +32,7 @@ export class CollectionDetailPage implements OnInit {
   private readonly alertCtrl = inject(AlertController);
   private readonly filterService = inject(ReviewFilterService);
   private readonly reviewStore = inject(ReviewStore);
+  private readonly pronunciationService = inject(PronunciationService);
 
   readonly collection = signal<Collection | null>(null);
   readonly allCards = signal<Card[]>([]);
@@ -75,6 +76,7 @@ export class CollectionDetailPage implements OnInit {
   constructor() {
     addIcons({
       chevronBackOutline,
+      chevronForwardOutline,
       playOutline,
       volumeHighOutline,
       ellipsisHorizontalOutline,
@@ -217,5 +219,9 @@ export class CollectionDetailPage implements OnInit {
 
   openDetail(card: Card): void {
     this.router.navigate(['/vault', card.id]);
+  }
+
+  playAudio(card: Card): void {
+    void this.pronunciationService.play(card);
   }
 }

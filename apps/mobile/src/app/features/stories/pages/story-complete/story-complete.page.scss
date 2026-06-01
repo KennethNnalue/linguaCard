@@ -1,77 +1,69 @@
-// ── Nav ───────────────────────────────────────────────────────────
+@use 'theme/tokens' as t;
+@use 'theme/utils' as u;
+
+// ── Nav ────────────────────────────────────────────────────────────
 .sc-nav {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 6px 16px 10px;
+  @include u.flex-between;
+  padding: t.$lc-space-1 t.$lc-space-4 t.$lc-space-2;
 }
 
 .sc-back-btn {
-  width: 32px;
-  height: 32px;
-  border-radius: 50%;
+  @include u.circle(32px);
+  @include u.flex-center;
   background: var(--lc-surface);
   border: 1px solid var(--lc-border);
-  display: flex;
-  align-items: center;
-  justify-content: center;
   cursor: pointer;
-  color: var(--lc-text-secondary);
-  font-size: 18px;
+  @include u.touch-state;
+
+  ion-icon { font-size: t.$lc-text-xl; color: var(--lc-text-secondary); }
 }
 
 .sc-nav-title {
-  font-family: var(--lc-font-display);
-  font-size: 17px;
-  font-weight: 600;
+  font-family: t.$lc-font-display;
+  @include u.lc-font('md', t.$lc-font-weight-semibold);
   color: var(--lc-text-primary);
 }
 
-// ── Banner ────────────────────────────────────────────────────────
+// ── Banner ─────────────────────────────────────────────────────────
 .sc-banner {
-  margin: 0 14px 20px;
-  background: linear-gradient(135deg, #1a3830 0%, #2d5a4e 60%, #3d7a66 100%);
-  border-radius: 20px;
-  padding: 24px 20px 20px;
+  margin: 0 t.$lc-space-4 t.$lc-space-5;
+  background: linear-gradient(135deg, #1A3830 0%, #2D5A4E 60%, #3D7A66 100%);
+  border-radius: t.$lc-radius-lg;
+  padding: t.$lc-space-6 t.$lc-space-5 t.$lc-space-5;
   text-align: center;
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 6px;
+  gap: t.$lc-space-1;
 }
 
 .sc-banner-icon {
-  font-size: 48px;
   color: #6EE7B7;
-  line-height: 1;
-  margin-bottom: 4px;
-
-  ion-icon {
-    font-size: 48px;
-  }
+  margin-bottom: t.$lc-space-1;
+  ion-icon { font-size: 48px; }
 }
 
 .sc-banner-title {
-  font-family: var(--lc-font-display);
+  font-family: t.$lc-font-display;
+  @include u.lc-font('4xl', t.$lc-font-weight-bold);
   font-size: 24px;
-  font-weight: 700;
   color: white;
 }
 
 .sc-banner-sub {
-  font-size: 13px;
+  @include u.lc-font('sm');
   color: rgba(255, 255, 255, 0.65);
-  margin-bottom: 6px;
+  margin-bottom: t.$lc-space-1;
 }
 
 .sc-banner-stats {
   display: flex;
   align-items: center;
-  gap: 16px;
-  margin-top: 10px;
+  gap: t.$lc-space-4;
+  margin-top: t.$lc-space-2 + 2px;
   background: rgba(255, 255, 255, 0.1);
-  border-radius: 14px;
-  padding: 10px 20px;
+  border-radius: t.$lc-radius-md;
+  padding: t.$lc-space-2 + 2px t.$lc-space-5;
 }
 
 .sc-stat {
@@ -82,14 +74,13 @@
 }
 
 .sc-stat-value {
-  font-size: 20px;
-  font-weight: 700;
+  font-family: t.$lc-font-display;
+  @include u.lc-font('3xl', t.$lc-font-weight-bold);
   color: white;
-  font-family: var(--lc-font-display);
 }
 
 .sc-stat-label {
-  font-size: 10px;
+  @include u.lc-font('xxs');
   color: rgba(255, 255, 255, 0.55);
   text-transform: uppercase;
   letter-spacing: 0.05em;
@@ -103,113 +94,102 @@
 
 // ── Section header ─────────────────────────────────────────────────
 .sc-section-header {
-  padding: 0 16px 10px;
+  padding: 0 t.$lc-space-4 t.$lc-space-2 + 2px;
 }
 
 .sc-section-title {
-  font-size: 11px;
-  font-weight: 600;
+  @include u.lc-font('xxs', t.$lc-font-weight-semibold);
   letter-spacing: 0.06em;
   text-transform: uppercase;
   color: var(--lc-text-hint);
 }
 
-// ── Vocab list ─────────────────────────────────────────────────────
+// ── Vocab list (enriched card layout) ─────────────────────────────
 .sc-vocab-list {
-  padding: 0 14px;
+  padding: 0 t.$lc-space-4;
   display: flex;
   flex-direction: column;
-  gap: 6px;
+  gap: t.$lc-space-2;
 }
 
-.sc-vocab-row {
+.sc-vocab-card {
+  @include u.lc-card(t.$lc-radius-md);
+  overflow: hidden;
   display: flex;
-  align-items: center;
-  gap: 10px;
-  background: var(--lc-card);
-  border: 1px solid var(--lc-border);
-  border-radius: 12px;
-  padding: 10px 12px;
+  cursor: default;
 }
 
-.sc-article-badge {
-  font-size: 10px;
-  font-weight: 700;
-  padding: 2px 7px;
-  border-radius: 8px;
-  border: 1px solid transparent;
+.sc-vocab-bar {
+  width: t.$lc-space-1;
   flex-shrink: 0;
+  border-radius: 2px 0 0 2px;
 
-  &.art-der {
-    background: #EAF2FC;
-    color: #1A56A3;
-    border-color: #85B7EB;
-  }
-
-  &.art-die {
-    background: #FEF2F2;
-    color: #B91C1C;
-    border-color: #FCA5A5;
-  }
-
-  &.art-das {
-    background: #F1EFE8;
-    color: #5F5E5A;
-    border-color: #B4B2A9;
-  }
+  &--der { background: t.$lc-masc-text; }
+  &--die { background: t.$lc-fem-text; }
+  &--das { background: t.$lc-neut-text; }
+  &--none { background: t.$lc-mastery-0; }
 }
 
-.sc-vocab-info {
+.sc-vocab-content {
   flex: 1;
-  display: flex;
-  flex-direction: column;
-  gap: 1px;
+  padding: t.$lc-space-2 + 2px t.$lc-space-3;
   min-width: 0;
 }
 
-.sc-vocab-de {
-  font-size: 14px;
-  font-weight: 600;
+.sc-vocab-top {
+  display: flex;
+  align-items: center;
+  gap: t.$lc-space-1 + 2px;
+  margin-bottom: 2px;
+}
+
+.sc-vocab-word {
+  font-family: t.$lc-font-display;
+  @include u.lc-font('md', t.$lc-font-weight-semibold);
   color: var(--lc-text-primary);
+  line-height: 1.2;
+}
+
+.sc-vocab-mid {
+  display: flex;
+  align-items: center;
+  gap: t.$lc-space-2;
 }
 
 .sc-vocab-en {
-  font-size: 11px;
-  color: var(--lc-text-hint);
+  @include u.lc-font('xs');
+  color: var(--lc-text-secondary);
+  flex: 1;
+  @include u.text-overflow;
 }
 
 .sc-vocab-base {
-  font-size: 11px;
-  color: var(--lc-brand-mid);
-  font-weight: 500;
+  @include u.lc-font('xxs', t.$lc-font-weight-medium);
+  color: t.$lc-brand-mid;
   flex-shrink: 0;
 }
 
 // ── Actions ────────────────────────────────────────────────────────
 .sc-actions {
   display: flex;
-  gap: 10px;
-  padding: 20px 14px 0;
+  gap: t.$lc-space-2 + 2px;
+  padding: t.$lc-space-5 t.$lc-space-4 0;
 }
 
 .sc-btn-replay,
 .sc-btn-library {
   flex: 1;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 6px;
-  font-size: 14px;
-  font-weight: 600;
-  padding: 13px;
-  border-radius: 14px;
+  @include u.flex-center;
+  gap: t.$lc-space-1 + 2px;
+  @include u.lc-font('sm', t.$lc-font-weight-semibold);
+  padding: t.$lc-space-3;
+  border-radius: t.$lc-radius-md;
   border: none;
   cursor: pointer;
-  font-family: var(--lc-font-body);
+  font-family: t.$lc-font-body;
+  @include u.touch-state;
 
-  ion-icon {
-    font-size: 16px;
-  }
+  ion-icon { font-size: t.$lc-text-xl; }
 }
 
 .sc-btn-replay {
@@ -219,14 +199,14 @@
 }
 
 .sc-btn-library {
-  background: var(--lc-brand);
+  background: t.$lc-brand;
   color: white;
 }
 
 // ── Loading ────────────────────────────────────────────────────────
 .sc-loading {
-  padding: 48px 20px;
+  padding: t.$lc-space-12 t.$lc-space-5;
   text-align: center;
-  font-size: 14px;
+  @include u.lc-font('sm');
   color: var(--lc-text-hint);
 }

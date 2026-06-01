@@ -19,17 +19,93 @@
   &::after  { content: ''; position: absolute; bottom: -28px; left: 20px; width: 70px; height: 70px; border-radius: 50%; background: rgba(255,255,255,0.04); }
 }
 
-.rh-due-top { display: flex; align-items: center; gap: 14px; margin-bottom: 14px; position: relative; z-index: t.$lc-z-raised; }
-.rh-donut { @include u.square(64px); position: relative; }
-.rh-donut-center { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; }
-.rh-donut-num { font-size: 22px; font-weight: t.$lc-font-weight-semibold; color: white; line-height: 1; }
-.rh-donut-lbl { @include u.lc-font('xxs', t.$lc-font-weight-medium); color: rgba(255,255,255,0.6); margin-top: 1px; }
+.rh-due-greeting {
+  @include u.lc-font('xxs', t.$lc-font-weight-semibold);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.45);
+  margin-bottom: t.$lc-space-3;
+}
+
+.rh-ring-row {
+  display: flex;
+  align-items: center;
+  gap: t.$lc-space-4;
+  margin-bottom: t.$lc-space-3;
+  position: relative;
+  z-index: t.$lc-z-raised;
+}
+
+// Ring — identical token pattern to home hero ring
+.rh-ring {
+  position: relative;
+  width: 64px;
+  height: 64px;
+  flex-shrink: 0;
+
+  svg {
+    transform: rotate(-90deg);
+    width: 64px;
+    height: 64px;
+  }
+}
+
+.rh-ring-bg {
+  fill: none;
+  stroke: rgba(255, 255, 255, 0.12);
+  stroke-width: 5;
+}
+
+.rh-ring-fill {
+  fill: none;
+  stroke: #6EE7B7;
+  stroke-width: 5;
+  stroke-linecap: round;
+  transition: stroke-dashoffset 0.6s ease;
+}
+
+.rh-ring-text {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  text-align: center;
+}
+
+.rh-ring-num {
+  font-family: t.$lc-font-display;
+  @include u.lc-font('2xl', t.$lc-font-weight-semibold);
+  color: white;
+  line-height: 1;
+}
+
+.rh-ring-lbl {
+  @include u.lc-font('xxs');
+  color: rgba(255, 255, 255, 0.55);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
 
 .rh-due-info { flex: 1; }
-.rh-due-heading { @include u.lc-font('xxs', t.$lc-font-weight-semibold); letter-spacing: 0.08em; text-transform: uppercase; color: rgba(255,255,255,0.5); margin: 0 0 t.$lc-space-2; }
-.rh-due-tags { display: flex; flex-wrap: wrap; gap: t.$lc-space-2; }
-.rh-due-tag { display: flex; align-items: center; gap: t.$lc-space-1; @include u.lc-font('xxs', t.$lc-font-weight-medium); color: rgba(255,255,255,0.8); }
-.rh-due-dot { @include u.circle(6px); }
+
+.rh-due-tag-row {
+  display: flex;
+  align-items: baseline;
+  gap: t.$lc-space-1;
+  margin-bottom: t.$lc-space-1;
+}
+
+.rh-due-stat-num {
+  font-family: t.$lc-font-display;
+  @include u.lc-font('2xl', t.$lc-font-weight-semibold);
+  color: white;
+  line-height: 1;
+}
+
+.rh-due-stat-lbl {
+  @include u.lc-font('xxs');
+  color: rgba(255, 255, 255, 0.55);
+}
 
 .rh-start-btn {
   position: relative; z-index: t.$lc-z-raised; width: 100%;

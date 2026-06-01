@@ -1,83 +1,80 @@
+@use 'theme/tokens' as t;
+@use 'theme/utils' as u;
+
 .mb-nav {
   display: flex;
   align-items: center;
-  padding: 6px 16px 10px;
-  gap: 12px;
+  padding: t.$lc-space-1 t.$lc-space-4 t.$lc-space-2;
+  gap: t.$lc-space-3;
 }
 
 .mb-nav-title {
-  font-size: 15px;
-  font-weight: 600;
+  font-family: t.$lc-font-display;
+  @include u.lc-font('md', t.$lc-font-weight-semibold);
   color: var(--lc-text-primary);
   flex: 1;
   text-align: center;
 }
 
-.mb-nav-spacer {
-  width: 32px;
+.mb-nav-spacer { width: 30px; }
+
+.mb-back-btn {
+  @include u.circle(30px);
+  @include u.flex-center;
+  background: t.$lc-brand-light;
+  border: none;
+  cursor: pointer;
+  flex-shrink: 0;
+  @include u.touch-state;
+
+  ion-icon { font-size: 14px; color: t.$lc-brand; }
 }
 
-.mb-content {
-  padding: 0 0 env(safe-area-inset-bottom, 24px);
-}
+.mb-content { padding: 0 0 env(safe-area-inset-bottom, t.$lc-space-6); }
 
-.mb-source-wrap {
-  padding: 0 14px 16px;
-}
+.mb-source-wrap { padding: 0 t.$lc-space-4 t.$lc-space-4; }
 
 .mb-source-btn {
   width: 100%;
-  background: var(--lc-card);
+  @include u.lc-card(t.$lc-radius-md);
   border: 1.5px solid var(--lc-border);
-  border-radius: 12px;
-  padding: 11px 14px;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
+  padding: 11px t.$lc-space-4;
+  @include u.flex-between;
   cursor: pointer;
-  font-family: var(--lc-font-body);
-  font-size: 13px;
-  font-weight: 600;
+  font-family: t.$lc-font-body;
+  @include u.lc-font('sm', t.$lc-font-weight-semibold);
   color: var(--lc-text-primary);
 
-  ion-icon {
-    font-size: 14px;
-    color: var(--lc-text-hint);
-  }
+  ion-icon { font-size: t.$lc-text-md; color: var(--lc-text-hint); }
 }
 
 // ── Bars ──────────────────────────────────────────────────────────
-.mb-bars {
-  padding: 0 16px;
-}
+.mb-bars { padding: 0 t.$lc-space-4; }
 
 .mb-bars-label {
-  font-size: 9px;
-  font-weight: 600;
+  @include u.lc-font('xxs', t.$lc-font-weight-semibold);
   letter-spacing: 0.08em;
   text-transform: uppercase;
   color: var(--lc-text-hint);
-  margin: 0 0 12px;
+  margin: 0 0 t.$lc-space-3;
 }
 
 .mb-bar-row {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: t.$lc-space-2;
   padding: 5px 0;
   cursor: pointer;
+  @include u.touch-state;
 }
 
 .mb-bar-dot {
-  width: 10px;
-  height: 10px;
-  border-radius: 50%;
+  @include u.circle(10px);
   flex-shrink: 0;
 }
 
 .mb-bar-lbl {
-  font-size: 11px;
-  font-weight: 600;
+  @include u.lc-font('xs', t.$lc-font-weight-semibold);
   color: var(--lc-text-primary);
   min-width: 56px;
 }
@@ -98,56 +95,43 @@
 }
 
 .mb-bar-count {
-  font-size: 11px;
-  font-weight: 600;
+  @include u.lc-font('xs', t.$lc-font-weight-semibold);
   color: var(--lc-text-secondary);
   min-width: 30px;
   text-align: right;
 }
 
 .mb-play-btn {
-  width: 24px;
-  height: 24px;
-  border-radius: 50%;
-  background: var(--lc-brand-light);
+  @include u.circle(24px);
+  @include u.flex-center;
+  background: t.$lc-brand-light;
   border: none;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  flex-shrink: 0;
   cursor: pointer;
-  color: var(--lc-brand);
+  color: t.$lc-brand;
   font-size: 10px;
+  flex-shrink: 0;
+  @include u.touch-state;
 
-  &:disabled {
-    opacity: 0.4;
-    cursor: not-allowed;
-  }
+  &:disabled { opacity: 0.4; cursor: not-allowed; }
 }
 
 // ── Tip ───────────────────────────────────────────────────────────
 .mb-tip {
-  margin: 16px 14px 0;
-  background: var(--lc-brand-light);
-  border-radius: 12px;
-  padding: 12px 14px;
+  margin: t.$lc-space-4 t.$lc-space-4 0;
+  background: t.$lc-brand-light;
+  border-radius: t.$lc-radius-md;
+  padding: t.$lc-space-3 t.$lc-space-3;
   display: flex;
   align-items: flex-start;
-  gap: 8px;
+  gap: t.$lc-space-2;
 }
 
-.mb-tip-icon {
-  font-size: 14px;
-  flex-shrink: 0;
-}
+.mb-tip-icon { font-size: t.$lc-text-md; flex-shrink: 0; }
 
 .mb-tip-text {
-  font-size: 11px;
-  color: var(--lc-brand);
+  @include u.lc-font('xs');
+  color: t.$lc-brand;
   line-height: 1.5;
   margin: 0;
-
-  strong {
-    font-weight: 600;
-  }
+  strong { font-weight: t.$lc-font-weight-semibold; }
 }

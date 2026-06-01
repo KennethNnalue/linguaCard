@@ -1,11 +1,11 @@
-import { inject, Injectable, signal } from '@angular/core';
-import { firstValueFrom, Observable } from 'rxjs';
-import { Card, ConfidenceRating } from '@lingua-card/shared/domain';
-import { CardApiService } from '../../vault/services/card-api.service';
-import { Sm2Service } from '../../../shared/srs/sm2.service';
-import { LocalDataService, PendingSrsRating } from '../../../core/services/local-data.service';
-import { AuthService } from '../../../core/services/auth.service';
-import { SyncService } from '../../../core/services/sync.service';
+import {inject, Injectable, signal} from '@angular/core';
+import {firstValueFrom, Observable} from 'rxjs';
+import {Card, ConfidenceRating} from '@lingua-card/shared/domain';
+import {CardApiService} from '../../vault/services/card-api.service';
+import {Sm2Service} from '../../../shared/srs/sm2.service';
+import {LocalDataService, PendingSrsRating} from '../../../core/services/local-data.service';
+import {AuthService} from '../../../core/services/auth.service';
+import {SyncService} from '../../../core/services/sync.service';
 
 export interface ReviewSession {
   id: string;
@@ -18,7 +18,10 @@ export interface ReviewSession {
   reviewedCards: Card[];
 }
 
-@Injectable({ providedIn: 'root' })
+// Keep at most this many sessions in local storage to avoid unbounded growth
+const MAX_HISTORY = 50;
+
+@Injectable({providedIn: 'root'})
 export class ReviewStore {
   private readonly cardApi = inject(CardApiService);
   private readonly sm2 = inject(Sm2Service);
@@ -35,6 +38,16 @@ export class ReviewStore {
   readonly completedSession = this._completedSession.asReadonly();
   readonly sessionHistory = this._sessionHistory.asReadonly();
   readonly pendingQueue = this._pendingQueue.asReadonly();
+
+  // Called once at app startup (from a root-level initializer or the review feature init)
+  async loadHistory(): Promise<void> {
+    const userId = this.authService.currentUser()?.id;
+    if (!userId) return;
+    const stored = await this.localData.getSessionHistory(userId) as ReviewSession[];
+    if (stored?.length) {
+      this._sessionHistory.set(stored);
+    }
+  }
 
   startSession(cards: Card[], collectionId: string | null, collectionName: string | null): void {
     this._completedSession.set(null);
@@ -54,7 +67,7 @@ export class ReviewStore {
   rateCard(card: Card, rating: ConfidenceRating): Observable<Card> {
     this._activeSession.update(s => {
       if (!s) return s;
-      return { ...s, ratings: { ...s.ratings, [card.id]: rating } };
+      return {...s, ratings: {...s.ratings, [card.id]: rating}};
     });
 
     // 1. Optimistic SM-2 state update
@@ -75,9 +88,8 @@ export class ReviewStore {
     if (navigator.onLine) {
       void this.flushRating(pendingRating);
     }
-    // If offline, SrsSyncHandler flushes on reconnect
 
-    return this.cardApi.update(card.id, { srsState: newSrs, updatedAt: new Date().toISOString() });
+    return this.cardApi.update(card.id, {srsState: newSrs, updatedAt: new Date().toISOString()});
   }
 
   completeSession(finalQueue: Card[]): void {
@@ -91,7 +103,13 @@ export class ReviewStore {
     this._completedSession.set(completed);
     this._activeSession.set(null);
     this._pendingQueue.set([]);
-    this._sessionHistory.update(history => [completed, ...history]);
+
+    // Prepend to in-memory history and persist to local storage
+    this._sessionHistory.update(history => {
+      const updated = [completed, ...history].slice(0, MAX_HISTORY);
+      void this.persistHistory(updated);
+      return updated;
+    });
 
     // Flush any remaining buffered ratings now that the session is complete
     if (navigator.onLine) {
@@ -99,7 +117,7 @@ export class ReviewStore {
     } else {
       void this.syncService.enqueue({
         type: 'FLUSH_SRS_RATINGS',
-        payload: { userId: this.authService.currentUser()?.id },
+        payload: {userId: this.authService.currentUser()?.id},
       });
     }
   }
@@ -108,11 +126,19 @@ export class ReviewStore {
     this._completedSession.set(null);
   }
 
+  private async persistHistory(sessions: ReviewSession[]): Promise<void> {
+    const userId = this.authService.currentUser()?.id;
+    if (!userId) return;
+    // Strip reviewedCards from each session before persisting to keep storage lean
+    // (reviewedCards are large Card objects — not needed for the history list display)
+    const slim = sessions.map(({reviewedCards: _, ...rest}) => rest);
+    await this.localData.setSessionHistory(userId, slim);
+  }
+
   private async bufferRating(rating: PendingSrsRating): Promise<void> {
     const userId = this.authService.currentUser()?.id;
     if (!userId) return;
     const existing = await this.localData.getPendingSrsRatings(userId);
-    // Deduplicate: keep latest per cardId
     const filtered = existing.filter(r => r.cardId !== rating.cardId);
     await this.localData.setPendingSrsRatings(userId, [...filtered, rating]);
   }
@@ -122,14 +148,13 @@ export class ReviewStore {
     if (!userId) return;
     try {
       await firstValueFrom(this.cardApi.batchRateSrs([rating]));
-      // Remove from buffer on success
       const existing = await this.localData.getPendingSrsRatings(userId);
       await this.localData.setPendingSrsRatings(
         userId,
         existing.filter(r => !(r.cardId === rating.cardId && r.reviewedAt === rating.reviewedAt))
       );
     } catch {
-      // Will be retried by SrsSyncHandler on reconnect — no action needed
+      // Will be retried by SrsSyncHandler on reconnect
     }
   }
 
@@ -142,7 +167,7 @@ export class ReviewStore {
       await firstValueFrom(this.cardApi.batchRateSrs(pending));
       await this.localData.setPendingSrsRatings(userId, []);
     } catch {
-      void this.syncService.enqueue({ type: 'FLUSH_SRS_RATINGS', payload: { userId } });
+      void this.syncService.enqueue({type: 'FLUSH_SRS_RATINGS', payload: {userId}});
     }
   }
 }

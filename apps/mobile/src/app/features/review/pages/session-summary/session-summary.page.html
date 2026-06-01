@@ -64,22 +64,13 @@
         <p class="ss-section-label">Words reviewed</p>
         <div class="ss-word-list">
           @for (row of reviewedCardRows(); track row.card.id) {
-            <div class="ss-word-row">
-              <lc-article-badge [article]="row.card.content.article"></lc-article-badge>
-              <div class="ss-word-info">
-                <span class="ss-word-back lc-display">{{ row.card.content.back }}</span>
-                <span class="ss-word-front">{{ row.card.content.front }}</span>
-              </div>
-              <div class="ss-dots">
-                @for (i of dotIndices; track i) {
-                  <span
-                    class="lc-mastery-dot"
-                    [class]="i < row.masteryLevel ? 'lc-mastery-dot--' + row.masteryLevel : 'lc-mastery-dot--0'">
-                  </span>
-                }
-              </div>
-              <span class="ss-mastery-lbl">{{ row.masteryLabel }}</span>
-            </div>
+            <lc-word-card
+              [card]="row.card"
+              [categoryName]="getCategoryLabel(row.card)"
+              [compact]="true"
+              (cardClick)="navigateToCard(row.card)"
+              (playAudio)="navigateToCard(row.card)"
+            />
           }
         </div>
       </div>

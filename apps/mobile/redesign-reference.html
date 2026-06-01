@@ -1,0 +1,912 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>LinguaCard — Redesign Reference: Home, Vault & Word Card</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,500;0,600;1,400&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600&family=Fira+Code:wght@400;500&display=swap" rel="stylesheet">
+<style>
+/* ─── DESIGN TOKENS ─────────────────────────────────────────── */
+:root {
+  --lc-brand:#2D5A4E;--lc-brand-light:#E8F2EE;--lc-brand-mid:#4A8C7A;--lc-brand-dark:#1A3830;
+  --lc-accent:#E07B3F;--lc-accent-light:#FDF0E6;
+  --lc-masc-bg:#EAF2FC;--lc-masc-text:#1A56A3;--lc-masc-border:#85B7EB;
+  --lc-fem-bg:#FEF2F2;--lc-fem-text:#B91C1C;--lc-fem-border:#FCA5A5;
+  --lc-neut-bg:#F1EFE8;--lc-neut-text:#5F5E5A;--lc-neut-border:#B4B2A9;
+  --lc-mastery-0:#D1D5DB;--lc-mastery-1:#FCA5A5;--lc-mastery-2:#FCD34D;
+  --lc-mastery-3:#6EE7B7;--lc-mastery-4:#34D399;--lc-mastery-5:#059669;
+  --lc-surface:#FAFAF8;--lc-card:#FFFFFF;--lc-border:rgba(45,90,78,0.12);
+  --lc-text-primary:#1A2B26;--lc-text-secondary:#6B7C78;--lc-text-hint:#9BAAA6;
+  --lc-shadow-card:0 2px 12px rgba(45,90,78,0.08),0 1px 3px rgba(0,0,0,0.04);
+  --lc-shadow-float:0 8px 32px rgba(45,90,78,0.14),0 2px 8px rgba(0,0,0,0.06);
+  --lc-font-display:'Lora',Georgia,serif;
+  --lc-font-body:'DM Sans',system-ui,sans-serif;
+  --lc-font-mono:'Fira Code','Courier New',monospace;
+  --lc-radius-sm:8px;--lc-radius-md:12px;--lc-radius-lg:20px;--lc-radius-xl:28px;
+}
+
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:var(--lc-font-body);background:#F0EDEA;color:var(--lc-text-primary);min-height:100vh;}
+
+/* ─── PAGE LAYOUT ───────────────────────────────────────────── */
+.page-header{background:var(--lc-brand);padding:32px 40px 28px;position:sticky;top:0;z-index:100;box-shadow:0 4px 20px rgba(0,0,0,0.2);}
+.page-header-inner{max-width:1400px;margin:0 auto;display:flex;align-items:center;justify-content:space-between;gap:20px;flex-wrap:wrap;}
+.logo{font-family:var(--lc-font-display);font-size:24px;font-weight:600;color:white;}
+.logo-sub{font-size:12px;color:rgba(255,255,255,0.6);margin-top:2px;}
+.main{max-width:1400px;margin:0 auto;padding:40px;}
+.section{margin-bottom:56px;}
+.section-title{font-family:var(--lc-font-display);font-size:22px;font-weight:600;color:var(--lc-text-primary);margin-bottom:6px;}
+.section-sub{font-size:13px;color:var(--lc-text-secondary);margin-bottom:24px;line-height:1.6;}
+
+/* ─── PHONE SHELL ────────────────────────────────────────────── */
+.phones-row{display:flex;gap:28px;align-items:flex-start;overflow-x:auto;padding-bottom:8px;}
+.phone-wrap{display:flex;flex-direction:column;align-items:center;gap:10px;flex:0 0 auto;}
+.phone-label{font-size:11px;font-weight:600;letter-spacing:0.07em;text-transform:uppercase;color:var(--lc-text-hint);}
+.phone{width:300px;background:var(--lc-surface);border-radius:40px;border:8px solid #1A1A1A;box-shadow:0 0 0 1px #333,var(--lc-shadow-float),0 24px 48px rgba(0,0,0,0.2);overflow:hidden;position:relative;}
+.phone::before{content:'';position:absolute;top:0;left:50%;transform:translateX(-50%);width:80px;height:6px;background:#1A1A1A;border-radius:0 0 8px 8px;z-index:10;}
+.phone-inner{background:var(--lc-surface);min-height:620px;display:flex;flex-direction:column;padding-top:8px;}
+.status-bar{display:flex;justify-content:space-between;align-items:center;padding:10px 20px 6px;font-size:11px;font-weight:600;color:var(--lc-text-secondary);}
+.sig{display:flex;gap:3px;align-items:flex-end;}
+.sig span{width:3px;background:var(--lc-text-secondary);border-radius:1px;}
+.sig span:nth-child(1){height:4px;}
+.sig span:nth-child(2){height:7px;}
+.sig span:nth-child(3){height:10px;}
+.batt{width:20px;height:10px;border:1.5px solid var(--lc-text-secondary);border-radius:3px;position:relative;margin-left:4px;}
+.batt::after{content:'';position:absolute;top:1.5px;left:1.5px;width:65%;height:5px;background:var(--lc-text-secondary);border-radius:1px;}
+
+/* ─── BOTTOM NAV ─────────────────────────────────────────────── */
+.bottom-nav{display:flex;background:var(--lc-card);border-top:1px solid var(--lc-border);padding:9px 0 6px;margin-top:auto;}
+.nav-item{flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;cursor:pointer;}
+.nav-item svg{width:18px;height:18px;stroke:var(--lc-text-hint);fill:none;stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round;}
+.nav-item.on svg{stroke:var(--lc-brand);}
+.nav-lbl{font-size:9px;font-weight:600;color:var(--lc-text-hint);}
+.nav-item.on .nav-lbl{color:var(--lc-brand);}
+.nav-dot{width:4px;height:4px;border-radius:50%;background:var(--lc-brand);margin:1px auto 0;}
+
+/* ─── COMMON ELEMENTS ─────────────────────────────────────────── */
+.art-badge{font-size:9px;font-weight:700;padding:2px 7px;border-radius:20px;border:1px solid;flex-shrink:0;letter-spacing:.04em;}
+.art-der{background:var(--lc-masc-bg);color:var(--lc-masc-text);border-color:var(--lc-masc-border);}
+.art-die{background:var(--lc-fem-bg);color:var(--lc-fem-text);border-color:var(--lc-fem-border);}
+.art-das{background:var(--lc-neut-bg);color:var(--lc-neut-text);border-color:var(--lc-neut-border);}
+.m-dot{width:7px;height:7px;border-radius:50%;flex-shrink:0;}
+.m0{background:var(--lc-mastery-0)}.m1{background:var(--lc-mastery-1)}.m2{background:var(--lc-mastery-2)}.m3{background:var(--lc-mastery-3)}.m4{background:var(--lc-mastery-4)}.m5{background:var(--lc-mastery-5)}
+
+/* ═══════════════════════════════════════════════════════════════
+   REDESIGNED HOME SCREEN
+   ═══════════════════════════════════════════════════════════════ */
+
+/* Top bar */
+.h2-topbar{display:flex;align-items:center;justify-content:space-between;padding:4px 16px 10px;}
+.h2-logo{font-family:var(--lc-font-display);font-size:17px;font-weight:600;color:var(--lc-text-primary);}
+.h2-avatar{width:30px;height:30px;border-radius:50%;background:var(--lc-brand);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:white;}
+
+/* Today's learning card */
+.h2-today{margin:0 14px 12px;background:linear-gradient(135deg,#1A3830 0%,#2D5A4E 55%,#3D7A66 100%);border-radius:20px;padding:18px;position:relative;overflow:hidden;}
+.h2-today::before{content:'';position:absolute;top:-24px;right:-24px;width:110px;height:110px;border-radius:50%;background:rgba(255,255,255,0.06);}
+.h2-today::after{content:'';position:absolute;bottom:-36px;right:20px;width:80px;height:80px;border-radius:50%;background:rgba(255,255,255,0.03);}
+.h2-today-greeting{font-size:10px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:rgba(255,255,255,0.45);margin-bottom:3px;}
+.h2-today-title{font-family:var(--lc-font-display);font-size:20px;font-weight:600;color:white;line-height:1.2;margin-bottom:14px;}
+
+/* Circular progress ring */
+.h2-ring-row{display:flex;align-items:center;gap:16px;margin-bottom:14px;}
+.h2-ring{position:relative;width:64px;height:64px;flex-shrink:0;}
+.h2-ring svg{transform:rotate(-90deg);width:64px;height:64px;}
+.h2-ring-bg{fill:none;stroke:rgba(255,255,255,0.12);stroke-width:5;}
+.h2-ring-fill{fill:none;stroke:#6EE7B7;stroke-width:5;stroke-linecap:round;transition:stroke-dashoffset 0.6s;}
+.h2-ring-text{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);text-align:center;}
+.h2-ring-num{font-family:var(--lc-font-display);font-size:18px;font-weight:600;color:white;line-height:1;}
+.h2-ring-lbl{font-size:7px;color:rgba(255,255,255,0.55);text-transform:uppercase;font-weight:600;letter-spacing:.06em;}
+
+.h2-ring-meta{flex:1;}
+.h2-ring-stat{display:flex;align-items:baseline;gap:4px;margin-bottom:5px;}
+.h2-ring-stat-num{font-family:var(--lc-font-display);font-size:18px;font-weight:600;color:white;line-height:1;}
+.h2-ring-stat-lbl{font-size:10px;color:rgba(255,255,255,0.55);}
+.h2-ring-breakdown{font-size:10px;color:rgba(255,255,255,0.5);}
+
+.h2-today-actions{display:flex;gap:8px;position:relative;z-index:1;}
+.h2-btn-start{display:inline-flex;align-items:center;gap:6px;background:white;color:var(--lc-brand);font-size:12px;font-weight:700;padding:9px 18px;border-radius:20px;border:none;cursor:pointer;font-family:var(--lc-font-body);}
+.h2-btn-start svg{width:12px;height:12px;fill:var(--lc-brand);}
+.h2-btn-col{display:inline-flex;align-items:center;gap:4px;background:rgba(255,255,255,0.12);border:1px solid rgba(255,255,255,0.2);color:white;font-size:11px;font-weight:600;padding:8px 14px;border-radius:20px;cursor:pointer;font-family:var(--lc-font-body);}
+
+/* Streak + stats row */
+.h2-stats{display:flex;gap:8px;padding:0 14px 14px;}
+.h2-stat{flex:1;background:var(--lc-card);border:1px solid var(--lc-border);border-radius:14px;padding:12px;box-shadow:var(--lc-shadow-card);text-align:center;}
+.h2-stat-icon{font-size:16px;margin-bottom:3px;display:block;}
+.h2-stat-val{font-family:var(--lc-font-display);font-size:20px;font-weight:600;color:var(--lc-text-primary);line-height:1;}
+.h2-stat-lbl{font-size:9px;color:var(--lc-text-hint);font-weight:500;margin-top:3px;}
+.h2-streak-dots{display:flex;justify-content:center;gap:3px;margin-top:5px;}
+.h2-streak-dot{width:6px;height:6px;border-radius:50%;}
+.h2-streak-dot.active{background:var(--lc-accent);}
+.h2-streak-dot.inactive{background:var(--lc-border);}
+
+/* Word of the day */
+.h2-wotd{margin:0 14px 14px;background:var(--lc-card);border:1px solid var(--lc-border);border-radius:16px;padding:14px;box-shadow:var(--lc-shadow-card);position:relative;overflow:hidden;}
+.h2-wotd::before{content:'';position:absolute;top:0;left:0;width:4px;height:100%;background:var(--lc-accent);border-radius:0 2px 2px 0;}
+.h2-wotd-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;padding-left:8px;}
+.h2-wotd-lbl{font-size:10px;font-weight:600;letter-spacing:.07em;text-transform:uppercase;color:var(--lc-accent);}
+.h2-wotd-play{width:28px;height:28px;border-radius:50%;background:var(--lc-accent-light);border:1px solid rgba(224,123,63,0.2);display:flex;align-items:center;justify-content:center;cursor:pointer;}
+.h2-wotd-play svg{width:12px;height:12px;fill:var(--lc-accent);stroke:none;}
+.h2-wotd-body{padding-left:8px;}
+.h2-wotd-word{font-family:var(--lc-font-display);font-size:22px;font-weight:600;color:var(--lc-text-primary);line-height:1.2;margin-bottom:2px;}
+.h2-wotd-trans{font-size:12px;color:var(--lc-text-secondary);margin-bottom:8px;}
+.h2-wotd-example{font-size:11px;color:var(--lc-text-secondary);font-style:italic;line-height:1.5;background:var(--lc-surface);border-radius:8px;padding:8px 10px;}
+.h2-wotd-example strong{color:var(--lc-brand);font-style:normal;}
+
+/* Section header */
+.h2-sec-hdr{display:flex;justify-content:space-between;align-items:center;padding:4px 16px 8px;}
+.h2-sec-t{font-size:13px;font-weight:600;color:var(--lc-text-primary);}
+.h2-sec-l{font-size:10px;color:var(--lc-brand-mid);font-weight:600;cursor:pointer;}
+
+/* Weekly progress mini-chart */
+.h2-weekly{margin:0 14px 14px;background:var(--lc-card);border:1px solid var(--lc-border);border-radius:14px;padding:14px;box-shadow:var(--lc-shadow-card);}
+.h2-weekly-bars{display:flex;align-items:flex-end;gap:6px;height:50px;margin-bottom:6px;}
+.h2-weekly-bar-wrap{flex:1;display:flex;flex-direction:column;align-items:center;gap:4px;}
+.h2-weekly-bar{width:100%;border-radius:4px 4px 2px 2px;background:var(--lc-brand-light);transition:height 0.3s;}
+.h2-weekly-bar.filled{background:var(--lc-brand);}
+.h2-weekly-bar.today{background:var(--lc-accent);}
+.h2-weekly-day{font-size:8px;font-weight:600;color:var(--lc-text-hint);text-transform:uppercase;}
+.h2-weekly-day.today{color:var(--lc-accent);}
+.h2-weekly-legend{display:flex;justify-content:space-between;margin-top:4px;}
+.h2-weekly-total{font-size:10px;color:var(--lc-text-secondary);}
+.h2-weekly-total strong{color:var(--lc-text-primary);font-weight:600;}
+
+/* Quick actions */
+.h2-actions{display:flex;gap:8px;padding:0 14px 14px;}
+.h2-action{flex:1;background:var(--lc-card);border:1px solid var(--lc-border);border-radius:14px;padding:12px 10px;text-align:center;box-shadow:var(--lc-shadow-card);cursor:pointer;transition:transform 0.15s;}
+.h2-action:active{transform:scale(0.96);}
+.h2-action-icon{font-size:22px;margin-bottom:4px;display:block;}
+.h2-action-lbl{font-size:10px;font-weight:600;color:var(--lc-text-primary);}
+.h2-action-sub{font-size:8px;color:var(--lc-text-hint);margin-top:1px;}
+
+/* Recent words - compact */
+.h2-recent{padding:0 14px;display:flex;flex-direction:column;gap:6px;margin-bottom:14px;}
+.h2-recent-card{display:flex;align-items:center;gap:10px;padding:10px 12px;background:var(--lc-card);border:1px solid var(--lc-border);border-radius:12px;box-shadow:var(--lc-shadow-card);}
+.h2-recent-mastery{width:3px;height:32px;border-radius:2px;flex-shrink:0;}
+.h2-recent-body{flex:1;min-width:0;}
+.h2-recent-word{font-size:13px;font-weight:600;color:var(--lc-text-primary);}
+.h2-recent-trans{font-size:11px;color:var(--lc-text-secondary);}
+.h2-recent-tag{font-size:8px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--lc-brand-mid);background:var(--lc-brand-light);padding:2px 6px;border-radius:20px;flex-shrink:0;}
+
+
+/* ═══════════════════════════════════════════════════════════════
+   REDESIGNED VAULT SCREEN
+   ═══════════════════════════════════════════════════════════════ */
+
+/* Top bar */
+.v2-topbar{display:flex;align-items:center;justify-content:space-between;padding:4px 16px 6px;}
+.v2-title{font-family:var(--lc-font-display);font-size:22px;font-weight:600;color:var(--lc-text-primary);line-height:1.2;}
+.v2-title-count{font-size:13px;font-weight:400;color:var(--lc-text-hint);}
+.v2-actions-row{display:flex;gap:6px;}
+.v2-icon-btn{width:32px;height:32px;border-radius:50%;background:var(--lc-brand-light);display:flex;align-items:center;justify-content:center;border:none;cursor:pointer;}
+.v2-icon-btn svg{width:14px;height:14px;stroke:var(--lc-brand);fill:none;stroke-width:2;stroke-linecap:round;}
+.v2-fab{width:32px;height:32px;border-radius:50%;background:var(--lc-accent);display:flex;align-items:center;justify-content:center;border:none;box-shadow:0 4px 12px rgba(224,123,63,0.4);cursor:pointer;}
+.v2-fab svg{width:14px;height:14px;stroke:white;fill:none;stroke-width:2.2;stroke-linecap:round;}
+
+/* Smart search */
+.v2-search{margin:0 14px 10px;background:var(--lc-card);border:1px solid var(--lc-border);border-radius:12px;padding:10px 12px;display:flex;align-items:center;gap:8px;box-shadow:var(--lc-shadow-card);}
+.v2-search svg{width:14px;height:14px;stroke:var(--lc-text-hint);fill:none;stroke-width:2;stroke-linecap:round;flex-shrink:0;}
+.v2-search span{font-size:13px;color:var(--lc-text-hint);flex:1;}
+.v2-search-shortcut{font-size:9px;font-weight:600;color:var(--lc-text-hint);background:var(--lc-surface);border:1px solid var(--lc-border);border-radius:4px;padding:2px 5px;}
+
+/* Segment tabs */
+.v2-segment{display:flex;margin:0 14px 10px;background:rgba(45,90,78,0.06);border-radius:10px;padding:3px;}
+.v2-seg-btn{flex:1;padding:7px 4px;border-radius:8px;font-size:11px;font-weight:600;color:var(--lc-text-hint);background:transparent;border:none;cursor:pointer;font-family:var(--lc-font-body);text-align:center;transition:all 0.15s;}
+.v2-seg-btn.on{background:var(--lc-card);color:var(--lc-brand);box-shadow:0 1px 4px rgba(0,0,0,0.08);}
+
+/* Filter row */
+.v2-filter-row{display:flex;align-items:center;gap:6px;padding:0 14px 10px;overflow-x:auto;}
+.v2-filter-chip{display:flex;align-items:center;gap:4px;flex:0 0 auto;padding:5px 10px;border-radius:20px;font-size:10px;font-weight:600;border:1px solid;cursor:pointer;font-family:var(--lc-font-body);transition:all 0.15s;}
+.v2-filter-on{background:var(--lc-brand);color:white;border-color:var(--lc-brand);}
+.v2-filter-off{background:var(--lc-card);color:var(--lc-text-secondary);border-color:var(--lc-border);}
+.v2-filter-count{font-size:8px;background:rgba(255,255,255,0.25);border-radius:20px;padding:1px 5px;font-weight:700;}
+.v2-filter-dropdown{display:flex;align-items:center;gap:3px;padding:5px 10px;border-radius:20px;font-size:10px;font-weight:600;border:1px solid var(--lc-border);background:var(--lc-surface);cursor:pointer;font-family:var(--lc-font-body);color:var(--lc-text-secondary);}
+.v2-filter-dropdown svg{width:10px;height:10px;stroke:currentColor;fill:none;stroke-width:2;}
+
+/* Article legend - integrated inline */
+.v2-article-legend{display:flex;gap:6px;padding:0 14px 8px;}
+.v2-art-pill{display:flex;align-items:center;gap:3px;font-size:9px;font-weight:500;color:var(--lc-text-hint);cursor:pointer;padding:3px 8px;border-radius:12px;border:1px solid transparent;transition:all 0.15s;}
+.v2-art-pill.active{border-color:var(--lc-border);background:var(--lc-card);}
+.v2-art-dot{width:8px;height:8px;border-radius:50%;}
+
+/* ═══════════════════════════════════════════════════════════════
+   REDESIGNED WORD CARD (in vault list)
+   ═══════════════════════════════════════════════════════════════ */
+.v2-word-list{padding:0 14px;display:flex;flex-direction:column;gap:8px;}
+
+.v2-word-card{background:var(--lc-card);border:1px solid var(--lc-border);border-radius:14px;overflow:hidden;box-shadow:var(--lc-shadow-card);cursor:pointer;transition:transform 0.15s;}
+.v2-word-card:active{transform:scale(0.98);}
+
+/* Mastery accent bar on left */
+.v2-wc-inner{display:flex;gap:0;}
+.v2-wc-mastery-bar{width:4px;flex-shrink:0;border-radius:2px 0 0 2px;}
+
+.v2-wc-content{flex:1;padding:12px 12px 10px;min-width:0;}
+
+/* Top row: article + word + mastery dot */
+.v2-wc-top{display:flex;align-items:center;gap:6px;margin-bottom:3px;}
+.v2-wc-word{font-family:var(--lc-font-display);font-size:16px;font-weight:600;color:var(--lc-text-primary);line-height:1.2;}
+.v2-wc-phonetic{font-family:var(--lc-font-mono);font-size:9px;color:var(--lc-text-hint);margin-left:2px;}
+
+/* Translation + category row */
+.v2-wc-mid{display:flex;align-items:center;gap:6px;margin-bottom:6px;}
+.v2-wc-trans{font-size:12px;color:var(--lc-text-secondary);flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.v2-wc-tag{font-size:8px;font-weight:600;letter-spacing:.05em;text-transform:uppercase;color:var(--lc-brand-mid);background:var(--lc-brand-light);padding:2px 6px;border-radius:20px;flex-shrink:0;}
+
+/* Example sentence preview */
+.v2-wc-example{font-size:11px;color:var(--lc-text-hint);font-style:italic;line-height:1.4;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-bottom:6px;}
+.v2-wc-example strong{color:var(--lc-brand);font-style:normal;}
+
+/* Bottom row: mastery + interval + actions */
+.v2-wc-bottom{display:flex;align-items:center;gap:8px;}
+.v2-wc-mastery-pill{display:flex;align-items:center;gap:4px;font-size:9px;font-weight:600;color:var(--lc-text-hint);}
+.v2-wc-mastery-pill .m-dot{width:6px;height:6px;}
+.v2-wc-interval{font-size:9px;color:var(--lc-text-hint);}
+.v2-wc-spacer{flex:1;}
+.v2-wc-action{width:26px;height:26px;border-radius:8px;background:var(--lc-surface);border:1px solid var(--lc-border);display:flex;align-items:center;justify-content:center;cursor:pointer;flex-shrink:0;}
+.v2-wc-action svg{width:12px;height:12px;stroke:var(--lc-text-secondary);fill:none;stroke-width:1.8;stroke-linecap:round;}
+.v2-wc-action:hover svg{stroke:var(--lc-brand);}
+
+/* Due badge */
+.v2-wc-due{font-size:8px;font-weight:700;color:var(--lc-accent);background:var(--lc-accent-light);padding:2px 6px;border-radius:20px;flex-shrink:0;}
+
+/* ═══════════════════════════════════════════════════════════════
+   REDESIGNED WORD DETAIL
+   ═══════════════════════════════════════════════════════════════ */
+
+/* Word detail header */
+.wd2-header{margin:0 14px;background:var(--lc-card);border:1px solid var(--lc-border);border-radius:18px;padding:16px;box-shadow:var(--lc-shadow-card);margin-bottom:12px;}
+.wd2-word-row{display:flex;align-items:center;gap:8px;margin-bottom:4px;}
+.wd2-word{font-family:var(--lc-font-display);font-size:28px;font-weight:600;color:var(--lc-text-primary);line-height:1.1;}
+.wd2-phonetic{font-family:var(--lc-font-mono);font-size:12px;color:var(--lc-text-hint);margin-bottom:2px;}
+.wd2-trans{font-size:14px;color:var(--lc-text-secondary);margin-bottom:10px;}
+.wd2-pills{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:12px;}
+.wd2-status-pill{display:flex;align-items:center;gap:4px;font-size:10px;font-weight:600;padding:4px 10px;border-radius:20px;}
+.wd2-audio-row{display:flex;gap:8px;}
+.wd2-audio-btn{display:flex;align-items:center;gap:5px;background:var(--lc-brand-light);border:none;border-radius:12px;padding:8px 14px;font-size:11px;font-weight:600;color:var(--lc-brand);cursor:pointer;font-family:var(--lc-font-body);flex:1;justify-content:center;}
+.wd2-audio-btn svg{width:14px;height:14px;stroke:var(--lc-brand);fill:none;stroke-width:1.8;stroke-linecap:round;}
+
+/* Mastery card */
+.wd2-mastery{margin:0 14px 10px;background:var(--lc-card);border:1px solid var(--lc-border);border-radius:14px;padding:14px;box-shadow:var(--lc-shadow-card);}
+.wd2-sec-lbl{font-size:10px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--lc-text-hint);margin-bottom:10px;}
+.wd2-mastery-visual{display:flex;align-items:center;gap:12px;margin-bottom:10px;}
+.wd2-mastery-ring{position:relative;width:52px;height:52px;flex-shrink:0;}
+.wd2-mastery-ring svg{transform:rotate(-90deg);width:52px;height:52px;}
+.wd2-mastery-ring-bg{fill:none;stroke:var(--lc-border);stroke-width:5;}
+.wd2-mastery-ring-fill{fill:none;stroke-width:5;stroke-linecap:round;}
+.wd2-mastery-ring-text{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);font-family:var(--lc-font-display);font-size:16px;font-weight:600;color:var(--lc-text-primary);}
+.wd2-mastery-info{flex:1;}
+.wd2-mastery-level{font-size:13px;font-weight:600;color:var(--lc-text-primary);margin-bottom:2px;}
+.wd2-mastery-next{font-size:11px;color:var(--lc-text-secondary);}
+.wd2-stats-row{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;}
+.wd2-stat-cell{background:var(--lc-surface);border-radius:10px;padding:8px 6px;text-align:center;}
+.wd2-stat-val{font-family:var(--lc-font-display);font-size:14px;font-weight:600;color:var(--lc-text-primary);line-height:1;}
+.wd2-stat-lbl{font-size:8px;color:var(--lc-text-hint);font-weight:500;margin-top:3px;}
+
+/* Examples card */
+.wd2-examples{margin:0 14px 10px;background:var(--lc-card);border:1px solid var(--lc-border);border-radius:14px;padding:14px;box-shadow:var(--lc-shadow-card);}
+.wd2-example-block{margin-bottom:10px;padding-bottom:10px;border-bottom:1px solid var(--lc-border);}
+.wd2-example-block:last-child{margin-bottom:0;padding-bottom:0;border-bottom:none;}
+.wd2-ex-de{font-size:13px;color:var(--lc-text-primary);line-height:1.5;margin-bottom:2px;}
+.wd2-ex-de strong{color:var(--lc-brand);}
+.wd2-ex-en{font-size:11px;color:var(--lc-text-hint);font-style:italic;line-height:1.4;}
+
+/* Notes card */
+.wd2-notes{margin:0 14px 10px;background:var(--lc-accent-light);border:1px solid rgba(224,123,63,0.2);border-radius:14px;padding:12px 14px;display:flex;gap:10px;align-items:flex-start;}
+.wd2-notes-icon{font-size:16px;flex-shrink:0;margin-top:1px;}
+.wd2-notes-text{font-size:12px;color:var(--lc-text-primary);line-height:1.5;}
+.wd2-notes-text strong{color:var(--lc-accent);}
+
+/* Related words */
+.wd2-related{margin:0 14px 10px;background:var(--lc-card);border:1px solid var(--lc-border);border-radius:14px;padding:14px;box-shadow:var(--lc-shadow-card);}
+.wd2-related-item{display:flex;align-items:center;gap:8px;padding:6px 0;border-bottom:1px solid var(--lc-border);}
+.wd2-related-item:last-child{border-bottom:none;}
+.wd2-related-word{font-size:13px;font-weight:600;color:var(--lc-text-primary);flex:1;}
+.wd2-related-trans{font-size:11px;color:var(--lc-text-secondary);}
+
+/* Bottom actions */
+.wd2-bottom-actions{margin:0 14px;display:flex;gap:8px;padding-bottom:14px;}
+.wd2-btn-review{flex:1;background:var(--lc-brand);color:white;border:none;border-radius:12px;padding:12px;font-size:13px;font-weight:600;font-family:var(--lc-font-body);text-align:center;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:6px;}
+.wd2-btn-review svg{width:14px;height:14px;stroke:white;fill:none;stroke-width:2;stroke-linecap:round;}
+.wd2-btn-edit{width:44px;height:44px;border-radius:12px;background:var(--lc-surface);border:1px solid var(--lc-border);display:flex;align-items:center;justify-content:center;cursor:pointer;}
+.wd2-btn-edit svg{width:16px;height:16px;stroke:var(--lc-text-secondary);fill:none;stroke-width:1.8;stroke-linecap:round;}
+
+/* ─── DESIGN NOTES SECTION ──────────────────────────────────── */
+.notes-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(340px,1fr));gap:16px;margin-top:16px;}
+.note-card{background:var(--lc-card);border:1px solid var(--lc-border);border-radius:14px;padding:20px;box-shadow:var(--lc-shadow-card);}
+.note-card-title{font-size:12px;font-weight:600;letter-spacing:.07em;text-transform:uppercase;color:var(--lc-brand-mid);margin-bottom:10px;}
+.note-card p{font-size:13px;color:var(--lc-text-secondary);line-height:1.7;margin-bottom:8px;}
+.note-card p:last-child{margin-bottom:0;}
+.note-card strong{color:var(--lc-text-primary);}
+.note-card ul{margin:6px 0 8px 18px;font-size:13px;color:var(--lc-text-secondary);line-height:1.7;}
+</style>
+</head>
+<body>
+
+<div class="page-header">
+  <div class="page-header-inner">
+    <div>
+      <div class="logo">LinguaCard — Redesign Reference</div>
+      <div class="logo-sub">Home, Vault & Word Card Redesign · Epic LC-RD</div>
+    </div>
+  </div>
+</div>
+
+<div class="main">
+
+<!-- ═══════════════ SECTION 1: HOME ═══════════════ -->
+<div class="section">
+  <div class="section-title">Redesigned Home Screen</div>
+  <div class="section-sub">
+    The home screen becomes a personalized learning dashboard with actionable insights, motivation mechanics, and quick access to all learning modalities.
+    Replaces the flat stats-only layout with a goal-oriented experience centered around today's learning session.
+  </div>
+
+  <div class="phones-row">
+
+    <!-- HOME REDESIGNED -->
+    <div class="phone-wrap">
+      <div class="phone-label">R01 · Home — Dashboard</div>
+      <div class="phone">
+        <div class="phone-inner">
+          <div class="status-bar"><span>9:41</span><div style="display:flex;align-items:center;gap:3px;"><div class="sig"><span></span><span></span><span></span></div><div class="batt"></div></div></div>
+
+          <!-- Top bar -->
+          <div class="h2-topbar">
+            <div class="h2-logo">LinguaCard</div>
+            <div class="h2-avatar">KN</div>
+          </div>
+
+          <!-- Today's learning card with ring progress -->
+          <div class="h2-today">
+            <div class="h2-today-greeting">Good Morning</div>
+            <div class="h2-today-title">Ready to learn today?</div>
+
+            <div class="h2-ring-row">
+              <div class="h2-ring">
+                <svg viewBox="0 0 64 64">
+                  <circle class="h2-ring-bg" cx="32" cy="32" r="28"/>
+                  <circle class="h2-ring-fill" cx="32" cy="32" r="28" stroke-dasharray="175.9" stroke-dashoffset="132"/>
+                </svg>
+                <div class="h2-ring-text">
+                  <div class="h2-ring-num">376</div>
+                  <div class="h2-ring-lbl">due</div>
+                </div>
+              </div>
+              <div class="h2-ring-meta">
+                <div class="h2-ring-stat">
+                  <div class="h2-ring-stat-num">295</div>
+                  <div class="h2-ring-stat-lbl">new cards</div>
+                </div>
+                <div class="h2-ring-stat">
+                  <div class="h2-ring-stat-num">81</div>
+                  <div class="h2-ring-stat-lbl">reviews</div>
+                </div>
+                <div class="h2-ring-breakdown">All collections</div>
+              </div>
+            </div>
+
+            <div class="h2-today-actions">
+              <button class="h2-btn-start">
+                <svg viewBox="0 0 24 24"><polygon points="5,3 19,12 5,21"/></svg>
+                Start session
+              </button>
+              <button class="h2-btn-col">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round"><path d="M4 6h16M4 12h10M4 18h6"/></svg>
+                Filter
+              </button>
+            </div>
+          </div>
+
+          <!-- Stats row with streak -->
+          <div class="h2-stats">
+            <div class="h2-stat">
+              <span class="h2-stat-icon">🔥</span>
+              <div class="h2-stat-val">3</div>
+              <div class="h2-stat-lbl">Day streak</div>
+              <div class="h2-streak-dots">
+                <div class="h2-streak-dot active"></div>
+                <div class="h2-streak-dot active"></div>
+                <div class="h2-streak-dot active"></div>
+                <div class="h2-streak-dot inactive"></div>
+                <div class="h2-streak-dot inactive"></div>
+                <div class="h2-streak-dot inactive"></div>
+                <div class="h2-streak-dot inactive"></div>
+              </div>
+            </div>
+            <div class="h2-stat">
+              <span class="h2-stat-icon">📚</span>
+              <div class="h2-stat-val">380</div>
+              <div class="h2-stat-lbl">Words</div>
+            </div>
+            <div class="h2-stat">
+              <span class="h2-stat-icon">⭐</span>
+              <div class="h2-stat-val">42</div>
+              <div class="h2-stat-lbl">Mastered</div>
+            </div>
+          </div>
+
+          <!-- Word of the day -->
+          <div class="h2-wotd">
+            <div class="h2-wotd-header">
+              <span class="h2-wotd-lbl">✦ Word of the Day</span>
+              <div class="h2-wotd-play"><svg viewBox="0 0 24 24"><polygon points="5,3 19,12 5,21"/></svg></div>
+            </div>
+            <div class="h2-wotd-body">
+              <div class="h2-wotd-word">die Sehnsucht</div>
+              <div class="h2-wotd-trans">longing, yearning — <span style="font-style:italic;color:var(--lc-text-hint);">noun, feminine</span></div>
+              <div class="h2-wotd-example"><strong>Die Sehnsucht</strong> nach der Heimat ist groß.</div>
+            </div>
+          </div>
+
+          <!-- Bottom nav -->
+          <div class="bottom-nav">
+            <div class="nav-item on"><svg viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9,22 9,12 15,12 15,22"/></svg><span class="nav-lbl">Home</span><div class="nav-dot"></div></div>
+            <div class="nav-item"><svg viewBox="0 0 24 24"><rect x="2" y="3" width="20" height="14" rx="2" ry="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg><span class="nav-lbl">Vault</span></div>
+            <div class="nav-item"><svg viewBox="0 0 24 24"><polygon points="5,3 19,12 5,21"/></svg><span class="nav-lbl">Review</span></div>
+            <div class="nav-item"><svg viewBox="0 0 24 24"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg><span class="nav-lbl">Stories</span></div>
+            <div class="nav-item"><svg viewBox="0 0 24 24"><polygon points="11,5 6,9 2,9 2,15 6,15 11,19 11,5"/><path d="M15.54,8.46a5,5,0,0,1,0,7.07"/></svg><span class="nav-lbl">Listen</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- HOME SCROLLED — Weekly progress + quick actions -->
+    <div class="phone-wrap">
+      <div class="phone-label">R01b · Home — Scrolled</div>
+      <div class="phone">
+        <div class="phone-inner">
+          <div class="status-bar"><span>9:41</span><div style="display:flex;align-items:center;gap:3px;"><div class="sig"><span></span><span></span><span></span></div><div class="batt"></div></div></div>
+
+          <div class="h2-topbar">
+            <div class="h2-logo">LinguaCard</div>
+            <div class="h2-avatar">KN</div>
+          </div>
+
+          <!-- Weekly progress -->
+          <div class="h2-sec-hdr">
+            <div class="h2-sec-t">This week</div>
+            <div class="h2-sec-l">Details →</div>
+          </div>
+          <div class="h2-weekly">
+            <div class="h2-weekly-bars">
+              <div class="h2-weekly-bar-wrap"><div class="h2-weekly-bar filled" style="height:40px;"></div><span class="h2-weekly-day">Mo</span></div>
+              <div class="h2-weekly-bar-wrap"><div class="h2-weekly-bar filled" style="height:28px;"></div><span class="h2-weekly-day">Tu</span></div>
+              <div class="h2-weekly-bar-wrap"><div class="h2-weekly-bar filled" style="height:50px;"></div><span class="h2-weekly-day">We</span></div>
+              <div class="h2-weekly-bar-wrap"><div class="h2-weekly-bar" style="height:10px;"></div><span class="h2-weekly-day">Th</span></div>
+              <div class="h2-weekly-bar-wrap"><div class="h2-weekly-bar" style="height:6px;"></div><span class="h2-weekly-day">Fr</span></div>
+              <div class="h2-weekly-bar-wrap"><div class="h2-weekly-bar today" style="height:20px;"></div><span class="h2-weekly-day today">Sa</span></div>
+              <div class="h2-weekly-bar-wrap"><div class="h2-weekly-bar" style="height:4px;"></div><span class="h2-weekly-day">Su</span></div>
+            </div>
+            <div class="h2-weekly-legend">
+              <span class="h2-weekly-total"><strong>118</strong> cards reviewed</span>
+              <span class="h2-weekly-total">Goal: <strong>150</strong></span>
+            </div>
+          </div>
+
+          <!-- Quick actions -->
+          <div class="h2-sec-hdr">
+            <div class="h2-sec-t">Quick actions</div>
+          </div>
+          <div class="h2-actions">
+            <div class="h2-action">
+              <span class="h2-action-icon">📸</span>
+              <div class="h2-action-lbl">Scan</div>
+              <div class="h2-action-sub">Import words</div>
+            </div>
+            <div class="h2-action">
+              <span class="h2-action-icon">📖</span>
+              <div class="h2-action-lbl">Story</div>
+              <div class="h2-action-sub">Generate new</div>
+            </div>
+            <div class="h2-action">
+              <span class="h2-action-icon">🎧</span>
+              <div class="h2-action-lbl">Listen</div>
+              <div class="h2-action-sub">Audio playlist</div>
+            </div>
+          </div>
+
+          <!-- Recent words -->
+          <div class="h2-sec-hdr">
+            <div class="h2-sec-t">Recently added</div>
+            <div class="h2-sec-l">See all →</div>
+          </div>
+          <div class="h2-recent">
+            <div class="h2-recent-card">
+              <div class="h2-recent-mastery" style="background:var(--lc-mastery-0);"></div>
+              <div class="h2-recent-body">
+                <div class="h2-recent-word">Zug</div>
+                <div class="h2-recent-trans">the train</div>
+              </div>
+              <span class="h2-recent-tag">Travel</span>
+            </div>
+            <div class="h2-recent-card">
+              <div class="h2-recent-mastery" style="background:var(--lc-mastery-0);"></div>
+              <div class="h2-recent-body">
+                <div class="h2-recent-word">wichtig</div>
+                <div class="h2-recent-trans">important</div>
+              </div>
+              <span class="h2-recent-tag">Communication</span>
+            </div>
+            <div class="h2-recent-card">
+              <div class="h2-recent-mastery" style="background:var(--lc-mastery-0);"></div>
+              <div class="h2-recent-body">
+                <div class="h2-recent-word">grillen</div>
+                <div class="h2-recent-trans">to grill</div>
+              </div>
+              <span class="h2-recent-tag">Celebrations</span>
+            </div>
+          </div>
+
+          <div class="bottom-nav">
+            <div class="nav-item on"><svg viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9,22 9,12 15,12 15,22"/></svg><span class="nav-lbl">Home</span><div class="nav-dot"></div></div>
+            <div class="nav-item"><svg viewBox="0 0 24 24"><rect x="2" y="3" width="20" height="14" rx="2" ry="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg><span class="nav-lbl">Vault</span></div>
+            <div class="nav-item"><svg viewBox="0 0 24 24"><polygon points="5,3 19,12 5,21"/></svg><span class="nav-lbl">Review</span></div>
+            <div class="nav-item"><svg viewBox="0 0 24 24"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg><span class="nav-lbl">Stories</span></div>
+            <div class="nav-item"><svg viewBox="0 0 24 24"><polygon points="11,5 6,9 2,9 2,15 6,15 11,19 11,5"/><path d="M15.54,8.46a5,5,0,0,1,0,7.07"/></svg><span class="nav-lbl">Listen</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- VAULT REDESIGNED -->
+    <div class="phone-wrap">
+      <div class="phone-label">R02 · Vault — All Words</div>
+      <div class="phone">
+        <div class="phone-inner">
+          <div class="status-bar"><span>9:45</span><div style="display:flex;align-items:center;gap:3px;"><div class="sig"><span></span><span></span><span></span></div><div class="batt"></div></div></div>
+
+          <!-- Top bar -->
+          <div class="v2-topbar">
+            <div>
+              <div class="v2-title">Vault <span class="v2-title-count">380</span></div>
+            </div>
+            <div class="v2-actions-row">
+              <button class="v2-icon-btn"><svg viewBox="0 0 24 24"><path d="M4 6h16M4 12h10M4 18h6"/></svg></button>
+              <button class="v2-fab"><svg viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg></button>
+            </div>
+          </div>
+
+          <!-- Segment -->
+          <div class="v2-segment">
+            <div class="v2-seg-btn on">All words</div>
+            <div class="v2-seg-btn">Collections</div>
+          </div>
+
+          <!-- Search -->
+          <div class="v2-search">
+            <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+            <span>Search words…</span>
+          </div>
+
+          <!-- Filter row -->
+          <div class="v2-filter-row">
+            <div class="v2-filter-chip v2-filter-on">All <span class="v2-filter-count">380</span></div>
+            <div class="v2-filter-chip v2-filter-off">Due now</div>
+            <div class="v2-filter-chip v2-filter-off">New</div>
+            <div class="v2-filter-chip v2-filter-off">Mastered</div>
+            <div class="v2-filter-dropdown">
+              Sort ▾
+            </div>
+          </div>
+
+          <!-- Article legend -->
+          <div class="v2-article-legend">
+            <div class="v2-art-pill active">
+              <div class="v2-art-dot" style="background:var(--lc-masc-text);"></div>
+              <span>der</span>
+            </div>
+            <div class="v2-art-pill">
+              <div class="v2-art-dot" style="background:var(--lc-fem-text);"></div>
+              <span>die</span>
+            </div>
+            <div class="v2-art-pill">
+              <div class="v2-art-dot" style="background:var(--lc-neut-text);"></div>
+              <span>das</span>
+            </div>
+            <div style="flex:1;"></div>
+            <div style="font-size:9px;color:var(--lc-text-hint);display:flex;align-items:center;gap:3px;">
+              <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><polyline points="19,12 12,19 5,12"/></svg>
+              Newest
+            </div>
+          </div>
+
+          <!-- Word cards -->
+          <div class="v2-word-list">
+            <!-- Card 1: new word, no mastery -->
+            <div class="v2-word-card">
+              <div class="v2-wc-inner">
+                <div class="v2-wc-mastery-bar" style="background:var(--lc-mastery-0);"></div>
+                <div class="v2-wc-content">
+                  <div class="v2-wc-top">
+                    <span class="art-badge art-der" style="font-size:8px;padding:1px 6px;">der</span>
+                    <span class="v2-wc-word">Zug</span>
+                    <span class="v2-wc-phonetic">/tsuːk/</span>
+                  </div>
+                  <div class="v2-wc-mid">
+                    <span class="v2-wc-trans">the train</span>
+                    <span class="v2-wc-tag">Travel</span>
+                  </div>
+                  <div class="v2-wc-example"><strong>Der Zug</strong> fährt um 8 Uhr ab.</div>
+                  <div class="v2-wc-bottom">
+                    <div class="v2-wc-mastery-pill"><div class="m-dot m0"></div> New</div>
+                    <span class="v2-wc-due">Due</span>
+                    <div class="v2-wc-spacer"></div>
+                    <div class="v2-wc-action"><svg viewBox="0 0 24 24"><polygon points="11,5 6,9 2,9 2,15 6,15 11,19 11,5"/><path d="M15.54,8.46a5,5,0,0,1,0,7.07"/></svg></div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Card 2: learning, with mastery 2 -->
+            <div class="v2-word-card">
+              <div class="v2-wc-inner">
+                <div class="v2-wc-mastery-bar" style="background:var(--lc-mastery-2);"></div>
+                <div class="v2-wc-content">
+                  <div class="v2-wc-top">
+                    <span class="v2-wc-word">wichtig</span>
+                  </div>
+                  <div class="v2-wc-mid">
+                    <span class="v2-wc-trans">important</span>
+                    <span class="v2-wc-tag">Communication</span>
+                  </div>
+                  <div class="v2-wc-example">Das ist ein <strong>wichtiger</strong> Punkt.</div>
+                  <div class="v2-wc-bottom">
+                    <div class="v2-wc-mastery-pill"><div class="m-dot m2"></div> Learning</div>
+                    <span class="v2-wc-interval">3d interval</span>
+                    <div class="v2-wc-spacer"></div>
+                    <div class="v2-wc-action"><svg viewBox="0 0 24 24"><polygon points="11,5 6,9 2,9 2,15 6,15 11,19 11,5"/><path d="M15.54,8.46a5,5,0,0,1,0,7.07"/></svg></div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Card 3: mastered -->
+            <div class="v2-word-card">
+              <div class="v2-wc-inner">
+                <div class="v2-wc-mastery-bar" style="background:var(--lc-mastery-5);"></div>
+                <div class="v2-wc-content">
+                  <div class="v2-wc-top">
+                    <span class="art-badge art-die" style="font-size:8px;padding:1px 6px;">die</span>
+                    <span class="v2-wc-word">Katze</span>
+                    <span class="v2-wc-phonetic">/ˈkat.sə/</span>
+                  </div>
+                  <div class="v2-wc-mid">
+                    <span class="v2-wc-trans">the cat</span>
+                    <span class="v2-wc-tag">Animals</span>
+                  </div>
+                  <div class="v2-wc-example"><strong>Die Katze</strong> sitzt auf dem Sofa.</div>
+                  <div class="v2-wc-bottom">
+                    <div class="v2-wc-mastery-pill"><div class="m-dot m5"></div> Mastered</div>
+                    <span class="v2-wc-interval">28d interval</span>
+                    <div class="v2-wc-spacer"></div>
+                    <div class="v2-wc-action"><svg viewBox="0 0 24 24"><polygon points="11,5 6,9 2,9 2,15 6,15 11,19 11,5"/><path d="M15.54,8.46a5,5,0,0,1,0,7.07"/></svg></div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Card 4: feminine, no example -->
+            <div class="v2-word-card">
+              <div class="v2-wc-inner">
+                <div class="v2-wc-mastery-bar" style="background:var(--lc-mastery-3);"></div>
+                <div class="v2-wc-content">
+                  <div class="v2-wc-top">
+                    <span class="art-badge art-die" style="font-size:8px;padding:1px 6px;">die</span>
+                    <span class="v2-wc-word">Kantine</span>
+                  </div>
+                  <div class="v2-wc-mid">
+                    <span class="v2-wc-trans">the canteen</span>
+                    <span class="v2-wc-tag">Food</span>
+                  </div>
+                  <div class="v2-wc-example"><strong>Die Kantine</strong> hat heute Schnitzel.</div>
+                  <div class="v2-wc-bottom">
+                    <div class="v2-wc-mastery-pill"><div class="m-dot m3"></div> Review</div>
+                    <span class="v2-wc-interval">7d interval</span>
+                    <div class="v2-wc-spacer"></div>
+                    <div class="v2-wc-action"><svg viewBox="0 0 24 24"><polygon points="11,5 6,9 2,9 2,15 6,15 11,19 11,5"/><path d="M15.54,8.46a5,5,0,0,1,0,7.07"/></svg></div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div style="height:14px;"></div>
+          <div class="bottom-nav">
+            <div class="nav-item"><svg viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9,22 9,12 15,12 15,22"/></svg><span class="nav-lbl">Home</span></div>
+            <div class="nav-item on"><svg viewBox="0 0 24 24"><rect x="2" y="3" width="20" height="14" rx="2" ry="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg><span class="nav-lbl">Vault</span><div class="nav-dot"></div></div>
+            <div class="nav-item"><svg viewBox="0 0 24 24"><polygon points="5,3 19,12 5,21"/></svg><span class="nav-lbl">Review</span></div>
+            <div class="nav-item"><svg viewBox="0 0 24 24"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg><span class="nav-lbl">Stories</span></div>
+            <div class="nav-item"><svg viewBox="0 0 24 24"><polygon points="11,5 6,9 2,9 2,15 6,15 11,19 11,5"/><path d="M15.54,8.46a5,5,0,0,1,0,7.07"/></svg><span class="nav-lbl">Listen</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- WORD DETAIL REDESIGNED -->
+    <div class="phone-wrap">
+      <div class="phone-label">R03 · Word Detail</div>
+      <div class="phone">
+        <div class="phone-inner" style="overflow-y:auto;">
+          <div class="status-bar"><span>9:47</span><div style="display:flex;align-items:center;gap:3px;"><div class="sig"><span></span><span></span><span></span></div><div class="batt"></div></div></div>
+
+          <!-- Nav -->
+          <div style="display:flex;align-items:center;justify-content:space-between;padding:4px 16px 10px;">
+            <button style="width:30px;height:30px;border-radius:50%;background:var(--lc-brand-light);display:flex;align-items:center;justify-content:center;border:none;cursor:pointer;">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="var(--lc-brand)" stroke-width="2" stroke-linecap="round"><polyline points="15,18 9,12 15,6"/></svg>
+            </button>
+            <span style="font-family:var(--lc-font-display);font-size:14px;font-weight:600;color:var(--lc-text-primary);">Word Detail</span>
+            <button style="width:30px;height:30px;border-radius:50%;background:var(--lc-surface);border:1px solid var(--lc-border);display:flex;align-items:center;justify-content:center;cursor:pointer;">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="var(--lc-text-secondary)" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="1"/><circle cx="19" cy="12" r="1"/><circle cx="5" cy="12" r="1"/></svg>
+            </button>
+          </div>
+
+          <!-- Word header card -->
+          <div class="wd2-header">
+            <div class="wd2-word-row">
+              <span class="art-badge art-die" style="font-size:10px;padding:3px 9px;">die</span>
+              <div class="wd2-word">Katze</div>
+            </div>
+            <div class="wd2-phonetic">/ˈkat.sə/</div>
+            <div class="wd2-trans">the cat · noun, feminine</div>
+            <div class="wd2-pills">
+              <div class="wd2-status-pill" style="background:#D1FAE5;color:#059669;">
+                <div style="width:6px;height:6px;border-radius:50%;background:#059669;"></div>
+                Mastered
+              </div>
+              <div class="wd2-status-pill" style="background:var(--lc-brand-light);color:var(--lc-brand-mid);">Animals</div>
+            </div>
+            <div class="wd2-audio-row">
+              <button class="wd2-audio-btn">
+                <svg viewBox="0 0 24 24"><polygon points="11,5 6,9 2,9 2,15 6,15 11,19 11,5"/><path d="M15.54,8.46a5,5,0,0,1,0,7.07"/></svg>
+                Listen
+              </button>
+              <button class="wd2-audio-btn" style="background:var(--lc-accent-light);color:var(--lc-accent);">
+                <svg viewBox="0 0 24 24" stroke="var(--lc-accent)"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/></svg>
+                Record
+              </button>
+            </div>
+          </div>
+
+          <!-- Mastery progress -->
+          <div class="wd2-mastery">
+            <div class="wd2-sec-lbl">Mastery Progress</div>
+            <div class="wd2-mastery-visual">
+              <div class="wd2-mastery-ring">
+                <svg viewBox="0 0 52 52">
+                  <circle class="wd2-mastery-ring-bg" cx="26" cy="26" r="22"/>
+                  <circle class="wd2-mastery-ring-fill" cx="26" cy="26" r="22" stroke="#059669" stroke-dasharray="138.2" stroke-dashoffset="0"/>
+                </svg>
+                <div class="wd2-mastery-ring-text">5</div>
+              </div>
+              <div class="wd2-mastery-info">
+                <div class="wd2-mastery-level">Level 5 — Mastered</div>
+                <div class="wd2-mastery-next">Next review in 28 days</div>
+              </div>
+            </div>
+            <div class="wd2-stats-row">
+              <div class="wd2-stat-cell"><div class="wd2-stat-val">8</div><div class="wd2-stat-lbl">Reviews</div></div>
+              <div class="wd2-stat-cell"><div class="wd2-stat-val">4.9</div><div class="wd2-stat-lbl">Avg rating</div></div>
+              <div class="wd2-stat-cell"><div class="wd2-stat-val">28d</div><div class="wd2-stat-lbl">Interval</div></div>
+              <div class="wd2-stat-cell"><div class="wd2-stat-val">2d</div><div class="wd2-stat-lbl">Last seen</div></div>
+            </div>
+          </div>
+
+          <!-- Examples -->
+          <div class="wd2-examples">
+            <div class="wd2-sec-lbl">Example Sentences</div>
+            <div class="wd2-example-block">
+              <div class="wd2-ex-de"><strong>Die Katze</strong> sitzt auf dem Sofa.</div>
+              <div class="wd2-ex-en">"The cat is sitting on the sofa."</div>
+            </div>
+            <div class="wd2-example-block">
+              <div class="wd2-ex-de">Meine <strong>Katze</strong> heißt Luna.</div>
+              <div class="wd2-ex-en">"My cat is called Luna."</div>
+            </div>
+          </div>
+
+          <!-- Notes -->
+          <div class="wd2-notes">
+            <span class="wd2-notes-icon">💡</span>
+            <div class="wd2-notes-text">Always <strong>feminine</strong>. Plural: <strong>die Katzen</strong>. Related: der Kater (male cat).</div>
+          </div>
+
+          <!-- Related words -->
+          <div class="wd2-related">
+            <div class="wd2-sec-lbl">Related Words</div>
+            <div class="wd2-related-item">
+              <span class="art-badge art-der" style="font-size:8px;padding:1px 5px;">der</span>
+              <span class="wd2-related-word">Kater</span>
+              <span class="wd2-related-trans">the male cat / tomcat</span>
+            </div>
+            <div class="wd2-related-item">
+              <span class="art-badge art-das" style="font-size:8px;padding:1px 5px;">das</span>
+              <span class="wd2-related-word">Kätzchen</span>
+              <span class="wd2-related-trans">the kitten</span>
+            </div>
+            <div class="wd2-related-item">
+              <span class="art-badge art-das" style="font-size:8px;padding:1px 5px;">das</span>
+              <span class="wd2-related-word">Haustier</span>
+              <span class="wd2-related-trans">the pet</span>
+            </div>
+          </div>
+
+          <!-- Bottom actions -->
+          <div class="wd2-bottom-actions">
+            <button class="wd2-btn-review">
+              <svg viewBox="0 0 24 24"><polygon points="5,3 19,12 5,21"/></svg>
+              Review this word
+            </button>
+            <button class="wd2-btn-edit"><svg viewBox="0 0 24 24"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.12 2.12 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg></button>
+            <button class="wd2-btn-edit"><svg viewBox="0 0 24 24" stroke="#B91C1C"><polyline points="3,6 5,6 21,6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg></button>
+          </div>
+
+          <div style="height:14px;"></div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- ═══════════════ DESIGN RATIONALE ═══════════════ -->
+<div class="section">
+  <div class="section-title">Design Rationale & UX Improvements</div>
+  <div class="section-sub">Key decisions and research-backed improvements behind the redesign.</div>
+
+  <div class="notes-grid">
+    <div class="note-card">
+      <div class="note-card-title">Home — Motivation Engine</div>
+      <p><strong>Problem:</strong> The old home screen was a passive data display with no clear call to action. Stats (0 streak, 380 words, 0 mastered) were demoralizing.</p>
+      <p><strong>Solution:</strong> The hero card now centers on <strong>today's actionable goal</strong> with a circular progress ring showing completion. The ring fills as you review, creating immediate visual feedback. "Start session" is the primary CTA — one tap to begin learning.</p>
+      <p><strong>Research:</strong> Duolingo and Anki both show that a clear daily goal with visual progress drives 2-3× more daily engagement than passive stats alone.</p>
+    </div>
+
+    <div class="note-card">
+      <div class="note-card-title">Home — Word of the Day</div>
+      <p><strong>Problem:</strong> No passive learning opportunities between review sessions.</p>
+      <p><strong>Solution:</strong> A "Word of the Day" card with the accent-colored left border draws attention without being intrusive. It shows the word, translation, grammatical info, and an example sentence in context — reinforcing the i+1 comprehensible input principle.</p>
+      <p>The play button lets users hear pronunciation without navigating away, reducing friction for audio learning.</p>
+    </div>
+
+    <div class="note-card">
+      <div class="note-card-title">Home — Weekly Progress Chart</div>
+      <p><strong>Problem:</strong> Users had no visibility into their learning patterns over time.</p>
+      <p><strong>Solution:</strong> A compact bar chart showing daily review activity for the week. Today is highlighted in accent color, completed days in brand green. A goal line gives users something to work toward. This creates accountability and helps identify patterns (e.g., skipping weekends).</p>
+    </div>
+
+    <div class="note-card">
+      <div class="note-card-title">Vault — Smarter Filtering</div>
+      <p><strong>Problem:</strong> The old "der / die / das" pills were cramped and visually noisy. Filter options were limited. The search was basic.</p>
+      <p><strong>Solution:</strong> Filters are reorganized into two tiers. The primary filter row uses chips for learning states (All, Due now, New, Mastered) — the most useful ways to slice vocabulary. Article gender filters move to a subtle legend row below, using colored dots that match the article badge system. A sort dropdown completes the toolbar.</p>
+      <p>This layered approach puts <strong>learning-relevant filters first</strong> and article filters second, reflecting actual user behavior.</p>
+    </div>
+
+    <div class="note-card">
+      <div class="note-card-title">Word Card — Rich Context</div>
+      <p><strong>Problem:</strong> The old word cards showed only the word and translation — an empty, uninformative layout that wasted space and provided no learning value at a glance.</p>
+      <p><strong>Solution:</strong> Each card now shows five layers of information:</p>
+      <ul>
+        <li><strong>Mastery bar</strong> — color-coded left accent strip shows SRS state at a glance</li>
+        <li><strong>Word + phonetic</strong> — with article badge for nouns</li>
+        <li><strong>Translation + category</strong> — context immediately visible</li>
+        <li><strong>Example sentence</strong> — one-line preview with the word highlighted in brand color</li>
+        <li><strong>Status footer</strong> — mastery level, interval, due badge, and a quick play-audio action</li>
+      </ul>
+      <p>This transforms the card from a label into a <strong>learning artifact</strong>. Users can recall context without tapping into the detail view.</p>
+    </div>
+
+    <div class="note-card">
+      <div class="note-card-title">Word Detail — Card-based Sections</div>
+      <p><strong>Problem:</strong> The old detail page was a single long scroll with divider lines. Mastery stats were small info cells. No related words or learning actions.</p>
+      <p><strong>Solution:</strong> Content is grouped into distinct cards, each with a clear purpose: header (identity), mastery (progress), examples (context), notes (tips), related words (expanding vocabulary), and bottom actions (what to do next). The mastery ring replaces the flat progress bar for a more engaging visualization. A "Review this word" CTA drives action directly from the detail view.</p>
+      <p><strong>New feature:</strong> "Related Words" section leverages existing vocabulary data to show word families, helping learners build connections between words they already know.</p>
+    </div>
+  </div>
+</div>
+
+</div><!-- /main -->
+
+</body>
+</html>

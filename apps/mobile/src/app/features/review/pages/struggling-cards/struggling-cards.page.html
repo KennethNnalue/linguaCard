@@ -1,10 +1,10 @@
 <ion-header class="ion-no-border">
   <ion-toolbar>
     <div class="sc-nav">
-      <button class="lc-back-btn" (click)="goBack()" aria-label="Back">
+      <button class="sc-back-btn" (click)="goBack()" aria-label="Back">
         <ion-icon name="chevron-back-outline"></ion-icon>
       </button>
-      <span class="sc-nav-title lc-display">Struggling Cards</span>
+      <span class="sc-nav-title">Struggling Cards</span>
       <div class="sc-nav-spacer"></div>
     </div>
   </ion-toolbar>
@@ -27,28 +27,16 @@
       <!-- Card list -->
       <div class="sc-list">
         @for (card of strugglingCards(); track card.id) {
-          <div
-            class="sc-card"
-            [style.background]="articleBg(card)"
-            [style.border-color]="articleBorder(card)"
-            (click)="openWordDetail(card)">
-            <div class="sc-card-top">
-              <div class="sc-card-left">
-                @if (card.content.article) {
-                  <lc-article-badge [article]="card.content.article"></lc-article-badge>
-                }
-                <span class="sc-word">{{ card.content.back }}</span>
-              </div>
-              <span class="sc-fail-badge" [class]="failBadgeClass(card)">
-                {{ failCount(card) }} {{ failCount(card) === 1 ? 'fail' : 'fails' }}
-              </span>
-            </div>
-            <p class="sc-translation">{{ card.content.front }}</p>
-            <div class="sc-meta">
-              <span>Last reviewed: {{ lastReviewedLabel(card) }}</span>
-              <span>·</span>
-              <span>Mastery: {{ card.srsState?.masteryLevel ?? 0 }}</span>
-            </div>
+          <div class="sc-card-wrap">
+            <lc-word-card
+              [card]="card"
+              [categoryName]="getCategoryLabel(card)"
+              (cardClick)="openWordDetail(card)"
+              (playAudio)="openWordDetail(card)"
+            />
+            <span class="sc-fail-badge" [class.sc-fail-badge--red]="failCount(card) >= 4">
+              {{ failCount(card) }} {{ failCount(card) === 1 ? 'fail' : 'fails' }}
+            </span>
           </div>
         }
       </div>

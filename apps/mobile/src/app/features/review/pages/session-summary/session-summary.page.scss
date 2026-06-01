@@ -45,15 +45,6 @@
 .ss-bar-count { @include u.lc-font('xs'); color: var(--lc-text-hint); width: 20px; text-align: right; flex-shrink: 0; }
 
 .ss-word-list { display: flex; flex-direction: column; gap: t.$lc-space-2; }
-.ss-word-row {
-  display: flex; align-items: center; gap: t.$lc-space-3;
-  @include u.lc-card; padding: t.$lc-space-3 t.$lc-space-3;
-}
-.ss-word-info { flex: 1; display: flex; flex-direction: column; gap: 2px; min-width: 0; }
-.ss-word-back  { @include u.lc-font('md', t.$lc-font-weight-semibold); color: var(--lc-text-primary); @include u.text-overflow; }
-.ss-word-front { @include u.lc-font('xs'); color: var(--lc-text-secondary); @include u.text-overflow; }
-.ss-dots { display: flex; gap: 3px; flex-shrink: 0; }
-.ss-mastery-lbl { @include u.lc-font('xs'); color: var(--lc-text-hint); min-width: 56px; text-align: right; flex-shrink: 0; }
 
 .ss-actions { display: flex; flex-direction: column; gap: t.$lc-space-3; padding: t.$lc-space-1 t.$lc-space-4 48px; }
 .ss-btn-retry {

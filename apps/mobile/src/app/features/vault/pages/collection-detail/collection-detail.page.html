@@ -57,25 +57,30 @@
     </button>
   </div>
 
-  <!-- Category chips -->
+  <!-- Category chips with scroll arrows -->
   @if (categoryIds().length > 0) {
-    <div class="cd-cat-scroll">
-      <button
-        class="lc-cat-chip"
-        [class.lc-cat-chip--active]="!activeCategoryId()"
-        [class.lc-cat-chip--inactive]="!!activeCategoryId()"
-        (click)="setCategory(null)">
-        All ({{ allCards().length }})
-      </button>
-      @for (catId of categoryIds(); track catId) {
+    <div class="cd-cat-row">
+      <div class="cd-cat-scroll">
         <button
           class="lc-cat-chip"
-          [class.lc-cat-chip--active]="activeCategoryId() === catId"
-          [class.lc-cat-chip--inactive]="activeCategoryId() !== catId"
-          (click)="setCategory(catId)">
-          {{ getCategoryName(catId, categories()) }}
+          [class.lc-cat-chip--active]="!activeCategoryId()"
+          [class.lc-cat-chip--inactive]="!!activeCategoryId()"
+          (click)="setCategory(null)">
+          All ({{ allCards().length }})
         </button>
-      }
+        @for (catId of categoryIds(); track catId) {
+          <button
+            class="lc-cat-chip"
+            [class.lc-cat-chip--active]="activeCategoryId() === catId"
+            [class.lc-cat-chip--inactive]="activeCategoryId() !== catId"
+            (click)="setCategory(catId)">
+            {{ getCategoryName(catId, categories()) }}
+          </button>
+        }
+      </div>
+      <div class="cd-cat-arrow">
+        <ion-icon name="chevron-forward-outline"></ion-icon>
+      </div>
     </div>
   }
 
@@ -83,27 +88,16 @@
   <div class="cd-word-list">
     @if (loading()) {
       @for (i of [1, 2, 3, 4, 5]; track i) {
-        <div class="lc-card" style="padding:12px;display:flex;gap:10px;align-items:center;margin:0 14px 8px;">
-          <div class="lc-skeleton" style="width:7px;height:7px;border-radius:50%;"></div>
-          <div class="lc-skeleton" style="width:36px;height:18px;border-radius:8px;"></div>
-          <div style="flex:1">
-            <div class="lc-skeleton" style="width:100px;height:13px;border-radius:4px;margin-bottom:4px;"></div>
-            <div class="lc-skeleton" style="width:70px;height:11px;border-radius:4px;"></div>
-          </div>
-        </div>
+        <div class="cd-skeleton"></div>
       }
     } @else {
       @for (card of filteredCards(); track card.id) {
-        <div class="lc-word-item cd-word-item" (click)="openDetail(card)">
-          <lc-mastery-dot [level]="card.srsState?.masteryLevel ?? 0"></lc-mastery-dot>
-          <lc-article-badge [article]="card.content.article"></lc-article-badge>
-          <div style="flex:1;min-width:0;">
-            <p class="lc-word-front">{{ card.content.front }}</p>
-            <p
-              class="lc-word-back">{{ card.content.article ? card.content.article + ' ' : '' }}{{ card.content.back }}</p>
-          </div>
-          <span class="lc-word-tag">{{ getCategoryName(card.categoryIds[0], categories()) }}</span>
-        </div>
+        <lc-word-card
+          [card]="card"
+          [categoryName]="getCategoryName(card.categoryIds[0], categories())"
+          (cardClick)="openDetail(card)"
+          (playAudio)="playAudio(card)"
+        />
       } @empty {
         <div class="lc-empty-state">
           <span class="lc-empty-icon">📖</span>

@@ -73,6 +73,17 @@ export class LocalDataService {
     await this.storage.remove(`stories:${userId}`);
   }
 
+  // ── Review session history ────────────────────────────────────
+  async getSessionHistory(userId: string): Promise<unknown[]> {
+    await this.init();
+    return (await this.storage.get(`session_history:${userId}`)) ?? [];
+  }
+
+  async setSessionHistory(userId: string, sessions: unknown[]): Promise<void> {
+    await this.init();
+    await this.storage.set(`session_history:${userId}`, sessions);
+  }
+
   // ── SRS pending ratings ───────────────────────────────────────
   async getPendingSrsRatings(userId: string): Promise<PendingSrsRating[]> {
     await this.init();
@@ -103,6 +114,7 @@ export class LocalDataService {
       this.storage.remove(`collections:${userId}`),
       this.storage.remove(`stories:${userId}`),
       this.storage.remove(`srs_ratings:${userId}`),
+      this.storage.remove(`session_history:${userId}`),
       this.storage.remove('last_synced_at:cards'),
       this.storage.remove('last_synced_at:collections'),
       this.storage.remove('last_synced_at:stories'),

@@ -1,0 +1,133 @@
+@use '../../../../theme/tokens' as t;
+@use '../../../../theme/utils' as u;
+
+:host {
+  display: block;
+}
+
+.wc-card {
+  @include u.lc-card(t.$lc-radius-md);
+  overflow: hidden;
+  cursor: pointer;
+  @include u.touch-state;
+}
+
+.wc-inner {
+  display: flex;
+}
+
+.wc-mastery-bar {
+  width: t.$lc-space-1;
+  flex-shrink: 0;
+  border-radius: 2px 0 0 2px;
+}
+
+.wc-content {
+  flex: 1;
+  padding: t.$lc-space-3 t.$lc-space-3 t.$lc-space-2;
+  min-width: 0;
+}
+
+.wc-top {
+  display: flex;
+  align-items: center;
+  gap: t.$lc-space-1 + 2px;
+  margin-bottom: 3px;
+}
+
+.wc-word {
+  font-family: t.$lc-font-display;
+  @include u.lc-font('xl', t.$lc-font-weight-semibold);
+  color: t.$lc-text-primary;
+  line-height: 1.2;
+}
+
+.wc-phonetic {
+  font-family: t.$lc-font-mono;
+  @include u.lc-font('xxs');
+  color: t.$lc-text-hint;
+}
+
+.wc-mid {
+  display: flex;
+  align-items: center;
+  gap: t.$lc-space-2;
+  margin-bottom: t.$lc-space-1 + 2px;
+}
+
+.wc-trans {
+  @include u.lc-font('sm');
+  color: t.$lc-text-secondary;
+  flex: 1;
+  @include u.text-overflow;
+}
+
+.wc-tag {
+  @include u.lc-font('xxs', t.$lc-font-weight-bold);
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: t.$lc-brand-mid;
+  background: t.$lc-brand-light;
+  padding: 2px t.$lc-space-1 + 2px;
+  border-radius: t.$lc-radius-full;
+  flex-shrink: 0;
+}
+
+.wc-example {
+  @include u.lc-font('xs');
+  color: t.$lc-text-hint;
+  font-style: italic;
+  line-height: 1.4;
+  @include u.text-overflow;
+  margin-bottom: t.$lc-space-1 + 2px;
+
+  :global(strong) {
+    color: t.$lc-brand;
+    font-style: normal;
+  }
+}
+
+.wc-bottom {
+  display: flex;
+  align-items: center;
+  gap: t.$lc-space-2;
+}
+
+.wc-mastery-pill {
+  display: flex;
+  align-items: center;
+  gap: t.$lc-space-1;
+  @include u.lc-font('xxs', t.$lc-font-weight-semibold);
+  color: t.$lc-text-hint;
+}
+
+.wc-due {
+  @include u.lc-font('xxs', t.$lc-font-weight-bold);
+  color: t.$lc-accent;
+  background: t.$lc-accent-light;
+  padding: 2px t.$lc-space-1 + 2px;
+  border-radius: t.$lc-radius-full;
+}
+
+.wc-interval {
+  @include u.lc-font('xxs');
+  color: t.$lc-text-hint;
+}
+
+.wc-spacer {
+  flex: 1;
+}
+
+.wc-action {
+  @include u.square(26px);
+  border-radius: t.$lc-radius-sm;
+  background: var(--lc-surface);
+  border: 1px solid var(--lc-border);
+  @include u.flex-center;
+  cursor: pointer;
+
+  ion-icon {
+    font-size: 12px;
+    color: t.$lc-text-secondary;
+  }
+}

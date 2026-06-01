@@ -9,7 +9,6 @@ import {
   playOutline,
   informationCircleOutline,
 } from 'ionicons/icons';
-import { CardStore } from '../../../vault/store/card.store';
 import { CollectionStore } from '../../../vault/store/collection.store';
 import { ReviewStore } from '../../store/review.store';
 import { ReviewFilterService } from '../../services/review-filter.service';
@@ -24,7 +23,6 @@ const MASTERY_LABELS = ['New', 'Beginner', 'Learning', 'Familiar', 'Good', 'Mast
   imports: [IonContent, IonHeader, IonToolbar, IonIcon],
 })
 export class ReviewHubPage {
-  private readonly cardStore = inject(CardStore);
   private readonly reviewStore = inject(ReviewStore);
   private readonly collectionStore = inject(CollectionStore);
   private readonly filterService = inject(ReviewFilterService);
@@ -43,6 +41,24 @@ export class ReviewHubPage {
   readonly newCount = computed(() => this.filterService.getNewCount());
 
   readonly recentSessions = computed(() => this.reviewStore.sessionHistory().slice(0, 2));
+
+  // Ring shows fraction of due cards reviewed today (same logic as home ring)
+  readonly completedToday = computed(() => {
+    const today = new Date().toISOString().split('T')[0];
+    return this.reviewStore.sessionHistory()
+      .filter(s => s.completedAt?.startsWith(today))
+      .reduce((sum, s) => sum + (s.reviewedCards?.length ?? 0), 0);
+  });
+
+  readonly ringOffset = computed(() => {
+    const circumference = 2 * Math.PI * 28;
+    const due = this.dueTodayCount();
+    const done = this.completedToday();
+    const total = due + done;
+    if (total === 0) return circumference;
+    const progress = Math.min(1, done / total);
+    return circumference * (1 - progress);
+  });
 
   readonly donutSegments = computed(() => {
     const dist = this.dueTodayByMastery();

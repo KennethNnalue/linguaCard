@@ -1,4 +1,5 @@
 // Usage: @use '../../../theme/utils' as u; then @include u.flex-center;
+@use 'sass:map';
 @use 'tokens' as t;
 
 // ─── FLEX ────────────────────────────────────────────────────────────────────
@@ -49,7 +50,7 @@
     '3xl': t.$lc-text-3xl,
     '4xl': t.$lc-text-4xl,
   );
-  font-size: map-get($sizes, $size-key);
+  font-size: map.get($sizes, $size-key);
   font-weight: $weight;
 }
 

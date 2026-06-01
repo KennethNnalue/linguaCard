@@ -3,20 +3,23 @@ import { Router } from '@angular/router';
 import { NavController, IonContent, IonHeader, IonIcon, IonToolbar } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
 import { chevronBackOutline } from 'ionicons/icons';
-import { Card } from '../../../../core/models/mock-data';
-import { ArticleBadgeComponent } from '../../../../shared/components/article-badge/article-badge.component';
-import { ReviewStore } from '../../store/review.store';
-import { ReviewFilterService } from '../../services/review-filter.service';
+import {Card} from '@lingua-card/shared/domain';
+import {ReviewStore} from '../../store/review.store';
+import {ReviewFilterService} from '../../services/review-filter.service';
+import {CategoryStore} from '../../../vault/store/category.store';
+import {WordCardComponent} from '../../../../shared/ui/word-card/word-card.component';
+import {getCategoryName} from '../../../../shared/helpers/helpers';
 
 @Component({
   selector: 'lc-struggling-cards',
   templateUrl: './struggling-cards.page.html',
   styleUrls: ['./struggling-cards.page.scss'],
-  imports: [IonContent, IonHeader, IonToolbar, IonIcon, ArticleBadgeComponent],
+  imports: [IonContent, IonHeader, IonToolbar, IonIcon, WordCardComponent],
 })
 export class StrugglingCardsPage {
   private readonly filterService = inject(ReviewFilterService);
   private readonly reviewStore = inject(ReviewStore);
+  private readonly categoryStore = inject(CategoryStore);
   private readonly navCtrl = inject(NavController);
   private readonly router = inject(Router);
 
@@ -69,6 +72,10 @@ export class StrugglingCardsPage {
     if (!queue.length) return;
     this.reviewStore.startSession(queue, null, 'Struggling cards');
     void this.navCtrl.navigateForward('/review/player');
+  }
+
+  getCategoryLabel(card: Card): string {
+    return getCategoryName(card.categoryIds?.[0], this.categoryStore.categories());
   }
 
   openWordDetail(card: Card): void {

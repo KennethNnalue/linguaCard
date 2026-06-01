@@ -1,0 +1,49 @@
+<div class="wc-card" (click)="cardClick.emit()">
+  <div class="wc-inner">
+    <div class="wc-mastery-bar" [style.background]="masteryColor()"></div>
+    <div class="wc-content">
+
+      <!-- Row 1: article + word + phonetic -->
+      <div class="wc-top">
+        @if (card().content.article) {
+          <lc-article-badge [article]="card().content.article" />
+        }
+        <span class="wc-word">{{ card().content.back }}</span>
+        @if (card().content.phonetic) {
+          <span class="wc-phonetic">{{ card().content.phonetic }}</span>
+        }
+      </div>
+
+      <!-- Row 2: translation + category -->
+      <div class="wc-mid">
+        <span class="wc-trans">{{ card().content.front }}</span>
+        @if (categoryName()) {
+          <span class="wc-tag">{{ categoryName() }}</span>
+        }
+      </div>
+
+      <!-- Row 3: example sentence preview (unless compact) -->
+      @if (!compact() && firstExample()) {
+        <p class="wc-example" [innerHTML]="highlightedExample()"></p>
+      }
+
+      <!-- Row 4: mastery + interval + due badge + audio -->
+      <div class="wc-bottom">
+        <div class="wc-mastery-pill">
+          <lc-mastery-dot [level]="masteryLevel()" />
+          <span>{{ masteryLabel() }}</span>
+        </div>
+        @if (isDue() && card().srsState) {
+          <span class="wc-due">Due</span>
+        } @else if (intervalText()) {
+          <span class="wc-interval">{{ intervalText() }}</span>
+        }
+        <div class="wc-spacer"></div>
+        <button class="wc-action" (click)="onPlayAudio($event)" aria-label="Play pronunciation">
+          <ion-icon name="volume-high-outline"></ion-icon>
+        </button>
+      </div>
+
+    </div>
+  </div>
+</div>

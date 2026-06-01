@@ -1,154 +1,455 @@
 @use 'theme/tokens' as t;
 @use 'theme/utils' as u;
 
+// ─── NAV ─────────────────────────────────────────────────────────────────────
 .home-nav {
   @include u.flex-between;
-  padding: t.$lc-space-2 t.$lc-space-4 t.$lc-space-3;
+  padding: t.$lc-space-1 t.$lc-space-4 t.$lc-space-2;
 }
 
 .home-logo {
-  @include u.lc-font('3xl', t.$lc-font-weight-semibold);
+  font-family: t.$lc-font-display;
+  @include u.lc-font('xl', t.$lc-font-weight-semibold);
   color: var(--lc-text-primary);
 }
 
-.home-nav-right {
-  display: flex;
-  align-items: center;
-  gap: t.$lc-space-3;
-}
-
-.avatar-btn {
-  @include u.circle(36px);
+.home-avatar {
+  @include u.circle(30px);
   border: none;
   background: var(--lc-brand);
   color: t.$lc-text-inverse;
-  @include u.lc-font('xs', t.$lc-font-weight-bold);
+  @include u.lc-font('xxs', t.$lc-font-weight-bold);
   @include u.flex-center;
   font-family: t.$lc-font-body;
   cursor: pointer;
-  transition: opacity var(--lc-transition-fast);
-
-  &:active { opacity: 0.8; }
+  @include u.touch-state;
 }
 
-.home-content { padding: 0; }
-
-.greeting { padding: t.$lc-space-1 t.$lc-space-4 t.$lc-space-4; }
-
-.greeting-sub {
-  @include u.lc-font('xs', t.$lc-font-weight-semibold);
-  color: var(--lc-brand-mid);
-  letter-spacing: 0.07em;
-  text-transform: uppercase;
-  margin: 0 0 t.$lc-space-1;
+.home-content {
+  padding: 0;
 }
 
-.greeting-name {
-  font-size: 22px;
-  font-weight: t.$lc-font-weight-semibold;
-  color: var(--lc-text-primary);
-  line-height: 1.2;
-  margin: 0;
+// ─── HERO CARD ───────────────────────────────────────────────────────────────
+.hero-card {
+  margin: 0 t.$lc-space-4 t.$lc-space-3;
+  background: linear-gradient(135deg, #1A3830 0%, #2D5A4E 55%, #3D7A66 100%);
+  border-radius: t.$lc-radius-lg;
+  padding: t.$lc-space-4;
+  position: relative;
+  overflow: hidden;
+
+  &::before {
+    content: '';
+    position: absolute;
+    top: -24px; right: -24px;
+    width: 110px; height: 110px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.06);
+    pointer-events: none;
+  }
+
+  &::after {
+    content: '';
+    position: absolute;
+    bottom: -36px; right: 20px;
+    width: 80px; height: 80px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.03);
+    pointer-events: none;
+  }
 }
 
-.hero-card { margin: 0 14px 14px; }
-
-.hero-label {
+.hero-greeting {
   @include u.lc-font('xxs', t.$lc-font-weight-semibold);
   letter-spacing: 0.08em;
   text-transform: uppercase;
-  color: rgba(255, 255, 255, 0.55);
-  margin: 0 0 t.$lc-space-2;
+  color: rgba(255, 255, 255, 0.45);
+  margin-bottom: 3px;
 }
 
-.hero-count {
-  font-size: 40px;
-  font-weight: t.$lc-font-weight-semibold;
+.hero-title {
+  font-family: t.$lc-font-display;
+  @include u.lc-font('3xl', t.$lc-font-weight-semibold);
+  color: white;
+  line-height: 1.2;
+  margin-bottom: t.$lc-space-3;
+}
+
+// Ring progress
+.hero-ring-row {
+  display: flex;
+  align-items: center;
+  gap: t.$lc-space-4;
+  margin-bottom: t.$lc-space-3;
+  position: relative;
+  z-index: 1;
+}
+
+.hero-ring {
+  position: relative;
+  width: 64px;
+  height: 64px;
+  flex-shrink: 0;
+
+  svg {
+    transform: rotate(-90deg);
+    width: 64px;
+    height: 64px;
+  }
+}
+
+.ring-bg {
+  fill: none;
+  stroke: rgba(255, 255, 255, 0.12);
+  stroke-width: 5;
+}
+
+.ring-fill {
+  fill: none;
+  stroke: #6EE7B7;
+  stroke-width: 5;
+  stroke-linecap: round;
+  transition: stroke-dashoffset 0.6s ease;
+}
+
+.ring-text {
+  position: absolute;
+  top: 50%; left: 50%;
+  transform: translate(-50%, -50%);
+  text-align: center;
+}
+
+.ring-num {
+  font-family: t.$lc-font-display;
+  @include u.lc-font('2xl', t.$lc-font-weight-semibold);
   color: white;
   line-height: 1;
-  margin: 0;
+}
+
+.ring-lbl {
+  @include u.lc-font('xxs');
+  color: rgba(255, 255, 255, 0.55);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
 }
 
 .hero-meta {
-  @include u.lc-font('xs');
-  color: rgba(255, 255, 255, 0.6);
-  margin: t.$lc-space-1 0 14px;
+  flex: 1;
 }
 
-.hero-collection-pill {
+.hero-stat-row {
+  display: flex;
+  align-items: baseline;
+  gap: t.$lc-space-1;
+  margin-bottom: 4px;
+}
+
+.hero-stat-num {
+  font-family: t.$lc-font-display;
+  @include u.lc-font('2xl', t.$lc-font-weight-semibold);
+  color: white;
+  line-height: 1;
+}
+
+.hero-stat-lbl {
+  @include u.lc-font('xxs');
+  color: rgba(255, 255, 255, 0.55);
+}
+
+.hero-col-pill {
+  @include u.lc-font('xxs', t.$lc-font-weight-medium);
+  color: rgba(255, 255, 255, 0.5);
+  background: transparent;
+  border: none;
+  padding: 0;
+  font-family: t.$lc-font-body;
+  cursor: pointer;
+  margin-top: 2px;
+}
+
+.hero-actions {
+  display: flex;
+  gap: t.$lc-space-2;
+  position: relative;
+  z-index: 1;
+}
+
+.hero-btn-start {
+  display: inline-flex;
+  align-items: center;
+  gap: t.$lc-space-1 + 2px;
+  background: white;
+  color: t.$lc-brand;
+  font-family: t.$lc-font-body;
+  @include u.lc-font('xs', t.$lc-font-weight-bold);
+  padding: 9px t.$lc-space-4;
+  border-radius: t.$lc-radius-full;
+  border: none;
+  cursor: pointer;
+  @include u.touch-state;
+
+  ion-icon { font-size: 12px; }
+}
+
+.hero-btn-filter {
   display: inline-flex;
   align-items: center;
   gap: t.$lc-space-1;
-  padding: t.$lc-space-1 t.$lc-space-3;
-  border-radius: t.$lc-radius-full;
-  border: 1px solid rgba(255, 255, 255, 0.35);
   background: rgba(255, 255, 255, 0.12);
-  color: rgba(255, 255, 255, 0.85);
-  @include u.lc-font('xs', t.$lc-font-weight-semibold);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  color: white;
   font-family: t.$lc-font-body;
+  @include u.lc-font('xxs', t.$lc-font-weight-semibold);
+  padding: t.$lc-space-2 t.$lc-space-3;
+  border-radius: t.$lc-radius-full;
   cursor: pointer;
-  margin-bottom: t.$lc-space-3;
-  transition: background t.$lc-duration-fast;
-
-  ion-icon { font-size: 11px; }
-  &:active { background: rgba(255, 255, 255, 0.2); }
+  @include u.touch-state;
 }
 
-.hero-actions { display: flex; gap: t.$lc-space-2; align-items: center; }
-
+// ─── STATS ROW ───────────────────────────────────────────────────────────────
 .stats-row {
   display: flex;
   gap: t.$lc-space-2;
-  padding: 0 14px t.$lc-space-4;
+  padding: 0 t.$lc-space-4 t.$lc-space-3;
 }
 
 .stat-card {
   flex: 1;
-  padding: t.$lc-space-3 t.$lc-space-3;
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
+  @include u.lc-card;
+  padding: t.$lc-space-3;
+  text-align: center;
 }
 
-.stat-icon { font-size: t.$lc-text-md; }
+.stat-icon {
+  font-size: t.$lc-text-xl;
+  margin-bottom: 3px;
+  display: block;
+}
 
 .stat-val {
-  font-size: 17px;
-  font-weight: t.$lc-font-weight-semibold;
+  font-family: t.$lc-font-display;
+  @include u.lc-font('3xl', t.$lc-font-weight-semibold);
   color: var(--lc-text-primary);
-  margin: 0;
-  line-height: 1.2;
+  line-height: 1;
 }
 
 .stat-lbl {
   @include u.lc-font('xxs', t.$lc-font-weight-medium);
   color: var(--lc-text-hint);
-  margin: 0;
+  margin-top: 3px;
 }
 
-.article-legend {
+.streak-dots {
   display: flex;
-  gap: t.$lc-space-3;
-  padding: t.$lc-space-1 t.$lc-space-4 t.$lc-space-3;
+  justify-content: center;
+  gap: 3px;
+  margin-top: t.$lc-space-1;
+}
+
+.streak-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--lc-border);
+
+  &--active {
+    background: t.$lc-accent;
+  }
+}
+
+// ─── WORD OF THE DAY ─────────────────────────────────────────────────────────
+.wotd-card {
+  margin: 0 t.$lc-space-4 t.$lc-space-3;
+  @include u.lc-card;
+  padding: t.$lc-space-3 t.$lc-space-3 t.$lc-space-3 t.$lc-space-4;
+  position: relative;
+  overflow: hidden;
+
+  &::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0;
+    width: 4px; height: 100%;
+    background: t.$lc-accent;
+    border-radius: 2px 0 0 2px;
+  }
+}
+
+.wotd-header {
+  @include u.flex-between;
+  margin-bottom: t.$lc-space-2;
+}
+
+.wotd-label {
+  @include u.lc-font('xxs', t.$lc-font-weight-semibold);
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+  color: t.$lc-accent;
+}
+
+.wotd-play {
+  @include u.square(28px);
+  border-radius: 50%;
+  background: t.$lc-accent-light;
+  border: 1px solid rgba(224, 123, 63, 0.2);
+  @include u.flex-center;
+  cursor: pointer;
+  @include u.touch-state;
+
+  ion-icon {
+    font-size: 12px;
+    color: t.$lc-accent;
+  }
+}
+
+.wotd-word {
+  font-family: t.$lc-font-display;
+  @include u.lc-font('4xl', t.$lc-font-weight-semibold);
+  color: var(--lc-text-primary);
+  line-height: 1.2;
+  margin-bottom: 2px;
+}
+
+.wotd-trans {
+  @include u.lc-font('xs');
+  color: var(--lc-text-secondary);
+  margin-bottom: t.$lc-space-2;
+
+  em { color: var(--lc-text-hint); }
+}
+
+.wotd-example {
+  @include u.lc-font('xs');
+  color: var(--lc-text-secondary);
+  line-height: 1.5;
+  background: var(--lc-surface);
+  border-radius: t.$lc-radius-sm;
+  padding: t.$lc-space-2 t.$lc-space-2 + 2px;
+
+  em { font-style: italic; }
+}
+
+// ─── SECTION HEADER ──────────────────────────────────────────────────────────
+.sec-header {
+  @include u.flex-between;
+  padding: t.$lc-space-1 t.$lc-space-4 t.$lc-space-2;
+}
+
+.sec-title {
+  @include u.lc-font('sm', t.$lc-font-weight-semibold);
+  color: var(--lc-text-primary);
+}
+
+.sec-link {
+  @include u.lc-font('xxs', t.$lc-font-weight-semibold);
+  color: t.$lc-brand-mid;
+  cursor: pointer;
+}
+
+// ─── WEEKLY CHART ────────────────────────────────────────────────────────────
+.weekly-card {
+  margin: 0 t.$lc-space-4 t.$lc-space-3;
+  @include u.lc-card;
+  padding: t.$lc-space-3;
+}
+
+.weekly-bars {
+  display: flex;
+  align-items: flex-end;
+  gap: t.$lc-space-1 + 2px;
+  height: 54px;
+  margin-bottom: t.$lc-space-1;
+}
+
+.weekly-bar-wrap {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
   align-items: center;
+  gap: 4px;
 }
 
-.legend-item { display: flex; align-items: center; gap: 5px; }
+.weekly-bar {
+  width: 100%;
+  border-radius: 4px 4px 2px 2px;
+  background: t.$lc-brand-light;
+  min-height: 4px;
 
-.legend-lbl {
-  @include u.lc-font('xxs', t.$lc-font-weight-medium);
+  &--filled {
+    background: t.$lc-brand;
+  }
+
+  &--today {
+    background: t.$lc-accent;
+  }
+}
+
+.weekly-day {
+  @include u.lc-font('xxs', t.$lc-font-weight-semibold);
   color: var(--lc-text-hint);
+  text-transform: uppercase;
+
+  &--today {
+    color: t.$lc-accent;
+  }
 }
 
-.word-list-home {
-  padding: 0 14px;
+.weekly-legend {
+  @include u.flex-between;
+  margin-top: t.$lc-space-1;
+}
+
+.weekly-total,
+.weekly-goal {
+  @include u.lc-font('xxs');
+  color: var(--lc-text-secondary);
+
+  strong {
+    color: var(--lc-text-primary);
+    font-weight: t.$lc-font-weight-semibold;
+  }
+}
+
+// ─── QUICK ACTIONS ───────────────────────────────────────────────────────────
+.quick-actions {
+  display: flex;
+  gap: t.$lc-space-2;
+  padding: 0 t.$lc-space-4 t.$lc-space-3;
+}
+
+.quick-action {
+  flex: 1;
+  @include u.lc-card;
+  padding: t.$lc-space-3 t.$lc-space-2;
+  text-align: center;
+  cursor: pointer;
+  border: none;
+  font-family: t.$lc-font-body;
+  @include u.touch-state;
+}
+
+.quick-icon {
+  font-size: 22px;
+  margin-bottom: t.$lc-space-1;
+  display: block;
+}
+
+.quick-lbl {
+  @include u.lc-font('xxs', t.$lc-font-weight-semibold);
+  color: var(--lc-text-primary);
+}
+
+.quick-sub {
+  @include u.lc-font('xxs');
+  color: var(--lc-text-hint);
+  margin-top: 1px;
+}
+
+// ─── RECENT LIST ─────────────────────────────────────────────────────────────
+.recent-list {
+  padding: 0 t.$lc-space-4;
   display: flex;
   flex-direction: column;
   gap: t.$lc-space-2;
-}
-
-.home-nav-right .lc-fab {
-  @include u.circle(32px);
-  box-shadow: 0 3px 10px rgba(224, 123, 63, 0.35);
-  ion-icon { font-size: 17px; }
+  margin-bottom: t.$lc-space-3;
 }

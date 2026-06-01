@@ -45,17 +45,22 @@
 
     <div class="sc-vocab-list">
       @for (vw of s.vocabWords; track vw.cardId) {
-        <div class="sc-vocab-row">
-          @if (vw.article) {
-            <span class="sc-article-badge" [ngClass]="articleClass(vw.article)">
-              {{ vw.article }}
-            </span>
-          }
-          <div class="sc-vocab-info">
-            <span class="sc-vocab-de">{{ vw.german }}</span>
-            <span class="sc-vocab-en">{{ vw.english }}</span>
+        <div class="sc-vocab-card">
+          <div class="sc-vocab-bar" [class]="'sc-vocab-bar--' + (vw.article ?? 'none')"></div>
+          <div class="sc-vocab-content">
+            <div class="sc-vocab-top">
+              @if (vw.article) {
+                <lc-article-badge [article]="vw.article" />
+              }
+              <span class="sc-vocab-word">{{ vw.german }}</span>
+            </div>
+            <div class="sc-vocab-mid">
+              <span class="sc-vocab-en">{{ vw.english }}</span>
+              @if (vw.germanBase && vw.germanBase !== vw.german) {
+                <span class="sc-vocab-base">{{ vw.germanBase }}</span>
+              }
+            </div>
           </div>
-          <span class="sc-vocab-base">{{ vw.germanBase }}</span>
         </div>
       }
     </div>

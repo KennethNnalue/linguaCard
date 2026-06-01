@@ -15,12 +15,14 @@ import {
   shuffleOutline,
   repeatOutline,
 } from 'ionicons/icons';
-import { ConfidenceRating } from '../../../../core/models/mock-data';
-import { CardStore } from '../../../vault/store/card.store';
-import { CategoryStore } from '../../../vault/store/category.store';
-import { ListenStore } from '../../store/listen.store';
-import { ArticleBadgeComponent } from '../../../../shared/components/article-badge/article-badge.component';
-import { PlaylistSourceSheetComponent } from '../../components/playlist-source-sheet/playlist-source-sheet.component';
+import {Card, ConfidenceRating} from '@lingua-card/shared/domain';
+import {CardStore} from '../../../vault/store/card.store';
+import {CategoryStore} from '../../../vault/store/category.store';
+import {ListenStore} from '../../store/listen.store';
+import {ArticleBadgeComponent} from '../../../../shared/components/article-badge/article-badge.component';
+import {PlaylistSourceSheetComponent} from '../../components/playlist-source-sheet/playlist-source-sheet.component';
+import {WordCardComponent} from '../../../../shared/ui/word-card/word-card.component';
+import {getCategoryName} from '../../../../shared/helpers/helpers';
 
 type PlaylistMode = 'word-meaning' | 'examples-only' | 'deep-dive';
 
@@ -28,7 +30,7 @@ type PlaylistMode = 'word-meaning' | 'examples-only' | 'deep-dive';
   selector: 'lc-listen',
   templateUrl: './listen.component.html',
   styleUrls: ['./listen.component.scss', './listen.browser.scss', './listen.player.scss', './listen.controls.scss'],
-  imports: [IonContent, IonHeader, IonIcon, IonToolbar, ArticleBadgeComponent],
+  imports: [IonContent, IonHeader, IonIcon, IonToolbar, ArticleBadgeComponent, WordCardComponent],
 })
 export class ListenComponent implements OnInit, OnDestroy, ViewWillLeave {
   private readonly listenStore = inject(ListenStore);
@@ -101,15 +103,6 @@ export class ListenComponent implements OnInit, OnDestroy, ViewWillLeave {
       .join(' · ') as string;
   });
 
-  readonly currentArticleLabel = computed(() => {
-    const card = this.currentCard();
-    if (!card?.content.article) return '';
-    const genderMap: Record<string, string> = {
-      der: 'masculine', die: 'feminine', das: 'neuter',
-    };
-    const gender = card.content.gender ?? genderMap[card.content.article] ?? '';
-    return `${card.content.article} — ${gender}`;
-  });
 
   readonly currentCardCategory = computed(() => {
     const card = this.currentCard();
@@ -209,6 +202,10 @@ export class ListenComponent implements OnInit, OnDestroy, ViewWillLeave {
   backToBrowser(): void {
     this.listenStore.pause();
     this.inPlayerView.set(false);
+  }
+
+  getCategoryLabel(card: Card): string {
+    return getCategoryName(card.categoryIds?.[0], this.categories());
   }
 
   goBack(): void {

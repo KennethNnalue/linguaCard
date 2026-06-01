@@ -1,29 +1,19 @@
-import { Component, inject, OnInit, signal } from '@angular/core';
-import { NgClass } from '@angular/common';
-import { ActivatedRoute, Router } from '@angular/router';
-import {
-  IonContent,
-  IonHeader,
-  IonIcon,
-  IonToolbar,
-} from '@ionic/angular/standalone';
-import { addIcons } from 'ionicons';
-import {
-  checkmarkCircleOutline,
-  arrowBackOutline,
-  playOutline,
-  sparklesOutline,
-} from 'ionicons/icons';
-import { Story } from '../../../../core/models/mock-data';
-import { StoryStore } from '../../store/story.store';
-import { StoryApiService } from '../../services/story-api.service';
-import { firstValueFrom } from 'rxjs';
+import {Component, inject, OnInit, signal} from '@angular/core';
+import {ActivatedRoute, Router} from '@angular/router';
+import {IonContent, IonHeader, IonIcon, IonToolbar,} from '@ionic/angular/standalone';
+import {addIcons} from 'ionicons';
+import {arrowBackOutline, checkmarkCircleOutline, playOutline, sparklesOutline,} from 'ionicons/icons';
+import {Story} from '@lingua-card/shared/domain';
+import {StoryStore} from '../../store/story.store';
+import {StoryApiService} from '../../services/story-api.service';
+import {firstValueFrom} from 'rxjs';
+import {ArticleBadgeComponent} from '../../../../shared/components/article-badge/article-badge.component';
 
 @Component({
   selector: 'lc-story-complete',
   templateUrl: './story-complete.page.html',
   styleUrls: ['./story-complete.page.scss'],
-  imports: [IonContent, IonHeader, IonToolbar, IonIcon, NgClass],
+  imports: [IonContent, IonHeader, IonToolbar, IonIcon, ArticleBadgeComponent],
 })
 export class StoryCompletePage implements OnInit {
   private readonly route = inject(ActivatedRoute);
@@ -34,7 +24,7 @@ export class StoryCompletePage implements OnInit {
   readonly story = signal<Story | null>(null);
 
   constructor() {
-    addIcons({ checkmarkCircleOutline, arrowBackOutline, playOutline, sparklesOutline });
+    addIcons({checkmarkCircleOutline, arrowBackOutline, playOutline, sparklesOutline});
   }
 
   async ngOnInit(): Promise<void> {
@@ -58,12 +48,5 @@ export class StoryCompletePage implements OnInit {
   replayStory(): void {
     const s = this.story();
     if (s) this.router.navigate(['/stories', s.id]);
-  }
-
-  articleClass(article: string | null): string {
-    if (article === 'der') return 'art-der';
-    if (article === 'die') return 'art-die';
-    if (article === 'das') return 'art-das';
-    return '';
   }
 }

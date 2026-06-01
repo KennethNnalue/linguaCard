@@ -59,8 +59,46 @@
 }
 
 // ─── CATEGORY CHIPS ──────────────────────────────────────────────────────────
-.cd-cat-scroll { display: flex; gap: t.$lc-space-2; padding: 0 14px t.$lc-space-3; overflow-x: auto; scrollbar-width: none; &::-webkit-scrollbar { display: none; } }
+.cd-cat-row {
+  display: flex;
+  align-items: center;
+  padding: 0 t.$lc-space-4 t.$lc-space-3;
+  gap: t.$lc-space-1;
+  position: relative;
+}
+
+.cd-cat-scroll {
+  display: flex;
+  gap: t.$lc-space-2;
+  overflow-x: auto;
+  scrollbar-width: none;
+  flex: 1;
+  &::-webkit-scrollbar { display: none; }
+}
+
+.cd-cat-arrow {
+  flex-shrink: 0;
+  @include u.flex-center;
+  @include u.square(22px);
+  border-radius: t.$lc-radius-full;
+  background: var(--lc-brand-light);
+  pointer-events: none;
+
+  ion-icon {
+    font-size: 11px;
+    color: t.$lc-brand;
+  }
+}
 
 // ─── WORD LIST ────────────────────────────────────────────────────────────────
-.cd-word-list { padding: 0 14px t.$lc-space-8; display: flex; flex-direction: column; gap: t.$lc-space-2; }
-.cd-word-item { padding: t.$lc-space-4 t.$lc-space-4; cursor: default; }
+.cd-word-list {
+  padding: 0 t.$lc-space-4 t.$lc-space-8;
+  display: flex;
+  flex-direction: column;
+  gap: t.$lc-space-2;
+}
+
+.cd-skeleton {
+  @include u.lc-card;
+  height: 100px;
+}

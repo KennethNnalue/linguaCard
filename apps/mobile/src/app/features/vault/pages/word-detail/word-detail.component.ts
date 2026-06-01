@@ -1,5 +1,5 @@
 import {Component, computed, inject} from '@angular/core';
-import {ActivatedRoute, Router} from '@angular/router';
+import {ActivatedRoute, Router, RouterLink} from '@angular/router';
 import {toSignal} from '@angular/core/rxjs-interop';
 import {map} from 'rxjs/operators';
 import {AlertController, IonContent, IonHeader, IonIcon, IonToolbar, ModalController,} from '@ionic/angular/standalone';
@@ -8,14 +8,15 @@ import {
   chevronBackOutline,
   createOutline,
   ellipsisHorizontalOutline,
+  micOutline,
+  playOutline,
   trashOutline,
   volumeHighOutline,
 } from 'ionicons/icons';
-import { CardStore } from '../../store/card.store';
-import { CategoryStore } from '../../store/category.store';
-import { CardApiService } from '../../services/card-api.service';
-import { AudioService } from '../../../../shared/audio/audio.service';
-import { PronunciationService } from '../../../ai/audio/pronunciation.service';
+import {CardStore} from '../../store/card.store';
+import {CategoryStore} from '../../store/category.store';
+import {CardApiService} from '../../services/card-api.service';
+import {PronunciationService} from '../../../ai/audio/pronunciation.service';
 import {ArticleBadgeComponent} from '../../../../shared/components/article-badge/article-badge.component';
 import {AddWordSheetComponent} from '../../components/add-word-sheet/add-word-sheet.component';
 import {getCategoryName} from '../../../../shared/helpers/helpers';
@@ -25,13 +26,12 @@ import {getCategoryName} from '../../../../shared/helpers/helpers';
   standalone: true,
   templateUrl: './word-detail.component.html',
   styleUrls: ['./word-detail.component.scss'],
-  imports: [IonHeader, IonToolbar, IonContent, IonIcon, ArticleBadgeComponent],
+  imports: [IonHeader, IonToolbar, IonContent, IonIcon, ArticleBadgeComponent, RouterLink],
 })
 export class WordDetailComponent {
   private readonly cardStore = inject(CardStore);
   private readonly categoryStore = inject(CategoryStore);
   private readonly cardApi = inject(CardApiService);
-  private readonly audioService = inject(AudioService);
   private readonly pronunciationService = inject(PronunciationService);
   private readonly router = inject(Router);
   private readonly route = inject(ActivatedRoute);
@@ -43,6 +43,8 @@ export class WordDetailComponent {
       chevronBackOutline,
       ellipsisHorizontalOutline,
       volumeHighOutline,
+      micOutline,
+      playOutline,
       createOutline,
       trashOutline,
     });
@@ -59,20 +61,27 @@ export class WordDetailComponent {
 
   readonly categories = this.categoryStore.categories;
 
-  readonly masteryPercent = computed(() => {
-    const lvl = this.card()?.srsState?.masteryLevel ?? 0;
-    return (lvl / 5) * 100;
-  });
+  readonly masteryLevel = computed(() => this.card()?.srsState?.masteryLevel ?? 0);
 
-  readonly masteryColor = computed(() => {
-    const lvl = this.card()?.srsState?.masteryLevel ?? 0;
-    return ['#D1D5DB', '#FCA5A5', '#FCD34D', '#6EE7B7', '#34D399', '#059669'][lvl];
-  });
+  readonly masteryColor = computed(() =>
+    ['#D1D5DB', '#FCA5A5', '#FCD34D', '#6EE7B7', '#34D399', '#059669'][this.masteryLevel()]
+  );
+
+  readonly masteryBgColor = computed(() =>
+    ['#F3F4F6', '#FEF2F2', '#FFFBEA', '#F0FDF9', '#ECFDF5', '#D1FAE5'][this.masteryLevel()]
+  );
 
   readonly masteryLabel = computed(() => {
     const state = this.card()?.srsState?.state;
     if (!state || state === 'new') return 'New';
     return {learning: 'Learning', review: 'Review', mastered: 'Mastered'}[state] ?? 'New';
+  });
+
+  readonly masteryRingOffset = computed(() => {
+    // Circumference for r=22: 2π*22 ≈ 138.23
+    const circumference = 2 * Math.PI * 22;
+    const progress = this.masteryLevel() / 5;
+    return circumference * (1 - progress);
   });
 
   readonly nextReviewText = computed(() => {
@@ -96,8 +105,23 @@ export class WordDetailComponent {
   readonly intervalText = computed(() => `${this.card()?.srsState?.intervalDays ?? 0}d`);
 
   readonly categoryName = computed(() => {
-    const id = this.card()?.categoryIds[0];
+    const id = this.card()?.categoryIds?.[0];
     return id ? getCategoryName(id, this.categories()) : '';
+  });
+
+  readonly relatedWords = computed(() => {
+    const card = this.card();
+    if (!card) return [];
+    const word = card.content.back.toLowerCase();
+    const stem = word.slice(0, 4);
+    return this.cardStore.cards()
+      .filter(c => c.id !== card.id)
+      .filter(c => {
+        const other = c.content.back.toLowerCase();
+        return (other.includes(stem) || word.includes(other.slice(0, 4)))
+          && Math.abs(other.length - word.length) <= 5;
+      })
+      .slice(0, 5);
   });
 
   goBack(): void {
@@ -113,8 +137,10 @@ export class WordDetailComponent {
   }
 
   async openEdit(): Promise<void> {
+    const card = this.card();
     const modal = await this.modalCtrl.create({
       component: AddWordSheetComponent,
+      componentProps: {cardToEdit: card},
       breakpoints: [0, 0.95, 1],
       initialBreakpoint: 0.95,
       handleBehavior: 'cycle',
