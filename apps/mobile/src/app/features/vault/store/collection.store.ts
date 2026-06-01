@@ -110,9 +110,11 @@ export const CollectionStore = signalStore(
           cardCount: 0,
           masteredCount: 0,
           dueCount: 0,
+          isDefault: false,
+          importStatus: 'complete',
+          pendingWords: [],
           createdAt: now,
           updatedAt: now,
-          isDefault: false,
         };
         patchState(store, { collections: [...store.collections(), tempCol] });
 

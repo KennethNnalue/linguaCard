@@ -1,39 +1,62 @@
+@use 'theme/tokens' as t;
+@use 'theme/utils' as u;
+
 .proc-page {
-  --background: var(--lc-bg, #FAFAF8);
+  --background: var(--lc-surface, #FAFAF8);
 }
 
 .proc-content {
   min-height: 100%;
   display: flex;
   flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  padding: 40px 24px 60px;
-  gap: 20px;
-  text-align: center;
+  padding: t.$lc-space-2 0 t.$lc-space-6;
 }
 
-// ─── HEADING ──────────────────────────────────────────────────────────────────
+// ─── TOP BAR ─────────────────────────────────────────────────────────────────
 
-.proc-heading {
-  font-size: 20px;
-  font-weight: 600;
+.proc-topbar {
+  display: flex;
+  align-items: center;
+  gap: t.$lc-space-3;
+  padding: t.$lc-space-2 14px t.$lc-space-3;
+}
+
+.proc-back {
+  @include u.circle(30px);
+  @include u.flex-center;
+  background: var(--lc-brand-light);
+  border: none;
+  cursor: pointer;
+  flex-shrink: 0;
+
+  svg {
+    width: 14px;
+    height: 14px;
+    color: var(--lc-brand);
+  }
+}
+
+.proc-topbar-title {
+  @include u.lc-font('md', t.$lc-font-weight-semibold);
+  font-family: t.$lc-font-display;
   color: var(--lc-text-primary);
-  margin: 0;
-  min-height: 28px;
-  transition: opacity 0.3s;
+}
+
+.proc-topbar-sub {
+  @include u.lc-font('xs');
+  color: var(--lc-text-hint);
+  margin-top: 1px;
 }
 
 // ─── IMAGE THUMBNAIL + SCAN ───────────────────────────────────────────────────
 
 .proc-img-wrap {
   position: relative;
-  width: min(280px, 80vw);
-  height: min(210px, 60vw);
-  border-radius: var(--lc-radius-md, 12px);
+  margin: 0 14px t.$lc-space-4;
+  height: 130px;
+  border-radius: 14px;
   overflow: hidden;
-  border: 2px solid var(--lc-brand);
-  box-shadow: 0 4px 20px rgba(45, 90, 78, 0.2);
+  background: var(--lc-surface);
 }
 
 .proc-img {
@@ -43,91 +66,330 @@
   display: block;
 }
 
-// ─── SCAN LINE ────────────────────────────────────────────────────────────────
-
 .scan-overlay {
   position: absolute;
   inset: 0;
   overflow: hidden;
-  border-radius: inherit;
   pointer-events: none;
+}
 
-  &::after {
-    content: '';
-    position: absolute;
-    top: -6px;
-    left: 0;
-    right: 0;
-    height: 6px;
-    background: linear-gradient(transparent, rgba(45, 90, 78, 0.35), transparent);
-    animation: scan-down 2s ease-in-out infinite;
+.scan-glow {
+  position: absolute;
+  left: 0;
+  right: 0;
+  height: 20px;
+  background: linear-gradient(180deg, transparent 0%, rgba(45,90,78,0.12) 50%, transparent 100%);
+  animation: scan-glow 2.2s ease-in-out infinite;
+}
+
+.scan-line {
+  position: absolute;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: var(--lc-brand);
+  opacity: 0.85;
+  animation: scan-line 2.2s ease-in-out infinite;
+}
+
+@keyframes scan-line {
+  0%   { top: 8%; }
+  55%  { top: 88%; }
+  100% { top: 8%; }
+}
+
+@keyframes scan-glow {
+  0%   { top: 0%; }
+  55%  { top: 82%; }
+  100% { top: 0%; }
+}
+
+// ─── TWO-PHASE STEPS ─────────────────────────────────────────────────────────
+
+.proc-phases {
+  padding: t.$lc-space-4 14px 0;
+}
+
+.proc-phase-row {
+  display: flex;
+  align-items: flex-start;
+  gap: t.$lc-space-3;
+}
+
+.proc-connector {
+  width: 2px;
+  height: 22px;
+  background: var(--lc-border);
+  margin: 4px 0 4px 13px;
+
+  &--done { background: var(--lc-brand-mid); }
+}
+
+.proc-step-dot {
+  @include u.circle(28px);
+  @include u.flex-center;
+  flex-shrink: 0;
+  border: 2px solid var(--lc-border);
+  background: var(--lc-surface);
+
+  svg { width: 12px; height: 12px; color: var(--lc-text-hint); }
+
+  &--active {
+    background: var(--lc-brand-light);
+    border-color: var(--lc-brand);
+  }
+
+  &--done {
+    background: var(--lc-brand);
+    border-color: var(--lc-brand);
+    svg { color: white; }
+  }
+
+  &--warn {
+    background: var(--lc-warn-bg, #FFFBEB);
+    border-color: var(--lc-warn-border, #FCD34D);
+    svg { stroke: var(--lc-warn, #B45309); }
+  }
+
+  &--pending {
+    opacity: 0.6;
   }
 }
 
-@keyframes scan-down {
-  0%   { transform: translateY(0); }
-  100% { transform: translateY(calc(100% + 300px)); }
+.proc-spinner {
+  @include u.square(14px);
+  border: 2px solid rgba(45, 90, 78, 0.2);
+  border-top-color: var(--lc-brand);
+  border-radius: 50%;
+  animation: spin 0.75s linear infinite;
 }
 
-// ─── STATUS TEXT ──────────────────────────────────────────────────────────────
+@keyframes spin { to { transform: rotate(360deg); } }
 
-.proc-status {
-  font-size: 15px;
-  color: var(--lc-text-secondary);
-  margin: 0;
-  font-weight: 500;
-  animation: pulse-text 2s ease-in-out infinite;
+.proc-step-body {
+  flex: 1;
+  padding-bottom: t.$lc-space-2;
 }
 
-@keyframes pulse-text {
-  0%, 100% { opacity: 1; }
-  50%       { opacity: 0.55; }
+.proc-step-title {
+  @include u.lc-font('sm', t.$lc-font-weight-semibold);
+  color: var(--lc-text-primary);
+
+  &--muted { color: var(--lc-text-hint); font-weight: 400; }
+  &--warn  { color: var(--lc-warn, #B45309); }
 }
 
-// ─── SKELETON CHIPS ───────────────────────────────────────────────────────────
+.proc-step-sub {
+  @include u.lc-font('xs');
+  color: var(--lc-text-hint);
+  margin-top: 1px;
+}
 
-.proc-skeletons {
+// ─── PROGRESS CARD ────────────────────────────────────────────────────────────
+
+.proc-progress-card {
+  margin: t.$lc-space-3 14px 0;
+  background: var(--lc-card);
+  border: 1px solid var(--lc-border);
+  border-radius: 14px;
+  padding: 14px;
+  box-shadow: var(--lc-shadow-card);
+}
+
+.proc-progress-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: t.$lc-space-3;
+}
+
+.proc-progress-label {
+  @include u.lc-font('xxs', t.$lc-font-weight-semibold);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--lc-text-hint);
+}
+
+.proc-progress-count {
+  @include u.lc-font('sm', t.$lc-font-weight-semibold);
+  color: var(--lc-brand);
+}
+
+.proc-bar-track {
+  height: 6px;
+  background: var(--lc-surface);
+  border-radius: 3px;
+  border: 1px solid var(--lc-border);
+  overflow: hidden;
+  margin-bottom: t.$lc-space-2;
+}
+
+.proc-bar-fill {
+  height: 100%;
+  border-radius: 3px;
+  background: var(--lc-brand);
+  transition: width 0.4s ease;
+}
+
+.proc-bar-labels {
+  display: flex;
+  justify-content: space-between;
+  @include u.lc-font('xxs');
+  color: var(--lc-text-hint);
+}
+
+.proc-chip-grid {
   display: flex;
   flex-wrap: wrap;
-  gap: 8px;
-  justify-content: center;
-  max-width: 280px;
+  gap: 5px;
+  margin-top: t.$lc-space-3;
 }
 
-%skel-base {
-  height: 28px;
+.proc-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 3px 9px;
   border-radius: 20px;
-  background: var(--lc-border, #E5E7EB);
-  animation: skel-pulse 1.5s ease-in-out infinite;
+  @include u.lc-font('xxs', t.$lc-font-weight-semibold);
+  border: 1px solid;
+
+  &--done {
+    background: var(--lc-brand-light);
+    color: var(--lc-brand);
+    border-color: rgba(45, 90, 78, 0.2);
+
+    svg {
+      width: 8px;
+      height: 8px;
+      stroke: var(--lc-brand);
+      fill: none;
+      stroke-width: 2.5;
+      stroke-linecap: round;
+    }
+  }
 }
 
-.proc-skel {
-  @extend %skel-base;
+.proc-batch-info {
+  display: flex;
+  align-items: center;
+  gap: t.$lc-space-2;
+  margin-top: t.$lc-space-3;
+  padding: t.$lc-space-2 t.$lc-space-3;
+  background: var(--lc-surface);
+  border-radius: 8px;
+  border: 1px solid var(--lc-border);
+  @include u.lc-font('xxs');
+  color: var(--lc-text-secondary);
 
-  &--1 { width: 72px; animation-delay: 0s; }
-  &--2 { width: 56px; animation-delay: 0.15s; }
-  &--3 { width: 88px; animation-delay: 0.3s; }
-  &--4 { width: 64px; animation-delay: 0.45s; }
-  &--5 { width: 80px; animation-delay: 0.6s; }
-  &--6 { width: 52px; animation-delay: 0.75s; }
+  svg {
+    width: 12px;
+    height: 12px;
+    flex-shrink: 0;
+    color: var(--lc-text-hint);
+    fill: none;
+  }
 }
 
-@keyframes skel-pulse {
-  0%, 100% { opacity: 0.6; }
-  50%       { opacity: 0.25; }
+// ─── PARTIAL RESULT ───────────────────────────────────────────────────────────
+
+.proc-partial-banner {
+  margin: t.$lc-space-3 14px 0;
+  background: var(--lc-warn-bg, #FFFBEB);
+  border: 1.5px solid var(--lc-warn-border, #FCD34D);
+  border-radius: 14px;
+  padding: 14px;
+  display: flex;
+  gap: t.$lc-space-3;
 }
 
-// ─── CANCEL ───────────────────────────────────────────────────────────────────
+.proc-partial-icon {
+  font-size: 20px;
+  flex-shrink: 0;
+  margin-top: 1px;
+}
+
+.proc-partial-title {
+  @include u.lc-font('sm', t.$lc-font-weight-semibold);
+  color: var(--lc-warn, #B45309);
+  margin-bottom: 3px;
+}
+
+.proc-partial-sub {
+  @include u.lc-font('xs');
+  color: var(--lc-warn-text, #92400E);
+  line-height: 1.5;
+}
+
+.proc-partial-stats {
+  display: flex;
+  gap: t.$lc-space-2;
+  padding: t.$lc-space-3 14px 0;
+}
+
+.proc-partial-stat {
+  flex: 1;
+  background: var(--lc-card);
+  border: 1px solid var(--lc-border);
+  border-radius: 12px;
+  padding: t.$lc-space-3;
+  text-align: center;
+  box-shadow: var(--lc-shadow-card);
+}
+
+.proc-partial-stat-val {
+  font-family: t.$lc-font-display;
+  @include u.lc-font('3xl', t.$lc-font-weight-semibold);
+  color: var(--lc-text-primary);
+  line-height: 1;
+
+  &--ok   { color: var(--lc-brand); }
+  &--warn { color: var(--lc-warn, #B45309); }
+}
+
+.proc-partial-stat-lbl {
+  @include u.lc-font('xxs');
+  color: var(--lc-text-hint);
+  margin-top: 3px;
+}
+
+// ─── INFO NOTE ────────────────────────────────────────────────────────────────
+
+.proc-info-note {
+  display: flex;
+  align-items: center;
+  gap: t.$lc-space-2;
+  margin: t.$lc-space-4 14px 0;
+  padding: t.$lc-space-3 t.$lc-space-3;
+  background: var(--lc-surface);
+  border-radius: 10px;
+  border: 1px solid var(--lc-border);
+  @include u.lc-font('xxs');
+  color: var(--lc-text-hint);
+
+  svg {
+    width: 12px;
+    height: 12px;
+    flex-shrink: 0;
+    fill: none;
+  }
+}
+
+// ─── FOOTER ──────────────────────────────────────────────────────────────────
+
+.proc-spacer { flex: 1; }
 
 .proc-cancel {
-  margin-top: 12px;
+  margin: t.$lc-space-4 auto 0;
   background: transparent;
   border: none;
-  font-size: 14px;
+  @include u.lc-font('sm');
   color: var(--lc-text-hint);
-  font-family: var(--lc-font-body);
+  font-family: t.$lc-font-body;
   cursor: pointer;
-  padding: 8px 16px;
+  padding: t.$lc-space-2 t.$lc-space-4;
+  display: block;
+  text-align: center;
 
   &:active { color: var(--lc-fem-text); }
 }

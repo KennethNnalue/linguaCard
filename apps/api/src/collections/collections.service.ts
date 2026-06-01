@@ -2,7 +2,7 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { randomUUID } from 'crypto';
-import type { Collection } from '@lingua-card/shared/domain';
+import type { Collection, CollectionImportStatus } from '@lingua-card/shared/domain';
 import { CreateCollectionDto, UpdateCollectionDto } from '@lingua-card/shared/dto';
 import { CollectionEntity } from './collection.entity';
 import { CardEntity } from '../cards/card.entity';
@@ -101,6 +101,9 @@ export class CollectionsService {
       masteredCount: counts.masteredCount,
       dueCount: counts.dueCount,
       isDefault: e.isDefault,
+      importStatus: (e.importStatus as CollectionImportStatus) ?? 'complete',
+      pendingWords: e.pendingWords ?? [],
+      sourceImageDescription: e.sourceImageDescription ?? undefined,
       createdAt: e.createdAt instanceof Date ? e.createdAt.toISOString() : e.createdAt,
       updatedAt: e.updatedAt instanceof Date ? e.updatedAt.toISOString() : e.updatedAt,
     };

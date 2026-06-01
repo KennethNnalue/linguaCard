@@ -4,7 +4,9 @@
       <button class="lc-back-btn" (click)="goBack()" aria-label="Back">
         <ion-icon name="chevron-back-outline"></ion-icon>
       </button>
-      <h1 class="cd-nav-title lc-display">{{ collection()?.name ?? '' }}</h1>
+      <h1 class="cd-nav-title lc-display" [class.cd-nav-title--completed]="justCompleted()">
+        {{ collection()?.name ?? '' }}
+      </h1>
       <button class="cd-menu-btn" (click)="showMenu()" aria-label="Options">
         <ion-icon name="ellipsis-horizontal-outline"></ion-icon>
       </button>
@@ -13,6 +15,32 @@
 </ion-header>
 
 <ion-content>
+
+  <!-- Incomplete import banner -->
+  @if (collection()?.importStatus === 'incomplete') {
+    <div class="cd-incomplete-banner">
+      <div class="cd-incomplete-banner__icon">
+        <ion-icon name="time-outline"></ion-icon>
+      </div>
+      <div class="cd-incomplete-banner__body">
+        <p class="cd-incomplete-banner__title">Import incomplete</p>
+        <p class="cd-incomplete-banner__sub">
+          {{ collection()!.pendingWords.length }} words still need flashcards
+        </p>
+      </div>
+      <button
+        class="cd-incomplete-banner__btn"
+        [class.cd-incomplete-banner__btn--loading]="completing()"
+        (click)="completeImport()"
+        [disabled]="completing()">
+        @if (completing()) {
+          <span class="cd-spinner"></span>
+        } @else {
+          Complete
+        }
+      </button>
+    </div>
+  }
 
   <!-- Hero strip -->
   <div class="cd-hero">
@@ -107,6 +135,25 @@
       }
     }
   </div>
+
+  <!-- Pending ghost rows (only when collection is incomplete) -->
+  @if (!loading() && collection()?.importStatus === 'incomplete' && collection()!.pendingWords.length > 0) {
+    <div class="cd-pending-section">
+      <div class="cd-pending-label">
+        <div class="cd-pending-dot"></div>
+        Pending ({{ collection()!.pendingWords.length }}) — tap Complete above
+      </div>
+      @for (i of pendingGhosts(); track i) {
+        <div class="cd-ghost-row">
+          <div class="cd-ghost-art"></div>
+          <div class="cd-ghost-body">
+            <div class="cd-ghost-line" [style.width]="ghostWidths[i % 3][0]"></div>
+            <div class="cd-ghost-line cd-ghost-line--short" [style.width]="ghostWidths[i % 3][1]"></div>
+          </div>
+        </div>
+      }
+    </div>
+  }
 
   <div style="height: 100px;"></div>
 

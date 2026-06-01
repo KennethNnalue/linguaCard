@@ -13,7 +13,7 @@
 <ion-content>
   <div class="imp-rv-content">
 
-    <!-- File info bar with thumbnail (LC-091) -->
+    <!-- File info bar with thumbnail -->
     <div class="imp-file-bar">
       @if (image()) {
         <img
@@ -24,10 +24,22 @@
         <ion-icon name="checkmark-circle-outline" class="imp-file-icon"></ion-icon>
       }
       <div style="flex:1;min-width:0;">
-        <p class="imp-file-name">{{ result()?.totalFound }} words detected</p>
+        <p class="imp-file-name">
+          {{ totalFound() }} words found
+          @if (pendingCount() > 0) { · {{ wordList().length }} ready }
+        </p>
         <p class="imp-file-sub">AI-scanned · {{ image()?.mimeType }}</p>
       </div>
-      <ion-icon name="checkmark-circle-outline" style="color: var(--lc-brand); font-size: 22px; flex-shrink:0;"></ion-icon>
+      @if (pendingCount() > 0) {
+        <div class="imp-pending-badge">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+            <circle cx="12" cy="12" r="9"/><polyline points="12,6 12,12 16,14"/>
+          </svg>
+          {{ pendingCount() }} pending
+        </div>
+      } @else {
+        <ion-icon name="checkmark-circle-outline" style="color: var(--lc-brand); font-size: 22px; flex-shrink:0;"></ion-icon>
+      }
     </div>
 
     <!-- Duplicate summary banner -->
@@ -42,16 +54,22 @@
       </div>
     }
 
-    <!-- Summary stats + select all (LC-089) -->
+    <!-- Summary stats + select all -->
     <div class="imp-summary-row">
       <div class="imp-sum-cell">
-        <span class="imp-sum-val">{{ wordList().length }}</span>
-        <span class="imp-sum-lbl">Total</span>
+        <span class="imp-sum-val">{{ totalFound() }}</span>
+        <span class="imp-sum-lbl">Total found</span>
       </div>
       <div class="imp-sum-cell imp-sum-cell--ready">
         <span class="imp-sum-val">{{ selectedCount() }}</span>
         <span class="imp-sum-lbl">Selected</span>
       </div>
+      @if (pendingCount() > 0) {
+        <div class="imp-sum-cell imp-sum-cell--warn">
+          <span class="imp-sum-val">{{ pendingCount() }}</span>
+          <span class="imp-sum-lbl">Pending</span>
+        </div>
+      }
       @if (duplicateCount() > 0) {
         <div class="imp-sum-cell imp-sum-cell--warn">
           <span class="imp-sum-val">{{ duplicateCount() }}</span>
@@ -140,13 +158,28 @@
 
     <div class="imp-rv-spacer"></div>
 
+    <!-- All-pending info banner -->
+    @if (allPending()) {
+      <div class="imp-all-pending-banner">
+        <div class="imp-all-pending-icon">⏳</div>
+        <div class="imp-all-pending-body">
+          <div class="imp-all-pending-title">No cards ready yet</div>
+          <div class="imp-all-pending-sub">
+            All {{ pendingCount() }} words hit the quota limit. Save to collection now — tap "Complete" any time to generate the flashcards.
+          </div>
+        </div>
+      </div>
+    }
+
     <!-- Import button -->
     <button
       class="imp-import-btn"
-      [disabled]="importing() || selectedCount() === 0 || !selectedCollectionId()"
+      [disabled]="importing() || (!allPending() && selectedCount() === 0) || !selectedCollectionId()"
       (click)="confirmImport()">
       @if (importing()) {
-        Importing…
+        Saving…
+      } @else if (allPending()) {
+        Save to collection — generate cards later
       } @else {
         Import {{ selectedCount() }} words to Vault
       }

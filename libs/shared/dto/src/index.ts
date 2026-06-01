@@ -65,6 +65,9 @@ export class UpdateCollectionDto {
   @IsOptional() @IsString() emoji?: string;
   @IsOptional() @IsString() colour?: string;
   @IsOptional() @IsString() description?: string;
+  @IsOptional() @IsString() importStatus?: string;
+  @IsOptional() @IsArray() pendingWords?: unknown[];
+  @IsOptional() @IsString() sourceImageDescription?: string;
 }
 
 // ─── CATEGORY DTOs ────────────────────────────────────────────────────────────
@@ -168,6 +171,9 @@ export interface IUpdateCollectionDto {
   emoji?: string;
   colour?: string;
   description?: string;
+  importStatus?: string;
+  pendingWords?: unknown[];
+  sourceImageDescription?: string;
 }
 
 export interface ICreateCategoryDto {

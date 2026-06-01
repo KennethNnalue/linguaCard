@@ -123,21 +123,71 @@
   &:active { opacity: 0.8; }
 }
 
-// ─── TIPS ─────────────────────────────────────────────────────────────────────
+// ─── HERO DROPZONE ────────────────────────────────────────────────────────────
 
-.img-imp-tips {
+.img-imp-hero {
+  background: var(--lc-card, #fff);
+  border: 1.5px dashed var(--lc-brand-mid, #4A8C7A);
+  border-radius: 20px;
   display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 150px;
   gap: 8px;
-  flex-wrap: wrap;
-  margin-top: 4px;
+  padding: 20px 16px;
+  text-align: center;
 }
 
-.img-imp-tip-chip {
-  background: var(--lc-surface, #F5F5F5);
-  border: 1px solid var(--lc-border);
-  border-radius: 20px;
-  padding: 6px 12px;
-  font-size: 13px;
+.img-imp-hero-icon { font-size: 34px; line-height: 1; }
+
+.img-imp-hero-title {
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--lc-text-primary);
+}
+
+.img-imp-hero-sub {
+  font-size: 12px;
   color: var(--lc-text-secondary);
-  font-weight: 500;
+  line-height: 1.5;
+  max-width: 260px;
+}
+
+// ─── TIPS CARD ────────────────────────────────────────────────────────────────
+
+.img-imp-tips-card {
+  background: var(--lc-brand-light, #E8F2EE);
+  border-radius: var(--lc-radius-md, 12px);
+  padding: 12px 14px;
+}
+
+.img-imp-tips-label {
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--lc-brand-mid, #4A8C7A);
+  margin-bottom: 8px;
+}
+
+.img-imp-tip-row {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  margin-bottom: 5px;
+  font-size: 12px;
+  color: var(--lc-text-secondary);
+  line-height: 1.4;
+
+  &:last-child { margin-bottom: 0; }
+}
+
+.img-imp-tip-dot {
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  background: var(--lc-brand-mid, #4A8C7A);
+  flex-shrink: 0;
+  margin-top: 5px;
 }

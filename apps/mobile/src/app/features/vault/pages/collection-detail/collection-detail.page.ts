@@ -1,9 +1,10 @@
 import {Component, computed, inject, OnInit, signal} from '@angular/core';
 import {ActivatedRoute, Router} from '@angular/router';
-import {AlertController, IonContent, IonHeader, IonIcon, IonToolbar, ModalController,} from '@ionic/angular/standalone';
+import {AlertController, IonContent, IonHeader, IonIcon, IonToolbar, ModalController, ToastController,} from '@ionic/angular/standalone';
 import {addIcons} from 'ionicons';
-import {chevronBackOutline, chevronForwardOutline, ellipsisHorizontalOutline, playOutline, volumeHighOutline,} from 'ionicons/icons';
+import {chevronBackOutline, chevronForwardOutline, ellipsisHorizontalOutline, playOutline, timeOutline, volumeHighOutline,} from 'ionicons/icons';
 import {Card, Collection} from '@lingua-card/shared/domain';
+import {firstValueFrom} from 'rxjs';
 import {CollectionApiService} from '../../services/collection-api.service';
 import {CategoryStore} from '../../store/category.store';
 import {CollectionStore} from '../../store/collection.store';
@@ -14,6 +15,7 @@ import {ReviewFilterService} from '../../../review/services/review-filter.servic
 import {ReviewStore} from '../../../review/store/review.store';
 import {WordCardComponent} from '../../../../shared/ui/word-card/word-card.component';
 import {WordAudioService} from '../../../../shared/audio/word-audio.service';
+import {ImageImportApiService} from '../../import/services/image-import-api.service';
 
 @Component({
   selector: 'lc-collection-detail',
@@ -30,11 +32,15 @@ export class CollectionDetailPage implements OnInit {
   private readonly categoryStore = inject(CategoryStore);
   private readonly modalCtrl = inject(ModalController);
   private readonly alertCtrl = inject(AlertController);
+  private readonly toastCtrl = inject(ToastController);
   private readonly filterService = inject(ReviewFilterService);
   private readonly reviewStore = inject(ReviewStore);
   private readonly wordAudio = inject(WordAudioService);
+  private readonly importApi = inject(ImageImportApiService);
 
   readonly collection = signal<Collection | null>(null);
+  readonly completing = signal(false);
+  readonly justCompleted = signal(false);
   readonly allCards = signal<Card[]>([]);
   readonly activeCategoryId = signal<string | null>(null);
   readonly loading = signal(true);
@@ -61,6 +67,17 @@ export class CollectionDetailPage implements OnInit {
     ).length;
   });
 
+  readonly pendingGhosts = computed(() => {
+    const count = this.collection()?.pendingWords.length ?? 0;
+    return Array.from({ length: Math.min(count, 5) }, (_, i) => i);
+  });
+
+  readonly ghostWidths: [string, string][] = [
+    ['70px', '50px'],
+    ['90px', '65px'],
+    ['55px', '40px'],
+  ];
+
   readonly masteredCount = computed(() =>
     this.allCards().filter(c => (c.srsState?.masteryLevel ?? 0) >= 5).length,
   );
@@ -80,6 +97,7 @@ export class CollectionDetailPage implements OnInit {
       playOutline,
       volumeHighOutline,
       ellipsisHorizontalOutline,
+      timeOutline,
     });
   }
 
@@ -89,6 +107,11 @@ export class CollectionDetailPage implements OnInit {
       next: col => this.collection.set(col),
       error: () => this.goBack(),
     });
+    this.loadCards();
+  }
+
+  loadCards(): void {
+    const id = this.route.snapshot.paramMap.get('id')!;
     this.collectionApi.getCards(id).subscribe({
       next: cards => {
         this.allCards.set(cards);
@@ -96,6 +119,49 @@ export class CollectionDetailPage implements OnInit {
       },
       error: () => this.loading.set(false),
     });
+  }
+
+  async completeImport(): Promise<void> {
+    const col = this.collection();
+    if (!col || this.completing()) return;
+
+    this.completing.set(true);
+    try {
+      const result = await firstValueFrom(this.importApi.completeCollection(col.id));
+
+      this.collection.update(c => c ? {
+        ...c,
+        importStatus: result.isComplete ? 'complete' : 'incomplete',
+        pendingWords: result.pendingWords,
+        cardCount:    c.cardCount + result.newCards,
+      } : c);
+
+      this.loadCards();
+      this.collectionStore.loadCollections();
+
+      if (result.isComplete) {
+        this.justCompleted.set(true);
+        setTimeout(() => this.justCompleted.set(false), 2000);
+      }
+
+      const toast = await this.toastCtrl.create({
+        message: result.isComplete
+          ? `✓ All cards added — collection complete!`
+          : `✓ ${result.newCards} cards added — ${result.pendingWords.length} still pending`,
+        duration: 3500,
+        color: result.isComplete ? 'success' : 'warning',
+      });
+      await toast.present();
+    } catch {
+      const toast = await this.toastCtrl.create({
+        message: 'Could not complete import. Try again later.',
+        duration: 3000,
+        color: 'danger',
+      });
+      await toast.present();
+    } finally {
+      this.completing.set(false);
+    }
   }
 
   goBack(): void {

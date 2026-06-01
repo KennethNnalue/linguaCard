@@ -3,7 +3,7 @@ import { HttpClient } from '@angular/common/http';
 import { forkJoin, Observable, of, switchMap } from 'rxjs';
 import { map } from 'rxjs/operators';
 import { environment } from '../../../../environments/environment';
-import { Card, Collection, CreateCollectionDto, UpdateCollectionDto } from '@lingua-card/shared/domain';
+import { Card, Collection, CreateCollectionDto, RawExtractedWord, UpdateCollectionDto } from '@lingua-card/shared/domain';
 
 @Injectable({ providedIn: 'root' })
 export class CollectionApiService {
@@ -24,6 +24,13 @@ export class CollectionApiService {
 
   update(id: string, dto: UpdateCollectionDto): Observable<Collection> {
     return this.http.patch<Collection>(`${this.baseUrl}/${id}`, dto);
+  }
+
+  markIncomplete(id: string, pendingWords: RawExtractedWord[]): Observable<Collection> {
+    return this.http.patch<Collection>(`${this.baseUrl}/${id}`, {
+      importStatus: 'incomplete',
+      pendingWords,
+    });
   }
 
   remove(id: string): Observable<void> {

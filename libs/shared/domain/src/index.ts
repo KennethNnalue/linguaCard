@@ -225,9 +225,12 @@ export interface Collection {
   cardCount: number;
   masteredCount: number;
   dueCount: number;
+  isDefault: boolean;
+  importStatus: CollectionImportStatus;
+  pendingWords: RawExtractedWord[];
+  sourceImageDescription?: string;
   createdAt: string;
   updatedAt: string;
-  isDefault: boolean;
 }
 
 // ─── USER ─────────────────────────────────────────────────────────────────────
@@ -397,7 +400,7 @@ export interface StoryVocabWord {
 
 export type StoryDifficulty = 'A1' | 'A2' | 'B1' | 'B2';
 export type StoryLength = 'short' | 'medium' | 'long' | 'very-long' | 'extra-long';
-export type AIProviderType = 'anthropic' | 'openai' | 'gemini';
+export type AIProviderType = 'anthropic' | 'openai' | 'gemini' | 'openrouter';
 
 export interface PronunciationRequest {
   cardId: string;
@@ -466,4 +469,40 @@ export interface ImageImportResult {
   imageDescription: string;
   processingMs: number;
   modelUsed: string;
+}
+
+// ─── RESILIENT IMAGE IMPORT (LC-103) ──────────────────────────────────────────
+
+export type CollectionImportStatus = 'complete' | 'incomplete';
+
+/** A word exactly as seen in the image — no translation yet */
+export interface RawExtractedWord {
+  back: string;
+  article: ArticleType | null;
+  rawText: string;
+}
+
+/** Phase 1 response — raw words only, no enrichment */
+export interface WordExtractionResult {
+  rawWords: RawExtractedWord[];
+  totalFound: number;
+  imageDescription: string;
+  processingMs: number;
+  modelUsed: string;
+}
+
+/** Phase 2 request — enrich raw words into full card data */
+export interface EnrichWordsRequest {
+  rawWords: RawExtractedWord[];
+  targetLanguage: string;
+  nativeLanguage: string;
+  collectionId?: string;
+  batchSize?: number;
+}
+
+/** Phase 2 response — what was enriched vs what is still pending */
+export interface EnrichWordsResult {
+  enriched: ImageExtractedWord[];
+  pending: RawExtractedWord[];
+  isComplete: boolean;
 }

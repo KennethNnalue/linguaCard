@@ -38,20 +38,35 @@
       </div>
     }
 
-    <p class="img-imp-subtitle">What would you like to scan?</p>
+    <!-- Hero dropzone — dashed border, icon, descriptive copy -->
+    <div class="img-imp-hero">
+      <div class="img-imp-hero-icon">📷</div>
+      <div class="img-imp-hero-title lc-display">Scan or pick an image</div>
+      <div class="img-imp-hero-sub">Point at any page with German words — menus, textbooks, signs, flashcards</div>
+    </div>
 
-    <!-- Picker buttons -->
+    <!-- Picker buttons (camera + gallery) -->
     <lc-image-picker
       (imagePicked)="onImagePicked($event)"
       (pickCancelled)="void(0)"
       (pickError)="onPickError($event)">
     </lc-image-picker>
 
-    <!-- Tips -->
-    <div class="img-imp-tips">
-      <div class="img-imp-tip-chip">📋 Menus</div>
-      <div class="img-imp-tip-chip">💡 Good light</div>
-      <div class="img-imp-tip-chip">🔤 German text</div>
+    <!-- Tips section -->
+    <div class="img-imp-tips-card">
+      <div class="img-imp-tips-label">For best results</div>
+      <div class="img-imp-tip-row">
+        <div class="img-imp-tip-dot"></div>
+        <span>Good lighting — avoid shadows on the text</span>
+      </div>
+      <div class="img-imp-tip-row">
+        <div class="img-imp-tip-dot"></div>
+        <span>Hold the camera still — blurry images may miss words</span>
+      </div>
+      <div class="img-imp-tip-row">
+        <div class="img-imp-tip-dot"></div>
+        <span>Large images with many words work better in batches</span>
+      </div>
     </div>
 
   </div>

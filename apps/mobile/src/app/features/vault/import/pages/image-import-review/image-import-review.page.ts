@@ -21,9 +21,10 @@ import {
   ImageExtractedWord,
   ParsedImportRow,
 } from '@lingua-card/shared/domain';
-import { forkJoin, of } from 'rxjs';
-import { catchError, map } from 'rxjs/operators';
+import { firstValueFrom, forkJoin, of } from 'rxjs';
+import { catchError, map, switchMap } from 'rxjs/operators';
 import { CardApiService } from '../../../services/card-api.service';
+import { CollectionApiService } from '../../../services/collection-api.service';
 import { AuthService } from '../../../../../core/services/auth.service';
 import { CardStore } from '../../../store/card.store';
 import { CollectionStore } from '../../../store/collection.store';
@@ -50,6 +51,7 @@ interface SelectableWord extends ParsedImportRow {
 export class ImageImportReviewPage implements OnInit {
   private readonly importImageState = inject(ImageImportStateService);
   private readonly cardApi = inject(CardApiService);
+  private readonly collectionApi = inject(CollectionApiService);
   private readonly authService = inject(AuthService);
   private readonly collectionStore = inject(CollectionStore);
   private readonly cardStore = inject(CardStore);
@@ -59,8 +61,13 @@ export class ImageImportReviewPage implements OnInit {
   private readonly modalCtrl = inject(ModalController);
   private readonly wordDedupApi = inject(WordDedupApiService);
 
-  readonly image = this.importImageState.image;
-  readonly result = this.importImageState.result;
+  readonly image      = this.importImageState.image;
+  readonly result     = this.importImageState.result;
+  readonly enrichment = this.importImageState.enrichment;
+
+  readonly pendingCount = computed(() => this.enrichment()?.pending.length ?? 0);
+  readonly totalFound   = computed(() => this.result()?.totalFound ?? 0);
+
   readonly wordList = signal<SelectableWord[]>([]);
   readonly selectedCollectionId = signal<string | null>(null);
   readonly importing = signal(false);
@@ -79,16 +86,20 @@ export class ImageImportReviewPage implements OnInit {
   readonly allSelected = computed(() => this.wordList().every(w => w.selected));
   readonly warningCount = computed(() => this.wordList().filter(w => w.confidence < 0.7).length);
 
+  /** True when enrichment returned zero ready words — all words are pending */
+  readonly allPending = computed(() => this.pendingCount() > 0 && this.wordList().length === 0);
+
   constructor() {
     addIcons({ arrowBackOutline, checkmarkCircleOutline, warningOutline });
   }
 
   async ngOnInit(): Promise<void> {
-    if (!this.result()) {
+    // Need either enriched words or pending words to show this screen
+    if (!this.result() && !this.enrichment()) {
       this.router.navigate(['/vault/import/image']);
       return;
     }
-    const words = this.result()!.words;
+    const words = this.result()?.words ?? [];
     const rows: SelectableWord[] = words.map((w, i) => ({
       ...this.toImportRow(w, i),
       id: i,
@@ -168,13 +179,22 @@ export class ImageImportReviewPage implements OnInit {
   }
 
   async confirmImport(): Promise<void> {
+    if (this.importing() || !this.selectedCollectionId()) return;
+
+    // All-pending case: no enriched words at all — mark the collection incomplete and bail
+    if (this.allPending()) {
+      await this.saveAllPending();
+      return;
+    }
+
     const rows = this.selectedWords();
-    if (!rows.length || this.importing() || !this.selectedCollectionId()) return;
+    if (!rows.length) return;
 
     this.importing.set(true);
-    const collectionId = this.selectedCollectionId();
+    const collectionId = this.selectedCollectionId()!;
     const userId = this.authService.currentUser()?.id ?? '';
     const now = new Date().toISOString();
+    const pending = this.enrichment()?.pending ?? [];
 
     const requests = rows.map(row =>
       this.cardApi.create({
@@ -207,20 +227,33 @@ export class ImageImportReviewPage implements OnInit {
 
     forkJoin(requests).pipe(
       map(results => results.filter(r => r !== null).length),
+      switchMap(created => {
+        // If there are pending words, mark the collection as incomplete after cards are saved
+        if (pending.length > 0) {
+          return this.collectionApi.markIncomplete(collectionId, pending).pipe(
+            map(() => created),
+            catchError(() => of(created)),
+          );
+        }
+        return of(created);
+      }),
     ).subscribe({
       next: async created => {
         this.importing.set(false);
         this.importImageState.clear();
         this.cardStore.loadCards();
         this.collectionStore.loadCollections();
+        const hasPending = pending.length > 0;
         const toast = await this.toastCtrl.create({
-          message: `✓ ${created} words added to your Vault`,
-          duration: 3000,
+          message: hasPending
+            ? `✓ ${created} cards added — ${pending.length} more will be generated later`
+            : `✓ ${created} words added to your Vault`,
+          duration: 3500,
           position: 'bottom',
-          color: 'success',
+          color: hasPending ? 'warning' : 'success',
         });
         await toast.present();
-        this.router.navigate(['/vault']);
+        this.router.navigate(['/vault/collections', collectionId]);
       },
       error: async () => {
         this.importing.set(false);
@@ -233,6 +266,36 @@ export class ImageImportReviewPage implements OnInit {
         await toast.present();
       },
     });
+  }
+
+  private async saveAllPending(): Promise<void> {
+    const collectionId = this.selectedCollectionId()!;
+    const pending = this.enrichment()?.pending ?? [];
+    if (!pending.length) return;
+
+    this.importing.set(true);
+    try {
+      await firstValueFrom(this.collectionApi.markIncomplete(collectionId, pending));
+      this.importImageState.clear();
+      this.collectionStore.loadCollections();
+      const toast = await this.toastCtrl.create({
+        message: `Collection saved — tap "Complete" to generate ${pending.length} flashcards when ready`,
+        duration: 4000,
+        position: 'bottom',
+        color: 'warning',
+      });
+      await toast.present();
+      this.router.navigate(['/vault/collections', collectionId]);
+    } catch {
+      const toast = await this.toastCtrl.create({
+        message: 'Could not save collection. Please try again.',
+        duration: 3000,
+        color: 'danger',
+      });
+      await toast.present();
+    } finally {
+      this.importing.set(false);
+    }
   }
 
   goBack(): void {

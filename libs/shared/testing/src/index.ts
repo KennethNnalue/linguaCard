@@ -56,20 +56,23 @@ export const MOCK_COLLECTIONS: Collection[] = [
     description: 'Vocabulary from Netzwerk chapter 6, covering food, ordering and events.',
     emoji: '🇩🇪', colour: '#2D5A4E', contextId: 'german-vocab',
     cardCount: 19, masteredCount: 4, dueCount: 8,
-    createdAt: '2025-05-01T09:00:00Z', updatedAt: '2025-05-07T09:00:00Z', isDefault: false,
+    isDefault: false, importStatus: 'complete', pendingWords: [],
+    createdAt: '2025-05-01T09:00:00Z', updatedAt: '2025-05-07T09:00:00Z',
   },
   {
     id: 'col-002', userId: 'user-001', name: 'Chapter 3 — Family',
     description: 'Family and animals vocabulary from chapter 3.',
     emoji: '🇩🇪', colour: '#2D5A4E', contextId: 'german-vocab',
     cardCount: 5, masteredCount: 1, dueCount: 4,
-    createdAt: '2025-04-15T09:00:00Z', updatedAt: '2025-05-06T09:00:00Z', isDefault: false,
+    isDefault: false, importStatus: 'complete', pendingWords: [],
+    createdAt: '2025-04-15T09:00:00Z', updatedAt: '2025-05-06T09:00:00Z',
   },
   {
     id: 'col-003', userId: 'user-001', name: 'My custom words',
     description: '', emoji: '📚', colour: '#2D5A4E', contextId: 'german-vocab',
     cardCount: 0, masteredCount: 0, dueCount: 0,
-    createdAt: '2025-05-07T09:00:00Z', updatedAt: '2025-05-07T09:00:00Z', isDefault: true,
+    isDefault: true, importStatus: 'complete', pendingWords: [],
+    createdAt: '2025-05-07T09:00:00Z', updatedAt: '2025-05-07T09:00:00Z',
   },
 ];
 

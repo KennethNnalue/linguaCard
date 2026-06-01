@@ -16,6 +16,7 @@ import { CardEntity } from '../cards/card.entity';
 import { StoryEntity } from './story.entity';
 import { AnthropicAdapter, type AITextRequest } from '../ai/providers/anthropic.adapter';
 import { GeminiAdapter } from '../ai/providers/gemini.adapter';
+import { OpenRouterAdapter } from '../ai/providers/openrouter.adapter';
 import { StoryPromptBuilder } from './story-prompt.builder';
 import { StoryAudioService } from './story-audio.service';
 import { StoryVocabMapper } from './story-vocab.mapper';
@@ -43,17 +44,21 @@ export class StoryGenerationService {
     @InjectRepository(StoryEntity)
     private readonly storyRepo: Repository<StoryEntity>,
     private readonly promptBuilder: StoryPromptBuilder,
-    private readonly anthropic: AnthropicAdapter,
-    private readonly gemini: GeminiAdapter,
-    private readonly config: ConfigService,
+    private readonly anthropic:   AnthropicAdapter,
+    private readonly gemini:      GeminiAdapter,
+    private readonly openRouter:  OpenRouterAdapter,
+    private readonly config:      ConfigService,
     private readonly audioService: StoryAudioService,
     private readonly vocabMapper: StoryVocabMapper,
   ) {}
 
   private get textProvider(): { generateText(r: AITextRequest): Promise<{ text: string; model: string; inputTokens: number; outputTokens: number }> } {
     const provider = this.config.get<AiConfig>('ai')!.defaultProvider;
-    if (provider === 'gemini') return this.gemini;
-    return this.anthropic;
+    switch (provider) {
+      case 'openrouter': return this.openRouter;
+      case 'gemini':     return this.gemini;
+      default:           return this.anthropic;
+    }
   }
 
   async generateAndSave(userId: string, dto: GenerateStoryDto): Promise<Story> {
@@ -147,7 +152,7 @@ export class StoryGenerationService {
         messages: [{ role: 'user', content: prompt }],
         maxTokens: 2048,
       });
-      const clean = response.text.replace(/^```(?:json)?\s*/i, '').replace(/\s*```\s*$/i, '').trim();
+      const clean = (response.text.match(/```(?:json)?\s*([\s\S]*?)\s*```/i)?.[1] ?? response.text).trim();
       const parsed = JSON.parse(clean) as StoryQuizQuestion[];
       return Array.isArray(parsed) ? parsed : [];
     } catch (err) {
@@ -166,7 +171,7 @@ export class StoryGenerationService {
         messages: [{ role: 'user', content: prompt }],
         maxTokens: 3072,
       });
-      const clean = response.text.replace(/^```(?:json)?\s*/i, '').replace(/\s*```\s*$/i, '').trim();
+      const clean = (response.text.match(/```(?:json)?\s*([\s\S]*?)\s*```/i)?.[1] ?? response.text).trim();
       const parsed = JSON.parse(clean) as StoryGrammarNote[];
       return Array.isArray(parsed) ? parsed : [];
     } catch (err) {
@@ -185,7 +190,7 @@ export class StoryGenerationService {
         messages: [{ role: 'user', content: prompt }],
         maxTokens: 2048,
       });
-      const clean = response.text.replace(/^```(?:json)?\s*/i, '').replace(/\s*```\s*$/i, '').trim();
+      const clean = (response.text.match(/```(?:json)?\s*([\s\S]*?)\s*```/i)?.[1] ?? response.text).trim();
       const parsed = JSON.parse(clean) as StoryKeyword[];
       return Array.isArray(parsed) ? parsed.map(k => ({ ...k, cardId: null })) : [];
     } catch (err) {
@@ -289,7 +294,7 @@ export class StoryGenerationService {
       throw new InternalServerErrorException('Story generation failed. Please try again.');
     }
 
-    const clean = rawText.replace(/^```(?:json)?\s*/i, '').replace(/\s*```\s*$/i, '').trim();
+    const clean = (rawText.match(/```(?:json)?\s*([\s\S]*?)\s*```/i)?.[1] ?? rawText).trim();
     try {
       return JSON.parse(clean) as GeneratedStoryContent;
     } catch {

@@ -38,7 +38,8 @@
   padding: 13px 14px;
   cursor: pointer;
   transition: box-shadow t.$lc-duration-fast;
-  &--empty { border-style: dashed; box-shadow: none; }
+  &--empty      { border-style: dashed; box-shadow: none; }
+  &--incomplete { border-color: var(--lc-warn-border, #FCD34D); }
   &:active { box-shadow: none; }
 }
 
@@ -66,3 +67,22 @@
 .col-progress-bar  { height: 3px; background: rgba(45, 90, 78, 0.1); border-radius: 3px; overflow: hidden; margin-bottom: t.$lc-space-2; }
 .col-progress-fill { height: 100%; background: var(--lc-mastery-5); border-radius: 3px; transition: width 0.4s ease; }
 .col-progress-meta { @include u.flex-between; @include u.lc-font('xxs'); color: var(--lc-text-hint); }
+
+
+// ─── INCOMPLETE IMPORT INDICATOR ──────────────────────────────────────────────
+.col-card-name-row {
+  display: flex;
+  align-items: center;
+  gap: t.$lc-space-2;
+  flex: 1;
+  min-width: 0;
+}
+
+.col-incomplete-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--lc-warn-border, #FCD34D);
+  border: 1.5px solid var(--lc-warn, #B45309);
+  flex-shrink: 0;
+}

@@ -1,0 +1,997 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>LinguaCard — Design Reference: Resilient Two-Phase Image Import · LC-103</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,500;0,600;1,400&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600&family=Fira+Code:wght@400;500&display=swap" rel="stylesheet">
+<style>
+/* ─── DESIGN TOKENS (identical to redesign-reference.html) ──────────────── */
+:root {
+  --lc-brand:#2D5A4E;--lc-brand-light:#E8F2EE;--lc-brand-mid:#4A8C7A;--lc-brand-dark:#1A3830;
+  --lc-accent:#E07B3F;--lc-accent-light:#FDF0E6;
+  --lc-masc-bg:#EAF2FC;--lc-masc-text:#1A56A3;--lc-masc-border:#85B7EB;
+  --lc-fem-bg:#FEF2F2;--lc-fem-text:#B91C1C;--lc-fem-border:#FCA5A5;
+  --lc-neut-bg:#F1EFE8;--lc-neut-text:#5F5E5A;--lc-neut-border:#B4B2A9;
+  --lc-mastery-0:#D1D5DB;--lc-mastery-1:#FCA5A5;--lc-mastery-2:#FCD34D;
+  --lc-mastery-3:#6EE7B7;--lc-mastery-4:#34D399;--lc-mastery-5:#059669;
+  --lc-surface:#FAFAF8;--lc-card:#FFFFFF;--lc-border:rgba(45,90,78,0.12);
+  --lc-text-primary:#1A2B26;--lc-text-secondary:#6B7C78;--lc-text-hint:#9BAAA6;
+  --lc-shadow-card:0 2px 12px rgba(45,90,78,0.08),0 1px 3px rgba(0,0,0,0.04);
+  --lc-shadow-float:0 8px 32px rgba(45,90,78,0.14),0 2px 8px rgba(0,0,0,0.06);
+  --lc-font-display:'Lora',Georgia,serif;
+  --lc-font-body:'DM Sans',system-ui,sans-serif;
+  --lc-font-mono:'Fira Code','Courier New',monospace;
+  --lc-radius-sm:8px;--lc-radius-md:12px;--lc-radius-lg:20px;--lc-radius-xl:28px;
+  /* Warning palette */
+  --lc-warn:#B45309;--lc-warn-bg:#FFFBEB;--lc-warn-border:#FCD34D;
+  --lc-warn-text:#92400E;
+  /* Success palette */
+  --lc-ok:#065F46;--lc-ok-bg:#ECFDF5;--lc-ok-border:#6EE7B7;
+}
+
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:var(--lc-font-body);background:#F0EDEA;color:var(--lc-text-primary);min-height:100vh;}
+
+/* ─── PAGE LAYOUT ──────────────────────────────────────────────────────── */
+.page-header{background:var(--lc-brand);padding:32px 40px 28px;position:sticky;top:0;z-index:100;box-shadow:0 4px 20px rgba(0,0,0,0.2);}
+.page-header-inner{max-width:1600px;margin:0 auto;display:flex;align-items:center;justify-content:space-between;gap:20px;flex-wrap:wrap;}
+.logo{font-family:var(--lc-font-display);font-size:24px;font-weight:600;color:white;}
+.logo-sub{font-size:12px;color:rgba(255,255,255,0.6);margin-top:2px;}
+.badge{display:inline-flex;align-items:center;background:rgba(255,255,255,0.15);border:1px solid rgba(255,255,255,0.25);color:white;font-size:11px;font-weight:600;padding:4px 10px;border-radius:20px;letter-spacing:.04em;}
+.main{max-width:1600px;margin:0 auto;padding:40px;}
+.section{margin-bottom:56px;}
+.section-title{font-family:var(--lc-font-display);font-size:22px;font-weight:600;color:var(--lc-text-primary);margin-bottom:6px;}
+.section-sub{font-size:13px;color:var(--lc-text-secondary);margin-bottom:24px;line-height:1.6;max-width:780px;}
+
+/* ─── PHONE SHELL (identical to redesign-reference.html) ──────────────── */
+.phones-row{display:flex;gap:28px;align-items:flex-start;overflow-x:auto;padding-bottom:16px;}
+.phone-wrap{display:flex;flex-direction:column;align-items:center;gap:10px;flex:0 0 auto;}
+.phone-label{font-size:11px;font-weight:600;letter-spacing:0.07em;text-transform:uppercase;color:var(--lc-text-hint);}
+.phone{width:300px;background:var(--lc-surface);border-radius:40px;border:8px solid #1A1A1A;box-shadow:0 0 0 1px #333,var(--lc-shadow-float),0 24px 48px rgba(0,0,0,0.2);overflow:hidden;position:relative;}
+.phone::before{content:'';position:absolute;top:0;left:50%;transform:translateX(-50%);width:80px;height:6px;background:#1A1A1A;border-radius:0 0 8px 8px;z-index:10;}
+.phone-inner{background:var(--lc-surface);min-height:640px;display:flex;flex-direction:column;padding-top:8px;}
+.status-bar{display:flex;justify-content:space-between;align-items:center;padding:10px 20px 6px;font-size:11px;font-weight:600;color:var(--lc-text-secondary);}
+.sig{display:flex;gap:3px;align-items:flex-end;}
+.sig span{width:3px;background:var(--lc-text-secondary);border-radius:1px;}
+.sig span:nth-child(1){height:4px;}.sig span:nth-child(2){height:7px;}.sig span:nth-child(3){height:10px;}
+.batt{width:20px;height:10px;border:1.5px solid var(--lc-text-secondary);border-radius:3px;position:relative;margin-left:4px;}
+.batt::after{content:'';position:absolute;top:1.5px;left:1.5px;width:65%;height:5px;background:var(--lc-text-secondary);border-radius:1px;}
+
+/* ─── BOTTOM NAV ────────────────────────────────────────────────────────── */
+.bottom-nav{display:flex;background:var(--lc-card);border-top:1px solid var(--lc-border);padding:9px 0 6px;margin-top:auto;}
+.nav-item{flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;cursor:pointer;}
+.nav-item svg{width:18px;height:18px;stroke:var(--lc-text-hint);fill:none;stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round;}
+.nav-item.on svg{stroke:var(--lc-brand);}
+.nav-lbl{font-size:9px;font-weight:600;color:var(--lc-text-hint);}
+.nav-item.on .nav-lbl{color:var(--lc-brand);}
+.nav-dot{width:4px;height:4px;border-radius:50%;background:var(--lc-brand);margin:1px auto 0;}
+
+/* ─── COMMON ELEMENTS ──────────────────────────────────────────────────── */
+.art-badge{font-size:9px;font-weight:700;padding:2px 7px;border-radius:20px;border:1px solid;flex-shrink:0;letter-spacing:.04em;}
+.art-der{background:var(--lc-masc-bg);color:var(--lc-masc-text);border-color:var(--lc-masc-border);}
+.art-die{background:var(--lc-fem-bg);color:var(--lc-fem-text);border-color:var(--lc-fem-border);}
+.art-das{background:var(--lc-neut-bg);color:var(--lc-neut-text);border-color:var(--lc-neut-border);}
+.art-verb{background:var(--lc-accent-light);color:var(--lc-accent);border-color:rgba(224,123,63,0.3);}
+.m-dot{width:7px;height:7px;border-radius:50%;flex-shrink:0;}
+.m0{background:var(--lc-mastery-0)}.m5{background:var(--lc-mastery-5)}
+
+/* ─── TOP BAR WITH BACK ────────────────────────────────────────────────── */
+.topbar{display:flex;align-items:center;gap:10px;padding:4px 14px 10px;}
+.back-btn{width:30px;height:30px;border-radius:50%;background:var(--lc-brand-light);display:flex;align-items:center;justify-content:center;flex-shrink:0;border:none;}
+.back-btn svg{width:14px;height:14px;stroke:var(--lc-brand);fill:none;stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round;}
+.topbar-title{font-family:var(--lc-font-display);font-size:15px;font-weight:600;color:var(--lc-text-primary);}
+.topbar-sub{font-size:11px;color:var(--lc-text-hint);margin-top:1px;}
+
+/* ════════════════════════════════════════════════════════════════
+   SCREEN I01 — IMAGE PICKER (entry point)
+   ════════════════════════════════════════════════════════════════ */
+.imp-hero{margin:10px 14px 0;background:var(--lc-card);border:1.5px dashed var(--lc-brand-mid);border-radius:20px;display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:160px;gap:10px;padding:20px;}
+.imp-hero-icon{font-size:36px;}
+.imp-hero-t{font-family:var(--lc-font-display);font-size:15px;font-weight:600;color:var(--lc-text-primary);}
+.imp-hero-s{font-size:11px;color:var(--lc-text-secondary);text-align:center;line-height:1.5;}
+.imp-btns{display:flex;gap:8px;padding:12px 14px 0;}
+.imp-btn-primary{flex:1;background:var(--lc-brand);color:white;border:none;border-radius:var(--lc-radius-md);padding:12px;font-size:12px;font-weight:600;font-family:var(--lc-font-body);display:flex;align-items:center;justify-content:center;gap:6px;}
+.imp-btn-primary svg{width:14px;height:14px;stroke:white;fill:none;stroke-width:2;stroke-linecap:round;}
+.imp-btn-secondary{flex:1;background:var(--lc-card);color:var(--lc-brand);border:1.5px solid var(--lc-brand);border-radius:var(--lc-radius-md);padding:12px;font-size:12px;font-weight:600;font-family:var(--lc-font-body);display:flex;align-items:center;justify-content:center;gap:6px;}
+.imp-btn-secondary svg{width:14px;height:14px;stroke:var(--lc-brand);fill:none;stroke-width:2;stroke-linecap:round;}
+.imp-or{display:flex;align-items:center;gap:8px;padding:12px 14px 0;}
+.imp-or-line{flex:1;height:1px;background:var(--lc-border);}
+.imp-or-txt{font-size:10px;color:var(--lc-text-hint);font-weight:600;letter-spacing:.04em;}
+.imp-tips{margin:12px 14px 0;background:var(--lc-brand-light);border-radius:var(--lc-radius-md);padding:12px;}
+.imp-tips-t{font-size:10px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--lc-brand-mid);margin-bottom:6px;}
+.imp-tip{display:flex;align-items:flex-start;gap:6px;margin-bottom:5px;font-size:11px;color:var(--lc-text-secondary);}
+.imp-tip:last-child{margin-bottom:0;}
+.imp-tip-dot{width:4px;height:4px;border-radius:50%;background:var(--lc-brand-mid);flex-shrink:0;margin-top:4px;}
+
+/* ════════════════════════════════════════════════════════════════
+   SCREEN I02 — PROCESSING: PHASE 1 (extracting words)
+   ════════════════════════════════════════════════════════════════ */
+.proc-img-thumb{margin:10px 14px 0;height:130px;border-radius:14px;background:#E8ECE5;overflow:hidden;position:relative;display:flex;align-items:center;justify-content:center;}
+.proc-img-content{display:flex;flex-direction:column;gap:5px;padding:12px;width:100%;}
+.proc-img-line{height:8px;border-radius:3px;background:rgba(45,90,78,0.15);}
+.proc-img-line.dark{background:rgba(45,90,78,0.28);}
+.proc-img-line.short{width:55%;}
+.proc-img-line.mid{width:75%;}
+.proc-img-line.full{width:95%;}
+.scan-overlay{position:absolute;inset:0;overflow:hidden;}
+.scan-line{position:absolute;left:0;right:0;height:2px;background:var(--lc-brand);opacity:.85;animation:scan 2.2s ease-in-out infinite;}
+@keyframes scan{0%{top:8%}55%{top:88%}100%{top:8%}}
+.scan-glow{position:absolute;left:0;right:0;height:20px;background:linear-gradient(180deg,transparent 0%,rgba(45,90,78,0.12) 50%,transparent 100%);animation:scan-glow 2.2s ease-in-out infinite;}
+@keyframes scan-glow{0%{top:0%}55%{top:82%}100%{top:0%}}
+
+.proc-phases{padding:14px 14px 0;}
+.proc-phase-row{display:flex;align-items:flex-start;gap:10px;margin-bottom:0;}
+.proc-phase-connector{width:2px;height:22px;background:var(--lc-border);margin-left:13px;margin:4px 0 4px 13px;}
+.proc-phase-connector.done{background:var(--lc-brand-mid);}
+.proc-step-dot{width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.proc-step-dot.active{background:var(--lc-brand-light);border:2px solid var(--lc-brand);}
+.proc-step-dot.done{background:var(--lc-brand);border:2px solid var(--lc-brand);}
+.proc-step-dot.pending{background:var(--lc-surface);border:1.5px solid var(--lc-border);}
+.proc-step-dot svg{width:12px;height:12px;}
+.spinner-ring{width:14px;height:14px;border:2px solid rgba(45,90,78,0.2);border-top-color:var(--lc-brand);border-radius:50%;animation:spin .75s linear infinite;}
+@keyframes spin{to{transform:rotate(360deg)}}
+.proc-step-body{flex:1;padding-bottom:4px;}
+.proc-step-t{font-size:13px;font-weight:600;color:var(--lc-text-primary);}
+.proc-step-s{font-size:11px;color:var(--lc-text-hint);margin-top:1px;}
+.proc-step-t.muted{color:var(--lc-text-hint);}
+
+/* ════════════════════════════════════════════════════════════════
+   SCREEN I03 — PROCESSING: PHASE 2 (enriching, in progress)
+   ════════════════════════════════════════════════════════════════ */
+.proc-progress-card{margin:10px 14px 0;background:var(--lc-card);border:1px solid var(--lc-border);border-radius:14px;padding:14px;box-shadow:var(--lc-shadow-card);}
+.proc-progress-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;}
+.proc-progress-label{font-size:11px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--lc-text-hint);}
+.proc-progress-count{font-size:13px;font-weight:600;color:var(--lc-brand);}
+.proc-bar-track{height:6px;background:var(--lc-surface);border-radius:3px;border:1px solid var(--lc-border);overflow:hidden;margin-bottom:8px;}
+.proc-bar-fill{height:100%;border-radius:3px;background:var(--lc-brand);transition:width .4s ease;}
+.proc-bar-labels{display:flex;justify-content:space-between;font-size:10px;color:var(--lc-text-hint);}
+.proc-chip-grid{display:flex;flex-wrap:wrap;gap:5px;margin-top:12px;}
+.proc-chip{display:inline-flex;align-items:center;gap:4px;padding:3px 9px;border-radius:20px;font-size:10px;font-weight:600;border:1px solid;}
+.proc-chip.done{background:var(--lc-brand-light);color:var(--lc-brand);border-color:rgba(45,90,78,0.2);}
+.proc-chip.done svg{width:8px;height:8px;stroke:var(--lc-brand);fill:none;stroke-width:2.5;stroke-linecap:round;}
+.proc-chip.pending{background:var(--lc-surface);color:var(--lc-text-hint);border-color:var(--lc-border);opacity:.5;}
+.proc-chip.active{background:var(--lc-brand-light);color:var(--lc-brand);border-color:var(--lc-brand);animation:pulse 1.4s ease-in-out infinite;}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.6}}
+.proc-batch-info{display:flex;align-items:center;gap:6px;margin-top:10px;padding:8px 10px;background:var(--lc-surface);border-radius:8px;border:1px solid var(--lc-border);}
+.proc-batch-info svg{width:12px;height:12px;stroke:var(--lc-text-hint);fill:none;stroke-width:1.8;flex-shrink:0;}
+.proc-batch-info-t{font-size:10px;color:var(--lc-text-secondary);}
+
+/* ════════════════════════════════════════════════════════════════
+   SCREEN I04 — PROCESSING: PARTIAL RESULT (rate limit hit)
+   ════════════════════════════════════════════════════════════════ */
+.partial-banner{margin:10px 14px 0;background:var(--lc-warn-bg);border:1.5px solid var(--lc-warn-border);border-radius:14px;padding:14px;display:flex;gap:10px;}
+.partial-banner-icon{font-size:20px;flex-shrink:0;margin-top:1px;}
+.partial-banner-body{}
+.partial-banner-t{font-size:13px;font-weight:600;color:var(--lc-warn);margin-bottom:3px;}
+.partial-banner-s{font-size:11px;color:var(--lc-warn-text);line-height:1.5;}
+.partial-stats{display:flex;gap:8px;padding:10px 14px 0;}
+.partial-stat{flex:1;background:var(--lc-card);border:1px solid var(--lc-border);border-radius:12px;padding:10px;text-align:center;box-shadow:var(--lc-shadow-card);}
+.partial-stat-val{font-family:var(--lc-font-display);font-size:22px;font-weight:600;color:var(--lc-text-primary);line-height:1;}
+.partial-stat-lbl{font-size:9px;color:var(--lc-text-hint);font-weight:500;margin-top:3px;}
+.partial-stat-val.ok{color:var(--lc-brand);}
+.partial-stat-val.warn{color:var(--lc-warn);}
+.partial-cta-area{padding:12px 14px 0;}
+.partial-cta-primary{width:100%;background:var(--lc-brand);color:white;border:none;border-radius:var(--lc-radius-md);padding:13px;font-size:13px;font-weight:600;font-family:var(--lc-font-body);display:flex;align-items:center;justify-content:center;gap:6px;}
+.partial-cta-primary svg{width:14px;height:14px;stroke:white;fill:none;stroke-width:2.2;stroke-linecap:round;}
+.partial-cta-note{font-size:10px;color:var(--lc-text-hint);text-align:center;margin-top:7px;}
+
+/* ════════════════════════════════════════════════════════════════
+   SCREEN I05 — REVIEW SCREEN (choose collection, confirm)
+   ════════════════════════════════════════════════════════════════ */
+.rev-img-row{display:flex;align-items:center;gap:10px;margin:10px 14px 0;padding:10px 12px;background:var(--lc-card);border:1px solid var(--lc-border);border-radius:12px;box-shadow:var(--lc-shadow-card);}
+.rev-img-thumb{width:44px;height:44px;border-radius:8px;background:#E8ECE5;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0;}
+.rev-img-info{flex:1;}
+.rev-img-t{font-size:13px;font-weight:600;color:var(--lc-text-primary);}
+.rev-img-s{font-size:11px;color:var(--lc-text-secondary);}
+.rev-img-badge{display:flex;align-items:center;gap:4px;background:var(--lc-warn-bg);border:1px solid var(--lc-warn-border);border-radius:20px;padding:3px 8px;font-size:9px;font-weight:600;color:var(--lc-warn);white-space:nowrap;}
+.rev-collection-area{padding:10px 14px 0;}
+.rev-collection-lbl{font-size:10px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--lc-text-hint);margin-bottom:6px;}
+.rev-collection-picker{display:flex;align-items:center;gap:8px;padding:11px 13px;background:var(--lc-brand-light);border:1.5px solid var(--lc-brand);border-radius:12px;}
+.rev-collection-emoji{font-size:16px;}
+.rev-collection-name{flex:1;font-size:13px;font-weight:600;color:var(--lc-brand);}
+.rev-collection-check{width:18px;height:18px;border-radius:50%;background:var(--lc-brand);display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.rev-collection-check svg{width:10px;height:10px;stroke:white;fill:none;stroke-width:2.5;stroke-linecap:round;}
+.rev-sum-row{display:flex;gap:6px;padding:10px 14px 0;}
+.rev-sum{flex:1;background:var(--lc-card);border:1px solid var(--lc-border);border-radius:10px;padding:8px;text-align:center;box-shadow:var(--lc-shadow-card);}
+.rev-sum-val{font-family:var(--lc-font-display);font-size:18px;font-weight:600;color:var(--lc-text-primary);line-height:1;}
+.rev-sum-lbl{font-size:8px;color:var(--lc-text-hint);font-weight:500;margin-top:2px;}
+.rev-sum-val.warn{color:var(--lc-warn);}
+.rev-select-bar{display:flex;justify-content:space-between;align-items:center;padding:10px 14px 4px;}
+.rev-select-lbl{font-size:10px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--lc-text-hint);}
+.rev-select-all{font-size:10px;font-weight:600;color:var(--lc-brand-mid);}
+.rev-word-list{padding:0 14px;display:flex;flex-direction:column;gap:0;}
+.rev-word-row{display:flex;align-items:center;gap:8px;padding:8px 0;border-bottom:1px solid var(--lc-border);}
+.rev-word-row:last-child{border-bottom:none;}
+.rev-checkbox{width:18px;height:18px;border-radius:5px;border:1.5px solid var(--lc-border);display:flex;align-items:center;justify-content:center;flex-shrink:0;background:var(--lc-card);}
+.rev-checkbox.checked{background:var(--lc-brand);border-color:var(--lc-brand);}
+.rev-checkbox.checked svg{width:10px;height:10px;stroke:white;fill:none;stroke-width:2.5;stroke-linecap:round;}
+.rev-word-body{flex:1;min-width:0;}
+.rev-word-back{font-size:13px;font-weight:600;color:var(--lc-text-primary);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.rev-word-front{font-size:10px;color:var(--lc-text-secondary);}
+.rev-word-row.deselected .rev-word-back,.rev-word-row.deselected .rev-word-front{opacity:.35;}
+.rev-cta{padding:10px 14px 0;}
+.rev-cta-btn{width:100%;background:var(--lc-brand);color:white;border:none;border-radius:var(--lc-radius-md);padding:13px;font-size:13px;font-weight:600;font-family:var(--lc-font-body);text-align:center;}
+
+/* ════════════════════════════════════════════════════════════════
+   SCREEN I06 — COLLECTION DETAIL: incomplete state
+   ════════════════════════════════════════════════════════════════ */
+.col-detail-hero{padding:14px 14px 12px;background:var(--lc-card);border-bottom:1px solid var(--lc-border);}
+.col-detail-top{display:flex;align-items:flex-start;gap:10px;margin-bottom:10px;}
+.col-detail-emoji{font-size:32px;line-height:1;}
+.col-detail-info{flex:1;}
+.col-detail-name{font-family:var(--lc-font-display);font-size:18px;font-weight:600;color:var(--lc-text-primary);margin-bottom:2px;}
+.col-detail-meta{font-size:11px;color:var(--lc-text-secondary);}
+.col-detail-edit{width:30px;height:30px;border-radius:50%;background:var(--lc-surface);border:1px solid var(--lc-border);display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.col-detail-edit svg{width:13px;height:13px;stroke:var(--lc-text-secondary);fill:none;stroke-width:1.8;stroke-linecap:round;}
+.col-detail-stats{display:flex;gap:6px;}
+.col-detail-stat{flex:1;background:var(--lc-surface);border:1px solid var(--lc-border);border-radius:10px;padding:8px 6px;text-align:center;}
+.col-detail-stat-val{font-family:var(--lc-font-display);font-size:16px;font-weight:600;color:var(--lc-text-primary);line-height:1;}
+.col-detail-stat-lbl{font-size:8px;color:var(--lc-text-hint);font-weight:500;margin-top:2px;}
+
+/* Incomplete import banner */
+.incomplete-banner{margin:0 14px 0;background:var(--lc-warn-bg);border:1.5px solid var(--lc-warn-border);border-radius:14px;padding:12px 14px;display:flex;align-items:center;gap:10px;}
+.ib-icon-wrap{width:32px;height:32px;border-radius:50%;background:rgba(180,83,9,0.1);display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.ib-icon-wrap svg{width:16px;height:16px;stroke:var(--lc-warn);fill:none;stroke-width:1.8;stroke-linecap:round;}
+.ib-body{flex:1;}
+.ib-title{font-size:12px;font-weight:700;color:var(--lc-warn);margin-bottom:1px;}
+.ib-sub{font-size:11px;color:var(--lc-warn-text);line-height:1.4;}
+.ib-btn{flex-shrink:0;padding:7px 14px;border-radius:var(--lc-radius-sm);background:var(--lc-brand);color:white;font-size:12px;font-weight:600;font-family:var(--lc-font-body);border:none;}
+
+/* Word list in collection detail */
+.col-detail-section-lbl{font-size:10px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--lc-text-hint);padding:10px 14px 6px;display:flex;align-items:center;gap:6px;}
+.pending-dot{width:6px;height:6px;border-radius:50%;background:var(--lc-warn-border);flex-shrink:0;}
+.col-word-row{display:flex;align-items:center;gap:8px;padding:9px 14px;border-bottom:1px solid var(--lc-border);}
+.col-word-row:last-child{border-bottom:none;}
+.col-word-body{flex:1;min-width:0;}
+.col-word-back{font-size:13px;font-weight:600;color:var(--lc-text-primary);}
+.col-word-front{font-size:10px;color:var(--lc-text-secondary);}
+.col-word-row.ghost .col-word-back,.col-word-row.ghost .col-word-front{opacity:.3;}
+.ghost-line{height:10px;border-radius:3px;background:var(--lc-border);}
+.ghost-short{width:50px;}.ghost-mid{width:70px;}.ghost-long{width:90px;}
+
+/* ════════════════════════════════════════════════════════════════
+   SCREEN I07 — COLLECTIONS LIST: incomplete dot indicator
+   ════════════════════════════════════════════════════════════════ */
+.col-list-topbar{display:flex;align-items:center;justify-content:space-between;padding:4px 14px 10px;}
+.col-list-title{font-family:var(--lc-font-display);font-size:20px;font-weight:600;color:var(--lc-text-primary);}
+.col-list-add{width:32px;height:32px;border-radius:50%;background:var(--lc-accent);display:flex;align-items:center;justify-content:center;border:none;box-shadow:0 4px 12px rgba(224,123,63,0.35);}
+.col-list-add svg{width:16px;height:16px;stroke:white;fill:none;stroke-width:2.2;stroke-linecap:round;}
+.col-hero-banner{margin:0 14px 10px;background:linear-gradient(135deg,#1A3830 0%,#2D5A4E 100%);border-radius:16px;padding:14px 16px;display:flex;align-items:center;justify-content:space-between;}
+.col-hero-total-lbl{font-size:9px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:rgba(255,255,255,0.5);margin-bottom:2px;}
+.col-hero-total{font-family:var(--lc-font-display);font-size:22px;font-weight:600;color:white;}
+.col-hero-right{text-align:right;}
+.col-hero-due-lbl{font-size:9px;color:rgba(255,255,255,0.5);margin-bottom:2px;}
+.col-hero-due{font-family:var(--lc-font-display);font-size:22px;font-weight:600;color:#6EE7B7;}
+.col-cards{padding:0 14px;display:flex;flex-direction:column;gap:8px;}
+.col-card{background:var(--lc-card);border:1px solid var(--lc-border);border-radius:14px;padding:12px 14px;box-shadow:var(--lc-shadow-card);cursor:pointer;}
+.col-card.incomplete{border-color:var(--lc-warn-border);}
+.col-card-top{display:flex;align-items:center;gap:8px;margin-bottom:6px;}
+.col-card-emoji{font-size:20px;flex-shrink:0;}
+.col-card-name-row{display:flex;align-items:center;gap:5px;flex:1;min-width:0;}
+.col-card-name{font-family:var(--lc-font-display);font-size:13px;font-weight:600;color:var(--lc-text-primary);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.col-incomplete-dot{width:7px;height:7px;border-radius:50%;background:#FCD34D;flex-shrink:0;border:1.5px solid #B45309;}
+.col-card-chevron{width:16px;height:16px;flex-shrink:0;}
+.col-card-chevron svg{width:16px;height:16px;stroke:var(--lc-text-hint);fill:none;stroke-width:1.8;stroke-linecap:round;}
+.col-card-meta{font-size:10px;color:var(--lc-text-secondary);margin-bottom:8px;}
+.col-card-meta .warn{color:var(--lc-warn);font-weight:600;}
+.col-progress-track{height:3px;background:var(--lc-surface);border-radius:2px;border:1px solid var(--lc-border);overflow:hidden;}
+.col-progress-fill{height:100%;border-radius:2px;background:var(--lc-brand);}
+
+/* ─── DESIGN NOTES ──────────────────────────────────────────────────────── */
+.notes-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(340px,1fr));gap:16px;margin-top:16px;}
+.note-card{background:var(--lc-card);border:1px solid var(--lc-border);border-radius:14px;padding:20px;box-shadow:var(--lc-shadow-card);}
+.note-card-title{font-size:12px;font-weight:600;letter-spacing:.07em;text-transform:uppercase;color:var(--lc-brand-mid);margin-bottom:10px;}
+.note-card p{font-size:13px;color:var(--lc-text-secondary);line-height:1.7;margin-bottom:8px;}
+.note-card p:last-child{margin-bottom:0;}
+.note-card strong{color:var(--lc-text-primary);}
+.note-card ul{margin:6px 0 8px 18px;font-size:13px;color:var(--lc-text-secondary);line-height:1.8;}
+.note-card code{font-family:var(--lc-font-mono);font-size:11px;background:var(--lc-surface);padding:1px 5px;border-radius:4px;border:1px solid var(--lc-border);color:var(--lc-brand-dark);}
+</style>
+</head>
+<body>
+
+<div class="page-header">
+  <div class="page-header-inner">
+    <div>
+      <div class="logo">LinguaCard — Design Reference</div>
+      <div class="logo-sub">Resilient Two-Phase Image Import · Epic LC-103 to LC-113</div>
+    </div>
+    <div style="display:flex;gap:8px;flex-wrap:wrap;">
+      <span class="badge">LC-103 → LC-113</span>
+      <span class="badge">7 screens</span>
+      <span class="badge">Image Import</span>
+    </div>
+  </div>
+</div>
+
+<div class="main">
+
+<!-- ═══════════════ SECTION 1: IMPORT FLOW ═══════════════ -->
+<div class="section">
+  <div class="section-title">Two-Phase Import Flow</div>
+  <div class="section-sub">
+    The import flow is split into Phase 1 (image vision — extract raw words) and Phase 2 (text enrichment — generate translations, examples, categories in batches of 10).
+    Rate limits mid-Phase 2 produce a partial result — the user still gets their ready cards immediately, and the collection tracks pending words for later completion.
+    Screens I01–I05 cover the full end-to-end import journey. I06–I07 cover the post-import incomplete collection experience.
+  </div>
+
+  <div class="phones-row">
+
+    <!-- ── I01: IMAGE PICKER ENTRY ── -->
+    <div class="phone-wrap">
+      <div class="phone-label">I01 · Image picker — entry</div>
+      <div class="phone">
+        <div class="phone-inner">
+          <div class="status-bar"><span>9:41</span><div style="display:flex;align-items:center;gap:3px;"><div class="sig"><span></span><span></span><span></span></div><div class="batt"></div></div></div>
+
+          <div class="topbar">
+            <button class="back-btn"><svg viewBox="0 0 24 24"><polyline points="15,18 9,12 15,6"/></svg></button>
+            <div>
+              <div class="topbar-title">Import from Image</div>
+              <div class="topbar-sub">Scan a page, menu, or flashcard</div>
+            </div>
+          </div>
+
+          <div class="imp-hero">
+            <div class="imp-hero-icon">📷</div>
+            <div class="imp-hero-t">Scan or pick an image</div>
+            <div class="imp-hero-s">Point at any page with German words — menus, textbooks, signs, flashcards</div>
+          </div>
+
+          <div class="imp-btns">
+            <button class="imp-btn-primary">
+              <svg viewBox="0 0 24 24"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>
+              Take photo
+            </button>
+            <button class="imp-btn-secondary">
+              <svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21,15 16,10 5,21"/></svg>
+              Choose from gallery
+            </button>
+          </div>
+
+          <div class="imp-or">
+            <div class="imp-or-line"></div>
+            <span class="imp-or-txt">Tips for best results</span>
+            <div class="imp-or-line"></div>
+          </div>
+
+          <div class="imp-tips">
+            <div class="imp-tips-t">For best results</div>
+            <div class="imp-tip"><div class="imp-tip-dot"></div><span>Good lighting — avoid shadows on the text</span></div>
+            <div class="imp-tip"><div class="imp-tip-dot"></div><span>Hold the camera still — blurry images may miss words</span></div>
+            <div class="imp-tip"><div class="imp-tip-dot"></div><span>Large images with many words work better in batches</span></div>
+          </div>
+
+          <div style="height:12px;"></div>
+          <div class="bottom-nav">
+            <div class="nav-item"><svg viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9,22 9,12 15,12 15,22"/></svg><span class="nav-lbl">Home</span></div>
+            <div class="nav-item on"><svg viewBox="0 0 24 24"><rect x="2" y="3" width="20" height="14" rx="2" ry="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg><span class="nav-lbl">Vault</span><div class="nav-dot"></div></div>
+            <div class="nav-item"><svg viewBox="0 0 24 24"><polygon points="5,3 19,12 5,21"/></svg><span class="nav-lbl">Review</span></div>
+            <div class="nav-item"><svg viewBox="0 0 24 24"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg><span class="nav-lbl">Stories</span></div>
+            <div class="nav-item"><svg viewBox="0 0 24 24"><polygon points="11,5 6,9 2,9 2,15 6,15 11,19 11,5"/><path d="M15.54,8.46a5,5,0,0,1,0,7.07"/></svg><span class="nav-lbl">Listen</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── I02: PROCESSING — PHASE 1 ── -->
+    <div class="phone-wrap">
+      <div class="phone-label">I02 · Processing — Phase 1 extracting</div>
+      <div class="phone">
+        <div class="phone-inner">
+          <div class="status-bar"><span>9:43</span><div style="display:flex;align-items:center;gap:3px;"><div class="sig"><span></span><span></span><span></span></div><div class="batt"></div></div></div>
+
+          <div class="topbar">
+            <button class="back-btn"><svg viewBox="0 0 24 24"><polyline points="15,18 9,12 15,6"/></svg></button>
+            <div>
+              <div class="topbar-title">Scanning image</div>
+              <div class="topbar-sub">Please wait…</div>
+            </div>
+          </div>
+
+          <!-- Image thumbnail with scan animation -->
+          <div class="proc-img-thumb">
+            <div class="proc-img-content">
+              <div class="proc-img-line dark full"></div>
+              <div class="proc-img-line mid"></div>
+              <div class="proc-img-line dark short"></div>
+              <div class="proc-img-line full"></div>
+              <div class="proc-img-line dark mid"></div>
+              <div class="proc-img-line short"></div>
+              <div class="proc-img-line dark full"></div>
+              <div class="proc-img-line mid"></div>
+            </div>
+            <div class="scan-overlay">
+              <div class="scan-glow"></div>
+              <div class="scan-line"></div>
+            </div>
+          </div>
+
+          <!-- Two-phase progress -->
+          <div class="proc-phases">
+            <!-- Phase 1 active -->
+            <div class="proc-phase-row">
+              <div class="proc-step-dot active"><div class="spinner-ring"></div></div>
+              <div class="proc-step-body">
+                <div class="proc-step-t">Spotting vocabulary…</div>
+                <div class="proc-step-s">Reading words from image</div>
+              </div>
+            </div>
+            <div class="proc-phase-connector"></div>
+            <!-- Phase 2 pending -->
+            <div class="proc-phase-row">
+              <div class="proc-step-dot pending">
+                <svg viewBox="0 0 24 24" style="width:12px;height:12px;stroke:var(--lc-text-hint);fill:none;stroke-width:1.8;stroke-linecap:round;"><circle cx="12" cy="12" r="9"/><polyline points="12,6 12,12 16,14"/></svg>
+              </div>
+              <div class="proc-step-body">
+                <div class="proc-step-t muted">Generating flashcards</div>
+                <div class="proc-step-s">Translations + examples</div>
+              </div>
+            </div>
+          </div>
+
+          <div style="margin:16px 14px 0;padding:10px 12px;background:var(--lc-surface);border-radius:10px;border:1px solid var(--lc-border);font-size:10px;color:var(--lc-text-hint);display:flex;align-items:center;gap:6px;">
+            <svg viewBox="0 0 24 24" style="width:12px;height:12px;stroke:var(--lc-text-hint);fill:none;stroke-width:1.8;stroke-linecap:round;flex-shrink:0;"><circle cx="12" cy="12" r="9"/><path d="M12 8v4M12 16h.01"/></svg>
+            Step 1 of 2 — quick scan. Step 2 generates translations and example sentences.
+          </div>
+
+          <div style="flex:1;"></div>
+          <div style="padding:12px 14px;text-align:center;">
+            <span style="font-size:11px;color:var(--lc-text-hint);">Cancel</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── I03: PROCESSING — PHASE 2 IN PROGRESS ── -->
+    <div class="phone-wrap">
+      <div class="phone-label">I03 · Processing — Phase 2 enriching</div>
+      <div class="phone">
+        <div class="phone-inner">
+          <div class="status-bar"><span>9:44</span><div style="display:flex;align-items:center;gap:3px;"><div class="sig"><span></span><span></span><span></span></div><div class="batt"></div></div></div>
+
+          <div class="topbar">
+            <button class="back-btn"><svg viewBox="0 0 24 24"><polyline points="15,18 9,12 15,6"/></svg></button>
+            <div>
+              <div class="topbar-title">Generating flashcards</div>
+              <div class="topbar-sub">Building your collection…</div>
+            </div>
+          </div>
+
+          <!-- Phase status -->
+          <div class="proc-phases">
+            <div class="proc-phase-row">
+              <div class="proc-step-dot done">
+                <svg viewBox="0 0 24 24" style="width:12px;height:12px;stroke:white;fill:none;stroke-width:2.5;stroke-linecap:round;"><polyline points="20,6 9,17 4,12"/></svg>
+              </div>
+              <div class="proc-step-body">
+                <div class="proc-step-t">Found 47 words</div>
+                <div class="proc-step-s">Image scanned successfully</div>
+              </div>
+            </div>
+            <div class="proc-phase-connector done"></div>
+            <div class="proc-phase-row">
+              <div class="proc-step-dot active"><div class="spinner-ring"></div></div>
+              <div class="proc-step-body">
+                <div class="proc-step-t">Generating cards…</div>
+                <div class="proc-step-s">Batch 3 of 5 in progress</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Progress card -->
+          <div class="proc-progress-card">
+            <div class="proc-progress-header">
+              <span class="proc-progress-label">Progress</span>
+              <span class="proc-progress-count">30 / 47 ready</span>
+            </div>
+            <div class="proc-bar-track">
+              <div class="proc-bar-fill" style="width:64%;"></div>
+            </div>
+            <div class="proc-bar-labels">
+              <span>30 cards</span>
+              <span>17 remaining</span>
+            </div>
+            <!-- Word chips -->
+            <div class="proc-chip-grid">
+              <div class="proc-chip done"><svg viewBox="0 0 24 24"><polyline points="20,6 9,17 4,12"/></svg>das Hobby</div>
+              <div class="proc-chip done"><svg viewBox="0 0 24 24"><polyline points="20,6 9,17 4,12"/></svg>das Buch</div>
+              <div class="proc-chip done"><svg viewBox="0 0 24 24"><polyline points="20,6 9,17 4,12"/></svg>das Café</div>
+              <div class="proc-chip done"><svg viewBox="0 0 24 24"><polyline points="20,6 9,17 4,12"/></svg>kochen</div>
+              <div class="proc-chip done"><svg viewBox="0 0 24 24"><polyline points="20,6 9,17 4,12"/></svg>reisen</div>
+              <div class="proc-chip active">der Arzt…</div>
+              <div class="proc-chip pending">das Museum</div>
+              <div class="proc-chip pending">fotografieren</div>
+              <div class="proc-chip pending">die Firma</div>
+            </div>
+            <div class="proc-batch-info">
+              <svg viewBox="0 0 24 24"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 7V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v2"/></svg>
+              <span class="proc-batch-info-t">Processing 10 words at a time — your progress is saved after each batch</span>
+            </div>
+          </div>
+
+          <div style="flex:1;"></div>
+          <div style="padding:12px 14px;text-align:center;">
+            <span style="font-size:11px;color:var(--lc-text-hint);">Running in background — you can leave this screen</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── I04: PARTIAL RESULT (rate limit hit) ── -->
+    <div class="phone-wrap">
+      <div class="phone-label">I04 · Partial result — 15 pending</div>
+      <div class="phone">
+        <div class="phone-inner">
+          <div class="status-bar"><span>9:46</span><div style="display:flex;align-items:center;gap:3px;"><div class="sig"><span></span><span></span><span></span></div><div class="batt"></div></div></div>
+
+          <div class="topbar">
+            <button class="back-btn"><svg viewBox="0 0 24 24"><polyline points="15,18 9,12 15,6"/></svg></button>
+            <div>
+              <div class="topbar-title">Almost done</div>
+              <div class="topbar-sub">32 cards are ready now</div>
+            </div>
+          </div>
+
+          <!-- Phase summary -->
+          <div class="proc-phases">
+            <div class="proc-phase-row">
+              <div class="proc-step-dot done"><svg viewBox="0 0 24 24" style="width:12px;height:12px;stroke:white;fill:none;stroke-width:2.5;stroke-linecap:round;"><polyline points="20,6 9,17 4,12"/></svg></div>
+              <div class="proc-step-body">
+                <div class="proc-step-t">47 words extracted</div>
+                <div class="proc-step-s">Image scanned successfully</div>
+              </div>
+            </div>
+            <div class="proc-phase-connector done"></div>
+            <div class="proc-phase-row">
+              <div class="proc-step-dot" style="background:var(--lc-warn-bg);border:2px solid var(--lc-warn-border);">
+                <svg viewBox="0 0 24 24" style="width:11px;height:11px;stroke:var(--lc-warn);fill:none;stroke-width:2.2;stroke-linecap:round;"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+              </div>
+              <div class="proc-step-body">
+                <div class="proc-step-t" style="color:var(--lc-warn);">32 of 47 cards generated</div>
+                <div class="proc-step-s">15 words paused — quota limit reached</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Warning banner -->
+          <div class="partial-banner">
+            <div class="partial-banner-icon">⏳</div>
+            <div class="partial-banner-body">
+              <div class="partial-banner-t">15 cards will be added later</div>
+              <div class="partial-banner-s">The AI quota limit was reached mid-import. Your collection will show a "Complete" button once you add these 32 cards — tap it any time to finish generating the rest.</div>
+            </div>
+          </div>
+
+          <!-- Stats -->
+          <div class="partial-stats">
+            <div class="partial-stat">
+              <div class="partial-stat-val ok">32</div>
+              <div class="partial-stat-lbl">Ready now</div>
+            </div>
+            <div class="partial-stat">
+              <div class="partial-stat-val warn">15</div>
+              <div class="partial-stat-lbl">Pending</div>
+            </div>
+            <div class="partial-stat">
+              <div class="partial-stat-val">47</div>
+              <div class="partial-stat-lbl">Total found</div>
+            </div>
+          </div>
+
+          <div class="partial-cta-area">
+            <button class="partial-cta-primary">
+              <svg viewBox="0 0 24 24"><polyline points="20,6 9,17 4,12"/></svg>
+              Add 32 cards to collection
+            </button>
+            <div class="partial-cta-note">15 pending cards will appear in the collection with a "Complete" button</div>
+          </div>
+
+          <div style="flex:1;"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── I05: REVIEW SCREEN ── -->
+    <div class="phone-wrap">
+      <div class="phone-label">I05 · Review — select words &amp; confirm</div>
+      <div class="phone">
+        <div class="phone-inner" style="overflow-y:auto;">
+          <div class="status-bar"><span>9:47</span><div style="display:flex;align-items:center;gap:3px;"><div class="sig"><span></span><span></span><span></span></div><div class="batt"></div></div></div>
+
+          <div class="topbar">
+            <button class="back-btn"><svg viewBox="0 0 24 24"><polyline points="15,18 9,12 15,6"/></svg></button>
+            <div><div class="topbar-title">Review words</div></div>
+          </div>
+
+          <!-- Image + status -->
+          <div class="rev-img-row">
+            <div class="rev-img-thumb">📄</div>
+            <div class="rev-img-info">
+              <div class="rev-img-t">Hobbys &amp; Berufe textbook p.4</div>
+              <div class="rev-img-s">47 words found · 32 ready</div>
+            </div>
+            <div class="rev-img-badge">
+              <svg viewBox="0 0 24 24" style="width:9px;height:9px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;"><circle cx="12" cy="12" r="9"/><polyline points="12,6 12,12 16,14"/></svg>
+              15 pending
+            </div>
+          </div>
+
+          <!-- Collection picker -->
+          <div class="rev-collection-area">
+            <div class="rev-collection-lbl">Add to collection</div>
+            <div class="rev-collection-picker">
+              <div class="rev-collection-emoji">📚</div>
+              <div class="rev-collection-name">Hobbys &amp; Freizeit</div>
+              <div class="rev-collection-check"><svg viewBox="0 0 24 24"><polyline points="20,6 9,17 4,12"/></svg></div>
+            </div>
+          </div>
+
+          <!-- Summary -->
+          <div class="rev-sum-row">
+            <div class="rev-sum">
+              <div class="rev-sum-val">47</div>
+              <div class="rev-sum-lbl">Total found</div>
+            </div>
+            <div class="rev-sum">
+              <div class="rev-sum-val">30</div>
+              <div class="rev-sum-lbl">Selected</div>
+            </div>
+            <div class="rev-sum">
+              <div class="rev-sum-val warn">15</div>
+              <div class="rev-sum-lbl">Pending</div>
+            </div>
+          </div>
+
+          <!-- Word list -->
+          <div class="rev-select-bar">
+            <span class="rev-select-lbl">Extracted words (32 ready)</span>
+            <span class="rev-select-all">Deselect all</span>
+          </div>
+          <div class="rev-word-list">
+            <div class="rev-word-row">
+              <div class="rev-checkbox checked"><svg viewBox="0 0 24 24"><polyline points="20,6 9,17 4,12"/></svg></div>
+              <span class="art-badge art-das" style="font-size:8px;padding:1px 5px;">das</span>
+              <div class="rev-word-body">
+                <div class="rev-word-back">Hobby, -s</div>
+                <div class="rev-word-front">hobby</div>
+              </div>
+            </div>
+            <div class="rev-word-row">
+              <div class="rev-checkbox checked"><svg viewBox="0 0 24 24"><polyline points="20,6 9,17 4,12"/></svg></div>
+              <span class="art-badge art-das" style="font-size:8px;padding:1px 5px;">das</span>
+              <div class="rev-word-body">
+                <div class="rev-word-back">Buch, -¨er</div>
+                <div class="rev-word-front">book</div>
+              </div>
+            </div>
+            <div class="rev-word-row">
+              <div class="rev-checkbox checked"><svg viewBox="0 0 24 24"><polyline points="20,6 9,17 4,12"/></svg></div>
+              <span class="art-badge art-verb" style="font-size:8px;padding:1px 5px;">verb</span>
+              <div class="rev-word-body">
+                <div class="rev-word-back">kochen</div>
+                <div class="rev-word-front">to cook</div>
+              </div>
+            </div>
+            <div class="rev-word-row deselected">
+              <div class="rev-checkbox"></div>
+              <span class="art-badge art-der" style="font-size:8px;padding:1px 5px;opacity:.3;">der</span>
+              <div class="rev-word-body">
+                <div class="rev-word-back">Fußball (Sg.)</div>
+                <div class="rev-word-front">football / soccer</div>
+              </div>
+            </div>
+            <div class="rev-word-row">
+              <div class="rev-checkbox checked"><svg viewBox="0 0 24 24"><polyline points="20,6 9,17 4,12"/></svg></div>
+              <span class="art-badge art-verb" style="font-size:8px;padding:1px 5px;">verb</span>
+              <div class="rev-word-body">
+                <div class="rev-word-back">reisen</div>
+                <div class="rev-word-front">to travel</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="rev-cta">
+            <button class="rev-cta-btn">Import 30 words to collection →</button>
+          </div>
+          <div style="height:14px;"></div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- ═══════════════ SECTION 2: INCOMPLETE COLLECTION UX ═══════════════ -->
+<div class="section">
+  <div class="section-title">Incomplete Collection Experience</div>
+  <div class="section-sub">
+    After a partial import, the collection is saved with <code>importStatus: 'incomplete'</code> and <code>pendingWords[]</code> stored in the database.
+    Two surfaces show the incomplete state: the collection detail page (I06, banner + "Complete" button + ghost placeholder rows) and the collections list (I07, amber dot indicator with pending count).
+    Tapping "Complete" on I06 calls <code>POST /import/complete/:collectionId</code> and resumes Phase 2 enrichment for only the pending words.
+  </div>
+
+  <div class="phones-row">
+
+    <!-- ── I06: COLLECTION DETAIL — INCOMPLETE ── -->
+    <div class="phone-wrap">
+      <div class="phone-label">I06 · Collection detail — incomplete</div>
+      <div class="phone">
+        <div class="phone-inner" style="overflow-y:auto;">
+          <div class="status-bar"><span>9:52</span><div style="display:flex;align-items:center;gap:3px;"><div class="sig"><span></span><span></span><span></span></div><div class="batt"></div></div></div>
+
+          <div class="topbar" style="padding-bottom:8px;">
+            <button class="back-btn"><svg viewBox="0 0 24 24"><polyline points="15,18 9,12 15,6"/></svg></button>
+            <div class="topbar-title" style="flex:1;">Hobbys &amp; Freizeit</div>
+            <button class="col-detail-edit"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="1"/><circle cx="19" cy="12" r="1"/><circle cx="5" cy="12" r="1"/></svg></button>
+          </div>
+
+          <!-- Collection hero -->
+          <div class="col-detail-hero">
+            <div class="col-detail-top">
+              <div class="col-detail-emoji">📚</div>
+              <div class="col-detail-info">
+                <div class="col-detail-name">Hobbys &amp; Freizeit</div>
+                <div class="col-detail-meta">Imported from image · 2 June 2026</div>
+              </div>
+              <button class="col-detail-edit"><svg viewBox="0 0 24 24"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.12 2.12 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg></button>
+            </div>
+            <div class="col-detail-stats">
+              <div class="col-detail-stat"><div class="col-detail-stat-val">32</div><div class="col-detail-stat-lbl">Cards</div></div>
+              <div class="col-detail-stat"><div class="col-detail-stat-val">0</div><div class="col-detail-stat-lbl">Mastered</div></div>
+              <div class="col-detail-stat"><div class="col-detail-stat-val">32</div><div class="col-detail-stat-lbl">Due now</div></div>
+              <div class="col-detail-stat"><div class="col-detail-stat-val" style="color:var(--lc-warn);">15</div><div class="col-detail-stat-lbl">Pending</div></div>
+            </div>
+          </div>
+
+          <!-- INCOMPLETE BANNER -->
+          <div style="height:10px;"></div>
+          <div class="incomplete-banner">
+            <div class="ib-icon-wrap">
+              <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><polyline points="12,6 12,12 16,14"/></svg>
+            </div>
+            <div class="ib-body">
+              <div class="ib-title">Import incomplete</div>
+              <div class="ib-sub">15 words still need flashcards. Tap to finish generating them.</div>
+            </div>
+            <button class="ib-btn">Complete</button>
+          </div>
+
+          <!-- Action buttons -->
+          <div style="display:flex;gap:8px;padding:10px 14px 0;">
+            <button style="flex:1;background:var(--lc-brand);color:white;border:none;border-radius:var(--lc-radius-md);padding:11px;font-size:12px;font-weight:600;font-family:var(--lc-font-body);display:flex;align-items:center;justify-content:center;gap:5px;">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.2" stroke-linecap="round"><polygon points="5,3 19,12 5,21"/></svg>
+              Study now
+            </button>
+            <button style="flex:1;background:var(--lc-card);color:var(--lc-brand);border:1.5px solid var(--lc-brand);border-radius:var(--lc-radius-md);padding:11px;font-size:12px;font-weight:600;font-family:var(--lc-font-body);display:flex;align-items:center;justify-content:center;gap:5px;">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="var(--lc-brand)" stroke-width="2" stroke-linecap="round"><polygon points="11,5 6,9 2,9 2,15 6,15 11,19 11,5"/><path d="M15.54,8.46a5,5,0,0,1,0,7.07"/></svg>
+              Listen
+            </button>
+          </div>
+
+          <!-- Cards list — 3 real + pending ghosts -->
+          <div class="col-detail-section-lbl">Cards (32 of 47)</div>
+
+          <div class="col-word-row">
+            <span class="art-badge art-das" style="font-size:8px;padding:1px 5px;">das</span>
+            <div class="col-word-body">
+              <div class="col-word-back">Hobby, -s</div>
+              <div class="col-word-front">hobby</div>
+            </div>
+            <div class="m-dot m0"></div>
+          </div>
+          <div class="col-word-row">
+            <span class="art-badge art-das" style="font-size:8px;padding:1px 5px;">das</span>
+            <div class="col-word-body">
+              <div class="col-word-back">Buch, -¨er</div>
+              <div class="col-word-front">book</div>
+            </div>
+            <div class="m-dot m0"></div>
+          </div>
+          <div class="col-word-row">
+            <span class="art-badge art-verb" style="font-size:8px;padding:1px 5px;">verb</span>
+            <div class="col-word-body">
+              <div class="col-word-back">kochen</div>
+              <div class="col-word-front">to cook</div>
+            </div>
+            <div class="m-dot m0"></div>
+          </div>
+
+          <!-- Pending ghost section -->
+          <div class="col-detail-section-lbl"><div class="pending-dot"></div>Pending (15) — tap Complete above</div>
+
+          <div class="col-word-row ghost">
+            <div style="width:28px;height:20px;border-radius:4px;background:var(--lc-border);opacity:.4;"></div>
+            <div class="col-word-body">
+              <div class="ghost-line ghost-mid" style="margin-bottom:4px;"></div>
+              <div class="ghost-line ghost-short"></div>
+            </div>
+          </div>
+          <div class="col-word-row ghost">
+            <div style="width:28px;height:20px;border-radius:4px;background:var(--lc-border);opacity:.4;"></div>
+            <div class="col-word-body">
+              <div class="ghost-line ghost-long" style="margin-bottom:4px;"></div>
+              <div class="ghost-line ghost-mid"></div>
+            </div>
+          </div>
+          <div class="col-word-row ghost">
+            <div style="width:28px;height:20px;border-radius:4px;background:var(--lc-border);opacity:.4;"></div>
+            <div class="col-word-body">
+              <div class="ghost-line ghost-short" style="margin-bottom:4px;"></div>
+              <div class="ghost-line ghost-short"></div>
+            </div>
+          </div>
+
+          <div style="height:14px;"></div>
+          <div class="bottom-nav">
+            <div class="nav-item"><svg viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9,22 9,12 15,12 15,22"/></svg><span class="nav-lbl">Home</span></div>
+            <div class="nav-item on"><svg viewBox="0 0 24 24"><rect x="2" y="3" width="20" height="14" rx="2" ry="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg><span class="nav-lbl">Vault</span><div class="nav-dot"></div></div>
+            <div class="nav-item"><svg viewBox="0 0 24 24"><polygon points="5,3 19,12 5,21"/></svg><span class="nav-lbl">Review</span></div>
+            <div class="nav-item"><svg viewBox="0 0 24 24"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg><span class="nav-lbl">Stories</span></div>
+            <div class="nav-item"><svg viewBox="0 0 24 24"><polygon points="11,5 6,9 2,9 2,15 6,15 11,19 11,5"/><path d="M15.54,8.46a5,5,0,0,1,0,7.07"/></svg><span class="nav-lbl">Listen</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── I07: COLLECTIONS LIST — INCOMPLETE DOT ── -->
+    <div class="phone-wrap">
+      <div class="phone-label">I07 · Collections list — incomplete dot</div>
+      <div class="phone">
+        <div class="phone-inner">
+          <div class="status-bar"><span>9:52</span><div style="display:flex;align-items:center;gap:3px;"><div class="sig"><span></span><span></span><span></span></div><div class="batt"></div></div></div>
+
+          <!-- Top bar -->
+          <div class="col-list-topbar">
+            <div class="col-list-title">My Collections</div>
+            <button class="col-list-add"><svg viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg></button>
+          </div>
+
+          <!-- Hero stats -->
+          <div class="col-hero-banner">
+            <div>
+              <div class="col-hero-total-lbl">Total words</div>
+              <div class="col-hero-total">155</div>
+            </div>
+            <div class="col-hero-right">
+              <div class="col-hero-due-lbl">Due today</div>
+              <div class="col-hero-due">37</div>
+            </div>
+          </div>
+
+          <div class="col-cards">
+
+            <!-- Collection 1: complete -->
+            <div class="col-card">
+              <div class="col-card-top">
+                <div class="col-card-emoji">📖</div>
+                <div class="col-card-name-row">
+                  <span class="col-card-name">Chapter 6 — Restaurant</span>
+                </div>
+                <div class="col-card-chevron"><svg viewBox="0 0 24 24"><polyline points="9,18 15,12 9,6"/></svg></div>
+              </div>
+              <div class="col-card-meta">95 words · 12 due</div>
+              <div class="col-progress-track"><div class="col-progress-fill" style="width:48%;"></div></div>
+            </div>
+
+            <!-- Collection 2: INCOMPLETE — amber dot + border -->
+            <div class="col-card incomplete">
+              <div class="col-card-top">
+                <div class="col-card-emoji">📚</div>
+                <div class="col-card-name-row">
+                  <span class="col-card-name">Hobbys &amp; Freizeit</span>
+                  <div class="col-incomplete-dot" title="15 cards pending"></div>
+                </div>
+                <div class="col-card-chevron"><svg viewBox="0 0 24 24"><polyline points="9,18 15,12 9,6"/></svg></div>
+              </div>
+              <div class="col-card-meta">32 words · 25 due · <span class="warn">15 pending ⏳</span></div>
+              <div class="col-progress-track"><div class="col-progress-fill" style="width:14%;"></div></div>
+            </div>
+
+            <!-- Collection 3: complete -->
+            <div class="col-card">
+              <div class="col-card-top">
+                <div class="col-card-emoji">🏥</div>
+                <div class="col-card-name-row">
+                  <span class="col-card-name">Health &amp; Body</span>
+                </div>
+                <div class="col-card-chevron"><svg viewBox="0 0 24 24"><polyline points="9,18 15,12 9,6"/></svg></div>
+              </div>
+              <div class="col-card-meta">28 words · 0 due</div>
+              <div class="col-progress-track"><div class="col-progress-fill" style="width:62%;"></div></div>
+            </div>
+
+            <!-- Legend note -->
+            <div style="display:flex;align-items:center;gap:6px;padding:6px 2px;font-size:10px;color:var(--lc-text-hint);">
+              <div style="width:7px;height:7px;border-radius:50%;background:#FCD34D;border:1.5px solid #B45309;flex-shrink:0;"></div>
+              Amber dot = import incomplete — tap collection to finish
+            </div>
+
+          </div>
+
+          <div style="flex:1;"></div>
+          <div class="bottom-nav">
+            <div class="nav-item"><svg viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9,22 9,12 15,12 15,22"/></svg><span class="nav-lbl">Home</span></div>
+            <div class="nav-item on"><svg viewBox="0 0 24 24"><rect x="2" y="3" width="20" height="14" rx="2" ry="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg><span class="nav-lbl">Vault</span><div class="nav-dot"></div></div>
+            <div class="nav-item"><svg viewBox="0 0 24 24"><polygon points="5,3 19,12 5,21"/></svg><span class="nav-lbl">Review</span></div>
+            <div class="nav-item"><svg viewBox="0 0 24 24"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg><span class="nav-lbl">Stories</span></div>
+            <div class="nav-item"><svg viewBox="0 0 24 24"><polygon points="11,5 6,9 2,9 2,15 6,15 11,19 11,5"/><path d="M15.54,8.46a5,5,0,0,1,0,7.07"/></svg><span class="nav-lbl">Listen</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- ═══════════════ DESIGN RATIONALE ═══════════════ -->
+<div class="section">
+  <div class="section-title">Design Rationale &amp; UX Decisions</div>
+  <div class="section-sub">Key decisions behind the two-phase import and incomplete collection experience.</div>
+
+  <div class="notes-grid">
+    <div class="note-card">
+      <div class="note-card-title">I01 — Why a dedicated picker screen</div>
+      <p><strong>Context:</strong> The existing import entry page (<code>/vault/import</code>) was extended in LC-088 to surface the image import button. Screen I01 is the dedicated <code>/vault/import/image</code> route after tapping that button.</p>
+      <p>The dashed-border dropzone mirrors the existing CSV import affordance, making the feature immediately discoverable. Tips are shown upfront because image quality directly affects extraction accuracy — preventing user frustration before it starts.</p>
+    </div>
+
+    <div class="note-card">
+      <div class="note-card-title">I02 — Phase 1 scan animation</div>
+      <p>The scan line animating over the image thumbnail is a <strong>functional metaphor</strong> — it tells the user the AI is reading text from the image, not just "thinking". This reduces perceived wait time and builds mental model.</p>
+      <p>The two-step progress indicator (Phase 1 active, Phase 2 grayed out) sets expectations: the user knows there are two steps, so they're not surprised when the screen transitions to a second phase instead of jumping straight to the review screen.</p>
+    </div>
+
+    <div class="note-card">
+      <div class="note-card-title">I03 — Batched progress with word chips</div>
+      <p>The word chip grid is the most important UX decision in the entire flow. Each chip turning green as its batch completes gives the user <strong>granular feedback</strong> — they can see their vocabulary accumulating in real time, not just a spinner.</p>
+      <p>The note "Processing 10 words at a time — your progress is saved after each batch" explicitly tells the user why they're seeing this progress, removing the black box. This manages expectations for the rate limit case — if the bar stops at 68%, the user already understands why.</p>
+    </div>
+
+    <div class="note-card">
+      <div class="note-card-title">I04 — Partial result is not an error</div>
+      <p><strong>Critical design decision:</strong> Screen I04 uses amber (warning) rather than red (error) intentionally. 32 of 47 cards is a success, not a failure. The framing is "<strong>32 cards are ready now</strong>" not "import failed".</p>
+      <p>The CTA says "Add 32 cards to collection" — not "try again" or "retry". The user gets immediate value. The pending 15 become a background concern handled through the collection detail (I06), not a blocker on the happy path.</p>
+    </div>
+
+    <div class="note-card">
+      <div class="note-card-title">I05 — Review screen: partial import indicator</div>
+      <p>The review screen shows the "15 pending" badge inline in the image info row so users understand the incomplete state before confirming. The summary row surfaces the pending count as a distinct stat alongside selected and total.</p>
+      <p>Words with generated card data are shown as normal selectable rows. Pending words are <em>not</em> shown — they have no data yet. The CTA correctly says "Import 30 words" (the selected count), never referencing the pending words which can't be imported yet.</p>
+    </div>
+
+    <div class="note-card">
+      <div class="note-card-title">I06 — Incomplete banner design</div>
+      <p>The banner appears <strong>between the hero stats and the action buttons</strong> — directly in the user's scan path, impossible to miss. It uses the amber palette consistently with I03 and I04.</p>
+      <p>Ghost placeholder rows below the real word list visually represent the pending words. They are intentionally faint and show no content — this communicates "these slots exist but aren't filled yet" without being alarming. The section label "Pending (15) — tap Complete above" provides direct instruction.</p>
+      <p>The "Complete" button in the banner calls <code>POST /import/complete/:collectionId</code>. On success the banner disappears, the ghost rows are replaced by real cards, and the collection stat updates in place — no navigation required.</p>
+    </div>
+
+    <div class="note-card">
+      <div class="note-card-title">I07 — Amber dot: scannable at a glance</div>
+      <p>The amber dot next to the collection name is deliberately small (7px) and uses the amber palette that users have already seen in I03, I04, and I06 — creating <strong>visual consistency</strong> across the whole flow.</p>
+      <p>The amber border on the incomplete card provides a secondary signal so the collection is findable even when the list is long. The meta row shows "15 pending ⏳" in amber text as tertiary reinforcement.</p>
+      <p>Collections with <code>importStatus: 'complete'</code> (all CSV imports, completed image imports) show no dot — the indicator is <strong>additive only</strong>, never subtractive.</p>
+    </div>
+
+    <div class="note-card">
+      <div class="note-card-title">Screen–ticket mapping</div>
+      <ul>
+        <li><strong>I01</strong> — existing LC-085 (image entry page) · no new ticket</li>
+        <li><strong>I02</strong> — LC-109 · two-phase processing screen, Phase 1 state</li>
+        <li><strong>I03</strong> — LC-109 · two-phase processing screen, Phase 2 state</li>
+        <li><strong>I04</strong> — LC-109 · partial result state (rate limit hit)</li>
+        <li><strong>I05</strong> — LC-087 (existing review page) · updated for partial badge · no new ticket</li>
+        <li><strong>I06</strong> — LC-110 + LC-111 · incomplete banner on CollectionDetailPage</li>
+        <li><strong>I07</strong> — LC-112 · amber dot on collections list</li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+</div><!-- /main -->
+</body>
+</html>

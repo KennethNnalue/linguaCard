@@ -1,18 +1,12 @@
-import { Component, inject, OnDestroy, OnInit, signal } from '@angular/core';
+import { Component, computed, inject, OnDestroy, OnInit, signal } from '@angular/core';
 import { Router } from '@angular/router';
-import {
-  IonContent,
-  ToastController,
-} from '@ionic/angular/standalone';
+import { IonContent, ToastController } from '@ionic/angular/standalone';
+import { firstValueFrom } from 'rxjs';
+import { EnrichWordsResult, WordExtractionResult } from '@lingua-card/shared/domain';
 import { ImageImportApiService } from '../../services/image-import-api.service';
 import { ImageImportStateService } from '../../image-import-state.service';
-import { PickedImage } from '../../../../../shared/image/image.model';
 
-const STATUS_COPY = [
-  'Scanning your image…',
-  'Spotting vocabulary…',
-  'Generating examples…',
-] as const;
+export type ProcessingPhase = 'extracting' | 'enriching' | 'partial' | 'done';
 
 @Component({
   selector: 'lc-image-processing',
@@ -23,52 +17,120 @@ const STATUS_COPY = [
 })
 export class ImageProcessingPage implements OnInit, OnDestroy {
   private readonly importImageState = inject(ImageImportStateService);
-  private readonly imageImportApi = inject(ImageImportApiService);
-  private readonly router = inject(Router);
-  private readonly toastCtrl = inject(ToastController);
+  private readonly imageImportApi   = inject(ImageImportApiService);
+  private readonly router           = inject(Router);
+  private readonly toastCtrl        = inject(ToastController);
 
-  readonly image = this.importImageState.image;
-  readonly statusPhase = signal<0 | 1 | 2>(0);
-  readonly statusCopy = STATUS_COPY;
+  readonly image          = this.importImageState.image;
+  readonly phase          = signal<ProcessingPhase>('extracting');
+  readonly extractedCount = signal(0);
+  readonly enrichedCount  = signal(0);
+  readonly totalCount     = signal(0);
+  readonly pendingCount   = signal(0);
+
+  /** Chips shown once Phase 2 starts — populated progressively */
+  readonly enrichedWords  = signal<string[]>([]);
+
+  readonly phase1Done  = computed(() => this.phase() !== 'extracting');
+  readonly phase1Label = computed(() =>
+    this.phase1Done()
+      ? `Found ${this.extractedCount()} words`
+      : 'Spotting vocabulary…'
+  );
+  readonly phase2Label = computed(() => {
+    const p = this.phase();
+    if (p === 'extracting') return 'Generating flashcards';
+    if (p === 'enriching')  return `Generating cards… ${this.enrichedCount()} of ${this.totalCount()}`;
+    if (p === 'partial')    return `${this.enrichedCount()} of ${this.totalCount()} cards generated`;
+    return 'Cards generated';
+  });
 
   private timers: ReturnType<typeof setTimeout>[] = [];
+  private intervals: ReturnType<typeof setInterval>[] = [];
 
   ngOnInit(): void {
     if (!this.image()) {
       this.router.navigate(['/vault/import/image']);
       return;
     }
-    this.startStatusCycling();
-    this.callApi(this.image()!);
+    void this.run();
   }
 
-  private startStatusCycling(): void {
-    this.timers.push(setTimeout(() => this.statusPhase.set(1), 2000));
-    this.timers.push(setTimeout(() => this.statusPhase.set(2), 4500));
-  }
+  private async run(): Promise<void> {
+    const image = this.image()!;
 
-  private callApi(image: PickedImage): void {
-    this.imageImportApi.extractWords(image).subscribe({
-      next: (result) => {
-        this.importImageState.setResult(result);
-        this.router.navigate(['/vault/import/image/review']);
-      },
-      error: async (err) => {
-        const status: number = err?.status ?? 0;
-        const errorCode = this.toErrorCode(status);
-        this.importImageState.setError(errorCode);
+    // ── Phase 1: Extract raw words from image ─────────────────────────────────
+    this.phase.set('extracting');
+    let extraction: WordExtractionResult;
+    try {
+      extraction = await firstValueFrom(this.imageImportApi.extractWords(image));
+    } catch (err) {
+      await this.showError(err, 'Could not read image. Please try again.');
+      return;
+    }
 
-        const message = err?.error?.message ?? 'Something went wrong. Please try again.';
-        const toast = await this.toastCtrl.create({
-          message,
-          duration: 3500,
-          position: 'bottom',
-          color: 'danger',
-        });
-        await toast.present();
-        this.router.navigate(['/vault/import/image']);
-      },
-    });
+    this.extractedCount.set(extraction.totalFound);
+    this.totalCount.set(extraction.totalFound);
+    this.importImageState.setExtractionResult(extraction);
+
+    if (extraction.totalFound === 0) {
+      const toast = await this.toastCtrl.create({
+        message: 'No German words found in this image.',
+        duration: 3500,
+        color: 'warning',
+      });
+      await toast.present();
+      this.router.navigate(['/vault/import/image']);
+      return;
+    }
+
+    // ── Phase 2: Enrich words into full card data ─────────────────────────────
+    this.phase.set('enriching');
+
+    // Simulate count ticking up while we wait for the single batch HTTP call
+    const total = extraction.totalFound;
+    const batchSize = 10;
+    let simCount = 0;
+    const simInterval = setInterval(() => {
+      simCount = Math.min(simCount + batchSize, Math.floor(total * 0.85));
+      this.enrichedCount.set(simCount);
+    }, 1800);
+    this.intervals.push(simInterval);
+
+    let enrichResult: EnrichWordsResult;
+    try {
+      enrichResult = await firstValueFrom(
+        this.imageImportApi.enrichWords({
+          rawWords: extraction.rawWords,
+          targetLanguage: 'de',
+          nativeLanguage: 'en',
+        }),
+      );
+    } catch {
+      enrichResult = { enriched: [], pending: extraction.rawWords, isComplete: false };
+    }
+
+    clearInterval(simInterval);
+    this.enrichedCount.set(enrichResult.enriched.length);
+    this.pendingCount.set(enrichResult.pending.length);
+    this.importImageState.setEnrichResult(enrichResult);
+
+    // Reveal word chips one at a time for visual feedback
+    const chips = enrichResult.enriched.slice(0, 8).map(w => w.back);
+    for (let i = 0; i < chips.length; i++) {
+      this.enrichedWords.set(chips.slice(0, i + 1));
+      await this.delay(120);
+    }
+
+    if (!enrichResult.isComplete) {
+      this.phase.set('partial');
+      // Hold on I04 so user reads the partial result before navigating to review
+      await this.delay(2500);
+    } else {
+      this.phase.set('done');
+    }
+
+    this.router.navigate(['/vault/import/image/review']);
   }
 
   cancel(): void {
@@ -76,8 +138,17 @@ export class ImageProcessingPage implements OnInit, OnDestroy {
     this.router.navigate(['/vault/import/image']);
   }
 
-  ngOnDestroy(): void {
-    this.timers.forEach(clearTimeout);
+  private async showError(err: unknown, fallback: string): Promise<void> {
+    const status: number = (err as { status?: number })?.status ?? 0;
+    const message: string = (err as { error?: { message?: string } })?.error?.message ?? fallback;
+    this.importImageState.setError(this.toErrorCode(status));
+    const toast = await this.toastCtrl.create({
+      message,
+      duration: 3500,
+      color: 'danger',
+    });
+    await toast.present();
+    this.router.navigate(['/vault/import/image']);
   }
 
   private toErrorCode(status: number): Parameters<ImageImportStateService['setError']>[0] {
@@ -87,5 +158,16 @@ export class ImageProcessingPage implements OnInit, OnDestroy {
     if (status === 429) return 'quota_exceeded';
     if (status === 0)   return 'network_error';
     return 'ai_error';
+  }
+
+  private delay(ms: number): Promise<void> {
+    return new Promise(resolve => {
+      this.timers.push(setTimeout(resolve, ms));
+    });
+  }
+
+  ngOnDestroy(): void {
+    this.timers.forEach(clearTimeout);
+    this.intervals.forEach(clearInterval);
   }
 }

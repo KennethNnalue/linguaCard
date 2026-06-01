@@ -44,6 +44,7 @@
         <div
           class="col-card"
           [class.col-card--empty]="col.cardCount === 0"
+          [class.col-card--incomplete]="col.importStatus === 'incomplete'"
           (click)="openDetail(col)">
 
           <div class="col-card-top">
@@ -51,6 +52,9 @@
               <div class="col-card-name-row">
                 <span class="col-card-emoji">{{ col.emoji }}</span>
                 <span class="col-card-name lc-display">{{ col.name }}</span>
+                @if (col.importStatus === 'incomplete') {
+                  <span class="col-incomplete-dot" [title]="col.pendingWords.length + ' cards pending'"></span>
+                }
               </div>
               <div class="col-card-meta">
                 {{ col.cardCount }} words

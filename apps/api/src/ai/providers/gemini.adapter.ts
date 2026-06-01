@@ -1,4 +1,4 @@
-import { Injectable, Logger, ServiceUnavailableException, HttpException } from '@nestjs/common';
+import { Injectable, Logger, ServiceUnavailableException, HttpException, InternalServerErrorException } from '@nestjs/common';
 import { GoogleGenAI, Modality } from '@google/genai';
 import type { AITextRequest, AITextResponse } from './anthropic.adapter';
 
@@ -15,8 +15,9 @@ export interface AISpeechResponse {
   mimeType: string;
 }
 
-const TEXT_MODEL = 'gemini-2.5-flash';
-const TTS_MODEL = 'gemini-2.5-flash-preview-tts';
+const TEXT_MODEL        = 'gemini-2.5-flash';
+const TTS_MODEL         = 'gemini-2.5-flash-preview-tts';
+const VISION_LITE_MODEL = 'gemini-2.5-flash-lite';
 
 // Free-tier limit: 3 requests/minute for gemini-2.5-flash-tts.
 // Token bucket: refill 1 token every 20s (= 3/min). Max burst = 3.
@@ -96,6 +97,41 @@ export class GeminiAdapter {
         );
       }
       throw err;
+    }
+  }
+
+  async generateVisionLite(opts: {
+    imageBase64: string;
+    mimeType:    string;
+    prompt:      string;
+    maxTokens?:  number;
+  }): Promise<string> {
+    try {
+      const response = await this.ai.models.generateContent({
+        model: VISION_LITE_MODEL,
+        contents: [
+          {
+            role:  'user',
+            parts: [
+              { inlineData: { mimeType: opts.mimeType, data: opts.imageBase64 } },
+              { text: opts.prompt },
+            ],
+          },
+        ],
+        config: {
+          maxOutputTokens: opts.maxTokens ?? 4096,
+          thinkingConfig:  { thinkingBudget: 0 },
+        },
+      });
+      return response.text ?? '';
+    } catch (err: any) {
+      if (err?.status === 429) {
+        throw new HttpException(
+          { message: 'AI quota exceeded. Please try again later.' },
+          429,
+        );
+      }
+      throw new InternalServerErrorException('AI processing failed. Please try again.');
     }
   }
 

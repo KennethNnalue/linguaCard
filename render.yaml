@@ -24,6 +24,16 @@ services:
         sync: false          # optional — leave blank until Whisper is needed
       - key: AI_DEFAULT_PROVIDER
         value: gemini
+      # ── OpenRouter (image → cards + optional story generation) ──────────────
+      - key: OPENROUTER_API_KEY
+        sync: false          # openrouter.ai → Keys → Create key (starts sk-or-v1-)
+      - key: OPENROUTER_VISION_MODEL
+        value: google/gemma-4-26b-a4b-it:free
+      - key: OPENROUTER_TEXT_MODEL
+        value: google/gemma-4-26b-a4b-it:free
+      # ── Groq Whisper (STT karaoke timestamps, free tier) ────────────────────
+      - key: GROQ_API_KEY
+        sync: false          # console.groq.com → API Keys (starts gsk_)
       - key: API_PUBLIC_URL
         value: https://linguacard-api.onrender.com  # fallback for local-disk mode
       # ── Cloudflare R2 (audio file storage) ─────────────────────────────────

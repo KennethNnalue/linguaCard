@@ -1,33 +1,204 @@
 <ion-content class="proc-page">
   <div class="proc-content">
 
-    <h1 class="proc-heading lc-display">{{ statusCopy[statusPhase()] }}</h1>
+    <!-- Back button + title -->
+    <div class="proc-topbar">
+      <button class="proc-back" (click)="cancel()" aria-label="Cancel">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round">
+          <polyline points="15,18 9,12 15,6"/>
+        </svg>
+      </button>
+      <div class="proc-topbar-text">
+        @switch (phase()) {
+          @case ('extracting') {
+            <div class="proc-topbar-title">Scanning image</div>
+            <div class="proc-topbar-sub">Please wait…</div>
+          }
+          @case ('enriching') {
+            <div class="proc-topbar-title">Generating flashcards</div>
+            <div class="proc-topbar-sub">Building your collection…</div>
+          }
+          @case ('partial') {
+            <div class="proc-topbar-title">Almost done</div>
+            <div class="proc-topbar-sub">{{ enrichedCount() }} cards are ready now</div>
+          }
+          @default {
+            <div class="proc-topbar-title">Done!</div>
+          }
+        }
+      </div>
+    </div>
 
-    <!-- Image thumbnail with scan overlay -->
-    @if (image()) {
+    <!-- Image thumbnail with scan animation (Phase 1 only) -->
+    @if (phase() === 'extracting' && image()) {
       <div class="proc-img-wrap">
         <img
           class="proc-img"
           [src]="'data:' + image()!.mimeType + ';base64,' + image()!.base64"
           alt="Scanning image" />
-        <div class="scan-overlay"></div>
+        <div class="scan-overlay">
+          <div class="scan-glow"></div>
+          <div class="scan-line"></div>
+        </div>
       </div>
     }
 
-    <!-- Status text -->
-    <p class="proc-status">{{ statusCopy[statusPhase()] }}</p>
+    <!-- Two-phase step indicators -->
+    <div class="proc-phases">
 
-    <!-- Skeleton word chips -->
-    <div class="proc-skeletons">
-      <div class="proc-skel proc-skel--1"></div>
-      <div class="proc-skel proc-skel--2"></div>
-      <div class="proc-skel proc-skel--3"></div>
-      <div class="proc-skel proc-skel--4"></div>
-      <div class="proc-skel proc-skel--5"></div>
-      <div class="proc-skel proc-skel--6"></div>
+      <!-- Phase 1 step -->
+      <div class="proc-phase-row">
+        <div class="proc-step-dot"
+             [class.proc-step-dot--active]="phase() === 'extracting'"
+             [class.proc-step-dot--done]="phase1Done()">
+          @if (phase() === 'extracting') {
+            <div class="proc-spinner"></div>
+          } @else {
+            <svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round">
+              <polyline points="20,6 9,17 4,12"/>
+            </svg>
+          }
+        </div>
+        <div class="proc-step-body">
+          <div class="proc-step-title" [class.proc-step-title--muted]="phase() === 'extracting'">
+            {{ phase1Label() }}
+          </div>
+          <div class="proc-step-sub">Reading words from image</div>
+        </div>
+      </div>
+
+      <div class="proc-connector" [class.proc-connector--done]="phase1Done()"></div>
+
+      <!-- Phase 2 step -->
+      <div class="proc-phase-row">
+        <div class="proc-step-dot"
+             [class.proc-step-dot--active]="phase() === 'enriching'"
+             [class.proc-step-dot--warn]="phase() === 'partial'"
+             [class.proc-step-dot--done]="phase() === 'done'"
+             [class.proc-step-dot--pending]="phase() === 'extracting'">
+          @if (phase() === 'enriching') {
+            <div class="proc-spinner"></div>
+          } @else if (phase() === 'partial') {
+            <svg viewBox="0 0 24 24" fill="none" stroke-width="2.2" stroke-linecap="round">
+              <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/>
+              <line x1="12" y1="9" x2="12" y2="13"/>
+              <line x1="12" y1="17" x2="12.01" y2="17"/>
+            </svg>
+          } @else if (phase() === 'done') {
+            <svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round">
+              <polyline points="20,6 9,17 4,12"/>
+            </svg>
+          } @else {
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round">
+              <circle cx="12" cy="12" r="9"/>
+              <polyline points="12,6 12,12 16,14"/>
+            </svg>
+          }
+        </div>
+        <div class="proc-step-body">
+          <div class="proc-step-title"
+               [class.proc-step-title--muted]="phase() === 'extracting'"
+               [class.proc-step-title--warn]="phase() === 'partial'">
+            {{ phase2Label() }}
+          </div>
+          <div class="proc-step-sub">
+            @if (phase() === 'partial') {
+              {{ pendingCount() }} words paused — quota limit reached
+            } @else {
+              Translations + examples
+            }
+          </div>
+        </div>
+      </div>
     </div>
 
-    <button class="proc-cancel" (click)="cancel()">Cancel</button>
+    <!-- Phase 2: progress card with word chips -->
+    @if (phase() === 'enriching' || phase() === 'partial') {
+      <div class="proc-progress-card">
+        <div class="proc-progress-header">
+          <span class="proc-progress-label">Progress</span>
+          <span class="proc-progress-count">{{ enrichedCount() }} / {{ totalCount() }} ready</span>
+        </div>
+        <div class="proc-bar-track">
+          <div class="proc-bar-fill"
+               [style.width.%]="totalCount() > 0 ? (enrichedCount() / totalCount() * 100) : 0">
+          </div>
+        </div>
+        <div class="proc-bar-labels">
+          <span>{{ enrichedCount() }} cards</span>
+          <span>{{ totalCount() - enrichedCount() }} remaining</span>
+        </div>
+        @if (enrichedWords().length > 0) {
+          <div class="proc-chip-grid">
+            @for (word of enrichedWords(); track word) {
+              <div class="proc-chip proc-chip--done">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round">
+                  <polyline points="20,6 9,17 4,12"/>
+                </svg>
+                {{ word }}
+              </div>
+            }
+          </div>
+        }
+        <div class="proc-batch-info">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round">
+            <rect x="2" y="7" width="20" height="14" rx="2"/>
+            <path d="M16 7V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v2"/>
+          </svg>
+          <span>Processing 10 words at a time — progress saved after each batch</span>
+        </div>
+      </div>
+    }
+
+    <!-- Partial result banner (I04) -->
+    @if (phase() === 'partial') {
+      <div class="proc-partial-banner">
+        <div class="proc-partial-icon">⏳</div>
+        <div class="proc-partial-body">
+          <div class="proc-partial-title">{{ pendingCount() }} cards will be added later</div>
+          <div class="proc-partial-sub">
+            The AI quota limit was reached mid-import. Your collection will show a "Complete" button — tap it any time to finish.
+          </div>
+        </div>
+      </div>
+
+      <div class="proc-partial-stats">
+        <div class="proc-partial-stat">
+          <div class="proc-partial-stat-val proc-partial-stat-val--ok">{{ enrichedCount() }}</div>
+          <div class="proc-partial-stat-lbl">Ready now</div>
+        </div>
+        <div class="proc-partial-stat">
+          <div class="proc-partial-stat-val proc-partial-stat-val--warn">{{ pendingCount() }}</div>
+          <div class="proc-partial-stat-lbl">Pending</div>
+        </div>
+        <div class="proc-partial-stat">
+          <div class="proc-partial-stat-val">{{ totalCount() }}</div>
+          <div class="proc-partial-stat-lbl">Total found</div>
+        </div>
+      </div>
+    }
+
+    <!-- Info note (Phase 1) -->
+    @if (phase() === 'extracting') {
+      <div class="proc-info-note">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round">
+          <circle cx="12" cy="12" r="9"/>
+          <path d="M12 8v4M12 16h.01"/>
+        </svg>
+        Step 1 of 2 — quick scan. Step 2 generates translations and example sentences.
+      </div>
+    }
+
+    <div class="proc-spacer"></div>
+
+    <!-- Footer -->
+    <button class="proc-cancel" (click)="cancel()">
+      @if (phase() === 'enriching') {
+        Running in background — you can leave this screen
+      } @else {
+        Cancel
+      }
+    </button>
 
   </div>
 </ion-content>
