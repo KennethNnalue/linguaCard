@@ -43,12 +43,7 @@
     </div>
 
     <!-- Duplicate summary banner -->
-    @if (duplicateCheckLoading()) {
-      <div class="imp-dedup-banner imp-dedup-banner--loading">
-        Checking for duplicates in your vault…
-      </div>
-    }
-    @if (!duplicateCheckLoading() && duplicateCount() > 0) {
+    @if (duplicateCount() > 0) {
       <div class="imp-dedup-banner imp-dedup-banner--warn">
         ⚠ {{ duplicateCount() }} of {{ wordList().length }} words already in your vault (deselected)
       </div>
@@ -167,6 +162,12 @@
           <div class="imp-all-pending-sub">
             All {{ pendingCount() }} words hit the quota limit. Save to collection now — tap "Complete" any time to generate the flashcards.
           </div>
+          @if (pendingDuplicateCount() > 0) {
+            <div class="imp-pending-dedup-warn">
+              ⚠ {{ pendingDuplicateCount() }} of {{ pendingCount() }} words already exist in your vault.
+              When you tap "Complete", duplicates will be reused automatically — no new cards created.
+            </div>
+          }
         </div>
       </div>
     }

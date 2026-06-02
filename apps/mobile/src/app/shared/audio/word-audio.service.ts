@@ -4,6 +4,7 @@ import { AiAudioCacheService } from '../../features/ai/audio/ai-audio-cache.serv
 import { GeminiAdapter } from '../../features/ai/providers/gemini.adapter';
 import { AudioService } from './audio.service';
 import { WordAudioApiService } from './word-audio-api.service';
+import { AudioReadinessStore } from './audio-readiness.store';
 import { normalizeForAudio } from './normalize';
 
 @Injectable({ providedIn: 'root' })
@@ -12,6 +13,7 @@ export class WordAudioService {
   private readonly cache = inject(AiAudioCacheService);
   private readonly gemini = inject(GeminiAdapter);
   private readonly fallback = inject(AudioService);
+  private readonly audioReadiness = inject(AudioReadinessStore);
 
   // Tracks which cache keys are actively being fetched from the API.
   // isLoading is true when any word is in-flight, without one word's finish
@@ -150,6 +152,7 @@ export class WordAudioService {
         if (r.wordAudio.audioUrl) {
           const key = this._cacheKey(r.wordAudio.normalizedText, r.wordAudio.language);
           this._urlMap.set(key, r.wordAudio.audioUrl);
+          this.audioReadiness.markReady(key);
         }
       }
     } catch {
@@ -172,6 +175,7 @@ export class WordAudioService {
     const deviceCached = await this.cache.getFromCache(cacheKey);
     if (deviceCached) {
       this._urlMap.set(cacheKey, deviceCached);
+      this.audioReadiness.markReady(cacheKey);
       return deviceCached;
     }
 
@@ -194,6 +198,7 @@ export class WordAudioService {
     cacheKey: string,
   ): Promise<string | null> {
     this._loadingKeys.update(s => { s.add(cacheKey); return new Set(s); });
+    this.audioReadiness.markPending(cacheKey);
     try {
       const result = await this.api.resolve(text, language);
 
@@ -203,19 +208,26 @@ export class WordAudioService {
       }
 
       const audioUrl = result.wordAudio.audioUrl;
-      if (!audioUrl) return null;
+      if (!audioUrl) {
+        this.audioReadiness.markFailed(cacheKey);
+        return null;
+      }
 
       this._urlMap.set(cacheKey, audioUrl);
 
-      // Download to device for offline use (no-op on web)
-      const localUrl = await this.cache.getOrDownload(cacheKey, audioUrl);
+      // Download to device for offline use (no-op on web).
+      // Use saveFromUrl so subsequent sessions hit Capacitor Filesystem immediately.
+      const localUrl = await this.cache.saveFromUrl(cacheKey, audioUrl);
       if (localUrl && localUrl !== audioUrl) {
         this._urlMap.set(cacheKey, localUrl);
+        this.audioReadiness.markReady(cacheKey);
         return localUrl;
       }
 
+      this.audioReadiness.markReady(cacheKey);
       return audioUrl;
     } catch (err: any) {
+      this.audioReadiness.markFailed(cacheKey);
       // Unexpected HTTP error (network failure, 5xx, etc.)
       if (err?.status === 429) {
         const headerSecs = err?.headers?.get?.('Retry-After');

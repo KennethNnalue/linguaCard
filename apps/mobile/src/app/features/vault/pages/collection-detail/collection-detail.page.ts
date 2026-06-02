@@ -15,6 +15,9 @@ import {ReviewFilterService} from '../../../review/services/review-filter.servic
 import {ReviewStore} from '../../../review/store/review.store';
 import {WordCardComponent} from '../../../../shared/ui/word-card/word-card.component';
 import {WordAudioService} from '../../../../shared/audio/word-audio.service';
+import {AudioReadinessStore} from '../../../../shared/audio/audio-readiness.store';
+import {CollectionAudioPrefetchService} from '../../../../shared/audio/collection-audio-prefetch.service';
+import {normalizeForAudio} from '../../../../shared/audio/normalize';
 import {ImageImportApiService} from '../../import/services/image-import-api.service';
 
 @Component({
@@ -36,6 +39,8 @@ export class CollectionDetailPage implements OnInit {
   private readonly filterService = inject(ReviewFilterService);
   private readonly reviewStore = inject(ReviewStore);
   private readonly wordAudio = inject(WordAudioService);
+  private readonly audioReadiness = inject(AudioReadinessStore);
+  private readonly audioPrefetch = inject(CollectionAudioPrefetchService);
   private readonly importApi = inject(ImageImportApiService);
 
   readonly collection = signal<Collection | null>(null);
@@ -78,6 +83,24 @@ export class CollectionDetailPage implements OnInit {
     ['55px', '40px'],
   ];
 
+  /** Cache keys for all cards in this collection — used for audio progress bar. */
+  private readonly _audioCacheKeys = computed(() =>
+    this.allCards().map(c => {
+      const text = (c.content.article ? `${c.content.article} ` : '') + c.content.back;
+      return `wa-de-DE-${normalizeForAudio(text, 'de-DE')}`;
+    })
+  );
+
+  readonly audioReadyCount = computed(() =>
+    this.audioReadiness.readyCount(this._audioCacheKeys())()
+  );
+
+  readonly audioPrefetchActive = computed(() => {
+    const keys = this._audioCacheKeys();
+    if (!keys.length) return false;
+    return !this.audioReadiness.allSettled(keys)();
+  });
+
   readonly masteredCount = computed(() =>
     this.allCards().filter(c => (c.srsState?.masteryLevel ?? 0) >= 5).length,
   );
@@ -110,12 +133,15 @@ export class CollectionDetailPage implements OnInit {
     this.loadCards();
   }
 
-  loadCards(): void {
+  loadCards(prefetchAudio = false): void {
     const id = this.route.snapshot.paramMap.get('id')!;
     this.collectionApi.getCards(id).subscribe({
       next: cards => {
         this.allCards.set(cards);
         this.loading.set(false);
+        if (prefetchAudio) {
+          this.audioPrefetch.prefetchCollection(cards);
+        }
       },
       error: () => this.loading.set(false),
     });
@@ -129,6 +155,7 @@ export class CollectionDetailPage implements OnInit {
     try {
       const result = await firstValueFrom(this.importApi.completeCollection(col.id));
 
+      const reused = result.reusedCards ?? 0;
       this.collection.update(c => c ? {
         ...c,
         importStatus: result.isComplete ? 'complete' : 'incomplete',
@@ -136,7 +163,8 @@ export class CollectionDetailPage implements OnInit {
         cardCount:    c.cardCount + result.newCards,
       } : c);
 
-      this.loadCards();
+      // prefetchAudio=true: fire-and-forget audio pre-generation for newly created cards
+      this.loadCards(result.newCards > 0);
       this.collectionStore.loadCollections();
 
       if (result.isComplete) {
@@ -144,10 +172,19 @@ export class CollectionDetailPage implements OnInit {
         setTimeout(() => this.justCompleted.set(false), 2000);
       }
 
+      let message: string;
+      if (!result.isComplete) {
+        message = `✓ ${result.newCards} cards added — ${result.pendingWords.length} still pending`;
+      } else if (reused > 0 && result.newCards > 0) {
+        message = `✓ ${result.newCards} added, ${reused} duplicate${reused === 1 ? '' : 's'} reused — collection complete!`;
+      } else if (reused > 0 && result.newCards === 0) {
+        message = `All ${reused} words already in your vault — collection complete!`;
+      } else {
+        message = `✓ All cards added — collection complete!`;
+      }
+
       const toast = await this.toastCtrl.create({
-        message: result.isComplete
-          ? `✓ All cards added — collection complete!`
-          : `✓ ${result.newCards} cards added — ${result.pendingWords.length} still pending`,
+        message,
         duration: 3500,
         color: result.isComplete ? 'success' : 'warning',
       });
@@ -289,5 +326,11 @@ export class CollectionDetailPage implements OnInit {
 
   playAudio(card: Card): void {
     void this.wordAudio.playCard(card);
+  }
+
+  getAudioStatus(card: Card) {
+    const text = (card.content.article ? `${card.content.article} ` : '') + card.content.back;
+    const key = `wa-de-DE-${normalizeForAudio(text, 'de-DE')}`;
+    return this.audioReadiness.getStatus(key)();
   }
 }

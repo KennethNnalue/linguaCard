@@ -140,12 +140,25 @@
   &:disabled { opacity: 0.6; cursor: not-allowed; }
 }
 
-.wd2-audio-ready-dot {
-  width: 6px;
-  height: 6px;
+.wd2-audio-dot {
+  width: 7px;
+  height: 7px;
   border-radius: 50%;
-  background: var(--lc-brand);
   flex-shrink: 0;
+
+  &--ready {
+    background: var(--ion-color-success, #2dd36f);
+  }
+
+  &--pending {
+    background: var(--ion-color-warning, #ffc409);
+    animation: wd-dot-pulse 1.2s ease-in-out infinite;
+  }
+}
+
+@keyframes wd-dot-pulse {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.4; transform: scale(0.75); }
 }
 
 .wd-audio-spinner {

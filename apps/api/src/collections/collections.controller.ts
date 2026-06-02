@@ -31,4 +31,13 @@ export class CollectionsController {
   remove(@CurrentUser() userId: string, @Param('id') id: string) {
     return this.collectionsService.remove(userId, id);
   }
+
+  @Post(':id/cards/:cardId')
+  addExistingCard(
+    @CurrentUser() userId: string,
+    @Param('id') collectionId: string,
+    @Param('cardId') cardId: string,
+  ) {
+    return this.collectionsService.addExistingCard(userId, collectionId, cardId);
+  }
 }

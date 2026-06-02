@@ -239,3 +239,49 @@
   color: var(--lc-brand);
   transition: color 0.3s ease;
 }
+
+// ─── AUDIO PREFETCH PROGRESS BAR ─────────────────────────────────────────────
+
+.cd-audio-progress {
+  display: flex;
+  align-items: center;
+  gap: t.$lc-space-3;
+  background: rgba(var(--lc-brand-rgb, 45, 90, 78), 0.06);
+  border: 1px solid rgba(var(--lc-brand-rgb, 45, 90, 78), 0.2);
+  border-radius: t.$lc-radius-md;
+  padding: 10px 14px;
+  margin: t.$lc-space-3 14px 0;
+
+  &__icon {
+    font-size: 18px;
+    flex-shrink: 0;
+    color: var(--lc-brand);
+  }
+
+  &__body {
+    flex: 1;
+    min-width: 0;
+  }
+
+  &__label {
+    display: block;
+    font-size: t.$lc-text-xs;
+    color: var(--lc-text-secondary);
+    margin-bottom: 5px;
+  }
+
+  &__track {
+    height: 4px;
+    border-radius: 2px;
+    background: rgba(var(--lc-brand-rgb, 45, 90, 78), 0.15);
+    overflow: hidden;
+  }
+
+  &__fill {
+    height: 100%;
+    border-radius: 2px;
+    background: var(--lc-brand);
+    transition: width 0.4s ease;
+    min-width: 4px;
+  }
+}

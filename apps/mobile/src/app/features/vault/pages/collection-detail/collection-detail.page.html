@@ -42,6 +42,24 @@
     </div>
   }
 
+  <!-- Audio pre-generation progress bar -->
+  @if (audioPrefetchActive() && wordCount() > 0) {
+    <div class="cd-audio-progress">
+      <span class="cd-audio-progress__icon">♫</span>
+      <div class="cd-audio-progress__body">
+        <span class="cd-audio-progress__label">
+          Preparing audio… {{ audioReadyCount() }} / {{ wordCount() }} words ready
+        </span>
+        <div class="cd-audio-progress__track">
+          <div
+            class="cd-audio-progress__fill"
+            [style.width.%]="wordCount() > 0 ? (audioReadyCount() / wordCount()) * 100 : 0">
+          </div>
+        </div>
+      </div>
+    </div>
+  }
+
   <!-- Hero strip -->
   <div class="cd-hero">
     <div class="cd-hero-top">
@@ -123,6 +141,7 @@
         <lc-word-card
           [card]="card"
           [categoryName]="getCategoryName(card.categoryIds[0], categories())"
+          [audioStatus]="getAudioStatus(card)"
           (cardClick)="openDetail(card)"
           (playAudio)="playAudio(card)"
         />

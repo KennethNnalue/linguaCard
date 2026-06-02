@@ -342,6 +342,16 @@
   line-height: 1.5;
 }
 
+.imp-pending-dedup-warn {
+  margin-top: 8px;
+  padding: 8px 10px;
+  background: rgba(255, 196, 9, 0.15);
+  border-radius: 8px;
+  font-size: 12px;
+  color: var(--lc-warn, #B45309);
+  line-height: 1.5;
+}
+
 // ─── ACTIONS ─────────────────────────────────────────────────────────────────
 
 .imp-import-btn {

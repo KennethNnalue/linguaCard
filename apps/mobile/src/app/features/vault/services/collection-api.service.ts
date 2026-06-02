@@ -43,6 +43,11 @@ export class CollectionApiService {
     });
   }
 
+  /** Assigns an existing card to a collection without creating a new card. */
+  addExistingCard(collectionId: string, cardId: string): Observable<void> {
+    return this.http.post<void>(`${this.baseUrl}/${collectionId}/cards/${cardId}`, {});
+  }
+
   clearCards(collectionId: string): Observable<{ deleted: number }> {
     return this.http.delete<{ deleted: number }>(`${environment.apiUrl}/cards/clear`, {
       params: { collectionId },

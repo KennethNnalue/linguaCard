@@ -5,6 +5,7 @@ import {volumeHighOutline} from 'ionicons/icons';
 import {Card} from '@lingua-card/shared/domain';
 import {ArticleBadgeComponent} from '../../components/article-badge/article-badge.component';
 import {MasteryDotComponent} from '../../components/mastery-dot/mastery-dot.component';
+import type {AudioReadinessStatus} from '../../audio/audio-readiness.store';
 
 @Component({
   selector: 'lc-word-card',
@@ -17,6 +18,7 @@ export class WordCardComponent {
   readonly card = input.required<Card>();
   readonly categoryName = input<string>('');
   readonly compact = input<boolean>(false);
+  readonly audioStatus = input<AudioReadinessStatus | 'unknown'>('unknown');
 
   readonly cardClick = output<void>();
   readonly playAudio = output<void>();

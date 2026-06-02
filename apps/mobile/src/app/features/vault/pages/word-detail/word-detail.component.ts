@@ -17,9 +17,11 @@ import {CardStore} from '../../store/card.store';
 import {CategoryStore} from '../../store/category.store';
 import {CardApiService} from '../../services/card-api.service';
 import {WordAudioService} from '../../../../shared/audio/word-audio.service';
+import {AudioReadinessStore} from '../../../../shared/audio/audio-readiness.store';
 import {ArticleBadgeComponent} from '../../../../shared/components/article-badge/article-badge.component';
 import {AddWordSheetComponent} from '../../components/add-word-sheet/add-word-sheet.component';
 import {getCategoryName} from '../../../../shared/helpers/helpers';
+import {normalizeForAudio} from '../../../../shared/audio/normalize';
 
 @Component({
   selector: 'lc-word-detail',
@@ -33,6 +35,7 @@ export class WordDetailComponent {
   private readonly categoryStore = inject(CategoryStore);
   private readonly cardApi = inject(CardApiService);
   private readonly wordAudio = inject(WordAudioService);
+  private readonly audioReadiness = inject(AudioReadinessStore);
   private readonly router = inject(Router);
   private readonly route = inject(ActivatedRoute);
   private readonly alertCtrl = inject(AlertController);
@@ -130,14 +133,21 @@ export class WordDetailComponent {
 
   readonly isPronunciationLoading = this.wordAudio.isLoading;
 
-  // True when the AI audio URL is already in the in-memory cache for this session.
-  // Becomes true after the first successful tap — used to show the "ready" dot.
-  readonly isAudioReady = computed(() => {
+  /** Cache key for this card's audio — mirrors the key used by WordAudioService. */
+  private readonly _audioCacheKey = computed(() => {
     const card = this.card();
-    if (!card) return false;
+    if (!card) return '';
     const text = (card.content.article ? `${card.content.article} ` : '') + card.content.back;
-    return this.wordAudio.hasCached(text, 'de-DE');
+    return `wa-de-DE-${normalizeForAudio(text, 'de-DE')}`;
   });
+
+  /** 'ready' | 'pending' | 'failed' | 'unknown' — drives the readiness dot. */
+  readonly audioStatus = computed(() =>
+    this.audioReadiness.getStatus(this._audioCacheKey())(),
+  );
+
+  readonly isAudioReady = computed(() => this.audioStatus() === 'ready');
+  readonly isAudioPending = computed(() => this.audioStatus() === 'pending');
 
   playPronunciation(): void {
     const card = this.card();

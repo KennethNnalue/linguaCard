@@ -61,7 +61,7 @@ export class VaultPage {
     addIcons({addOutline, cloudUploadOutline, funnelOutline, chevronDownOutline});
   }
 
-  readonly activeTab = signal<'words' | 'collections'>('words');
+  readonly activeTab = signal<'words' | 'collections'>('collections');
   readonly masteryFilter = signal<VaultMasteryFilter>('all');
   readonly sortMode = signal<VaultSortMode>('newest');
 

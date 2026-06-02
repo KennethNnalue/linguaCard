@@ -10,6 +10,6 @@ import { WordAudioModule } from '../word-audio/word-audio.module';
   imports: [TypeOrmModule.forFeature([CardEntity]), WordAudioModule],
   controllers: [CardsController],
   providers: [CardsService, WordDedupService],
-  exports: [CardsService],
+  exports: [CardsService, WordDedupService],
 })
 export class CardsModule {}

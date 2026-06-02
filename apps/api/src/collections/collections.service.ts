@@ -92,6 +92,18 @@ export class CollectionsService {
     if (!result.affected) throw new NotFoundException(`Collection ${id} not found`);
   }
 
+  /** Assign an existing card to a collection without creating a new card. */
+  async addExistingCard(userId: string, collectionId: string, cardId: string): Promise<void> {
+    const [collection, card] = await Promise.all([
+      this.repo.findOneBy({ id: collectionId, userId }),
+      this.cardRepo.findOneBy({ id: cardId, userId }),
+    ]);
+    if (!collection) throw new NotFoundException(`Collection ${collectionId} not found`);
+    if (!card) throw new NotFoundException(`Card ${cardId} not found`);
+    card.collectionId = collectionId;
+    await this.cardRepo.save(card);
+  }
+
   private toModel(e: CollectionEntity, counts: LiveCounts): Collection {
     return {
       id: e.id,

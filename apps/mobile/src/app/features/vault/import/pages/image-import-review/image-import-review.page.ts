@@ -15,6 +15,7 @@ import {
   warningOutline,
 } from 'ionicons/icons';
 import {
+  Card,
   CardContent,
   ExampleSentence,
   GenderType,
@@ -31,13 +32,15 @@ import { CollectionStore } from '../../../store/collection.store';
 import { CategoryStore } from '../../../store/category.store';
 import { AssignCollectionSheetComponent } from '../../../components/assign-collection-sheet/assign-collection-sheet.component';
 import { ImageImportStateService } from '../../image-import-state.service';
-import { WordDedupApiService } from '../../../services/word-dedup-api.service';
+import { CardDedupService } from '../../../../../shared/dedup/card-dedup.service';
+import { CollectionAudioPrefetchService } from '../../../../../shared/audio/collection-audio-prefetch.service';
 
 interface SelectableWord extends ParsedImportRow {
   id: number;
   selected: boolean;
   confidence: number;
   isDuplicate?: boolean;
+  duplicateCard?: Card | null;
   duplicateCollectionName?: string | null;
 }
 
@@ -59,7 +62,8 @@ export class ImageImportReviewPage implements OnInit {
   private readonly router = inject(Router);
   private readonly toastCtrl = inject(ToastController);
   private readonly modalCtrl = inject(ModalController);
-  private readonly wordDedupApi = inject(WordDedupApiService);
+  private readonly dedupService = inject(CardDedupService);
+  private readonly audioPrefetch = inject(CollectionAudioPrefetchService);
 
   readonly image      = this.importImageState.image;
   readonly result     = this.importImageState.result;
@@ -79,7 +83,6 @@ export class ImageImportReviewPage implements OnInit {
     return col ? `${col.emoji} ${col.name}` : 'Select collection';
   });
 
-  readonly duplicateCheckLoading = signal(false);
   readonly duplicateCount = computed(() => this.wordList().filter(w => w.isDuplicate).length);
   readonly selectedWords = computed(() => this.wordList().filter(w => w.selected));
   readonly selectedCount = computed(() => this.selectedWords().length);
@@ -89,11 +92,18 @@ export class ImageImportReviewPage implements OnInit {
   /** True when enrichment returned zero ready words — all words are pending */
   readonly allPending = computed(() => this.pendingCount() > 0 && this.wordList().length === 0);
 
+  /**
+   * Pending-path duplicate count: how many raw pending words already exist in the vault.
+   * Only meaningful when allPending() is true.
+   * RawExtractedWord already has back + article from Phase 1, so CardDedupService can check them.
+   */
+  readonly pendingDuplicateCount = signal(0);
+
   constructor() {
     addIcons({ arrowBackOutline, checkmarkCircleOutline, warningOutline });
   }
 
-  async ngOnInit(): Promise<void> {
+  ngOnInit(): void {
     // Need either enriched words or pending words to show this screen
     if (!this.result() && !this.enrichment()) {
       this.router.navigate(['/vault/import/image']);
@@ -120,36 +130,38 @@ export class ImageImportReviewPage implements OnInit {
     }
 
     this.wordList.set(rows);
-    await this._checkVaultDuplicates(rows);
+    this._checkVaultDuplicates(rows);
+
+    // For the all-pending path: use back-only dedup (no article) because:
+    // 1. Phase 1 extraction embeds the article in back ("der Hund" not "Hund")
+    // 2. The article from Phase 1 AI extraction is unconfirmed — unreliable as a key
+    // checkBatchByBackOnly strips article prefixes and matches on the bare word only.
+    const pendingWords = this.enrichment()?.pending ?? [];
+    if (pendingWords.length > 0 && rows.length === 0) {
+      const matches = this.dedupService.checkBatchByBackOnly(pendingWords);
+      this.pendingDuplicateCount.set(matches.filter(m => m !== null).length);
+    }
   }
 
-  private async _checkVaultDuplicates(rows: SelectableWord[]): Promise<void> {
-    this.duplicateCheckLoading.set(true);
-    try {
-      const results = await this.wordDedupApi.checkDuplicates(
-        rows.map(r => ({ back: r.back, article: r.article ?? undefined })),
-      );
-      this.wordList.update(ws =>
-        ws.map((w, i) => {
-          const match = results[i];
-          const isDuplicate = !!match?.existingCard;
-          return {
-            ...w,
-            isDuplicate,
-            duplicateCollectionName: match?.existingCard?.collectionId ?? null,
-            selected: isDuplicate ? false : w.selected,
-            status: isDuplicate ? 'warning' : w.status,
-            warningMessages: isDuplicate
-              ? [...w.warningMessages, 'Already in your vault']
-              : w.warningMessages,
-          };
-        }),
-      );
-    } catch {
-      // Dedup check failure is non-fatal — import continues without it
-    } finally {
-      this.duplicateCheckLoading.set(false);
-    }
+  private _checkVaultDuplicates(rows: SelectableWord[]): void {
+    const matches = this.dedupService.checkBatch(
+      rows.map(r => ({ back: r.back, article: r.article ?? null })),
+    );
+    this.wordList.update(ws =>
+      ws.map((w, i) => {
+        const match = matches[i];
+        if (!match) return w;
+        return {
+          ...w,
+          isDuplicate: true,
+          duplicateCard: match,
+          duplicateCollectionName: match.collectionId ?? null,
+          selected: false,
+          status: 'warning' as const,
+          warningMessages: [...w.warningMessages, 'Already in your vault'],
+        };
+      }),
+    );
   }
 
   toggleWord(id: number): void {
@@ -196,7 +208,11 @@ export class ImageImportReviewPage implements OnInit {
     const now = new Date().toISOString();
     const pending = this.enrichment()?.pending ?? [];
 
-    const requests = rows.map(row =>
+    // Split: rows with an existing duplicate card get assigned; others get created
+    const newRows = rows.filter(r => !r.duplicateCard);
+    const reuseRows = rows.filter(r => !!r.duplicateCard);
+
+    const createRequests = newRows.map(row =>
       this.cardApi.create({
         deckId: 'deck-001',
         collectionId,
@@ -225,29 +241,47 @@ export class ImageImportReviewPage implements OnInit {
       }).pipe(catchError(() => of(null)))
     );
 
-    forkJoin(requests).pipe(
-      map(results => results.filter(r => r !== null).length),
-      switchMap(created => {
+    const assignRequests = reuseRows.map(row =>
+      this.collectionApi.addExistingCard(collectionId, row.duplicateCard!.id).pipe(
+        map(() => row.duplicateCard!),
+        catchError(() => of(null)),
+      )
+    );
+
+    const allRequests = [...createRequests, ...assignRequests];
+
+    forkJoin(allRequests.length ? allRequests : [of(null)]).pipe(
+      map(results => results.filter((r): r is Card => r !== null)),
+      switchMap(allCards => {
         // If there are pending words, mark the collection as incomplete after cards are saved
         if (pending.length > 0) {
           return this.collectionApi.markIncomplete(collectionId, pending).pipe(
-            map(() => created),
-            catchError(() => of(created)),
+            map(() => allCards),
+            catchError(() => of(allCards)),
           );
         }
-        return of(created);
+        return of(allCards);
       }),
     ).subscribe({
-      next: async created => {
+      next: async allCards => {
         this.importing.set(false);
         this.importImageState.clear();
         this.cardStore.loadCards();
         this.collectionStore.loadCollections();
+
+        const newCards = allCards.filter(c => newRows.some(r => r.back === c.content.back));
+        // Fire-and-forget: pre-generate audio for newly created cards only
+        this.audioPrefetch.prefetchCollection(newCards);
+
+        const created = newCards.length;
+        const reused = reuseRows.length;
         const hasPending = pending.length > 0;
         const toast = await this.toastCtrl.create({
           message: hasPending
             ? `✓ ${created} cards added — ${pending.length} more will be generated later`
-            : `✓ ${created} words added to your Vault`,
+            : reused > 0
+              ? `✓ ${created} imported, ${reused} already existed (reused)`
+              : `✓ ${created} words added to your Vault`,
           duration: 3500,
           position: 'bottom',
           color: hasPending ? 'warning' : 'success',

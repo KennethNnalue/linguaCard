@@ -53,7 +53,9 @@
               <ion-icon name="volume-high-outline"></ion-icon>
               Listen
               @if (isAudioReady()) {
-                <span class="wd2-audio-ready-dot" title="AI audio ready"></span>
+                <span class="wd2-audio-dot wd2-audio-dot--ready" title="AI audio cached on device"></span>
+              } @else if (isAudioPending()) {
+                <span class="wd2-audio-dot wd2-audio-dot--pending" title="Generating audio…"></span>
               }
             }
           </button>

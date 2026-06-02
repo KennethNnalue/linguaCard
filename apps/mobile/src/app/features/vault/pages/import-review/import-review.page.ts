@@ -14,15 +14,26 @@ import {
   checkmarkCircleOutline,
   warningOutline,
 } from 'ionicons/icons';
-import { CardContent, ExampleSentence, GenderType, ParsedImportRow } from '../../../../core/models/mock-data';
+import { CardContent, ExampleSentence, GenderType, ParsedImportRow } from '@lingua-card/shared/domain';
+import type { Card } from '@lingua-card/shared/domain';
 import { CardApiService } from '../../services/card-api.service';
+import { CollectionApiService } from '../../services/collection-api.service';
 import { AuthService } from '../../../../core/services/auth.service';
 import { CardStore } from '../../store/card.store';
 import { CollectionStore } from '../../store/collection.store';
 import { ImportStateService } from '../../services/import-state.service';
 import { AssignCollectionSheetComponent } from '../../components/assign-collection-sheet/assign-collection-sheet.component';
+import { CardDedupService } from '../../../../shared/dedup/card-dedup.service';
+import { CollectionAudioPrefetchService } from '../../../../shared/audio/collection-audio-prefetch.service';
 import { forkJoin, of } from 'rxjs';
 import { catchError, map } from 'rxjs/operators';
+
+interface SelectableRow extends ParsedImportRow {
+  selected: boolean;
+  isDuplicate: boolean;
+  duplicateCard: Card | null;
+  duplicateSource: string | null;
+}
 
 @Component({
   selector: 'lc-import-review',
@@ -40,10 +51,14 @@ export class ImportReviewPage implements OnInit {
   private readonly router = inject(Router);
   private readonly toastCtrl = inject(ToastController);
   private readonly modalCtrl = inject(ModalController);
+  private readonly collectionApi = inject(CollectionApiService);
+  private readonly dedupService = inject(CardDedupService);
+  private readonly audioPrefetch = inject(CollectionAudioPrefetchService);
 
   readonly importing = signal(false);
   readonly result = this.importState.result;
   readonly selectedCollectionId = signal<string | null>(null);
+  readonly wordList = signal<SelectableRow[]>([]);
 
   readonly selectedCollectionLabel = computed(() => {
     const id = this.selectedCollectionId();
@@ -52,7 +67,16 @@ export class ImportReviewPage implements OnInit {
     return col ? `${col.emoji} ${col.name}` : 'No collection';
   });
 
-  readonly readyCount = computed(() => this.result()?.validRows.length ?? 0);
+  readonly selectedWords = computed(() => this.wordList().filter(w => w.selected));
+  readonly selectedCount = computed(() => this.selectedWords().length);
+  readonly duplicateCount = computed(() => this.wordList().filter(w => w.isDuplicate).length);
+  readonly vaultDuplicateCount = computed(() =>
+    this.wordList().filter(w => w.isDuplicate && w.duplicateCard).length
+  );
+  readonly totalCount = computed(() => this.wordList().length);
+
+  // Keep backward-compat computed values for template
+  readonly readyCount = computed(() => this.selectedCount());
   readonly warningCount = computed(() => this.result()?.warningCount ?? 0);
   readonly errorCount = computed(() => this.result()?.errorRows.length ?? 0);
   readonly first4Rows = computed(() => (this.result()?.validRows ?? []).slice(0, 4));
@@ -64,12 +88,75 @@ export class ImportReviewPage implements OnInit {
   ngOnInit(): void {
     if (!this.importState.result()) {
       this.router.navigate(['/vault/import']);
+      return;
     }
+    this._buildWordList();
+  }
+
+  private _buildWordList(): void {
+    const rows = this.result()?.validRows ?? [];
+
+    // Step 1: within-batch dedup — mark second occurrence of same word
+    const batchSeen = new Map<string, number>();
+    const withBatchDedup: SelectableRow[] = rows.map((row, i) => {
+      const key = this._normalizeKey(row.article, row.back);
+      let batchDup = false;
+      let dupSource: string | null = null;
+      if (batchSeen.has(key)) {
+        batchDup = true;
+        dupSource = `row ${batchSeen.get(key)! + 1} in this import`;
+      } else {
+        batchSeen.set(key, i);
+      }
+      return {
+        ...row,
+        selected: !batchDup,
+        isDuplicate: batchDup,
+        duplicateCard: null,
+        duplicateSource: dupSource,
+      };
+    });
+
+    // Step 2: vault dedup (synchronous — reads CardStore index once)
+    const vaultMatches = this.dedupService.checkBatch(
+      withBatchDedup.map(r => ({ back: r.back, article: r.article ?? null }))
+    );
+
+    const finalRows = withBatchDedup.map((row, i) => {
+      const match = vaultMatches[i];
+      if (match) {
+        return {
+          ...row,
+          isDuplicate: true,
+          duplicateCard: match,
+          selected: false,
+          duplicateSource: null,
+        };
+      }
+      return row;
+    });
+
+    this.wordList.set(finalRows);
+  }
+
+  toggleWord(rowIndex: number): void {
+    this.wordList.update(ws =>
+      ws.map(w => w.rowIndex === rowIndex ? { ...w, selected: !w.selected } : w)
+    );
+  }
+
+  suppressDuplicate(rowIndex: number): void {
+    this.wordList.update(ws =>
+      ws.map(w => w.rowIndex === rowIndex
+        ? { ...w, selected: true, isDuplicate: false, duplicateCard: null }
+        : w
+      )
+    );
   }
 
   async confirmImport(): Promise<void> {
-    const rows = this.result()?.validRows;
-    if (!rows?.length || this.importing()) return;
+    const rows = this.selectedWords();
+    if (!rows.length || this.importing()) return;
 
     if (!this.selectedCollectionId()) {
       const toast = await this.toastCtrl.create({
@@ -83,11 +170,15 @@ export class ImportReviewPage implements OnInit {
     }
 
     this.importing.set(true);
-    const collectionId = this.selectedCollectionId();
+    const collectionId = this.selectedCollectionId()!;
     const userId = this.authService.currentUser()?.id ?? '';
     const now = new Date().toISOString();
 
-    const requests = rows.map(row =>
+    // Split: rows with an existing card get assigned (not re-created)
+    const newRows = rows.filter(r => !r.duplicateCard);
+    const reuseRows = rows.filter(r => !!r.duplicateCard);
+
+    const createRequests = newRows.map(row =>
       this.cardApi.create({
         deckId: 'deck-001',
         collectionId,
@@ -116,22 +207,44 @@ export class ImportReviewPage implements OnInit {
       }).pipe(catchError(() => of(null)))
     );
 
-    forkJoin(requests).pipe(
-      map(results => results.filter(r => r !== null).length),
+    const assignRequests = reuseRows.map(row =>
+      this.collectionApi.addExistingCard(collectionId, row.duplicateCard!.id)
+        .pipe(
+          map(() => row.duplicateCard!),
+          catchError(() => of(null)),
+        )
+    );
+
+    const allRequests = [...createRequests, ...assignRequests];
+
+    forkJoin(allRequests.length ? allRequests : [of(null)]).pipe(
+      map(results => results.filter((r): r is Card => r !== null)),
     ).subscribe({
-      next: async created => {
+      next: async (allCards) => {
         this.importing.set(false);
         this.importState.clear();
         this.cardStore.loadCards();
         this.collectionStore.loadCollections();
+
+        const newCount = allCards.filter(c => newRows.some(r => r.back === c.content.back)).length;
+        const reusedCount = reuseRows.length;
+
+        // Fire-and-forget: pre-generate audio for newly created cards only
+        const newCards = allCards.filter(c => newRows.some(r => r.back === c.content.back));
+        this.audioPrefetch.prefetchCollection(newCards);
+
+        const msg = reusedCount > 0
+          ? `✓ ${newCount} imported, ${reusedCount} already existed (reused)`
+          : `✓ ${newCount} word${newCount === 1 ? '' : 's'} added to your Vault`;
+
         const toast = await this.toastCtrl.create({
-          message: `✓ ${created} words added to your Vault`,
+          message: msg,
           duration: 3000,
           position: 'bottom',
           color: 'success',
         });
         await toast.present();
-        this.router.navigate(['/vault']);
+        this.router.navigate(['/vault/collections', collectionId]);
       },
       error: async () => {
         this.importing.set(false);
@@ -168,6 +281,21 @@ export class ImportReviewPage implements OnInit {
   cancel(): void {
     this.importState.clear();
     this.router.navigate(['/vault']);
+  }
+
+  getDuplicateLabel(row: SelectableRow): string {
+    if (row.duplicateCard) {
+      const col = this.collectionStore.collections()
+        .find(c => c.id === row.duplicateCard!.collectionId);
+      return col ? `Already in "${col.name}"` : 'Already in your vault';
+    }
+    return row.duplicateSource ?? 'Duplicate';
+  }
+
+  private _normalizeKey(article: string | null | undefined, back: string): string {
+    const w = back.toLowerCase().trim();
+    const a = article?.toLowerCase().trim() ?? '';
+    return a ? `${a} ${w}` : w;
   }
 
   private rowToContent(row: ParsedImportRow): CardContent {

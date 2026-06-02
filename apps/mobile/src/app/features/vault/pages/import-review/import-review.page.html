@@ -19,24 +19,35 @@
         <ion-icon name="checkmark-circle-outline" class="imp-file-icon"></ion-icon>
         <div class="imp-file-text">
           <p class="imp-file-name">{{ result()!.fileName }}</p>
-          <p class="imp-file-sub">{{ result()!.totalRows }} words detected</p>
+          <p class="imp-file-sub">{{ totalCount() }} words detected</p>
         </div>
       </div>
+
+      <!-- Duplicate summary bar -->
+      @if (vaultDuplicateCount() > 0) {
+        <div class="imp-dedup-bar">
+          <ion-icon name="warning-outline" class="imp-dedup-bar__icon"></ion-icon>
+          <span class="imp-dedup-bar__text">
+            {{ vaultDuplicateCount() }} of {{ totalCount() }} words already in your vault
+            <span class="imp-dedup-bar__hint">(deselected)</span>
+          </span>
+        </div>
+      }
 
       <!-- Summary stats -->
       <div class="imp-summary-row">
         <div class="imp-sum-cell">
-          <span class="imp-sum-val">{{ result()!.totalRows }}</span>
+          <span class="imp-sum-val">{{ totalCount() }}</span>
           <span class="imp-sum-lbl">Total</span>
         </div>
         <div class="imp-sum-cell imp-sum-cell--ready">
-          <span class="imp-sum-val">{{ readyCount() }}</span>
-          <span class="imp-sum-lbl">Ready</span>
+          <span class="imp-sum-val">{{ selectedCount() }}</span>
+          <span class="imp-sum-lbl">Selected</span>
         </div>
-        @if (warningCount() > 0) {
+        @if (duplicateCount() > 0) {
           <div class="imp-sum-cell imp-sum-cell--warn">
-            <span class="imp-sum-val">{{ warningCount() }}</span>
-            <span class="imp-sum-lbl">Warnings</span>
+            <span class="imp-sum-val">{{ duplicateCount() }}</span>
+            <span class="imp-sum-lbl">Duplicates</span>
           </div>
         }
         @if (errorCount() > 0) {
@@ -46,14 +57,6 @@
           </div>
         }
       </div>
-
-      <!-- Warning note -->
-      @if (warningCount() > 0) {
-        <div class="imp-warn-note">
-          <ion-icon name="warning-outline"></ion-icon>
-          <span>{{ warningCount() }} rows have warnings but will still be imported</span>
-        </div>
-      }
 
       <!-- Collection picker -->
       <div class="imp-field">
@@ -67,31 +70,49 @@
         </button>
       </div>
 
-      <!-- Preview list -->
-      <p class="imp-section-lbl">Preview (first 4 rows)</p>
-      <div class="imp-preview-list">
-        @for (row of first4Rows(); track row.rowIndex) {
-          <div class="imp-preview-row">
-            <div class="imp-preview-top">
-              <span class="imp-row-num">{{ row.rowIndex }}</span>
-              <span class="imp-preview-front">{{ row.front }}</span>
-              @if (row.article) {
-                <span class="imp-art-small lc-article-badge lc-article-badge--{{ row.article }}">
-                  {{ row.article }}
-                </span>
-              }
-              @if (row.status === 'warning') {
-                <div class="imp-row-warn">
-                  <ion-icon name="warning-outline"></ion-icon>
-                </div>
+      <!-- Full selectable word list -->
+      <p class="imp-section-lbl">Words (tap to select / deselect)</p>
+      <div class="imp-word-list">
+        @for (row of wordList(); track row.rowIndex) {
+          <div
+            class="imp-word-row"
+            [class.imp-word-row--selected]="row.selected"
+            [class.imp-word-row--duplicate]="row.isDuplicate"
+            (click)="toggleWord(row.rowIndex)">
+
+            <div class="imp-word-checkbox">
+              @if (row.selected) {
+                <ion-icon name="checkmark-circle-outline" class="imp-word-checkbox--checked"></ion-icon>
               } @else {
-                <div class="imp-row-ok">
-                  <ion-icon name="checkmark-circle-outline"></ion-icon>
+                <span class="imp-word-checkbox--empty"></span>
+              }
+            </div>
+
+            <div class="imp-word-body">
+              <div class="imp-word-top">
+                @if (row.article) {
+                  <span class="imp-art-small lc-article-badge lc-article-badge--{{ row.article }}">
+                    {{ row.article }}
+                  </span>
+                }
+                <span class="imp-word-back">{{ row.back }}</span>
+                <span class="imp-word-front">{{ row.front }}</span>
+              </div>
+              @if (row.isDuplicate) {
+                <div class="imp-dup-row">
+                  <span class="imp-dup-badge">Duplicate</span>
+                  <span class="imp-dup-hint">{{ getDuplicateLabel(row) }}</span>
+                  @if (row.duplicateCard) {
+                    <button class="imp-dup-go" (click)="$event.stopPropagation(); suppressDuplicate(row.rowIndex)">
+                      Add anyway
+                    </button>
+                  }
                 </div>
               }
             </div>
-            @if (row.exampleTarget) {
-              <p class="imp-preview-ex">{{ row.exampleTarget }}</p>
+
+            @if (row.status === 'warning' && !row.isDuplicate) {
+              <ion-icon name="warning-outline" class="imp-word-warn-icon"></ion-icon>
             }
           </div>
         }
@@ -102,12 +123,12 @@
       <!-- Import button -->
       <button
         class="imp-import-btn"
-        [disabled]="importing() || readyCount() === 0 || !selectedCollectionId()"
+        [disabled]="importing() || selectedCount() === 0 || !selectedCollectionId()"
         (click)="confirmImport()">
         @if (importing()) {
           Importing…
         } @else {
-          Import {{ readyCount() }} words to Vault
+          Import {{ selectedCount() }} word{{ selectedCount() === 1 ? '' : 's' }} →
         }
       </button>
 

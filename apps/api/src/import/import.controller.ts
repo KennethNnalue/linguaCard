@@ -49,7 +49,7 @@ export class ImportController {
   completeCollection(
     @CurrentUser() userId: string,
     @Param('collectionId') collectionId: string,
-  ): Promise<{ newCards: number; pendingWords: RawExtractedWord[]; isComplete: boolean }> {
+  ): Promise<{ newCards: number; reusedCards: number; pendingWords: RawExtractedWord[]; isComplete: boolean }> {
     return this.collectionCompleteService.resume(userId, collectionId);
   }
 }

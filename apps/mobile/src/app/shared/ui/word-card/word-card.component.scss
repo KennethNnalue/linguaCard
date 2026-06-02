@@ -132,3 +132,31 @@
     color: var(--lc-text-secondary);
   }
 }
+
+.wc-action {
+  position: relative;
+}
+
+.wc-audio-dot {
+  position: absolute;
+  top: 2px;
+  right: 2px;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  pointer-events: none;
+
+  &--ready {
+    background: var(--ion-color-success, #2dd36f);
+  }
+
+  &--pending {
+    background: var(--ion-color-warning, #ffc409);
+    animation: wc-dot-pulse 1.2s ease-in-out infinite;
+  }
+}
+
+@keyframes wc-dot-pulse {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.4; transform: scale(0.75); }
+}

@@ -41,6 +41,11 @@
         <div class="wc-spacer"></div>
         <button class="wc-action" (click)="onPlayAudio($event)" aria-label="Play pronunciation">
           <ion-icon name="volume-high-outline"></ion-icon>
+          @if (audioStatus() === 'ready') {
+            <span class="wc-audio-dot wc-audio-dot--ready"></span>
+          } @else if (audioStatus() === 'pending') {
+            <span class="wc-audio-dot wc-audio-dot--pending"></span>
+          }
         </button>
       </div>
 

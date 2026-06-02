@@ -5,9 +5,14 @@
         <ion-icon name="chevron-back-outline"></ion-icon>
       </button>
       <h1 class="col-nav-title lc-display">My Collections</h1>
-      <button class="lc-fab" (click)="openCreateSheet()" aria-label="New collection">
-        <ion-icon name="add-outline"></ion-icon>
-      </button>
+      <div class="col-nav-actions">
+        <button class="col-icon-btn" (click)="navigateToImport()" aria-label="Import">
+          <ion-icon name="cloud-upload-outline"></ion-icon>
+        </button>
+        <button class="lc-fab" (click)="openCreateSheet()" aria-label="New collection">
+          <ion-icon name="add-outline"></ion-icon>
+        </button>
+      </div>
     </div>
   </ion-toolbar>
 </ion-header>

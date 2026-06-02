@@ -13,6 +13,7 @@ import type {
 import { CollectionEntity } from '../collections/collection.entity';
 import { CardEntity } from '../cards/card.entity';
 import { WordEnrichService } from './word-enrich.service';
+import { WordDedupService } from '../cards/word-dedup.service';
 
 @Injectable()
 export class CollectionCompleteService {
@@ -20,6 +21,7 @@ export class CollectionCompleteService {
 
   constructor(
     private readonly wordEnrich: WordEnrichService,
+    private readonly wordDedup: WordDedupService,
     @InjectRepository(CollectionEntity)
     private readonly collectionRepo: Repository<CollectionEntity>,
     @InjectRepository(CardEntity)
@@ -28,6 +30,7 @@ export class CollectionCompleteService {
 
   async resume(userId: string, collectionId: string): Promise<{
     newCards: number;
+    reusedCards: number;
     pendingWords: RawExtractedWord[];
     isComplete: boolean;
   }> {
@@ -35,14 +38,14 @@ export class CollectionCompleteService {
     if (!collection) throw new NotFoundException('Collection not found');
 
     if (collection.importStatus === 'complete') {
-      return { newCards: 0, pendingWords: [], isComplete: true };
+      return { newCards: 0, reusedCards: 0, pendingWords: [], isComplete: true };
     }
 
     const pending = (collection.pendingWords ?? []) as RawExtractedWord[];
     if (pending.length === 0) {
       collection.importStatus = 'complete';
       await this.collectionRepo.save(collection);
-      return { newCards: 0, pendingWords: [], isComplete: true };
+      return { newCards: 0, reusedCards: 0, pendingWords: [], isComplete: true };
     }
 
     const result = await this.wordEnrich.enrichWords({
@@ -52,13 +55,43 @@ export class CollectionCompleteService {
       collectionId,
     });
 
+    // Dedup all enriched words against the user's existing cards in one query.
+    // Use back-only matching because:
+    // 1. Phase 1 extraction embeds the article in back ("der Hund" not "Hund")
+    // 2. The enrichment prompt echoes back the original back value unchanged
+    // So enriched.back may be "der Hund" while the vault card has back="Hund", article="der"
+    // A word-only match is sufficient and avoids false negatives from article mismatches.
+    const dupResults = await this.wordDedup.findDuplicatesByBackOnly(
+      userId,
+      result.enriched.map(w => ({ back: w.back })),
+    );
+
     let newCards = 0;
-    for (const word of result.enriched) {
-      try {
-        await this.createCard(userId, collectionId, word);
-        newCards++;
-      } catch (err) {
-        this.logger.error('Failed to create card during resume', err);
+    let reusedCards = 0;
+
+    for (let i = 0; i < result.enriched.length; i++) {
+      const word = result.enriched[i];
+      const existing = dupResults[i];
+
+      if (existing) {
+        // Card already exists — reassign its collectionId rather than duplicating it.
+        // Preserves the original card's SRS state, audio, and all metadata.
+        try {
+          await this.cardRepo.update(
+            { id: existing.id, userId },
+            { collectionId },
+          );
+          reusedCards++;
+        } catch (err) {
+          this.logger.warn(`Failed to reassign duplicate card ${existing.id}`, err);
+        }
+      } else {
+        try {
+          await this.createCard(userId, collectionId, word);
+          newCards++;
+        } catch (err) {
+          this.logger.error('Failed to create card during resume', err);
+        }
       }
     }
 
@@ -68,6 +101,7 @@ export class CollectionCompleteService {
 
     return {
       newCards,
+      reusedCards,
       pendingWords: result.pending,
       isComplete: result.isComplete,
     };

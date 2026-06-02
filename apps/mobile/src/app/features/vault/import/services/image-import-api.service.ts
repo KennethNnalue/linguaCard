@@ -53,12 +53,15 @@ export class ImageImportApiService {
   /** Resume enrichment for an incomplete collection */
   completeCollection(collectionId: string): Observable<{
     newCards: number;
+    reusedCards: number;
     pendingWords: RawExtractedWord[];
     isComplete: boolean;
   }> {
-    return this.http.post<{ newCards: number; pendingWords: RawExtractedWord[]; isComplete: boolean }>(
-      `${this.base}/complete/${collectionId}`,
-      {},
-    );
+    return this.http.post<{
+      newCards: number;
+      reusedCards: number;
+      pendingWords: RawExtractedWord[];
+      isComplete: boolean;
+    }>(`${this.base}/complete/${collectionId}`, {});
   }
 }

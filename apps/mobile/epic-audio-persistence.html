@@ -1,0 +1,1382 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Epic: Audio Persistence, Pre-generation & Word Deduplication</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,500;0,600;1,400&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600&family=Fira+Code:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root {
+  --lc-brand:#2D5A4E;--lc-brand-light:#E8F2EE;--lc-brand-mid:#4A8C7A;--lc-brand-dark:#1A3830;
+  --lc-accent:#E07B3F;--lc-accent-light:#FDF0E6;
+  --lc-warn:#D97706;--lc-warn-light:#FFFBEB;--lc-warn-border:#FCD34D;
+  --lc-danger:#DC2626;--lc-danger-light:#FEF2F2;--lc-danger-border:#FCA5A5;
+  --lc-info:#1D4ED8;--lc-info-light:#EFF6FF;--lc-info-border:#93C5FD;
+  --lc-success:#059669;--lc-success-light:#ECFDF5;--lc-success-border:#6EE7B7;
+  --lc-surface:#FAFAF8;--lc-card:#FFFFFF;--lc-border:rgba(45,90,78,0.12);
+  --lc-text-primary:#1A2B26;--lc-text-secondary:#6B7C78;--lc-text-hint:#9BAAA6;
+  --lc-shadow-card:0 2px 12px rgba(45,90,78,0.08),0 1px 3px rgba(0,0,0,0.04);
+  --lc-shadow-float:0 8px 32px rgba(45,90,78,0.14),0 2px 8px rgba(0,0,0,0.06);
+  --lc-font-display:'Lora',Georgia,serif;
+  --lc-font-body:'DM Sans',system-ui,sans-serif;
+  --lc-font-mono:'Fira Code','Courier New',monospace;
+  --lc-radius-sm:8px;--lc-radius-md:12px;--lc-radius-lg:20px;--lc-radius-xl:28px;
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:var(--lc-font-body);background:#F0EDEA;color:var(--lc-text-primary);min-height:100vh;font-size:14px;line-height:1.6;}
+
+/* ── LAYOUT ────────────────────────────────────────────── */
+.page-header{background:var(--lc-brand);padding:28px 40px 24px;position:sticky;top:0;z-index:100;box-shadow:0 4px 20px rgba(0,0,0,0.2);}
+.page-header-inner{max-width:1320px;margin:0 auto;display:flex;align-items:flex-start;justify-content:space-between;gap:20px;flex-wrap:wrap;}
+.logo{font-family:var(--lc-font-display);font-size:20px;font-weight:600;color:white;}
+.logo-sub{font-size:11px;color:rgba(255,255,255,0.55);margin-top:2px;}
+.header-meta{display:flex;gap:8px;flex-wrap:wrap;margin-top:4px;}
+.hm-badge{padding:3px 10px;border-radius:20px;font-size:11px;font-weight:600;background:rgba(255,255,255,0.15);color:rgba(255,255,255,0.85);}
+.main{max-width:1320px;margin:0 auto;padding:36px 40px 80px;}
+
+/* ── SECTIONS ──────────────────────────────────────────── */
+.section{margin-bottom:52px;}
+.section-title{font-family:var(--lc-font-display);font-size:21px;font-weight:600;color:var(--lc-text-primary);margin-bottom:4px;}
+.section-sub{font-size:13px;color:var(--lc-text-secondary);margin-bottom:22px;}
+.divider{height:1px;background:var(--lc-border);margin:40px 0;}
+
+/* ── CARDS ──────────────────────────────────────────────── */
+.card{background:var(--lc-card);border-radius:var(--lc-radius-md);border:1px solid var(--lc-border);box-shadow:var(--lc-shadow-card);padding:20px 24px;}
+.card+.card{margin-top:14px;}
+
+/* ── GRID HELPERS ───────────────────────────────────────── */
+.grid-2{display:grid;grid-template-columns:1fr 1fr;gap:14px;}
+.grid-3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px;}
+.grid-4{display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:14px;}
+@media(max-width:900px){.grid-3,.grid-4{grid-template-columns:1fr 1fr;}.grid-2{grid-template-columns:1fr;}}
+
+/* ── PROBLEM BOX ──────────────────────────────────────── */
+.problem-box{background:var(--lc-danger-light);border:1px solid var(--lc-danger-border);border-radius:var(--lc-radius-md);padding:16px 20px;margin-bottom:10px;}
+.problem-title{font-size:13px;font-weight:600;color:var(--lc-danger);margin-bottom:4px;display:flex;align-items:center;gap:6px;}
+.problem-title::before{content:'⚠';font-size:14px;}
+.problem-body{font-size:13px;color:#991b1b;line-height:1.6;}
+
+/* ── STATUS BADGES ──────────────────────────────────────── */
+.badge{display:inline-flex;align-items:center;gap:4px;padding:2px 9px;border-radius:20px;font-size:11px;font-weight:600;letter-spacing:.02em;}
+.badge-done{background:var(--lc-success-light);color:#065f46;border:1px solid var(--lc-success-border);}
+.badge-partial{background:var(--lc-warn-light);color:#92400e;border:1px solid var(--lc-warn-border);}
+.badge-todo{background:var(--lc-info-light);color:#1e40af;border:1px solid var(--lc-info-border);}
+.badge-gap{background:var(--lc-danger-light);color:#991b1b;border:1px solid var(--lc-danger-border);}
+.badge-new{background:var(--lc-brand-light);color:var(--lc-brand-dark);border:1px solid rgba(45,90,78,0.25);}
+
+/* ── STORY CARD ──────────────────────────────────────────── */
+.story-card{background:var(--lc-card);border-radius:var(--lc-radius-md);border:1px solid var(--lc-border);box-shadow:var(--lc-shadow-card);overflow:hidden;margin-bottom:16px;}
+.story-card-header{padding:14px 20px 12px;display:flex;align-items:flex-start;justify-content:space-between;gap:12px;border-bottom:1px solid var(--lc-border);}
+.story-card-id{font-family:var(--lc-font-mono);font-size:11px;font-weight:500;color:var(--lc-brand);background:var(--lc-brand-light);padding:2px 8px;border-radius:4px;white-space:nowrap;}
+.story-card-title{font-weight:600;font-size:14px;color:var(--lc-text-primary);flex:1;}
+.story-card-meta{display:flex;gap:6px;align-items:center;flex-wrap:wrap;}
+.meta-pts{font-size:11px;color:var(--lc-text-secondary);white-space:nowrap;}
+.story-card-body{padding:16px 20px;}
+.story-card-phase{font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.07em;color:var(--lc-text-hint);margin-bottom:8px;}
+
+/* ── PHASE SEPARATOR ────────────────────────────────────── */
+.phase-sep{display:flex;align-items:center;gap:12px;margin:28px 0 18px;}
+.phase-sep-line{flex:1;height:1px;background:var(--lc-border);}
+.phase-sep-label{font-size:11px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:var(--lc-text-hint);padding:4px 12px;background:rgba(45,90,78,0.07);border-radius:20px;white-space:nowrap;}
+
+/* ── CODE BLOCK ─────────────────────────────────────────── */
+.code-block{background:#1A2B26;border-radius:var(--lc-radius-sm);padding:14px 16px;margin:10px 0;overflow-x:auto;}
+.code-block code{font-family:var(--lc-font-mono);font-size:11.5px;color:#A7D9C8;line-height:1.75;white-space:pre;}
+.code-block code .cm{color:#6B7C78;} .code-block code .ck{color:#C9A0DC;} .code-block code .cs{color:#F8D893;} .code-block code .cv{color:#7EC8E3;}
+
+/* ── ACCEPTANCE CRITERIA ────────────────────────────────── */
+.ac-list{list-style:none;padding:0;}
+.ac-list li{display:flex;align-items:flex-start;gap:8px;padding:5px 0;font-size:13px;border-bottom:1px solid rgba(45,90,78,0.06);}
+.ac-list li:last-child{border-bottom:none;}
+.ac-check{width:16px;height:16px;border:1.5px solid var(--lc-border);border-radius:4px;flex-shrink:0;margin-top:1px;}
+
+/* ── AUDIT TABLE ─────────────────────────────────────────── */
+.audit-table{width:100%;border-collapse:collapse;font-size:12.5px;}
+.audit-table th{background:rgba(45,90,78,0.06);font-weight:600;text-align:left;padding:8px 12px;color:var(--lc-text-secondary);font-size:11px;text-transform:uppercase;letter-spacing:.06em;border-bottom:1px solid var(--lc-border);}
+.audit-table td{padding:8px 12px;border-bottom:1px solid rgba(45,90,78,0.06);vertical-align:middle;}
+.audit-table tr:last-child td{border-bottom:none;}
+.audit-table td:first-child{font-family:var(--lc-font-mono);font-size:11px;color:var(--lc-brand);}
+
+/* ── METRIC CARD ─────────────────────────────────────────── */
+.metric-card{background:var(--lc-card);border-radius:var(--lc-radius-md);border:1px solid var(--lc-border);padding:16px 20px;text-align:center;}
+.metric-now{font-family:var(--lc-font-display);font-size:28px;font-weight:600;color:var(--lc-text-hint);}
+.metric-target{font-family:var(--lc-font-display);font-size:28px;font-weight:600;color:var(--lc-brand);}
+.metric-label{font-size:11px;color:var(--lc-text-secondary);margin-top:4px;}
+.metric-arrow{font-size:18px;color:var(--lc-brand-mid);margin:0 4px;}
+
+/* ── FLOW DIAGRAM ─────────────────────────────────────────── */
+.flow-row{display:flex;align-items:center;gap:0;margin:12px 0;}
+.flow-box{background:var(--lc-brand-light);border:1px solid rgba(45,90,78,0.2);border-radius:var(--lc-radius-sm);padding:8px 14px;font-size:12px;font-weight:600;color:var(--lc-brand-dark);white-space:nowrap;}
+.flow-box.new{background:var(--lc-accent-light);border-color:rgba(224,123,63,0.3);color:#7C3410;}
+.flow-box.exists{background:var(--lc-success-light);border-color:var(--lc-success-border);color:#065f46;}
+.flow-arr{font-size:14px;color:var(--lc-text-hint);padding:0 6px;}
+.flow-label{font-size:11px;color:var(--lc-text-secondary);margin-top:3px;text-align:center;}
+
+/* ── PHONES ─────────────────────────────────────────────── */
+.phones-row{display:flex;gap:20px;align-items:flex-start;overflow-x:auto;padding-bottom:8px;}
+.phone-wrap{display:flex;flex-direction:column;align-items:center;gap:8px;flex:0 0 auto;}
+.phone-label{font-size:10px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--lc-text-hint);}
+.phone{width:260px;background:var(--lc-surface);border-radius:36px;border:7px solid #1A1A1A;box-shadow:0 0 0 1px #333,var(--lc-shadow-float),0 20px 40px rgba(0,0,0,0.18);overflow:hidden;position:relative;}
+.phone::before{content:'';position:absolute;top:0;left:50%;transform:translateX(-50%);width:72px;height:5px;background:#1A1A1A;border-radius:0 0 6px 6px;z-index:10;}
+.phone-inner{background:var(--lc-surface);min-height:520px;display:flex;flex-direction:column;padding-top:6px;}
+.p-status{display:flex;justify-content:space-between;align-items:center;padding:9px 18px 4px;font-size:10px;font-weight:600;color:var(--lc-text-secondary);}
+.p-nav{display:flex;justify-content:space-between;align-items:center;padding:4px 14px 8px;}
+.p-nav-title{font-family:var(--lc-font-display);font-size:14px;font-weight:600;color:var(--lc-text-primary);}
+.p-back{width:28px;height:28px;border-radius:50%;background:var(--lc-brand-light);display:flex;align-items:center;justify-content:center;border:none;font-size:14px;color:var(--lc-brand);}
+.p-body{padding:0 14px 16px;flex:1;}
+.p-section-lbl{font-size:9px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--lc-text-hint);margin:10px 0 6px;}
+
+/* word card on import review */
+.p-word-row{display:flex;align-items:center;gap:8px;padding:8px 10px;background:var(--lc-card);border-radius:var(--lc-radius-sm);border:1px solid var(--lc-border);margin-bottom:6px;position:relative;}
+.p-word-row.dup{border-color:var(--lc-warn-border);background:var(--lc-warn-light);}
+.p-word-check{width:14px;height:14px;border:1.5px solid var(--lc-border);border-radius:3px;flex-shrink:0;}
+.p-word-check.checked{background:var(--lc-brand);border-color:var(--lc-brand);}
+.p-word-text{flex:1;min-width:0;}
+.p-word-de{font-weight:600;font-size:11px;color:var(--lc-text-primary);}
+.p-word-en{font-size:10px;color:var(--lc-text-secondary);}
+.p-dup-badge{background:var(--lc-warn-light);border:1px solid var(--lc-warn-border);border-radius:4px;padding:1px 5px;font-size:9px;font-weight:600;color:var(--lc-warn);white-space:nowrap;}
+.p-audio-dot{width:6px;height:6px;border-radius:50%;flex-shrink:0;}
+.p-audio-dot.ready{background:#059669;}
+.p-audio-dot.pending{background:#D97706;}
+.p-audio-dot.none{background:#D1D5DB;}
+
+/* word detail audio status */
+.p-play-btn{display:flex;align-items:center;gap:6px;background:var(--lc-brand);border:none;border-radius:20px;padding:7px 14px;color:white;font-size:11px;font-weight:600;cursor:pointer;}
+.p-play-status{font-size:10px;color:var(--lc-text-hint);margin-top:4px;text-align:center;}
+.p-import-bar{background:var(--lc-card);border-radius:var(--lc-radius-sm);border:1px solid var(--lc-border);padding:10px 12px;margin-bottom:8px;}
+.p-import-bar-lbl{font-size:10px;color:var(--lc-text-secondary);margin-bottom:6px;}
+.p-progress{height:4px;background:rgba(45,90,78,0.1);border-radius:2px;overflow:hidden;}
+.p-progress-fill{height:100%;border-radius:2px;background:var(--lc-brand);}
+.p-toast{background:#1A2B26;color:white;border-radius:var(--lc-radius-sm);padding:8px 12px;font-size:11px;display:flex;align-items:center;gap:6px;margin:8px 0;}
+.p-toast-icon{width:16px;height:16px;border-radius:50%;background:var(--lc-brand-mid);display:flex;align-items:center;justify-content:center;font-size:9px;flex-shrink:0;}
+
+/* warn banner */
+.p-warn-banner{background:var(--lc-warn-light);border:1px solid var(--lc-warn-border);border-radius:var(--lc-radius-sm);padding:8px 10px;font-size:10px;color:#92400e;margin-bottom:8px;line-height:1.4;}
+.p-warn-actions{display:flex;gap:6px;margin-top:6px;}
+.p-warn-btn{border:1px solid var(--lc-warn-border);background:white;color:#92400e;font-size:10px;font-weight:600;padding:3px 8px;border-radius:6px;cursor:pointer;}
+.p-warn-btn.primary{background:var(--lc-warn);border-color:var(--lc-warn);color:white;}
+
+/* dedup summary bar */
+.p-dedup-bar{background:rgba(217,119,6,0.08);border:1px solid var(--lc-warn-border);border-radius:var(--lc-radius-sm);padding:7px 10px;font-size:10px;color:#92400e;margin-bottom:10px;display:flex;align-items:center;gap:6px;}
+
+/* ── STORY MAP TABLE ─────────────────────────────────────── */
+.story-map{width:100%;border-collapse:collapse;font-size:12.5px;}
+.story-map th{background:rgba(45,90,78,0.06);font-weight:600;text-align:left;padding:8px 12px;color:var(--lc-text-secondary);font-size:11px;text-transform:uppercase;letter-spacing:.06em;border-bottom:2px solid var(--lc-border);}
+.story-map td{padding:8px 12px;border-bottom:1px solid rgba(45,90,78,0.06);vertical-align:middle;}
+.story-map tr:last-child td{border-bottom:none;}
+.story-map tr.phase-row td{background:rgba(45,90,78,0.03);font-size:10.5px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--lc-text-hint);padding:6px 12px;}
+.ticket-id{font-family:var(--lc-font-mono);font-size:11px;color:var(--lc-brand);background:var(--lc-brand-light);padding:2px 6px;border-radius:4px;white-space:nowrap;}
+.dep-pill{font-size:10px;background:rgba(45,90,78,0.08);color:var(--lc-text-secondary);padding:1px 6px;border-radius:10px;white-space:nowrap;}
+.pts-badge{background:var(--lc-brand);color:white;font-size:10px;font-weight:700;padding:2px 7px;border-radius:10px;}
+
+/* ── ARCH DIAGRAM ───────────────────────────────────────── */
+.arch-layer{background:var(--lc-card);border:1px solid var(--lc-border);border-radius:var(--lc-radius-sm);padding:10px 14px;margin-bottom:8px;}
+.arch-layer-title{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--lc-text-hint);margin-bottom:8px;}
+.arch-nodes{display:flex;gap:8px;flex-wrap:wrap;}
+.arch-node{background:var(--lc-brand-light);border:1px solid rgba(45,90,78,0.2);border-radius:6px;padding:5px 10px;font-size:11px;font-weight:600;color:var(--lc-brand-dark);}
+.arch-node.new{background:var(--lc-accent-light);border-color:rgba(224,123,63,0.3);color:#7C3410;}
+.arch-node.changed{background:#FFF7ED;border-color:#FED7AA;color:#7C2D12;}
+.arch-node.exists{background:var(--lc-success-light);border-color:var(--lc-success-border);color:#065f46;}
+
+/* ── RISK TABLE ─────────────────────────────────────────── */
+.risk-table{width:100%;border-collapse:collapse;font-size:12.5px;}
+.risk-table th{background:rgba(45,90,78,0.06);font-weight:600;text-align:left;padding:8px 12px;font-size:11px;text-transform:uppercase;letter-spacing:.06em;color:var(--lc-text-secondary);border-bottom:1px solid var(--lc-border);}
+.risk-table td{padding:8px 12px;border-bottom:1px solid rgba(45,90,78,0.06);vertical-align:top;font-size:12.5px;}
+.risk-h{background:#FECACA;color:#991b1b;padding:2px 7px;border-radius:10px;font-size:10px;font-weight:600;}
+.risk-m{background:#FDE68A;color:#78350f;padding:2px 7px;border-radius:10px;font-size:10px;font-weight:600;}
+.risk-l{background:#D1FAE5;color:#065f46;padding:2px 7px;border-radius:10px;font-size:10px;font-weight:600;}
+
+/* ── UTILS ───────────────────────────────────────────────── */
+.mono{font-family:var(--lc-font-mono);font-size:11px;background:var(--lc-brand-light);color:var(--lc-brand-dark);padding:1px 6px;border-radius:4px;}
+.text-hint{color:var(--lc-text-secondary);}
+ul.clean{list-style:none;padding:0;}
+ul.clean li{padding:3px 0;font-size:13px;display:flex;align-items:flex-start;gap:6px;}
+ul.clean li::before{content:'→';color:var(--lc-brand-mid);font-size:12px;margin-top:1px;flex-shrink:0;}
+</style>
+</head>
+<body>
+
+<!-- ═══════════════════════════════════ HEADER ═════════════════════════════ -->
+<div class="page-header">
+  <div class="page-header-inner">
+    <div>
+      <div class="logo">🎵 LinguaCard</div>
+      <div class="logo-sub">Engineering Epic Reference</div>
+    </div>
+    <div style="text-align:right;">
+      <div style="font-family:var(--lc-font-display);font-size:17px;font-weight:600;color:white;line-height:1.2;">Audio Persistence, Pre-generation &amp; Word Deduplication</div>
+      <div class="header-meta">
+        <span class="hm-badge">Epic LC-AP</span>
+        <span class="hm-badge">~38 points remaining</span>
+        <span class="hm-badge">3 phases</span>
+        <span class="hm-badge">Builds on LC-WA</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="main">
+
+<!-- ═══════════════════ 1. CURRENT STATE AUDIT ══════════════════════════════ -->
+<div class="section">
+  <div class="section-title">1 · Current State Audit</div>
+  <div class="section-sub">What already works, what's broken, and what doesn't exist yet. Read this before writing any code.</div>
+
+  <!-- R2 Clarification -->
+  <div class="card" style="margin-bottom:14px;">
+    <div style="font-weight:600;font-size:14px;margin-bottom:8px;">Your question: What is the difference between <span class="mono">pronunciation/</span> and <span class="mono">word-audio/</span> in R2?</div>
+    <div style="font-size:13px;line-height:1.7;color:var(--lc-text-secondary);">
+      You guessed right. Here's what each R2 prefix holds and what it means:
+    </div>
+    <div class="grid-3" style="margin-top:12px;">
+      <div class="card" style="border-color:rgba(220,38,38,0.2);background:var(--lc-danger-light);">
+        <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:#991b1b;margin-bottom:6px;">⚠ pronunciation/{cardId}.wav <span class="badge badge-gap" style="margin-left:4px;">Legacy</span></div>
+        <div style="font-size:12.5px;color:#7f1d1d;line-height:1.6;">The <strong>old</strong> format. One file per card, keyed by cardId. If two cards have the same German word, two separate files exist. These were generated on-demand when a user first tapped 🔊. <br><br>These are being migrated away from by the existing LC-WA epic scripts.</div>
+      </div>
+      <div class="card" style="border-color:var(--lc-success-border);background:var(--lc-success-light);">
+        <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:#065f46;margin-bottom:6px;">✅ word-audio/{hash}.wav <span class="badge badge-done" style="margin-left:4px;">Target</span></div>
+        <div style="font-size:12.5px;color:#064e3b;line-height:1.6;">The <strong>new</strong> format. One file per unique German word text, keyed by SHA-256 hash of the normalized text. "der Hund" is stored once regardless of how many cards reference it.<br><br>This is what the WordAudioService (NestJS + Angular) already produces.</div>
+      </div>
+      <div class="card" style="border-color:var(--lc-info-border);background:var(--lc-info-light);">
+        <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:#1e40af;margin-bottom:6px;">📖 stories/{storyId}.wav <span class="badge badge-done" style="margin-left:4px;">Works</span></div>
+        <div style="font-size:12.5px;color:#1e3a8a;line-height:1.6;">Full story narration audio — long-form TTS, different beast entirely. One file per story, includes karaoke timestamps. Generated by StoryAudioService.<br><br><em>Not affected by this epic.</em></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- What's already built -->
+  <div class="card" style="margin-bottom:14px;">
+    <div style="font-weight:600;font-size:14px;margin-bottom:12px;">What's already built from LC-WA</div>
+    <table class="audit-table">
+      <thead><tr><th>Component</th><th>File</th><th>Status</th><th>Notes</th></tr></thead>
+      <tbody>
+        <tr><td>WordAudioService (NestJS)</td><td>apps/api/src/word-audio/word-audio.service.ts</td><td><span class="badge badge-done">✅ Complete</span></td><td>resolve(), batchResolve(), generateAndPersist(), inflight dedup</td></tr>
+        <tr><td>WordAudioEntity + DB migration</td><td>apps/api/src/word-audio/word-audio.entity.ts</td><td><span class="badge badge-done">✅ Complete</span></td><td>word_audio table, normalized_text unique index</td></tr>
+        <tr><td>WordAudio API endpoints</td><td>apps/api/src/word-audio/word-audio.controller.ts</td><td><span class="badge badge-done">✅ Complete</span></td><td>POST /resolve, POST /batch-resolve, GET /lookup</td></tr>
+        <tr><td>WordAudioService (Angular)</td><td>apps/mobile/src/app/shared/audio/word-audio.service.ts</td><td><span class="badge badge-done">✅ Complete</span></td><td>Memory cache → device cache → API → Web Speech fallback</td></tr>
+        <tr><td>WordAudioApiService (Angular)</td><td>apps/mobile/src/app/shared/audio/word-audio-api.service.ts</td><td><span class="badge badge-done">✅ Complete</span></td><td>HTTP client for word-audio endpoints</td></tr>
+        <tr><td>PronunciationService (Angular)</td><td>apps/mobile/src/app/features/ai/audio/pronunciation.service.ts</td><td><span class="badge badge-done">✅ Wrapper</span></td><td>@deprecated thin wrapper delegating to WordAudioService</td></tr>
+        <tr><td>AiController.pronunciation</td><td>apps/api/src/ai/ai.controller.ts</td><td><span class="badge badge-done">✅ Done</span></td><td>Already delegates to WordAudioService.resolve()</td></tr>
+        <tr><td>AiAudioCacheService</td><td>apps/mobile/src/app/features/ai/audio/ai-audio-cache.service.ts</td><td><span class="badge badge-done">✅ Complete</span></td><td>Capacitor Filesystem cache for story audio</td></tr>
+        <tr><td>WordDedupService (NestJS)</td><td>apps/api/src/cards/word-dedup.service.ts</td><td><span class="badge badge-done">✅ Complete</span></td><td>findDuplicates() against user's card vault</td></tr>
+        <tr><td>POST /cards/check-duplicates</td><td>apps/api/src/cards/cards.controller.ts</td><td><span class="badge badge-done">✅ Complete</span></td><td>Batch check up to 200 words</td></tr>
+        <tr><td>Image import dedup check</td><td>apps/mobile/.../image-import-review.page.ts</td><td><span class="badge badge-done">✅ Complete</span></td><td>_checkVaultDuplicates() called on load</td></tr>
+        <tr><td>R2 migration script</td><td>apps/api/src/word-audio/migration/migrate-card-audio.ts</td><td><span class="badge badge-done">✅ Complete</span></td><td>One-time migration of pronunciation/ → word-audio/</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- THE ACTUAL GAPS -->
+  <div class="card">
+    <div style="font-weight:600;font-size:14px;margin-bottom:12px;color:var(--lc-danger);">⚠ What's still broken / missing — the real work</div>
+    <div class="grid-2">
+      <div>
+        <div class="problem-box">
+          <div class="problem-title">Audio not persisted on device after refresh</div>
+          <div class="problem-body">WordAudioService.play() uses the autoplay-policy workaround (falls back to Web Speech on cache miss rather than awaiting API). The result: device cache never gets populated on first play. Audio is re-generated from the API every session refresh because the Capacitor Filesystem write only happens when resolveAndCache() is explicitly called — which no flow currently does eagerly.</div>
+        </div>
+        <div class="problem-box">
+          <div class="problem-title">No pre-generation on collection import/creation</div>
+          <div class="problem-body">After a collection is imported (CSV or image), no audio is pre-generated. Users hit the generate-on-demand flow every time they first interact with a word. CardStore.create() and the bulk import endpoint don't trigger WordAudioService.batchResolve() after card creation.</div>
+        </div>
+      </div>
+      <div>
+        <div class="problem-box">
+          <div class="problem-title">CSV import has no duplicate detection</div>
+          <div class="problem-body">import-review.page.ts (CSV flow) has zero duplicate checking. The image import already has _checkVaultDuplicates(). The CSV import needs the same treatment. The "Add anyway → use existing card reference" flow is also unimplemented everywhere.</div>
+        </div>
+        <div class="problem-box">
+          <div class="problem-title">Client-side dedup lookup uses API call, not local store</div>
+          <div class="problem-body">Current duplicate checks POST to /cards/check-duplicates on every import. Since CardStore already holds all the user's cards in memory, this API call is wasteful. A client-side Map lookup using a normalized key is O(1) and avoids network latency entirely.</div>
+        </div>
+        <div class="problem-box">
+          <div class="problem-title">Add-word sheet has no duplicate warning</div>
+          <div class="problem-body">add-word-sheet.component.ts has zero duplicate detection. No warning fires when a user manually types a word that already exists in their vault.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════ 2. TARGET ARCHITECTURE ════════════════════════ -->
+<div class="section">
+  <div class="section-title">2 · Target Architecture</div>
+  <div class="section-sub">Where everything lives when this epic is complete.</div>
+
+  <div class="grid-2">
+    <div>
+      <div class="card">
+        <div style="font-weight:600;font-size:13px;margin-bottom:10px;">Audio Resolution Flow (after epic)</div>
+        <div class="flow-row"><div class="flow-box exists">User taps 🔊</div><span class="flow-arr">→</span><div class="flow-box exists">WordAudioService.play()</div></div>
+        <div style="margin-left:16px;border-left:2px solid var(--lc-border);padding-left:12px;margin-top:4px;">
+          <div style="font-size:11px;color:var(--lc-text-secondary);padding:3px 0;">① In-memory Map hit? <span style="color:var(--lc-success);">→ play immediately</span></div>
+          <div style="font-size:11px;color:var(--lc-text-secondary);padding:3px 0;">② Capacitor Filesystem hit? <span style="color:var(--lc-success);">→ play immediately</span></div>
+          <div style="font-size:11px;color:var(--lc-text-secondary);padding:3px 0;">③ DB via GET /word-audio/lookup? <span style="color:var(--lc-success);">→ download + cache + play</span></div>
+          <div style="font-size:11px;color:var(--lc-text-secondary);padding:3px 0;">④ Not in DB → generate TTS → R2 → DB → cache → play</div>
+          <div style="font-size:11px;color:var(--lc-text-secondary);padding:3px 0;">⑤ Fallback: Web Speech API</div>
+        </div>
+        <div style="margin-top:10px;padding:8px 10px;background:var(--lc-success-light);border-radius:var(--lc-radius-sm);font-size:12px;color:#065f46;">
+          <strong>New:</strong> After first resolution (step ③ or ④), audio is downloaded to Capacitor Filesystem. All subsequent sessions hit ② immediately.
+        </div>
+      </div>
+      <div class="card" style="margin-top:12px;">
+        <div style="font-weight:600;font-size:13px;margin-bottom:10px;">Client-Side Dedup Algorithm</div>
+        <div style="font-size:12.5px;color:var(--lc-text-secondary);line-height:1.7;margin-bottom:8px;">
+          No API call needed. CardStore already has all cards in memory. Build a normalized lookup Map on first use, then O(1) checks forever.
+        </div>
+        <div class="code-block"><code><span class="cm">// shared/dedup/card-dedup.service.ts</span>
+<span class="ck">buildIndex</span>(cards: Card[]): Map&lt;string, Card&gt; {
+  <span class="cv">const</span> map = <span class="ck">new</span> Map&lt;string, Card&gt;();
+  <span class="cv">for</span> (<span class="cv">const</span> card <span class="cv">of</span> cards) {
+    <span class="cv">const</span> key = normalize(
+      card.content.article,
+      card.content.back
+    );
+    <span class="cm">// First occurrence wins — no double-storing</span>
+    <span class="cv">if</span> (!map.has(key)) map.set(key, card);
+  }
+  <span class="cv">return</span> map;
+}
+
+<span class="ck">normalize</span>(article: string|null, back: string): string {
+  <span class="cv">const</span> w = back.toLowerCase().trim();
+  <span class="cv">const</span> a = article?.toLowerCase().trim() ?? <span class="cs">''</span>;
+  <span class="cv">return</span> a ? <span class="cs">`${a} ${w}`</span> : w;
+}</code></div>
+        <div style="font-size:11px;color:var(--lc-text-hint);margin-top:6px;">Index built once when CardStore loads. Checked instantly on import review and add-word sheet. Zero API calls.</div>
+      </div>
+    </div>
+    <div>
+      <div class="card">
+        <div style="font-weight:600;font-size:13px;margin-bottom:10px;">Pre-generation Flow (Collection Import)</div>
+        <div style="font-size:12.5px;color:var(--lc-text-secondary);line-height:1.7;margin-bottom:10px;">
+          When a collection is imported or generated, audio for all words should be triggered immediately after card creation — not on first user tap.
+        </div>
+        <div class="arch-layer">
+          <div class="arch-layer-title">Step 1 — Cards created</div>
+          <div class="arch-nodes">
+            <div class="arch-node exists">CardStore.confirmImport()</div>
+            <div class="arch-node new">→ triggers audio pre-gen</div>
+          </div>
+        </div>
+        <div style="text-align:center;font-size:18px;color:var(--lc-text-hint);margin:4px 0;">↓</div>
+        <div class="arch-layer">
+          <div class="arch-layer-title">Step 2 — Batch audio resolution (background)</div>
+          <div class="arch-nodes">
+            <div class="arch-node new">CollectionAudioPrefetchService</div>
+            <div class="arch-node exists">WordAudioApiService.batchResolve()</div>
+          </div>
+        </div>
+        <div style="text-align:center;font-size:18px;color:var(--lc-text-hint);margin:4px 0;">↓</div>
+        <div class="arch-layer">
+          <div class="arch-layer-title">Step 3 — Download &amp; persist to device</div>
+          <div class="arch-nodes">
+            <div class="arch-node new">AiAudioCacheService.saveFromUrl()</div>
+            <div class="arch-node exists">Capacitor Filesystem</div>
+          </div>
+        </div>
+        <div style="text-align:center;font-size:18px;color:var(--lc-text-hint);margin:4px 0;">↓</div>
+        <div class="arch-layer">
+          <div class="arch-layer-title">Step 4 — Status updates &amp; UI feedback</div>
+          <div class="arch-nodes">
+            <div class="arch-node new">AudioReadinessStore</div>
+            <div class="arch-node new">Audio status dot on word cards</div>
+          </div>
+        </div>
+        <div style="margin-top:10px;padding:8px 10px;background:var(--lc-brand-light);border-radius:var(--lc-radius-sm);font-size:12px;color:var(--lc-brand-dark);">
+          <strong>Key constraint:</strong> Pre-generation is fire-and-forget. It does NOT block the import confirmation flow. User sees cards immediately; audio readiness catches up within seconds.
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════ 3. STORY MAP ═════════════════════════════════════════ -->
+<div class="section">
+  <div class="section-title">3 · Story Map</div>
+  <div class="section-sub">All stories in implementation order. Phases within columns can run in parallel; phases across rows must be done in sequence.</div>
+
+  <table class="story-map">
+    <thead>
+      <tr>
+        <th style="width:90px;">Ticket</th>
+        <th>Title</th>
+        <th style="width:80px;">Phase</th>
+        <th style="width:50px;">Pts</th>
+        <th style="width:100px;">Depends on</th>
+        <th style="width:100px;">Status</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr class="phase-row"><td colspan="6">Phase A — Device Cache Fix (unblocked, do first)</td></tr>
+      <tr>
+        <td><span class="ticket-id">LC-AP01</span></td>
+        <td>Fix device cache write: download and persist audio after first API resolution</td>
+        <td style="font-size:11px;color:var(--lc-text-secondary);">A — Cache</td>
+        <td><span class="pts-badge">3</span></td>
+        <td>—</td>
+        <td><span class="badge badge-todo">🔵 To do</span></td>
+      </tr>
+      <tr>
+        <td><span class="ticket-id">LC-AP02</span></td>
+        <td>AiAudioCacheService: add saveFromUrl() method for URL-based download</td>
+        <td style="font-size:11px;color:var(--lc-text-secondary);">A — Cache</td>
+        <td><span class="pts-badge">2</span></td>
+        <td>—</td>
+        <td><span class="badge badge-todo">🔵 To do</span></td>
+      </tr>
+      <tr>
+        <td><span class="ticket-id">LC-AP03</span></td>
+        <td>AudioReadinessStore: reactive signal tracking audio cache status per word text</td>
+        <td style="font-size:11px;color:var(--lc-text-secondary);">A — Cache</td>
+        <td><span class="pts-badge">2</span></td>
+        <td>AP02</td>
+        <td><span class="badge badge-todo">🔵 To do</span></td>
+      </tr>
+      <tr>
+        <td><span class="ticket-id">LC-AP04</span></td>
+        <td>Audio readiness dot on word-card and word-detail (green = cached, amber = pending)</td>
+        <td style="font-size:11px;color:var(--lc-text-secondary);">A — Cache</td>
+        <td><span class="pts-badge">1</span></td>
+        <td>AP03</td>
+        <td><span class="badge badge-todo">🔵 To do</span></td>
+      </tr>
+
+      <tr class="phase-row"><td colspan="6">Phase B — Pre-generation on Import / Creation</td></tr>
+      <tr>
+        <td><span class="ticket-id">LC-AP05</span></td>
+        <td>CollectionAudioPrefetchService: batch-resolve + device-persist all words in a collection</td>
+        <td style="font-size:11px;color:var(--lc-text-secondary);">B — Pregen</td>
+        <td><span class="pts-badge">3</span></td>
+        <td>AP02</td>
+        <td><span class="badge badge-todo">🔵 To do</span></td>
+      </tr>
+      <tr>
+        <td><span class="ticket-id">LC-AP06</span></td>
+        <td>Wire pre-generation: trigger CollectionAudioPrefetchService after CSV import confirm</td>
+        <td style="font-size:11px;color:var(--lc-text-secondary);">B — Pregen</td>
+        <td><span class="pts-badge">1</span></td>
+        <td>AP05</td>
+        <td><span class="badge badge-todo">🔵 To do</span></td>
+      </tr>
+      <tr>
+        <td><span class="ticket-id">LC-AP07</span></td>
+        <td>Wire pre-generation: trigger after image import confirm</td>
+        <td style="font-size:11px;color:var(--lc-text-secondary);">B — Pregen</td>
+        <td><span class="pts-badge">1</span></td>
+        <td>AP05</td>
+        <td><span class="badge badge-todo">🔵 To do</span></td>
+      </tr>
+      <tr>
+        <td><span class="ticket-id">LC-AP08</span></td>
+        <td>Wire pre-generation: trigger after AI collection generation (story/AI-generated collections)</td>
+        <td style="font-size:11px;color:var(--lc-text-secondary);">B — Pregen</td>
+        <td><span class="pts-badge">1</span></td>
+        <td>AP05</td>
+        <td><span class="badge badge-todo">🔵 To do</span></td>
+      </tr>
+      <tr>
+        <td><span class="ticket-id">LC-AP09</span></td>
+        <td>Import success screen: show audio generation progress bar (N/M words ready)</td>
+        <td style="font-size:11px;color:var(--lc-text-secondary);">B — Pregen</td>
+        <td><span class="pts-badge">2</span></td>
+        <td>AP05, AP03</td>
+        <td><span class="badge badge-todo">🔵 To do</span></td>
+      </tr>
+
+      <tr class="phase-row"><td colspan="6">Phase C — Client-side Dedup (parallel with B)</td></tr>
+      <tr>
+        <td><span class="ticket-id">LC-AP10</span></td>
+        <td>CardDedupService: build normalized in-memory index from CardStore; O(1) lookup</td>
+        <td style="font-size:11px;color:var(--lc-text-secondary);">C — Dedup</td>
+        <td><span class="pts-badge">2</span></td>
+        <td>—</td>
+        <td><span class="badge badge-todo">🔵 To do</span></td>
+      </tr>
+      <tr>
+        <td><span class="ticket-id">LC-AP11</span></td>
+        <td>CSV import review: add client-side dedup check + duplicate row badges + summary bar</td>
+        <td style="font-size:11px;color:var(--lc-text-secondary);">C — Dedup</td>
+        <td><span class="pts-badge">3</span></td>
+        <td>AP10</td>
+        <td><span class="badge badge-todo">🔵 To do</span></td>
+      </tr>
+      <tr>
+        <td><span class="ticket-id">LC-AP12</span></td>
+        <td>Add-word sheet: client-side dedup check on back-field blur with inline warning</td>
+        <td style="font-size:11px;color:var(--lc-text-secondary);">C — Dedup</td>
+        <td><span class="pts-badge">2</span></td>
+        <td>AP10</td>
+        <td><span class="badge badge-todo">🔵 To do</span></td>
+      </tr>
+      <tr>
+        <td><span class="ticket-id">LC-AP13</span></td>
+        <td>"Use existing" path: on duplicate confirm, reference existing card instead of creating new</td>
+        <td style="font-size:11px;color:var(--lc-text-secondary);">C — Dedup</td>
+        <td><span class="pts-badge">3</span></td>
+        <td>AP11, AP12</td>
+        <td><span class="badge badge-todo">🔵 To do</span></td>
+      </tr>
+      <tr>
+        <td><span class="ticket-id">LC-AP14</span></td>
+        <td>Remove API call from image import dedup (migrate to CardDedupService)</td>
+        <td style="font-size:11px;color:var(--lc-text-secondary);">C — Dedup</td>
+        <td><span class="pts-badge">1</span></td>
+        <td>AP10</td>
+        <td><span class="badge badge-partial">🟡 Partial</span></td>
+      </tr>
+
+      <tr class="phase-row"><td colspan="6">Phase D — Migration &amp; Cleanup (run after A+B complete)</td></tr>
+      <tr>
+        <td><span class="ticket-id">LC-AP15</span></td>
+        <td>Run migrate-card-audio.ts on production to move pronunciation/ → word-audio/</td>
+        <td style="font-size:11px;color:var(--lc-text-secondary);">D — Migration</td>
+        <td><span class="pts-badge">1</span></td>
+        <td>AP01</td>
+        <td><span class="badge badge-todo">🔵 Ops task</span></td>
+      </tr>
+      <tr>
+        <td><span class="ticket-id">LC-AP16</span></td>
+        <td>Run cleanup-r2.ts to delete orphaned pronunciation/ files after migration verified</td>
+        <td style="font-size:11px;color:var(--lc-text-secondary);">D — Migration</td>
+        <td><span class="pts-badge">1</span></td>
+        <td>AP15</td>
+        <td><span class="badge badge-todo">🔵 Ops task</span></td>
+      </tr>
+    </tbody>
+  </table>
+  <div style="margin-top:10px;font-size:12px;color:var(--lc-text-hint);padding:8px 12px;background:var(--lc-brand-light);border-radius:var(--lc-radius-sm);">
+    <strong>Total remaining: ~28 points.</strong> Phase A and C can run fully in parallel. Phase B depends on AP02 from A. Phase D is an ops run, not a dev sprint.
+  </div>
+</div>
+
+<!-- ═══════════════════════ 4. DETAILED STORIES ══════════════════════════════ -->
+<div class="section">
+  <div class="section-title">4 · Story Details</div>
+  <div class="section-sub">Implementation spec for each ticket. Files, algorithms, acceptance criteria.</div>
+
+  <!-- ── PHASE A ── -->
+  <div class="phase-sep"><div class="phase-sep-line"></div><div class="phase-sep-label">Phase A — Device Cache Fix</div><div class="phase-sep-line"></div></div>
+
+  <!-- AP01 -->
+  <div class="story-card">
+    <div class="story-card-header">
+      <div style="display:flex;align-items:center;gap:10px;flex:1;">
+        <span class="story-card-id">LC-AP01</span>
+        <span class="story-card-title">Fix device cache write: download and persist audio after first API resolution</span>
+      </div>
+      <div class="story-card-meta">
+        <span class="pts-badge">3 pts</span>
+        <span class="badge badge-todo">To do</span>
+      </div>
+    </div>
+    <div class="story-card-body">
+      <div class="story-card-phase">Phase A · Depends on: AP02</div>
+      <div style="font-size:13px;margin-bottom:12px;color:var(--lc-text-secondary);line-height:1.6;">
+        <strong>Root cause:</strong> <span class="mono">WordAudioService.play()</span> correctly falls back to Web Speech on autoplay-policy grounds (you can't await an async call and then play audio — the browser blocks it). But the background resolution that follows never saves the resolved URL to the Capacitor Filesystem. On next session, <span class="mono">_urlMap</span> is empty and the device cache is empty, so we hit the API again.
+      </div>
+      <div style="font-size:13px;margin-bottom:8px;font-weight:600;">Files to modify</div>
+      <table class="audit-table" style="margin-bottom:12px;">
+        <thead><tr><th>File</th><th>Change</th></tr></thead>
+        <tbody>
+          <tr><td>shared/audio/word-audio.service.ts</td><td>After API resolution returns audioUrl, call AiAudioCacheService.saveFromUrl() in background</td></tr>
+          <tr><td>shared/audio/word-audio.service.ts</td><td>On startup (service init), warm _urlMap from Capacitor Filesystem by scanning cache dir</td></tr>
+        </tbody>
+      </table>
+      <div style="font-size:13px;margin-bottom:8px;font-weight:600;">Key implementation pattern</div>
+      <div class="code-block"><code><span class="cm">// word-audio.service.ts — after API returns audioUrl</span>
+<span class="ck">private async</span> <span class="cv">resolveAndCacheInBackground</span>(
+  text: string,
+  language: string,
+  cacheKey: string
+): Promise&lt;void&gt; {
+  <span class="cv">try</span> {
+    <span class="cm">// 1. Check device cache (may have been populated by a concurrent call)</span>
+    <span class="cv">const</span> deviceCached = <span class="cv">await</span> this.cache.getFromCache(cacheKey);
+    <span class="cv">if</span> (deviceCached) {
+      this._urlMap.set(cacheKey, deviceCached); <span class="cv">return</span>;
+    }
+    <span class="cm">// 2. Fetch from API (backend resolves or generates)</span>
+    <span class="cv">const</span> resp = <span class="cv">await</span> this.api.resolve(text, language);
+    <span class="cv">if</span> (!resp.wordAudio.audioUrl) <span class="cv">return</span>; <span class="cm">// still generating</span>
+
+    <span class="cm">// 3. Download to device and update in-memory map</span>
+    <span class="cv">const</span> localUrl = <span class="cv">await</span> this.cache.saveFromUrl(
+      cacheKey,
+      resp.wordAudio.audioUrl
+    );
+    this._urlMap.set(cacheKey, localUrl ?? resp.wordAudio.audioUrl);
+    this.audioReadiness.markReady(cacheKey); <span class="cm">// notify AP03 store</span>
+  } <span class="cv">catch</span> (err) {
+    <span class="cm">// Non-fatal — next play() will retry</span>
+    console.warn(<span class="cs">'Background audio cache failed'</span>, err);
+  }
+}</code></div>
+      <div style="font-size:13px;margin-bottom:8px;font-weight:600;">Acceptance criteria</div>
+      <ul class="ac-list">
+        <li><span class="ac-check"></span>After first play of a word (which uses Web Speech fallback), audio is downloaded to device in background</li>
+        <li><span class="ac-check"></span>Second session: playing the same word hits Capacitor Filesystem immediately, no API call</li>
+        <li><span class="ac-check"></span>Third play same session: hits _urlMap in-memory, no filesystem read</li>
+        <li><span class="ac-check"></span>Background download failure does not crash, logs warning, retried on next play</li>
+        <li><span class="ac-check"></span>On native platform only (web platform skips Capacitor Filesystem per existing isNative guard)</li>
+        <li><span class="ac-check"></span>Unit test: verify saveFromUrl() is called after successful API resolution</li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- AP02 -->
+  <div class="story-card">
+    <div class="story-card-header">
+      <div style="display:flex;align-items:center;gap:10px;flex:1;">
+        <span class="story-card-id">LC-AP02</span>
+        <span class="story-card-title">AiAudioCacheService: add saveFromUrl() for URL-based download + persist</span>
+      </div>
+      <div class="story-card-meta"><span class="pts-badge">2 pts</span><span class="badge badge-todo">To do</span></div>
+    </div>
+    <div class="story-card-body">
+      <div class="story-card-phase">Phase A · No dependencies</div>
+      <div style="font-size:13px;margin-bottom:12px;color:var(--lc-text-secondary);">AiAudioCacheService currently has <span class="mono">getOrDownload(storyId, remoteUrl)</span> and <span class="mono">saveBuffer(cacheKey, ArrayBuffer)</span>. We need a third method: download a file from a URL using a provided cache key (not storyId). This is the same as getOrDownload but decoupled from storyId naming.</div>
+      <div style="font-size:13px;margin-bottom:8px;font-weight:600;">Files to modify</div>
+      <table class="audit-table" style="margin-bottom:12px;">
+        <thead><tr><th>File</th><th>Change</th></tr></thead>
+        <tbody>
+          <tr><td>features/ai/audio/ai-audio-cache.service.ts</td><td>Add saveFromUrl(cacheKey, url): Promise&lt;string|null&gt;</td></tr>
+        </tbody>
+      </table>
+      <div class="code-block"><code><span class="ck">async</span> <span class="cv">saveFromUrl</span>(
+  cacheKey: string,
+  remoteUrl: string,
+  ext: <span class="cs">'wav'</span> | <span class="cs">'mp3'</span> = <span class="cs">'wav'</span>
+): Promise&lt;string | null&gt; {
+  <span class="cv">if</span> (!this.isNative) <span class="cv">return</span> remoteUrl; <span class="cm">// web: stream directly</span>
+  <span class="cv">const</span> path = <span class="cs">`${this.CACHE_DIR}/${cacheKey}.${ext}`</span>;
+  <span class="cv">await</span> Filesystem.mkdir({ path: this.CACHE_DIR, directory: Directory.Data, recursive: <span class="cv">true</span> });
+  <span class="cv">await</span> Filesystem.downloadFile({ path, url: remoteUrl, directory: Directory.Data });
+  <span class="cv">const</span> result = <span class="cv">await</span> Filesystem.getUri({ path, directory: Directory.Data });
+  <span class="cv">return</span> Capacitor.convertFileSrc(result.uri);
+}</code></div>
+      <ul class="ac-list">
+        <li><span class="ac-check"></span>saveFromUrl() downloads and persists audio to Capacitor Filesystem, returns local URI</li>
+        <li><span class="ac-check"></span>On web platform (isNative=false), returns the remoteUrl unchanged</li>
+        <li><span class="ac-check"></span>If file already exists at cacheKey, overwrites it (idempotent)</li>
+        <li><span class="ac-check"></span>Creates CACHE_DIR if it doesn't exist (recursive mkdir)</li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- AP03 -->
+  <div class="story-card">
+    <div class="story-card-header">
+      <div style="display:flex;align-items:center;gap:10px;flex:1;">
+        <span class="story-card-id">LC-AP03</span>
+        <span class="story-card-title">AudioReadinessStore: reactive signal tracking cache status per word text</span>
+      </div>
+      <div class="story-card-meta"><span class="pts-badge">2 pts</span><span class="badge badge-todo">To do</span></div>
+    </div>
+    <div class="story-card-body">
+      <div class="story-card-phase">Phase A · Depends on: AP02</div>
+      <div style="font-size:13px;margin-bottom:12px;color:var(--lc-text-secondary);">A lightweight signalStore that tracks which words have audio ready on device. Consumed by word-card and word-detail to show the readiness dot (AP04) and by the import success screen (AP09).</div>
+      <table class="audit-table" style="margin-bottom:12px;">
+        <thead><tr><th>File</th><th>Purpose</th></tr></thead>
+        <tbody>
+          <tr><td>shared/audio/audio-readiness.store.ts</td><td>signalStore: Map&lt;cacheKey, 'pending'|'ready'|'failed'&gt;</td></tr>
+        </tbody>
+      </table>
+      <div class="code-block"><code><span class="cm">// Interface</span>
+<span class="ck">interface</span> AudioReadinessState {
+  readiness: Map&lt;string, <span class="cs">'pending'</span> | <span class="cs">'ready'</span> | <span class="cs">'failed'</span>&gt;;
+}
+
+<span class="cm">// Key API on the store</span>
+markPending(cacheKey: string): void
+markReady(cacheKey: string): void
+markFailed(cacheKey: string): void
+getStatus(cacheKey: string): Signal&lt;<span class="cs">'pending'</span>|<span class="cs">'ready'</span>|<span class="cs">'failed'</span>|<span class="cs">'unknown'</span>&gt;
+readyCount(cacheKeys: string[]): Signal&lt;number&gt;
+allReady(cacheKeys: string[]): Signal&lt;boolean&gt;</code></div>
+      <ul class="ac-list">
+        <li><span class="ac-check"></span>getStatus() returns 'unknown' for words not yet encountered (not 'pending')</li>
+        <li><span class="ac-check"></span>Signals are reactive — components update automatically when status changes</li>
+        <li><span class="ac-check"></span>readyCount() computed signal increments as audio finishes downloading</li>
+        <li><span class="ac-check"></span>Store is providedIn: root (shared across all features)</li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- AP04 -->
+  <div class="story-card">
+    <div class="story-card-header">
+      <div style="display:flex;align-items:center;gap:10px;flex:1;">
+        <span class="story-card-id">LC-AP04</span>
+        <span class="story-card-title">Audio readiness dot on word-card and word-detail</span>
+      </div>
+      <div class="story-card-meta"><span class="pts-badge">1 pt</span><span class="badge badge-todo">To do</span></div>
+    </div>
+    <div class="story-card-body">
+      <div class="story-card-phase">Phase A · Depends on: AP03</div>
+      <div style="font-size:13px;margin-bottom:12px;color:var(--lc-text-secondary);">Small visual indicator on the audio play button. Green dot = AI audio cached on device. Amber dot = audio generation in progress. No dot = not yet generated (first tap will trigger).</div>
+      <table class="audit-table" style="margin-bottom:12px;">
+        <thead><tr><th>File</th><th>Change</th></tr></thead>
+        <tbody>
+          <tr><td>shared/audio/audio-player/audio-player.component.ts</td><td>Accept optional [audioStatus] input, render dot indicator</td></tr>
+          <tr><td>vault/pages/word-detail/word-detail.component.ts</td><td>Pass audioStatus from AudioReadinessStore</td></tr>
+          <tr><td>vault/components/word-card/word-card.component.ts</td><td>Pass audioStatus from AudioReadinessStore</td></tr>
+        </tbody>
+      </table>
+      <ul class="ac-list">
+        <li><span class="ac-check"></span>Green dot when AudioReadinessStore.getStatus(cacheKey) === 'ready'</li>
+        <li><span class="ac-check"></span>Amber pulsing dot when status === 'pending' (audio generating)</li>
+        <li><span class="ac-check"></span>No dot when status === 'unknown' (not yet requested)</li>
+        <li><span class="ac-check"></span>Dot updates reactively without full component re-render</li>
+        <li><span class="ac-check"></span>Dot is purely decorative — does not affect play button interaction</li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- ── PHASE B ── -->
+  <div class="phase-sep"><div class="phase-sep-line"></div><div class="phase-sep-label">Phase B — Pre-generation on Import</div><div class="phase-sep-line"></div></div>
+
+  <!-- AP05 -->
+  <div class="story-card">
+    <div class="story-card-header">
+      <div style="display:flex;align-items:center;gap:10px;flex:1;">
+        <span class="story-card-id">LC-AP05</span>
+        <span class="story-card-title">CollectionAudioPrefetchService: batch-resolve + device-persist all words in a collection</span>
+      </div>
+      <div class="story-card-meta"><span class="pts-badge">3 pts</span><span class="badge badge-todo">To do</span></div>
+    </div>
+    <div class="story-card-body">
+      <div class="story-card-phase">Phase B · Depends on: AP02, AP03</div>
+      <div style="font-size:13px;margin-bottom:12px;color:var(--lc-text-secondary);">The core service for Phase B. Given a list of cards (from an imported collection), it batches all word texts, calls the backend batch-resolve endpoint, then downloads and persists each returned audio URL to device storage. This runs entirely in the background — the import confirmation UX does not wait for it.</div>
+      <table class="audit-table" style="margin-bottom:12px;">
+        <thead><tr><th>File</th><th>Purpose</th></tr></thead>
+        <tbody>
+          <tr><td>shared/audio/collection-audio-prefetch.service.ts</td><td>New service: prefetchCollection(cards: Card[])</td></tr>
+        </tbody>
+      </table>
+      <div class="code-block"><code><span class="ck">@Injectable</span>({ providedIn: <span class="cs">'root'</span> })
+<span class="ck">export class</span> CollectionAudioPrefetchService {
+  <span class="cv">private readonly</span> api = inject(WordAudioApiService);
+  <span class="cv">private readonly</span> cache = inject(AiAudioCacheService);
+  <span class="cv">private readonly</span> readiness = inject(AudioReadinessStore);
+
+  <span class="cm">/**
+   * Fire-and-forget. Do NOT await this from import flows.
+   * Caller continues; audio arrives in background.
+   */</span>
+  prefetchCollection(cards: Card[]): void {
+    this._run(cards).catch(err =>
+      console.warn(<span class="cs">'Audio prefetch failed:'</span>, err)
+    );
+  }
+
+  <span class="ck">private async</span> _run(cards: Card[]): Promise&lt;void&gt; {
+    <span class="cv">const</span> words = cards.map(c => ({
+      text: (c.content.article ? <span class="cs">`${c.content.article} `</span> : <span class="cs">''</span>) + c.content.back,
+      language: <span class="cs">'de-DE'</span>,
+    }));
+
+    <span class="cm">// Mark all as pending immediately</span>
+    words.forEach(w => {
+      <span class="cv">const</span> key = this._cacheKey(w.text, w.language);
+      this.readiness.markPending(key);
+    });
+
+    <span class="cm">// Batch resolve (50 words per call max)</span>
+    <span class="cv">const</span> CHUNK = 50;
+    <span class="cv">for</span> (<span class="cv">let</span> i = 0; i &lt; words.length; i += CHUNK) {
+      <span class="cv">const</span> chunk = words.slice(i, i + CHUNK);
+      <span class="cv">const</span> resp = <span class="cv">await</span> this.api.batchResolve(chunk);
+      <span class="cv">for</span> (<span class="cv">const</span> item <span class="cv">of</span> resp.results) {
+        <span class="cv">if</span> (!item.wordAudio.audioUrl) <span class="cv">continue</span>;
+        <span class="cv">const</span> key = this._cacheKey(item.wordAudio.displayText, item.wordAudio.language);
+        <span class="cv">try</span> {
+          <span class="cv">await</span> this.cache.saveFromUrl(key, item.wordAudio.audioUrl);
+          this.readiness.markReady(key);
+        } <span class="cv">catch</span> {
+          this.readiness.markFailed(key);
+        }
+      }
+    }
+  }
+}</code></div>
+      <ul class="ac-list">
+        <li><span class="ac-check"></span>prefetchCollection() is fire-and-forget — does not block caller</li>
+        <li><span class="ac-check"></span>Words chunked into batches of 50 to respect API rate limit</li>
+        <li><span class="ac-check"></span>Each word's status updated in AudioReadinessStore as it completes</li>
+        <li><span class="ac-check"></span>Words already in device cache are skipped (getFromCache check before saveFromUrl)</li>
+        <li><span class="ac-check"></span>On WiFi only for native platform (reuse Network.getStatus() guard from StoryAudioPrefetchService)</li>
+        <li><span class="ac-check"></span>Failure of individual word does not stop rest of batch</li>
+        <li><span class="ac-check"></span>Integration test: 10-word collection → 10 files in Capacitor Filesystem after prefetch completes</li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- AP06-09 brief -->
+  <div class="story-card">
+    <div class="story-card-header">
+      <div style="display:flex;align-items:center;gap:10px;flex:1;">
+        <span class="story-card-id">LC-AP06–AP08</span>
+        <span class="story-card-title">Wire pre-generation after CSV import, image import, and AI collection generation</span>
+      </div>
+      <div class="story-card-meta"><span class="pts-badge">1 pt each</span><span class="badge badge-todo">To do</span></div>
+    </div>
+    <div class="story-card-body">
+      <div class="story-card-phase">Phase B · Depends on: AP05</div>
+      <div style="font-size:13px;margin-bottom:12px;color:var(--lc-text-secondary);">Three small wiring stories. Each injects CollectionAudioPrefetchService and calls prefetchCollection() after cards are saved. The pattern is identical for all three.</div>
+      <table class="audit-table">
+        <thead><tr><th>Ticket</th><th>File to modify</th><th>Where to call prefetchCollection()</th></tr></thead>
+        <tbody>
+          <tr><td>AP06</td><td>import-review.page.ts</td><td>Inside confirmImport() after cardApi.create() calls resolve</td></tr>
+          <tr><td>AP07</td><td>image-import-review.page.ts</td><td>Inside confirmImport() after cardApi.create() calls resolve</td></tr>
+          <tr><td>AP08</td><td>collection-detail.page.ts or wherever AI card gen completes</td><td>After AI generation response; pass the created cards</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- AP09 -->
+  <div class="story-card">
+    <div class="story-card-header">
+      <div style="display:flex;align-items:center;gap:10px;flex:1;">
+        <span class="story-card-id">LC-AP09</span>
+        <span class="story-card-title">Import success screen: audio generation progress indicator</span>
+      </div>
+      <div class="story-card-meta"><span class="pts-badge">2 pts</span><span class="badge badge-todo">To do</span></div>
+    </div>
+    <div class="story-card-body">
+      <div class="story-card-phase">Phase B · Depends on: AP05, AP03</div>
+      <div style="font-size:13px;margin-bottom:12px;color:var(--lc-text-secondary);">After the import confirmation flow navigates to collection detail or a success state, show a subtle progress indicator: "Generating audio… 12 / 24 words ready". Disappears automatically when allReady() fires.</div>
+      <table class="audit-table">
+        <thead><tr><th>File</th><th>Change</th></tr></thead>
+        <tbody>
+          <tr><td>vault/pages/collection-detail/collection-detail.page.ts</td><td>Show audio progress bar using AudioReadinessStore.readyCount() / total</td></tr>
+          <tr><td>vault/pages/collection-detail/collection-detail.page.html</td><td>Progress bar component, auto-hides when allReady</td></tr>
+        </tbody>
+      </table>
+      <ul class="ac-list">
+        <li><span class="ac-check"></span>Progress bar shows only when audio prefetch is in progress (at least one 'pending')</li>
+        <li><span class="ac-check"></span>Bar auto-dismisses when all words are 'ready' or 'failed'</li>
+        <li><span class="ac-check"></span>Failed words show a subtle retry icon, not an error state</li>
+        <li><span class="ac-check"></span>Progress bar does not appear on subsequent visits (audio already cached)</li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- ── PHASE C ── -->
+  <div class="phase-sep"><div class="phase-sep-line"></div><div class="phase-sep-label">Phase C — Client-side Dedup</div><div class="phase-sep-line"></div></div>
+
+  <!-- AP10 -->
+  <div class="story-card">
+    <div class="story-card-header">
+      <div style="display:flex;align-items:center;gap:10px;flex:1;">
+        <span class="story-card-id">LC-AP10</span>
+        <span class="story-card-title">CardDedupService: normalized in-memory index from CardStore</span>
+      </div>
+      <div class="story-card-meta"><span class="pts-badge">2 pts</span><span class="badge badge-todo">To do</span></div>
+    </div>
+    <div class="story-card-body">
+      <div class="story-card-phase">Phase C · No dependencies</div>
+      <div style="font-size:13px;margin-bottom:12px;color:var(--lc-text-secondary);">All the user's cards live in CardStore in memory. A normalized lookup index eliminates every API call for duplicate checking. The index is a computed signal — it auto-rebuilds when cards change.</div>
+      <table class="audit-table" style="margin-bottom:12px;">
+        <thead><tr><th>File</th><th>Purpose</th></tr></thead>
+        <tbody>
+          <tr><td>shared/dedup/card-dedup.service.ts</td><td>Index builder + lookup. Pure synchronous — no async, no HTTP.</td></tr>
+        </tbody>
+      </table>
+      <div class="code-block"><code><span class="ck">@Injectable</span>({ providedIn: <span class="cs">'root'</span> })
+<span class="ck">export class</span> CardDedupService {
+  <span class="cv">private readonly</span> cardStore = inject(CardStore);
+
+  <span class="cm">// Computed: rebuilds automatically when cards change</span>
+  <span class="cv">readonly</span> index = computed(() => {
+    <span class="cv">const</span> map = <span class="ck">new</span> Map&lt;string, Card&gt;();
+    <span class="cv">for</span> (<span class="cv">const</span> card <span class="cv">of</span> this.cardStore.cards()) {
+      <span class="cv">const</span> key = this.normalizeKey(card.content.article, card.content.back);
+      <span class="cv">if</span> (!map.has(key)) map.set(key, card);
+    }
+    <span class="cv">return</span> map;
+  });
+
+  <span class="cm">/** O(1) lookup. Returns existing card or null. */</span>
+  check(article: string | null, back: string): Card | null {
+    <span class="cv">return</span> this.index().get(this.normalizeKey(article, back)) ?? <span class="cv">null</span>;
+  }
+
+  <span class="cm">/** Batch check — for import review rows */</span>
+  checkBatch(words: {back: string; article?: string | null}[]): (Card | null)[] {
+    <span class="cv">const</span> idx = this.index(); <span class="cm">// read once — O(n) not O(n²)</span>
+    <span class="cv">return</span> words.map(w =>
+      idx.get(this.normalizeKey(w.article ?? <span class="cv">null</span>, w.back)) ?? <span class="cv">null</span>
+    );
+  }
+
+  <span class="ck">private</span> normalizeKey(article: string | null | undefined, back: string): string {
+    <span class="cv">const</span> w = back.toLowerCase().trim();
+    <span class="cv">const</span> a = article?.toLowerCase().trim() ?? <span class="cs">''</span>;
+    <span class="cv">return</span> a ? <span class="cs">`${a} ${w}`</span> : w;
+  }
+}</code></div>
+      <ul class="ac-list">
+        <li><span class="ac-check"></span>index is a computed signal — rebuilds when CardStore.cards() changes</li>
+        <li><span class="ac-check"></span>check() and checkBatch() are synchronous, zero async</li>
+        <li><span class="ac-check"></span>Normalization matches backend: lowercase, trimmed, article+space+word or word-only</li>
+        <li><span class="ac-check"></span>"der Hund" ≠ "die Hund" (article is part of the key)</li>
+        <li><span class="ac-check"></span>checkBatch() reads index once — O(n) not O(n²) for n-word imports</li>
+        <li><span class="ac-check"></span>Performance test: 1000-card vault + 50-word import batch completes in &lt; 5ms</li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- AP11 -->
+  <div class="story-card">
+    <div class="story-card-header">
+      <div style="display:flex;align-items:center;gap:10px;flex:1;">
+        <span class="story-card-id">LC-AP11</span>
+        <span class="story-card-title">CSV import review: client-side dedup + duplicate row badges + summary bar</span>
+      </div>
+      <div class="story-card-meta"><span class="pts-badge">3 pts</span><span class="badge badge-todo">To do</span></div>
+    </div>
+    <div class="story-card-body">
+      <div class="story-card-phase">Phase C · Depends on: AP10</div>
+      <div style="font-size:13px;margin-bottom:12px;color:var(--lc-text-secondary);">The CSV import review page (import-review.page.ts) currently has zero duplicate detection. Add client-side dedup using CardDedupService. Mirror the existing pattern from image-import-review.page.ts but use the local index instead of the API.</div>
+      <table class="audit-table" style="margin-bottom:12px;">
+        <thead><tr><th>File</th><th>Change</th></tr></thead>
+        <tbody>
+          <tr><td>vault/import/pages/import-review/import-review.page.ts</td><td>Call CardDedupService.checkBatch() on parsed rows; mark duplicates; deselect by default</td></tr>
+          <tr><td>vault/import/pages/import-review/import-review.page.html</td><td>Duplicate badge on rows, summary bar, within-batch dedup indicator</td></tr>
+        </tbody>
+      </table>
+      <div style="font-size:13px;margin-bottom:8px;font-weight:600;">Within-batch dedup (same algorithm as image import)</div>
+      <div class="code-block"><code><span class="cm">// Check within-batch duplicates (same as image-import-review)</span>
+<span class="cv">const</span> seen = <span class="ck">new</span> Map&lt;string, number&gt;();
+rows.forEach((row, i) => {
+  <span class="cv">const</span> key = normalize(row.article, row.back);
+  <span class="cv">if</span> (seen.has(key)) {
+    row.isDuplicate = <span class="cv">true</span>;
+    row.duplicateSource = <span class="cs">`row ${seen.get(key)! + 1} in this import`</span>;
+  } <span class="cv">else</span> {
+    seen.set(key, i);
+  }
+});
+
+<span class="cm">// Check against vault using client-side index</span>
+<span class="cv">const</span> vaultMatches = dedupService.checkBatch(rows);
+rows.forEach((row, i) => {
+  <span class="cv">const</span> match = vaultMatches[i];
+  <span class="cv">if</span> (match) {
+    row.isDuplicate = <span class="cv">true</span>;
+    row.duplicateCard = match;
+    row.selected = <span class="cv">false</span>; <span class="cm">// deselect by default</span>
+  }
+});</code></div>
+      <ul class="ac-list">
+        <li><span class="ac-check"></span>Duplicate rows show amber "Duplicate" badge with collection name from existing card</li>
+        <li><span class="ac-check"></span>Duplicates deselected by default; user can re-select manually</li>
+        <li><span class="ac-check"></span>Summary bar: "3 of 15 words already in your vault (deselected)"</li>
+        <li><span class="ac-check"></span>Within-batch duplicates flagged (second occurrence of same word in same CSV)</li>
+        <li><span class="ac-check"></span>Zero API calls for dedup — CardDedupService.checkBatch() only</li>
+        <li><span class="ac-check"></span>If all words are duplicates, import CTA still enabled (user may re-select some)</li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- AP12 -->
+  <div class="story-card">
+    <div class="story-card-header">
+      <div style="display:flex;align-items:center;gap:10px;flex:1;">
+        <span class="story-card-id">LC-AP12</span>
+        <span class="story-card-title">Add-word sheet: inline duplicate warning on back-field blur</span>
+      </div>
+      <div class="story-card-meta"><span class="pts-badge">2 pts</span><span class="badge badge-todo">To do</span></div>
+    </div>
+    <div class="story-card-body">
+      <div class="story-card-phase">Phase C · Depends on: AP10</div>
+      <table class="audit-table" style="margin-bottom:12px;">
+        <thead><tr><th>File</th><th>Change</th></tr></thead>
+        <tbody>
+          <tr><td>vault/components/add-word-sheet/add-word-sheet.component.ts</td><td>On blur of back field (or article change): call CardDedupService.check(); set duplicateCard signal</td></tr>
+          <tr><td>vault/components/add-word-sheet/add-word-sheet.component.html</td><td>Amber warning banner + "Add anyway" / "Go to existing" actions</td></tr>
+        </tbody>
+      </table>
+      <div style="font-size:13px;margin-bottom:8px;font-weight:600;">UX pattern (see design screens below)</div>
+      <ul class="clean" style="margin-bottom:10px;">
+        <li>Warning fires on blur of back field, not on every keystroke</li>
+        <li>"Add anyway" closes the warning, allows duplicate creation</li>
+        <li>"Go to existing" navigates to /vault/word/{existingCardId} and closes the sheet</li>
+        <li>Check re-fires when article changes (different article = different word)</li>
+      </ul>
+      <ul class="ac-list">
+        <li><span class="ac-check"></span>Warning banner shows: word text, existing collection name, two action buttons</li>
+        <li><span class="ac-check"></span>Check is synchronous (CardDedupService.check() — no async, no spinner)</li>
+        <li><span class="ac-check"></span>No check if back field is empty</li>
+        <li><span class="ac-check"></span>"Add anyway" is non-blocking — this is a warning, not a gate</li>
+        <li><span class="ac-check"></span>Warning dismisses when user clears the field</li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- AP13 -->
+  <div class="story-card">
+    <div class="story-card-header">
+      <div style="display:flex;align-items:center;gap:10px;flex:1;">
+        <span class="story-card-id">LC-AP13</span>
+        <span class="story-card-title">"Use existing" path: reference existing card instead of creating duplicate</span>
+      </div>
+      <div class="story-card-meta"><span class="pts-badge">3 pts</span><span class="badge badge-todo">To do</span></div>
+    </div>
+    <div class="story-card-body">
+      <div class="story-card-phase">Phase C · Depends on: AP11, AP12</div>
+      <div style="font-size:13px;margin-bottom:12px;color:var(--lc-text-secondary);">When a user imports a word that already exists and does NOT deselect it, instead of creating a new card, create a CollectionCard join-record pointing to the existing card ID. This way the collection gets the word, but no new card (or audio) is created. The existing card's audio is reused automatically.</div>
+      <div class="code-block"><code><span class="cm">// During bulk import — for rows where isDuplicate && row.selected</span>
+<span class="cv">if</span> (row.isDuplicate &amp;&amp; row.duplicateCard) {
+  <span class="cm">// Don't create a new card — assign existing card to this collection</span>
+  <span class="cv">await</span> collectionApi.addExistingCard(
+    collectionId,
+    row.duplicateCard.id
+  );
+} <span class="cv">else</span> {
+  <span class="cm">// Normal creation path</span>
+  <span class="cv">await</span> cardApi.create({ ...dto, collectionId });
+}</code></div>
+      <ul class="ac-list">
+        <li><span class="ac-check"></span>Re-selected duplicate rows create a collection assignment, not a new card</li>
+        <li><span class="ac-check"></span>Existing card's audioUrl, SRS state, and all metadata are preserved</li>
+        <li><span class="ac-check"></span>Backend: POST /collections/:id/cards/:cardId endpoint to add existing card to collection</li>
+        <li><span class="ac-check"></span>UI: import summary shows "X imported, Y already existed (reused)"</li>
+        <li><span class="ac-check"></span>If backend endpoint already exists, only the client-side wiring is needed</li>
+      </ul>
+    </div>
+  </div>
+
+</div>
+
+<!-- ═══════════════════ 5. DESIGN SCREENS ════════════════════════════════ -->
+<div class="section">
+  <div class="section-title">5 · Design Screens</div>
+  <div class="section-sub">Reference screens for the three new UX patterns. All use existing LinguaCard design tokens.</div>
+
+  <div class="phones-row">
+
+    <!-- Screen 1: CSV Import Review with dedup -->
+    <div class="phone-wrap">
+      <div class="phone-label">CSV Import Review — with dedup</div>
+      <div class="phone">
+        <div class="phone-inner">
+          <div class="p-status"><span>9:41</span><div style="display:flex;gap:4px;align-items:center;"><span style="font-size:9px;">●●●</span><span>WiFi</span><span>87%</span></div></div>
+          <div class="p-nav">
+            <button class="p-back">←</button>
+            <div class="p-nav-title">Review Import</div>
+            <div style="width:28px;"></div>
+          </div>
+          <div class="p-body">
+            <!-- Dedup summary bar -->
+            <div class="p-dedup-bar">
+              <span style="font-size:12px;">⚠</span>
+              <span>3 of 15 words already in your vault</span>
+            </div>
+            <!-- Progress note -->
+            <div style="font-size:10px;color:var(--lc-text-hint);margin-bottom:8px;">12 selected · 3 deselected (duplicates)</div>
+
+            <!-- Word rows -->
+            <div class="p-word-row">
+              <div class="p-word-check checked"></div>
+              <div class="p-word-text"><div class="p-word-de">der Apfel</div><div class="p-word-en">the apple</div></div>
+              <div class="p-audio-dot none"></div>
+            </div>
+            <div class="p-word-row dup">
+              <div class="p-word-check"></div>
+              <div class="p-word-text"><div class="p-word-de">der Hund</div><div class="p-word-en">the dog</div></div>
+              <div class="p-dup-badge">Duplicate</div>
+            </div>
+            <div style="font-size:9px;color:#92400e;margin:-3px 0 6px 22px;line-height:1.4;">Already in "Tiere" · <u style="cursor:pointer;">Go to card</u></div>
+            <div class="p-word-row">
+              <div class="p-word-check checked"></div>
+              <div class="p-word-text"><div class="p-word-de">das Buch</div><div class="p-word-en">the book</div></div>
+              <div class="p-audio-dot none"></div>
+            </div>
+            <div class="p-word-row dup">
+              <div class="p-word-check"></div>
+              <div class="p-word-text"><div class="p-word-de">schlafen</div><div class="p-word-en">to sleep</div></div>
+              <div class="p-dup-badge">Duplicate</div>
+            </div>
+            <div class="p-word-row">
+              <div class="p-word-check checked"></div>
+              <div class="p-word-text"><div class="p-word-de">die Straße</div><div class="p-word-en">the street</div></div>
+              <div class="p-audio-dot none"></div>
+            </div>
+            <!-- Import CTA -->
+            <div style="margin-top:12px;background:var(--lc-brand);color:white;border-radius:var(--lc-radius-md);padding:10px;text-align:center;font-size:12px;font-weight:600;">Import 12 words →</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Screen 2: Add-word sheet with duplicate warning -->
+    <div class="phone-wrap">
+      <div class="phone-label">Add Word — duplicate warning</div>
+      <div class="phone">
+        <div class="phone-inner">
+          <div class="p-status"><span>9:41</span><div style="display:flex;gap:4px;align-items:center;"><span style="font-size:9px;">●●●</span><span>WiFi</span><span>87%</span></div></div>
+          <div class="p-nav">
+            <button class="p-back">✕</button>
+            <div class="p-nav-title">Add Word</div>
+            <div style="width:28px;"></div>
+          </div>
+          <div class="p-body">
+            <div class="p-section-lbl">German word</div>
+            <!-- Article row -->
+            <div style="display:flex;gap:6px;margin-bottom:8px;">
+              <div style="background:#EAF2FC;border:1px solid #85B7EB;border-radius:6px;padding:6px 10px;font-size:11px;font-weight:700;color:#1A56A3;min-width:40px;text-align:center;">der</div>
+              <div style="flex:1;background:var(--lc-card);border:1px solid var(--lc-border);border-radius:6px;padding:6px 10px;font-size:12px;font-weight:600;color:var(--lc-text-primary);">Hund</div>
+            </div>
+            <!-- Duplicate warning banner -->
+            <div class="p-warn-banner">
+              <div style="display:flex;align-items:flex-start;gap:5px;">
+                <span>⚠</span>
+                <div><strong>"der Hund"</strong> already exists in <strong>Tiere (Chapter 3)</strong></div>
+              </div>
+              <div class="p-warn-actions">
+                <button class="p-warn-btn">Go to existing</button>
+                <button class="p-warn-btn primary">Add anyway</button>
+              </div>
+            </div>
+            <div class="p-section-lbl">English translation</div>
+            <div style="background:var(--lc-card);border:1px solid var(--lc-border);border-radius:6px;padding:6px 10px;font-size:12px;color:var(--lc-text-primary);margin-bottom:10px;">the dog</div>
+            <div class="p-section-lbl">Example sentence</div>
+            <div style="background:var(--lc-card);border:1px solid var(--lc-border);border-radius:6px;padding:6px 10px;font-size:12px;color:var(--lc-text-hint);margin-bottom:10px;">Der Hund spielt im Garten.</div>
+            <div style="background:var(--lc-brand);color:white;border-radius:var(--lc-radius-md);padding:10px;text-align:center;font-size:12px;font-weight:600;margin-top:8px;opacity:0.5;">Save word</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Screen 3: Collection detail with audio pregen progress -->
+    <div class="phone-wrap">
+      <div class="phone-label">Collection Detail — audio pregen</div>
+      <div class="phone">
+        <div class="phone-inner">
+          <div class="p-status"><span>9:41</span><div style="display:flex;gap:4px;align-items:center;"><span style="font-size:9px;">●●●</span><span>WiFi</span><span>87%</span></div></div>
+          <div class="p-nav">
+            <button class="p-back">←</button>
+            <div class="p-nav-title">Lebensmittel</div>
+            <div style="width:28px;"></div>
+          </div>
+          <div class="p-body">
+            <!-- Import success toast -->
+            <div class="p-toast">
+              <div class="p-toast-icon">✓</div>
+              <span>24 words imported successfully</span>
+            </div>
+            <!-- Audio generation progress -->
+            <div class="p-import-bar">
+              <div class="p-import-bar-lbl">🎵 Preparing audio… 12 / 24 words ready</div>
+              <div class="p-progress"><div class="p-progress-fill" style="width:50%"></div></div>
+            </div>
+            <!-- Word list with audio status dots -->
+            <div class="p-section-lbl">24 words · 0 due</div>
+            <div class="p-word-row">
+              <div class="p-word-text"><div class="p-word-de">das Brot</div><div class="p-word-en">the bread</div></div>
+              <div class="p-audio-dot ready" title="Audio ready"></div>
+            </div>
+            <div class="p-word-row">
+              <div class="p-word-text"><div class="p-word-de">die Milch</div><div class="p-word-en">the milk</div></div>
+              <div class="p-audio-dot ready" title="Audio ready"></div>
+            </div>
+            <div class="p-word-row">
+              <div class="p-word-text"><div class="p-word-de">der Käse</div><div class="p-word-en">the cheese</div></div>
+              <div class="p-audio-dot pending" title="Generating audio…"></div>
+            </div>
+            <div class="p-word-row">
+              <div class="p-word-text"><div class="p-word-de">das Fleisch</div><div class="p-word-en">the meat</div></div>
+              <div class="p-audio-dot none" title="Audio not yet generated"></div>
+            </div>
+            <div class="p-word-row">
+              <div class="p-word-text"><div class="p-word-de">der Fisch</div><div class="p-word-en">the fish</div></div>
+              <div class="p-audio-dot none"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Screen 4: Word detail - audio ready state -->
+    <div class="phone-wrap">
+      <div class="phone-label">Word Detail — audio cached</div>
+      <div class="phone">
+        <div class="phone-inner">
+          <div class="p-status"><span>9:41</span><div style="display:flex;gap:4px;align-items:center;"><span style="font-size:9px;">●●●</span><span>WiFi</span><span>87%</span></div></div>
+          <div class="p-nav">
+            <button class="p-back">←</button>
+            <div class="p-nav-title">Word Detail</div>
+            <div style="width:28px;"></div>
+          </div>
+          <div class="p-body">
+            <!-- Word hero -->
+            <div style="text-align:center;padding:16px 0 12px;">
+              <div style="font-size:11px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--lc-text-hint);margin-bottom:4px;">German</div>
+              <div style="font-family:var(--lc-font-display);font-size:28px;font-weight:600;color:var(--lc-text-primary);margin-bottom:2px;"><span style="background:#EAF2FC;color:#1A56A3;border-radius:6px;padding:2px 8px;font-size:14px;font-weight:700;margin-right:6px;">der</span>Hund</div>
+              <div style="font-size:14px;color:var(--lc-text-secondary);margin-bottom:14px;">the dog</div>
+              <!-- Play button with ready state -->
+              <div style="display:flex;flex-direction:column;align-items:center;gap:3px;">
+                <button class="p-play-btn">
+                  <span style="width:14px;height:14px;background:white;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;">
+                    <span style="color:var(--lc-brand);font-size:8px;margin-left:1px;">▶</span>
+                  </span>
+                  Play pronunciation
+                  <span style="width:6px;height:6px;background:#10B981;border-radius:50%;"></span>
+                </button>
+                <div class="p-play-status">AI audio · cached on device</div>
+              </div>
+            </div>
+            <div style="height:1px;background:var(--lc-border);margin:0 -14px 12px;"></div>
+            <!-- SRS info -->
+            <div class="p-section-lbl">Study progress</div>
+            <div style="background:var(--lc-card);border:1px solid var(--lc-border);border-radius:var(--lc-radius-sm);padding:10px 12px;margin-bottom:10px;">
+              <div style="display:flex;justify-content:space-between;font-size:11px;">
+                <span style="color:var(--lc-text-secondary);">Mastery</span>
+                <span style="font-weight:600;color:var(--lc-brand);">Level 3 / 5</span>
+              </div>
+              <div style="display:flex;justify-content:space-between;font-size:11px;margin-top:4px;">
+                <span style="color:var(--lc-text-secondary);">Next review</span>
+                <span style="font-weight:600;">In 3 days</span>
+              </div>
+            </div>
+            <!-- Example sentence -->
+            <div class="p-section-lbl">Example</div>
+            <div style="background:var(--lc-card);border:1px solid var(--lc-border);border-radius:var(--lc-radius-sm);padding:10px 12px;font-size:11px;line-height:1.6;color:var(--lc-text-primary);">
+              Der Hund spielt im Garten.
+              <div style="color:var(--lc-text-secondary);margin-top:2px;">The dog plays in the garden.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Dot legend -->
+  <div style="display:flex;gap:16px;flex-wrap:wrap;margin-top:16px;padding:10px 14px;background:var(--lc-card);border-radius:var(--lc-radius-sm);border:1px solid var(--lc-border);font-size:12px;color:var(--lc-text-secondary);">
+    <span style="font-weight:600;color:var(--lc-text-primary);">Audio dot legend:</span>
+    <span style="display:flex;align-items:center;gap:5px;"><span style="width:8px;height:8px;background:#059669;border-radius:50%;"></span> Green = AI audio cached on device (instant playback)</span>
+    <span style="display:flex;align-items:center;gap:5px;"><span style="width:8px;height:8px;background:#D97706;border-radius:50%;animation: none"></span> Amber = generating / downloading</span>
+    <span style="display:flex;align-items:center;gap:5px;"><span style="width:8px;height:8px;background:#D1D5DB;border-radius:50%;"></span> Gray = not yet requested (first tap generates)</span>
+  </div>
+</div>
+
+<!-- ═══════════════════ 6. METRICS ════════════════════════════════════════ -->
+<div class="section">
+  <div class="section-title">6 · Success Metrics</div>
+  <div class="section-sub">How we know this epic is working. Measure 30 days after full rollout.</div>
+  <div class="grid-4">
+    <div class="metric-card">
+      <div style="display:flex;justify-content:center;align-items:baseline;gap:4px;margin-bottom:4px;">
+        <div class="metric-now">~3s</div>
+        <div class="metric-arrow">→</div>
+        <div class="metric-target">&lt;200ms</div>
+      </div>
+      <div class="metric-label">Time to first audio play (known word)</div>
+    </div>
+    <div class="metric-card">
+      <div style="display:flex;justify-content:center;align-items:baseline;gap:4px;margin-bottom:4px;">
+        <div class="metric-now">~40%</div>
+        <div class="metric-arrow">→</div>
+        <div class="metric-target">&gt;90%</div>
+      </div>
+      <div class="metric-label">Audio device cache hit rate (native)</div>
+    </div>
+    <div class="metric-card">
+      <div style="display:flex;justify-content:center;align-items:baseline;gap:4px;margin-bottom:4px;">
+        <div class="metric-now">~15%</div>
+        <div class="metric-arrow">→</div>
+        <div class="metric-target">&lt;3%</div>
+      </div>
+      <div class="metric-label">Duplicate cards per user (avg % of vault)</div>
+    </div>
+    <div class="metric-card">
+      <div style="display:flex;justify-content:center;align-items:baseline;gap:4px;margin-bottom:4px;">
+        <div class="metric-now">on-tap</div>
+        <div class="metric-arrow">→</div>
+        <div class="metric-target">on-import</div>
+      </div>
+      <div class="metric-label">Audio generation trigger point</div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════ 7. RISKS ══════════════════════════════════════════ -->
+<div class="section">
+  <div class="section-title">7 · Risk Register</div>
+  <div class="section-sub">Known risks and mitigations. Review before starting each phase.</div>
+  <table class="risk-table">
+    <thead><tr><th>Risk</th><th>Likelihood</th><th>Impact</th><th>Mitigation</th></tr></thead>
+    <tbody>
+      <tr>
+        <td>Autoplay-policy blocks Audio.play() after background cache resolves</td>
+        <td><span class="risk-h">High</span></td>
+        <td><span class="risk-m">Medium</span></td>
+        <td>Background cache write is separate from play(). First play still uses Web Speech. Cached audio used on next tap (still within gesture context).</td>
+      </tr>
+      <tr>
+        <td>WiFi-only guard makes pre-generation invisible to users on cellular</td>
+        <td><span class="risk-m">Medium</span></td>
+        <td><span class="risk-l">Low</span></td>
+        <td>On cellular: audio generates on-demand as before. Progress bar simply doesn't appear. Users on cellular aren't worse off than today.</td>
+      </tr>
+      <tr>
+        <td>CardDedupService.index computed signal rebuilds on every card change during import</td>
+        <td><span class="risk-m">Medium</span></td>
+        <td><span class="risk-l">Low</span></td>
+        <td>checkBatch() reads the signal once before the loop. Import creates cards sequentially, not in parallel. Index rebuild is O(n) but rare — not O(n) per word checked.</td>
+      </tr>
+      <tr>
+        <td>TTS API rate limit hit during batch pre-generation for large collections</td>
+        <td><span class="risk-m">Medium</span></td>
+        <td><span class="risk-m">Medium</span></td>
+        <td>BatchResolve respects 5-concurrent backend limit. Rate-limited words get status 'failed' with retry on next CollectionAudioPrefetchService call. Google Cloud TTS (LC-114) has much higher limits than Gemini.</td>
+      </tr>
+      <tr>
+        <td>Duplicate card normalization mismatch between client and server</td>
+        <td><span class="risk-l">Low</span></td>
+        <td><span class="risk-h">High</span></td>
+        <td>CardDedupService.normalizeKey() must exactly match WordDedupService.normalizeWord() — same lowercase+trim+article logic. Share a pure function from shared/domain if possible.</td>
+      </tr>
+      <tr>
+        <td>Capacitor Filesystem fills up on low-storage devices</td>
+        <td><span class="risk-l">Low</span></td>
+        <td><span class="risk-m">Medium</span></td>
+        <td>AudioCacheEvictionService already exists for stories. Extend it to cover word audio. LRU eviction on least-recently-played words if total exceeds threshold (e.g. 100MB).</td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+
+<!-- ═══════════════════ 8. IMPLEMENTATION ORDER ═══════════════════════════ -->
+<div class="section">
+  <div class="section-title">8 · Implementation Order &amp; Parallelism</div>
+  <div class="section-sub">What can run in parallel, what must be serial.</div>
+  <div class="card">
+    <div style="font-size:13px;line-height:1.8;color:var(--lc-text-secondary);">
+      <strong style="color:var(--lc-text-primary);">Sprint 1 (parallel tracks):</strong><br>
+      &nbsp;&nbsp;Track 1: AP02 → AP01 → AP03 → AP04 (cache fix + status dots)<br>
+      &nbsp;&nbsp;Track 2: AP10 → AP11, AP12, AP14 (client dedup service + all consumers)<br><br>
+      <strong style="color:var(--lc-text-primary);">Sprint 2 (after AP02 done):</strong><br>
+      &nbsp;&nbsp;AP05 → AP06 + AP07 + AP08 (all three wiring stories unblock together) → AP09<br>
+      &nbsp;&nbsp;AP13 (use-existing path — needs AP11 + AP12 from Sprint 1)<br><br>
+      <strong style="color:var(--lc-text-primary);">Ops (after Sprint 2 validated on staging):</strong><br>
+      &nbsp;&nbsp;AP15 (run migrate-card-audio.ts on prod) → AP16 (run cleanup-r2.ts)<br><br>
+      <strong style="color:var(--lc-text-primary);">Total calendar time estimate:</strong> 2 sprints (~2 weeks) + 1 ops run day
+    </div>
+  </div>
+</div>
+
+<!-- footer -->
+<div style="text-align:center;padding:20px 0 0;font-size:11px;color:var(--lc-text-hint);">
+  LinguaCard Engineering · Epic LC-AP · Audio Persistence, Pre-generation &amp; Word Deduplication
+</div>
+
+</div><!-- /main -->
+</body>
+</html>

@@ -22,6 +22,8 @@ import { CollectionStore } from '../../store/collection.store';
 export class AssignCollectionSheetComponent implements OnInit {
   @Input() selectedCollectionId: string | null = null;
   @Input() required = false;
+  /** When true: creating a collection immediately dismisses the modal with the new ID. */
+  @Input() autoConfirmOnCreate = false;
 
   private readonly collectionStore = inject(CollectionStore);
   private readonly modalCtrl = inject(ModalController);
@@ -67,6 +69,9 @@ export class AssignCollectionSheetComponent implements OnInit {
         this.showCreateForm.set(false);
         this.newNameCtrl.reset();
         this.selected.set(col.id);
+        if (this.autoConfirmOnCreate) {
+          this.modalCtrl.dismiss({ collectionId: col.id });
+        }
       },
       error: () => this.creating.set(false),
     });

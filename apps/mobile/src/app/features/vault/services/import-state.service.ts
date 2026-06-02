@@ -1,5 +1,5 @@
 import { Injectable, signal } from '@angular/core';
-import { ParsedImportResult } from '../../../core/models/mock-data';
+import type { ParsedImportResult } from '@lingua-card/shared/domain';
 
 @Injectable({ providedIn: 'root' })
 export class ImportStateService {

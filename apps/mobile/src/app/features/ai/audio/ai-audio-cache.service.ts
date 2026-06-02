@@ -51,6 +51,34 @@ export class AiAudioCacheService {
     }
   }
 
+  /**
+   * Download a remote audio file and persist it under the given cacheKey.
+   * On web returns the remoteUrl unchanged (Capacitor Filesystem unavailable).
+   * Idempotent: overwrites any existing file at that path.
+   */
+  async saveFromUrl(
+    cacheKey: string,
+    remoteUrl: string,
+    ext: 'wav' | 'mp3' = 'wav',
+  ): Promise<string | null> {
+    if (!this.isNative) return remoteUrl;
+
+    const path = `${this.CACHE_DIR}/${cacheKey}.${ext}`;
+    try {
+      await Filesystem.mkdir({
+        path: this.CACHE_DIR,
+        directory: Directory.Data,
+        recursive: true,
+      });
+      await Filesystem.downloadFile({ path, url: remoteUrl, directory: Directory.Data });
+      const result = await Filesystem.getUri({ path, directory: Directory.Data });
+      return Capacitor.convertFileSrc(result.uri);
+    } catch (err) {
+      console.error(`Audio saveFromUrl failed for key ${cacheKey}:`, err);
+      return null;
+    }
+  }
+
   async saveBuffer(cacheKey: string, audioBuffer: ArrayBuffer, ext: 'wav' | 'mp3' = 'wav'): Promise<string | null> {
     if (!this.isNative) return null;
 

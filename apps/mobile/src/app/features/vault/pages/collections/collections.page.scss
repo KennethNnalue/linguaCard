@@ -4,6 +4,22 @@
 .col-nav { @include u.flex-between; padding: t.$lc-space-2 14px t.$lc-space-3; }
 .col-nav-title { @include u.lc-font('xl', t.$lc-font-weight-semibold); color: var(--lc-text-primary); }
 
+.col-nav-actions {
+  display: flex;
+  align-items: center;
+  gap: t.$lc-space-2;
+}
+
+.col-icon-btn {
+  @include u.circle(34px);
+  @include u.flex-center;
+  background: var(--lc-surface-2, var(--lc-brand-light));
+  border: 1px solid var(--lc-border);
+  cursor: pointer;
+  ion-icon { font-size: 18px; color: var(--lc-text-secondary); }
+  &:active { opacity: 0.7; }
+}
+
 .lc-back-btn {
   @include u.circle(30px);
   @include u.flex-center;
