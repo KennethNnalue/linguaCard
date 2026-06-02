@@ -397,6 +397,16 @@ Never write mastery colour CSS. Never use `.lc-mastery-dot--*` global classes.
 
 ---
 
+## Tests — skip for now
+
+**Do not write any test files (`.spec.ts`) for this project.** The `@types/jest` types are not configured in `apps/api/tsconfig.json`, so spec files cause TypeScript build failures on Render. Tests will be re-enabled in a dedicated story once the tsconfig is fixed.
+
+- Do not create `*.spec.ts` files
+- Do not add test scaffolding, mocks, or test utilities
+- If a ticket asks for tests, skip the test step and note it as deferred
+
+---
+
 ## Angular rules (always follow)
 
 1. **`ChangeDetectionStrategy.OnPush`** — every component, no exceptions
