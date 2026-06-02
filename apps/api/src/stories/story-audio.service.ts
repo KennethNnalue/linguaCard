@@ -26,15 +26,31 @@ export class StoryAudioService {
       const speech = await this.tts.generateSpeech({ text, language, ssml });
       return { audioBuffer: speech.audioBuffer, durationMs: speech.durationMs, mimeType: 'audio/mpeg' };
     } catch (primaryErr: unknown) {
-      const code = (primaryErr as any)?.code;
-      const isRecoverable =
-        code === 8 ||   // RESOURCE_EXHAUSTED (quota)
-        code === 14 ||  // UNAVAILABLE
-        (primaryErr as any) instanceof ServiceUnavailableException;
+      const err = primaryErr as any;
 
-      if (!isRecoverable) throw primaryErr;
+      if (err instanceof ServiceUnavailableException) {
+        this.logger.error(
+          'Google Cloud TTS is not configured (GOOGLE_CLOUD_TTS_KEY_BASE64 missing or invalid). ' +
+          'Fix the environment variable — not falling back to Gemini for config errors.',
+          err,
+        );
+        throw err;
+      }
 
-      this.logger.warn('Google Cloud TTS unavailable — falling back to Gemini TTS');
+      const transientGrpcCodes = new Set([4, 8, 14]);
+      const isTransient = transientGrpcCodes.has(err?.code);
+
+      if (!isTransient) {
+        this.logger.error(
+          `Google Cloud TTS failed with non-transient error (code=${err?.code}): ${err?.message}`,
+          err,
+        );
+        throw primaryErr;
+      }
+
+      this.logger.warn(
+        `Google Cloud TTS transient error (gRPC code=${err?.code}) — falling back to Gemini TTS`,
+      );
     }
 
     const speech = await this.gemini.generateSpeech({ text, language });

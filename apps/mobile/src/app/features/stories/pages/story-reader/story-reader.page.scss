@@ -399,6 +399,17 @@
   box-shadow: 0 4px 14px rgba(45, 90, 78, 0.35);
 
   &:disabled { opacity: 0.7; cursor: not-allowed; }
+
+  // Shown when autoPlay=1 was requested but browser policy prevents programmatic play.
+  // Pulses to draw the user's attention so they tap to start playback.
+  &--pulse {
+    animation: sr-play-pulse 1.4s ease-in-out infinite;
+  }
+}
+
+@keyframes sr-play-pulse {
+  0%, 100% { box-shadow: 0 4px 14px rgba(45, 90, 78, 0.35); }
+  50%       { box-shadow: 0 4px 22px rgba(45, 90, 78, 0.7), 0 0 0 8px rgba(45, 90, 78, 0.15); }
 }
 
 // ── Spinner inside play button ────────────────────────────────────

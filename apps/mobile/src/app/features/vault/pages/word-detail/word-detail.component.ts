@@ -155,6 +155,10 @@ export class WordDetailComponent {
     void this.wordAudio.playCard(card);
   }
 
+  playExample(sentence: string): void {
+    void this.wordAudio.play(sentence, 'de-DE');
+  }
+
   async openEdit(): Promise<void> {
     const card = this.card();
     const modal = await this.modalCtrl.create({

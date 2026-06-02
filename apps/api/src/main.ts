@@ -16,11 +16,31 @@ async function bootstrap() {
 
   app.setGlobalPrefix('api/v1');
   app.useGlobalPipes(new ValidationPipe({ whitelist: true, transform: true }));
-  app.useStaticAssets(join(process.cwd(), 'uploads'), { prefix: '/uploads' });
+
   const allowedOrigins = process.env['CORS_ORIGIN']
     ? process.env['CORS_ORIGIN'].split(',')
     : ['http://localhost:4200', 'http://localhost:8100'];
+
+  // CORS must be enabled before useStaticAssets so that fetch() calls from the
+  // web client (http://localhost:4200) can download audio files for IndexedDB
+  // caching. Static middleware runs outside the NestJS CORS interceptor, so we
+  // attach the header manually via the setHeaders option.
   app.enableCors({ origin: allowedOrigins, credentials: true });
+
+  // Audio files are content-addressed (SHA-256 in the filename) — immutable.
+  // Cache for 1 year. CORS header added so the web client can fetch() them.
+  app.useStaticAssets(join(process.cwd(), 'uploads'), {
+    prefix: '/uploads',
+    maxAge: '1y',
+    immutable: true,
+    setHeaders(res) {
+      const origin = res.req.headers['origin'];
+      if (origin && allowedOrigins.includes(origin)) {
+        res.setHeader('Access-Control-Allow-Origin', origin);
+        res.setHeader('Vary', 'Origin');
+      }
+    },
+  });
 
   const port = process.env['PORT'] ?? 3001;
   await app.listen(port);

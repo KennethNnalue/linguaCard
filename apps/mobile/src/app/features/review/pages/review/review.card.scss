@@ -152,11 +152,41 @@
   margin-bottom: 7px;
 }
 
+.rv-ex-row {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+}
+
 .rv-ex-de {
   font-size: 13px;
   color: var(--lc-text-primary);
   line-height: 1.5;
   margin: 0 0 3px;
+  flex: 1;
+}
+
+.rv-ex-play-btn {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 26px;
+  height: 26px;
+  border: none;
+  border-radius: 50%;
+  background: transparent;
+  color: var(--lc-text-hint);
+  cursor: pointer;
+  padding: 0;
+  margin-top: 1px;
+
+  ion-icon { font-size: 14px; }
+
+  &:active {
+    background: var(--lc-brand-light);
+    color: var(--lc-brand);
+  }
 }
 
 :host ::ng-deep .rv-ex-de strong {

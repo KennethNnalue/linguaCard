@@ -31,6 +31,13 @@ services:
         value: google/gemma-4-26b-a4b-it:free
       - key: OPENROUTER_TEXT_MODEL
         value: google/gemma-4-26b-a4b-it:free
+      # ── Per-task model routing (all via OPENROUTER_API_KEY) ─────────────────
+      - key: ENRICHMENT_MODEL
+        value: anthropic/claude-haiku-4-5
+      - key: STORY_MODEL_PRO
+        value: anthropic/claude-sonnet-4-6
+      - key: STORY_MODEL_FREE
+        value: google/gemini-2.5-flash
       # ── Groq Whisper (STT karaoke timestamps, free tier) ────────────────────
       - key: GROQ_API_KEY
         sync: false          # console.groq.com → API Keys (starts gsk_)

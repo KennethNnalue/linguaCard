@@ -91,15 +91,25 @@ export class GoogleCloudTTSAdapter implements OnModuleInit {
 
     const characterCount = request.text.length;
 
-    const [response] = await this.client.synthesizeSpeech({
-      input,
-      voice: { languageCode, name: voiceName },
-      audioConfig: {
-        audioEncoding: 'MP3',
-        speakingRate,
-        sampleRateHertz: 24000,
-      },
-    });
+    let response: protos.google.cloud.texttospeech.v1.ISynthesizeSpeechResponse;
+    try {
+      [response] = await this.client.synthesizeSpeech({
+        input,
+        voice: { languageCode, name: voiceName },
+        audioConfig: {
+          audioEncoding: 'MP3',
+          speakingRate,
+          sampleRateHertz: 24000,
+        },
+      });
+    } catch (err: unknown) {
+      const grpcErr = err as { code?: number; message?: string };
+      this.logger.error(
+        `Google Cloud TTS SDK error — gRPC code=${grpcErr?.code} message="${grpcErr?.message}"`,
+        err,
+      );
+      throw err;
+    }
 
     if (!response.audioContent) {
       throw new ServiceUnavailableException('Google Cloud TTS returned no audio content');

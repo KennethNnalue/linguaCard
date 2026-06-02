@@ -114,7 +114,12 @@
           <div class="wd2-sec-lbl">Example Sentences</div>
           @for (ex of word.content.examples; track ex.id; let last = $last) {
             <div class="wd2-example-block" [class.wd2-example-block--last]="last">
-              <p class="wd2-ex-de" [innerHTML]="highlightWord(ex.target, word.content.back)"></p>
+              <div class="wd2-ex-row">
+                <p class="wd2-ex-de" [innerHTML]="highlightWord(ex.target, word.content.back)"></p>
+                <button class="wd2-ex-play-btn" (click)="playExample(ex.target)" aria-label="Play example sentence">
+                  <ion-icon name="volume-high-outline"></ion-icon>
+                </button>
+              </div>
               <p class="wd2-ex-en">"{{ ex.native }}"</p>
             </div>
           }

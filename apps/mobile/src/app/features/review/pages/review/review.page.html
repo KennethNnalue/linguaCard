@@ -65,7 +65,12 @@
               }
               @for (ex of currentCard().content.examples; track ex.id) {
                 <div class="rv-ex-block">
-                  <p class="rv-ex-de" [innerHTML]="highlightWord(ex.target, currentCard().content.back)"></p>
+                  <div class="rv-ex-row">
+                    <p class="rv-ex-de" [innerHTML]="highlightWord(ex.target, currentCard().content.back)"></p>
+                    <button class="rv-ex-play-btn" (click)="playExample($event, ex.target)" aria-label="Play example">
+                      <ion-icon name="volume-high-outline"></ion-icon>
+                    </button>
+                  </div>
                   <p class="rv-ex-en">"{{ ex.native }}"</p>
                 </div>
               }

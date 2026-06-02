@@ -1,16 +1,20 @@
 export interface AiConfig {
-  anthropicApiKey: string;
-  openaiApiKey: string;
-  geminiApiKey: string;
-  openrouterApiKey: string;
-  openrouterVisionModel: string;
-  openrouterTextModel: string;
-  groqApiKey: string;
-  defaultProvider: 'anthropic' | 'openai' | 'gemini' | 'openrouter';
-  storageBucket: string;
+  anthropicApiKey:         string;
+  openaiApiKey:            string;
+  geminiApiKey:            string;
+  openrouterApiKey:        string;
+  openrouterVisionModel:   string;
+  openrouterTextModel:     string;
+  // Per-task model routing — override individually without touching other tasks
+  enrichmentModel:         string;   // POST /import/enrich
+  storyModelPro:           string;   // POST /stories/generate — Pro tier
+  storyModelFree:          string;   // POST /stories/generate — Free tier
+  groqApiKey:              string;
+  defaultProvider:         'anthropic' | 'openai' | 'gemini' | 'openrouter';
+  storageBucket:           string;
   googleCloudTtsKeyBase64: string;
-  googleCloudTtsVoice: string;
-  googleCloudTtsLanguage: string;
+  googleCloudTtsVoice:     string;
+  googleCloudTtsLanguage:  string;
 }
 
 export const aiConfig = (): { ai: AiConfig } => ({
@@ -21,6 +25,9 @@ export const aiConfig = (): { ai: AiConfig } => ({
     openrouterApiKey:     process.env['OPENROUTER_API_KEY']       ?? '',
     openrouterVisionModel: process.env['OPENROUTER_VISION_MODEL'] ?? 'google/gemma-4-26b-a4b-it:free',
     openrouterTextModel:   process.env['OPENROUTER_TEXT_MODEL']   ?? 'google/gemma-4-26b-a4b-it:free',
+    enrichmentModel:  process.env['ENRICHMENT_MODEL']  ?? 'anthropic/claude-haiku-4-5',
+    storyModelPro:    process.env['STORY_MODEL_PRO']   ?? 'anthropic/claude-sonnet-4-6',
+    storyModelFree:   process.env['STORY_MODEL_FREE']  ?? 'google/gemini-2.5-flash',
     groqApiKey:           process.env['GROQ_API_KEY']             ?? '',
     defaultProvider: (process.env['AI_DEFAULT_PROVIDER'] ?? 'gemini') as AiConfig['defaultProvider'],
     storageBucket:        process.env['AI_STORAGE_BUCKET']        ?? 'lingua-card-audio-dev',

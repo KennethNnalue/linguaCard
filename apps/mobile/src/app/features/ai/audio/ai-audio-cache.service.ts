@@ -2,22 +2,141 @@ import { Injectable } from '@angular/core';
 import { Filesystem, Directory } from '@capacitor/filesystem';
 import { Capacitor } from '@capacitor/core';
 
+// IndexedDB database name and store for web-platform audio cache.
+const WEB_DB_NAME    = 'lc-audio-cache';
+const WEB_DB_VERSION = 1;
+const WEB_STORE_NAME = 'audio-blobs';
+
 @Injectable({ providedIn: 'root' })
 export class AiAudioCacheService {
   private readonly CACHE_DIR = 'ai-audio';
 
-  // On web (ionic serve / PWA), Capacitor Filesystem maps to IndexedDB/OPFS and
-  // convertFileSrc() returns a localhost path that the browser's <audio> element
-  // cannot load. Skip the cache entirely and stream directly from the remote URL.
   private get isNative(): boolean {
     return Capacitor.getPlatform() !== 'web';
   }
 
+  // Lazily opened IndexedDB connection (web only).
+  private _webDb: IDBDatabase | null = null;
+
+  // Session-level blob URL cache: cacheKey → blob URL.
+  // Prevents creating duplicate blob URLs for the same audio across repeated
+  // getFromCache() / saveFromUrl() calls within a single app session.
+  private readonly _blobUrlMap = new Map<string, string>();
+
+  // ── Public API ─────────────────────────────────────────────────────────────
+
+  /**
+   * Used for story audio (large files, one per story).
+   *
+   * Native: downloads to device filesystem so the story plays offline.
+   * Web: returns the remote URL directly. The browser's built-in HTTP cache
+   * handles repeat plays (304 Not Modified) — fetching the whole file into
+   * IndexedDB would double-download a large file and trigger CORS errors on
+   * the static file server. Story audio is not suitable for IndexedDB caching.
+   */
   async getOrDownload(storyId: string, remoteUrl: string | null): Promise<string | null> {
     if (!remoteUrl) return null;
     if (!this.isNative) return remoteUrl;
+    return this._nativeGetOrDownload(storyId, remoteUrl);
+  }
 
-    const ext = remoteUrl.endsWith('.wav') ? 'wav' : 'mp3';
+  /**
+   * Download a remote audio file and persist it under the given cacheKey.
+   * Idempotent: skips the download if the file is already cached.
+   * Returns a playable local URL (Capacitor URI on native, blob: URL on web).
+   */
+  async saveFromUrl(
+    cacheKey: string,
+    remoteUrl: string,
+    ext: 'wav' | 'mp3' = 'wav',
+  ): Promise<string | null> {
+    if (this.isNative) {
+      return this._nativeSaveFromUrl(cacheKey, remoteUrl, ext);
+    }
+
+    // Web: check session map and IndexedDB first to avoid re-downloading.
+    const cached = await this._webGet(cacheKey);
+    if (cached) return cached;
+
+    try {
+      const buffer  = await this._fetchBuffer(remoteUrl);
+      const blobUrl = this._makeBlobUrl(buffer, remoteUrl);
+      await this._webPut(cacheKey, buffer);
+      this._blobUrlMap.set(cacheKey, blobUrl);
+      return blobUrl;
+    } catch {
+      return null;
+    }
+  }
+
+  async saveBuffer(cacheKey: string, audioBuffer: ArrayBuffer, ext: 'wav' | 'mp3' = 'wav'): Promise<string | null> {
+    if (this.isNative) {
+      return this._nativeSaveBuffer(cacheKey, audioBuffer, ext);
+    }
+
+    // Web: check session map first, then store in IndexedDB.
+    const cached = await this._webGet(cacheKey);
+    if (cached) return cached;
+
+    try {
+      const mime    = ext === 'mp3' ? 'audio/mpeg' : 'audio/wav';
+      const blobUrl = this._makeBlobUrl(audioBuffer, mime);
+      await this._webPut(cacheKey, audioBuffer);
+      this._blobUrlMap.set(cacheKey, blobUrl);
+      return blobUrl;
+    } catch {
+      return null;
+    }
+  }
+
+  async getFromCache(cacheKey: string): Promise<string | null> {
+    if (this.isNative) {
+      return this._findExistingPath(cacheKey);
+    }
+    return this._webGet(cacheKey);
+  }
+
+  async evict(storyId: string): Promise<void> {
+    if (this.isNative) {
+      for (const ext of ['wav', 'mp3']) {
+        try {
+          await Filesystem.deleteFile({
+            path: `${this.CACHE_DIR}/${storyId}.${ext}`,
+            directory: Directory.Data,
+          });
+        } catch {
+          // File may not exist
+        }
+      }
+    } else {
+      await this._webDelete(storyId);
+    }
+  }
+
+  async getCacheSize(): Promise<number> {
+    if (!this.isNative) return 0;
+    try {
+      const result = await Filesystem.readdir({ path: this.CACHE_DIR, directory: Directory.Data });
+      let total = 0;
+      for (const file of result.files) {
+        try {
+          const stat = await Filesystem.stat({
+            path: `${this.CACHE_DIR}/${file.name}`,
+            directory: Directory.Data,
+          });
+          total += stat.size;
+        } catch { /* ignore */ }
+      }
+      return total;
+    } catch {
+      return 0;
+    }
+  }
+
+  // ── Native (Capacitor Filesystem) helpers ──────────────────────────────────
+
+  private async _nativeGetOrDownload(storyId: string, remoteUrl: string): Promise<string | null> {
+    const ext  = remoteUrl.endsWith('.wav') ? 'wav' : 'mp3';
     const path = `${this.CACHE_DIR}/${storyId}.${ext}`;
 
     try {
@@ -26,23 +145,11 @@ export class AiAudioCacheService {
         const result = await Filesystem.getUri({ path, directory: Directory.Data });
         return Capacitor.convertFileSrc(result.uri);
       }
-    } catch {
-      // File doesn't exist yet — fall through to download
-    }
+    } catch { /* not cached yet */ }
 
     try {
-      await Filesystem.mkdir({
-        path: this.CACHE_DIR,
-        directory: Directory.Data,
-        recursive: true,
-      });
-
-      await Filesystem.downloadFile({
-        path,
-        url: remoteUrl,
-        directory: Directory.Data,
-      });
-
+      await Filesystem.mkdir({ path: this.CACHE_DIR, directory: Directory.Data, recursive: true });
+      await Filesystem.downloadFile({ path, url: remoteUrl, directory: Directory.Data });
       const result = await Filesystem.getUri({ path, directory: Directory.Data });
       return Capacitor.convertFileSrc(result.uri);
     } catch (err) {
@@ -51,25 +158,17 @@ export class AiAudioCacheService {
     }
   }
 
-  /**
-   * Download a remote audio file and persist it under the given cacheKey.
-   * On web returns the remoteUrl unchanged (Capacitor Filesystem unavailable).
-   * Idempotent: overwrites any existing file at that path.
-   */
-  async saveFromUrl(
+  private async _nativeSaveFromUrl(
     cacheKey: string,
     remoteUrl: string,
-    ext: 'wav' | 'mp3' = 'wav',
+    ext: 'wav' | 'mp3',
   ): Promise<string | null> {
-    if (!this.isNative) return remoteUrl;
+    const existing = await this._findExistingPath(cacheKey);
+    if (existing) return existing;
 
     const path = `${this.CACHE_DIR}/${cacheKey}.${ext}`;
     try {
-      await Filesystem.mkdir({
-        path: this.CACHE_DIR,
-        directory: Directory.Data,
-        recursive: true,
-      });
+      await Filesystem.mkdir({ path: this.CACHE_DIR, directory: Directory.Data, recursive: true });
       await Filesystem.downloadFile({ path, url: remoteUrl, directory: Directory.Data });
       const result = await Filesystem.getUri({ path, directory: Directory.Data });
       return Capacitor.convertFileSrc(result.uri);
@@ -79,24 +178,16 @@ export class AiAudioCacheService {
     }
   }
 
-  async saveBuffer(cacheKey: string, audioBuffer: ArrayBuffer, ext: 'wav' | 'mp3' = 'wav'): Promise<string | null> {
-    if (!this.isNative) return null;
-
+  private async _nativeSaveBuffer(
+    cacheKey: string,
+    audioBuffer: ArrayBuffer,
+    ext: 'wav' | 'mp3',
+  ): Promise<string | null> {
     const path = `${this.CACHE_DIR}/${cacheKey}.${ext}`;
     try {
-      await Filesystem.mkdir({
-        path: this.CACHE_DIR,
-        directory: Directory.Data,
-        recursive: true,
-      });
-
-      const base64 = this.arrayBufferToBase64(audioBuffer);
-      await Filesystem.writeFile({
-        path,
-        data: base64,
-        directory: Directory.Data,
-      });
-
+      await Filesystem.mkdir({ path: this.CACHE_DIR, directory: Directory.Data, recursive: true });
+      const base64 = this._arrayBufferToBase64(audioBuffer);
+      await Filesystem.writeFile({ path, data: base64, directory: Directory.Data });
       const result = await Filesystem.getUri({ path, directory: Directory.Data });
       return Capacitor.convertFileSrc(result.uri);
     } catch (err) {
@@ -105,10 +196,7 @@ export class AiAudioCacheService {
     }
   }
 
-  async getFromCache(cacheKey: string): Promise<string | null> {
-    if (!this.isNative) return null;
-
-    // Check both extensions: word audio is .wav, older story audio may be .mp3.
+  private async _findExistingPath(cacheKey: string): Promise<string | null> {
     for (const ext of ['wav', 'mp3'] as const) {
       const path = `${this.CACHE_DIR}/${cacheKey}.${ext}`;
       try {
@@ -117,53 +205,104 @@ export class AiAudioCacheService {
           const result = await Filesystem.getUri({ path, directory: Directory.Data });
           return Capacitor.convertFileSrc(result.uri);
         }
-      } catch {
-        // Not found with this extension — try next
-      }
+      } catch { /* try next extension */ }
     }
     return null;
   }
 
-  async evict(storyId: string): Promise<void> {
-    if (!this.isNative) return;
-    for (const ext of ['wav', 'mp3']) {
-      try {
-        await Filesystem.deleteFile({
-          path: `${this.CACHE_DIR}/${storyId}.${ext}`,
-          directory: Directory.Data,
-        });
-      } catch {
-        // File may not exist — ignore
-      }
-    }
+  // ── Web (IndexedDB) helpers ────────────────────────────────────────────────
+
+  private _openDb(): Promise<IDBDatabase> {
+    if (this._webDb) return Promise.resolve(this._webDb);
+
+    return new Promise((resolve, reject) => {
+      const req = indexedDB.open(WEB_DB_NAME, WEB_DB_VERSION);
+      req.onupgradeneeded = () => {
+        req.result.createObjectStore(WEB_STORE_NAME);
+      };
+      req.onsuccess = () => {
+        this._webDb = req.result;
+        resolve(req.result);
+      };
+      req.onerror = () => reject(req.error);
+    });
   }
 
-  async getCacheSize(): Promise<number> {
-    if (!this.isNative) return 0;
+  /**
+   * Returns a playable blob: URL if the key exists in IndexedDB, otherwise null.
+   * Reuses the session-level blob URL if already created — avoids leaking blob URLs
+   * from repeated calls for the same key within one app session.
+   */
+  private async _webGet(key: string): Promise<string | null> {
+    // Session hit — no need to touch IndexedDB at all.
+    if (this._blobUrlMap.has(key)) return this._blobUrlMap.get(key)!;
+
     try {
-      const result = await Filesystem.readdir({
-        path: this.CACHE_DIR,
-        directory: Directory.Data,
+      const db = await this._openDb();
+      const buf = await new Promise<ArrayBuffer | undefined>((resolve, reject) => {
+        const tx  = db.transaction(WEB_STORE_NAME, 'readonly');
+        const req = tx.objectStore(WEB_STORE_NAME).get(key);
+        req.onsuccess = () => resolve(req.result as ArrayBuffer | undefined);
+        req.onerror   = () => reject(req.error);
       });
-      let total = 0;
-      for (const file of result.files) {
-        try {
-          const stat = await Filesystem.stat({
-            path: `${this.CACHE_DIR}/${file.name}`,
-            directory: Directory.Data,
-          });
-          total += stat.size;
-        } catch {
-          // Ignore stat errors for individual files
-        }
-      }
-      return total;
+
+      if (!buf) return null;
+
+      const url = URL.createObjectURL(new Blob([buf], { type: 'audio/wav' }));
+      this._blobUrlMap.set(key, url);
+      return url;
     } catch {
-      return 0;
+      return null;
     }
   }
 
-  private arrayBufferToBase64(buffer: ArrayBuffer): string {
+  private async _webPut(key: string, buffer: ArrayBuffer): Promise<void> {
+    try {
+      const db = await this._openDb();
+      return new Promise((resolve, reject) => {
+        const tx    = db.transaction(WEB_STORE_NAME, 'readwrite');
+        const store = tx.objectStore(WEB_STORE_NAME);
+        const req   = store.put(buffer, key);
+        req.onsuccess = () => resolve();
+        req.onerror   = () => reject(req.error);
+      });
+    } catch { /* non-fatal */ }
+  }
+
+  private async _webDelete(key: string): Promise<void> {
+    try {
+      const db = await this._openDb();
+      return new Promise((resolve, reject) => {
+        const tx    = db.transaction(WEB_STORE_NAME, 'readwrite');
+        const store = tx.objectStore(WEB_STORE_NAME);
+        const req   = store.delete(key);
+        req.onsuccess = () => resolve();
+        req.onerror   = () => reject(req.error);
+      });
+    } catch { /* non-fatal */ }
+  }
+
+  // ── Shared helpers ─────────────────────────────────────────────────────────
+
+  /** Fetch a remote URL and return its bytes as an ArrayBuffer. */
+  private async _fetchBuffer(url: string): Promise<ArrayBuffer> {
+    const response = await fetch(url);
+    if (!response.ok) throw new Error(`Audio fetch failed: ${response.status}`);
+    return response.arrayBuffer();
+  }
+
+  /**
+   * Create a blob URL from an ArrayBuffer.
+   * mimeHint can be a full mime type ('audio/wav') or an extension hint ('wav', 'mp3').
+   */
+  private _makeBlobUrl(buffer: ArrayBuffer, mimeHint: string): string {
+    const mime = mimeHint.includes('/')
+      ? mimeHint
+      : mimeHint === 'mp3' ? 'audio/mpeg' : 'audio/wav';
+    return URL.createObjectURL(new Blob([buffer], { type: mime }));
+  }
+
+  private _arrayBufferToBase64(buffer: ArrayBuffer): string {
     let binary = '';
     const bytes = new Uint8Array(buffer);
     for (let i = 0; i < bytes.byteLength; i++) {

@@ -432,6 +432,7 @@ export interface Story {
   grammarNotes?: StoryGrammarNote[];
   keywords?: StoryKeyword[];
   isLearned?: boolean;
+  modelUsed?: string | null;
 }
 
 export interface GenerateStoryDto {

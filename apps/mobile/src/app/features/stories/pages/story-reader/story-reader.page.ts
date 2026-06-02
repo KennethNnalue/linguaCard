@@ -85,6 +85,10 @@ export class StoryReaderPage implements OnInit, OnDestroy, ViewWillLeave {
   readonly activeWordIdx = signal(-1);
   readonly speed = signal(1.0);
   readonly progressPct = signal(0);
+  // Set when autoPlay=1 is in the URL. The template shows a pulsing play button
+  // so the user knows playback is ready — they tap to start (browser policy requires
+  // play() to be synchronous within a user gesture; we cannot call it after awaits).
+  readonly autoPlayPending = signal(false);
 
   private audio: HTMLAudioElement | null = null;
   private timeupdateHandler: (() => void) | null = null;
@@ -140,8 +144,10 @@ export class StoryReaderPage implements OnInit, OnDestroy, ViewWillLeave {
     if (resolvedUrl) {
       this.initAudio(resolvedUrl, s.wordTimestamps);
       if (autoPlay) {
-        void this.audio?.play();
-        this.isPlaying.set(true);
+        // Cannot call audio.play() here — we're after multiple awaits, outside
+        // any user gesture context. Browsers block programmatic play() in this state.
+        // Signal the template to highlight the play button so the user taps to start.
+        this.autoPlayPending.set(true);
       }
     }
 
@@ -229,6 +235,7 @@ export class StoryReaderPage implements OnInit, OnDestroy, ViewWillLeave {
 
   togglePlay(): void {
     if (!this.audio) return;
+    this.autoPlayPending.set(false);
     if (this.isPlaying()) {
       this.audio.pause();
       this.isPlaying.set(false);
@@ -361,7 +368,12 @@ export class StoryReaderPage implements OnInit, OnDestroy, ViewWillLeave {
   // ── Keywords audio — persisted by cardId when in vault ───────────
 
   onKeywordsPlayWord(keyword: StoryKeyword): void {
-    const text = keyword.german || keyword.germanBase;
+    // Build the text exactly as the vault does: "article back" (e.g. "die Fahrkarte").
+    // This ensures the same normalised cache key is used whether the audio was
+    // pre-generated via collection import or played from the vault.
+    const text = keyword.article
+      ? `${keyword.article} ${keyword.germanBase}`
+      : keyword.germanBase;
     void this.wordAudio.play(text, 'de-DE');
   }
 

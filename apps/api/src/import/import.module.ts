@@ -10,6 +10,7 @@ import { WordEnrichPromptBuilder } from './word-enrich-prompt.builder';
 import { CollectionCompleteService } from './collection-complete.service';
 import { AiModule } from '../ai/ai.module';
 import { CardsModule } from '../cards/cards.module';
+import { WordAudioModule } from '../word-audio/word-audio.module';
 import { CollectionEntity } from '../collections/collection.entity';
 import { CardEntity } from '../cards/card.entity';
 
@@ -17,6 +18,7 @@ import { CardEntity } from '../cards/card.entity';
   imports: [
     AiModule,
     CardsModule,
+    WordAudioModule,
     TypeOrmModule.forFeature([CollectionEntity, CardEntity]),
   ],
   controllers: [ImportController],

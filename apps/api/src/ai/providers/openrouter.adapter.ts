@@ -3,6 +3,12 @@ import { ConfigService } from '@nestjs/config';
 import type { AiConfig } from '../../config/ai.config';
 import type { AITextRequest, AITextResponse } from './anthropic.adapter';
 
+// Extends AITextRequest with optional per-call model and temperature overrides.
+interface OpenRouterTextRequest extends AITextRequest {
+  model?:       string;
+  temperature?: number;
+}
+
 const OPENROUTER_BASE = 'https://openrouter.ai/api/v1';
 const APP_REFERER     = 'https://linguacard.app';
 const APP_TITLE       = 'LinguaCard';
@@ -52,11 +58,13 @@ export class OpenRouterAdapter {
     return (raw?.choices?.[0]?.message?.content as string | undefined) ?? '';
   }
 
-  async generateText(request: AITextRequest): Promise<AITextResponse> {
+  async generateText(request: OpenRouterTextRequest): Promise<AITextResponse> {
+    const modelToUse = request.model ?? this.textModel;
+
     const body = {
-      model:       this.textModel,
+      model:       modelToUse,
       max_tokens:  request.maxTokens  ?? 4096,
-      temperature: 0.7,
+      temperature: request.temperature ?? 0.7,
       messages:    request.messages,
     };
 
@@ -66,7 +74,7 @@ export class OpenRouterAdapter {
 
     return {
       text,
-      model:        (raw?.model as string | undefined) ?? this.textModel,
+      model:        (raw?.model as string | undefined) ?? modelToUse,
       inputTokens:  usage.prompt_tokens    ?? 0,
       outputTokens: usage.completion_tokens ?? 0,
     };

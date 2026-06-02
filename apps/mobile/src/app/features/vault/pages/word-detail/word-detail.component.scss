@@ -282,11 +282,43 @@
   }
 }
 
+.wd2-ex-row {
+  display: flex;
+  align-items: flex-start;
+  gap: t.$lc-space-2;
+}
+
 .wd2-ex-de {
   @include u.lc-font('sm');
   color: var(--lc-text-primary);
   line-height: 1.5;
   margin: 0 0 2px;
+  flex: 1;
+}
+
+.wd2-ex-play-btn {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  border: none;
+  border-radius: t.$lc-radius-full;
+  background: var(--lc-surface-raised);
+  color: var(--lc-text-secondary);
+  cursor: pointer;
+  padding: 0;
+  margin-top: 1px;
+
+  ion-icon {
+    font-size: 14px;
+  }
+
+  &:active {
+    background: var(--lc-brand-light);
+    color: var(--lc-brand);
+  }
 }
 
 :host ::ng-deep .wd2-ex-de strong {

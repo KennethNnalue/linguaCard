@@ -138,6 +138,8 @@ export class WordAudioService {
 
   /**
    * Pre-warm: resolve audio URLs for a batch without playing.
+   * Populates in-memory cache AND downloads to device filesystem so audio
+   * survives app restarts without a network round-trip.
    * Call after card creation or import to trigger background generation.
    */
   async preWarm(words: { text: string; language?: string }[]): Promise<void> {
@@ -149,11 +151,16 @@ export class WordAudioService {
     try {
       const response = await this.api.batchResolve(requests);
       for (const r of response.results) {
-        if (r.wordAudio.audioUrl) {
-          const key = this._cacheKey(r.wordAudio.normalizedText, r.wordAudio.language);
-          this._urlMap.set(key, r.wordAudio.audioUrl);
-          this.audioReadiness.markReady(key);
-        }
+        if (!r.wordAudio.audioUrl) continue;
+        const key      = this._cacheKey(r.wordAudio.normalizedText, r.wordAudio.language);
+        const remoteUrl = r.wordAudio.audioUrl;
+
+        // Download to device filesystem (no-op on web, idempotent if already cached).
+        const localUrl = await this.cache.saveFromUrl(key, remoteUrl);
+        const resolvedUrl = localUrl ?? remoteUrl;
+
+        this._urlMap.set(key, resolvedUrl);
+        this.audioReadiness.markReady(key);
       }
     } catch {
       // Pre-warm failure is non-fatal
@@ -281,6 +288,20 @@ export class WordAudioService {
       audio.addEventListener('error', cleanup, { once: true });
       audio.play().catch(cleanup);
     });
+  }
+
+  /**
+   * Write a batch of already-resolved audio URLs into the in-memory cache.
+   * Called by CollectionAudioPrefetchService after a successful batchResolve
+   * so the first play() after prefetch is an instant memory-cache hit instead
+   * of falling back to Web Speech.
+   */
+  populateMemoryCache(entries: { normalizedText: string; language: string; url: string }[]): void {
+    for (const e of entries) {
+      const key = this._cacheKey(e.normalizedText, e.language);
+      this._urlMap.set(key, e.url);
+      this.audioReadiness.markReady(key);
+    }
   }
 
   private _cacheKey(normalizedText: string, language: string): string {

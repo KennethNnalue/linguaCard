@@ -1,4 +1,6 @@
 import { HttpException, Injectable, Logger } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
+import type { AiConfig } from '../config/ai.config';
 import type {
   ArticleType,
   EnrichWordsRequest,
@@ -17,11 +19,16 @@ const INTER_BATCH_DELAY_MS = 3_500;
 @Injectable()
 export class WordEnrichService {
   private readonly logger = new Logger(WordEnrichService.name);
+  private readonly enrichmentModel: string;
 
   constructor(
     private readonly openRouter:    OpenRouterAdapter,
     private readonly promptBuilder: WordEnrichPromptBuilder,
-  ) {}
+    private readonly config:        ConfigService,
+  ) {
+    this.enrichmentModel = this.config.get<AiConfig>('ai')!.enrichmentModel;
+    this.logger.log(`Enrichment model: ${this.enrichmentModel}`);
+  }
 
   async enrichWords(dto: EnrichWordsRequest): Promise<EnrichWordsResult> {
     const batchSize = dto.batchSize ?? DEFAULT_BATCH_SIZE;
@@ -73,8 +80,9 @@ export class WordEnrichService {
     const prompt = this.promptBuilder.build(words, targetLanguage, nativeLanguage);
 
     const result = await this.openRouter.generateText({
-      messages: [{ role: 'user', content: prompt }],
+      messages:  [{ role: 'user', content: prompt }],
       maxTokens: 2048,
+      model:     this.enrichmentModel,
     });
     const rawText = result.text;
 

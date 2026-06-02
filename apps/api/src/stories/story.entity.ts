@@ -74,6 +74,9 @@ export class StoryEntity {
   @Column({ default: false })
   isLearned!: boolean;
 
+  @Column({ name: 'model_used', type: 'varchar', nullable: true, default: null })
+  modelUsed!: string | null;
+
   @CreateDateColumn()
   generatedAt!: Date;
 }

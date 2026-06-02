@@ -19,8 +19,7 @@ export class WordAudioController {
 
   @Post('batch-resolve')
   async batchResolve(@Body() dto: BatchResolveWordAudioDto): Promise<WordAudioBatchResolveResponse> {
-    const words = (dto.words ?? []).slice(0, 50);
-    return this.wordAudioService.batchResolve(words);
+    return this.wordAudioService.batchResolve(dto.words ?? []);
   }
 
   // Must appear before @Get(':id') so 'lookup' is not treated as an id

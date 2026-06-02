@@ -195,6 +195,7 @@
           <!-- Play/Pause -->
           <button
             class="sr2-play-btn"
+            [class.sr2-play-btn--pulse]="autoPlayPending()"
             (click)="togglePlay()"
             [disabled]="!s.audioUrl || audioGenerating() || audioLoading()"
             [attr.aria-label]="isPlaying() ? 'Pause' : 'Play'"

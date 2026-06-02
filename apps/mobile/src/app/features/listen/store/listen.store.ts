@@ -215,7 +215,9 @@ export class ListenStore {
     }
     if (mode === 'examples-only') {
       const items: Utterance[] = [
-        { text: word, lang: 'de-DE', pause: 600, useAi: true },
+        // Use articleWord (e.g. "die Fahrkarte") not bare word ("Fahrkarte") so the
+        // audio cache key is consistent with vault, review, and word-meaning mode.
+        { text: articleWord, lang: 'de-DE', pause: 600, useAi: true },
       ];
       if (example) {
         items.push({ text: example.target, lang: 'de-DE', pause: 800, useAi: true });

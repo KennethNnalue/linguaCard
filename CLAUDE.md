@@ -441,6 +441,7 @@ Rating 0–5 maps to: Blank / Hard / Hmm / Good / Easy / Nailed.
 | 9 | Fill the Gap (Cloze) | 📋 Planned | — |
 | 10 | Progress Dashboard | 📋 Planned | — |
 | 11 | Community Decks | 📋 Planned | — |
+| 13 | Tiered AI Routing | ✅ Implemented | `apps/api/src/stories/`, `apps/api/src/import/word-enrich.service.ts`, `apps/mobile/epic-tiered-ai-routing.md` |
 
 ### Implemented page inventory
 
@@ -455,6 +456,22 @@ Rating 0–5 maps to: Blank / Hard / Hmm / Good / Easy / Nailed.
 **Auth:** login, register, forgot password, reset-data sheet
 
 **Shared:** home/dashboard, onboarding, user menu, sync-status indicator, fab button
+
+---
+
+## AI provider routing (current production config)
+
+| Task | Adapter | Model | Config env var |
+|---|---|---|---|
+| Image extraction (Phase 1) | `GeminiAdapter` | `gemini-2.5-flash` (direct) | `GEMINI_API_KEY` |
+| Image extraction (legacy single-pass) | `OpenRouterAdapter` | `google/gemma-4-26b-a4b-it:free` | `OPENROUTER_API_KEY` |
+| Word enrichment | `OpenRouterAdapter` | `anthropic/claude-haiku-4-5` | `ENRICHMENT_MODEL` |
+| Story — Pro tier | `OpenRouterAdapter` | `anthropic/claude-sonnet-4-6` | `STORY_MODEL_PRO` |
+| Story — Free tier | `OpenRouterAdapter` | `google/gemini-2.5-flash` | `STORY_MODEL_FREE` |
+| TTS (word audio) | `GoogleCloudTtsAdapter` | `de-DE-Wavenet-B` | `GOOGLE_CLOUD_TTS_*` |
+| Whisper timestamps | `GroqWhisperAdapter` | `whisper-large-v3-turbo` | `GROQ_API_KEY` |
+
+Tier routing in `StoryGenerationService` is stubbed to `'pro'` until the subscription epic (LC-103–118) is implemented. See `apps/mobile/epic-tiered-ai-routing.md`.
 
 ---
 

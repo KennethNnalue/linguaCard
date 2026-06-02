@@ -213,6 +213,11 @@ export class ReviewPage implements OnInit {
     void this.wordAudio.playCard(card);
   }
 
+  playExample(event: Event, sentence: string): void {
+    event.stopPropagation();
+    void this.wordAudio.play(sentence, 'de-DE');
+  }
+
   flagCard(): void {
     // TODO: implement flag via API
   }

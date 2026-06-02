@@ -83,13 +83,24 @@ export class CollectionDetailPage implements OnInit {
     ['55px', '40px'],
   ];
 
-  /** Cache keys for all cards in this collection — used for audio progress bar. */
-  private readonly _audioCacheKeys = computed(() =>
-    this.allCards().map(c => {
-      const text = (c.content.article ? `${c.content.article} ` : '') + c.content.back;
-      return `wa-de-DE-${normalizeForAudio(text, 'de-DE')}`;
-    })
-  );
+  /**
+   * Cache keys for all audio in this collection: one per word + one per example
+   * sentence. Must exactly mirror the key set built by CollectionAudioPrefetchService
+   * so that markReady() writes map to the same keys allSettled() reads.
+   */
+  private readonly _audioCacheKeys = computed(() => {
+    const keys: string[] = [];
+    for (const c of this.allCards()) {
+      const wordText = (c.content.article ? `${c.content.article} ` : '') + c.content.back;
+      keys.push(`wa-de-DE-${normalizeForAudio(wordText, 'de-DE')}`);
+      for (const ex of c.content.examples ?? []) {
+        if (ex.target?.trim()) {
+          keys.push(`wa-de-DE-${normalizeForAudio(ex.target.trim(), 'de-DE')}`);
+        }
+      }
+    }
+    return keys;
+  });
 
   readonly audioReadyCount = computed(() =>
     this.audioReadiness.readyCount(this._audioCacheKeys())()
@@ -130,7 +141,7 @@ export class CollectionDetailPage implements OnInit {
       next: col => this.collection.set(col),
       error: () => this.goBack(),
     });
-    this.loadCards();
+    this.loadCards(true);
   }
 
   loadCards(prefetchAudio = false): void {
@@ -139,7 +150,7 @@ export class CollectionDetailPage implements OnInit {
       next: cards => {
         this.allCards.set(cards);
         this.loading.set(false);
-        if (prefetchAudio) {
+        if (prefetchAudio && cards.length > 0) {
           this.audioPrefetch.prefetchCollection(cards);
         }
       },
@@ -163,8 +174,7 @@ export class CollectionDetailPage implements OnInit {
         cardCount:    c.cardCount + result.newCards,
       } : c);
 
-      // prefetchAudio=true: fire-and-forget audio pre-generation for newly created cards
-      this.loadCards(result.newCards > 0);
+      this.loadCards(true);
       this.collectionStore.loadCollections();
 
       if (result.isComplete) {

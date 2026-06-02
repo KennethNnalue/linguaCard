@@ -11,20 +11,18 @@ import type {
   RawExtractedWord,
   WordExtractionResult,
 } from '@lingua-card/shared/domain';
-import { OpenRouterAdapter } from '../ai/providers/openrouter.adapter';
 import { GeminiAdapter } from '../ai/providers/gemini.adapter';
 import { ImageExtractPromptBuilder } from './image-extract-prompt.builder';
 import { recoverJsonArray } from './json-recovery.util';
 
-const OPENROUTER_VISION_MODEL = 'google/gemma-4-26b-a4b-it:free';
-const GEMINI_FALLBACK_MODEL   = 'gemini-2.5-flash-lite';
+const GEMINI_PRIMARY_MODEL  = 'gemini-2.5-flash';
+const GEMINI_FALLBACK_MODEL = 'gemini-2.5-flash-lite';
 
 @Injectable()
 export class ImageExtractService {
   private readonly logger = new Logger(ImageExtractService.name);
 
   constructor(
-    private readonly openRouter:    OpenRouterAdapter,
     private readonly gemini:        GeminiAdapter,
     private readonly promptBuilder: ImageExtractPromptBuilder,
   ) {}
@@ -43,8 +41,8 @@ export class ImageExtractService {
     let modelUsed: string;
 
     try {
-      rawText   = await this.openRouter.generateVision(visionOpts);
-      modelUsed = OPENROUTER_VISION_MODEL;
+      rawText   = await this.gemini.generateVision(visionOpts);
+      modelUsed = GEMINI_PRIMARY_MODEL;
     } catch (primaryErr: unknown) {
       const status = primaryErr instanceof HttpException
         ? primaryErr.getStatus()
@@ -52,17 +50,17 @@ export class ImageExtractService {
 
       if (status !== 429 && status !== 503) {
         if (primaryErr instanceof HttpException) throw primaryErr;
-        this.logger.error('OpenRouter vision call failed (Phase 1)', primaryErr);
+        this.logger.error('Gemini vision call failed (Phase 1)', primaryErr);
         throw new InternalServerErrorException('AI processing failed. Please try again.');
       }
 
-      this.logger.warn('OpenRouter Phase 1 unavailable — falling back to Gemini Flash-Lite');
+      this.logger.warn('Gemini Flash rate-limited — falling back to Gemini Flash-Lite');
       try {
         rawText   = await this.gemini.generateVisionLite(visionOpts);
         modelUsed = GEMINI_FALLBACK_MODEL;
       } catch (fallbackErr: unknown) {
         if (fallbackErr instanceof HttpException) throw fallbackErr;
-        this.logger.error('Gemini fallback (Phase 1) also failed', fallbackErr);
+        this.logger.error('Gemini Flash-Lite fallback (Phase 1) also failed', fallbackErr);
         throw new InternalServerErrorException('AI processing failed. Please try again.');
       }
     }

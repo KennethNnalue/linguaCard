@@ -14,13 +14,17 @@ import type {
 } from '@lingua-card/shared/domain';
 import { CardEntity } from '../cards/card.entity';
 import { StoryEntity } from './story.entity';
-import { AnthropicAdapter, type AITextRequest } from '../ai/providers/anthropic.adapter';
+import { AnthropicAdapter } from '../ai/providers/anthropic.adapter';
 import { GeminiAdapter } from '../ai/providers/gemini.adapter';
 import { OpenRouterAdapter } from '../ai/providers/openrouter.adapter';
 import { StoryPromptBuilder } from './story-prompt.builder';
 import { StoryAudioService } from './story-audio.service';
 import { StoryVocabMapper } from './story-vocab.mapper';
 import type { AiConfig } from '../config/ai.config';
+
+// TODO(LC-123): replace with SubscriptionService.getEffectiveTier(userId) once subscription epic (LC-103-118) is implemented.
+type SubscriptionTier = 'pro' | 'free';
+function stubGetTier(_userId: string): SubscriptionTier { return 'pro'; }
 
 interface GeneratedSentence {
   german: string;
@@ -38,6 +42,9 @@ interface GeneratedStoryContent {
 export class StoryGenerationService {
   private readonly logger = new Logger(StoryGenerationService.name);
 
+  private readonly storyModelPro:  string;
+  private readonly storyModelFree: string;
+
   constructor(
     @InjectRepository(CardEntity)
     private readonly cardRepo: Repository<CardEntity>,
@@ -50,15 +57,15 @@ export class StoryGenerationService {
     private readonly config:      ConfigService,
     private readonly audioService: StoryAudioService,
     private readonly vocabMapper: StoryVocabMapper,
-  ) {}
+  ) {
+    const ai = this.config.get<AiConfig>('ai')!;
+    this.storyModelPro  = ai.storyModelPro;
+    this.storyModelFree = ai.storyModelFree;
+    this.logger.log(`Story models — Pro: ${this.storyModelPro} | Free: ${this.storyModelFree}`);
+  }
 
-  private get textProvider(): { generateText(r: AITextRequest): Promise<{ text: string; model: string; inputTokens: number; outputTokens: number }> } {
-    const provider = this.config.get<AiConfig>('ai')!.defaultProvider;
-    switch (provider) {
-      case 'openrouter': return this.openRouter;
-      case 'gemini':     return this.gemini;
-      default:           return this.anthropic;
-    }
+  private modelForTier(tier: SubscriptionTier): string {
+    return tier === 'pro' ? this.storyModelPro : this.storyModelFree;
   }
 
   async generateAndSave(userId: string, dto: GenerateStoryDto): Promise<Story> {
@@ -70,7 +77,11 @@ export class StoryGenerationService {
       throw new BadRequestException('No cards found for the given collections');
     }
 
-    const content = await this.generateText(dto, cards);
+    const tier  = stubGetTier(userId);
+    const model = this.modelForTier(tier);
+    this.logger.log(`Generating story for userId=${userId} tier=${tier} model=${model}`);
+
+    const content = await this.generateTextWithModel(dto, cards, model);
 
     const vocabWords: StoryVocabWord[] = cards.map(card => ({
       cardId: card.id,
@@ -106,9 +117,9 @@ export class StoryGenerationService {
 
     // Generate quiz, grammar, and keywords concurrently — failures don't block save
     const [quizQuestions, grammarNotes, aiKeywords] = await Promise.all([
-      this.generateQuizQuestions(sentences, dto.difficulty),
-      this.generateGrammarNotes(sentences, dto.difficulty),
-      this.generateKeywords(sentences, dto.difficulty),
+      this.generateQuizQuestions(sentences, dto.difficulty, model),
+      this.generateGrammarNotes(sentences, dto.difficulty, model),
+      this.generateKeywords(sentences, dto.difficulty, model),
     ]);
 
     // Merge AI keywords with vault words (vault words get their cardId set)
@@ -136,6 +147,7 @@ export class StoryGenerationService {
       lastListenedAt: null,
       coverImageUrl: null,
       isLearned: false,
+      modelUsed: model,
     });
 
     const saved = await this.storyRepo.save(entity);
@@ -145,12 +157,14 @@ export class StoryGenerationService {
   private async generateQuizQuestions(
     sentences: StorySentence[],
     difficulty: string,
+    model: string,
   ): Promise<StoryQuizQuestion[]> {
     try {
       const prompt = this.promptBuilder.buildQuizPrompt(sentences, difficulty as Parameters<typeof this.promptBuilder.buildQuizPrompt>[1]);
-      const response = await this.textProvider.generateText({
-        messages: [{ role: 'user', content: prompt }],
+      const response = await this.openRouter.generateText({
+        messages:  [{ role: 'user', content: prompt }],
         maxTokens: 2048,
+        model,
       });
       const clean = (response.text.match(/```(?:json)?\s*([\s\S]*?)\s*```/i)?.[1] ?? response.text).trim();
       const parsed = JSON.parse(clean) as StoryQuizQuestion[];
@@ -164,12 +178,14 @@ export class StoryGenerationService {
   private async generateGrammarNotes(
     sentences: StorySentence[],
     difficulty: string,
+    model: string,
   ): Promise<StoryGrammarNote[]> {
     try {
       const prompt = this.promptBuilder.buildGrammarPrompt(sentences, difficulty as Parameters<typeof this.promptBuilder.buildGrammarPrompt>[1]);
-      const response = await this.textProvider.generateText({
-        messages: [{ role: 'user', content: prompt }],
+      const response = await this.openRouter.generateText({
+        messages:  [{ role: 'user', content: prompt }],
         maxTokens: 3072,
+        model,
       });
       const clean = (response.text.match(/```(?:json)?\s*([\s\S]*?)\s*```/i)?.[1] ?? response.text).trim();
       const parsed = JSON.parse(clean) as StoryGrammarNote[];
@@ -183,12 +199,14 @@ export class StoryGenerationService {
   private async generateKeywords(
     sentences: StorySentence[],
     difficulty: string,
+    model: string,
   ): Promise<StoryKeyword[]> {
     try {
       const prompt = this.promptBuilder.buildKeywordsPrompt(sentences, difficulty as Parameters<typeof this.promptBuilder.buildKeywordsPrompt>[1]);
-      const response = await this.textProvider.generateText({
-        messages: [{ role: 'user', content: prompt }],
+      const response = await this.openRouter.generateText({
+        messages:  [{ role: 'user', content: prompt }],
         maxTokens: 2048,
+        model,
       });
       const clean = (response.text.match(/```(?:json)?\s*([\s\S]*?)\s*```/i)?.[1] ?? response.text).trim();
       const parsed = JSON.parse(clean) as StoryKeyword[];
@@ -222,16 +240,17 @@ export class StoryGenerationService {
 
     const sentences: StorySentence[] = entity.sentences ?? [];
     const difficulty = entity.difficultyLevel ?? 'A2';
+    const enrichModel = this.modelForTier(stubGetTier(userId));
 
     const [quizQuestions, grammarNotes, aiKeywords] = await Promise.all([
       (entity.quizQuestions ?? []).length === 0
-        ? this.generateQuizQuestions(sentences, difficulty)
+        ? this.generateQuizQuestions(sentences, difficulty, enrichModel)
         : Promise.resolve(entity.quizQuestions!),
       (entity.grammarNotes ?? []).length === 0
-        ? this.generateGrammarNotes(sentences, difficulty)
+        ? this.generateGrammarNotes(sentences, difficulty, enrichModel)
         : Promise.resolve(entity.grammarNotes!),
       (entity.keywords ?? []).length === 0
-        ? this.generateKeywords(sentences, difficulty)
+        ? this.generateKeywords(sentences, difficulty, enrichModel)
         : Promise.resolve(entity.keywords!),
     ]);
 
@@ -275,20 +294,22 @@ export class StoryGenerationService {
     return merged.sort((a, b) => order.indexOf(a.level) - order.indexOf(b.level));
   }
 
-  private async generateText(
+  private async generateTextWithModel(
     dto: GenerateStoryDto,
     cards: CardEntity[],
+    model: string,
   ): Promise<GeneratedStoryContent> {
     const prompt = this.promptBuilder.build(dto, cards);
 
     let rawText: string;
     try {
-      const response = await this.textProvider.generateText({
-        messages: [{ role: 'user', content: prompt }],
+      const response = await this.openRouter.generateText({
+        messages:  [{ role: 'user', content: prompt }],
         maxTokens: 8192,
+        model,
       });
       rawText = response.text;
-      this.logger.log(`Story generated via ${response.model} (${response.inputTokens} in / ${response.outputTokens} out tokens)`);
+      this.logger.log(`Story generated | model=${response.model} | ${response.inputTokens}in/${response.outputTokens}out tokens`);
     } catch (err) {
       this.logger.error('AI text generation error', err);
       throw new InternalServerErrorException('Story generation failed. Please try again.');
@@ -327,6 +348,7 @@ export class StoryGenerationService {
       grammarNotes: e.grammarNotes ?? [],
       keywords: e.keywords ?? [],
       isLearned: e.isLearned ?? false,
+      modelUsed: e.modelUsed ?? null,
     };
   }
 }

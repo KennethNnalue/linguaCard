@@ -14,6 +14,7 @@ import { CollectionEntity } from '../collections/collection.entity';
 import { CardEntity } from '../cards/card.entity';
 import { WordEnrichService } from './word-enrich.service';
 import { WordDedupService } from '../cards/word-dedup.service';
+import { WordAudioService } from '../word-audio/word-audio.service';
 
 @Injectable()
 export class CollectionCompleteService {
@@ -22,6 +23,7 @@ export class CollectionCompleteService {
   constructor(
     private readonly wordEnrich: WordEnrichService,
     private readonly wordDedup: WordDedupService,
+    private readonly wordAudio: WordAudioService,
     @InjectRepository(CollectionEntity)
     private readonly collectionRepo: Repository<CollectionEntity>,
     @InjectRepository(CardEntity)
@@ -98,6 +100,23 @@ export class CollectionCompleteService {
     collection.pendingWords = result.pending;
     collection.importStatus = result.isComplete ? 'complete' : 'incomplete';
     await this.collectionRepo.save(collection);
+
+    // Fire-and-forget: pre-generate audio for every word + example sentence that
+    // was just enriched. Runs after the HTTP response is sent so import latency
+    // is unaffected. batchResolve() is idempotent — already-cached audio is skipped.
+    if (result.enriched.length > 0) {
+      const audioTexts: { text: string; language: string }[] = [];
+      for (const word of result.enriched) {
+        const wordText = (word.article ? `${word.article} ` : '') + word.back;
+        audioTexts.push({ text: wordText, language: 'de-DE' });
+        if (word.exampleTarget) {
+          audioTexts.push({ text: word.exampleTarget, language: 'de-DE' });
+        }
+      }
+      this.wordAudio.batchResolve(audioTexts).catch(err =>
+        this.logger.warn('Audio pre-generation after collection complete failed', err),
+      );
+    }
 
     return {
       newCards,

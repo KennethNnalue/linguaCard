@@ -21,7 +21,11 @@ import { aiConfig } from './config/ai.config';
   imports: [
     ConfigModule.forRoot({
       isGlobal: true,
-      envFilePath: ['.env', '../../.env'],
+      // Resolution order: most-specific first.
+      // apps/api/.env  — full API config (TTS keys, R2, Groq, etc.)
+      // .env           — root dev overrides (DB, JWT, Gemini key)
+      // ../../.env     — fallback when CWD is apps/api/ during nx build
+      envFilePath: ['apps/api/.env', '.env', '../../.env'],
       load: [databaseConfig, aiConfig],
     }),
     TypeOrmModule.forRootAsync({

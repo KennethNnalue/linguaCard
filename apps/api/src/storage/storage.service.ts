@@ -1,5 +1,5 @@
 import { Injectable, Logger } from '@nestjs/common';
-import { S3Client, PutObjectCommand, DeleteObjectCommand } from '@aws-sdk/client-s3';
+import { S3Client, PutObjectCommand, DeleteObjectCommand, HeadObjectCommand } from '@aws-sdk/client-s3';
 import { writeFile, mkdir, unlink } from 'fs/promises';
 import { join } from 'path';
 
@@ -36,6 +36,36 @@ export class StorageService {
       return this.uploadToR2(buffer, path, contentType);
     }
     return this.saveToLocalDisk(buffer, path);
+  }
+
+  /**
+   * Returns the public URL for a path if the object already exists in R2,
+   * or null if it doesn't exist or R2 is not configured.
+   * Used to skip TTS generation when audio was already uploaded in a previous run.
+   */
+  async getUrlIfExists(path: string): Promise<string | null> {
+    if (!this.s3) {
+      // Local disk — check filesystem
+      const fullPath = join(this.uploadsDir, path);
+      try {
+        const { stat } = await import('fs/promises');
+        const s = await stat(fullPath);
+        if (s.size > 0) {
+          const baseUrl = process.env['API_PUBLIC_URL']?.replace(/\/$/, '') ?? 'http://localhost:3001';
+          return `${baseUrl}/uploads/${path}`;
+        }
+      } catch {
+        // File doesn't exist
+      }
+      return null;
+    }
+
+    try {
+      await this.s3.send(new HeadObjectCommand({ Bucket: this.bucket, Key: path }));
+      return `${this.publicBaseUrl}/${path}`;
+    } catch {
+      return null;
+    }
   }
 
   private async uploadToR2(buffer: Buffer, path: string, contentType: string): Promise<string> {
