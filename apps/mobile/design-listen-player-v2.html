@@ -1,0 +1,925 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>LinguaCard — Listen Player v2 Design Reference</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,500;0,600;1,400&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600&family=Fira+Code:wght@400;500&display=swap" rel="stylesheet">
+<style>
+/* ─── DESIGN TOKENS (mirrors design-reference.html) ─────────── */
+:root {
+  --lc-brand:#2D5A4E;--lc-brand-light:#E8F2EE;--lc-brand-mid:#4A8C7A;--lc-brand-dark:#1A3830;
+  --lc-accent:#E07B3F;--lc-accent-light:#FDF0E6;
+  --lc-masc-bg:#EAF2FC;--lc-masc-text:#1A56A3;--lc-masc-border:#85B7EB;
+  --lc-fem-bg:#FEF2F2;--lc-fem-text:#B91C1C;--lc-fem-border:#FCA5A5;
+  --lc-neut-bg:#F1EFE8;--lc-neut-text:#5F5E5A;--lc-neut-border:#B4B2A9;
+  --lc-mastery-0:#D1D5DB;--lc-mastery-1:#FCA5A5;--lc-mastery-2:#FCD34D;
+  --lc-mastery-3:#6EE7B7;--lc-mastery-4:#34D399;--lc-mastery-5:#059669;
+  --lc-surface:#FAFAF8;--lc-card:#FFFFFF;--lc-border:rgba(45,90,78,0.12);
+  --lc-text-primary:#1A2B26;--lc-text-secondary:#6B7C78;--lc-text-hint:#9BAAA6;
+  --lc-shadow-card:0 2px 12px rgba(45,90,78,0.08),0 1px 3px rgba(0,0,0,0.04);
+  --lc-shadow-float:0 8px 32px rgba(45,90,78,0.14),0 2px 8px rgba(0,0,0,0.06);
+  --lc-font-display:'Lora',Georgia,serif;
+  --lc-font-body:'DM Sans',system-ui,sans-serif;
+  --lc-font-mono:'Fira Code','Courier New',monospace;
+  --lc-radius-sm:8px;--lc-radius-md:12px;--lc-radius-lg:20px;--lc-radius-xl:28px;
+  /* Player-specific tokens */
+  --lc-player-bg:#EFF5F3;
+  --lc-segment-active:rgba(45,90,78,0.18);
+  --lc-segment-played:rgba(45,90,78,0.08);
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:var(--lc-font-body);background:#F0EDEA;color:var(--lc-text-primary);min-height:100vh;}
+
+/* ─── PAGE CHROME ────────────────────────────────────────────── */
+.page-header{background:var(--lc-brand);padding:28px 40px 24px;position:sticky;top:0;z-index:100;box-shadow:0 4px 20px rgba(0,0,0,0.2);}
+.page-header-inner{max-width:1200px;margin:0 auto;display:flex;align-items:center;justify-content:space-between;gap:20px;flex-wrap:wrap;}
+.logo{font-family:var(--lc-font-display);font-size:22px;font-weight:600;color:white;}
+.logo-sub{font-size:12px;color:rgba(255,255,255,0.55);margin-top:2px;}
+.badge-epic{display:inline-block;background:rgba(255,255,255,0.18);border:1px solid rgba(255,255,255,0.3);border-radius:20px;padding:4px 12px;font-size:11px;font-weight:600;color:white;letter-spacing:.04em;}
+.main{max-width:1200px;margin:0 auto;padding:40px;}
+.section{margin-bottom:60px;}
+.section-title{font-family:var(--lc-font-display);font-size:22px;font-weight:600;color:var(--lc-text-primary);margin-bottom:4px;}
+.section-sub{font-size:13px;color:var(--lc-text-secondary);margin-bottom:28px;line-height:1.6;}
+
+/* ─── PHONE SHELL ────────────────────────────────────────────── */
+.phones-row{display:flex;gap:32px;align-items:flex-start;overflow-x:auto;padding-bottom:8px;}
+.phone-wrap{display:flex;flex-direction:column;align-items:center;gap:12px;flex:0 0 auto;}
+.phone-label{font-size:11px;font-weight:600;letter-spacing:.07em;text-transform:uppercase;color:var(--lc-text-hint);}
+.phone{width:290px;background:var(--lc-surface);border-radius:44px;border:8px solid #1A1A1A;box-shadow:0 0 0 1px #333,var(--lc-shadow-float),0 28px 56px rgba(0,0,0,0.22);overflow:hidden;position:relative;}
+.phone::before{content:'';position:absolute;top:0;left:50%;transform:translateX(-50%);width:80px;height:6px;background:#1A1A1A;border-radius:0 0 8px 8px;z-index:10;}
+.phone-inner{background:var(--lc-surface);min-height:600px;display:flex;flex-direction:column;padding-top:8px;}
+.status-bar{display:flex;justify-content:space-between;align-items:center;padding:10px 20px 6px;font-size:11px;font-weight:600;color:var(--lc-text-secondary);}
+.sig{display:flex;gap:3px;align-items:flex-end;}
+.sig span{width:3px;background:var(--lc-text-secondary);border-radius:1px;}
+.sig span:nth-child(1){height:4px;} .sig span:nth-child(2){height:7px;} .sig span:nth-child(3){height:10px;}
+.batt{width:20px;height:10px;border:1.5px solid var(--lc-text-secondary);border-radius:3px;position:relative;margin-left:4px;}
+.batt::after{content:'';position:absolute;top:1.5px;left:1.5px;width:65%;height:5px;background:var(--lc-text-secondary);border-radius:1px;}
+
+/* ─── SHARED NAV ─────────────────────────────────────────────── */
+.p-nav{display:flex;justify-content:space-between;align-items:center;padding:6px 16px 10px;}
+.p-nav-title{font-family:var(--lc-font-display);font-size:15px;font-weight:600;color:var(--lc-text-primary);}
+.p-back{width:30px;height:30px;border-radius:50%;background:var(--lc-brand-light);display:flex;align-items:center;justify-content:center;border:none;cursor:pointer;}
+.p-back svg{width:13px;height:13px;stroke:var(--lc-brand);fill:none;stroke-width:2;stroke-linecap:round;}
+.p-more{width:30px;height:30px;border-radius:50%;background:var(--lc-surface);border:1px solid var(--lc-border);display:flex;align-items:center;justify-content:center;cursor:pointer;}
+.p-more svg{width:14px;height:14px;stroke:var(--lc-text-secondary);fill:none;stroke-width:2;stroke-linecap:round;}
+
+/* ─── BOTTOM NAV ─────────────────────────────────────────────── */
+.bottom-nav{display:flex;background:var(--lc-card);border-top:1px solid var(--lc-border);padding:9px 0 6px;margin-top:auto;}
+.nav-item{flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;cursor:pointer;}
+.nav-item svg{width:18px;height:18px;stroke:var(--lc-text-hint);fill:none;stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round;}
+.nav-item.on svg{stroke:var(--lc-brand);}
+.nav-lbl{font-size:9px;font-weight:600;color:var(--lc-text-hint);}
+.nav-item.on .nav-lbl{color:var(--lc-brand);}
+.nav-dot{width:4px;height:4px;border-radius:50%;background:var(--lc-brand);margin:1px auto 0;}
+
+/* ═══════════════════════════════════════════════════════════════
+   SCREEN 1: LISTEN HUB (playlist)
+   ═══════════════════════════════════════════════════════════════ */
+
+/* Hero banner */
+.lh-hero{margin:0 14px 16px;background:var(--lc-brand);border-radius:20px;padding:18px;position:relative;overflow:hidden;}
+.lh-hero::before{content:'';position:absolute;top:-20px;right:-20px;width:110px;height:110px;border-radius:50%;background:rgba(255,255,255,0.06);}
+.lh-hero::after{content:'';position:absolute;bottom:-36px;right:14px;width:85px;height:85px;border-radius:50%;background:rgba(255,255,255,0.04);}
+.lh-hero-label{font-size:10px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:rgba(255,255,255,0.5);margin-bottom:5px;position:relative;z-index:1;}
+.lh-hero-title{font-family:var(--lc-font-display);font-size:22px;font-weight:600;color:white;line-height:1.2;margin-bottom:3px;position:relative;z-index:1;}
+.lh-hero-sub{font-size:11px;color:rgba(255,255,255,0.55);margin-bottom:14px;position:relative;z-index:1;}
+.lh-hero-btns{display:flex;gap:8px;position:relative;z-index:1;}
+.lh-btn-play{display:inline-flex;align-items:center;gap:6px;background:white;color:var(--lc-brand);font-size:12px;font-weight:700;padding:8px 16px;border-radius:20px;border:none;cursor:pointer;font-family:var(--lc-font-body);}
+.lh-btn-play svg{width:11px;height:11px;fill:var(--lc-brand);stroke:none;}
+.lh-btn-shuffle{display:inline-flex;align-items:center;gap:6px;background:rgba(255,255,255,0.15);border:1px solid rgba(255,255,255,0.25);color:white;font-size:12px;font-weight:600;padding:8px 14px;border-radius:20px;cursor:pointer;font-family:var(--lc-font-body);}
+.lh-btn-shuffle svg{width:13px;height:13px;stroke:white;fill:none;stroke-width:1.8;stroke-linecap:round;}
+
+/* Source row */
+.lh-source-row{display:flex;align-items:center;justify-content:space-between;padding:0 14px 12px;}
+.lh-source-pill{display:inline-flex;align-items:center;gap:5px;background:var(--lc-brand-light);border:1px solid rgba(45,90,78,0.2);border-radius:20px;padding:5px 10px;cursor:pointer;}
+.lh-source-pill svg{width:12px;height:12px;stroke:var(--lc-brand);fill:none;stroke-width:1.8;stroke-linecap:round;}
+.lh-source-label{font-size:11px;font-weight:600;color:var(--lc-brand);}
+.lh-source-chevron{width:10px;height:10px;stroke:var(--lc-brand-mid);fill:none;stroke-width:2;stroke-linecap:round;}
+.lh-queue-meta{font-size:11px;color:var(--lc-text-hint);}
+
+/* Playlist type toggle */
+.lh-mode-toggle{display:flex;gap:6px;padding:0 14px 14px;}
+.lh-mode-btn{flex:1;display:flex;flex-direction:column;align-items:center;padding:9px 6px;border-radius:12px;border:1.5px solid var(--lc-border);background:var(--lc-card);cursor:pointer;font-family:var(--lc-font-body);transition:all 0.15s;}
+.lh-mode-btn.active{border-color:var(--lc-brand);background:var(--lc-brand-light);}
+.lh-mode-title{font-size:11px;font-weight:600;color:var(--lc-text-primary);}
+.lh-mode-btn.active .lh-mode-title{color:var(--lc-brand);}
+.lh-mode-sub{font-size:9px;color:var(--lc-text-hint);margin-top:1px;}
+.lh-mode-btn.active .lh-mode-sub{color:var(--lc-brand-mid);}
+
+/* Speed row */
+.lh-speed-row{display:flex;align-items:center;gap:6px;padding:0 14px 14px;}
+.lh-speed-label{font-size:10px;font-weight:600;color:var(--lc-text-hint);}
+.lh-speed-chip{padding:4px 10px;border-radius:20px;font-size:10px;font-weight:700;border:1px solid var(--lc-border);background:var(--lc-card);color:var(--lc-text-secondary);cursor:pointer;font-family:var(--lc-font-body);}
+.lh-speed-chip.active{background:var(--lc-brand);color:white;border-color:var(--lc-brand);}
+
+/* Queue section header */
+.lh-queue-hdr{display:flex;justify-content:space-between;align-items:center;padding:2px 16px 8px;}
+.lh-queue-hdr-title{font-size:12px;font-weight:600;color:var(--lc-text-primary);}
+.lh-queue-hdr-time{font-size:10px;color:var(--lc-text-hint);}
+
+/* Queue items */
+.lh-queue{padding:0 14px;display:flex;flex-direction:column;gap:7px;}
+.lh-card{background:var(--lc-card);border:1px solid var(--lc-border);border-radius:12px;padding:10px 12px;box-shadow:var(--lc-shadow-card);display:flex;align-items:center;gap:8px;}
+.lh-card-body{flex:1;min-width:0;}
+.lh-card-word-row{display:flex;align-items:center;gap:6px;margin-bottom:2px;}
+.lh-card-word{font-size:13px;font-weight:600;color:var(--lc-text-primary);}
+.lh-card-trans{font-size:11px;color:var(--lc-text-secondary);}
+.lh-card-meta{display:flex;align-items:center;gap:5px;margin-top:3px;}
+.lh-card-status{font-size:9px;font-weight:600;color:var(--lc-text-hint);}
+.lh-card-due{font-size:9px;font-weight:700;color:var(--lc-accent);background:var(--lc-accent-light);padding:2px 7px;border-radius:10px;}
+.lh-card-cat{font-size:8px;font-weight:600;letter-spacing:.05em;text-transform:uppercase;color:var(--lc-brand-mid);background:var(--lc-brand-light);padding:2px 6px;border-radius:10px;}
+.lh-card-audio{width:28px;height:28px;border-radius:8px;background:var(--lc-surface);border:1px solid var(--lc-border);display:flex;align-items:center;justify-content:center;cursor:pointer;flex-shrink:0;}
+.lh-card-audio svg{width:12px;height:12px;stroke:var(--lc-text-hint);fill:none;stroke-width:1.8;stroke-linecap:round;}
+/* Article badge reuse */
+.art-badge{font-size:9px;font-weight:700;padding:2px 7px;border-radius:20px;border:1px solid;flex-shrink:0;letter-spacing:.04em;}
+.art-der{background:var(--lc-masc-bg);color:var(--lc-masc-text);border-color:var(--lc-masc-border);}
+.art-die{background:var(--lc-fem-bg);color:var(--lc-fem-text);border-color:var(--lc-fem-border);}
+.art-das{background:var(--lc-neut-bg);color:var(--lc-neut-text);border-color:var(--lc-neut-border);}
+
+/* ═══════════════════════════════════════════════════════════════
+   SCREEN 2: NOW PLAYING
+   ═══════════════════════════════════════════════════════════════ */
+
+/* Card display area */
+.np-card-area{background:var(--lc-player-bg);margin:0 14px 16px;border-radius:20px;padding:24px 20px 20px;min-height:200px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;border:1px solid rgba(45,90,78,0.1);position:relative;}
+.np-article-row{display:flex;justify-content:center;margin-bottom:4px;}
+.np-word{font-family:var(--lc-font-display);font-size:30px;font-weight:600;color:var(--lc-text-primary);text-align:center;line-height:1.2;}
+.np-translation{font-size:15px;color:var(--lc-brand-mid);text-align:center;font-weight:500;}
+
+/* Segment visualiser — shows which part is actively playing */
+.np-segment-track{display:flex;flex-direction:column;gap:5px;width:100%;margin-top:10px;}
+.np-segment{display:flex;align-items:center;gap:8px;padding:7px 10px;border-radius:10px;background:transparent;transition:background 0.2s;}
+.np-segment.playing{background:var(--lc-segment-active);}
+.np-segment.played{background:var(--lc-segment-played);}
+.np-segment-dot{width:6px;height:6px;border-radius:50%;background:var(--lc-text-hint);flex-shrink:0;transition:background 0.2s;}
+.np-segment.playing .np-segment-dot{background:var(--lc-brand);}
+.np-segment.played .np-segment-dot{background:rgba(45,90,78,0.3);}
+.np-segment-text{font-size:11px;color:var(--lc-text-secondary);line-height:1.4;flex:1;}
+.np-segment.playing .np-segment-text{color:var(--lc-text-primary);font-weight:500;}
+.np-segment.played .np-segment-text{color:var(--lc-text-hint);}
+.np-segment-lang{font-size:9px;font-weight:600;letter-spacing:.05em;text-transform:uppercase;color:var(--lc-text-hint);flex-shrink:0;}
+.np-segment.playing .np-segment-lang{color:var(--lc-brand-mid);}
+
+/* Pulse animation for playing segment */
+@keyframes np-pulse{0%,100%{opacity:1;}50%{opacity:0.5;}}
+.np-segment.playing .np-segment-dot{animation:np-pulse 1.2s ease-in-out infinite;}
+
+/* Progress section */
+.np-progress-wrap{padding:0 16px 12px;}
+.np-progress-bar{height:4px;background:var(--lc-border);border-radius:4px;overflow:hidden;margin-bottom:5px;}
+.np-progress-fill{height:100%;border-radius:4px;background:var(--lc-brand);}
+.np-progress-labels{display:flex;justify-content:space-between;font-size:10px;color:var(--lc-text-hint);}
+
+/* Mode selector */
+.np-mode-row{display:flex;gap:5px;padding:0 14px 14px;}
+.np-mode-btn{flex:1;padding:7px 4px;border-radius:10px;border:1px solid var(--lc-border);background:var(--lc-card);cursor:pointer;font-family:var(--lc-font-body);text-align:center;transition:all 0.15s;}
+.np-mode-btn.active{border-color:var(--lc-brand);background:var(--lc-brand-light);}
+.np-mode-title{font-size:10px;font-weight:600;color:var(--lc-text-secondary);}
+.np-mode-btn.active .np-mode-title{color:var(--lc-brand);}
+.np-mode-sub{font-size:8px;color:var(--lc-text-hint);margin-top:1px;}
+
+/* Speed row */
+.np-speed-row{display:flex;align-items:center;gap:6px;padding:0 14px 14px;}
+.np-speed-label{font-size:10px;font-weight:600;color:var(--lc-text-hint);}
+.np-speed-chip{padding:4px 10px;border-radius:20px;font-size:10px;font-weight:700;border:1px solid var(--lc-border);background:var(--lc-card);color:var(--lc-text-secondary);cursor:pointer;font-family:var(--lc-font-body);}
+.np-speed-chip.active{background:var(--lc-brand);color:white;border-color:var(--lc-brand);}
+
+/* Transport controls */
+.np-transport{display:flex;align-items:center;justify-content:center;gap:0;padding:0 14px 16px;}
+.np-ctrl{width:42px;height:42px;border-radius:50%;background:transparent;border:none;display:flex;align-items:center;justify-content:center;cursor:pointer;}
+.np-ctrl svg{width:18px;height:18px;stroke:var(--lc-text-secondary);fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;}
+.np-ctrl.active svg{stroke:var(--lc-brand);}
+.np-ctrl-play{width:56px;height:56px;border-radius:50%;background:var(--lc-brand);border:none;display:flex;align-items:center;justify-content:center;cursor:pointer;box-shadow:0 4px 16px rgba(45,90,78,0.35);margin:0 8px;}
+.np-ctrl-play svg{width:20px;height:20px;stroke:white;fill:none;stroke-width:2;stroke-linecap:round;}
+.np-ctrl-play svg.filled{fill:white;stroke:none;}
+
+/* ═══════════════════════════════════════════════════════════════
+   SCREEN 2b: NOW PLAYING — DEEP DIVE MODE
+   ═══════════════════════════════════════════════════════════════ */
+
+.np-grammar-pill{margin:0 0 8px;display:flex;align-items:flex-start;gap:7px;background:var(--lc-accent-light);border-radius:10px;padding:8px 10px;width:100%;}
+.np-grammar-icon{font-size:13px;flex-shrink:0;margin-top:1px;}
+.np-grammar-text{font-size:10px;color:var(--lc-accent);line-height:1.5;}
+.np-grammar-text strong{font-weight:600;}
+
+/* ═══════════════════════════════════════════════════════════════
+   SCREEN 3: LISTEN COMPLETE
+   ═══════════════════════════════════════════════════════════════ */
+
+.lc-complete-body{padding:0 14px;display:flex;flex-direction:column;align-items:center;gap:0;flex:1;}
+.lc-checkmark{width:64px;height:64px;border-radius:50%;background:var(--lc-brand-light);border:2px solid var(--lc-brand);display:flex;align-items:center;justify-content:center;margin:24px auto 16px;}
+.lc-checkmark svg{width:28px;height:28px;stroke:var(--lc-brand);fill:none;stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round;}
+.lc-complete-title{font-family:var(--lc-font-display);font-size:20px;font-weight:600;color:var(--lc-text-primary);text-align:center;margin-bottom:4px;}
+.lc-complete-sub{font-size:12px;color:var(--lc-text-hint);text-align:center;margin-bottom:20px;}
+.lc-stats-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;width:100%;margin-bottom:20px;}
+.lc-stat-cell{background:var(--lc-card);border:1px solid var(--lc-border);border-radius:12px;padding:12px 12px;box-shadow:var(--lc-shadow-card);}
+.lc-stat-val{font-family:var(--lc-font-display);font-size:22px;font-weight:600;color:var(--lc-text-primary);line-height:1;margin-bottom:2px;}
+.lc-stat-lbl{font-size:10px;color:var(--lc-text-hint);font-weight:500;}
+.lc-mode-badge{display:inline-flex;align-items:center;gap:5px;background:var(--lc-brand-light);border:1px solid rgba(45,90,78,0.2);border-radius:20px;padding:5px 12px;margin-bottom:20px;}
+.lc-mode-badge svg{width:12px;height:12px;stroke:var(--lc-brand);fill:none;stroke-width:1.8;stroke-linecap:round;}
+.lc-mode-label{font-size:11px;font-weight:600;color:var(--lc-brand);}
+.lc-cta-primary{width:100%;background:var(--lc-brand);color:white;border:none;border-radius:12px;padding:13px;font-size:14px;font-weight:600;font-family:var(--lc-font-body);cursor:pointer;margin-bottom:8px;display:flex;align-items:center;justify-content:center;gap:7px;}
+.lc-cta-primary svg{width:14px;height:14px;stroke:white;fill:none;stroke-width:2;stroke-linecap:round;}
+.lc-cta-secondary{width:100%;background:transparent;color:var(--lc-text-secondary);border:1px solid var(--lc-border);border-radius:12px;padding:12px;font-size:13px;font-weight:500;font-family:var(--lc-font-body);cursor:pointer;}
+
+/* ═══════════════════════════════════════════════════════════════
+   SCREEN 4: PLAYLIST SOURCE SHEET
+   ═══════════════════════════════════════════════════════════════ */
+.sheet-handle-wrap{padding:10px 0 6px;display:flex;justify-content:center;}
+.sheet-handle{width:36px;height:4px;border-radius:4px;background:var(--lc-border);}
+.sheet-title{font-family:var(--lc-font-display);font-size:16px;font-weight:600;color:var(--lc-text-primary);padding:4px 16px 14px;text-align:center;}
+.sheet-options{padding:0 14px 20px;display:flex;flex-direction:column;gap:8px;}
+.sheet-opt{display:flex;align-items:center;gap:12px;padding:12px 14px;background:var(--lc-card);border:1.5px solid var(--lc-border);border-radius:14px;cursor:pointer;}
+.sheet-opt.active{border-color:var(--lc-brand);background:var(--lc-brand-light);}
+.sheet-opt-icon{width:38px;height:38px;border-radius:10px;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.sheet-opt-body{flex:1;min-width:0;}
+.sheet-opt-title{font-size:13px;font-weight:600;color:var(--lc-text-primary);margin-bottom:1px;}
+.sheet-opt.active .sheet-opt-title{color:var(--lc-brand);}
+.sheet-opt-sub{font-size:11px;color:var(--lc-text-hint);}
+.sheet-opt-count{font-family:var(--lc-font-display);font-size:16px;font-weight:600;color:var(--lc-text-primary);}
+.sheet-opt.active .sheet-opt-count{color:var(--lc-brand);}
+.sheet-opt-check{width:18px;height:18px;border-radius:50%;background:var(--lc-brand);display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.sheet-opt-check svg{width:10px;height:10px;stroke:white;fill:none;stroke-width:2.5;stroke-linecap:round;}
+
+/* ─── ANNOTATION LAYER ───────────────────────────────────────── */
+.annotation-col{display:flex;flex-direction:column;gap:16px;min-width:280px;max-width:320px;}
+.annotation-card{background:var(--lc-card);border:1px solid var(--lc-border);border-radius:14px;padding:14px 16px;box-shadow:var(--lc-shadow-card);}
+.annotation-title{font-size:11px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--lc-brand);margin-bottom:8px;}
+.annotation-body{font-size:12px;color:var(--lc-text-secondary);line-height:1.6;}
+.annotation-body code{font-family:var(--lc-font-mono);font-size:10px;background:var(--lc-surface);border:1px solid var(--lc-border);border-radius:4px;padding:1px 5px;color:var(--lc-brand);}
+.annotation-body strong{color:var(--lc-text-primary);font-weight:600;}
+.annotation-list{list-style:none;margin-top:8px;display:flex;flex-direction:column;gap:5px;}
+.annotation-list li{display:flex;align-items:flex-start;gap:6px;font-size:12px;color:var(--lc-text-secondary);}
+.annotation-list li::before{content:'→';color:var(--lc-brand-mid);flex-shrink:0;font-size:11px;margin-top:1px;}
+.bug-pill{display:inline-block;background:#FEF2F2;border:1px solid #FCA5A5;border-radius:6px;padding:2px 7px;font-size:10px;font-weight:600;color:#B91C1C;margin-right:4px;margin-bottom:4px;}
+.fix-pill{display:inline-block;background:var(--lc-brand-light);border:1px solid rgba(45,90,78,0.25);border-radius:6px;padding:2px 7px;font-size:10px;font-weight:600;color:var(--lc-brand);margin-right:4px;margin-bottom:4px;}
+
+/* ─── SECTION DIVIDER ────────────────────────────────────────── */
+.divider-row{display:flex;align-items:center;gap:12px;margin-bottom:28px;}
+.divider-line{flex:1;height:1px;background:var(--lc-border);}
+.divider-label{font-size:11px;font-weight:600;letter-spacing:.07em;text-transform:uppercase;color:var(--lc-text-hint);}
+</style>
+</head>
+<body>
+
+<div class="page-header">
+  <div class="page-header-inner">
+    <div>
+      <div class="logo">LinguaCard — Listen Player v2</div>
+      <div class="logo-sub">Design Reference — Epic LC-200 · Player Rebuild</div>
+    </div>
+    <span class="badge-epic">LC-200 · 4 Screens</span>
+  </div>
+</div>
+
+<div class="main">
+
+<!-- ═══ SECTION 1 — LISTEN HUB ═══ -->
+<div class="section">
+  <div class="section-title">Screen 1 — Listen Hub (Playlist)</div>
+  <div class="section-sub">Route: <code style="font-family:monospace;font-size:12px;background:#F0EDEA;padding:2px 6px;border-radius:4px;">/listen</code> · Component: <code style="font-family:monospace;font-size:12px;background:#F0EDEA;padding:2px 6px;border-radius:4px;">ListenPage</code> · Store: <code style="font-family:monospace;font-size:12px;background:#F0EDEA;padding:2px 6px;border-radius:4px;">ListenStore</code></div>
+
+  <div class="phones-row">
+
+    <!-- Phone: Default state -->
+    <div class="phone-wrap">
+      <div class="phone-label">Default State</div>
+      <div class="phone">
+        <div class="phone-inner">
+          <div class="status-bar"><span>9:41</span><div style="display:flex;align-items:center;gap:4px;"><div class="sig"><span></span><span></span><span></span></div><svg width="14" height="10" viewBox="0 0 24 14"><path d="M1.5 7 C5 3 9 1 12 1 C15 1 19 3 22.5 7" stroke="#6B7C78" stroke-width="2" fill="none" stroke-linecap="round"/><path d="M4.5 10 C7 7.5 9.5 6 12 6 C14.5 6 17 7.5 19.5 10" stroke="#6B7C78" stroke-width="2" fill="none" stroke-linecap="round"/><circle cx="12" cy="13" r="1.5" fill="#6B7C78"/></svg><div class="batt"></div></div></div>
+
+          <div class="p-nav">
+            <div style="width:30px;"></div>
+            <div class="p-nav-title">Listen &amp; Learn</div>
+            <div class="p-more"><svg viewBox="0 0 24 24"><circle cx="12" cy="5" r="1.2"/><circle cx="12" cy="12" r="1.2"/><circle cx="12" cy="19" r="1.2"/></svg></div>
+          </div>
+
+          <!-- Source row -->
+          <div class="lh-source-row">
+            <div class="lh-source-pill">
+              <svg viewBox="0 0 24 24"><path d="M8 6h13M8 12h13M8 18h13M3 6h.01M3 12h.01M3 18h.01"/></svg>
+              <span class="lh-source-label">Today's due words</span>
+              <svg class="lh-source-chevron" viewBox="0 0 24 24"><polyline points="6,9 12,15 18,9"/></svg>
+            </div>
+            <span class="lh-queue-meta">~81 min</span>
+          </div>
+
+          <!-- Hero -->
+          <div class="lh-hero">
+            <div class="lh-hero-label">Playing from</div>
+            <div class="lh-hero-title">Today's due words</div>
+            <div class="lh-hero-sub">324 words in queue</div>
+            <div class="lh-hero-btns">
+              <button class="lh-btn-play">
+                <svg viewBox="0 0 24 24"><polygon points="5,3 19,12 5,21" fill="currentColor"/></svg>
+                Play
+              </button>
+              <button class="lh-btn-shuffle">
+                <svg viewBox="0 0 24 24"><polyline points="16,3 21,3 21,8"/><line x1="4" y1="20" x2="21" y2="3"/><polyline points="21,16 21,21 16,21"/><line x1="4" y1="4" x2="9" y2="9"/></svg>
+                Shuffle
+              </button>
+            </div>
+          </div>
+
+          <!-- Mode toggle -->
+          <div style="padding:0 14px 6px;font-size:10px;font-weight:600;letter-spacing:.07em;text-transform:uppercase;color:var(--lc-text-hint);">Playlist type</div>
+          <div class="lh-mode-toggle">
+            <button class="lh-mode-btn">
+              <div class="lh-mode-title">Compact</div>
+              <div class="lh-mode-sub">Word + meaning</div>
+            </button>
+            <button class="lh-mode-btn active">
+              <div class="lh-mode-title">Examples</div>
+              <div class="lh-mode-sub">Full sentences</div>
+            </button>
+            <button class="lh-mode-btn">
+              <div class="lh-mode-title">Deep dive</div>
+              <div class="lh-mode-sub">+ grammar tip</div>
+            </button>
+          </div>
+
+          <!-- Speed -->
+          <div class="lh-speed-row">
+            <span class="lh-speed-label">Speed</span>
+            <button class="lh-speed-chip">0.75×</button>
+            <button class="lh-speed-chip active">1×</button>
+            <button class="lh-speed-chip">1.25×</button>
+            <button class="lh-speed-chip">1.5×</button>
+          </div>
+
+          <!-- Queue -->
+          <div class="lh-queue-hdr">
+            <span class="lh-queue-hdr-title">Queue (324 words)</span>
+            <span class="lh-queue-hdr-time">~81 min</span>
+          </div>
+          <div class="lh-queue">
+            <div class="lh-card">
+              <div class="lh-card-body">
+                <div class="lh-card-word-row">
+                  <span class="art-badge art-der">der</span>
+                  <span class="lh-card-word">Joghurt</span>
+                </div>
+                <div class="lh-card-trans">yogurt</div>
+                <div class="lh-card-meta">
+                  <span class="lh-card-status">New</span>
+                  <span class="lh-card-due">Due</span>
+                  <span class="lh-card-cat">Food</span>
+                </div>
+              </div>
+              <div class="lh-card-audio"><svg viewBox="0 0 24 24"><polygon points="11,5 6,9 2,9 2,15 6,15 11,19"/><path d="M15.54,8.46a5,5,0,0,1,0,7.07"/><path d="M19.07,4.93a10,10,0,0,1,0,14.14"/></svg></div>
+            </div>
+            <div class="lh-card">
+              <div class="lh-card-body">
+                <div class="lh-card-word-row">
+                  <span class="lh-card-word">treffen</span>
+                </div>
+                <div class="lh-card-trans">to meet</div>
+                <div class="lh-card-meta">
+                  <span class="lh-card-status">Learning</span>
+                  <span class="lh-card-due">Due</span>
+                  <span class="lh-card-cat">Communication</span>
+                </div>
+              </div>
+              <div class="lh-card-audio"><svg viewBox="0 0 24 24"><polygon points="11,5 6,9 2,9 2,15 6,15 11,19"/><path d="M15.54,8.46a5,5,0,0,1,0,7.07"/></svg></div>
+            </div>
+            <div class="lh-card">
+              <div class="lh-card-body">
+                <div class="lh-card-word-row">
+                  <span class="art-badge art-der">der</span>
+                  <span class="lh-card-word">Treffpunkt, -e</span>
+                </div>
+                <div class="lh-card-trans">meeting point</div>
+                <div class="lh-card-meta">
+                  <span class="lh-card-status">New</span>
+                  <span class="lh-card-due">Due</span>
+                  <span class="lh-card-cat">Events</span>
+                </div>
+              </div>
+              <div class="lh-card-audio"><svg viewBox="0 0 24 24"><polygon points="11,5 6,9 2,9 2,15 6,15 11,19"/><path d="M15.54,8.46a5,5,0,0,1,0,7.07"/></svg></div>
+            </div>
+          </div>
+
+          <div class="bottom-nav" style="margin-top:12px;">
+            <div class="nav-item"><svg viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg><div class="nav-lbl">Home</div></div>
+            <div class="nav-item"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg><div class="nav-lbl">Vault</div></div>
+            <div class="nav-item"><svg viewBox="0 0 24 24"><polygon points="5,3 19,12 5,21"/></svg><div class="nav-lbl">Review</div></div>
+            <div class="nav-item"><svg viewBox="0 0 24 24"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg><div class="nav-lbl">Stories</div></div>
+            <div class="nav-item on"><svg viewBox="0 0 24 24"><polygon points="11,5 6,9 2,9 2,15 6,15 11,19 11,5"/><path d="M15.54,8.46a5,5,0,0,1,0,7.07"/><path d="M19.07,4.93a10,10,0,0,1,0,14.14"/></svg><div class="nav-lbl">Listen</div><div class="nav-dot"></div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Annotations col 1 -->
+    <div class="annotation-col">
+      <div class="annotation-card">
+        <div class="annotation-title">Source Selector</div>
+        <div class="annotation-body">
+          Tapping the source pill opens <code>PlaylistSourceSheet</code> (LC-208). The store's <code>loadQueue(source)</code> method populates the queue. The hero title and "324 words" count update reactively via <code>withComputed</code>.
+        </div>
+      </div>
+      <div class="annotation-card">
+        <div class="annotation-title">Mode Toggle → Store</div>
+        <div class="annotation-body">
+          Each button calls <code>store.updateSettings({ playMode })</code>. Settings persist to <code>localStorage</code> via <code>withHooks</code>. The script compiler runs at session start, not on each mode change here.
+        </div>
+      </div>
+      <div class="annotation-card">
+        <div class="annotation-title">Removed from this screen</div>
+        <div class="annotation-body">
+          <span class="bug-pill">Rating UI</span>
+          <span class="bug-pill">SRS calls</span>
+          <span class="bug-pill">sm2.service</span>
+          No spaced-repetition logic anywhere in the listen feature.
+        </div>
+      </div>
+      <div class="annotation-card">
+        <div class="annotation-title">Queue Items</div>
+        <div class="annotation-body">
+          Each item uses <code>&lt;lc-article-badge&gt;</code> for the gender badge. Category chip uses <code>&lt;lc-category-chip&gt;</code>. The audio preview button calls <code>audioService.speak(card.front, 'de')</code> directly — does <em>not</em> start a session.
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- ═══ SECTION 2 — NOW PLAYING (EXAMPLES MODE) ═══ -->
+<div class="section">
+  <div class="section-title">Screen 2a — Now Playing (Examples mode)</div>
+  <div class="section-sub">Route: <code style="font-family:monospace;font-size:12px;background:#F0EDEA;padding:2px 6px;border-radius:4px;">/listen/now-playing</code> · Component: <code style="font-family:monospace;font-size:12px;background:#F0EDEA;padding:2px 6px;border-radius:4px;">NowPlayingPage</code> · The segment track visually mirrors which audio segment is currently being spoken.</div>
+
+  <div class="phones-row">
+
+    <!-- Phone: Playing - mid card -->
+    <div class="phone-wrap">
+      <div class="phone-label">Playing — Example Segment</div>
+      <div class="phone">
+        <div class="phone-inner">
+          <div class="status-bar"><span>9:41</span><div style="display:flex;align-items:center;gap:4px;"><div class="sig"><span></span><span></span><span></span></div><svg width="14" height="10" viewBox="0 0 24 14"><path d="M1.5 7 C5 3 9 1 12 1 C15 1 19 3 22.5 7" stroke="#6B7C78" stroke-width="2" fill="none" stroke-linecap="round"/><path d="M4.5 10 C7 7.5 9.5 6 12 6 C14.5 6 17 7.5 19.5 10" stroke="#6B7C78" stroke-width="2" fill="none" stroke-linecap="round"/><circle cx="12" cy="13" r="1.5" fill="#6B7C78"/></svg><div class="batt"></div></div></div>
+
+          <div class="p-nav">
+            <div class="p-back"><svg viewBox="0 0 24 24"><polyline points="15,18 9,12 15,6"/></svg></div>
+            <div class="p-nav-title">Now Playing</div>
+            <div class="p-more"><svg viewBox="0 0 24 24"><circle cx="12" cy="5" r="1.2"/><circle cx="12" cy="12" r="1.2"/><circle cx="12" cy="19" r="1.2"/></svg></div>
+          </div>
+
+          <!-- Card area -->
+          <div class="np-card-area">
+            <div class="np-article-row">
+              <span class="art-badge art-der">der</span>
+            </div>
+            <div class="np-word">Physiotherapeut</div>
+            <div class="np-translation">the physiotherapist</div>
+
+            <!-- Segment track — showing 3rd segment (example) playing -->
+            <div class="np-segment-track">
+              <div class="np-segment played">
+                <div class="np-segment-dot"></div>
+                <div class="np-segment-text">Physiotherapeut</div>
+                <div class="np-segment-lang">DE</div>
+              </div>
+              <div class="np-segment played">
+                <div class="np-segment-dot"></div>
+                <div class="np-segment-text">the physiotherapist</div>
+                <div class="np-segment-lang">EN</div>
+              </div>
+              <div class="np-segment playing">
+                <div class="np-segment-dot"></div>
+                <div class="np-segment-text">Der Physiotherapeut hat mir bei meinem Rücken geholfen.</div>
+                <div class="np-segment-lang">DE</div>
+              </div>
+              <div class="np-segment">
+                <div class="np-segment-dot"></div>
+                <div class="np-segment-text">The physiotherapist helped me with my back.</div>
+                <div class="np-segment-lang">EN</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Progress -->
+          <div class="np-progress-wrap">
+            <div class="np-progress-bar"><div class="np-progress-fill" style="width:79.9%"></div></div>
+            <div class="np-progress-labels"><span>259 / 324</span><span>~81 min</span></div>
+          </div>
+
+          <!-- Mode selector -->
+          <div class="np-mode-row">
+            <button class="np-mode-btn"><div class="np-mode-title">Compact</div><div class="np-mode-sub">Word + meaning</div></button>
+            <button class="np-mode-btn active"><div class="np-mode-title">Examples</div><div class="np-mode-sub">Full sentences</div></button>
+            <button class="np-mode-btn"><div class="np-mode-title">Deep Dive</div><div class="np-mode-sub">+ grammar tip</div></button>
+          </div>
+
+          <!-- Speed -->
+          <div class="np-speed-row">
+            <span class="np-speed-label">Speed</span>
+            <button class="np-speed-chip">0.75×</button>
+            <button class="np-speed-chip active">1×</button>
+            <button class="np-speed-chip">1.25×</button>
+            <button class="np-speed-chip">1.5×</button>
+          </div>
+
+          <!-- Transport -->
+          <div class="np-transport">
+            <button class="np-ctrl active">
+              <svg viewBox="0 0 24 24"><polyline points="16,3 21,3 21,8"/><line x1="4" y1="20" x2="21" y2="3"/><polyline points="21,16 21,21 16,21"/><line x1="4" y1="4" x2="9" y2="9"/></svg>
+            </button>
+            <button class="np-ctrl">
+              <svg viewBox="0 0 24 24"><polygon points="19,20 9,12 19,4"/><line x1="5" y1="19" x2="5" y2="5"/></svg>
+            </button>
+            <button class="np-ctrl-play">
+              <svg class="filled" viewBox="0 0 24 24"><rect x="6" y="4" width="4" height="16" fill="white"/><rect x="14" y="4" width="4" height="16" fill="white"/></svg>
+            </button>
+            <button class="np-ctrl">
+              <svg viewBox="0 0 24 24"><polygon points="5,4 15,12 5,20"/><line x1="19" y1="5" x2="19" y2="19"/></svg>
+            </button>
+            <button class="np-ctrl">
+              <svg viewBox="0 0 24 24"><polyline points="17,1 21,5 17,9"/><path d="M3,11V9a4,4,0,0,1,4-4h14"/><polyline points="7,23 3,19 7,15"/><path d="M21,13v2a4,4,0,0,1-4,4H3"/></svg>
+            </button>
+          </div>
+
+          <div class="bottom-nav">
+            <div class="nav-item"><svg viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg><div class="nav-lbl">Home</div></div>
+            <div class="nav-item"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg><div class="nav-lbl">Vault</div></div>
+            <div class="nav-item"><svg viewBox="0 0 24 24"><polygon points="5,3 19,12 5,21"/></svg><div class="nav-lbl">Review</div></div>
+            <div class="nav-item"><svg viewBox="0 0 24 24"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg><div class="nav-lbl">Stories</div></div>
+            <div class="nav-item on"><svg viewBox="0 0 24 24"><polygon points="11,5 6,9 2,9 2,15 6,15 11,19 11,5"/><path d="M15.54,8.46a5,5,0,0,1,0,7.07"/><path d="M19.07,4.93a10,10,0,0,1,0,14.14"/></svg><div class="nav-lbl">Listen</div><div class="nav-dot"></div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Phone: Error state -->
+    <div class="phone-wrap">
+      <div class="phone-label">Error State (TTS failed)</div>
+      <div class="phone">
+        <div class="phone-inner">
+          <div class="status-bar"><span>9:41</span><div style="display:flex;align-items:center;gap:4px;"><div class="sig"><span></span><span></span><span></span></div><div class="batt"></div></div></div>
+          <div class="p-nav">
+            <div class="p-back"><svg viewBox="0 0 24 24"><polyline points="15,18 9,12 15,6"/></svg></div>
+            <div class="p-nav-title">Now Playing</div>
+            <div class="p-more"><svg viewBox="0 0 24 24"><circle cx="12" cy="5" r="1.2"/><circle cx="12" cy="12" r="1.2"/><circle cx="12" cy="19" r="1.2"/></svg></div>
+          </div>
+          <div class="np-card-area" style="border-color:rgba(185,28,28,0.2);background:#FEF2F2;">
+            <div class="np-article-row"><span class="art-badge art-die">die</span></div>
+            <div class="np-word" style="color:var(--lc-text-primary);">Speisekarte</div>
+            <div class="np-translation">the menu</div>
+            <!-- Error pill -->
+            <div style="display:flex;align-items:center;gap:7px;background:white;border:1px solid #FCA5A5;border-radius:10px;padding:9px 12px;margin-top:8px;width:100%;">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#B91C1C" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+              <span style="font-size:12px;color:#B91C1C;font-weight:500;flex:1;">Audio unavailable</span>
+              <button style="font-size:11px;font-weight:600;color:var(--lc-brand);background:var(--lc-brand-light);border:none;border-radius:8px;padding:5px 10px;cursor:pointer;">Retry</button>
+            </div>
+            <button style="font-size:11px;font-weight:600;color:var(--lc-text-hint);background:transparent;border:none;cursor:pointer;margin-top:4px;text-decoration:underline;">Skip this card</button>
+          </div>
+          <div class="np-progress-wrap">
+            <div class="np-progress-bar"><div class="np-progress-fill" style="width:55%"></div></div>
+            <div class="np-progress-labels"><span>178 / 324</span><span>~52 min</span></div>
+          </div>
+          <div class="np-mode-row">
+            <button class="np-mode-btn"><div class="np-mode-title">Compact</div></button>
+            <button class="np-mode-btn active"><div class="np-mode-title">Examples</div></button>
+            <button class="np-mode-btn"><div class="np-mode-title">Deep Dive</div></button>
+          </div>
+          <div class="np-speed-row">
+            <span class="np-speed-label">Speed</span>
+            <button class="np-speed-chip">0.75×</button>
+            <button class="np-speed-chip active">1×</button>
+            <button class="np-speed-chip">1.25×</button>
+            <button class="np-speed-chip">1.5×</button>
+          </div>
+          <div class="np-transport">
+            <button class="np-ctrl"><svg viewBox="0 0 24 24"><polyline points="16,3 21,3 21,8"/><line x1="4" y1="20" x2="21" y2="3"/><polyline points="21,16 21,21 16,21"/><line x1="4" y1="4" x2="9" y2="9"/></svg></button>
+            <button class="np-ctrl"><svg viewBox="0 0 24 24"><polygon points="19,20 9,12 19,4"/><line x1="5" y1="19" x2="5" y2="5"/></svg></button>
+            <button class="np-ctrl-play" style="background:#B91C1C;box-shadow:0 4px 16px rgba(185,28,28,0.3);">
+              <svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+            </button>
+            <button class="np-ctrl"><svg viewBox="0 0 24 24"><polygon points="5,4 15,12 5,20"/><line x1="19" y1="5" x2="19" y2="19"/></svg></button>
+            <button class="np-ctrl"><svg viewBox="0 0 24 24"><polyline points="17,1 21,5 17,9"/><path d="M3,11V9a4,4,0,0,1,4-4h14"/><polyline points="7,23 3,19 7,15"/><path d="M21,13v2a4,4,0,0,1-4,4H3"/></svg></button>
+          </div>
+          <div class="bottom-nav">
+            <div class="nav-item"><svg viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg><div class="nav-lbl">Home</div></div>
+            <div class="nav-item"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg><div class="nav-lbl">Vault</div></div>
+            <div class="nav-item"><svg viewBox="0 0 24 24"><polygon points="5,3 19,12 5,21"/></svg><div class="nav-lbl">Review</div></div>
+            <div class="nav-item"><svg viewBox="0 0 24 24"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg><div class="nav-lbl">Stories</div></div>
+            <div class="nav-item on"><svg viewBox="0 0 24 24"><polygon points="11,5 6,9 2,9 2,15 6,15 11,19 11,5"/><path d="M15.54,8.46a5,5,0,0,1,0,7.07"/></svg><div class="nav-lbl">Listen</div><div class="nav-dot"></div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Annotations col 2 -->
+    <div class="annotation-col">
+      <div class="annotation-card">
+        <div class="annotation-title">Segment Track — Key Innovation</div>
+        <div class="annotation-body">
+          The segment visualiser directly maps to the <code>PlaybackScript</code> stored in <code>ListenStore</code>. Each row is an <code>AudioSegment</code>. The <code>segmentIndex</code> signal drives the <code>.playing</code> / <code>.played</code> CSS classes with zero imperative DOM manipulation.
+        </div>
+      </div>
+      <div class="annotation-card">
+        <div class="annotation-title">Bug fixes visible here</div>
+        <div class="annotation-body">
+          <span class="fix-pill">B-01 fixed</span> Segments always play — script is pre-compiled, runner uses <code>concatMap</code> to guarantee serial playback.<br><br>
+          <span class="fix-pill">B-03 fixed</span> AudioService wraps TTS callbacks in <code>NgZone.run()</code> + 8s timeout — no more silent hangs.<br><br>
+          <span class="fix-pill">B-06 fixed</span> No rating UI on this screen whatsoever.
+        </div>
+      </div>
+      <div class="annotation-card">
+        <div class="annotation-title">Mode switching mid-session</div>
+        <div class="annotation-body">
+          Tapping a different mode calls <code>store.updateSettings({ playMode })</code>. The store recompiles scripts for remaining (unplayed) cards. Cards already played are not recompiled. Current card finishes its existing script before switching.
+        </div>
+      </div>
+      <div class="annotation-card">
+        <div class="annotation-title">Error state design</div>
+        <div class="annotation-body">
+          <strong>Retry</strong> re-emits the failed segment into the runner. <strong>Skip this card</strong> calls <code>store.next()</code> which advances the card cursor and plays the next card's first segment. The play button turns red to signal paused-due-to-error status.
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- ═══ SECTION 3 — NOW PLAYING (DEEP DIVE + COMPLETE) ═══ -->
+<div class="section">
+  <div class="section-title">Screen 2b — Now Playing (Deep Dive) &amp; Screen 3 — Session Complete</div>
+  <div class="section-sub">Deep Dive adds a grammar tip segment to the script. Session Complete replaces the rating summary — no SRS data is written.</div>
+
+  <div class="phones-row">
+
+    <!-- Deep Dive -->
+    <div class="phone-wrap">
+      <div class="phone-label">Now Playing — Deep Dive</div>
+      <div class="phone">
+        <div class="phone-inner">
+          <div class="status-bar"><span>9:41</span><div style="display:flex;align-items:center;gap:4px;"><div class="sig"><span></span><span></span><span></span></div><div class="batt"></div></div></div>
+          <div class="p-nav">
+            <div class="p-back"><svg viewBox="0 0 24 24"><polyline points="15,18 9,12 15,6"/></svg></div>
+            <div class="p-nav-title">Now Playing</div>
+            <div class="p-more"><svg viewBox="0 0 24 24"><circle cx="12" cy="5" r="1.2"/><circle cx="12" cy="12" r="1.2"/><circle cx="12" cy="19" r="1.2"/></svg></div>
+          </div>
+          <div class="np-card-area">
+            <div class="np-word">Schnitzel</div>
+            <div class="np-translation">the schnitzel</div>
+            <div class="np-segment-track">
+              <div class="np-segment played"><div class="np-segment-dot"></div><div class="np-segment-text">Schnitzel</div><div class="np-segment-lang">DE</div></div>
+              <div class="np-segment played"><div class="np-segment-dot"></div><div class="np-segment-text">the schnitzel</div><div class="np-segment-lang">EN</div></div>
+              <div class="np-segment played"><div class="np-segment-dot"></div><div class="np-segment-text">Das Wiener Schnitzel schmeckt ausgezeichnet.</div><div class="np-segment-lang">DE</div></div>
+              <div class="np-segment played"><div class="np-segment-dot"></div><div class="np-segment-text">The Wiener Schnitzel tastes excellent.</div><div class="np-segment-lang">EN</div></div>
+              <div class="np-segment playing"><div class="np-segment-dot"></div><div class="np-segment-text">Neuter noun — das Schnitzel, die Schnitzel (pl.).</div><div class="np-segment-lang">TIP</div></div>
+            </div>
+            <!-- Grammar pill — visible only in deep dive -->
+            <div class="np-grammar-pill">
+              <div class="np-grammar-icon">💡</div>
+              <div class="np-grammar-text"><strong>Grammar tip:</strong> Das Schnitzel is neuter. The plural is also "Schnitzel" — no ending change.</div>
+            </div>
+          </div>
+          <div class="np-progress-wrap">
+            <div class="np-progress-bar"><div class="np-progress-fill" style="width:38%"></div></div>
+            <div class="np-progress-labels"><span>124 / 324</span><span>~55 min</span></div>
+          </div>
+          <div class="np-mode-row">
+            <button class="np-mode-btn"><div class="np-mode-title">Compact</div></button>
+            <button class="np-mode-btn"><div class="np-mode-title">Examples</div></button>
+            <button class="np-mode-btn active"><div class="np-mode-title">Deep Dive</div><div class="np-mode-sub">+ grammar tip</div></button>
+          </div>
+          <div class="np-speed-row">
+            <span class="np-speed-label">Speed</span>
+            <button class="np-speed-chip">0.75×</button>
+            <button class="np-speed-chip active">1×</button>
+            <button class="np-speed-chip">1.25×</button>
+            <button class="np-speed-chip">1.5×</button>
+          </div>
+          <div class="np-transport">
+            <button class="np-ctrl"><svg viewBox="0 0 24 24"><polyline points="16,3 21,3 21,8"/><line x1="4" y1="20" x2="21" y2="3"/><polyline points="21,16 21,21 16,21"/><line x1="4" y1="4" x2="9" y2="9"/></svg></button>
+            <button class="np-ctrl"><svg viewBox="0 0 24 24"><polygon points="19,20 9,12 19,4"/><line x1="5" y1="19" x2="5" y2="5"/></svg></button>
+            <button class="np-ctrl-play"><svg class="filled" viewBox="0 0 24 24"><rect x="6" y="4" width="4" height="16" fill="white"/><rect x="14" y="4" width="4" height="16" fill="white"/></svg></button>
+            <button class="np-ctrl"><svg viewBox="0 0 24 24"><polygon points="5,4 15,12 5,20"/><line x1="19" y1="5" x2="19" y2="19"/></svg></button>
+            <button class="np-ctrl"><svg viewBox="0 0 24 24"><polyline points="17,1 21,5 17,9"/><path d="M3,11V9a4,4,0,0,1,4-4h14"/><polyline points="7,23 3,19 7,15"/><path d="M21,13v2a4,4,0,0,1-4,4H3"/></svg></button>
+          </div>
+          <div class="bottom-nav">
+            <div class="nav-item on"><svg viewBox="0 0 24 24"><polygon points="11,5 6,9 2,9 2,15 6,15 11,19 11,5"/><path d="M15.54,8.46a5,5,0,0,1,0,7.07"/></svg><div class="nav-lbl">Listen</div><div class="nav-dot"></div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Session Complete -->
+    <div class="phone-wrap">
+      <div class="phone-label">Session Complete</div>
+      <div class="phone">
+        <div class="phone-inner">
+          <div class="status-bar"><span>10:02</span><div style="display:flex;align-items:center;gap:4px;"><div class="sig"><span></span><span></span><span></span></div><div class="batt"></div></div></div>
+          <div class="p-nav">
+            <div style="width:30px;"></div>
+            <div class="p-nav-title">Session Complete</div>
+            <div style="width:30px;"></div>
+          </div>
+
+          <div class="lc-complete-body">
+            <div class="lc-checkmark">
+              <svg viewBox="0 0 24 24"><polyline points="20,6 9,17 4,12"/></svg>
+            </div>
+            <div class="lc-complete-title">All done!</div>
+            <div class="lc-complete-sub">You listened to all 324 words</div>
+
+            <div class="lc-mode-badge">
+              <svg viewBox="0 0 24 24"><polygon points="11,5 6,9 2,9 2,15 6,15 11,19 11,5"/><path d="M15.54,8.46a5,5,0,0,1,0,7.07"/></svg>
+              <span class="lc-mode-label">Examples mode</span>
+            </div>
+
+            <div class="lc-stats-grid">
+              <div class="lc-stat-cell">
+                <div class="lc-stat-val">324</div>
+                <div class="lc-stat-lbl">Words listened</div>
+              </div>
+              <div class="lc-stat-cell">
+                <div class="lc-stat-val">81 min</div>
+                <div class="lc-stat-lbl">Time spent</div>
+              </div>
+              <div class="lc-stat-cell">
+                <div class="lc-stat-val">1×</div>
+                <div class="lc-stat-lbl">Playback speed</div>
+              </div>
+              <div class="lc-stat-cell">
+                <div class="lc-stat-val">Today</div>
+                <div class="lc-stat-lbl">Due words cleared</div>
+              </div>
+            </div>
+
+            <button class="lc-cta-primary" style="width:calc(100% - 0px);">
+              <svg viewBox="0 0 24 24"><polyline points="16,3 21,3 21,8"/><line x1="4" y1="20" x2="21" y2="3"/><polyline points="21,16 21,21 16,21"/><line x1="4" y1="4" x2="9" y2="9"/></svg>
+              Listen again (reshuffled)
+            </button>
+            <button class="lc-cta-secondary">Back to home</button>
+          </div>
+
+          <div class="bottom-nav" style="margin-top:auto;">
+            <div class="nav-item"><svg viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg><div class="nav-lbl">Home</div></div>
+            <div class="nav-item"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg><div class="nav-lbl">Vault</div></div>
+            <div class="nav-item"><svg viewBox="0 0 24 24"><polygon points="5,3 19,12 5,21"/></svg><div class="nav-lbl">Review</div></div>
+            <div class="nav-item"><svg viewBox="0 0 24 24"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg><div class="nav-lbl">Stories</div></div>
+            <div class="nav-item on"><svg viewBox="0 0 24 24"><polygon points="11,5 6,9 2,9 2,15 6,15 11,19 11,5"/><path d="M15.54,8.46a5,5,0,0,1,0,7.07"/></svg><div class="nav-lbl">Listen</div><div class="nav-dot"></div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Annotations col 3 -->
+    <div class="annotation-col">
+      <div class="annotation-card">
+        <div class="annotation-title">Deep Dive Grammar Segment</div>
+        <div class="annotation-body">
+          The grammar tip is an <code>AudioSegment</code> of type <code>'grammar_tip'</code> with <code>lang: 'en'</code>. It is only included by <code>compileScript()</code> when <code>mode === 'deepDive'</code> and <code>card.grammarNote</code> is non-empty. The orange pill is purely decorative — it renders the same text that was already spoken.
+        </div>
+      </div>
+      <div class="annotation-card">
+        <div class="annotation-title">Session Complete — No SRS</div>
+        <div class="annotation-body">
+          <strong>Zero</strong> calls to <code>sm2.service.ts</code>. No rating modal. The summary shows passive listen stats only. The "Listen again" button calls <code>store.start({ shuffle: true, sameQueue: true })</code> — it uses the already-loaded <code>rawQueue</code> without fetching again.
+        </div>
+      </div>
+      <div class="annotation-card">
+        <div class="annotation-title">All bugs addressed</div>
+        <div class="annotation-body">
+          <span class="fix-pill">B-01</span> <span class="fix-pill">B-02</span> <span class="fix-pill">B-03</span> <span class="fix-pill">B-04</span> <span class="fix-pill">B-05</span> <span class="fix-pill">B-06</span> <span class="fix-pill">B-07</span> <span class="fix-pill">B-08</span>
+          <ul class="annotation-list">
+            <li>Serial <code>concatMap</code> runner eliminates B-01, B-03, B-04</li>
+            <li>Immutable queue copy eliminates B-02, B-05</li>
+            <li>SRS deletion eliminates B-06</li>
+            <li>Store-level settings eliminate B-07</li>
+            <li><code>signalStore()</code> rebuild eliminates B-08</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- ═══ SECTION 4 — PLAYLIST SOURCE SHEET ═══ -->
+<div class="section">
+  <div class="section-title">Screen 4 — Playlist Source Sheet</div>
+  <div class="section-sub">Bottom sheet component (<code>PlaylistSourceSheet</code>) opened from the Listen Hub source pill. Selecting a source calls <code>store.loadQueue(source)</code> and dismisses the sheet.</div>
+
+  <div class="phones-row">
+    <div class="phone-wrap">
+      <div class="phone-label">Source Selection</div>
+      <div class="phone">
+        <div class="phone-inner" style="position:relative;">
+          <!-- Dimmed background — listen hub preview -->
+          <div style="flex:1;background:rgba(250,250,248,0.92);display:flex;align-items:flex-end;">
+            <div style="width:100%;background:var(--lc-card);border-radius:20px 20px 0 0;box-shadow:0 -8px 32px rgba(0,0,0,0.12);padding-bottom:4px;">
+              <div class="sheet-handle-wrap"><div class="sheet-handle"></div></div>
+              <div class="sheet-title">Choose a playlist source</div>
+              <div class="sheet-options">
+
+                <div class="sheet-opt active">
+                  <div class="sheet-opt-icon" style="background:var(--lc-brand-light);">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--lc-brand)" stroke-width="1.8" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><polyline points="12,6 12,12 16,14"/></svg>
+                  </div>
+                  <div class="sheet-opt-body">
+                    <div class="sheet-opt-title">Today's due words</div>
+                    <div class="sheet-opt-sub">Cards scheduled for today</div>
+                  </div>
+                  <div class="sheet-opt-count">324</div>
+                  <div class="sheet-opt-check"><svg viewBox="0 0 24 24"><polyline points="20,6 9,17 4,12"/></svg></div>
+                </div>
+
+                <div class="sheet-opt">
+                  <div class="sheet-opt-icon" style="background:#F1EFE8;">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#5F5E5A" stroke-width="1.8" stroke-linecap="round"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18"/><path d="M9 21V9"/></svg>
+                  </div>
+                  <div class="sheet-opt-body">
+                    <div class="sheet-opt-title">A collection</div>
+                    <div class="sheet-opt-sub">Pick a specific collection</div>
+                  </div>
+                  <div class="sheet-opt-count" style="color:var(--lc-text-hint);">—</div>
+                </div>
+
+                <div class="sheet-opt">
+                  <div class="sheet-opt-icon" style="background:#EAF2FC;">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#1A56A3" stroke-width="1.8" stroke-linecap="round"><path d="M4 6h16M4 12h16M4 18h16"/></svg>
+                  </div>
+                  <div class="sheet-opt-body">
+                    <div class="sheet-opt-title">All cards</div>
+                    <div class="sheet-opt-sub">Your complete vocabulary</div>
+                  </div>
+                  <div class="sheet-opt-count" style="color:var(--lc-text-hint);">1,240</div>
+                </div>
+
+                <div class="sheet-opt">
+                  <div class="sheet-opt-icon" style="background:#FEF2F2;">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#B91C1C" stroke-width="1.8" stroke-linecap="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+                  </div>
+                  <div class="sheet-opt-body">
+                    <div class="sheet-opt-title">Struggling words</div>
+                    <div class="sheet-opt-sub">Mastery 0–2, needs practice</div>
+                  </div>
+                  <div class="sheet-opt-count" style="color:#B91C1C;">87</div>
+                </div>
+
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="annotation-col">
+      <div class="annotation-card">
+        <div class="annotation-title">Store integration</div>
+        <div class="annotation-body">
+          Each option emits the relevant source enum: <code>'due'</code>, <code>'collection:id'</code>, <code>'all'</code>, <code>'struggling'</code>. <code>store.loadQueue(source)</code> uses <code>rxMethod</code> with <code>switchMap</code> to cancel any pending load and fetch fresh cards from <code>CardStore</code>.
+        </div>
+      </div>
+      <div class="annotation-card">
+        <div class="annotation-title">Collection sub-selection</div>
+        <div class="annotation-body">
+          Tapping the "A collection" row does not dismiss the sheet. Instead it expands an inline list of collections from <code>CollectionStore</code>. Tapping a collection sets the source and dismisses.
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- ═══ ARCHITECTURE SUMMARY ═══ -->
+<div class="section">
+  <div class="section-title">Architecture Summary</div>
+  <div class="section-sub">The core insight: replace scattered async with a single serial pipeline. Every bug traced back to uncontrolled concurrency or wrong layer placement.</div>
+
+  <div style="background:var(--lc-card);border:1px solid var(--lc-border);border-radius:20px;padding:24px 28px;box-shadow:var(--lc-shadow-card);">
+    <pre style="font-family:var(--lc-font-mono);font-size:12px;color:var(--lc-text-primary);line-height:1.8;overflow-x:auto;">
+<span style="color:var(--lc-brand-mid);">// Before: fire-and-forget hell</span>
+audioService.speak(card.front).then(() => {
+  if (mode === 'examples') {
+    setTimeout(() => {
+      audioService.speak(card.exampleSentence).then(() => {
+        // Sometimes never fires — hangs here forever ☠
+        this.currentIndex++;         // ← race with shuffle
+      });
+    }, 600);
+  } else {
+    this.currentIndex++;
+  }
+});
+
+<span style="color:var(--lc-brand);">// After: serial concatMap state machine</span>
+segmentRunner$.pipe(
+  concatMap(seg =>
+    seg.type === 'silence'
+      ? timer(seg.durationMs)
+      : audioService.speak(seg.text, seg.lang, speed)   // NgZone-safe + timeout
+  ),
+).subscribe(() => store.advanceSegment());   // pure patchState — no races</pre>
+  </div>
+</div>
+
+</div>
+</body>
+</html>

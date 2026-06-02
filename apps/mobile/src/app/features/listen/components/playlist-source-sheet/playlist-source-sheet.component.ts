@@ -1,98 +1,68 @@
-import { Component, computed, inject, signal } from '@angular/core';
-import { IonContent, IonIcon, ModalController } from '@ionic/angular/standalone';
-import { addIcons } from 'ionicons';
-import { closeOutline, checkmarkOutline } from 'ionicons/icons';
-import { Card } from '../../../../core/models/mock-data';
-import { CardStore } from '../../../vault/store/card.store';
-import { CategoryStore } from '../../../vault/store/category.store';
-
-type SourceKey = 'due-today' | 'mastered' | 'struggling' | `category:${string}`;
-type PlaylistMode = 'word-meaning' | 'examples-only' | 'deep-dive';
+import { ChangeDetectionStrategy, Component, inject, signal } from '@angular/core';
+import { IonContent, ModalController } from '@ionic/angular/standalone';
+import { CollectionStore } from '../../../vault/store/collection.store';
+import { ListenSourceKey, ListenStore } from '../../store/listen.store';
 
 @Component({
   selector: 'lc-playlist-source-sheet',
   templateUrl: './playlist-source-sheet.component.html',
   styleUrls: ['./playlist-source-sheet.component.scss'],
-  imports: [IonContent, IonIcon],
+  changeDetection: ChangeDetectionStrategy.OnPush,
+  imports: [IonContent],
 })
 export class PlaylistSourceSheetComponent {
-  private readonly cardStore = inject(CardStore);
-  private readonly categoryStore = inject(CategoryStore);
+  private readonly listenStore = inject(ListenStore);
+  private readonly collectionStore = inject(CollectionStore);
   private readonly modalCtrl = inject(ModalController);
 
-  constructor() {
-    addIcons({ closeOutline, checkmarkOutline });
+  // All counts from the store — single source of truth
+  readonly selectedSource  = this.listenStore.selectedSource;
+  readonly dueCount        = this.listenStore.dueCount;
+  readonly allCount        = this.listenStore.allCount;
+  readonly strugglingCount = this.listenStore.strugglingCount;
+  readonly collectionCounts = this.listenStore.collectionCounts;
+  readonly collections     = this.collectionStore.collections;
+
+  readonly showCollections = signal(false);
+
+  isActive(src: ListenSourceKey): boolean {
+    return this.selectedSource() === src;
   }
 
-  readonly categories = this.categoryStore.categories;
-  readonly selectedSource = signal<SourceKey>('due-today');
-  readonly playbackMode = signal<PlaylistMode>('word-meaning');
-
-  readonly MODES: { value: PlaylistMode; label: string; desc: string }[] = [
-    { value: 'word-meaning', label: 'Word + meaning', desc: 'Word then translation' },
-    { value: 'examples-only', label: 'Examples only', desc: 'Full sentences' },
-    { value: 'deep-dive', label: 'Deep dive', desc: 'Word + examples + tip' },
-  ];
-
-  readonly dueCount = computed(() => this.cardStore.dueCards().length);
-  readonly masteredCount = computed(() => this.cardStore.masteredCount());
-
-  readonly strugglingCount = computed(() =>
-    this.cardStore.filteredCards().filter(c => (c.srsState?.lastRating ?? 5) <= 1).length
-  );
-
-  readonly dueMinutes = computed(() => Math.max(1, Math.ceil(this.dueCount() * 0.25)));
-  readonly masteredMinutes = computed(() => Math.max(1, Math.ceil(this.masteredCount() * 0.25)));
-
-  categoryCount(categoryId: string): number {
-    return this.cardStore.filteredCards().filter(c => c.categoryIds.includes(categoryId)).length;
+  isCollectionActive(id: string): boolean {
+    return this.selectedSource() === `collection:${id}`;
   }
 
-  categoryMinutes(categoryId: string): number {
-    return Math.max(1, Math.ceil(this.categoryCount(categoryId) * 0.25));
+  collectionCount(id: string): number {
+    return this.collectionCounts().get(id) ?? 0;
   }
 
-  selectSource(key: SourceKey): void {
-    this.selectedSource.set(key);
+  selectDue(): void {
+    this.listenStore.loadDueCards();
+    this.dismiss();
   }
 
-  selectCategory(catId: string): void {
-    this.selectedSource.set(`category:${catId}` as SourceKey);
+  selectAll(): void {
+    this.listenStore.loadAllCards();
+    this.dismiss();
   }
 
-  isCategorySelected(catId: string): boolean {
-    return this.selectedSource() === `category:${catId}`;
+  selectStruggling(): void {
+    this.listenStore.loadStrugglingCards();
+    this.dismiss();
   }
 
-  setMode(mode: PlaylistMode): void {
-    this.playbackMode.set(mode);
+  toggleCollections(): void {
+    this.showCollections.update(v => !v);
   }
 
-  async startListening(): Promise<void> {
-    const source = this.selectedSource();
-    let cards: Card[] = [];
-    let label = '';
-
-    if (source === 'due-today') {
-      cards = this.cardStore.dueCards();
-      label = "Today's due words";
-    } else if (source === 'mastered') {
-      cards = this.cardStore.filteredCards().filter(c => (c.srsState?.masteryLevel ?? 0) >= 4);
-      label = 'All mastered words';
-    } else if (source === 'struggling') {
-      cards = this.cardStore.filteredCards().filter(c => (c.srsState?.lastRating ?? 5) <= 1);
-      label = 'Struggling words';
-    } else if (source.startsWith('category:')) {
-      const catId = source.slice('category:'.length);
-      cards = this.cardStore.filteredCards().filter(c => c.categoryIds.includes(catId));
-      const catName = this.categories().find(c => c.id === catId)?.name ?? 'Category';
-      label = `Category: ${catName}`;
-    }
-
-    await this.modalCtrl.dismiss({ cards, label, mode: this.playbackMode() });
+  selectCollection(id: string): void {
+    const col = this.collections().find(c => c.id === id);
+    this.listenStore.loadCollectionCards(id, col?.name ?? 'Collection');
+    this.dismiss();
   }
 
-  async dismiss(): Promise<void> {
-    await this.modalCtrl.dismiss(null);
+  dismiss(): void {
+    void this.modalCtrl.dismiss();
   }
 }

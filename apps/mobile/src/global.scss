@@ -45,3 +45,14 @@ lc-import-review ion-content::part(scroll) {
   display: flex;
   flex-direction: column;
 }
+
+/* Playlist source bottom sheet */
+.pss-modal {
+  --border-radius: 20px 20px 0 0;
+  --box-shadow: 0 -8px 32px rgba(0, 0, 0, 0.12);
+  align-items: flex-end;
+}
+
+.pss-modal ion-modal {
+  --height: auto;
+}

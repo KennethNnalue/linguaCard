@@ -110,6 +110,16 @@ export const routes: Routes = [
           import('./features/listen/pages/listen/listen.component').then(m => m.ListenComponent),
       },
       {
+        path: 'listen/now-playing',
+        loadComponent: () =>
+          import('./features/listen/pages/now-playing/now-playing.page').then(m => m.NowPlayingPage),
+      },
+      {
+        path: 'listen/complete',
+        loadComponent: () =>
+          import('./features/listen/pages/listen-complete/listen-complete.page').then(m => m.ListenCompletePage),
+      },
+      {
         path: 'stories',
         loadComponent: () =>
           import('./features/stories/pages/story-library/story-library.page').then(m => m.StoryLibraryPage),

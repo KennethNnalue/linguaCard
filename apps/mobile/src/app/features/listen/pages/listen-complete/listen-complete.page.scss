@@ -1,0 +1,127 @@
+@use 'theme/tokens' as t;
+@use 'theme/utils' as u;
+
+// Make the whole page use the app surface colour (matches design's off-white bg)
+:host {
+  --ion-background-color: var(--lc-surface);
+}
+
+ion-header ion-toolbar {
+  --background: var(--lc-surface);
+  --border-width: 0;
+}
+
+ion-content {
+  --background: var(--lc-surface);
+  --offset-bottom: 0 !important;
+  --padding-bottom: 0;
+
+  &::part(scroll) {
+    display: flex;
+    flex-direction: column;
+    min-height: 100%;
+  }
+}
+
+// ── Nav ──────────────────────────────────────────────────────────────────────
+.lc-nav {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: t.$lc-space-2 16px;
+}
+
+.lc-nav-spacer { width: 30px; }
+
+.lc-nav-title {
+  font-family: t.$lc-font-display;
+  font-size: t.$lc-text-lg; font-weight: t.$lc-font-weight-semibold;
+  color: var(--lc-text-primary);
+}
+
+// ── Body ─────────────────────────────────────────────────────────────────────
+.lc-body {
+  padding: 0 14px 32px;
+  display: flex; flex-direction: column; align-items: center;
+  flex: 1;
+}
+
+// ── Checkmark ─────────────────────────────────────────────────────────────────
+.lc-checkmark {
+  width: 64px; height: 64px; border-radius: 50%;
+  background: var(--lc-brand-light);
+  border: 2px solid var(--lc-brand);
+  display: flex; align-items: center; justify-content: center;
+  margin: 24px auto 16px;
+  svg { width: 28px; height: 28px; stroke: var(--lc-brand); }
+}
+
+// ── Title ─────────────────────────────────────────────────────────────────────
+.lc-complete-title {
+  font-family: t.$lc-font-display;
+  font-size: 20px; font-weight: t.$lc-font-weight-semibold;
+  color: var(--lc-text-primary); text-align: center; margin-bottom: t.$lc-space-1;
+}
+
+.lc-complete-sub {
+  font-size: 12px; color: var(--lc-text-hint);
+  text-align: center; margin-bottom: t.$lc-space-5;
+}
+
+// ── Mode badge ────────────────────────────────────────────────────────────────
+.lc-mode-badge {
+  display: inline-flex; align-items: center; gap: t.$lc-space-1;
+  background: var(--lc-brand-light);
+  border: 1px solid rgba(45, 90, 78, 0.2);
+  border-radius: 20px; padding: 5px 12px;
+  margin-bottom: t.$lc-space-5;
+  svg { width: 12px; height: 12px; stroke: var(--lc-brand); }
+}
+
+.lc-mode-label {
+  font-size: 11px; font-weight: t.$lc-font-weight-semibold;
+  color: var(--lc-brand);
+}
+
+// ── Stats grid ────────────────────────────────────────────────────────────────
+.lc-stats-grid {
+  display: grid; grid-template-columns: 1fr 1fr;
+  gap: t.$lc-space-2; width: 100%; margin-bottom: t.$lc-space-5;
+}
+
+.lc-spacer { flex: 1; }
+
+.lc-stat-cell {
+  background: var(--lc-card);
+  border: 1px solid var(--lc-border);
+  border-radius: t.$lc-radius-md;
+  padding: 12px 12px;
+  box-shadow: 0 2px 12px rgba(45, 90, 78, 0.08), 0 1px 3px rgba(0, 0, 0, 0.04);
+}
+
+.lc-stat-val {
+  font-family: t.$lc-font-display;
+  font-size: 22px; font-weight: t.$lc-font-weight-semibold;
+  color: var(--lc-text-primary); line-height: 1; margin-bottom: 2px;
+}
+
+.lc-stat-lbl { font-size: 10px; color: var(--lc-text-hint); font-weight: 500; }
+
+// ── CTAs ──────────────────────────────────────────────────────────────────────
+.lc-cta-primary {
+  width: 100%; background: var(--lc-brand); color: white;
+  border: none; border-radius: t.$lc-radius-md; padding: 13px;
+  font-size: 14px; font-weight: t.$lc-font-weight-semibold;
+  font-family: t.$lc-font-body; cursor: pointer; margin-bottom: t.$lc-space-2;
+  display: flex; align-items: center; justify-content: center; gap: 7px;
+  svg { width: 14px; height: 14px; }
+  &:active { opacity: 0.85; }
+}
+
+.lc-cta-secondary {
+  width: 100%; background: transparent;
+  color: var(--lc-text-secondary);
+  border: 1px solid var(--lc-border);
+  border-radius: t.$lc-radius-md; padding: 12px;
+  font-size: 13px; font-weight: 500;
+  font-family: t.$lc-font-body; cursor: pointer;
+  &:active { opacity: 0.8; }
+}

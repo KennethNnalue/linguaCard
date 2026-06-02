@@ -234,7 +234,7 @@ export class CollectionDetailPage implements OnInit {
   startListen(): void {
     const col = this.collection();
     if (!col) return;
-    this.router.navigate(['/listen'], {queryParams: {collectionId: col.id}});
+    this.router.navigate(['/listen'], { queryParams: { collectionId: col.id, collectionName: col.name } });
   }
 
   async openAddWord(): Promise<void> {

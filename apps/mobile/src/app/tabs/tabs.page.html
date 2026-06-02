@@ -1,16 +1,16 @@
 <ion-tabs>
-  <ion-tab-bar slot="bottom">
-    <ion-tab-button tab="home" href="/tabs/home">
+  <ion-tab-bar slot="bottom" [class.hide]="hideTabBar()">
+    <ion-tab-button tab="home" href="/home">
       <ion-icon aria-hidden="true" name="home-outline"></ion-icon>
-      <ion-label> Home</ion-label>
+      <ion-label>Home</ion-label>
     </ion-tab-button>
 
-    <ion-tab-button tab="vault" href="/tabs/vault">
+    <ion-tab-button tab="vault" href="/vault">
       <ion-icon aria-hidden="true" name="tv-outline"></ion-icon>
       <ion-label>Vault</ion-label>
     </ion-tab-button>
 
-    <ion-tab-button tab="review" href="/tabs/review">
+    <ion-tab-button tab="review" href="/review">
       <ion-icon aria-hidden="true" name="play-circle-outline"></ion-icon>
       <ion-label>Review</ion-label>
     </ion-tab-button>
@@ -20,14 +20,9 @@
       <ion-label>Stories</ion-label>
     </ion-tab-button>
 
-    <ion-tab-button tab="listen" href="/tabs/listen">
+    <ion-tab-button tab="listen" href="/listen">
       <ion-icon aria-hidden="true" name="volume-high-outline"></ion-icon>
       <ion-label>Listen</ion-label>
     </ion-tab-button>
-
-    <!--    <ion-tab-button tab="progress" href="/tabs/progress">-->
-    <!--      <ion-icon aria-hidden="true" name="analytics-outline"></ion-icon>-->
-    <!--      <ion-label>Progress</ion-label>-->
-    <!--    </ion-tab-button>-->
   </ion-tab-bar>
 </ion-tabs>

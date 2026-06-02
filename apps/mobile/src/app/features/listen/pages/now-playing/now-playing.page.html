@@ -1,0 +1,174 @@
+<ion-header class="ion-no-border">
+  <ion-toolbar>
+    <div class="np-nav">
+      <button class="np-back" (click)="goBack()" aria-label="Back">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+          <polyline points="15,18 9,12 15,6"/>
+        </svg>
+      </button>
+      <span class="np-nav-title">Now Playing</span>
+      <div class="np-nav-spacer"></div>
+    </div>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+
+  @if (status() === 'complete') {
+    <div class="np-complete-redirect">
+      <div class="np-checkmark">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+          <polyline points="20,6 9,17 4,12"/>
+        </svg>
+      </div>
+      <p class="np-complete-msg">Session complete!</p>
+      <button class="np-complete-btn" (click)="goComplete()">See summary</button>
+    </div>
+  } @else {
+
+    <!-- Card display area — word + translation + segment track all inside -->
+    <div class="np-card-area" [class.error]="isError()">
+
+      <!-- Hero: article + word + translation — grows to fill space above segments -->
+      <div class="np-hero">
+        @if (currentCard()?.content?.article) {
+          <div class="np-article-row">
+            <lc-article-badge [article]="currentCard()!.content.article" />
+          </div>
+        }
+        <div class="np-word">{{ currentCard()?.content?.back }}</div>
+        <div class="np-translation">{{ currentCard()?.content?.front }}</div>
+      </div>
+
+      <!-- Segment visualiser -->
+      @if (visibleSegments().length > 0) {
+        <div class="np-segment-track">
+          @for (seg of visibleSegments(); track $index; let i = $index) {
+            <div class="np-segment" [class]="segmentClass(i)">
+              <div class="np-segment-dot"></div>
+              <div class="np-segment-text">{{ seg.text }}</div>
+              <div class="np-segment-lang">{{ segmentLang(i) }}</div>
+            </div>
+          }
+        </div>
+      }
+
+      <!-- Grammar pill (Deep Dive) -->
+      @if (grammarNote()) {
+        <div class="np-grammar-pill">
+          <span class="np-grammar-icon">💡</span>
+          <div class="np-grammar-text">
+            <strong>Grammar tip:</strong> {{ grammarNote() }}
+          </div>
+        </div>
+      }
+
+      <!-- Error state -->
+      @if (isError()) {
+        <div class="np-error-pill">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+            <circle cx="12" cy="12" r="10"/>
+            <line x1="12" y1="8" x2="12" y2="12"/>
+            <line x1="12" y1="16" x2="12.01" y2="16"/>
+          </svg>
+          <span class="np-error-text">Audio unavailable</span>
+          <button class="np-error-retry" (click)="retry()">Retry</button>
+        </div>
+        <button class="np-skip-link" (click)="skipCard()">Skip this card</button>
+      }
+    </div>
+
+    <!-- Progress -->
+    <div class="np-progress-wrap">
+      <div class="np-progress-bar">
+        <div class="np-progress-fill" [style.width.%]="progressPercent()"></div>
+      </div>
+      <div class="np-progress-labels">
+        <span>{{ cardIndex() + 1 }} / {{ queue().length }}</span>
+        <span>~{{ estimatedMinutes() }} min</span>
+      </div>
+    </div>
+
+    <!-- Mode selector -->
+    <div class="np-mode-row">
+      @for (m of MODES; track m.value) {
+        <button
+          class="np-mode-btn"
+          [class.active]="playMode() === m.value"
+          (click)="setMode(m.value)">
+          <div class="np-mode-title">{{ m.label }}</div>
+          <div class="np-mode-sub">{{ m.desc }}</div>
+        </button>
+      }
+    </div>
+
+    <!-- Speed -->
+    <div class="np-speed-row">
+      <span class="np-speed-label">Speed</span>
+      @for (s of SPEEDS; track s) {
+        <button
+          class="np-speed-chip"
+          [class.active]="speed() === s"
+          (click)="setSpeed(s)">
+          {{ s }}×
+        </button>
+      }
+    </div>
+
+    <!-- Transport controls -->
+    <div class="np-transport">
+      <button class="np-ctrl" [class.active]="isShuffled()" (click)="toggleShuffle()" aria-label="Shuffle">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round">
+          <polyline points="16,3 21,3 21,8"/>
+          <line x1="4" y1="20" x2="21" y2="3"/>
+          <polyline points="21,16 21,21 16,21"/>
+          <line x1="4" y1="4" x2="9" y2="9"/>
+        </svg>
+      </button>
+
+      <button class="np-ctrl" (click)="previous()" aria-label="Previous">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+          <polygon points="19,20 9,12 19,4"/>
+          <line x1="5" y1="19" x2="5" y2="5"/>
+        </svg>
+      </button>
+
+      <button class="np-ctrl-play" [class.error]="isError()" (click)="togglePlay()" aria-label="Play / Pause">
+        @if (isError()) {
+          <svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.2" stroke-linecap="round">
+            <circle cx="12" cy="12" r="10"/>
+            <line x1="12" y1="8" x2="12" y2="12"/>
+            <line x1="12" y1="16" x2="12.01" y2="16"/>
+          </svg>
+        } @else if (isPlaying()) {
+          <svg viewBox="0 0 24 24" fill="white">
+            <rect x="6" y="4" width="4" height="16"/>
+            <rect x="14" y="4" width="4" height="16"/>
+          </svg>
+        } @else {
+          <svg viewBox="0 0 24 24">
+            <polygon points="6,3 20,12 6,21" fill="white"/>
+          </svg>
+        }
+      </button>
+
+      <button class="np-ctrl" (click)="next()" aria-label="Next">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+          <polygon points="5,4 15,12 5,20"/>
+          <line x1="19" y1="5" x2="19" y2="19"/>
+        </svg>
+      </button>
+
+      <button class="np-ctrl" [class.active]="isRepeat()" (click)="toggleRepeat()" aria-label="Repeat">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round">
+          <polyline points="17,1 21,5 17,9"/>
+          <path d="M3,11V9a4,4,0,0,1,4-4h14"/>
+          <polyline points="7,23 3,19 7,15"/>
+          <path d="M21,13v2a4,4,0,0,1-4,4H3"/>
+        </svg>
+      </button>
+    </div>
+
+  }
+
+</ion-content>

@@ -1,96 +1,112 @@
 <ion-content>
   <div class="pss-wrap">
 
-    <!-- Header -->
-    <div class="pss-header">
-      <h2 class="pss-title lc-display">Choose what to listen to</h2>
-      <button class="pss-close" (click)="dismiss()" aria-label="Close">
-        <ion-icon name="close-outline"></ion-icon>
-      </button>
-    </div>
+    <div class="pss-handle-wrap"><div class="pss-handle"></div></div>
+    <div class="pss-title">Choose a playlist source</div>
 
-    <!-- Source grid -->
-    <div class="pss-grid">
+    <div class="pss-options">
 
-      <button
-        class="pss-source"
-        [class.pss-source--active]="selectedSource() === 'due-today'"
-        (click)="selectSource('due-today')">
-        <div class="pss-source-top">
-          <span class="pss-source-name">Today's due words</span>
-          @if (selectedSource() === 'due-today') {
-            <ion-icon class="pss-check" name="checkmark-outline"></ion-icon>
-          }
+      <!-- Today's due words -->
+      <div class="pss-opt" [class.active]="isActive('due')" (click)="selectDue()">
+        <div class="pss-opt-icon pss-icon-due">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round">
+            <circle cx="12" cy="12" r="10"/><polyline points="12,6 12,12 16,14"/>
+          </svg>
         </div>
-        <span class="pss-source-meta">{{ dueCount() }} words · ~{{ dueMinutes() }} min</span>
-      </button>
-
-      <button
-        class="pss-source"
-        [class.pss-source--active]="selectedSource() === 'mastered'"
-        (click)="selectSource('mastered')">
-        <div class="pss-source-top">
-          <span class="pss-source-name">All mastered words</span>
-          @if (selectedSource() === 'mastered') {
-            <ion-icon class="pss-check" name="checkmark-outline"></ion-icon>
-          }
+        <div class="pss-opt-body">
+          <div class="pss-opt-title">Today's due words</div>
+          <div class="pss-opt-sub">Cards scheduled for today</div>
         </div>
-        <span class="pss-source-meta">{{ masteredCount() }} words · ~{{ masteredMinutes() }} min</span>
-      </button>
-
-      <button
-        class="pss-source"
-        [class.pss-source--active]="selectedSource() === 'struggling'"
-        (click)="selectSource('struggling')">
-        <div class="pss-source-top">
-          <span class="pss-source-name">Struggling words</span>
-          @if (selectedSource() === 'struggling') {
-            <ion-icon class="pss-check" name="checkmark-outline"></ion-icon>
-          }
-        </div>
-        <span class="pss-source-meta">{{ strugglingCount() }} words · intensive</span>
-      </button>
-
-    </div>
-
-    <!-- Category list -->
-    @if (categories().length) {
-      <p class="pss-section-lbl">By category</p>
-      <div class="pss-categories">
-        @for (cat of categories(); track cat.id) {
-          <button
-            class="pss-cat-chip"
-            [class.pss-cat-chip--active]="isCategorySelected(cat.id)"
-            (click)="selectCategory(cat.id)">
-            <span class="pss-cat-dot" [style.background]="cat.colour"></span>
-            <span class="pss-cat-name">{{ cat.name }}</span>
-            <span class="pss-cat-count">{{ categoryCount(cat.id) }}</span>
-          </button>
+        <div class="pss-opt-count">{{ dueCount() }}</div>
+        @if (isActive('due')) {
+          <div class="pss-opt-check">
+            <svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round">
+              <polyline points="20,6 9,17 4,12"/>
+            </svg>
+          </div>
         }
       </div>
-    }
 
-    <!-- Playback mode -->
-    <div class="pss-divider"></div>
-    <p class="pss-section-lbl">Playback preference</p>
-    <div class="pss-modes">
-      @for (m of MODES; track m.value) {
-        <button
-          class="pss-mode"
-          [class.pss-mode--active]="playbackMode() === m.value"
-          (click)="setMode(m.value)">
-          <span class="pss-mode-name">{{ m.label }}</span>
-          <span class="pss-mode-desc">{{ m.desc }}</span>
-        </button>
+      <!-- A collection (expandable) -->
+      <div class="pss-opt" [class.active]="selectedSource().startsWith('collection:')" (click)="toggleCollections()">
+        <div class="pss-opt-icon pss-icon-col">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round">
+            <rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18"/><path d="M9 21V9"/>
+          </svg>
+        </div>
+        <div class="pss-opt-body">
+          <div class="pss-opt-title">A collection</div>
+          <div class="pss-opt-sub">Pick a specific collection</div>
+        </div>
+        <div class="pss-opt-count pss-count-hint">—</div>
+        <svg class="pss-chevron" [class.open]="showCollections()" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+          <polyline points="6,9 12,15 18,9"/>
+        </svg>
+      </div>
+
+      @if (showCollections()) {
+        <div class="pss-collection-list">
+          @for (col of collections(); track col.id) {
+            <div
+              class="pss-col-row"
+              [class.active]="isCollectionActive(col.id)"
+              (click)="selectCollection(col.id)">
+              <span class="pss-col-name">{{ col.name }}</span>
+              <span class="pss-col-count">{{ collectionCount(col.id) }}</span>
+              @if (isCollectionActive(col.id)) {
+                <div class="pss-opt-check pss-check-sm">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round">
+                    <polyline points="20,6 9,17 4,12"/>
+                  </svg>
+                </div>
+              }
+            </div>
+          }
+        </div>
       }
+
+      <!-- All cards -->
+      <div class="pss-opt" [class.active]="isActive('all')" (click)="selectAll()">
+        <div class="pss-opt-icon pss-icon-all">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round">
+            <path d="M4 6h16M4 12h16M4 18h16"/>
+          </svg>
+        </div>
+        <div class="pss-opt-body">
+          <div class="pss-opt-title">All cards</div>
+          <div class="pss-opt-sub">Your complete vocabulary</div>
+        </div>
+        <div class="pss-opt-count pss-count-hint">{{ allCount() }}</div>
+        @if (isActive('all')) {
+          <div class="pss-opt-check">
+            <svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round">
+              <polyline points="20,6 9,17 4,12"/>
+            </svg>
+          </div>
+        }
+      </div>
+
+      <!-- Struggling words -->
+      <div class="pss-opt" [class.active]="isActive('struggling')" (click)="selectStruggling()">
+        <div class="pss-opt-icon pss-icon-struggling">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round">
+            <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+          </svg>
+        </div>
+        <div class="pss-opt-body">
+          <div class="pss-opt-title">Struggling words</div>
+          <div class="pss-opt-sub">Mastery 0–2, needs practice</div>
+        </div>
+        <div class="pss-opt-count pss-count-red">{{ strugglingCount() }}</div>
+        @if (isActive('struggling')) {
+          <div class="pss-opt-check">
+            <svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round">
+              <polyline points="20,6 9,17 4,12"/>
+            </svg>
+          </div>
+        }
+      </div>
+
     </div>
-
-    <!-- CTA -->
-    <button class="pss-cta" (click)="startListening()">
-      Start listening
-    </button>
-
-    <div style="height: 16px;"></div>
-
   </div>
 </ion-content>

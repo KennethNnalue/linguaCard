@@ -10,6 +10,35 @@ export type ThemeMode = 'light' | 'dark' | 'system';
 export type PlaylistType = 'word-meaning' | 'examples-only' | 'deep-dive';
 export type ReviewMode = 'flashcard' | 'listen' | 'cloze' | 'write';
 export type SyncStatus = 'synced' | 'pending' | 'syncing' | 'error';
+export type PlayMode = 'compact' | 'examples' | 'deepDive';
+export type PlayerStatus = 'idle' | 'loading' | 'playing' | 'paused' | 'error' | 'complete';
+
+export type SegmentType =
+  | 'word_target'
+  | 'word_native'
+  | 'example_target'
+  | 'example_native'
+  | 'grammar_tip'
+  | 'silence';
+
+export interface AudioSegment {
+  type: SegmentType;
+  text: string;
+  lang: 'de' | 'en';
+  durationMs?: number;
+}
+
+export interface PlaybackScript {
+  cardId: string;
+  segments: AudioSegment[];
+}
+
+export interface PlayerSettings {
+  playMode: PlayMode;
+  speed: 0.75 | 1 | 1.25 | 1.5;
+  shuffle: boolean;
+  repeat: boolean;
+}
 
 // ─── ARTICLE COLOUR SYSTEM ────────────────────────────────────────────────────
 

@@ -1,226 +1,124 @@
 <ion-header class="ion-no-border">
   <ion-toolbar>
-    <div class="lt-nav">
-      <button class="lt-icon-btn" (click)="goBack()" aria-label="Go back">
-        <ion-icon name="chevron-back-outline"></ion-icon>
-      </button>
-      <span class="lt-nav-title lc-display">
-        {{ inPlayerView() ? 'Now Playing' : 'Listen & Learn' }}
-      </span>
-      <button class="lt-icon-btn" (click)="openSourceSelector()" aria-label="Choose playlist">
-        <ion-icon name="ellipsis-horizontal-outline"></ion-icon>
-      </button>
+    <div class="lh-nav">
+      <div class="lh-nav-spacer"></div>
+      <span class="lh-nav-title">Listen &amp; Learn</span>
+      <div class="lh-nav-spacer"></div>
     </div>
   </ion-toolbar>
 </ion-header>
 
 <ion-content>
 
-  <!-- ══ BROWSER VIEW ══════════════════════════════════════════════════════ -->
-  @if (!inPlayerView()) {
+  <!-- Source row -->
+  <div class="lh-source-row">
+    <button class="lh-source-pill" (click)="openSourceSheet()">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round">
+        <path d="M8 6h13M8 12h13M8 18h13M3 6h.01M3 12h.01M3 18h.01"/>
+      </svg>
+      <span class="lh-source-label">{{ sourceLabel() }}</span>
+      <svg class="lh-source-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+        <polyline points="6,9 12,15 18,9"/>
+      </svg>
+    </button>
+    <span class="lh-queue-meta">~{{ estimatedMinutes() }} min</span>
+  </div>
 
-    <!-- Hero card -->
-    <div class="lt-hero">
-      <p class="lt-hero-label">Playing from</p>
-      <h2 class="lt-hero-title lc-display">{{ activeSourceLabel() }}</h2>
-      <p class="lt-hero-meta">{{ activeCategoryNames() }}</p>
-      <div class="lt-hero-actions">
-        <button
-          class="lt-hero-play"
-          (click)="startPlayback()"
-          [disabled]="!queue().length"
-          aria-label="Play playlist">
-          <ion-icon name="play-outline"></ion-icon>
-        </button>
-        <button
-          class="lt-hero-shuffle"
-          (click)="toggleShuffle()"
-          [class.lt-hero-shuffle--active]="isShuffled()">
-          <ion-icon name="shuffle-outline"></ion-icon>
-          Shuffle
-        </button>
-      </div>
+  <!-- Hero -->
+  <div class="lh-hero">
+    <div class="lh-hero-label">Playing from</div>
+    <div class="lh-hero-title">{{ sourceLabel() }}</div>
+    <div class="lh-hero-sub">{{ queueCount() }} words in queue</div>
+    <div class="lh-hero-btns">
+      <button class="lh-btn-play" (click)="play()" [disabled]="!queueCount()">
+        <svg viewBox="0 0 24 24"><polygon points="5,3 19,12 5,21" fill="currentColor"/></svg>
+        Play
+      </button>
+      <button class="lh-btn-shuffle" (click)="shuffle()" [disabled]="!queueCount()">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round">
+          <polyline points="16,3 21,3 21,8"/><line x1="4" y1="20" x2="21" y2="3"/>
+          <polyline points="21,16 21,21 16,21"/><line x1="4" y1="4" x2="9" y2="9"/>
+        </svg>
+        Shuffle
+      </button>
     </div>
+  </div>
 
-    <!-- Playlist type chips -->
-    <div class="lt-mode-section">
-      <p class="lt-section-lbl">Playlist type</p>
-      <div class="lt-mode-chips">
-        @for (m of MODES; track m.value) {
-          <button
-            class="lt-mode-chip"
-            [class.lt-mode-chip--active]="playbackMode() === m.value"
-            (click)="setMode(m.value)">
-            <span class="lt-mode-chip-name">{{ m.label }}</span>
-            <span class="lt-mode-chip-desc">{{ m.desc }}</span>
-          </button>
-        }
-      </div>
-    </div>
-
-    <!-- Queue header -->
-    <div class="lt-queue-hdr">
-      <span class="lt-queue-title">Queue ({{ queue().length }} words)</span>
-      <span class="lt-queue-meta">~{{ estimatedMinutes() }} min</span>
-    </div>
-
-    <!-- Queue list -->
-    <div class="lt-queue-list">
-      @if (!queue().length) {
-        <div class="lc-empty-state">
-          <span class="lc-empty-icon">🎧</span>
-          <p class="lc-empty-title">No words in queue</p>
-          <p class="lc-empty-sub">Tap ⋯ above to choose a playlist source</p>
-        </div>
-      } @else {
-        @for (card of queue(); track card.id; let i = $index) {
-          <div
-            class="lt-q-card-wrap"
-            [class.lt-q-card-wrap--active]="i === currentIndex()">
-            @if (i === currentIndex() && isPlaying()) {
-              <div class="lt-q-playing-badge">
-                <span class="lt-wave" aria-hidden="true">
-                  <span></span><span></span><span></span><span></span><span></span>
-                </span>
-              </div>
-            }
-            <lc-word-card
-              [card]="card"
-              [categoryName]="getCategoryLabel(card)"
-              [compact]="true"
-              (cardClick)="openCardDetail(card)"
-              (playAudio)="playCardAudio(card)"
-            />
-          </div>
-        }
-      }
-    </div>
-
-    <div style="height: 24px;"></div>
-
-  }
-
-  <!-- ══ PLAYER VIEW ═══════════════════════════════════════════════════════ -->
-  @if (inPlayerView()) {
-    <div class="lt-player">
-
-      <!-- Art card -->
-      <div class="lt-art" [class]="playerArtClass()">
-        @if (currentCard()?.content?.article) {
-          <lc-article-badge [article]="currentCard()!.content.article" class="lt-art-article" />
-        }
-        <p class="lt-art-word lc-display">{{ currentCard()?.content?.back }}</p>
-        @if (currentCard()?.content?.phonetic) {
-          <p class="lt-art-phonetic">{{ currentCard()!.content.phonetic }}</p>
-        }
-        <p class="lt-art-category">{{ currentCardCategory() }}</p>
-      </div>
-
-      <!-- Translation + example -->
-      <div class="lt-player-meta">
-        <p class="lt-translation">{{ currentCard()?.content?.front }}</p>
-        @if (currentCard()?.content?.examples?.length) {
-          <p class="lt-example">
-            <strong>{{ currentCard()!.content.examples[0].target }}</strong>
-          </p>
-          <p class="lt-example-en">"{{ currentCard()!.content.examples[0].native }}"</p>
-        }
-      </div>
-
-      <!-- Speed controls -->
-      <div class="lt-speed-row">
-        <span class="lt-speed-lbl">Speed</span>
-        @for (s of SPEED_OPTIONS; track s) {
-          <button
-            class="lt-speed-chip"
-            [class.lt-speed-chip--active]="playbackSpeed() === s"
-            (click)="setSpeed(s)">
-            {{ s }}×
-          </button>
-        }
-      </div>
-
-      <!-- Mode switcher -->
-      <div class="lt-mode-row">
-        @for (m of MODES; track m.value) {
-          <button
-            class="lt-mode-btn"
-            [class.lt-mode-btn--active]="playbackMode() === m.value"
-            (click)="setMode(m.value)">
-            <span class="lt-mb-name">{{ m.label }}</span>
-            <span class="lt-mb-desc">{{ m.desc }}</span>
-          </button>
-        }
-      </div>
-
-      <!-- Progress track -->
-      <div class="lt-progress">
-        <div class="lt-prog-track">
-          <div class="lt-prog-fill" [style.width.%]="progressPercent()"></div>
-          <div class="lt-prog-thumb" [style.left.%]="progressPercent()"></div>
-        </div>
-        <div class="lt-prog-labels">
-          <span>{{ currentIndex() + 1 }} / {{ queue().length }}</span>
-          <span>~{{ estimatedMinutes() }} min</span>
-        </div>
-      </div>
-
-      <!-- Playback controls -->
-      <div class="lt-controls">
-        <button
-          class="lt-ctrl-btn"
-          [class.lt-ctrl-btn--active]="isShuffled()"
-          (click)="toggleShuffle()"
-          aria-label="Shuffle">
-          <ion-icon name="shuffle-outline"></ion-icon>
-        </button>
-        <button
-          class="lt-ctrl-btn"
-          (click)="prev()"
-          [disabled]="currentIndex() === 0"
-          aria-label="Previous">
-          <ion-icon name="play-skip-back-outline"></ion-icon>
-        </button>
-        <button class="lt-play-large" (click)="togglePlay()" aria-label="Play / Pause">
-          <ion-icon [name]="isPlaying() ? 'pause-outline' : 'play-outline'"></ion-icon>
-        </button>
-        <button
-          class="lt-ctrl-btn"
-          (click)="next()"
-          [disabled]="currentIndex() >= queue().length - 1"
-          aria-label="Next">
-          <ion-icon name="play-skip-forward-outline"></ion-icon>
-        </button>
-        <button class="lt-ctrl-btn" aria-label="Repeat">
-          <ion-icon name="repeat-outline"></ion-icon>
-        </button>
-      </div>
-
-    </div>
-
-    <!-- ── Rating overlay ──────────────────────────────────────────────── -->
-    @if (ratingWindowVisible()) {
-      <div class="lt-rating-overlay" (click)="dismissRating()">
-        <div class="lt-rating-sheet" (click)="$event.stopPropagation()">
-          <div class="lt-rating-hdr">
-            <p class="lt-rating-prompt">How well do you know this?</p>
-            <span class="lt-rating-countdown">{{ ratingCountdown() }}s</span>
-          </div>
-          <div class="lt-rating-row">
-            @for (r of RATINGS; track r.value) {
-              <button
-                class="lt-rating-btn lt-rating-btn--{{ r.value }}"
-                (click)="rateCard(r.value)">
-                <span class="lt-r-num">{{ r.value }}</span>
-                <span class="lt-r-lbl">{{ r.label }}</span>
-              </button>
-            }
-          </div>
-          <button class="lt-rating-skip" (click)="dismissRating()">Skip rating</button>
-        </div>
-      </div>
+  <!-- Playlist type -->
+  <div class="lh-section-lbl">Playlist type</div>
+  <div class="lh-mode-toggle">
+    @for (m of MODES; track m.value) {
+      <button
+        class="lh-mode-btn"
+        [class.active]="playMode() === m.value"
+        (click)="setMode(m.value)">
+        <div class="lh-mode-title">{{ m.label }}</div>
+        <div class="lh-mode-sub">{{ m.desc }}</div>
+      </button>
     }
+  </div>
 
-  }
+  <!-- Speed -->
+  <div class="lh-speed-row">
+    <span class="lh-speed-label">Speed</span>
+    @for (s of SPEEDS; track s) {
+      <button
+        class="lh-speed-chip"
+        [class.active]="speed() === s"
+        (click)="setSpeed(s)">
+        {{ s }}×
+      </button>
+    }
+  </div>
+
+  <!-- Queue header -->
+  <div class="lh-queue-hdr">
+    <span class="lh-queue-hdr-title">Queue ({{ queueCount() }} words)</span>
+    <span class="lh-queue-hdr-time">~{{ estimatedMinutes() }} min</span>
+  </div>
+
+  <!-- Queue list -->
+  <div class="lh-queue">
+    @if (!queueCount()) {
+      <div class="lh-empty">
+        <span class="lh-empty-icon">🎧</span>
+        <p class="lh-empty-title">No words in queue</p>
+        <p class="lh-empty-sub">Tap the source above to choose a playlist</p>
+      </div>
+    } @else {
+      @for (card of queue(); track card.id) {
+        <div class="lh-card">
+          <div class="lh-card-body">
+            <div class="lh-card-word-row">
+              @if (card.content.article) {
+                <lc-article-badge [article]="card.content.article" />
+              }
+              <span class="lh-card-word">{{ card.content.back }}</span>
+            </div>
+            <div class="lh-card-trans">{{ card.content.front }}</div>
+            <div class="lh-card-meta">
+              @if (card.srsState?.state) {
+                <span class="lh-card-status">{{ card.srsState!.state }}</span>
+              }
+              @if (card.srsState?.nextDueAt) {
+                <span class="lh-card-due">Due</span>
+              }
+              @if (getCategoryLabel(card)) {
+                <span class="lh-card-cat">{{ getCategoryLabel(card) }}</span>
+              }
+            </div>
+          </div>
+          <button class="lh-card-audio" (click)="playCardAudio(card)" aria-label="Preview audio">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round">
+              <polygon points="11,5 6,9 2,9 2,15 6,15 11,19"/>
+              <path d="M15.54,8.46a5,5,0,0,1,0,7.07"/>
+            </svg>
+          </button>
+        </div>
+      }
+    }
+  </div>
+
+  <div style="height: 32px;"></div>
 
 </ion-content>
