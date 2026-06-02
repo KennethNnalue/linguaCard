@@ -9,6 +9,7 @@ import {ReviewStore} from '../../store/review.store';
 import {CategoryStore} from '../../../vault/store/category.store';
 import {WordCardComponent} from '../../../../shared/ui/word-card/word-card.component';
 import {getCategoryName} from '../../../../shared/helpers/helpers';
+import {WordAudioService} from '../../../../shared/audio/word-audio.service';
 
 const MASTERY_LABELS = ['New', 'Beginner', 'Learning', 'Familiar', 'Good', 'Mastered'];
 const RATING_LABELS = ['Blank', 'Hard', 'Hmm', 'Good', 'Easy', 'Nailed'];
@@ -25,6 +26,7 @@ export class SessionSummaryPage implements OnInit {
   private readonly categoryStore = inject(CategoryStore);
   private readonly navCtrl = inject(NavController);
   private readonly router = inject(Router);
+  private readonly wordAudio = inject(WordAudioService);
 
   constructor() {
     addIcons({ arrowBackOutline, checkmarkCircleOutline, repeatOutline, refreshOutline });
@@ -120,6 +122,10 @@ export class SessionSummaryPage implements OnInit {
 
   navigateToCard(card: Card): void {
     void this.router.navigate(['/vault', card.id]);
+  }
+
+  playCardAudio(card: Card): void {
+    void this.wordAudio.playCard(card);
   }
 
   getCategoryLabel(card: Card): string {
