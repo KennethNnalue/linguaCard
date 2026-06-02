@@ -1,0 +1,66 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-title>Request Pro Access</ion-title>
+    <ion-icon
+      name="close-outline"
+      slot="end"
+      class="sheet-close"
+      (click)="dismiss()"
+    ></ion-icon>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="sheet-content">
+  @if (submitted()) {
+    <div class="success-state">
+      <ion-icon name="checkmark-circle-outline" class="success-icon"></ion-icon>
+      <p class="success-text">Sent! Kenneth will be in touch.</p>
+    </div>
+  } @else {
+    <form [formGroup]="form" class="contact-form" (ngSubmit)="send()">
+      <div class="field">
+        <label class="field-label">Name *</label>
+        <input
+          class="field-input"
+          type="text"
+          formControlName="name"
+          placeholder="Your name"
+        />
+      </div>
+
+      <div class="field">
+        <label class="field-label">Email *</label>
+        <input
+          class="field-input"
+          type="email"
+          formControlName="email"
+          placeholder="your@email.com"
+        />
+      </div>
+
+      <div class="field">
+        <label class="field-label">Message (optional)</label>
+        <textarea
+          class="field-input field-textarea"
+          formControlName="message"
+          placeholder="Tell us how you plan to use LinguaCard…"
+          rows="3"
+        ></textarea>
+      </div>
+
+      @if (error()) {
+        <p class="error-text">{{ error() }}</p>
+      }
+
+      <lc-button
+        variant="filled-primary"
+        [fullWidth]="true"
+        [loading]="isSubmitting()"
+        [disabled]="form.invalid || isSubmitting()"
+        (click)="send()"
+      >
+        Send Request
+      </lc-button>
+    </form>
+  }
+</ion-content>

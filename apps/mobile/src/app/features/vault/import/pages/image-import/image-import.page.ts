@@ -5,6 +5,7 @@ import {
   IonHeader,
   IonIcon,
   IonToolbar,
+  ModalController,
   ToastController,
 } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
@@ -15,6 +16,8 @@ import {
   ImageImportErrorCode,
   ImageImportStateService,
 } from '../../image-import-state.service';
+import { SubscriptionStore } from '../../../../subscription/store/subscription.store';
+import { ImageImportPaywallModalComponent } from '../../../../subscription/components/image-import-paywall-modal/image-import-paywall-modal.component';
 
 const MAX_FILE_SIZE_BYTES = 5 * 1024 * 1024;
 
@@ -29,6 +32,8 @@ export class ImageImportPage {
   private readonly router = inject(Router);
   private readonly importImageState = inject(ImageImportStateService);
   private readonly toastCtrl = inject(ToastController);
+  private readonly modalCtrl = inject(ModalController);
+  readonly subscriptionStore = inject(SubscriptionStore);
 
   readonly error = this.importImageState.error;
 
@@ -36,11 +41,23 @@ export class ImageImportPage {
     addIcons({ arrowBackOutline, closeCircleOutline, documentOutline });
   }
 
-  onImagePicked(image: PickedImage): void {
+  async onImagePicked(image: PickedImage): Promise<void> {
     if (image.fileSizeBytes > MAX_FILE_SIZE_BYTES) {
       this.importImageState.setError('too_large');
       return;
     }
+
+    if (!this.subscriptionStore.canImportViaImage()) {
+      const modal = await this.modalCtrl.create({
+        component: ImageImportPaywallModalComponent,
+        breakpoints: [0, 1],
+        initialBreakpoint: 1,
+      });
+      await modal.present();
+      const { data } = await modal.onWillDismiss<{ proceed: boolean }>();
+      if (!data?.proceed) return;
+    }
+
     this.importImageState.setImage(image);
     this.router.navigate(['/vault/import/image/processing']);
   }

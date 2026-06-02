@@ -34,6 +34,7 @@ import { AssignCollectionSheetComponent } from '../../../components/assign-colle
 import { ImageImportStateService } from '../../image-import-state.service';
 import { CardDedupService } from '../../../../../shared/dedup/card-dedup.service';
 import { CollectionAudioPrefetchService } from '../../../../../shared/audio/collection-audio-prefetch.service';
+import { SubscriptionStore } from '../../../../subscription/store/subscription.store';
 
 interface SelectableWord extends ParsedImportRow {
   id: number;
@@ -64,6 +65,7 @@ export class ImageImportReviewPage implements OnInit {
   private readonly modalCtrl = inject(ModalController);
   private readonly dedupService = inject(CardDedupService);
   private readonly audioPrefetch = inject(CollectionAudioPrefetchService);
+  private readonly subscriptionStore = inject(SubscriptionStore);
 
   readonly image      = this.importImageState.image;
   readonly result     = this.importImageState.result;
@@ -268,6 +270,7 @@ export class ImageImportReviewPage implements OnInit {
         this.importImageState.clear();
         this.cardStore.loadCards();
         this.collectionStore.loadCollections();
+        this.subscriptionStore.onImageImported();
 
         const newCards = allCards.filter(c => newRows.some(r => r.back === c.content.back));
         // Fire-and-forget: pre-generate audio for newly created cards only
@@ -312,6 +315,7 @@ export class ImageImportReviewPage implements OnInit {
       await firstValueFrom(this.collectionApi.markIncomplete(collectionId, pending));
       this.importImageState.clear();
       this.collectionStore.loadCollections();
+      this.subscriptionStore.onImageImported();
       const toast = await this.toastCtrl.create({
         message: `Collection saved — tap "Complete" to generate ${pending.length} flashcards when ready`,
         duration: 4000,

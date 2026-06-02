@@ -9,6 +9,8 @@ import {SyncService} from './core/services/sync.service';
 import {SyncNotificationService} from './core/services/sync-notification.service';
 import {NetworkService} from './core/services/network.service';
 import {ReviewStore} from './features/review/store/review.store';
+import {SubscriptionStore} from './features/subscription/store/subscription.store';
+import {AuthService} from './core/services/auth.service';
 import {PwaInstallBannerComponent} from './shared/components/pwa-install-banner/pwa-install-banner.component';
 import {OfflineBannerComponent} from './shared/components/offline-banner/offline-banner.component';
 
@@ -24,6 +26,8 @@ export class AppComponent implements OnInit {
   private readonly syncNotification = inject(SyncNotificationService);
   private readonly networkService = inject(NetworkService);
   private readonly reviewStore = inject(ReviewStore);
+  private readonly subscriptionStore = inject(SubscriptionStore);
+  private readonly authService = inject(AuthService);
 
   constructor() {
     this.themeService.initialize();
@@ -34,6 +38,10 @@ export class AppComponent implements OnInit {
 
     // Load persisted session history before any UI renders
     await this.reviewStore.loadHistory();
+
+    if (this.authService.isAuthenticated()) {
+      this.subscriptionStore.loadStatus();
+    }
 
     await this.syncService.init();
 

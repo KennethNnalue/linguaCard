@@ -441,6 +441,7 @@ Rating 0–5 maps to: Blank / Hard / Hmm / Good / Easy / Nailed.
 | 9 | Fill the Gap (Cloze) | 📋 Planned | — |
 | 10 | Progress Dashboard | 📋 Planned | — |
 | 11 | Community Decks | 📋 Planned | — |
+| 12 | Subscription & Paywall | ✅ Implemented | `features/subscription/`, `apps/api/src/subscriptions/`, `apps/mobile/epic-subscription-paywall.md` |
 | 13 | Tiered AI Routing | ✅ Implemented | `apps/api/src/stories/`, `apps/api/src/import/word-enrich.service.ts`, `apps/mobile/epic-tiered-ai-routing.md` |
 
 ### Implemented page inventory
@@ -471,7 +472,7 @@ Rating 0–5 maps to: Blank / Hard / Hmm / Good / Easy / Nailed.
 | TTS (word audio) | `GoogleCloudTtsAdapter` | `de-DE-Wavenet-B` | `GOOGLE_CLOUD_TTS_*` |
 | Whisper timestamps | `GroqWhisperAdapter` | `whisper-large-v3-turbo` | `GROQ_API_KEY` |
 
-Tier routing in `StoryGenerationService` is stubbed to `'pro'` until the subscription epic (LC-103–118) is implemented. See `apps/mobile/epic-tiered-ai-routing.md`.
+Tier routing in `StoryGenerationService` is live — resolved per-request via `SubscriptionService.getStatusForUser()`. Pro users get Claude Sonnet 4.6; free users get Gemini 2.5 Flash. See `apps/mobile/epic-subscription-paywall.md`.
 
 ---
 
@@ -505,5 +506,6 @@ These are **known deviations** from the architecture. Do not "fix" them without 
 | `apps/mobile/epic-image-import.md` | Image Import epic — LC-080 to LC-093 |
 | `apps/mobile/epic-design-system.md` | LDS epic — DS-01 to DS-17 |
 | `apps/mobile/story-ready-update-epic.md` | Story Reader Redesign epic |
+| `apps/mobile/epic-subscription-paywall.md` | Subscription & Paywall epic — LC-103 to LC-118 |
 | `design-reference.html` | Visual design spec — open in browser before building any screen |
 | `apps/api/src/` | NestJS backend source |

@@ -5,6 +5,7 @@ import { JwtService } from '@nestjs/jwt';
 import { randomUUID } from 'crypto';
 import * as bcrypt from 'bcrypt';
 import { UserEntity } from './user.entity';
+import { SubscriptionService } from '../subscriptions/subscription.service';
 import type { LoginDto, RegisterDto } from '@lingua-card/shared/dto';
 
 export interface AuthUser {
@@ -25,6 +26,7 @@ export class AuthService {
     @InjectRepository(UserEntity)
     private readonly userRepo: Repository<UserEntity>,
     private readonly jwtService: JwtService,
+    private readonly subscriptions: SubscriptionService,
   ) {}
 
   async register(dto: RegisterDto): Promise<AuthResponse> {
@@ -45,6 +47,7 @@ export class AuthService {
       avatarInitials,
     });
     const saved = await this.userRepo.save(entity);
+    await this.subscriptions.createFree(saved.id);
     return this.buildResponse(saved);
   }
 

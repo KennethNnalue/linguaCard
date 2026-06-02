@@ -11,6 +11,7 @@ import {
 import { AuthService } from '../../../core/services/auth.service';
 import { SyncService } from '../../../core/services/sync.service';
 import { ThemeService } from '../../../core/services/theme.service';
+import { SubscriptionStore } from '../../../features/subscription/store/subscription.store';
 
 @Component({
   selector: 'lc-user-menu',
@@ -23,6 +24,7 @@ export class UserMenuComponent {
   readonly auth = inject(AuthService);
   readonly theme = inject(ThemeService);
   readonly sync = inject(SyncService);
+  readonly subscriptionStore = inject(SubscriptionStore);
 
   @Output() closed = new EventEmitter<void>();
   @Output() resetRequested = new EventEmitter<void>();

@@ -3,7 +3,12 @@
 <div class="ctx-menu" role="menu" aria-label="User menu">
   <!-- User info -->
   <div class="ctx-user-row">
-    <div class="ctx-user-name">{{ auth.currentUser()?.name ?? 'Account' }}</div>
+    <div class="ctx-user-name">
+      {{ auth.currentUser()?.name ?? 'Account' }}
+      <span class="tier-badge" [class.tier-badge--pro]="subscriptionStore.isPro()">
+        {{ subscriptionStore.isPro() ? 'PRO' : 'FREE' }}
+      </span>
+    </div>
     <div class="ctx-user-email">{{ auth.currentUser()?.email }}</div>
   </div>
 

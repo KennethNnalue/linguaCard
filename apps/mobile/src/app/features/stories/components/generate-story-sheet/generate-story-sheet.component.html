@@ -10,6 +10,20 @@
 </ion-header>
 
 <ion-content>
+  @if (!subscriptionStore.isPro()) {
+    <div class="free-usage-bar">
+      <span class="free-usage-text">
+        {{ subscriptionStore.status()?.storiesGenerated ?? 0 }} of
+        {{ subscriptionStore.status()?.freeStoryLimit ?? 3 }} free stories used
+      </span>
+      <div class="free-usage-track">
+        <div
+          class="free-usage-fill"
+          [style.width.%]="((subscriptionStore.status()?.storiesGenerated ?? 0) / (subscriptionStore.status()?.freeStoryLimit ?? 3)) * 100"
+        ></div>
+      </div>
+    </div>
+  }
   <div class="gs-body">
 
     <!-- Collections picker -->
@@ -49,19 +63,31 @@
 
     <!-- Length -->
     <div class="gs-section">
-      <div class="gs-section-label">Story length</div>
+      <div class="gs-section-label">
+        Story length
+        @if (!subscriptionStore.isPro()) {
+          <span class="gs-section-pro-hint">Short only on free plan</span>
+        }
+      </div>
       <div class="gs-chips">
         @for (opt of lengths; track opt.value) {
-          <button
-            class="gs-chip"
-            [ngClass]="{ active: selectedLength() === opt.value }"
-            (click)="selectedLength.set(opt.value)"
-          >
-            {{ opt.label }}
-            @if (opt.badge) {
-              <span class="gs-chip-badge">{{ opt.badge }}</span>
-            }
-          </button>
+          @if (subscriptionStore.isPro() || opt.value === 'short') {
+            <button
+              class="gs-chip"
+              [ngClass]="{ active: selectedLength() === opt.value }"
+              (click)="selectedLength.set(opt.value)"
+            >
+              {{ opt.label }}
+              @if (opt.badge) {
+                <span class="gs-chip-badge">{{ opt.badge }}</span>
+              }
+            </button>
+          } @else {
+            <button class="gs-chip gs-chip--locked" disabled>
+              {{ opt.label }}
+              <ion-icon name="lock-closed-outline" class="gs-chip-lock"></ion-icon>
+            </button>
+          }
         }
       </div>
       @if (isLongFormat()) {

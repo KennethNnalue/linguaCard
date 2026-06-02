@@ -11,12 +11,14 @@ import { AiModule } from '../ai/ai.module';
 import { ConfigModule } from '@nestjs/config';
 import { CardEntity } from '../cards/card.entity';
 import { StorageService } from '../storage/storage.service';
+import { SubscriptionsModule } from '../subscriptions/subscriptions.module';
 
 @Module({
   imports: [
     TypeOrmModule.forFeature([StoryEntity, CardEntity]),
     AiModule,
     ConfigModule,
+    SubscriptionsModule,
   ],
   controllers: [StoriesController],
   providers: [

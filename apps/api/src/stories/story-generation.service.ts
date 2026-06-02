@@ -1,4 +1,4 @@
-import { Injectable, Logger, BadRequestException, InternalServerErrorException } from '@nestjs/common';
+import { Injectable, Logger, BadRequestException, ForbiddenException, InternalServerErrorException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { ConfigService } from '@nestjs/config';
 import { In, Repository } from 'typeorm';
@@ -11,6 +11,7 @@ import type {
   StoryQuizQuestion,
   StoryGrammarNote,
   StoryKeyword,
+  SubscriptionTier,
 } from '@lingua-card/shared/domain';
 import { CardEntity } from '../cards/card.entity';
 import { StoryEntity } from './story.entity';
@@ -20,11 +21,8 @@ import { OpenRouterAdapter } from '../ai/providers/openrouter.adapter';
 import { StoryPromptBuilder } from './story-prompt.builder';
 import { StoryAudioService } from './story-audio.service';
 import { StoryVocabMapper } from './story-vocab.mapper';
+import { SubscriptionService } from '../subscriptions/subscription.service';
 import type { AiConfig } from '../config/ai.config';
-
-// TODO(LC-123): replace with SubscriptionService.getEffectiveTier(userId) once subscription epic (LC-103-118) is implemented.
-type SubscriptionTier = 'pro' | 'free';
-function stubGetTier(_userId: string): SubscriptionTier { return 'pro'; }
 
 interface GeneratedSentence {
   german: string;
@@ -54,9 +52,10 @@ export class StoryGenerationService {
     private readonly anthropic:   AnthropicAdapter,
     private readonly gemini:      GeminiAdapter,
     private readonly openRouter:  OpenRouterAdapter,
-    private readonly config:      ConfigService,
-    private readonly audioService: StoryAudioService,
-    private readonly vocabMapper: StoryVocabMapper,
+    private readonly config:        ConfigService,
+    private readonly audioService:  StoryAudioService,
+    private readonly vocabMapper:   StoryVocabMapper,
+    private readonly subscriptions: SubscriptionService,
   ) {
     const ai = this.config.get<AiConfig>('ai')!;
     this.storyModelPro  = ai.storyModelPro;
@@ -69,6 +68,12 @@ export class StoryGenerationService {
   }
 
   async generateAndSave(userId: string, dto: GenerateStoryDto): Promise<Story> {
+    const status = await this.subscriptions.getStatusForUser(userId);
+
+    if (!status.isActive && status.storiesRemaining !== null && status.storiesRemaining <= 0) {
+      throw new ForbiddenException('Story limit reached. Upgrade to Pro for unlimited stories.');
+    }
+
     const cards = await this.cardRepo.find({
       where: { userId, collectionId: In(dto.collectionIds) },
     });
@@ -77,7 +82,7 @@ export class StoryGenerationService {
       throw new BadRequestException('No cards found for the given collections');
     }
 
-    const tier  = stubGetTier(userId);
+    const tier  = status.isActive ? 'pro' : 'free';
     const model = this.modelForTier(tier);
     this.logger.log(`Generating story for userId=${userId} tier=${tier} model=${model}`);
 
@@ -240,7 +245,8 @@ export class StoryGenerationService {
 
     const sentences: StorySentence[] = entity.sentences ?? [];
     const difficulty = entity.difficultyLevel ?? 'A2';
-    const enrichModel = this.modelForTier(stubGetTier(userId));
+    const tier = await this.subscriptions.getEffectiveTier(userId);
+    const enrichModel = this.modelForTier(tier);
 
     const [quizQuestions, grammarNotes, aiKeywords] = await Promise.all([
       (entity.quizQuestions ?? []).length === 0

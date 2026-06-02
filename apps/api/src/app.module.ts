@@ -14,6 +14,8 @@ import { HealthModule } from './health/health.module';
 import { AiModule } from './ai/ai.module';
 import { ImportModule } from './import/import.module';
 import { WordAudioModule } from './word-audio/word-audio.module';
+import { SubscriptionsModule } from './subscriptions/subscriptions.module';
+import { ContactModule } from './contact/contact.module';
 import databaseConfig from './config/database.config';
 import { aiConfig } from './config/ai.config';
 
@@ -42,6 +44,8 @@ import { aiConfig } from './config/ai.config';
     CategoriesModule,
     StoriesModule,
     WordAudioModule,
+    SubscriptionsModule,
+    ContactModule,
     SeedModule,
   ],
   providers: [

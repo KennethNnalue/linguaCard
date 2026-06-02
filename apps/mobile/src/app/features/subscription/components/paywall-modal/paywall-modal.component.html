@@ -1,0 +1,43 @@
+<ion-content class="paywall-content">
+  <div class="paywall-sheet">
+    <div class="paywall-header">
+      <ion-icon name="sparkles-outline" class="paywall-icon"></ion-icon>
+      <h2 class="paywall-title">Unlock Unlimited Stories</h2>
+    </div>
+
+    <p class="paywall-subtitle">You've used your 3 free stories. Upgrade to Pro for:</p>
+
+    <ul class="paywall-benefits">
+      <li>
+        <ion-icon name="checkmark-circle-outline"></ion-icon>
+        Unlimited story generation
+      </li>
+      <li>
+        <ion-icon name="checkmark-circle-outline"></ion-icon>
+        Claude Sonnet — highest quality
+      </li>
+      <li>
+        <ion-icon name="checkmark-circle-outline"></ion-icon>
+        Priority support
+      </li>
+    </ul>
+
+    <div class="paywall-actions">
+      <lc-button
+        variant="filled-accent"
+        [fullWidth]="true"
+        (click)="openContactSheet()"
+      >
+        Request Pro Access
+      </lc-button>
+
+      <lc-button
+        variant="ghost-primary"
+        [fullWidth]="true"
+        (click)="dismiss()"
+      >
+        Not now
+      </lc-button>
+    </div>
+  </div>
+</ion-content>

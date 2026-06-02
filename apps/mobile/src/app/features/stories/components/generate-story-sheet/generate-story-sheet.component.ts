@@ -9,10 +9,11 @@ import {
   ModalController,
 } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
-import { sparklesOutline, closeOutline, checkmarkOutline } from 'ionicons/icons';
+import { sparklesOutline, closeOutline, checkmarkOutline, lockClosedOutline } from 'ionicons/icons';
 import type { GenerateStoryDto, StoryDifficulty, StoryLength } from '@lingua-card/shared/domain';
 import { CollectionStore } from '../../../vault/store/collection.store';
 import { StoryStore } from '../../store/story.store';
+import { SubscriptionStore } from '../../../subscription/store/subscription.store';
 
 type GenerationStep = 0 | 1 | 2 | 3;
 
@@ -26,6 +27,7 @@ export class GenerateStorySheetComponent implements OnDestroy {
   private readonly collectionStore = inject(CollectionStore);
   private readonly storyStore = inject(StoryStore);
   private readonly modalCtrl = inject(ModalController);
+  readonly subscriptionStore = inject(SubscriptionStore);
 
   readonly collections = this.collectionStore.collections;
   readonly isGenerating = this.storyStore.isGenerating;
@@ -74,7 +76,11 @@ export class GenerateStorySheetComponent implements OnDestroy {
   private stepTimers: ReturnType<typeof setTimeout>[] = [];
 
   constructor() {
-    addIcons({ sparklesOutline, closeOutline, checkmarkOutline });
+    addIcons({ sparklesOutline, closeOutline, checkmarkOutline, lockClosedOutline });
+    // Free users can only generate short stories
+    if (!this.subscriptionStore.isPro()) {
+      this.selectedLength.set('short');
+    }
   }
 
   ngOnDestroy(): void {
@@ -121,7 +127,7 @@ export class GenerateStorySheetComponent implements OnDestroy {
     this.generationStep.set(0);
 
     if (story) {
-      void this.modalCtrl.dismiss({ story });
+      void this.modalCtrl.dismiss({ story, generated: true });
     }
   }
 

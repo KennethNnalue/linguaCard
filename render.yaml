@@ -64,3 +64,14 @@ services:
       - key: R2_PUBLIC_URL
         sync: false          # public URL for the bucket, e.g. https://audio.linguacard.app
                              # or the r2.dev subdomain: https://pub-<hash>.r2.dev
+      # ── Contact / Upgrade Email (Gmail App Password) ────────────────────────
+      - key: SMTP_HOST
+        value: smtp.gmail.com
+      - key: SMTP_PORT
+        value: "587"
+      - key: SMTP_USER
+        sync: false          # paste Gmail address in Render dashboard
+      - key: SMTP_PASS
+        sync: false          # paste Gmail App Password in Render dashboard
+      - key: SMTP_FROM
+        value: noreply@linguacard.app

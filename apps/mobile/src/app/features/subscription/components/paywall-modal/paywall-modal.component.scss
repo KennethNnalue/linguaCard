@@ -1,0 +1,70 @@
+@use 'theme/tokens' as t;
+
+.paywall-content {
+  --background: #{t.$lc-surface};
+}
+
+.paywall-sheet {
+  padding: t.$lc-space-6;
+  display: flex;
+  flex-direction: column;
+  gap: t.$lc-space-5;
+}
+
+.paywall-header {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: t.$lc-space-3;
+  text-align: center;
+}
+
+.paywall-icon {
+  font-size: 2.5rem;
+  color: t.$lc-accent;
+}
+
+.paywall-title {
+  font-family: t.$lc-font-display;
+  font-size: 1.5rem;
+  font-weight: t.$lc-font-weight-semibold;
+  color: t.$lc-text-primary;
+  margin: 0;
+}
+
+.paywall-subtitle {
+  font-family: t.$lc-font-body;
+  color: t.$lc-text-secondary;
+  text-align: center;
+  margin: 0;
+}
+
+.paywall-benefits {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: t.$lc-space-3;
+
+  li {
+    display: flex;
+    align-items: center;
+    gap: t.$lc-space-3;
+    color: t.$lc-text-primary;
+    font-family: t.$lc-font-body;
+
+    ion-icon {
+      color: t.$lc-brand;
+      font-size: 1.25rem;
+      flex-shrink: 0;
+    }
+  }
+}
+
+.paywall-actions {
+  display: flex;
+  flex-direction: column;
+  gap: t.$lc-space-2;
+  margin-top: t.$lc-space-2;
+}

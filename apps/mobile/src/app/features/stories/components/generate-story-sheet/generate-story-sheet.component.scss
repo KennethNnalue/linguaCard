@@ -78,6 +78,25 @@
   &.disabled { opacity: 0.45; cursor: not-allowed; }
 }
 
+.gs-section-pro-hint {
+  @include u.lc-font('xxs', t.$lc-font-weight-semibold);
+  color: var(--lc-accent); background: var(--lc-accent-light);
+  padding: 2px 7px; border-radius: t.$lc-radius-sm; letter-spacing: 0; text-transform: none;
+  margin-left: auto;
+}
+
+.gs-chip--locked {
+  opacity: 0.4;
+  cursor: not-allowed;
+  display: flex;
+  align-items: center;
+  gap: t.$lc-space-1;
+}
+
+.gs-chip-lock {
+  font-size: 0.7rem;
+}
+
 .gs-chip-badge {
   display: inline-block; margin-left: 5px; padding: 1px 5px; border-radius: t.$lc-space-1;
   background: var(--lc-accent); color: #fff; @include u.lc-font('xxs', t.$lc-font-weight-semibold);
@@ -101,3 +120,30 @@
 .gs-error-actions { display: flex; align-items: center; gap: t.$lc-space-3; margin-top: t.$lc-space-2; }
 .gs-retry-btn { padding: t.$lc-space-2 14px; border-radius: t.$lc-radius-sm; background: var(--lc-brand); color: #fff; @include u.lc-font('sm', t.$lc-font-weight-semibold); border: none; cursor: pointer; font-family: t.$lc-font-body; }
 .gs-support-link { @include u.lc-font('xs'); color: var(--lc-brand); text-decoration: underline; }
+
+.free-usage-bar {
+  padding: t.$lc-space-3 t.$lc-space-4;
+  border-bottom: 1px solid var(--lc-border);
+  display: flex;
+  flex-direction: column;
+  gap: t.$lc-space-2;
+}
+
+.free-usage-text {
+  @include u.lc-font('xs');
+  color: var(--lc-text-secondary);
+}
+
+.free-usage-track {
+  height: 4px;
+  background: var(--lc-border);
+  border-radius: t.$lc-radius-full;
+  overflow: hidden;
+}
+
+.free-usage-fill {
+  height: 100%;
+  background: t.$lc-brand;
+  border-radius: t.$lc-radius-full;
+  transition: width 0.3s ease;
+}

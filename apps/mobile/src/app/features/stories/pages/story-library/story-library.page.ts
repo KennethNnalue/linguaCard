@@ -25,6 +25,8 @@ import type { Story } from '@lingua-card/shared/domain';
 import { StoryStore } from '../../store/story.store';
 import { SyncService } from '../../../../core/services/sync.service';
 import { GenerateStorySheetComponent } from '../../components/generate-story-sheet/generate-story-sheet.component';
+import { SubscriptionStore } from '../../../subscription/store/subscription.store';
+import { PaywallModalComponent } from '../../../subscription/components/paywall-modal/paywall-modal.component';
 
 @Component({
   selector: 'lc-story-library',
@@ -38,6 +40,7 @@ export class StoryLibraryPage implements OnInit {
   private readonly router = inject(Router);
   private readonly modalCtrl = inject(ModalController);
   private readonly alertCtrl = inject(AlertController);
+  private readonly subscriptionStore = inject(SubscriptionStore);
 
   readonly stories = this.storyStore.sortedStories;
   readonly isLoading = this.storyStore.isLoading;
@@ -62,6 +65,16 @@ export class StoryLibraryPage implements OnInit {
   }
 
   async openGenerateSheet(): Promise<void> {
+    if (!this.subscriptionStore.canGenerateStory()) {
+      const paywall = await this.modalCtrl.create({
+        component: PaywallModalComponent,
+        breakpoints: [0, 1],
+        initialBreakpoint: 1,
+      });
+      await paywall.present();
+      return;
+    }
+
     const modal = await this.modalCtrl.create({
       component: GenerateStorySheetComponent,
       breakpoints: [0, 0.85, 1],
@@ -69,7 +82,10 @@ export class StoryLibraryPage implements OnInit {
       handle: true,
     });
     await modal.present();
-    const { data } = await modal.onWillDismiss<{ story: Story }>();
+    const { data } = await modal.onWillDismiss<{ story: Story; generated?: boolean }>();
+    if (data?.generated) {
+      this.subscriptionStore.onStoryGenerated();
+    }
     if (data?.story) {
       this.router.navigate(['/stories', data.story.id]);
     }

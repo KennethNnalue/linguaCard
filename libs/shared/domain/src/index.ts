@@ -507,3 +507,35 @@ export interface EnrichWordsResult {
   pending: RawExtractedWord[];
   isComplete: boolean;
 }
+
+// ─── SUBSCRIPTIONS ────────────────────────────────────────────────────────────
+
+export type SubscriptionTier = 'free' | 'pro';
+
+export interface Subscription {
+  id: string;
+  userId: string;
+  tier: SubscriptionTier;
+  activatedAt: string | null;
+  expiresAt:   string | null;
+  createdAt:   string;
+}
+
+export interface SubscriptionStatus {
+  tier:                  SubscriptionTier;
+  isActive:              boolean;
+  storiesGenerated:      number;
+  storiesRemaining:      number | null;
+  freeStoryLimit:        number;
+  imageImportsUsed:      number;
+  imageImportsRemaining: number | null;
+  freeImageImportLimit:  number;
+}
+
+// ─── CONTACT / UPGRADE ───────────────────────────────────────────────────────
+
+export interface UpgradeRequestDto {
+  name:    string;
+  email:   string;
+  message: string;
+}
