@@ -1,5 +1,6 @@
 import { importProvidersFrom, isDevMode, provideZoneChangeDetection } from '@angular/core';
 import { bootstrapApplication } from '@angular/platform-browser';
+import { provideAnimations } from '@angular/platform-browser/animations';
 import { provideHttpClient, withFetch, withInterceptors } from '@angular/common/http';
 import {
   PreloadAllModules,
@@ -21,6 +22,7 @@ import { provideReview } from './app/features/review/review.providers';
 
 bootstrapApplication(AppComponent, {
   providers: [
+    provideAnimations(),
     provideZoneChangeDetection(),
     { provide: RouteReuseStrategy, useClass: IonicRouteStrategy },
     provideIonicAngular(),

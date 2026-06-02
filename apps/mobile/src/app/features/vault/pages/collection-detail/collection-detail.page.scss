@@ -208,6 +208,7 @@
     flex-shrink: 0;
     @include u.flex-center;
     min-width: 72px;
+    min-height: 32px;
     padding: t.$lc-space-2 14px;
     border-radius: t.$lc-radius-sm;
     background: var(--lc-brand);
@@ -224,6 +225,7 @@
 }
 
 .cd-spinner {
+  display: block;
   @include u.square(14px);
   border: 2px solid rgba(255, 255, 255, 0.35);
   border-top-color: white;

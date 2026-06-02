@@ -2,7 +2,7 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { randomUUID } from 'crypto';
-import type { Collection, CollectionImportStatus } from '@lingua-card/shared/domain';
+import type { Collection, CollectionImportStatus, RawExtractedWord } from '@lingua-card/shared/domain';
 import { CreateCollectionDto, UpdateCollectionDto } from '@lingua-card/shared/dto';
 import { CollectionEntity } from './collection.entity';
 import { CardEntity } from '../cards/card.entity';
@@ -77,7 +77,11 @@ export class CollectionsService {
   async update(userId: string, id: string, dto: UpdateCollectionDto): Promise<Collection> {
     const entity = await this.repo.findOneBy({ id, userId });
     if (!entity) throw new NotFoundException(`Collection ${id} not found`);
-    Object.assign(entity, dto);
+    const { pendingWords, ...rest } = dto;
+    Object.assign(entity, rest);
+    if (pendingWords !== undefined) {
+      entity.pendingWords = [...(entity.pendingWords ?? []), ...(pendingWords as RawExtractedWord[])];
+    }
     const saved = await this.repo.save(entity);
     const countsMap = await this.buildCountsMap(userId);
     return this.toModel(saved, countsMap.get(id) ?? { cardCount: 0, masteredCount: 0, dueCount: 0 });
