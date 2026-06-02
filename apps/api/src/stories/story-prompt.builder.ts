@@ -1,6 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import type { GenerateStoryDto, StoryDifficulty, StoryLength, StorySentence } from '@lingua-card/shared/domain';
 import type { CardEntity } from '../cards/card.entity';
+import type { StoryEntity } from './story.entity';
 
 @Injectable()
 export class StoryPromptBuilder {
@@ -129,6 +130,48 @@ OUTPUT: valid JSON array only, no markdown fences:
 [
   { "german": "wandern", "germanBase": "wandern", "english": "to hike, to wander", "article": null, "wordType": "verb", "level": "A1" }
 ]`;
+  }
+
+  buildExtensionPrompt(entity: StoryEntity): string {
+    const existingSentences = (entity.sentences ?? [])
+      .map((s, i) => `${i + 1}. ${s.german}`)
+      .join('\n');
+
+    const targetSentenceCount = this.targetCountForLength(entity.lengthType);
+    const remaining = Math.max(5, targetSentenceCount - (entity.sentences?.length ?? 0));
+
+    const difficulty = (entity.difficultyLevel ?? 'A2') as StoryDifficulty;
+    const cefrDesc = this.cefrDescriptions[difficulty];
+
+    return `You are continuing an unfinished German learning story.
+
+STORY SO FAR (do not repeat these sentences):
+${existingSentences}
+
+TASK: Continue the story naturally from the last sentence above.
+Write exactly ${remaining} additional sentences that:
+- Follow on directly from sentence ${entity.sentences?.length ?? 0}
+- Match the same characters, setting, and narrative voice
+- Stay at CEFR level ${difficulty} — ${cefrDesc}
+- Use natural, everyday German
+
+OUTPUT — valid JSON only, no markdown fences, no preamble:
+{
+  "sentences": [
+    { "german": "...", "english": "...", "vocabWordsUsed": [] }
+  ]
+}`;
+  }
+
+  private targetCountForLength(length: StoryLength): number {
+    const map: Record<StoryLength, number> = {
+      'short':      12,
+      'medium':     22,
+      'long':       35,
+      'very-long':  50,
+      'extra-long': 65,
+    };
+    return map[length] ?? 22;
   }
 
   private buildVocabList(cards: CardEntity[]): string {

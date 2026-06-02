@@ -108,6 +108,15 @@ export class StoriesService {
     return this.generation.enrichExisting(userId, id);
   }
 
+  async extend(userId: string, id: string): Promise<Story> {
+    const entity = await this.repo.findOneBy({ id, userId });
+    if (!entity) throw new NotFoundException(`Story ${id} not found`);
+    if (entity.generationStatus !== 'partial') {
+      return this.toModel(entity);
+    }
+    return this.generation.extendStory(entity);
+  }
+
   async setLearned(userId: string, id: string, isLearned: boolean): Promise<Story> {
     const entity = await this.repo.findOneBy({ id, userId });
     if (!entity) throw new NotFoundException(`Story ${id} not found`);
@@ -140,6 +149,7 @@ export class StoriesService {
       grammarNotes: e.grammarNotes ?? [],
       keywords: e.keywords ?? [],
       isLearned: e.isLearned ?? false,
+      generationStatus: (e.generationStatus ?? 'complete'),
     };
   }
 }

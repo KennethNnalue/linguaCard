@@ -22,6 +22,8 @@ interface StoryState {
   error: string | null;
   generateError: string | null;
   hasEverLoaded: boolean;
+  extendingId: string | null;
+  extendError: string | null;
 }
 
 const initialState: StoryState = {
@@ -32,6 +34,8 @@ const initialState: StoryState = {
   error: null,
   generateError: null,
   hasEverLoaded: false,
+  extendingId: null,
+  extendError: null,
 };
 
 export const StoryStore = signalStore(
@@ -45,6 +49,9 @@ export const StoryStore = signalStore(
       )
     ),
     totalCount: computed(() => stories().length),
+    incompleteStories: computed(() =>
+      stories().filter(s => s.generationStatus === 'partial')
+    ),
   })),
 
   withMethods((store) => {
@@ -186,6 +193,26 @@ export const StoryStore = signalStore(
         void firstValueFrom(api.remove(id)).catch(() => {
           void syncService.enqueue({ type: 'DELETE_STORY', payload: { storyId: id } });
         });
+      },
+
+      extendStory(id: string): void {
+        void (async () => {
+          patchState(store, { extendingId: id, extendError: null });
+          try {
+            const extended = await firstValueFrom(api.extend(id));
+            patchState(store, {
+              stories: store.stories().map(s => s.id === id ? extended : s),
+              extendingId: null,
+            });
+            const userId = uid();
+            if (userId) {
+              await localData.setStories(userId, store.stories());
+            }
+          } catch (err) {
+            const msg = err instanceof Error ? err.message : 'Extension failed';
+            patchState(store, { extendingId: null, extendError: msg });
+          }
+        })();
       },
 
       clearGenerateError(): void {

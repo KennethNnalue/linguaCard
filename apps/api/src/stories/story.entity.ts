@@ -6,6 +6,7 @@ import type {
   StorySentence, WordTimestamp, StoryVocabWord,
   StoryDifficulty, StoryLength,
   StoryQuizQuestion, StoryGrammarNote, StoryKeyword,
+  StoryGenerationStatus,
 } from '@lingua-card/shared/domain';
 
 @Entity('stories')
@@ -76,6 +77,9 @@ export class StoryEntity {
 
   @Column({ name: 'model_used', type: 'varchar', nullable: true, default: null })
   modelUsed!: string | null;
+
+  @Column({ name: 'generation_status', type: 'varchar', length: 20, default: 'complete' })
+  generationStatus!: StoryGenerationStatus;
 
   @CreateDateColumn()
   generatedAt!: Date;

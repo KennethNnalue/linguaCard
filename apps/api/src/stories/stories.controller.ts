@@ -46,6 +46,11 @@ export class StoriesController {
     return this.storiesService.enrich(userId, id);
   }
 
+  @Post(':id/extend')
+  extend(@CurrentUser() userId: string, @Param('id') id: string) {
+    return this.storiesService.extend(userId, id);
+  }
+
   @Patch(':id/listen')
   recordListen(@CurrentUser() userId: string, @Param('id') id: string) {
     return this.storiesService.recordListen(userId, id);

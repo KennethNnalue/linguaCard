@@ -1,4 +1,4 @@
-import { Component, inject, OnInit } from '@angular/core';
+import { Component, effect, inject, OnInit } from '@angular/core';
 import { NgClass, TitleCasePipe } from '@angular/common';
 import { Router } from '@angular/router';
 import {
@@ -8,8 +8,10 @@ import {
   IonIcon,
   IonRefresher,
   IonRefresherContent,
+  IonSpinner,
   IonToolbar,
   ModalController,
+  ToastController,
 } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
 import {
@@ -20,6 +22,8 @@ import {
   sparklesOutline,
   trashOutline,
   chevronDownCircleOutline,
+  warningOutline,
+  addCircleOutline,
 } from 'ionicons/icons';
 import type { Story } from '@lingua-card/shared/domain';
 import { StoryStore } from '../../store/story.store';
@@ -32,7 +36,7 @@ import { PaywallModalComponent } from '../../../subscription/components/paywall-
   selector: 'lc-story-library',
   templateUrl: './story-library.page.html',
   styleUrls: ['./story-library.page.scss'],
-  imports: [IonContent, IonHeader, IonToolbar, IonIcon, IonRefresher, IonRefresherContent, NgClass, TitleCasePipe],
+  imports: [IonContent, IonHeader, IonToolbar, IonIcon, IonRefresher, IonRefresherContent, IonSpinner, NgClass, TitleCasePipe],
 })
 export class StoryLibraryPage implements OnInit {
   private readonly storyStore = inject(StoryStore);
@@ -40,15 +44,30 @@ export class StoryLibraryPage implements OnInit {
   private readonly router = inject(Router);
   private readonly modalCtrl = inject(ModalController);
   private readonly alertCtrl = inject(AlertController);
+  private readonly toastCtrl = inject(ToastController);
   private readonly subscriptionStore = inject(SubscriptionStore);
 
   readonly stories = this.storyStore.sortedStories;
   readonly isLoading = this.storyStore.isLoading;
   readonly isRefreshing = this.storyStore.isRefreshing;
   readonly isGenerating = this.storyStore.isGenerating;
+  readonly extendingId = this.storyStore.extendingId;
 
   constructor() {
-    addIcons({ bookOutline, addOutline, playOutline, timeOutline, sparklesOutline, trashOutline, chevronDownCircleOutline });
+    addIcons({ bookOutline, addOutline, playOutline, timeOutline, sparklesOutline, trashOutline, chevronDownCircleOutline, warningOutline, addCircleOutline });
+
+    effect(async () => {
+      const err = this.storyStore.extendError();
+      if (err) {
+        const toast = await this.toastCtrl.create({
+          message: 'Extension failed — please try again.',
+          duration: 3000,
+          color: 'danger',
+          position: 'bottom',
+        });
+        await toast.present();
+      }
+    });
   }
 
   ngOnInit(): void {
@@ -120,6 +139,11 @@ export class StoryLibraryPage implements OnInit {
     if (article === 'die') return 'art-die';
     if (article === 'das') return 'art-das';
     return '';
+  }
+
+  onExtend(event: Event, id: string): void {
+    event.stopPropagation();
+    this.storyStore.extendStory(id);
   }
 
   async confirmDelete(event: Event, story: Story): Promise<void> {

@@ -62,6 +62,12 @@
       <div class="ss-story-card" (click)="openStory(null, story)" role="button" [attr.aria-label]="'Open story: ' + story.title">
         <div class="ss-story-top">
           <div class="ss-story-title">{{ story.title }}</div>
+          @if (story.generationStatus === 'partial') {
+            <div class="sl-incomplete-badge">
+              <ion-icon name="warning-outline"></ion-icon>
+              Incomplete
+            </div>
+          }
           <div class="ss-story-meta">
             <span>
               <ion-icon name="time-outline"></ion-icon>
@@ -92,14 +98,32 @@
             {{ story.difficultyLevel }} · {{ story.lengthType | titlecase }}
           </span>
           <div class="ss-story-footer-right">
-            <button class="ss-story-action-btn ss-listen-btn" (click)="listenStory($event, story)" aria-label="Listen to story">
-              <ion-icon name="play-outline"></ion-icon>
-              Listen
-            </button>
-            <button class="ss-story-action-btn ss-read-btn" (click)="openStory($event, story)" aria-label="Read story">
-              <ion-icon name="book-outline"></ion-icon>
-              Read
-            </button>
+            @if (story.generationStatus === 'partial') {
+              <button
+                class="sl-btn-extend"
+                [class.sl-btn-extend--loading]="extendingId() === story.id"
+                [disabled]="extendingId() === story.id"
+                (click)="onExtend($event, story.id)"
+                aria-label="Extend incomplete story"
+              >
+                @if (extendingId() === story.id) {
+                  <ion-spinner name="dots"></ion-spinner>
+                  Extending…
+                } @else {
+                  <ion-icon name="add-circle-outline"></ion-icon>
+                  Extend
+                }
+              </button>
+            } @else {
+              <button class="ss-story-action-btn ss-listen-btn" (click)="listenStory($event, story)" aria-label="Listen to story">
+                <ion-icon name="play-outline"></ion-icon>
+                Listen
+              </button>
+              <button class="ss-story-action-btn ss-read-btn" (click)="openStory($event, story)" aria-label="Read story">
+                <ion-icon name="book-outline"></ion-icon>
+                Read
+              </button>
+            }
             <button class="ss-delete-btn" (click)="confirmDelete($event, story)" aria-label="Delete story">
               <ion-icon name="trash-outline"></ion-icon>
             </button>

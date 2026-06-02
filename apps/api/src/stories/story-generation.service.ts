@@ -13,6 +13,7 @@ import type {
   StoryKeyword,
   SubscriptionTier,
 } from '@lingua-card/shared/domain';
+import { recoverStoryContent } from './story-json-recovery.util';
 import { CardEntity } from '../cards/card.entity';
 import { StoryEntity } from './story.entity';
 import { AnthropicAdapter } from '../ai/providers/anthropic.adapter';
@@ -23,6 +24,8 @@ import { StoryAudioService } from './story-audio.service';
 import { StoryVocabMapper } from './story-vocab.mapper';
 import { SubscriptionService } from '../subscriptions/subscription.service';
 import type { AiConfig } from '../config/ai.config';
+
+const MIN_RECOVERABLE_SENTENCES = 5;
 
 interface GeneratedSentence {
   german: string;
@@ -86,7 +89,7 @@ export class StoryGenerationService {
     const model = this.modelForTier(tier);
     this.logger.log(`Generating story for userId=${userId} tier=${tier} model=${model}`);
 
-    const content = await this.generateTextWithModel(dto, cards, model);
+    const { content, isPartial } = await this.generateTextWithModel(dto, cards, model);
 
     const vocabWords: StoryVocabWord[] = cards.map(card => ({
       cardId: card.id,
@@ -153,6 +156,7 @@ export class StoryGenerationService {
       coverImageUrl: null,
       isLearned: false,
       modelUsed: model,
+      generationStatus: isPartial ? 'partial' : 'complete',
     });
 
     const saved = await this.storyRepo.save(entity);
@@ -304,7 +308,7 @@ export class StoryGenerationService {
     dto: GenerateStoryDto,
     cards: CardEntity[],
     model: string,
-  ): Promise<GeneratedStoryContent> {
+  ): Promise<{ content: GeneratedStoryContent; isPartial: boolean }> {
     const prompt = this.promptBuilder.build(dto, cards);
 
     let rawText: string;
@@ -321,12 +325,93 @@ export class StoryGenerationService {
       throw new InternalServerErrorException('Story generation failed. Please try again.');
     }
 
-    const clean = (rawText.match(/```(?:json)?\s*([\s\S]*?)\s*```/i)?.[1] ?? rawText).trim();
-    try {
-      return JSON.parse(clean) as GeneratedStoryContent;
-    } catch {
-      this.logger.error('JSON parse failed. Raw response:', rawText);
+    const { content, sentenceCount, wasRecovered } = recoverStoryContent(rawText);
+
+    if (!content || sentenceCount < MIN_RECOVERABLE_SENTENCES) {
+      this.logger.error('Story parse failed — recovery found < MIN sentences. Raw response:', rawText);
       throw new InternalServerErrorException('Story generation returned invalid data.');
+    }
+
+    if (wasRecovered) {
+      this.logger.warn(
+        `Story parse failed but recovered ${sentenceCount} sentences — will save as partial.`,
+        { sentenceCount },
+      );
+    }
+
+    return { content, isPartial: wasRecovered };
+  }
+
+  async extendStory(entity: StoryEntity): Promise<Story> {
+    const tier = await this.subscriptions.getEffectiveTier(entity.userId);
+    const model = this.modelForTier(tier);
+
+    const prompt = this.promptBuilder.buildExtensionPrompt(entity);
+
+    let rawText: string;
+    try {
+      const response = await this.openRouter.generateText({
+        messages: [{ role: 'user', content: prompt }],
+        maxTokens: 8192,
+        model,
+      });
+      rawText = response.text;
+      this.logger.log(
+        `Story extension generated | model=${response.model} | ` +
+        `${response.inputTokens}in/${response.outputTokens}out tokens`,
+      );
+    } catch (err) {
+      this.logger.error('Story extension AI error', err);
+      throw new InternalServerErrorException('Story extension failed. Please try again.');
+    }
+
+    const { content, sentenceCount } = recoverStoryContent(rawText);
+
+    if (!content || sentenceCount === 0) {
+      this.logger.warn('Story extension returned no usable sentences — story remains partial.');
+      return this.toModel(entity);
+    }
+
+    const existingSentences: StorySentence[] = entity.sentences ?? [];
+    const startIndex = existingSentences.length;
+    const newSentences: StorySentence[] = content.sentences.map((s, i) => ({
+      index: startIndex + i,
+      german: s.german,
+      english: s.english,
+      vocabWordIds: [],
+    }));
+
+    entity.sentences = [...existingSentences, ...newSentences];
+    entity.generationStatus = 'complete';
+    entity.bodyDe = entity.sentences.map(s => s.german).join(' ');
+    entity.bodyEn = entity.sentences.map(s => s.english).join(' ');
+
+    const saved = await this.storyRepo.save(entity);
+
+    void this.regenerateAudioForExtended(saved);
+
+    return this.toModel(saved);
+  }
+
+  private async regenerateAudioForExtended(entity: StoryEntity): Promise<void> {
+    try {
+      const fullText = entity.sentences.map(s => s.german).join(' ');
+      const { audioUrl, timestamps, durationMs } =
+        await this.audioService.generateAudioWithTimestamps(fullText, entity.id);
+
+      const markedTimestamps = this.vocabMapper.markVocabWords(
+        timestamps,
+        entity.vocabWords ?? [],
+      );
+
+      entity.audioUrl = audioUrl;
+      entity.audioDurationMs = durationMs;
+      entity.wordTimestamps = markedTimestamps;
+
+      await this.storyRepo.save(entity);
+      this.logger.log(`Audio regenerated for extended story ${entity.id}`);
+    } catch (err) {
+      this.logger.warn(`Audio regeneration failed for story ${entity.id}`, err);
     }
   }
 
@@ -355,6 +440,7 @@ export class StoryGenerationService {
       keywords: e.keywords ?? [],
       isLearned: e.isLearned ?? false,
       modelUsed: e.modelUsed ?? null,
+      generationStatus: (e.generationStatus ?? 'complete'),
     };
   }
 }

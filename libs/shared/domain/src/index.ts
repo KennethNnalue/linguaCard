@@ -402,6 +402,17 @@ export type StoryDifficulty = 'A1' | 'A2' | 'B1' | 'B2';
 export type StoryLength = 'short' | 'medium' | 'long' | 'very-long' | 'extra-long';
 export type AIProviderType = 'anthropic' | 'openai' | 'gemini' | 'openrouter';
 
+// ─── RESILIENT STORY GENERATION ──────────────────────────────────────────────
+
+/**
+ * 'complete'  — all sentences generated and saved successfully.
+ * 'partial'   — JSON parse failed or token limit hit; some sentences saved,
+ *               story can be extended via POST /stories/:id/extend.
+ * 'extending' — client-side transient state: an extend request is in flight.
+ *               Never stored in the DB; set locally in StoryStore only.
+ */
+export type StoryGenerationStatus = 'complete' | 'partial' | 'extending';
+
 export interface PronunciationRequest {
   cardId: string;
   word: string;
@@ -433,6 +444,7 @@ export interface Story {
   keywords?: StoryKeyword[];
   isLearned?: boolean;
   modelUsed?: string | null;
+  generationStatus: StoryGenerationStatus;
 }
 
 export interface GenerateStoryDto {

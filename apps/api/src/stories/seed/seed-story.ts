@@ -32,4 +32,5 @@ export const SEED_STORY: Omit<Story, 'id' | 'userId' | 'generatedAt' | 'listenCo
   sourceCollectionIds: [],
   difficultyLevel: 'A2',
   lengthType: 'medium',
+  generationStatus: 'complete',
 };

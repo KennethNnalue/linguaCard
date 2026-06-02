@@ -40,4 +40,8 @@ export class StoryApiService {
   enrich(id: string): Observable<Story> {
     return this.http.post<Story>(`${this.baseUrl}/${id}/enrich`, {});
   }
+
+  extend(id: string): Observable<Story> {
+    return this.http.post<Story>(`${this.baseUrl}/${id}/extend`, {});
+  }
 }
