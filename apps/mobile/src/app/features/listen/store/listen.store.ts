@@ -67,16 +67,22 @@ export class ListenStore {
     this._currentIndex.set(0);
     this._activeSourceLabel.set(label);
 
-    // LC-SA02: Pre-warm AI audio for all German words and first example sentences
-    // in the playlist so audio is cached before the user reaches each card.
+    // LC-SA02: Pre-warm AI audio for German words, German example sentences,
+    // and English translations so all utterances are cached before playback.
     const texts = cards.flatMap(c => {
       const word = c.content.article
         ? `${c.content.article} ${c.content.back}`
         : c.content.back;
-      const sentence = c.content.examples?.[0]?.target;
-      return sentence
-        ? [{ text: word }, { text: sentence }]
-        : [{ text: word }];
+      const items: { text: string; language: string }[] = [
+        { text: word, language: 'de-DE' },
+        { text: c.content.front, language: 'en-US' },
+      ];
+      const sentence = c.content.examples?.[0];
+      if (sentence) {
+        items.push({ text: sentence.target, language: 'de-DE' });
+        items.push({ text: sentence.native, language: 'en-US' });
+      }
+      return items;
     });
     void this.wordAudio.preWarm(texts);
   }
@@ -204,7 +210,7 @@ export class ListenStore {
     if (mode === 'word-meaning') {
       return [
         { text: articleWord, lang: 'de-DE', pause: 800, useAi: true },
-        { text: translation, lang: 'en-US', pause: 1200, useAi: false },
+        { text: translation, lang: 'en-US', pause: 1200, useAi: true },
       ];
     }
     if (mode === 'examples-only') {
@@ -213,21 +219,21 @@ export class ListenStore {
       ];
       if (example) {
         items.push({ text: example.target, lang: 'de-DE', pause: 800, useAi: true });
-        items.push({ text: example.native, lang: 'en-US', pause: 1200, useAi: false });
+        items.push({ text: example.native, lang: 'en-US', pause: 1200, useAi: true });
       }
       return items;
     }
     // deep-dive
     const items: Utterance[] = [
       { text: articleWord, lang: 'de-DE', pause: 600, useAi: true },
-      { text: translation, lang: 'en-US', pause: 600, useAi: false },
+      { text: translation, lang: 'en-US', pause: 600, useAi: true },
     ];
     if (example) {
       items.push({ text: example.target, lang: 'de-DE', pause: 800, useAi: true });
-      items.push({ text: example.native, lang: 'en-US', pause: 800, useAi: false });
+      items.push({ text: example.native, lang: 'en-US', pause: 800, useAi: true });
     }
     if (card.content.notes) {
-      items.push({ text: card.content.notes, lang: 'en-US', pause: 1200, useAi: false });
+      items.push({ text: card.content.notes, lang: 'en-US', pause: 1200, useAi: true });
     }
     return items;
   }

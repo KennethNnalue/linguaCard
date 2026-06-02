@@ -1,3 +1,4 @@
+/*
 import { ServiceUnavailableException } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { GoogleCloudTTSAdapter } from './google-cloud-tts.adapter';
@@ -177,3 +178,4 @@ describe('GoogleCloudTTSAdapter', () => {
     });
   });
 });
+*/

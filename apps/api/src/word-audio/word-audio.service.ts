@@ -99,32 +99,45 @@ export class WordAudioService {
   }
 
   async batchResolve(words: WordAudioResolveRequest[]): Promise<WordAudioBatchResolveResponse> {
-    const language = 'de-DE';
+    const DEFAULT_LANG = 'de-DE';
     const normalized = words.map(w => ({
       original: w,
-      normalizedText: normalizeForAudio(w.text, w.language ?? language),
-      language: w.language ?? language,
+      normalizedText: normalizeForAudio(w.text, w.language ?? DEFAULT_LANG),
+      language: w.language ?? DEFAULT_LANG,
     }));
 
-    const allNormalized = normalized.map(n => n.normalizedText);
-    const existing = await this.repo.findByNormalizedTexts(allNormalized, language);
-    const existingMap = new Map(existing.map(e => [e.normalizedText, e]));
+    // Group by language so each DB query uses the correct language filter.
+    const byLanguage = new Map<string, string[]>();
+    for (const n of normalized) {
+      const group = byLanguage.get(n.language) ?? [];
+      group.push(n.normalizedText);
+      byLanguage.set(n.language, group);
+    }
+    const existingArrays = await Promise.all(
+      [...byLanguage.entries()].map(([lang, texts]) =>
+        this.repo.findByNormalizedTexts(texts, lang),
+      ),
+    );
+    // Key: `language:normalizedText` to avoid collisions across languages.
+    const existingMap = new Map(
+      existingArrays.flat().map(e => [`${e.language}:${e.normalizedText}`, e]),
+    );
 
     const results: WordAudioResolveResponse[] = [];
     let generated = 0;
     let reused = 0;
 
     const missing = normalized.filter(n => {
-      const e = existingMap.get(n.normalizedText);
+      const e = existingMap.get(`${n.language}:${n.normalizedText}`);
       return !e || e.status !== 'ready';
     });
     const ready = normalized.filter(n => {
-      const e = existingMap.get(n.normalizedText);
+      const e = existingMap.get(`${n.language}:${n.normalizedText}`);
       return e && e.status === 'ready';
     });
 
     for (const n of ready) {
-      results.push({ wordAudio: this.toModel(existingMap.get(n.normalizedText)!), cached: true });
+      results.push({ wordAudio: this.toModel(existingMap.get(`${n.language}:${n.normalizedText}`)!), cached: true });
       reused++;
     }
 
