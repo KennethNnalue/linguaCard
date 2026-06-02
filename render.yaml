@@ -34,6 +34,13 @@ services:
       # ── Groq Whisper (STT karaoke timestamps, free tier) ────────────────────
       - key: GROQ_API_KEY
         sync: false          # console.groq.com → API Keys (starts gsk_)
+      # ── Google Cloud TTS (word pronunciation + story narration) ─────────────
+      - key: GOOGLE_CLOUD_TTS_KEY_BASE64
+        sync: false          # paste the base64 key in Render dashboard; never in yaml
+      - key: GOOGLE_CLOUD_TTS_VOICE
+        value: de-DE-Wavenet-B
+      - key: GOOGLE_CLOUD_TTS_LANGUAGE
+        value: de-DE
       - key: API_PUBLIC_URL
         value: https://linguacard-api.onrender.com  # fallback for local-disk mode
       # ── Cloudflare R2 (audio file storage) ─────────────────────────────────

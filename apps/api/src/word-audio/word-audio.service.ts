@@ -1,4 +1,4 @@
-import { Injectable, Logger } from '@nestjs/common';
+import { Injectable, Logger, ServiceUnavailableException } from '@nestjs/common';
 import { randomUUID } from 'crypto';
 import type {
   WordAudio,
@@ -6,11 +6,13 @@ import type {
   WordAudioResolveResponse,
   WordAudioBatchResolveResponse,
 } from '@lingua-card/shared/domain';
+import { GoogleCloudTTSAdapter } from '../ai/providers/google-cloud-tts.adapter';
 import { GeminiAdapter } from '../ai/providers/gemini.adapter';
 import { StorageService } from '../storage/storage.service';
 import { WordAudioRepository } from './word-audio.repository';
 import { WordAudioEntity } from './word-audio.entity';
 import { normalizeForAudio, audioStorageHash } from './normalize';
+import { buildWordSsml } from './ssml-builder';
 
 const BATCH_CONCURRENCY = 5;
 
@@ -27,6 +29,7 @@ export class WordAudioService {
 
   constructor(
     private readonly repo: WordAudioRepository,
+    private readonly tts: GoogleCloudTTSAdapter,
     private readonly gemini: GeminiAdapter,
     private readonly storage: StorageService,
   ) {}
@@ -154,6 +157,30 @@ export class WordAudioService {
     return entity ? this.toModel(entity) : null;
   }
 
+  private async generateSpeechWithFallback(
+    displayText: string,
+    language: string,
+    ssml: boolean,
+  ): Promise<{ audioBuffer: ArrayBuffer; durationMs: number; mimeType: string }> {
+    try {
+      const speech = await this.tts.generateSpeech({ text: displayText, language, ssml });
+      return { audioBuffer: speech.audioBuffer, durationMs: speech.durationMs, mimeType: 'audio/mpeg' };
+    } catch (primaryErr: unknown) {
+      const code = (primaryErr as any)?.code;
+      const isRecoverable =
+        code === 8 ||   // RESOURCE_EXHAUSTED (quota)
+        code === 14 ||  // UNAVAILABLE
+        (primaryErr as any) instanceof ServiceUnavailableException;
+
+      if (!isRecoverable) throw primaryErr;
+
+      this.logger.warn('Google Cloud TTS unavailable — falling back to Gemini TTS');
+    }
+
+    const speech = await this.gemini.generateSpeech({ text: displayText, language });
+    return { audioBuffer: speech.audioBuffer, durationMs: speech.durationMs, mimeType: speech.mimeType };
+  }
+
   private async generateAndPersist(
     normalizedText: string,
     displayText: string,
@@ -161,7 +188,7 @@ export class WordAudioService {
     existingEntity?: WordAudioEntity,
   ): Promise<WordAudioEntity> {
     const hash = audioStorageHash(normalizedText, language);
-    const storagePath = `word-audio/${hash}.wav`;
+    const storagePath = `word-audio/${hash}.mp3`;
 
     let entity = existingEntity;
     if (!entity) {
@@ -179,30 +206,29 @@ export class WordAudioService {
     }
 
     try {
-      const speech = await this.gemini.generateSpeech({ text: displayText, language });
+      const speech = await this.generateSpeechWithFallback(buildWordSsml(displayText), language, true);
+      const ext         = speech.mimeType.includes('mp3') ? 'mp3' : 'wav';
+      const actualPath  = `word-audio/${hash}.${ext}`;
       const audioUrl = await this.storage.upload(
         Buffer.from(speech.audioBuffer),
-        storagePath,
-        'audio/wav',
+        actualPath,
+        speech.mimeType.includes('mp3') ? 'audio/mpeg' : 'audio/wav',
       );
 
-      entity.audioUrl = audioUrl;
+      entity.audioUrl   = audioUrl;
+      entity.storagePath = actualPath;
       entity.durationMs = speech.durationMs;
-      entity.status = 'ready';
+      entity.status     = 'ready';
       return await this.repo.save(entity);
     } catch (err: any) {
       this.logger.warn(`TTS generation failed for "${displayText}":`, err);
 
-      // On 429, keep status 'pending' so it retries next time instead of staying failed.
-      // On other errors, mark failed and stamp failedAt for the cooldown check in resolve().
       const is429 = err?.status === 429 || err?.response?.statusCode === 429;
       if (!is429) {
-        entity.status = 'failed';
+        entity.status   = 'failed';
         entity.failedAt = new Date();
         await this.repo.save(entity);
       }
-      // Attach retryAfterMs to the error so the controller can forward it
-      // to the client via a Retry-After header.
       throw err;
     }
   }

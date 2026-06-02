@@ -8,6 +8,9 @@ export interface AiConfig {
   groqApiKey: string;
   defaultProvider: 'anthropic' | 'openai' | 'gemini' | 'openrouter';
   storageBucket: string;
+  googleCloudTtsKeyBase64: string;
+  googleCloudTtsVoice: string;
+  googleCloudTtsLanguage: string;
 }
 
 export const aiConfig = (): { ai: AiConfig } => ({
@@ -21,5 +24,8 @@ export const aiConfig = (): { ai: AiConfig } => ({
     groqApiKey:           process.env['GROQ_API_KEY']             ?? '',
     defaultProvider: (process.env['AI_DEFAULT_PROVIDER'] ?? 'gemini') as AiConfig['defaultProvider'],
     storageBucket:        process.env['AI_STORAGE_BUCKET']        ?? 'lingua-card-audio-dev',
+    googleCloudTtsKeyBase64: process.env['GOOGLE_CLOUD_TTS_KEY_BASE64'] ?? '',
+    googleCloudTtsVoice:     process.env['GOOGLE_CLOUD_TTS_VOICE']      ?? 'de-DE-Wavenet-B',
+    googleCloudTtsLanguage:  process.env['GOOGLE_CLOUD_TTS_LANGUAGE']   ?? 'de-DE',
   },
 });

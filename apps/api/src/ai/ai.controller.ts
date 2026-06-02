@@ -1,5 +1,6 @@
-import { Body, Controller, forwardRef, HttpException, Inject, Logger, Post, Res } from '@nestjs/common';
+import { Body, Controller, forwardRef, HttpException, Inject, Logger, Post, Res, ServiceUnavailableException } from '@nestjs/common';
 import { Response } from 'express';
+import { GoogleCloudTTSAdapter } from './providers/google-cloud-tts.adapter';
 import { GeminiAdapter } from './providers/gemini.adapter';
 import { StorageService } from '../storage/storage.service';
 import { WordAudioService } from '../word-audio/word-audio.service';
@@ -22,6 +23,7 @@ export class AiController {
   private readonly logger = new Logger(AiController.name);
 
   constructor(
+    private readonly gctts:  GoogleCloudTTSAdapter,
     private readonly gemini: GeminiAdapter,
     private readonly storage: StorageService,
     @Inject(forwardRef(() => WordAudioService))
@@ -31,19 +33,43 @@ export class AiController {
   @Post('tts')
   async tts(@Body() dto: TtsRequestDto, @Res() res: Response): Promise<void> {
     try {
-      const speech = await this.gemini.generateSpeech({
-        text: dto.text,
-        voice: dto.voice,
-        language: dto.language ?? 'de-DE',
-      });
+      let audioBuffer: ArrayBuffer;
+      let mimeType: string;
 
-      const ext = speech.mimeType.includes('mp3') ? 'mp3' : 'wav';
+      try {
+        const speech = await this.gctts.generateSpeech({
+          text:     dto.text,
+          voice:    dto.voice,
+          language: dto.language ?? 'de-DE',
+        });
+        audioBuffer = speech.audioBuffer;
+        mimeType    = 'audio/mpeg';
+      } catch (primaryErr: unknown) {
+        const code = (primaryErr as any)?.code;
+        const isRecoverable =
+          code === 8 ||
+          code === 14 ||
+          (primaryErr as any) instanceof ServiceUnavailableException;
+
+        if (!isRecoverable) throw primaryErr;
+
+        this.logger.warn('Google Cloud TTS unavailable — falling back to Gemini TTS');
+        const speech = await this.gemini.generateSpeech({
+          text:     dto.text,
+          voice:    dto.voice,
+          language: dto.language ?? 'de-DE',
+        });
+        audioBuffer = speech.audioBuffer;
+        mimeType    = speech.mimeType;
+      }
+
+      const ext = mimeType.includes('mp3') ? 'mp3' : 'wav';
       res.set({
-        'Content-Type': speech.mimeType,
+        'Content-Type':        mimeType,
         'Content-Disposition': `inline; filename="tts.${ext}"`,
-        'Content-Length': speech.audioBuffer.byteLength,
+        'Content-Length':      audioBuffer.byteLength,
       });
-      res.send(Buffer.from(speech.audioBuffer));
+      res.send(Buffer.from(audioBuffer));
     } catch (err) {
       this.handleTtsError(err, res);
     }

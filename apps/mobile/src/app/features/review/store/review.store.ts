@@ -88,9 +88,11 @@ export class ReviewStore {
       return {...s, ratings: {...s.ratings, [card.id]: rating}};
     });
 
-    // 1. Optimistic SM-2 state update
+    // 1. Compute new SRS state and apply optimistically to the store immediately
     const existingSrs = card.srsState ?? this.sm2.freshState(card.id, card.userId);
     const newSrs = this.sm2.compute(existingSrs, rating);
+    const optimisticCard: Card = {...card, srsState: newSrs};
+    this.cardStore.updateCard(optimisticCard);
 
     // 2. Buffer locally — write to pending list regardless of connectivity
     const sessionId = this._activeSession()?.id ?? crypto.randomUUID();

@@ -85,7 +85,7 @@ export const CardStore = signalStore(
 
     totalCount: computed(() => cards().length),
     masteredCount: computed(() =>
-      cards().filter((c) => c.srsState?.state === 'mastered').length
+      cards().filter((c) => (c.srsState?.masteryLevel ?? 0) >= 4).length
     ),
     learningCount: computed(() =>
       cards().filter(
