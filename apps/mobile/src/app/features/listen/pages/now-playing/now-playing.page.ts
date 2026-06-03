@@ -40,25 +40,23 @@ export class NowPlayingPage {
   // M6 fix: register side effects at field level, not in constructor body
   // Signal so effect() re-runs reactively when the guard flips
   private readonly _readyToRedirect = signal(false);
-
-  private readonly _afterFirstRender = afterNextRender(
-    () => this._readyToRedirect.set(true)
-  );
-
   private readonly _redirectEffect = effect(() => {
     if (this._readyToRedirect() && this.listenStore.status() === 'complete') {
       this.router.navigate(['/listen/complete'], { replaceUrl: true });
     }
   });
 
-  // C1 fix: stop audio hard on destroy so in-flight speech doesn't outlive the page
   private readonly _destroyRef = inject(DestroyRef);
-  private readonly _onDestroy = this._destroyRef.onDestroy(() => {
-    if (this.listenStore.status() !== 'complete') {
-      this.listenStore.stopAudio();
-      this.listenStore.pause();
-    }
-  });
+
+  constructor() {
+    afterNextRender(() => this._readyToRedirect.set(true));
+    this._destroyRef.onDestroy(() => {
+      if (this.listenStore.status() !== 'complete') {
+        this.listenStore.stopAudio();
+        this.listenStore.pause();
+      }
+    });
+  }
 
   // Named derived state — isPlaying/isError used by name in template
   readonly isPlaying = computed(() => this.listenStore.status() === 'playing');
@@ -72,7 +70,10 @@ export class NowPlayingPage {
     const script = this.listenStore.currentScript();
     if (!script) return [];
 
-    const visible = script.segments.filter(s => s.type !== 'silence');
+    // word_target / word_native are shown in the hero block — exclude from the track
+    const visible = script.segments.filter(s =>
+      s.type !== 'silence' && s.type !== 'word_target' && s.type !== 'word_native'
+    );
     const segIdx  = this.listenStore.segmentIndex();
     const activeSeg = script.segments[segIdx];
     const activeVisibleIdx = (!activeSeg || activeSeg.type === 'silence')

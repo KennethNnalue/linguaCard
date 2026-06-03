@@ -1,5 +1,5 @@
 import { Injectable, computed, inject, signal } from '@angular/core';
-import type { Card, WordAudioResolveRequest } from '@lingua-card/shared/domain';
+import { type Card, type WordAudioResolveRequest } from '@lingua-card/shared/domain';
 import { AiAudioCacheService } from '../../features/ai/audio/ai-audio-cache.service';
 import { GeminiAdapter } from '../../features/ai/providers/gemini.adapter';
 import { AudioService } from './audio.service';
@@ -121,7 +121,8 @@ export class WordAudioService {
     if (!this._isRateLimited()) {
       const ephemeralUrl = await this._ephemeralTts(text, language);
       if (ephemeralUrl) {
-        return this._playAndWait(ephemeralUrl);
+        // ephemeral = true: this blob was never stored in _urlMap, revoke after play.
+        return this._playAndWait(ephemeralUrl, true);
       }
     }
 
@@ -281,7 +282,7 @@ export class WordAudioService {
     }
   }
 
-  private _playAndWait(url: string): Promise<void> {
+  private _playAndWait(url: string, ephemeral = false): Promise<void> {
     return new Promise(resolve => {
       const audio = new Audio(url);
       this._activeAudio = audio;
@@ -290,7 +291,11 @@ export class WordAudioService {
         // Only clear the reference if it still points to this element —
         // stop() may have already nulled it and started a new word.
         if (this._activeAudio === audio) this._activeAudio = null;
-        if (url.startsWith('blob:')) URL.revokeObjectURL(url);
+        // Only revoke truly ephemeral blob URLs (one-shot TTS, never stored in
+        // _urlMap). Persistent blobs from the IndexedDB web cache must stay alive
+        // for the entire session — revoking them causes net::ERR_FILE_NOT_FOUND
+        // when previous() replays a card that already played once this session.
+        if (ephemeral && url.startsWith('blob:')) URL.revokeObjectURL(url);
         resolve();
       };
 

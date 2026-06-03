@@ -30,8 +30,7 @@ export type PlaybackSpeed = 0.75 | 0.95 | 1 | 1.25 | 1.5;
 
 export const LISTEN_SPEEDS_EXTENDED: PlaybackSpeed[] = [0.75, 0.95, 1, 1.25, 1.5];
 
-// now-playing omits 0.95 — derived so both arrays stay in sync
-export const PLAYBACK_SPEEDS: PlaybackSpeed[] = LISTEN_SPEEDS_EXTENDED.filter(s => s !== 0.95);
+export const PLAYBACK_SPEEDS: PlaybackSpeed[] = LISTEN_SPEEDS_EXTENDED;
 
 // ─── Play Modes ───────────────────────────────────────────────────────────────
 
