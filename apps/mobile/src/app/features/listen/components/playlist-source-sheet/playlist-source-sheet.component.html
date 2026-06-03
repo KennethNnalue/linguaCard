@@ -7,7 +7,8 @@
     <div class="pss-options">
 
       <!-- Today's due words -->
-      <div class="pss-opt" [class.active]="isActive('due')" (click)="selectDue()">
+      <!-- H2 fix: [class.active] now binds to the activeSource() computed, not a plain method -->
+      <div class="pss-opt" [class.active]="activeSource() === 'due'" (click)="selectDue()">
         <div class="pss-opt-icon pss-icon-due">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round">
             <circle cx="12" cy="12" r="10"/><polyline points="12,6 12,12 16,14"/>
@@ -17,8 +18,8 @@
           <div class="pss-opt-title">Today's due words</div>
           <div class="pss-opt-sub">Cards scheduled for today</div>
         </div>
-        <div class="pss-opt-count">{{ dueCount() }}</div>
-        @if (isActive('due')) {
+        <div class="pss-opt-count">{{ listenStore.dueCount() }}</div>
+        @if (activeSource() === 'due') {
           <div class="pss-opt-check">
             <svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round">
               <polyline points="20,6 9,17 4,12"/>
@@ -28,7 +29,7 @@
       </div>
 
       <!-- A collection (expandable) -->
-      <div class="pss-opt" [class.active]="selectedSource().startsWith('collection:')" (click)="toggleCollections()">
+      <div class="pss-opt" [class.active]="activeSource().startsWith('collection:')" (click)="toggleCollections()">
         <div class="pss-opt-icon pss-icon-col">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round">
             <rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18"/><path d="M9 21V9"/>
@@ -46,14 +47,14 @@
 
       @if (showCollections()) {
         <div class="pss-collection-list">
-          @for (col of collections(); track col.id) {
+          @for (col of collectionStore.collections(); track col.id) {
             <div
               class="pss-col-row"
-              [class.active]="isCollectionActive(col.id)"
+              [class.active]="activeSource() === 'collection:' + col.id"
               (click)="selectCollection(col.id)">
               <span class="pss-col-name">{{ col.name }}</span>
-              <span class="pss-col-count">{{ collectionCount(col.id) }}</span>
-              @if (isCollectionActive(col.id)) {
+              <span class="pss-col-count">{{ listenStore.collectionCounts().get(col.id) ?? 0 }}</span>
+              @if (activeSource() === 'collection:' + col.id) {
                 <div class="pss-opt-check pss-check-sm">
                   <svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round">
                     <polyline points="20,6 9,17 4,12"/>
@@ -66,7 +67,7 @@
       }
 
       <!-- All cards -->
-      <div class="pss-opt" [class.active]="isActive('all')" (click)="selectAll()">
+      <div class="pss-opt" [class.active]="activeSource() === 'all'" (click)="selectAll()">
         <div class="pss-opt-icon pss-icon-all">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round">
             <path d="M4 6h16M4 12h16M4 18h16"/>
@@ -76,8 +77,8 @@
           <div class="pss-opt-title">All cards</div>
           <div class="pss-opt-sub">Your complete vocabulary</div>
         </div>
-        <div class="pss-opt-count pss-count-hint">{{ allCount() }}</div>
-        @if (isActive('all')) {
+        <div class="pss-opt-count pss-count-hint">{{ listenStore.allCount() }}</div>
+        @if (activeSource() === 'all') {
           <div class="pss-opt-check">
             <svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round">
               <polyline points="20,6 9,17 4,12"/>
@@ -87,7 +88,7 @@
       </div>
 
       <!-- Struggling words -->
-      <div class="pss-opt" [class.active]="isActive('struggling')" (click)="selectStruggling()">
+      <div class="pss-opt" [class.active]="activeSource() === 'struggling'" (click)="selectStruggling()">
         <div class="pss-opt-icon pss-icon-struggling">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round">
             <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
@@ -97,8 +98,8 @@
           <div class="pss-opt-title">Struggling words</div>
           <div class="pss-opt-sub">Mastery 0–2, needs practice</div>
         </div>
-        <div class="pss-opt-count pss-count-red">{{ strugglingCount() }}</div>
-        @if (isActive('struggling')) {
+        <div class="pss-opt-count pss-count-red">{{ listenStore.strugglingCount() }}</div>
+        @if (activeSource() === 'struggling') {
           <div class="pss-opt-check">
             <svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round">
               <polyline points="20,6 9,17 4,12"/>

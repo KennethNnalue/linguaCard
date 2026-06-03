@@ -409,18 +409,24 @@ Never write mastery colour CSS. Never use `.lc-mastery-dot--*` global classes.
 
 ## Angular rules (always follow)
 
+> **Always read `.claude/skills/angular.md` before writing or editing any Angular component, directive, pipe, or service.**
+
 1. **`ChangeDetectionStrategy.OnPush`** — every component, no exceptions
-2. **Standalone components only** — no NgModule declarations
+2. **Standalone components only** — do NOT set `standalone: true` in the decorator (it is the default in Angular 19+; setting it is redundant)
 3. **`input()` signals** for new component inputs, not `@Input()` decorators
-4. **`inject()`** for dependencies, not constructor injection
-5. **Lazy-load every feature** — `loadComponent` / `loadChildren` in routes
-6. **Never use `any`** — every HTTP call has a typed generic
-7. **Never subscribe in a service** — return `Observable<T>`, let stores/components subscribe
-8. **Never hardcode a language** — everything through `LearningContext` interface
-9. **Offline-first** — writes go to local store first; `SyncService` handles server sync
-10. **DTOs for writes** — `CreateCardDto` not `Partial<Card>` for POST/PATCH
-11. **Never import from `mock-data.ts`** — use `@lingua-card/shared/domain`
-12. **Never hardcode a URL** — always use `environment.apiUrl`
+4. **`output()` function** for outputs, not `@Output()` / `EventEmitter`
+5. **`inject()`** for dependencies, not constructor injection
+6. **Host bindings in `host` object** — never use `@HostBinding` / `@HostListener`
+7. **Native control flow** — `@if`, `@for`, `@switch`; never `*ngIf`, `*ngFor`, `*ngSwitch`
+8. **`class` / `style` bindings** — never `ngClass` or `ngStyle`
+9. **Lazy-load every feature** — `loadComponent` / `loadChildren` in routes
+10. **Never use `any`** — every HTTP call has a typed generic
+11. **Never subscribe in a service** — return `Observable<T>`, let stores/components subscribe
+12. **Never hardcode a language** — everything through `LearningContext` interface
+13. **Offline-first** — writes go to local store first; `SyncService` handles server sync
+14. **DTOs for writes** — `CreateCardDto` not `Partial<Card>` for POST/PATCH
+15. **Never import from `mock-data.ts`** — use `@lingua-card/shared/domain`
+16. **Never hardcode a URL** — always use `environment.apiUrl`
 
 ---
 

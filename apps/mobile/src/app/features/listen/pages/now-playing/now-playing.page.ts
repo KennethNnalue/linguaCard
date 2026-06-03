@@ -1,142 +1,136 @@
-import { afterNextRender, ChangeDetectionStrategy, Component, computed, effect, inject, OnDestroy } from '@angular/core';
+import {
+  afterNextRender,
+  ChangeDetectionStrategy,
+  Component,
+  computed,
+  DestroyRef,
+  effect,
+  inject,
+  signal,
+} from '@angular/core';
 import { Router } from '@angular/router';
 import { NavController } from '@ionic/angular';
 import { IonContent, IonHeader, IonToolbar } from '@ionic/angular/standalone';
+import { PlayMode } from '@lingua-card/shared/domain';
 import { ListenStore } from '../../store/listen.store';
 import { ArticleBadgeComponent } from '../../../../shared/components/article-badge/article-badge.component';
+import { PLAY_MODE_OPTIONS, PLAYBACK_SPEEDS, PlaybackSpeed } from '../../models/listen.models';
+
+interface SegmentViewModel {
+  text: string;
+  langLabel: string;
+  cls: '' | 'played' | 'playing';
+}
 
 @Component({
   selector: 'lc-now-playing',
   templateUrl: './now-playing.page.html',
-  styleUrls: ['./now-playing.page.scss'],
+  styleUrl: './now-playing.page.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [IonContent, IonHeader, IonToolbar, ArticleBadgeComponent],
 })
-export class NowPlayingPage implements OnDestroy {
-  private readonly listenStore = inject(ListenStore);
+export class NowPlayingPage {
+  protected readonly listenStore = inject(ListenStore);
   private readonly router = inject(Router);
   private readonly navCtrl = inject(NavController);
 
-  // Guard: only redirect to complete after the first render so that
-  // arriving on this page while status is already 'complete' (stale store
-  // state) doesn't immediately bounce the user away before playback starts.
-  private _readyToRedirect = false;
+  readonly MODES = PLAY_MODE_OPTIONS;
+  readonly SPEEDS = PLAYBACK_SPEEDS;
 
-  constructor() {
-    afterNextRender(() => {
-      this._readyToRedirect = true;
-    });
+  // M6 fix: register side effects at field level, not in constructor body
+  // Signal so effect() re-runs reactively when the guard flips
+  private readonly _readyToRedirect = signal(false);
 
-    effect(() => {
-      if (this._readyToRedirect && this.status() === 'complete') {
-        this.router.navigate(['/listen/complete'], { replaceUrl: true });
-      }
-    });
-  }
+  private readonly _afterFirstRender = afterNextRender(
+    () => this._readyToRedirect.set(true)
+  );
 
-  readonly currentCard = this.listenStore.currentCard;
-  readonly currentScript = this.listenStore.currentScript;
-  readonly segmentIndex = this.listenStore.segmentIndex;
-  readonly cardIndex = this.listenStore.cardIndex;
-  readonly queue = this.listenStore.queue;
-  readonly status = this.listenStore.status;
-  readonly playMode = this.listenStore.playMode;
-  readonly speed = this.listenStore.speed;
-  readonly isShuffled = this.listenStore.isShuffled;
-  readonly isRepeat = this.listenStore.isRepeat;
-  readonly estimatedMinutes = this.listenStore.estimatedMinutes;
-  readonly errorMessage = this.listenStore.errorMessage;
-
-  readonly isPlaying = computed(() => this.status() === 'playing');
-  readonly isError = computed(() => this.status() === 'error');
-
-  readonly progressPercent = computed(() => {
-    const len = this.queue().length;
-    return len ? (this.cardIndex() / len) * 100 : 0;
+  private readonly _redirectEffect = effect(() => {
+    if (this._readyToRedirect() && this.listenStore.status() === 'complete') {
+      this.router.navigate(['/listen/complete'], { replaceUrl: true });
+    }
   });
 
-  readonly visibleSegments = computed(() => {
-    const script = this.currentScript();
+  // C1 fix: stop audio hard on destroy so in-flight speech doesn't outlive the page
+  private readonly _destroyRef = inject(DestroyRef);
+  private readonly _onDestroy = this._destroyRef.onDestroy(() => {
+    if (this.listenStore.status() !== 'complete') {
+      this.listenStore.stopAudio();
+      this.listenStore.pause();
+    }
+  });
+
+  // Named derived state — isPlaying/isError used by name in template
+  readonly isPlaying = computed(() => this.listenStore.status() === 'playing');
+  readonly isError   = computed(() => this.listenStore.status() === 'error');
+
+  // M5 fix: use the store's progressPercent directly — no local duplication
+  readonly progressPercent = this.listenStore.progressPercent;
+
+  // H1 fix: build a typed view-model array instead of calling plain methods per segment
+  readonly segmentViewModels = computed<SegmentViewModel[]>(() => {
+    const script = this.listenStore.currentScript();
     if (!script) return [];
-    return script.segments.filter(s => s.type !== 'silence');
-  });
 
-  readonly activeVisibleSegmentIndex = computed(() => {
-    const script = this.currentScript();
-    const segIdx = this.segmentIndex();
-    if (!script) return -1;
+    const visible = script.segments.filter(s => s.type !== 'silence');
+    const segIdx  = this.listenStore.segmentIndex();
     const activeSeg = script.segments[segIdx];
-    if (!activeSeg || activeSeg.type === 'silence') return -1;
-    return this.visibleSegments().findIndex(s => s === activeSeg);
+    const activeVisibleIdx = (!activeSeg || activeSeg.type === 'silence')
+      ? -1
+      : visible.findIndex(s => s === activeSeg);
+
+    return visible.map((seg, i) => ({
+      text: seg.text,
+      langLabel: seg.type === 'grammar_tip' ? 'TIP' : seg.lang.toUpperCase(),
+      cls: i < activeVisibleIdx ? 'played' : i === activeVisibleIdx ? 'playing' : '',
+    }));
   });
-
-  readonly MODES = [
-    { value: 'compact' as const, label: 'Compact', desc: 'Word + meaning' },
-    { value: 'examples' as const, label: 'Examples', desc: 'Full sentences' },
-    { value: 'deepDive' as const, label: 'Deep Dive', desc: '+ grammar tip' },
-  ];
-
-  readonly SPEEDS = [0.75 as const, 1 as const, 1.25 as const, 1.5 as const];
 
   readonly grammarNote = computed(() => {
-    const card = this.currentCard();
-    return this.playMode() === 'deepDive' ? (card?.content?.notes ?? '') : '';
+    const card = this.listenStore.currentCard();
+    return this.listenStore.playMode() === 'deepDive' ? (card?.content?.notes ?? '') : '';
   });
 
-  segmentClass(idx: number): string {
-    const activeIdx = this.activeVisibleSegmentIndex();
-    if (idx < activeIdx) return 'played';
-    if (idx === activeIdx) return 'playing';
-    return '';
-  }
-
-  segmentLang(idx: number): string {
-    const seg = this.visibleSegments()[idx];
-    if (!seg) return '';
-    if (seg.type === 'grammar_tip') return 'TIP';
-    return seg.lang.toUpperCase();
-  }
-
+  // H4 fix: togglePlay is safe in all states — guards handled per action
   togglePlay(): void {
     if (this.isPlaying()) {
       this.listenStore.pause();
+    } else if (this.isError()) {
+      this.listenStore.retrySegment();
     } else {
-      this.listenStore.resume();
+      this.listenStore.resume(); // no-ops when not paused (guard is in store.resume())
     }
   }
 
-  next(): void { this.listenStore.next(); }
+  next(): void     { this.listenStore.next(); }
   previous(): void { this.listenStore.previous(); }
-  retry(): void { this.listenStore.retrySegment(); }
+  retry(): void    { this.listenStore.retrySegment(); }
   skipCard(): void { this.listenStore.skipCard(); }
 
   toggleShuffle(): void {
-    this.listenStore.updateSettings({ shuffle: !this.isShuffled() });
+    this.listenStore.updateSettings({ shuffle: !this.listenStore.isShuffled() });
   }
 
   toggleRepeat(): void {
-    this.listenStore.updateSettings({ repeat: !this.isRepeat() });
+    this.listenStore.updateSettings({ repeat: !this.listenStore.isRepeat() });
   }
 
-  setMode(mode: 'compact' | 'examples' | 'deepDive'): void {
+  setMode(mode: PlayMode): void {
     this.listenStore.updateSettings({ playMode: mode });
   }
 
-  setSpeed(speed: 0.75 | 1 | 1.25 | 1.5): void {
+  setSpeed(speed: PlaybackSpeed): void {
     this.listenStore.updateSettings({ speed });
   }
 
   goBack(): void {
+    // C1 fix: stop audio before navigating so the utterance doesn't keep playing
+    this.listenStore.stopAudio();
     this.listenStore.pause();
     this.navCtrl.back();
   }
 
   goComplete(): void {
     this.router.navigate(['/listen/complete']);
-  }
-
-  ngOnDestroy(): void {
-    if (this.status() === 'complete') return;
-    this.listenStore.pause();
   }
 }

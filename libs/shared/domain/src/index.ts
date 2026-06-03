@@ -35,7 +35,7 @@ export interface PlaybackScript {
 
 export interface PlayerSettings {
   playMode: PlayMode;
-  speed: 0.75 | 1 | 1.25 | 1.5;
+  speed: 0.75 | 0.95 | 1 | 1.25 | 1.5;
   shuffle: boolean;
   repeat: boolean;
 }

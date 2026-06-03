@@ -30,6 +30,12 @@ export class WordAudioService {
   // Stop making API calls until this timestamp passes (set on 429/503).
   private _rateLimitedUntil = 0;
 
+  // The HTMLAudioElement currently playing via _playAndWait, if any.
+  // Kept so stop() can abort it immediately — new Audio() creates an anonymous
+  // element with no external cancel handle, so without this reference the
+  // audio plays to completion regardless of navigation or skip actions.
+  private _activeAudio: HTMLAudioElement | null = null;
+
   /**
    * Play AI pronunciation for a card's word.
    * Builds text from article + back, then resolves via the word audio registry.
@@ -278,16 +284,41 @@ export class WordAudioService {
   private _playAndWait(url: string): Promise<void> {
     return new Promise(resolve => {
       const audio = new Audio(url);
+      this._activeAudio = audio;
+
       const cleanup = () => {
-        // Revoke ephemeral blob URLs immediately after playback to prevent memory leaks.
-        // Persistent R2 URLs (https://...) are not affected.
+        // Only clear the reference if it still points to this element —
+        // stop() may have already nulled it and started a new word.
+        if (this._activeAudio === audio) this._activeAudio = null;
         if (url.startsWith('blob:')) URL.revokeObjectURL(url);
         resolve();
       };
+
       audio.addEventListener('ended', cleanup, { once: true });
       audio.addEventListener('error', cleanup, { once: true });
+      // 'lc-stop' is dispatched by stop() below so the promise resolves immediately
+      // instead of hanging forever (pause() fires no standard events).
+      audio.addEventListener('lc-stop', cleanup, { once: true });
       audio.play().catch(cleanup);
     });
+  }
+
+  /**
+   * Immediately stop all in-flight audio: the active HTMLAudioElement (if any)
+   * and the Web Speech fallback. Called by the listen pipeline on next/previous/skip
+   * so the current word does not keep playing after the user navigates away.
+   */
+  stop(): void {
+    if (this._activeAudio) {
+      const audio = this._activeAudio;
+      this._activeAudio = null;
+      audio.pause();
+      audio.currentTime = 0;
+      // Dispatch before nulling so the cleanup listener inside _playAndWait resolves
+      // the promise — prevents the concatMap inner observable from hanging forever.
+      audio.dispatchEvent(new Event('lc-stop'));
+    }
+    this.fallback.stop();
   }
 
   /**

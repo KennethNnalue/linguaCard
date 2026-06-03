@@ -14,7 +14,7 @@
 
 <ion-content>
 
-  @if (status() === 'complete') {
+  @if (listenStore.status() === 'complete') {
     <div class="np-complete-redirect">
       <div class="np-checkmark">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
@@ -26,34 +26,35 @@
     </div>
   } @else {
 
-    <!-- Card display area — word + translation + segment track all inside -->
     <div class="np-card-area" [class.error]="isError()">
 
-      <!-- Hero: article + word + translation — grows to fill space above segments -->
       <div class="np-hero">
-        @if (currentCard()?.content?.article) {
+        @if (listenStore.currentCard()?.content?.article) {
           <div class="np-article-row">
-            <lc-article-badge [article]="currentCard()!.content.article" />
+            <lc-article-badge [article]="listenStore.currentCard()!.content.article" />
           </div>
         }
-        <div class="np-word">{{ currentCard()?.content?.back }}</div>
-        <div class="np-translation">{{ currentCard()?.content?.front }}</div>
+        <div class="np-word">{{ listenStore.currentCard()?.content?.back }}</div>
+        <div class="np-translation">{{ listenStore.currentCard()?.content?.front }}</div>
       </div>
 
-      <!-- Segment visualiser -->
-      @if (visibleSegments().length > 0) {
+      <!-- H1 fix: iterate view-model — no plain method calls in the loop -->
+      @if (segmentViewModels().length > 0) {
         <div class="np-segment-track">
-          @for (seg of visibleSegments(); track $index; let i = $index) {
-            <div class="np-segment" [class]="segmentClass(i)">
+          @for (vm of segmentViewModels(); track vm.text) {
+            <!-- M1 fix: discrete class bindings preserve the static np-segment class -->
+            <div
+              class="np-segment"
+              [class.played]="vm.cls === 'played'"
+              [class.playing]="vm.cls === 'playing'">
               <div class="np-segment-dot"></div>
-              <div class="np-segment-text">{{ seg.text }}</div>
-              <div class="np-segment-lang">{{ segmentLang(i) }}</div>
+              <div class="np-segment-text">{{ vm.text }}</div>
+              <div class="np-segment-lang">{{ vm.langLabel }}</div>
             </div>
           }
         </div>
       }
 
-      <!-- Grammar pill (Deep Dive) -->
       @if (grammarNote()) {
         <div class="np-grammar-pill">
           <span class="np-grammar-icon">💡</span>
@@ -63,7 +64,6 @@
         </div>
       }
 
-      <!-- Error state -->
       @if (isError()) {
         <div class="np-error-pill">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
@@ -78,23 +78,22 @@
       }
     </div>
 
-    <!-- Progress -->
+    <!-- M5 fix: progressPercent comes from the store directly via the forwarded computed -->
     <div class="np-progress-wrap">
       <div class="np-progress-bar">
         <div class="np-progress-fill" [style.width.%]="progressPercent()"></div>
       </div>
       <div class="np-progress-labels">
-        <span>{{ cardIndex() + 1 }} / {{ queue().length }}</span>
-        <span>~{{ estimatedMinutes() }} min</span>
+        <span>{{ listenStore.cardIndex() + 1 }} / {{ listenStore.queue().length }}</span>
+        <span>~{{ listenStore.estimatedMinutes() }} min</span>
       </div>
     </div>
 
-    <!-- Mode selector -->
     <div class="np-mode-row">
       @for (m of MODES; track m.value) {
         <button
           class="np-mode-btn"
-          [class.active]="playMode() === m.value"
+          [class.active]="listenStore.playMode() === m.value"
           (click)="setMode(m.value)">
           <div class="np-mode-title">{{ m.label }}</div>
           <div class="np-mode-sub">{{ m.desc }}</div>
@@ -102,22 +101,20 @@
       }
     </div>
 
-    <!-- Speed -->
     <div class="np-speed-row">
       <span class="np-speed-label">Speed</span>
       @for (s of SPEEDS; track s) {
         <button
           class="np-speed-chip"
-          [class.active]="speed() === s"
+          [class.active]="listenStore.speed() === s"
           (click)="setSpeed(s)">
           {{ s }}×
         </button>
       }
     </div>
 
-    <!-- Transport controls -->
     <div class="np-transport">
-      <button class="np-ctrl" [class.active]="isShuffled()" (click)="toggleShuffle()" aria-label="Shuffle">
+      <button class="np-ctrl" [class.active]="listenStore.isShuffled()" (click)="toggleShuffle()" aria-label="Shuffle">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round">
           <polyline points="16,3 21,3 21,8"/>
           <line x1="4" y1="20" x2="21" y2="3"/>
@@ -159,7 +156,7 @@
         </svg>
       </button>
 
-      <button class="np-ctrl" [class.active]="isRepeat()" (click)="toggleRepeat()" aria-label="Repeat">
+      <button class="np-ctrl" [class.active]="listenStore.isRepeat()" (click)="toggleRepeat()" aria-label="Repeat">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round">
           <polyline points="17,1 21,5 17,9"/>
           <path d="M3,11V9a4,4,0,0,1,4-4h14"/>

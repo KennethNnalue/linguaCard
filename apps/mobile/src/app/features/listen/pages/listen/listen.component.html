@@ -16,18 +16,18 @@
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round">
         <path d="M8 6h13M8 12h13M8 18h13M3 6h.01M3 12h.01M3 18h.01"/>
       </svg>
-      <span class="lh-source-label">{{ sourceLabel() }}</span>
+      <span class="lh-source-label">{{ listenStore.sourceLabel() }}</span>
       <svg class="lh-source-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
         <polyline points="6,9 12,15 18,9"/>
       </svg>
     </button>
-    <span class="lh-queue-meta">~{{ estimatedMinutes() }} min</span>
+    <span class="lh-queue-meta">~{{ listenStore.estimatedMinutes() }} min</span>
   </div>
 
   <!-- Hero -->
   <div class="lh-hero">
     <div class="lh-hero-label">Playing from</div>
-    <div class="lh-hero-title">{{ sourceLabel() }}</div>
+    <div class="lh-hero-title">{{ listenStore.sourceLabel() }}</div>
     <div class="lh-hero-sub">{{ queueCount() }} words in queue</div>
     <div class="lh-hero-btns">
       <button class="lh-btn-play" (click)="play()" [disabled]="!queueCount()">
@@ -50,7 +50,7 @@
     @for (m of MODES; track m.value) {
       <button
         class="lh-mode-btn"
-        [class.active]="playMode() === m.value"
+        [class.active]="listenStore.playMode() === m.value"
         (click)="setMode(m.value)">
         <div class="lh-mode-title">{{ m.label }}</div>
         <div class="lh-mode-sub">{{ m.desc }}</div>
@@ -64,7 +64,7 @@
     @for (s of SPEEDS; track s) {
       <button
         class="lh-speed-chip"
-        [class.active]="speed() === s"
+        [class.active]="listenStore.speed() === s"
         (click)="setSpeed(s)">
         {{ s }}×
       </button>
@@ -74,7 +74,7 @@
   <!-- Queue header -->
   <div class="lh-queue-hdr">
     <span class="lh-queue-hdr-title">Queue ({{ queueCount() }} words)</span>
-    <span class="lh-queue-hdr-time">~{{ estimatedMinutes() }} min</span>
+    <span class="lh-queue-hdr-time">~{{ listenStore.estimatedMinutes() }} min</span>
   </div>
 
   <!-- Queue list -->
@@ -86,7 +86,7 @@
         <p class="lh-empty-sub">Tap the source above to choose a playlist</p>
       </div>
     } @else {
-      @for (card of queue(); track card.id) {
+      @for (card of listenStore.queue(); track card.id) {
         <div class="lh-card">
           <div class="lh-card-body">
             <div class="lh-card-word-row">
@@ -103,8 +103,9 @@
               @if (card.srsState?.nextDueAt) {
                 <span class="lh-card-due">Due</span>
               }
-              @if (getCategoryLabel(card)) {
-                <span class="lh-card-cat">{{ getCategoryLabel(card) }}</span>
+              @let categoryLabel = getCategoryLabel(card);
+              @if (categoryLabel) {
+                <span class="lh-card-cat">{{ categoryLabel }}</span>
               }
             </div>
           </div>
@@ -119,6 +120,6 @@
     }
   </div>
 
-  <div style="height: 32px;"></div>
+  <div class="lh-bottom-spacer"></div>
 
 </ion-content>
