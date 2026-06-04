@@ -142,7 +142,7 @@ export class WordDetailComponent {
 
   /** 'ready' | 'pending' | 'failed' | 'unknown' — drives the readiness dot. */
   readonly audioStatus = computed(() =>
-    this.audioReadiness.getStatus(this._audioCacheKey())(),
+    this.audioReadiness.statusFor(this._audioCacheKey()),
   );
 
   readonly isAudioReady = computed(() => this.audioStatus() === 'ready');

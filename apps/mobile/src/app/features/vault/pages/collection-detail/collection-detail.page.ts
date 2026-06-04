@@ -103,13 +103,13 @@ export class CollectionDetailPage implements OnInit {
   });
 
   readonly audioReadyCount = computed(() =>
-    this.audioReadiness.readyCount(this._audioCacheKeys())()
+    this.audioReadiness.readyCountFor(this._audioCacheKeys()),
   );
 
   readonly audioPrefetchActive = computed(() => {
     const keys = this._audioCacheKeys();
     if (!keys.length) return false;
-    return !this.audioReadiness.allSettled(keys)();
+    return !this.audioReadiness.allSettledFor(keys);
   });
 
   readonly masteredCount = computed(() =>
@@ -341,6 +341,6 @@ export class CollectionDetailPage implements OnInit {
   getAudioStatus(card: Card) {
     const text = (card.content.article ? `${card.content.article} ` : '') + card.content.back;
     const key = `wa-de-DE-${normalizeForAudio(text, 'de-DE')}`;
-    return this.audioReadiness.getStatus(key)();
+    return this.audioReadiness.statusFor(key);
   }
 }

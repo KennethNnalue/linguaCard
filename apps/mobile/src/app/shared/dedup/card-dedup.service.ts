@@ -54,6 +54,16 @@ export class CardDedupService {
   }
 
   /**
+   * Single lookup using back-only key (no article).
+   * Fallback for manual add/edit when the vault card may have a different or
+   * absent article — e.g. verbs stored without article, or article-mismatch
+   * from Phase 1 image import.
+   */
+  checkByBackOnly(back: string): Card | null {
+    return this.backOnlyIndex().get(this.normalizeBack(back)) ?? null;
+  }
+
+  /**
    * Batch check using back-only key (no article).
    * For Phase 1 raw/pending words where:
    * - back may include the article prefix ("der Hund" → strips to "hund")

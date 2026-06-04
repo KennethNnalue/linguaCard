@@ -30,7 +30,7 @@ export class CollectionAudioPrefetchService {
     // Skip words already 'ready' so a re-visit doesn't reset completed state.
     for (const w of words) {
       const key = this._cacheKey(w.text, w.language);
-      if (this.readiness.getStatus(key)() !== 'ready') {
+      if (this.readiness.statusFor(key) !== 'ready') {
         this.readiness.markPending(key);
       }
     }

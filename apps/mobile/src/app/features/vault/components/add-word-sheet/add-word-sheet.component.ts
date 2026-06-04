@@ -1,7 +1,7 @@
 import { Component, computed, inject, Input, OnInit, signal } from '@angular/core';
 import { Router } from '@angular/router';
 import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
-import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { takeUntilDestroyed, toSignal } from '@angular/core/rxjs-interop';
 import { distinctUntilChanged } from 'rxjs/operators';
 import {
   IonContent,
@@ -30,7 +30,6 @@ import { CardDedupService } from '../../../../shared/dedup/card-dedup.service';
 
 @Component({
   selector: 'lc-add-word-sheet',
-  standalone: true,
   templateUrl: './add-word-sheet.component.html',
   styleUrls: ['./add-word-sheet.component.scss', './add-word-sheet.fields.scss'],
   imports: [IonHeader, IonToolbar, IonContent, IonIcon, ReactiveFormsModule],
@@ -61,8 +60,13 @@ export class AddWordSheetComponent implements OnInit {
     exampleNative: new FormControl(''),
   });
 
+  private readonly _collectionId = toSignal(
+    this.form.get('collectionId')!.valueChanges,
+    { initialValue: this.form.get('collectionId')!.value },
+  );
+
   readonly selectedCollectionLabel = computed(() => {
-    const id = this.form.get('collectionId')!.value;
+    const id = this._collectionId();
     if (!id) return 'No collection';
     const col = this.collectionStore.collections().find(c => c.id === id);
     return col ? `${col.emoji} ${col.name}` : 'No collection';
@@ -166,9 +170,22 @@ export class AddWordSheetComponent implements OnInit {
       return;
     }
     const article = this.form.get('article')!.value ?? null;
-    const found = this.dedupService.check(article, back);
-    // When editing, a match against the card itself is not a duplicate
-    const isDuplicate = found && found.id !== this.cardToEdit?.id;
+    const selfId = this.cardToEdit?.id;
+
+    // Full-key lookup first (article + back). Covers enriched cards from any entry
+    // point (manual add, CSV, image import) where article is confirmed.
+    let found = this.dedupService.check(article, back);
+
+    // Fallback to back-only lookup when:
+    //   - Full-key missed (no match with this article)
+    //   - The existing vault card may have a different or missing article
+    //     (e.g. verbs stored without article, or article-mismatch from Phase 1 import)
+    if (!found || found.id === selfId) {
+      found = this.dedupService.checkByBackOnly(back) ?? found;
+    }
+
+    // Suppress if the only match is the card currently being edited
+    const isDuplicate = found && found.id !== selfId;
     this.suppressDuplicateWarning.set(false);
     this.duplicateCard.set(isDuplicate ? found : null);
   }

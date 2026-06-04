@@ -1,4 +1,4 @@
-import { Component, inject, Input, OnInit, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, inject, Input, OnInit, signal } from '@angular/core';
 import { ReactiveFormsModule, FormControl, Validators } from '@angular/forms';
 import {
   IonContent,
@@ -14,9 +14,9 @@ import { CollectionStore } from '../../store/collection.store';
 
 @Component({
   selector: 'lc-assign-collection-sheet',
-  standalone: true,
   templateUrl: './assign-collection-sheet.component.html',
   styleUrls: ['./assign-collection-sheet.component.scss'],
+  changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [IonHeader, IonToolbar, IonContent, IonIcon, ReactiveFormsModule],
 })
 export class AssignCollectionSheetComponent implements OnInit {
