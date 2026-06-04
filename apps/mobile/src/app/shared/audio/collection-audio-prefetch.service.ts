@@ -103,7 +103,7 @@ export class CollectionAudioPrefetchService {
     }
   }
 
-  /** Builds the flat list of texts to fetch: word + all example sentences per card. */
+  /** Builds the flat list of texts to fetch: word + examples + plural + synonym examples per card. */
   private _buildWordList(cards: Card[]): { text: string; language: string }[] {
     const items: { text: string; language: string }[] = [];
     for (const c of cards) {
@@ -114,6 +114,14 @@ export class CollectionAudioPrefetchService {
       for (const ex of c.content.examples ?? []) {
         if (ex.target?.trim()) {
           items.push({ text: ex.target.trim(), language: 'de-DE' });
+        }
+      }
+      if (c.content.plural) {
+        items.push({ text: c.content.plural, language: 'de-DE' });
+      }
+      for (const syn of c.content.synonyms ?? []) {
+        if (syn.example?.trim()) {
+          items.push({ text: syn.example.trim(), language: 'de-DE' });
         }
       }
     }

@@ -1,5 +1,5 @@
-import {Component, computed, inject} from '@angular/core';
-import {ActivatedRoute, Router, RouterLink} from '@angular/router';
+import {Component, computed, inject, signal} from '@angular/core';
+import {ActivatedRoute, Router} from '@angular/router';
 import {toSignal} from '@angular/core/rxjs-interop';
 import {map} from 'rxjs/operators';
 import {AlertController, IonContent, IonHeader, IonIcon, IonToolbar, ModalController, NavController,} from '@ionic/angular/standalone';
@@ -28,7 +28,7 @@ import {normalizeForAudio} from '../../../../shared/audio/normalize';
   standalone: true,
   templateUrl: './word-detail.component.html',
   styleUrls: ['./word-detail.component.scss'],
-  imports: [IonHeader, IonToolbar, IonContent, IonIcon, ArticleBadgeComponent, RouterLink],
+  imports: [IonHeader, IonToolbar, IonContent, IonIcon, ArticleBadgeComponent],
 })
 export class WordDetailComponent {
   private readonly cardStore = inject(CardStore);
@@ -111,20 +111,27 @@ export class WordDetailComponent {
     return id ? getCategoryName(id, this.categories()) : '';
   });
 
-  readonly relatedWords = computed(() => {
-    const card = this.card();
-    if (!card) return [];
-    const word = card.content.back.toLowerCase();
-    const stem = word.slice(0, 4);
-    return this.cardStore.cards()
-      .filter(c => c.id !== card.id)
-      .filter(c => {
-        const other = c.content.back.toLowerCase();
-        return (other.includes(stem) || word.includes(other.slice(0, 4)))
-          && Math.abs(other.length - word.length) <= 5;
-      })
-      .slice(0, 5);
-  });
+  readonly synonyms = computed(() => this.card()?.content.synonyms ?? []);
+
+  // Accordion: only one synonym open at a time. null = all collapsed.
+  private readonly expandedSynonym = signal<number | null>(null);
+
+  toggleSynonym(i: number): void {
+    this.expandedSynonym.set(this.expandedSynonym() === i ? null : i);
+  }
+
+  isSynonymExpanded(i: number): boolean {
+    return this.expandedSynonym() === i;
+  }
+
+  playSynonymExample(sentence: string): void {
+    void this.wordAudio.play(sentence, 'de-DE');
+  }
+
+  playPlural(): void {
+    const plural = this.card()?.content.plural;
+    if (plural) void this.wordAudio.play(plural, 'de-DE');
+  }
 
   goBack(): void {
     this.navCtrl.back();

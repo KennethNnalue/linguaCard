@@ -152,8 +152,33 @@
   color: var(--lc-text-hint);
   font-style: italic;
   text-align: center;
-  margin: 0 0 14px;
+  margin: 0 0 10px;
   font-family: var(--lc-font-display);
+}
+
+.rv-plural {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  margin-bottom: 12px;
+  background: var(--lc-surface);
+  border: 1px solid var(--lc-border);
+  border-radius: var(--lc-radius-md);
+  padding: 5px 10px;
+}
+
+.rv-plural-lbl {
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--lc-brand-mid);
+}
+
+.rv-plural-val {
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--lc-text-primary);
 }
 
 .rv-ex-block {

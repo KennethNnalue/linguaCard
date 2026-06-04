@@ -1,0 +1,716 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>LinguaCard — Synonyms & Plurals Design Reference</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,500;0,600;1,400&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600&family=Fira+Code:wght@400;500&display=swap" rel="stylesheet">
+<style>
+/* ─── DESIGN TOKENS (mirrors apps/mobile/src/theme/variables.scss) ─────────── */
+:root {
+  --lc-brand:#2D5A4E;--lc-brand-light:#E8F2EE;--lc-brand-mid:#4A8C7A;--lc-brand-dark:#1A3830;
+  --lc-accent:#E07B3F;--lc-accent-light:#FDF0E6;
+  --lc-masc-bg:#EAF2FC;--lc-masc-text:#1A56A3;--lc-masc-border:#85B7EB;
+  --lc-fem-bg:#FEF2F2;--lc-fem-text:#B91C1C;--lc-fem-border:#FCA5A5;
+  --lc-neut-bg:#F1EFE8;--lc-neut-text:#5F5E5A;--lc-neut-border:#B4B2A9;
+  --lc-mastery-0:#D1D5DB;--lc-mastery-1:#FCA5A5;--lc-mastery-2:#FCD34D;
+  --lc-mastery-3:#6EE7B7;--lc-mastery-4:#34D399;--lc-mastery-5:#059669;
+  --lc-surface:#FAFAF8;--lc-card:#FFFFFF;--lc-border:rgba(45,90,78,0.12);
+  --lc-text-primary:#1A2B26;--lc-text-secondary:#6B7C78;--lc-text-hint:#9BAAA6;
+  --lc-shadow-card:0 2px 12px rgba(45,90,78,0.08),0 1px 3px rgba(0,0,0,0.04);
+  --lc-shadow-float:0 8px 32px rgba(45,90,78,0.14),0 2px 8px rgba(0,0,0,0.06);
+  --lc-font-display:'Lora',Georgia,serif;
+  --lc-font-body:'DM Sans',system-ui,sans-serif;
+  --lc-font-mono:'Fira Code','Courier New',monospace;
+  --lc-radius-sm:8px;--lc-radius-md:12px;--lc-radius-lg:20px;--lc-radius-xl:28px;
+  --lc-radius-full:999px;
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:var(--lc-font-body);background:#F0EDEA;color:var(--lc-text-primary);min-height:100vh;}
+
+/* ─── PAGE LAYOUT ───────────────────────────────────────────── */
+.page-header{background:var(--lc-brand);padding:32px 40px 28px;position:sticky;top:0;z-index:100;box-shadow:0 4px 20px rgba(0,0,0,0.2);}
+.page-header-inner{max-width:1400px;margin:0 auto;display:flex;align-items:center;justify-content:space-between;gap:20px;flex-wrap:wrap;}
+.logo{font-family:var(--lc-font-display);font-size:24px;font-weight:600;color:white;}
+.logo-sub{font-size:12px;color:rgba(255,255,255,0.6);margin-top:2px;}
+.epic-pill{font-size:11px;font-weight:600;color:white;background:rgba(255,255,255,0.15);border:1px solid rgba(255,255,255,0.25);padding:5px 12px;border-radius:var(--lc-radius-full);}
+.main{max-width:1400px;margin:0 auto;padding:40px;}
+.section{margin-bottom:56px;}
+.section-title{font-family:var(--lc-font-display);font-size:22px;font-weight:600;color:var(--lc-text-primary);margin-bottom:6px;}
+.section-sub{font-size:13px;color:var(--lc-text-secondary);margin-bottom:24px;max-width:760px;line-height:1.6;}
+
+/* ─── PHONE SHELL ────────────────────────────────────────────── */
+.phones-row{display:flex;gap:28px;align-items:flex-start;flex-wrap:wrap;}
+.phone-wrap{display:flex;flex-direction:column;align-items:center;gap:12px;flex:0 0 auto;}
+.phone-label{font-size:11px;font-weight:600;letter-spacing:0.07em;text-transform:uppercase;color:var(--lc-text-hint);}
+.phone{width:300px;background:var(--lc-surface);border-radius:40px;border:8px solid #1A1A1A;box-shadow:0 0 0 1px #333,var(--lc-shadow-float),0 24px 48px rgba(0,0,0,0.2);overflow:hidden;position:relative;}
+.phone::before{content:'';position:absolute;top:0;left:50%;transform:translateX(-50%);width:80px;height:6px;background:#1A1A1A;border-radius:0 0 8px 8px;z-index:10;}
+.phone-inner{background:var(--lc-surface);min-height:620px;display:flex;flex-direction:column;padding-top:8px;}
+.status-bar{display:flex;justify-content:space-between;align-items:center;padding:10px 20px 6px;font-size:11px;font-weight:600;color:var(--lc-text-secondary);}
+.sig{display:flex;gap:3px;align-items:flex-end;}
+.sig span{width:3px;background:var(--lc-text-secondary);border-radius:1px;}
+.sig span:nth-child(1){height:4px;}.sig span:nth-child(2){height:7px;}.sig span:nth-child(3){height:10px;}
+.batt{width:20px;height:10px;border:1.5px solid var(--lc-text-secondary);border-radius:3px;position:relative;margin-left:4px;}
+.batt::after{content:'';position:absolute;top:1.5px;left:1.5px;width:65%;height:5px;background:var(--lc-text-secondary);border-radius:1px;}
+
+/* ─── PHONE NAV ─────────────────────────────────────────────── */
+.p-nav{display:flex;justify-content:space-between;align-items:center;padding:6px 16px 10px;}
+.p-nav-title{font-family:var(--lc-font-display);font-size:15px;font-weight:600;color:var(--lc-text-primary);}
+.p-back{width:30px;height:30px;border-radius:50%;background:var(--lc-brand-light);display:flex;align-items:center;justify-content:center;border:none;cursor:pointer;}
+.p-back svg{width:13px;height:13px;stroke:var(--lc-brand);fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;}
+
+/* ─── ARTICLE BADGE ─────────────────────────────────────────── */
+.art-badge{font-size:9px;font-weight:700;padding:2px 8px;border-radius:var(--lc-radius-full);border:1px solid;flex-shrink:0;letter-spacing:.04em;display:inline-flex;align-items:center;}
+.art-der{background:var(--lc-masc-bg);color:var(--lc-masc-text);border-color:var(--lc-masc-border);}
+.art-die{background:var(--lc-fem-bg);color:var(--lc-fem-text);border-color:var(--lc-fem-border);}
+.art-das{background:var(--lc-neut-bg);color:var(--lc-neut-text);border-color:var(--lc-neut-border);}
+
+/* ─── WORD DETAIL (wd2-*) ───────────────────────────────────── */
+.wd2{padding:0 14px 14px;display:flex;flex-direction:column;gap:12px;overflow-y:auto;}
+.wd2-card{background:var(--lc-card);border:1px solid var(--lc-border);border-radius:var(--lc-radius-lg);box-shadow:var(--lc-shadow-card);padding:16px;}
+
+/* Header card */
+.wd2-word-row{display:flex;align-items:center;gap:9px;}
+.wd2-word{font-family:var(--lc-font-display);font-size:27px;font-weight:600;color:var(--lc-text-primary);line-height:1.1;}
+.wd2-trans{font-size:13px;color:var(--lc-text-secondary);margin-top:6px;}
+.wd2-phonetic{font-size:12px;color:var(--lc-text-hint);font-family:var(--lc-font-mono);margin-top:2px;}
+/* NEW — plural line */
+.wd2-plural-row{display:flex;align-items:center;gap:7px;margin-top:9px;padding-top:9px;border-top:1px dashed var(--lc-border);}
+.wd2-plural-lbl{font-size:9px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;color:var(--lc-brand-mid);background:var(--lc-brand-light);padding:2px 7px;border-radius:var(--lc-radius-full);}
+.wd2-plural-val{font-size:13px;font-weight:500;color:var(--lc-text-primary);}
+.wd2-plural-play{width:22px;height:22px;border-radius:50%;border:1px solid var(--lc-border);background:var(--lc-surface);display:flex;align-items:center;justify-content:center;cursor:pointer;margin-left:auto;}
+.wd2-plural-play svg{width:11px;height:11px;fill:var(--lc-brand-mid);}
+.wd2-pills{display:flex;gap:6px;margin-top:12px;flex-wrap:wrap;}
+.wd2-pill{font-size:9px;font-weight:600;letter-spacing:.05em;text-transform:uppercase;color:var(--lc-text-secondary);background:var(--lc-surface);border:1px solid var(--lc-border);padding:3px 9px;border-radius:var(--lc-radius-full);display:inline-flex;align-items:center;gap:4px;}
+.wd2-pill-dot{width:6px;height:6px;border-radius:50%;background:var(--lc-mastery-5);}
+.wd2-listen-btn{margin-top:14px;width:100%;display:flex;align-items:center;justify-content:center;gap:7px;background:var(--lc-brand-light);color:var(--lc-brand);border:none;border-radius:var(--lc-radius-md);padding:11px;font-size:13px;font-weight:600;font-family:var(--lc-font-body);cursor:pointer;}
+.wd2-listen-btn svg{width:14px;height:14px;fill:var(--lc-brand);}
+.wd2-listen-dot{width:6px;height:6px;border-radius:50%;background:var(--lc-mastery-5);margin-left:2px;}
+
+/* Section label */
+.wd2-sec-lbl{font-size:10px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--lc-text-hint);margin-bottom:12px;}
+
+/* Examples */
+.wd2-example-block{padding-bottom:12px;margin-bottom:12px;border-bottom:1px solid var(--lc-border);}
+.wd2-example-block:last-child{padding-bottom:0;margin-bottom:0;border-bottom:none;}
+.wd2-ex-row{display:flex;align-items:flex-start;gap:8px;}
+.wd2-ex-de{font-size:14px;color:var(--lc-text-primary);line-height:1.5;flex:1;}
+.wd2-ex-de strong{color:var(--lc-brand);font-weight:600;}
+.wd2-ex-en{font-size:12px;color:var(--lc-text-hint);font-style:italic;margin-top:4px;line-height:1.4;}
+.wd2-ex-play{width:24px;height:24px;border-radius:50%;border:1px solid var(--lc-border);background:var(--lc-surface);display:flex;align-items:center;justify-content:center;cursor:pointer;flex-shrink:0;}
+.wd2-ex-play svg{width:12px;height:12px;fill:var(--lc-brand-mid);}
+
+/* Notes */
+.wd2-notes{background:var(--lc-accent-light);border:1px solid rgba(224,123,63,0.2);border-radius:var(--lc-radius-md);padding:13px 14px;display:flex;gap:10px;align-items:flex-start;}
+.wd2-notes-icon{font-size:15px;line-height:1.4;}
+.wd2-notes-text{font-size:13px;color:var(--lc-text-primary);line-height:1.55;}
+.wd2-notes-text strong{color:var(--lc-accent);font-weight:600;}
+
+/* NEW — Synonyms card (wd2-syn-*) */
+.wd2-syn-item{border-bottom:1px solid var(--lc-border);}
+.wd2-syn-item:last-child{border-bottom:none;}
+.wd2-syn-head{display:flex;align-items:center;gap:9px;padding:11px 0;cursor:pointer;}
+.wd2-syn-word{font-size:15px;font-weight:600;color:var(--lc-text-primary);}
+.wd2-syn-trans{font-size:12px;color:var(--lc-text-secondary);flex:1;}
+.wd2-syn-chev{width:16px;height:16px;flex-shrink:0;transition:transform .2s ease;}
+.wd2-syn-chev svg{width:14px;height:14px;stroke:var(--lc-text-hint);fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;}
+.wd2-syn-item.open .wd2-syn-chev{transform:rotate(180deg);}
+.wd2-syn-body{max-height:0;overflow:hidden;transition:max-height .25s ease;}
+.wd2-syn-item.open .wd2-syn-body{max-height:180px;}
+.wd2-syn-example{background:var(--lc-surface);border-radius:var(--lc-radius-md);padding:11px 12px;margin:0 0 12px;}
+.wd2-syn-ex-row{display:flex;align-items:flex-start;gap:8px;}
+.wd2-syn-ex-de{font-size:13px;color:var(--lc-text-primary);line-height:1.5;flex:1;}
+.wd2-syn-ex-de strong{color:var(--lc-brand);font-weight:600;}
+.wd2-syn-ex-en{font-size:11px;color:var(--lc-text-hint);font-style:italic;margin-top:3px;line-height:1.4;}
+
+/* Mastery ring (compact, for completeness) */
+.wd2-mastery-row{display:flex;align-items:center;gap:14px;}
+.wd2-ring{width:54px;height:54px;flex-shrink:0;}
+.wd2-mastery-info{flex:1;}
+.wd2-mastery-lvl{font-size:14px;font-weight:600;color:var(--lc-text-primary);}
+.wd2-mastery-next{font-size:11px;color:var(--lc-text-hint);margin-top:2px;}
+.wd2-stats-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-top:14px;padding-top:14px;border-top:1px solid var(--lc-border);}
+.wd2-stat-cell{text-align:center;}
+.wd2-stat-val{font-family:var(--lc-font-display);font-size:16px;font-weight:600;color:var(--lc-text-primary);}
+.wd2-stat-lbl{font-size:8px;font-weight:600;letter-spacing:.05em;text-transform:uppercase;color:var(--lc-text-hint);margin-top:2px;}
+
+/* ─── REVIEW CARD (rv-*) ────────────────────────────────────── */
+.rv-prog-wrap{padding:4px 16px 12px;}
+.rv-prog-track{height:4px;background:var(--lc-border);border-radius:var(--lc-radius-full);overflow:hidden;}
+.rv-prog-fill{height:100%;background:var(--lc-brand);border-radius:var(--lc-radius-full);}
+.rv-prog-labels{display:flex;justify-content:space-between;font-size:10px;color:var(--lc-text-hint);margin-top:5px;}
+.rv-card-scene{padding:0 16px;}
+.rv-card{background:var(--lc-card);border:1px solid var(--lc-border);border-radius:var(--lc-radius-xl);padding:20px;box-shadow:var(--lc-shadow-float);}
+.rv-card-hdr{display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;}
+.rv-side-lbl{font-size:10px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--lc-text-hint);}
+.rv-lang-chip{font-size:11px;font-weight:600;color:var(--lc-brand-mid);background:var(--lc-brand-light);padding:3px 10px;border-radius:var(--lc-radius-full);}
+.rv-art-row{display:flex;align-items:center;gap:8px;margin-bottom:8px;}
+.rv-art-gender{font-size:11px;color:var(--lc-text-hint);}
+.rv-back-word{font-family:var(--lc-font-display);font-size:32px;font-weight:600;color:var(--lc-text-primary);line-height:1.1;}
+.rv-phonetic{font-size:12px;color:var(--lc-text-hint);font-family:var(--lc-font-mono);margin-top:4px;}
+/* NEW — plural on review back face */
+.rv-plural{display:inline-flex;align-items:center;gap:6px;margin-top:10px;background:var(--lc-surface);border:1px solid var(--lc-border);border-radius:var(--lc-radius-md);padding:6px 11px;}
+.rv-plural-lbl{font-size:9px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--lc-brand-mid);}
+.rv-plural-val{font-size:13px;font-weight:500;color:var(--lc-text-primary);}
+.rv-ex-block{margin-top:14px;padding-top:12px;border-top:1px solid var(--lc-border);}
+.rv-ex-de{font-size:13px;color:var(--lc-text-primary);line-height:1.5;}
+.rv-ex-de strong{color:var(--lc-brand);font-weight:600;}
+.rv-ex-en{font-size:11px;color:var(--lc-text-hint);font-style:italic;margin-top:3px;}
+.rv-audio-btn{margin-top:14px;width:100%;display:flex;align-items:center;justify-content:center;gap:7px;background:var(--lc-brand-light);color:var(--lc-brand);border:none;border-radius:var(--lc-radius-md);padding:10px;font-size:12px;font-weight:600;cursor:pointer;font-family:var(--lc-font-body);}
+.rv-audio-btn svg{width:13px;height:13px;fill:var(--lc-brand);}
+.rv-rating{display:flex;gap:5px;padding:16px;margin-top:auto;}
+.rv-rating-btn{flex:1;border-radius:var(--lc-radius-md);border:1px solid var(--lc-border);background:var(--lc-card);padding:10px 0;text-align:center;cursor:pointer;}
+.rv-r-num{display:block;font-family:var(--lc-font-display);font-size:16px;font-weight:600;}
+.rv-r-lbl{display:block;font-size:7px;font-weight:600;letter-spacing:.05em;text-transform:uppercase;color:var(--lc-text-hint);margin-top:2px;}
+
+/* ─── ADD WORD SHEET (aw-*) ─────────────────────────────────── */
+.aw-form{padding:6px 16px 16px;display:flex;flex-direction:column;gap:14px;}
+.aw-field{display:flex;flex-direction:column;gap:6px;}
+.aw-lbl{font-size:11px;font-weight:600;color:var(--lc-text-primary);}
+.aw-lbl-hint{font-size:10px;font-weight:400;color:var(--lc-text-hint);font-style:italic;}
+.aw-input{width:100%;border:1px solid var(--lc-border);border-radius:var(--lc-radius-md);padding:10px 12px;font-size:13px;font-family:var(--lc-font-body);color:var(--lc-text-primary);background:var(--lc-card);}
+.aw-input::placeholder{color:var(--lc-text-hint);}
+.aw-back-row{display:flex;align-items:center;gap:8px;}
+.aw-gen-btn{display:flex;align-items:center;justify-content:center;gap:6px;background:var(--lc-accent);color:white;border:none;border-radius:var(--lc-radius-md);padding:9px 14px;font-size:12px;font-weight:700;font-family:var(--lc-font-body);cursor:pointer;white-space:nowrap;box-shadow:0 3px 10px rgba(224,123,63,0.3);}
+.aw-gen-btn svg{width:13px;height:13px;}
+.aw-article-seg{display:flex;gap:5px;}
+.aw-art-seg-btn{flex:1;border:1px solid var(--lc-border);background:var(--lc-card);border-radius:var(--lc-radius-sm);padding:7px 0;font-size:12px;font-weight:600;color:var(--lc-text-secondary);cursor:pointer;text-align:center;}
+.aw-art-seg-btn--active.der{background:var(--lc-masc-bg);color:var(--lc-masc-text);border-color:var(--lc-masc-border);}
+.aw-art-seg-btn--active.die{background:var(--lc-fem-bg);color:var(--lc-fem-text);border-color:var(--lc-fem-border);}
+.aw-art-seg-btn--active.das{background:var(--lc-neut-bg);color:var(--lc-neut-text);border-color:var(--lc-neut-border);}
+.aw-art-seg-btn--active.none{background:var(--lc-brand-light);color:var(--lc-brand);border-color:var(--lc-brand-mid);}
+/* NEW — plural field */
+.aw-plural-hint{font-size:10px;color:var(--lc-text-hint);font-style:italic;}
+/* NEW — synonym editor */
+.aw-syn-list{display:flex;flex-direction:column;gap:7px;}
+.aw-syn-chip{display:flex;align-items:center;gap:8px;background:var(--lc-surface);border:1px solid var(--lc-border);border-radius:var(--lc-radius-md);padding:9px 11px;}
+.aw-syn-chip-word{font-size:13px;font-weight:600;color:var(--lc-text-primary);}
+.aw-syn-chip-trans{font-size:11px;color:var(--lc-text-secondary);flex:1;}
+.aw-syn-chip-x{width:18px;height:18px;border-radius:50%;background:var(--lc-border);border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;color:var(--lc-text-secondary);font-size:12px;line-height:1;}
+.aw-syn-add{display:flex;align-items:center;gap:6px;background:none;border:1px dashed var(--lc-brand-mid);color:var(--lc-brand);border-radius:var(--lc-radius-md);padding:8px 11px;font-size:12px;font-weight:600;cursor:pointer;font-family:var(--lc-font-body);align-self:flex-start;}
+.aw-gen-tag{display:inline-flex;align-items:center;gap:4px;font-size:9px;font-weight:600;letter-spacing:.04em;text-transform:uppercase;color:var(--lc-accent);background:var(--lc-accent-light);padding:2px 7px;border-radius:var(--lc-radius-full);}
+.aw-save-btn{width:100%;background:var(--lc-brand);color:white;border:none;border-radius:var(--lc-radius-md);padding:13px;font-size:14px;font-weight:700;font-family:var(--lc-font-body);cursor:pointer;margin-top:4px;}
+.aw-spinner{width:13px;height:13px;border:2px solid rgba(255,255,255,0.4);border-top-color:white;border-radius:50%;animation:spin .7s linear infinite;}
+@keyframes spin{to{transform:rotate(360deg);}}
+
+/* ─── LISTEN QUEUE (ln-*) ───────────────────────────────────── */
+.ln-type-row{display:flex;gap:6px;padding:0 16px 12px;}
+.ln-type{flex:1;border:1px solid var(--lc-border);background:var(--lc-card);border-radius:var(--lc-radius-md);padding:9px 6px;text-align:center;cursor:pointer;}
+.ln-type--active{border-color:var(--lc-brand-mid);background:var(--lc-brand-light);}
+.ln-type-t{font-size:11px;font-weight:600;color:var(--lc-text-primary);}
+.ln-type-s{font-size:8px;color:var(--lc-text-hint);margin-top:2px;}
+.ln-queue{padding:0 16px;display:flex;flex-direction:column;gap:8px;}
+.ln-row{background:var(--lc-card);border:1px solid var(--lc-border);border-radius:var(--lc-radius-md);padding:11px 12px;display:flex;align-items:flex-start;gap:9px;box-shadow:var(--lc-shadow-card);}
+.ln-row-body{flex:1;}
+.ln-word-row{display:flex;align-items:center;gap:8px;}
+.ln-word{font-size:14px;font-weight:600;color:var(--lc-text-primary);}
+.ln-trans{font-size:11px;color:var(--lc-text-secondary);margin-top:3px;}
+/* NEW — deep-dive extra line */
+.ln-extra{font-size:10px;color:var(--lc-brand-mid);margin-top:4px;}
+.ln-extra strong{font-weight:600;color:var(--lc-text-primary);}
+.ln-play{width:30px;height:30px;border-radius:50%;border:1px solid var(--lc-border);background:var(--lc-surface);display:flex;align-items:center;justify-content:center;cursor:pointer;flex-shrink:0;}
+.ln-play svg{width:13px;height:13px;fill:var(--lc-brand-mid);}
+
+/* ─── BEFORE / AFTER + RATIONALE ────────────────────────────── */
+.cmp-grid{display:grid;grid-template-columns:1fr 1fr;gap:20px;margin-top:8px;}
+.cmp-col{background:var(--lc-card);border:1px solid var(--lc-border);border-radius:var(--lc-radius-lg);padding:18px;box-shadow:var(--lc-shadow-card);}
+.cmp-tag{display:inline-block;font-size:10px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;padding:3px 10px;border-radius:var(--lc-radius-full);margin-bottom:12px;}
+.cmp-tag--before{background:var(--lc-fem-bg);color:var(--lc-fem-text);}
+.cmp-tag--after{background:var(--lc-brand-light);color:var(--lc-brand);}
+.cmp-col h4{font-size:13px;font-weight:600;margin-bottom:8px;color:var(--lc-text-primary);}
+.cmp-col p{font-size:12px;color:var(--lc-text-secondary);line-height:1.6;margin-bottom:8px;}
+.cmp-col code{font-family:var(--lc-font-mono);font-size:11px;background:var(--lc-surface);padding:1px 5px;border-radius:4px;color:var(--lc-brand-dark);}
+.demo-related{display:flex;flex-direction:column;gap:6px;margin-top:10px;}
+.demo-rel-item{display:flex;align-items:center;gap:8px;font-size:12px;padding:8px 10px;background:var(--lc-surface);border-radius:var(--lc-radius-sm);}
+.demo-rel-item .bad{color:var(--lc-fem-text);font-size:11px;margin-left:auto;}
+.demo-rel-item .good{color:var(--lc-brand-mid);font-size:11px;margin-left:auto;}
+
+.notes-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:16px;margin-top:8px;}
+.note-card{background:var(--lc-card);border:1px solid var(--lc-border);border-radius:var(--lc-radius-lg);padding:18px;box-shadow:var(--lc-shadow-card);}
+.note-card-title{font-size:13px;font-weight:600;color:var(--lc-brand);margin-bottom:8px;}
+.note-card p{font-size:12px;color:var(--lc-text-secondary);line-height:1.6;}
+.note-card strong{color:var(--lc-text-primary);}
+.code-block{background:#1A2B26;border-radius:var(--lc-radius-md);padding:14px;margin-top:10px;overflow-x:auto;}
+.code-block pre{font-family:var(--lc-font-mono);font-size:11px;color:#A8D5C4;line-height:1.6;white-space:pre;}
+.code-block .k{color:#E07B3F;}.code-block .s{color:#FCD34D;}.code-block .c{color:#6B7C78;}
+</style>
+</head>
+<body>
+
+<div class="page-header">
+  <div class="page-header-inner">
+    <div>
+      <div class="logo">LinguaCard</div>
+      <div class="logo-sub">Design Reference — Synonyms &amp; Plural Forms</div>
+    </div>
+    <span class="epic-pill">Epic LC-130 · Angular 21 / Ionic</span>
+  </div>
+</div>
+
+<div class="main">
+
+  <!-- ───────────── INTRO ───────────── -->
+  <div class="section">
+    <div class="section-title">What's changing</div>
+    <div class="section-sub">
+      Two upgrades to vocabulary cards. <strong>(1)</strong> "Related words" are replaced by
+      AI-generated <strong>true synonyms</strong>, each with a translation and an expandable
+      example sentence. <strong>(2)</strong> Every noun gets a structured <strong>plural form</strong>,
+      generated at creation/import and surfaced on the detail page and in review — following the
+      German-teaching principle of learning article + plural together with the word.
+    </div>
+  </div>
+
+  <!-- ───────────── SCREENS ───────────── -->
+  <div class="section">
+    <div class="section-title">Updated screens</div>
+    <div class="section-sub">Reference layouts for the four touched surfaces. Tap synonym rows to expand their example.</div>
+
+    <div class="phones-row">
+
+      <!-- ════ SCREEN A: WORD DETAIL ════ -->
+      <div class="phone-wrap">
+        <div class="phone-label">A · Word Detail — synonyms + plural</div>
+        <div class="phone">
+          <div class="phone-inner">
+            <div class="status-bar"><span>9:51</span><div style="display:flex;align-items:center;gap:3px;"><div class="sig"><span></span><span></span><span></span></div><div class="batt"></div></div></div>
+            <div class="p-nav">
+              <button class="p-back"><svg viewBox="0 0 24 24"><polyline points="15,18 9,12 15,6"/></svg></button>
+              <span class="p-nav-title">Word Detail</span>
+              <button class="p-back" style="background:var(--lc-surface);border:1px solid var(--lc-border);"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="1"/><circle cx="19" cy="12" r="1"/><circle cx="5" cy="12" r="1"/></svg></button>
+            </div>
+
+            <div class="wd2">
+
+              <!-- Header card -->
+              <div class="wd2-card">
+                <div class="wd2-word-row">
+                  <span class="art-badge art-das">das</span>
+                  <span class="wd2-word">Flugzeug</span>
+                </div>
+                <div class="wd2-trans">airplane · noun, neuter</div>
+                <div class="wd2-phonetic">/ˈfluːkˌt͡sɔɪ̯k/</div>
+
+                <!-- NEW — plural line -->
+                <div class="wd2-plural-row">
+                  <span class="wd2-plural-lbl">Plural</span>
+                  <span class="wd2-plural-val">die Flugzeuge</span>
+                  <button class="wd2-plural-play"><svg viewBox="0 0 24 24"><polygon points="11,5 6,9 2,9 2,15 6,15 11,19 11,5"/><path d="M15.54,8.46a5,5,0,0,1,0,7.07" fill="none" stroke="var(--lc-brand-mid)" stroke-width="2"/></svg></button>
+                </div>
+
+                <div class="wd2-pills">
+                  <span class="wd2-pill"><span class="wd2-pill-dot"></span>New</span>
+                  <span class="wd2-pill">Travel</span>
+                </div>
+                <button class="wd2-listen-btn">
+                  <svg viewBox="0 0 24 24"><polygon points="11,5 6,9 2,9 2,15 6,15 11,19 11,5"/><path d="M15.54,8.46a5,5,0,0,1,0,7.07" fill="none" stroke="var(--lc-brand)" stroke-width="2"/></svg>
+                  Listen to pronunciation
+                  <span class="wd2-listen-dot"></span>
+                </button>
+              </div>
+
+              <!-- Examples card -->
+              <div class="wd2-card">
+                <div class="wd2-sec-lbl">Example Sentences</div>
+                <div class="wd2-example-block">
+                  <div class="wd2-ex-row">
+                    <p class="wd2-ex-de">Das <strong>Flugzeug</strong> fliegt über die Wolken.</p>
+                    <button class="wd2-ex-play"><svg viewBox="0 0 24 24"><polygon points="11,5 6,9 2,9 2,15 6,15 11,19 11,5"/></svg></button>
+                  </div>
+                  <p class="wd2-ex-en">"The airplane flies over the clouds."</p>
+                </div>
+              </div>
+
+              <!-- NEW — Synonyms card -->
+              <div class="wd2-card">
+                <div class="wd2-sec-lbl">Synonyms</div>
+
+                <!-- Synonym 1 (expanded) -->
+                <div class="wd2-syn-item open" onclick="this.classList.toggle('open')">
+                  <div class="wd2-syn-head">
+                    <span class="art-badge art-die">die</span>
+                    <span class="wd2-syn-word">Maschine</span>
+                    <span class="wd2-syn-trans">machine, aircraft</span>
+                    <span class="wd2-syn-chev"><svg viewBox="0 0 24 24"><polyline points="6,9 12,15 18,9"/></svg></span>
+                  </div>
+                  <div class="wd2-syn-body">
+                    <div class="wd2-syn-example">
+                      <div class="wd2-syn-ex-row">
+                        <p class="wd2-syn-ex-de">Die <strong>Maschine</strong> landet pünktlich.</p>
+                        <button class="wd2-ex-play"><svg viewBox="0 0 24 24"><polygon points="11,5 6,9 2,9 2,15 6,15 11,19 11,5"/></svg></button>
+                      </div>
+                      <p class="wd2-syn-ex-en">"The aircraft lands on time."</p>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Synonym 2 (collapsed) -->
+                <div class="wd2-syn-item" onclick="this.classList.toggle('open')">
+                  <div class="wd2-syn-head">
+                    <span class="art-badge art-der">der</span>
+                    <span class="wd2-syn-word">Flieger</span>
+                    <span class="wd2-syn-trans">plane (colloquial)</span>
+                    <span class="wd2-syn-chev"><svg viewBox="0 0 24 24"><polyline points="6,9 12,15 18,9"/></svg></span>
+                  </div>
+                  <div class="wd2-syn-body">
+                    <div class="wd2-syn-example">
+                      <div class="wd2-syn-ex-row">
+                        <p class="wd2-syn-ex-de">Der <strong>Flieger</strong> startet in zehn Minuten.</p>
+                        <button class="wd2-ex-play"><svg viewBox="0 0 24 24"><polygon points="11,5 6,9 2,9 2,15 6,15 11,19 11,5"/></svg></button>
+                      </div>
+                      <p class="wd2-syn-ex-en">"The plane takes off in ten minutes."</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div style="height:8px;"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ════ SCREEN B: REVIEW BACK FACE ════ -->
+      <div class="phone-wrap">
+        <div class="phone-label">B · Review — plural on reveal</div>
+        <div class="phone">
+          <div class="phone-inner">
+            <div class="status-bar"><span>9:53</span><div style="display:flex;align-items:center;gap:3px;"><div class="sig"><span></span><span></span><span></span></div><div class="batt"></div></div></div>
+            <div class="p-nav">
+              <button class="p-back"><svg viewBox="0 0 24 24"><polyline points="15,18 9,12 15,6"/></svg></button>
+              <span class="p-nav-title">Review Session</span>
+              <div style="width:30px;"></div>
+            </div>
+            <div class="rv-prog-wrap">
+              <div class="rv-prog-track"><div class="rv-prog-fill" style="width:18%;"></div></div>
+              <div class="rv-prog-labels"><span>3 of 11</span><span>Travel</span></div>
+            </div>
+
+            <div class="rv-card-scene">
+              <div class="rv-card">
+                <div class="rv-card-hdr">
+                  <span class="rv-side-lbl">airplane</span>
+                  <span class="rv-lang-chip">🇩🇪 German</span>
+                </div>
+                <div class="rv-art-row">
+                  <span class="art-badge art-das">das</span>
+                  <span class="rv-art-gender">das — neuter</span>
+                </div>
+                <p class="rv-back-word">Flugzeug</p>
+                <p class="rv-phonetic">/ˈfluːkˌt͡sɔɪ̯k/</p>
+
+                <!-- NEW — plural on back face -->
+                <div class="rv-plural">
+                  <span class="rv-plural-lbl">Plural</span>
+                  <span class="rv-plural-val">die Flugzeuge</span>
+                </div>
+
+                <div class="rv-ex-block">
+                  <p class="rv-ex-de">Das <strong>Flugzeug</strong> fliegt über die Wolken.</p>
+                  <p class="rv-ex-en">"The airplane flies over the clouds."</p>
+                </div>
+
+                <button class="rv-audio-btn">
+                  <svg viewBox="0 0 24 24"><polygon points="11,5 6,9 2,9 2,15 6,15 11,19 11,5"/></svg>
+                  Play pronunciation
+                </button>
+              </div>
+            </div>
+
+            <div class="rv-rating">
+              <div class="rv-rating-btn"><span class="rv-r-num" style="color:var(--lc-text-hint);">0</span><span class="rv-r-lbl">Blank</span></div>
+              <div class="rv-rating-btn"><span class="rv-r-num" style="color:var(--lc-fem-text);">1</span><span class="rv-r-lbl">Hard</span></div>
+              <div class="rv-rating-btn"><span class="rv-r-num" style="color:var(--lc-mastery-2);">2</span><span class="rv-r-lbl">Hmm</span></div>
+              <div class="rv-rating-btn"><span class="rv-r-num" style="color:var(--lc-mastery-3);">3</span><span class="rv-r-lbl">Good</span></div>
+              <div class="rv-rating-btn"><span class="rv-r-num" style="color:var(--lc-mastery-4);">4</span><span class="rv-r-lbl">Easy</span></div>
+              <div class="rv-rating-btn"><span class="rv-r-num" style="color:var(--lc-mastery-5);">5</span><span class="rv-r-lbl">Nailed</span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ════ SCREEN C: ADD WORD ════ -->
+      <div class="phone-wrap">
+        <div class="phone-label">C · Add Word — auto-generate</div>
+        <div class="phone">
+          <div class="phone-inner">
+            <div class="status-bar"><span>9:55</span><div style="display:flex;align-items:center;gap:3px;"><div class="sig"><span></span><span></span><span></span></div><div class="batt"></div></div></div>
+            <div class="p-nav">
+              <button class="p-back" style="background:var(--lc-surface);border:1px solid var(--lc-border);"><svg viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
+              <span class="p-nav-title">Add New Word</span>
+              <div style="width:30px;"></div>
+            </div>
+
+            <div class="aw-form">
+              <!-- German word + auto-generate -->
+              <div class="aw-field">
+                <p class="aw-lbl">Back — German <span class="aw-lbl-hint">(article auto-detected)</span></p>
+                <div class="aw-back-row">
+                  <input class="aw-input" value="Flugzeug" />
+                  <button class="aw-gen-btn">
+                    <svg viewBox="0 0 24 24" fill="white"><path d="M12 2l2.4 7.2L22 12l-7.6 2.8L12 22l-2.4-7.2L2 12l7.6-2.8z"/></svg>
+                    Auto
+                  </button>
+                </div>
+                <div class="aw-article-seg" style="margin-top:6px;">
+                  <button class="aw-art-seg-btn none">None</button>
+                  <button class="aw-art-seg-btn der">der</button>
+                  <button class="aw-art-seg-btn die">die</button>
+                  <button class="aw-art-seg-btn das aw-art-seg-btn--active das">das</button>
+                </div>
+              </div>
+
+              <!-- English -->
+              <div class="aw-field">
+                <p class="aw-lbl">Front — English <span class="aw-gen-tag"><svg width="9" height="9" viewBox="0 0 24 24" fill="var(--lc-accent)"><path d="M12 2l2.4 7.2L22 12l-7.6 2.8L12 22l-2.4-7.2L2 12l7.6-2.8z"/></svg>generated</span></p>
+                <input class="aw-input" value="airplane" />
+              </div>
+
+              <!-- NEW — Plural field (only shown when article selected) -->
+              <div class="aw-field">
+                <p class="aw-lbl">Plural <span class="aw-plural-hint">— include the article</span> <span class="aw-gen-tag"><svg width="9" height="9" viewBox="0 0 24 24" fill="var(--lc-accent)"><path d="M12 2l2.4 7.2L22 12l-7.6 2.8L12 22l-2.4-7.2L2 12l7.6-2.8z"/></svg>generated</span></p>
+                <input class="aw-input" value="die Flugzeuge" />
+              </div>
+
+              <!-- NEW — Synonyms editor -->
+              <div class="aw-field">
+                <p class="aw-lbl">Synonyms <span class="aw-gen-tag"><svg width="9" height="9" viewBox="0 0 24 24" fill="var(--lc-accent)"><path d="M12 2l2.4 7.2L22 12l-7.6 2.8L12 22l-2.4-7.2L2 12l7.6-2.8z"/></svg>generated</span></p>
+                <div class="aw-syn-list">
+                  <div class="aw-syn-chip">
+                    <span class="art-badge art-die">die</span>
+                    <span class="aw-syn-chip-word">Maschine</span>
+                    <span class="aw-syn-chip-trans">machine, aircraft</span>
+                    <button class="aw-syn-chip-x">×</button>
+                  </div>
+                  <div class="aw-syn-chip">
+                    <span class="art-badge art-der">der</span>
+                    <span class="aw-syn-chip-word">Flieger</span>
+                    <span class="aw-syn-chip-trans">plane (colloquial)</span>
+                    <button class="aw-syn-chip-x">×</button>
+                  </div>
+                  <button class="aw-syn-add">
+                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="var(--lc-brand)" stroke-width="2.2" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+                    Add synonym
+                  </button>
+                </div>
+              </div>
+
+              <button class="aw-save-btn">Save to Vault</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ════ SCREEN D: ADD WORD (generating) ════ -->
+      <div class="phone-wrap">
+        <div class="phone-label">D · Add Word — generating state</div>
+        <div class="phone">
+          <div class="phone-inner">
+            <div class="status-bar"><span>9:54</span><div style="display:flex;align-items:center;gap:3px;"><div class="sig"><span></span><span></span><span></span></div><div class="batt"></div></div></div>
+            <div class="p-nav">
+              <button class="p-back" style="background:var(--lc-surface);border:1px solid var(--lc-border);"><svg viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
+              <span class="p-nav-title">Add New Word</span>
+              <div style="width:30px;"></div>
+            </div>
+
+            <div class="aw-form">
+              <div class="aw-field">
+                <p class="aw-lbl">Back — German</p>
+                <div class="aw-back-row">
+                  <input class="aw-input" value="Flugzeug" />
+                  <button class="aw-gen-btn" style="opacity:.85;">
+                    <span class="aw-spinner"></span>
+                    Generating…
+                  </button>
+                </div>
+              </div>
+              <div class="aw-field">
+                <p class="aw-lbl">Front — English</p>
+                <input class="aw-input" placeholder="Filling in…" style="color:var(--lc-text-hint);" />
+              </div>
+              <div class="aw-field">
+                <p class="aw-lbl">Plural <span class="aw-plural-hint">— include the article</span></p>
+                <input class="aw-input" placeholder="Filling in…" style="color:var(--lc-text-hint);" />
+              </div>
+              <div class="aw-field">
+                <p class="aw-lbl">Synonyms</p>
+                <div class="aw-syn-list">
+                  <div class="aw-syn-chip" style="opacity:.5;">
+                    <span style="width:60px;height:10px;background:var(--lc-border);border-radius:4px;"></span>
+                    <span style="flex:1;height:10px;background:var(--lc-border);border-radius:4px;"></span>
+                  </div>
+                  <div class="aw-syn-chip" style="opacity:.35;">
+                    <span style="width:50px;height:10px;background:var(--lc-border);border-radius:4px;"></span>
+                    <span style="flex:1;height:10px;background:var(--lc-border);border-radius:4px;"></span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ════ SCREEN E: LISTEN DEEP DIVE ════ -->
+      <div class="phone-wrap">
+        <div class="phone-label">E · Listen — Deep Dive rows</div>
+        <div class="phone">
+          <div class="phone-inner">
+            <div class="status-bar"><span>9:58</span><div style="display:flex;align-items:center;gap:3px;"><div class="sig"><span></span><span></span><span></span></div><div class="batt"></div></div></div>
+            <div class="p-nav">
+              <span class="p-nav-title" style="margin:0 auto;">Listen &amp; Learn</span>
+            </div>
+
+            <div style="padding:0 16px 4px;"><p style="font-size:10px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--lc-text-hint);margin-bottom:10px;">Playlist type</p></div>
+            <div class="ln-type-row">
+              <div class="ln-type"><div class="ln-type-t">Compact</div><div class="ln-type-s">Word + meaning</div></div>
+              <div class="ln-type"><div class="ln-type-t">Examples</div><div class="ln-type-s">Full sentences</div></div>
+              <div class="ln-type ln-type--active"><div class="ln-type-t">Deep Dive</div><div class="ln-type-s">+ grammar tip</div></div>
+            </div>
+
+            <div style="padding:0 16px 8px;"><p style="font-size:10px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--lc-text-hint);">Queue (10 words)</p></div>
+            <div class="ln-queue">
+              <div class="ln-row">
+                <div class="ln-row-body">
+                  <div class="ln-word-row"><span class="art-badge art-das">das</span><span class="ln-word">Flugzeug, –e</span></div>
+                  <div class="ln-trans">airplane</div>
+                  <!-- NEW — deep dive extra line -->
+                  <div class="ln-extra"><strong>Pl.</strong> die Flugzeuge · <strong>syn.</strong> die Maschine</div>
+                </div>
+                <button class="ln-play"><svg viewBox="0 0 24 24"><polygon points="11,5 6,9 2,9 2,15 6,15 11,19 11,5"/></svg></button>
+              </div>
+              <div class="ln-row">
+                <div class="ln-row-body">
+                  <div class="ln-word-row"><span class="art-badge art-die">die</span><span class="ln-word">Fahrkarte, –n</span></div>
+                  <div class="ln-trans">ticket</div>
+                  <div class="ln-extra"><strong>Pl.</strong> die Fahrkarten · <strong>syn.</strong> das Ticket</div>
+                </div>
+                <button class="ln-play"><svg viewBox="0 0 24 24"><polygon points="11,5 6,9 2,9 2,15 6,15 11,19 11,5"/></svg></button>
+              </div>
+              <div class="ln-row">
+                <div class="ln-row-body">
+                  <div class="ln-word-row"><span class="art-badge art-der">der</span><span class="ln-word">Hauptbahnhof, –höfe</span></div>
+                  <div class="ln-trans">main train station</div>
+                  <div class="ln-extra"><strong>Pl.</strong> die Hauptbahnhöfe</div>
+                </div>
+                <button class="ln-play"><svg viewBox="0 0 24 24"><polygon points="11,5 6,9 2,9 2,15 6,15 11,19 11,5"/></svg></button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ───────────── BEFORE / AFTER ───────────── -->
+  <div class="section">
+    <div class="section-title">Related words → Synonyms: before &amp; after</div>
+    <div class="section-sub">Why the change matters, using the real example from the current screenshots.</div>
+    <div class="cmp-grid">
+      <div class="cmp-col">
+        <span class="cmp-tag cmp-tag--before">Before — stem matching</span>
+        <h4>das Flugzeug → "Related Words"</h4>
+        <p>Derived client-side: lowercase the word, take the first 4 characters as a "stem",
+          then match other vault cards by substring with a length filter. Result is
+          orthographic noise — and only ever words already in the user's vault.</p>
+        <div class="demo-related">
+          <div class="demo-rel-item"><span class="art-badge art-das">das</span>Hobby <span class="bad">✕ not a synonym</span></div>
+          <div class="demo-rel-item"><span class="art-badge art-das">das</span>Café <span class="bad">✕ not a synonym</span></div>
+          <div class="demo-rel-item"><span class="art-badge art-das">das</span>Buch <span class="bad">✕ not a synonym</span></div>
+        </div>
+      </div>
+      <div class="cmp-col">
+        <span class="cmp-tag cmp-tag--after">After — AI synonyms</span>
+        <h4>das Flugzeug → "Synonyms"</h4>
+        <p>Generated by the enrichment model and stored on the card. True
+          meaning-equivalents, each with a translation and an example sentence the learner can
+          expand — and they're independent of what's already in the vault.</p>
+        <div class="demo-related">
+          <div class="demo-rel-item"><span class="art-badge art-die">die</span>Maschine <span class="good">✓ "Die Maschine landet…"</span></div>
+          <div class="demo-rel-item"><span class="art-badge art-der">der</span>Flieger <span class="good">✓ "Der Flieger startet…"</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ───────────── RATIONALE ───────────── -->
+  <div class="section">
+    <div class="section-title">Design rationale &amp; UX research</div>
+    <div class="section-sub">Decisions behind where each piece of data lives.</div>
+    <div class="notes-grid">
+      <div class="note-card">
+        <div class="note-card-title">Article + plural, learned together</div>
+        <p>Every credible German resource gives the same advice: memorize <strong>der Tisch,
+          die Tische</strong> as one unit, never the bare noun. So plural sits <strong>next to
+          the headword</strong> on detail, and on the review <strong>back face</strong> — the
+          recall surface where article + plural should be rehearsed as one.</p>
+      </div>
+      <div class="note-card">
+        <div class="note-card-title">Synonyms need context</div>
+        <p>Retention research and the strongest vocab apps pair each synonym with a
+          <strong>translation and a sample sentence</strong>. A bare list teaches substitution
+          without nuance; a synonym + example teaches <strong>when</strong> to use it. Each
+          synonym is <code>{ word, article, translation, example }</code>, expandable on tap.</p>
+      </div>
+      <div class="note-card">
+        <div class="note-card-title">Don't clutter the review card</div>
+        <p>The review card is a recall test. Plurals belong there (part of the word's
+          identity); <strong>synonyms do not</strong> — they'd dilute the test. Synonyms live
+          on the detail page and, compactly, in the Listen <strong>Deep Dive</strong> browsing
+          surface.</p>
+      </div>
+      <div class="note-card">
+        <div class="note-card-title">Graceful absence</div>
+        <p>Many words have no good synonym, and non-nouns have no plural. Every surface hides
+          the field cleanly when empty — no empty headers, no <code>—</code> noise. The model
+          is told to return <code>[]</code> rather than invent weak synonyms.</p>
+      </div>
+      <div class="note-card">
+        <div class="note-card-title">Generate, don't burden</div>
+        <p>Manual entry gets a one-tap <strong>✨ Auto-generate</strong> that fills
+          translation, article, plural, example, and synonyms via the same enrichment path as
+          import — so quality matches and users rarely hand-type synonyms.</p>
+      </div>
+      <div class="note-card">
+        <div class="note-card-title">Backwards compatible</div>
+        <p>New fields are optional (<code>plural: string | null</code>,
+          <code>synonyms: Synonym[]</code> defaulting to <code>[]</code>). Hundreds of existing
+          cards keep working; an optional batch backfill fills them in later without
+          overwriting anything.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ───────────── DATA MODEL ───────────── -->
+  <div class="section">
+    <div class="section-title">Data model change</div>
+    <div class="section-sub">The single source of truth — <code>libs/shared/domain/src/index.ts</code>.</div>
+    <div class="code-block"><pre><span class="k">export interface</span> Synonym {
+  word: <span class="k">string</span>;            <span class="c">// synonym headword, no article</span>
+  article: ArticleType | <span class="k">null</span>;
+  translation: <span class="k">string</span>;     <span class="c">// native-language meaning</span>
+  example: <span class="k">string</span>;         <span class="c">// target-language sentence using it</span>
+  exampleNative: <span class="k">string</span>;   <span class="c">// translation of that sentence</span>
+}
+
+<span class="k">export interface</span> CardContent {
+  front: <span class="k">string</span>;
+  back: <span class="k">string</span>;
+  article: ArticleType | <span class="k">null</span>;
+  gender: GenderType;
+  plural: <span class="k">string</span> | <span class="k">null</span>;     <span class="c">// NEW — full plural w/ article: "die Flugzeuge"</span>
+  examples: ExampleSentence[];
+  synonyms: Synonym[];          <span class="c">// NEW — true synonyms, defaults to []</span>
+  notes: <span class="k">string</span>;
+  audioAssetId: <span class="k">string</span> | <span class="k">null</span>;
+  imageUrl: <span class="k">string</span> | <span class="k">null</span>;
+  phonetic: <span class="k">string</span> | <span class="k">null</span>;
+}</pre></div>
+  </div>
+
+</div>
+
+</body>
+</html>

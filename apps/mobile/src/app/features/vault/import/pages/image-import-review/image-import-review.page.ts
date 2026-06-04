@@ -1,4 +1,5 @@
-import { Component, computed, inject, OnInit, signal } from '@angular/core';
+import { Component, computed, DestroyRef, inject, OnInit, signal } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { Router } from '@angular/router';
 import {
   IonContent,
@@ -53,6 +54,7 @@ interface SelectableWord extends ParsedImportRow {
   imports: [IonHeader, IonToolbar, IonContent, IonIcon],
 })
 export class ImageImportReviewPage implements OnInit {
+  private readonly destroyRef = inject(DestroyRef);
   private readonly importImageState = inject(ImageImportStateService);
   private readonly cardApi = inject(CardApiService);
   private readonly collectionApi = inject(CollectionApiService);
@@ -77,6 +79,8 @@ export class ImageImportReviewPage implements OnInit {
   readonly wordList = signal<SelectableWord[]>([]);
   readonly selectedCollectionId = signal<string | null>(null);
   readonly importing = signal(false);
+  /** True while the initial card-freshness fetch is in flight — prevents allPending() flicker. */
+  private readonly initialising = signal(true);
 
   readonly selectedCollectionLabel = computed(() => {
     const id = this.selectedCollectionId();
@@ -91,8 +95,11 @@ export class ImageImportReviewPage implements OnInit {
   readonly allSelected = computed(() => this.wordList().every(w => w.selected));
   readonly warningCount = computed(() => this.wordList().filter(w => w.confidence < 0.7).length);
 
-  /** True when enrichment returned zero ready words — all words are pending */
-  readonly allPending = computed(() => this.pendingCount() > 0 && this.wordList().length === 0);
+  /** True when enrichment returned zero ready words — all words are pending.
+   *  Guard with !initialising() so the banner doesn't flash during the card-freshness fetch. */
+  readonly allPending = computed(() =>
+    !this.initialising() && this.pendingCount() > 0 && this.wordList().length === 0,
+  );
 
   /**
    * Pending-path duplicate count: how many raw pending words already exist in the vault.
@@ -111,6 +118,32 @@ export class ImageImportReviewPage implements OnInit {
       this.router.navigate(['/vault/import/image']);
       return;
     }
+
+    // Fetch fresh cards once to avoid false vault-duplicate flags from stale
+    // in-memory store state (e.g. after card deletions in this session).
+    // takeUntilDestroyed cancels the subscription if the user navigates away
+    // before the response arrives, preventing a post-destroy state mutation.
+    this.cardApi.getAll().pipe(
+      takeUntilDestroyed(this.destroyRef),
+    ).subscribe({
+      next: freshCards => {
+        this._buildRows(freshCards);
+        this.initialising.set(false);
+        // Sync the store with the same fresh data — no second network call.
+        this.cardStore.loadCards();
+      },
+      error: () => {
+        // Offline / API unavailable — fall back to current store state so the
+        // page stays functional. The dedup check may produce false positives
+        // if the store is stale, but the user can still override manually.
+        const fallback = this.cardStore.cards();
+        this._buildRows(fallback);
+        this.initialising.set(false);
+      },
+    });
+  }
+
+  private _buildRows(freshCards: Card[]): void {
     const words = this.result()?.words ?? [];
     const rows: SelectableWord[] = words.map((w, i) => ({
       ...this.toImportRow(w, i),
@@ -132,7 +165,7 @@ export class ImageImportReviewPage implements OnInit {
     }
 
     this.wordList.set(rows);
-    this._checkVaultDuplicates(rows);
+    this._checkVaultDuplicates(rows, freshCards);
 
     // For the all-pending path: use back-only dedup (no article) because:
     // 1. Phase 1 extraction embeds the article in back ("der Hund" not "Hund")
@@ -140,14 +173,15 @@ export class ImageImportReviewPage implements OnInit {
     // checkBatchByBackOnly strips article prefixes and matches on the bare word only.
     const pendingWords = this.enrichment()?.pending ?? [];
     if (pendingWords.length > 0 && rows.length === 0) {
-      const matches = this.dedupService.checkBatchByBackOnly(pendingWords);
+      const matches = this.dedupService.checkBatchByBackOnly(pendingWords, freshCards);
       this.pendingDuplicateCount.set(matches.filter(m => m !== null).length);
     }
   }
 
-  private _checkVaultDuplicates(rows: SelectableWord[]): void {
+  private _checkVaultDuplicates(rows: SelectableWord[], freshCards: Card[]): void {
     const matches = this.dedupService.checkBatch(
       rows.map(r => ({ back: r.back, article: r.article ?? null })),
+      freshCards,
     );
     this.wordList.update(ws =>
       ws.map((w, i) => {
@@ -357,6 +391,8 @@ export class ImageImportReviewPage implements OnInit {
       categoryId: cat?.id ?? '',
       exampleTarget: word.exampleTarget,
       exampleNative: word.exampleNative,
+      plural: word.plural,
+      synonyms: word.synonyms,
       status: word.confidence >= 0.6 ? 'valid' : 'warning',
       warningMessages: word.confidence < 0.6 ? ['Low confidence — please verify'] : [],
       errorMessages: [],
@@ -376,7 +412,9 @@ export class ImageImportReviewPage implements OnInit {
       back: row.back,
       article: row.article,
       gender,
+      plural: row.plural ?? null,
       examples,
+      synonyms: row.synonyms ?? [],
       notes: '',
       audioAssetId: null,
       imageUrl: null,

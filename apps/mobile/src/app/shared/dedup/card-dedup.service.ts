@@ -13,14 +13,7 @@ export class CardDedupService {
    * Full-key index: article + back (lowercase trimmed).
    * Used for enriched words where article is confirmed by AI enrichment.
    */
-  readonly index = computed(() => {
-    const map = new Map<string, Card>();
-    for (const card of this.cardStore.cards()) {
-      const key = this.normalizeKey(card.content.article, card.content.back);
-      if (!map.has(key)) map.set(key, card);
-    }
-    return map;
-  });
+  readonly index = computed(() => this._buildIndex(this.cardStore.cards()));
 
   /**
    * Back-only index: just the word, no article.
@@ -30,14 +23,7 @@ export class CardDedupService {
    * A match on the bare word is sufficient to detect a duplicate — article
    * mismatch is tolerated for pending words.
    */
-  readonly backOnlyIndex = computed(() => {
-    const map = new Map<string, Card>();
-    for (const card of this.cardStore.cards()) {
-      const key = this.normalizeBack(card.content.back);
-      if (!map.has(key)) map.set(key, card);
-    }
-    return map;
-  });
+  readonly backOnlyIndex = computed(() => this._buildBackOnlyIndex(this.cardStore.cards()));
 
   /** O(1) lookup using full article+back key. For enriched/confirmed words. */
   check(article: string | null | undefined, back: string): Card | null {
@@ -47,9 +33,11 @@ export class CardDedupService {
   /**
    * Batch check using full article+back key.
    * For enriched words (CSV import, image import enriched path).
+   * Pass `cards` to check against a specific list instead of the store index
+   * (use this when the store may be stale, e.g. after a deletion).
    */
-  checkBatch(words: { back: string; article?: string | null }[]): (Card | null)[] {
-    const idx = this.index();
+  checkBatch(words: { back: string; article?: string | null }[], cards?: Card[]): (Card | null)[] {
+    const idx = cards ? this._buildIndex(cards) : this.index();
     return words.map(w => idx.get(this.normalizeKey(w.article, w.back)) ?? null);
   }
 
@@ -68,10 +56,29 @@ export class CardDedupService {
    * For Phase 1 raw/pending words where:
    * - back may include the article prefix ("der Hund" → strips to "hund")
    * - article from extraction is unreliable
+   * Pass `cards` to check against a specific list instead of the store index.
    */
-  checkBatchByBackOnly(words: { back: string }[]): (Card | null)[] {
-    const idx = this.backOnlyIndex();
+  checkBatchByBackOnly(words: { back: string }[], cards?: Card[]): (Card | null)[] {
+    const idx = cards ? this._buildBackOnlyIndex(cards) : this.backOnlyIndex();
     return words.map(w => idx.get(this.normalizeBack(w.back)) ?? null);
+  }
+
+  private _buildIndex(cards: Card[]): Map<string, Card> {
+    const map = new Map<string, Card>();
+    for (const card of cards) {
+      const key = this.normalizeKey(card.content.article, card.content.back);
+      if (!map.has(key)) map.set(key, card);
+    }
+    return map;
+  }
+
+  private _buildBackOnlyIndex(cards: Card[]): Map<string, Card> {
+    const map = new Map<string, Card>();
+    for (const card of cards) {
+      const key = this.normalizeBack(card.content.back);
+      if (!map.has(key)) map.set(key, card);
+    }
+    return map;
   }
 
   private normalizeKey(article: string | null | undefined, back: string): string {

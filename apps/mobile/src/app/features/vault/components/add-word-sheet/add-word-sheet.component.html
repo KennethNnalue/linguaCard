@@ -4,7 +4,7 @@
       <button class="aw-close-btn" (click)="dismiss()" aria-label="Close">
         <ion-icon name="close-outline"></ion-icon>
       </button>
-      <span class="aw-title lc-display">{{ isEditing ? 'Edit Word' : 'Add New Word' }}</span>
+      <span class="aw-title lc-display">{{ isEditing() ? 'Edit Word' : 'Add New Word' }}</span>
       <div class="aw-nav-spacer"></div>
     </div>
   </ion-toolbar>
@@ -69,6 +69,19 @@
       </div>
     </div>
 
+    <!-- Plural — only shown when an article is selected -->
+    @if (showPluralField()) {
+      <div class="aw-field">
+        <p class="aw-lbl">Plural <span class="aw-lbl-hint">— include the article</span></p>
+        <input
+          class="aw-input"
+          type="text"
+          placeholder="e.g. die Flugzeuge"
+          formControlName="plural"
+          autocomplete="off" />
+      </div>
+    }
+
     <!-- Duplicate warning -->
     @if (showDuplicateWarning()) {
       <div class="aw-duplicate-warning">
@@ -87,7 +100,7 @@
     <!-- Collection -->
     <div class="aw-field">
       <p class="aw-lbl">Collection <span class="aw-lbl-hint aw-lbl-hint--required">*required</span></p>
-      @if (lockedCollectionId) {
+      @if (lockedCollectionId()) {
         <div class="aw-collection-locked">{{ selectedCollectionLabel() }}</div>
       } @else {
         <button
@@ -179,10 +192,10 @@
 
     <!-- Save -->
     <button type="submit" class="aw-save-btn" [disabled]="saving()">
-      @if (saving()) { Saving… } @else if (isEditing) { Save changes } @else { Save to Vault }
+      @if (saving()) { Saving… } @else if (isEditing()) { Save changes } @else { Save to Vault }
     </button>
 
-    @if (!isEditing) {
+    @if (!isEditing()) {
       <p class="aw-import-link" (click)="navigateToImport()">
         Add multiple words? Import a CSV →
       </p>

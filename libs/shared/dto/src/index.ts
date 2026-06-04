@@ -9,6 +9,14 @@ export class CreateExampleSentenceDto {
   @IsString() native!: string;
 }
 
+export class SynonymDto {
+  @IsString() word!: string;
+  @IsOptional() @IsIn(['der', 'die', 'das', 'le', 'la', 'el', 'un', 'une', null]) article?: ArticleType | null;
+  @IsString() translation!: string;
+  @IsOptional() @IsString() example?: string;
+  @IsOptional() @IsString() exampleNative?: string;
+}
+
 export class CreateCardContentDto {
   @IsString() @MinLength(1) front!: string;
   @IsString() @MinLength(1) back!: string;
@@ -21,7 +29,9 @@ export class CreateCardContentDto {
   @IsIn(['masculine', 'feminine', 'neuter', null])
   gender?: string | null;
 
+  @IsOptional() @IsString() plural?: string | null;
   @IsOptional() @IsArray() examples?: CreateExampleSentenceDto[];
+  @IsOptional() @IsArray() @ValidateNested({ each: true }) @Type(() => SynonymDto) synonyms?: SynonymDto[];
   @IsOptional() @IsString() notes?: string;
   @IsOptional() @IsString() audioAssetId?: string | null;
   @IsOptional() @IsString() imageUrl?: string | null;

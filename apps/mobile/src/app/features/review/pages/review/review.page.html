@@ -64,6 +64,12 @@
               @if (currentCard().content.phonetic) {
                 <p class="rv-phonetic">{{ currentCard().content.phonetic }}</p>
               }
+              @if (currentCard().content.plural) {
+                <div class="rv-plural">
+                  <span class="rv-plural-lbl">Plural</span>
+                  <span class="rv-plural-val">{{ currentCard().content.plural }}</span>
+                </div>
+              }
               @for (ex of currentCard().content.examples; track ex.id) {
                 <div class="rv-ex-block">
                   <div class="rv-ex-row">

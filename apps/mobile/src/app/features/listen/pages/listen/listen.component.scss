@@ -159,6 +159,21 @@
 .lh-card-word-row { display: flex; align-items: center; gap: 6px; margin-bottom: 2px; }
 .lh-card-word { font-size: 13px; font-weight: t.$lc-font-weight-semibold; color: var(--lc-text-primary); }
 .lh-card-trans { font-size: 11px; color: var(--lc-text-secondary); }
+
+.lh-card-extra {
+  display: flex;
+  align-items: center;
+  gap: t.$lc-space-1;
+  margin-top: 3px;
+  @include u.lc-font('xxs');
+  color: var(--lc-brand-mid);
+  flex-wrap: wrap;
+
+  strong { font-weight: t.$lc-font-weight-semibold; color: var(--lc-text-primary); }
+}
+
+.lh-card-extra-sep { color: var(--lc-text-hint); }
+
 .lh-card-meta { display: flex; align-items: center; gap: t.$lc-space-1; margin-top: 3px; }
 
 .lh-card-status {

@@ -88,9 +88,11 @@ export class ImageImportService {
       front: String(item['front'] ?? ''),
       back: String(item['back'] ?? ''),
       article: this.parseArticle(item['article']),
+      plural: null,
       categoryName: String(item['categoryName'] ?? 'Other'),
       exampleTarget: String(item['exampleTarget'] ?? ''),
       exampleNative: String(item['exampleNative'] ?? ''),
+      synonyms: [],
       confidence: typeof item['confidence'] === 'number'
         ? Math.min(1, Math.max(0, item['confidence']))
         : 0.5,

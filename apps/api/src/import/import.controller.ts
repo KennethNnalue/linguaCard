@@ -1,5 +1,7 @@
-import { Body, Controller, HttpCode, HttpStatus, Param, Post } from '@nestjs/common';
+import { Body, Controller, ForbiddenException, HttpCode, HttpStatus, Param, Post } from '@nestjs/common';
 import type {
+  EnrichOneRequest,
+  EnrichOneResult,
   EnrichWordsRequest,
   EnrichWordsResult,
   ImageImportRequest,
@@ -12,14 +14,16 @@ import { ImageExtractService } from './image-extract.service';
 import { WordEnrichService } from './word-enrich.service';
 import { CollectionCompleteService } from './collection-complete.service';
 import { CurrentUser } from '../common/decorators/current-user.decorator';
+import { SubscriptionService } from '../subscriptions/subscription.service';
 
 @Controller('import')
 export class ImportController {
   constructor(
-    private readonly imageImportService:      ImageImportService,
-    private readonly imageExtractService:     ImageExtractService,
-    private readonly wordEnrichService:       WordEnrichService,
+    private readonly imageImportService:        ImageImportService,
+    private readonly imageExtractService:       ImageExtractService,
+    private readonly wordEnrichService:         WordEnrichService,
     private readonly collectionCompleteService: CollectionCompleteService,
+    private readonly subscriptionService:       SubscriptionService,
   ) {}
 
   /** Legacy single-pass endpoint — kept for backwards compatibility */
@@ -51,5 +55,19 @@ export class ImportController {
     @Param('collectionId') collectionId: string,
   ): Promise<{ newCards: number; reusedCards: number; pendingWords: RawExtractedWord[]; isComplete: boolean }> {
     return this.collectionCompleteService.resume(userId, collectionId);
+  }
+
+  /** Enrich a single word on demand — used by the add-word sheet auto-generate button */
+  @Post('enrich-one')
+  @HttpCode(HttpStatus.OK)
+  async enrichOne(
+    @CurrentUser() userId: string,
+    @Body() dto: EnrichOneRequest,
+  ): Promise<EnrichOneResult> {
+    const status = await this.subscriptionService.getStatusForUser(userId);
+    if (!status.isActive && (status.imageImportsRemaining ?? 0) <= 0) {
+      throw new ForbiddenException('Free enrichment limit reached. Upgrade to Pro to continue.');
+    }
+    return this.wordEnrichService.enrichOne(dto);
   }
 }

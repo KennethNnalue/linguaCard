@@ -96,6 +96,20 @@
               <span class="lh-card-word">{{ card.content.back }}</span>
             </div>
             <div class="lh-card-trans">{{ card.content.front }}</div>
+            @if (listenStore.playMode() === 'deepDive') {
+              @let hasPluralOrSyn = card.content.plural || (card.content.synonyms && card.content.synonyms.length > 0);
+              @if (hasPluralOrSyn) {
+                <div class="lh-card-extra">
+                  @if (card.content.plural) {
+                    <span><strong>Pl.</strong> {{ card.content.plural }}</span>
+                  }
+                  @if (card.content.synonyms && card.content.synonyms.length > 0) {
+                    @if (card.content.plural) { <span class="lh-card-extra-sep">·</span> }
+                    <span><strong>syn.</strong> {{ card.content.synonyms[0].article ? card.content.synonyms[0].article + ' ' : '' }}{{ card.content.synonyms[0].word }}</span>
+                  }
+                </div>
+              }
+            }
             <div class="lh-card-meta">
               @if (card.srsState?.state) {
                 <span class="lh-card-status">{{ card.srsState!.state }}</span>

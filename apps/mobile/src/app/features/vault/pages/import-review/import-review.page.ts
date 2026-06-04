@@ -1,4 +1,5 @@
-import { Component, computed, inject, OnInit, signal } from '@angular/core';
+import { Component, computed, DestroyRef, inject, OnInit, signal } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { Router } from '@angular/router';
 import {
   IonContent,
@@ -43,6 +44,7 @@ interface SelectableRow extends ParsedImportRow {
   imports: [IonHeader, IonToolbar, IonContent, IonIcon],
 })
 export class ImportReviewPage implements OnInit {
+  private readonly destroyRef = inject(DestroyRef);
   private readonly importState = inject(ImportStateService);
   private readonly cardApi = inject(CardApiService);
   private readonly authService = inject(AuthService);
@@ -90,10 +92,20 @@ export class ImportReviewPage implements OnInit {
       this.router.navigate(['/vault/import']);
       return;
     }
-    this._buildWordList();
+    // Fetch fresh cards to ensure vault-dedup uses current state (not stale
+    // in-memory store — e.g. after card deletions in this session).
+    this.cardApi.getAll().pipe(
+      takeUntilDestroyed(this.destroyRef),
+    ).subscribe({
+      next: freshCards => {
+        this._buildWordList(freshCards);
+        this.cardStore.loadCards();
+      },
+      error: () => this._buildWordList(this.cardStore.cards()),
+    });
   }
 
-  private _buildWordList(): void {
+  private _buildWordList(freshCards: Card[]): void {
     const rows = this.result()?.validRows ?? [];
 
     // Step 1: within-batch dedup — mark second occurrence of same word
@@ -117,9 +129,10 @@ export class ImportReviewPage implements OnInit {
       };
     });
 
-    // Step 2: vault dedup (synchronous — reads CardStore index once)
+    // Step 2: vault dedup against fresh card list
     const vaultMatches = this.dedupService.checkBatch(
-      withBatchDedup.map(r => ({ back: r.back, article: r.article ?? null }))
+      withBatchDedup.map(r => ({ back: r.back, article: r.article ?? null })),
+      freshCards,
     );
 
     const finalRows = withBatchDedup.map((row, i) => {
@@ -311,7 +324,9 @@ export class ImportReviewPage implements OnInit {
       back: row.back,
       article: row.article,
       gender,
+      plural: null,
       examples,
+      synonyms: [],
       notes: '',
       audioAssetId: null,
       imageUrl: null,

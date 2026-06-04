@@ -15,6 +15,7 @@ import { CardEntity } from '../cards/card.entity';
 import { WordEnrichService } from './word-enrich.service';
 import { WordDedupService } from '../cards/word-dedup.service';
 import { WordAudioService } from '../word-audio/word-audio.service';
+import { SynonymAudioPrefetchService } from '../word-audio/synonym-audio-prefetch.service';
 
 @Injectable()
 export class CollectionCompleteService {
@@ -24,6 +25,7 @@ export class CollectionCompleteService {
     private readonly wordEnrich: WordEnrichService,
     private readonly wordDedup: WordDedupService,
     private readonly wordAudio: WordAudioService,
+    private readonly synonymAudioPrefetch: SynonymAudioPrefetchService,
     @InjectRepository(CollectionEntity)
     private readonly collectionRepo: Repository<CollectionEntity>,
     @InjectRepository(CardEntity)
@@ -101,21 +103,37 @@ export class CollectionCompleteService {
     collection.importStatus = result.isComplete ? 'complete' : 'incomplete';
     await this.collectionRepo.save(collection);
 
-    // Fire-and-forget: pre-generate audio for every word + example sentence that
-    // was just enriched. Runs after the HTTP response is sent so import latency
-    // is unaffected. batchResolve() is idempotent — already-cached audio is skipped.
+    // Fire-and-forget audio pre-generation — runs after the HTTP response is sent.
+    // Primary audio (word + main example): fired immediately via batchResolve so
+    // the user hears audio on first tap into the vault.
+    // Secondary audio (plural + synonym examples): queued in the throttled
+    // SynonymAudioPrefetchService to avoid spiking TTS quota on large imports.
     if (result.enriched.length > 0) {
-      const audioTexts: { text: string; language: string }[] = [];
+      const primaryAudio: { text: string; language: string }[] = [];
+      const secondaryAudio: { text: string; language: string }[] = [];
+
       for (const word of result.enriched) {
-        const wordText = (word.article ? `${word.article} ` : '') + word.back;
-        audioTexts.push({ text: wordText, language: 'de-DE' });
+        primaryAudio.push({
+          text: (word.article ? `${word.article} ` : '') + word.back,
+          language: 'de-DE',
+        });
         if (word.exampleTarget) {
-          audioTexts.push({ text: word.exampleTarget, language: 'de-DE' });
+          primaryAudio.push({ text: word.exampleTarget, language: 'de-DE' });
+        }
+        if (word.plural) {
+          secondaryAudio.push({ text: word.plural, language: 'de-DE' });
+        }
+        for (const syn of (word.synonyms ?? [])) {
+          if (syn.example) secondaryAudio.push({ text: syn.example, language: 'de-DE' });
         }
       }
-      this.wordAudio.batchResolve(audioTexts).catch(err =>
-        this.logger.warn('Audio pre-generation after collection complete failed', err),
+
+      this.wordAudio.batchResolve(primaryAudio).catch(err =>
+        this.logger.warn('Primary audio pre-generation failed', err),
       );
+      if (secondaryAudio.length > 0) {
+        this.synonymAudioPrefetch.enqueue(secondaryAudio);
+      }
     }
 
     return {
@@ -142,7 +160,9 @@ export class CollectionCompleteService {
       back: word.back,
       article: word.article,
       gender,
+      plural: word.plural ?? null,
       examples,
+      synonyms: word.synonyms ?? [],
       notes: '',
       audioAssetId: null,
       imageUrl: null,

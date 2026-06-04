@@ -27,6 +27,16 @@
         }
         <div class="wd2-trans">{{ word.content.front }}@if (word.content.article) { · noun, {{ word.content.article === 'der' ? 'masculine' : word.content.article === 'die' ? 'feminine' : 'neuter' }}}</div>
 
+        @if (word.content.plural) {
+          <div class="wd2-plural-row">
+            <span class="wd2-plural-lbl">Plural</span>
+            <span class="wd2-plural-val">{{ word.content.plural }}</span>
+            <button class="wd2-plural-play" (click)="playPlural()" aria-label="Play plural">
+              <ion-icon name="volume-high-outline"></ion-icon>
+            </button>
+          </div>
+        }
+
         <div class="wd2-pills">
           <div class="wd2-status-pill wd2-mastery-pill--{{ masteryLevel() }}">
             <div class="wd2-status-dot wd2-mastery-dot--{{ masteryLevel() }}"></div>
@@ -128,15 +138,35 @@
         </div>
       }
 
-      <!-- ── Related words card ── -->
-      @if (relatedWords().length > 0) {
+      <!-- ── Synonyms card ── -->
+      @if (synonyms().length > 0) {
         <div class="wd2-section">
-          <div class="wd2-sec-lbl">Related Words</div>
-          @for (related of relatedWords(); track related.id; let last = $last) {
-            <div class="wd2-related-item" [class.wd2-related-item--last]="last" [routerLink]="['/vault', related.id]">
-              <lc-article-badge [article]="related.content.article" />
-              <span class="wd2-related-word">{{ related.content.back }}</span>
-              <span class="wd2-related-trans">{{ related.content.front }}</span>
+          <div class="wd2-sec-lbl">Synonyms</div>
+          @for (syn of synonyms(); track $index; let i = $index; let last = $last) {
+            <div class="syn-item" [class.syn-item--open]="isSynonymExpanded(i)" [class.syn-item--last]="last">
+              <div class="syn-head" (click)="toggleSynonym(i)">
+                <lc-article-badge [article]="syn.article" />
+                <span class="syn-word">{{ syn.word }}</span>
+                <span class="syn-trans">{{ syn.translation }}</span>
+                <span class="syn-chev">
+                  <ion-icon name="chevron-down-outline"></ion-icon>
+                </span>
+              </div>
+              @if (isSynonymExpanded(i) && syn.example) {
+                <div class="syn-body">
+                  <div class="syn-example">
+                    <div class="syn-ex-row">
+                      <p class="syn-ex-de" [innerHTML]="highlightWord(syn.example, syn.word)"></p>
+                      <button class="wd2-ex-play-btn" (click)="playSynonymExample(syn.example)" aria-label="Play synonym example">
+                        <ion-icon name="volume-high-outline"></ion-icon>
+                      </button>
+                    </div>
+                    @if (syn.exampleNative) {
+                      <p class="syn-ex-en">"{{ syn.exampleNative }}"</p>
+                    }
+                  </div>
+                </div>
+              }
             </div>
           }
         </div>

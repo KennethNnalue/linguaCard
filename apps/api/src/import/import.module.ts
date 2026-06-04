@@ -11,6 +11,7 @@ import { CollectionCompleteService } from './collection-complete.service';
 import { AiModule } from '../ai/ai.module';
 import { CardsModule } from '../cards/cards.module';
 import { WordAudioModule } from '../word-audio/word-audio.module';
+import { SubscriptionsModule } from '../subscriptions/subscriptions.module';
 import { CollectionEntity } from '../collections/collection.entity';
 import { CardEntity } from '../cards/card.entity';
 
@@ -19,6 +20,7 @@ import { CardEntity } from '../cards/card.entity';
     AiModule,
     CardsModule,
     WordAudioModule,
+    SubscriptionsModule,
     TypeOrmModule.forFeature([CollectionEntity, CardEntity]),
   ],
   controllers: [ImportController],

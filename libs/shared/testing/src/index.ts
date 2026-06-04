@@ -162,7 +162,7 @@ export const MOCK_CARDS: Card[] = [
     content: { front: 'the cat', back: 'Katze', article: 'die', gender: 'feminine', phonetic: '/ˈkat.sə/', examples: [
       { id: 'ex-001a', target: 'Die Katze sitzt auf dem Sofa.', native: 'The cat is sitting on the sofa.' },
       { id: 'ex-001b', target: 'Meine Katze heißt Luna.', native: 'My cat is called Luna.' },
-    ], notes: 'Always feminine. Plural: die Katzen.', audioAssetId: 'audio-001', imageUrl: null },
+    ], notes: 'Always feminine. Plural: die Katzen.', audioAssetId: 'audio-001', imageUrl: null, plural: null, synonyms: [], },
     srsState: makeSrsState('card-001', { masteryLevel: 5, state: 'mastered', intervalDays: 30, repetitions: 8, lastRating: 5, lastReviewedAt: daysAgo(2), nextDueAt: daysFromNow(28) }),
   },
   {
@@ -171,7 +171,7 @@ export const MOCK_CARDS: Card[] = [
     createdAt: '2025-01-15T10:05:00Z', updatedAt: '2025-01-15T10:05:00Z',
     content: { front: 'the dog', back: 'Hund', article: 'der', gender: 'masculine', phonetic: '/hʊnt/', examples: [
       { id: 'ex-002a', target: 'Der Hund bellt laut.', native: 'The dog barks loudly.' },
-    ], notes: 'Masculine. Plural: die Hunde.', audioAssetId: 'audio-002', imageUrl: null },
+    ], notes: 'Masculine. Plural: die Hunde.', audioAssetId: 'audio-002', imageUrl: null, plural: null, synonyms: [], },
     srsState: makeSrsState('card-002', { masteryLevel: 4, state: 'review', intervalDays: 14, repetitions: 5, lastRating: 4, lastReviewedAt: daysAgo(10), nextDueAt: daysFromNow(4) }),
   },
   {
@@ -180,7 +180,7 @@ export const MOCK_CARDS: Card[] = [
     createdAt: '2025-01-16T09:00:00Z', updatedAt: '2025-01-16T09:00:00Z',
     content: { front: 'the bird', back: 'Vogel', article: 'der', gender: 'masculine', phonetic: '/ˈfoː.ɡəl/', examples: [
       { id: 'ex-003a', target: 'Der Vogel singt im Baum.', native: 'The bird is singing in the tree.' },
-    ], notes: 'Masculine. Plural: die Vögel (umlaut changes!).', audioAssetId: null, imageUrl: null },
+    ], notes: 'Masculine. Plural: die Vögel (umlaut changes!).', audioAssetId: null, imageUrl: null, plural: null, synonyms: [], },
     srsState: makeSrsState('card-003', { masteryLevel: 2, state: 'learning', intervalDays: 4, repetitions: 2, lastRating: 2, lastReviewedAt: daysAgo(1), nextDueAt: daysFromNow(0) }),
   },
   {
@@ -189,7 +189,7 @@ export const MOCK_CARDS: Card[] = [
     createdAt: '2025-01-16T09:10:00Z', updatedAt: '2025-01-16T09:10:00Z',
     content: { front: 'the horse', back: 'Pferd', article: 'das', gender: 'neuter', phonetic: '/p͡feːɐ̯t/', examples: [
       { id: 'ex-004a', target: 'Das Pferd läuft schnell.', native: 'The horse runs fast.' },
-    ], notes: 'Neuter. Plural: die Pferde.', audioAssetId: null, imageUrl: null },
+    ], notes: 'Neuter. Plural: die Pferde.', audioAssetId: null, imageUrl: null, plural: null, synonyms: [], },
     srsState: makeSrsState('card-004', { masteryLevel: 0, state: 'new', nextDueAt: new Date().toISOString() }),
   },
   {
@@ -198,7 +198,7 @@ export const MOCK_CARDS: Card[] = [
     createdAt: '2025-01-17T08:00:00Z', updatedAt: '2025-01-17T08:00:00Z',
     content: { front: 'the fish', back: 'Fisch', article: 'der', gender: 'masculine', phonetic: '/fɪʃ/', examples: [
       { id: 'ex-005a', target: 'Der Fisch schwimmt im Wasser.', native: 'The fish swims in the water.' },
-    ], notes: 'Masculine. Plural: die Fische.', audioAssetId: null, imageUrl: null },
+    ], notes: 'Masculine. Plural: die Fische.', audioAssetId: null, imageUrl: null, plural: null, synonyms: [], },
     srsState: makeSrsState('card-005', { masteryLevel: 1, state: 'learning', intervalDays: 2, repetitions: 1, lastRating: 1, lastReviewedAt: daysAgo(1), nextDueAt: new Date().toISOString() }),
   },
   {
@@ -207,7 +207,7 @@ export const MOCK_CARDS: Card[] = [
     createdAt: '2025-01-17T10:00:00Z', updatedAt: '2025-01-17T10:00:00Z',
     content: { front: 'the bread', back: 'Brot', article: 'das', gender: 'neuter', phonetic: '/bʁoːt/', examples: [
       { id: 'ex-006a', target: 'Das Brot ist frisch gebacken.', native: 'The bread is freshly baked.' },
-    ], notes: 'Neuter. Plural: die Brote.', audioAssetId: 'audio-006', imageUrl: null },
+    ], notes: 'Neuter. Plural: die Brote.', audioAssetId: 'audio-006', imageUrl: null, plural: null, synonyms: [], },
     srsState: makeSrsState('card-006', { masteryLevel: 5, state: 'mastered', intervalDays: 21, repetitions: 7, lastRating: 5, lastReviewedAt: daysAgo(5), nextDueAt: daysFromNow(16) }),
   },
   {
@@ -216,7 +216,7 @@ export const MOCK_CARDS: Card[] = [
     createdAt: '2025-01-18T09:00:00Z', updatedAt: '2025-01-18T09:00:00Z',
     content: { front: 'the water', back: 'Wasser', article: 'das', gender: 'neuter', phonetic: '/ˈvas.ɐ/', examples: [
       { id: 'ex-007a', target: 'Ich trinke ein Glas Wasser.', native: 'I am drinking a glass of water.' },
-    ], notes: 'Neuter. Uncountable in most contexts.', audioAssetId: null, imageUrl: null },
+    ], notes: 'Neuter. Uncountable in most contexts.', audioAssetId: null, imageUrl: null, plural: null, synonyms: [], },
     srsState: makeSrsState('card-007', { masteryLevel: 3, state: 'review', intervalDays: 7, repetitions: 3, lastRating: 3, lastReviewedAt: daysAgo(5), nextDueAt: daysFromNow(2) }),
   },
   {
@@ -225,7 +225,7 @@ export const MOCK_CARDS: Card[] = [
     createdAt: '2025-01-18T10:00:00Z', updatedAt: '2025-01-18T10:00:00Z',
     content: { front: 'the apple', back: 'Apfel', article: 'der', gender: 'masculine', phonetic: '/ˈap.fəl/', examples: [
       { id: 'ex-008a', target: 'Der Apfel ist rot und süß.', native: 'The apple is red and sweet.' },
-    ], notes: 'Masculine. Plural: die Äpfel (umlaut!).', audioAssetId: null, imageUrl: null },
+    ], notes: 'Masculine. Plural: die Äpfel (umlaut!).', audioAssetId: null, imageUrl: null, plural: null, synonyms: [], },
     srsState: makeSrsState('card-008', { masteryLevel: 4, state: 'review', intervalDays: 10, repetitions: 4, lastRating: 4, lastReviewedAt: daysAgo(8), nextDueAt: daysFromNow(2) }),
   },
   {
@@ -234,7 +234,7 @@ export const MOCK_CARDS: Card[] = [
     createdAt: '2025-01-19T08:00:00Z', updatedAt: '2025-01-19T08:00:00Z',
     content: { front: 'the coffee', back: 'Kaffee', article: 'der', gender: 'masculine', phonetic: '/ˈka.feː/', examples: [
       { id: 'ex-009a', target: 'Ich trinke morgens immer Kaffee.', native: 'I always drink coffee in the morning.' },
-    ], notes: 'Masculine. Very culturally important in Germany!', audioAssetId: 'audio-009', imageUrl: null },
+    ], notes: 'Masculine. Very culturally important in Germany!', audioAssetId: 'audio-009', imageUrl: null, plural: null, synonyms: [], },
     srsState: makeSrsState('card-009', { masteryLevel: 2, state: 'learning', intervalDays: 3, repetitions: 2, lastRating: 2, lastReviewedAt: daysAgo(2), nextDueAt: new Date().toISOString() }),
   },
   {
@@ -243,7 +243,7 @@ export const MOCK_CARDS: Card[] = [
     createdAt: '2025-01-19T09:00:00Z', updatedAt: '2025-01-19T09:00:00Z',
     content: { front: 'the cake', back: 'Kuchen', article: 'der', gender: 'masculine', phonetic: '/ˈkuː.xən/', examples: [
       { id: 'ex-010a', target: 'Der Kuchen schmeckt wunderbar.', native: 'The cake tastes wonderful.' },
-    ], notes: 'Masculine. Kaffee und Kuchen is a beloved German tradition!', audioAssetId: null, imageUrl: null },
+    ], notes: 'Masculine. Kaffee und Kuchen is a beloved German tradition!', audioAssetId: null, imageUrl: null, plural: null, synonyms: [], },
     srsState: makeSrsState('card-010', { masteryLevel: 0, state: 'new', nextDueAt: new Date().toISOString() }),
   },
   {
@@ -252,7 +252,7 @@ export const MOCK_CARDS: Card[] = [
     createdAt: '2025-01-20T08:00:00Z', updatedAt: '2025-01-20T08:00:00Z',
     content: { front: 'the train', back: 'Zug', article: 'der', gender: 'masculine', phonetic: '/t͡suːk/', examples: [
       { id: 'ex-011a', target: 'Der Zug fährt um 8 Uhr ab.', native: "The train departs at 8 o'clock." },
-    ], notes: "Masculine. Germany's rail network (Deutsche Bahn) is extensive.", audioAssetId: 'audio-011', imageUrl: null },
+    ], notes: "Masculine. Germany's rail network (Deutsche Bahn) is extensive.", audioAssetId: 'audio-011', imageUrl: null, plural: null, synonyms: [], },
     srsState: makeSrsState('card-011', { masteryLevel: 3, state: 'review', intervalDays: 7, repetitions: 3, lastRating: 3, lastReviewedAt: daysAgo(4), nextDueAt: daysFromNow(3) }),
   },
   {
@@ -261,7 +261,7 @@ export const MOCK_CARDS: Card[] = [
     createdAt: '2025-01-21T09:00:00Z', updatedAt: '2025-01-21T09:00:00Z',
     content: { front: 'to eat', back: 'essen', article: null, gender: null, phonetic: '/ˈɛs.ən/', examples: [
       { id: 'ex-014a', target: 'Was isst du zum Mittagessen?', native: 'What are you eating for lunch?' },
-    ], notes: 'Strong verb: ich esse, du isst, er/sie isst.', audioAssetId: null, imageUrl: null },
+    ], notes: 'Strong verb: ich esse, du isst, er/sie isst.', audioAssetId: null, imageUrl: null, plural: null, synonyms: [], },
     srsState: makeSrsState('card-014', { masteryLevel: 3, state: 'review', intervalDays: 8, repetitions: 3, lastRating: 3, lastReviewedAt: daysAgo(6), nextDueAt: daysFromNow(2) }),
   },
   {
@@ -270,7 +270,7 @@ export const MOCK_CARDS: Card[] = [
     createdAt: '2025-01-22T08:00:00Z', updatedAt: '2025-01-22T08:00:00Z',
     content: { front: 'to go', back: 'gehen', article: null, gender: null, phonetic: '/ˈɡeː.ən/', examples: [
       { id: 'ex-015a', target: 'Ich gehe jeden Morgen spazieren.', native: 'I go for a walk every morning.' },
-    ], notes: 'Irregular. ich gehe, du gehst, er geht.', audioAssetId: null, imageUrl: null },
+    ], notes: 'Irregular. ich gehe, du gehst, er geht.', audioAssetId: null, imageUrl: null, plural: null, synonyms: [], },
     srsState: makeSrsState('card-015', { masteryLevel: 5, state: 'mastered', intervalDays: 28, repetitions: 9, lastRating: 5, lastReviewedAt: daysAgo(3), nextDueAt: daysFromNow(25) }),
   },
   {
@@ -279,7 +279,7 @@ export const MOCK_CARDS: Card[] = [
     createdAt: '2025-01-23T09:00:00Z', updatedAt: '2025-01-23T09:00:00Z',
     content: { front: 'the child', back: 'Kind', article: 'das', gender: 'neuter', phonetic: '/kɪnt/', examples: [
       { id: 'ex-018a', target: 'Das Kind spielt im Garten.', native: 'The child plays in the garden.' },
-    ], notes: 'Neuter. Plural: die Kinder.', audioAssetId: null, imageUrl: null },
+    ], notes: 'Neuter. Plural: die Kinder.', audioAssetId: null, imageUrl: null, plural: null, synonyms: [], },
     srsState: makeSrsState('card-018', { masteryLevel: 5, state: 'mastered', intervalDays: 25, repetitions: 7, lastRating: 5, lastReviewedAt: daysAgo(4), nextDueAt: daysFromNow(21) }),
   },
   {
@@ -288,7 +288,7 @@ export const MOCK_CARDS: Card[] = [
     createdAt: '2025-01-25T08:00:00Z', updatedAt: '2025-01-25T08:00:00Z',
     content: { front: 'the door', back: 'Tür', article: 'die', gender: 'feminine', phonetic: '/tyːɐ̯/', examples: [
       { id: 'ex-021a', target: 'Bitte schließ die Tür!', native: 'Please close the door!' },
-    ], notes: 'Feminine. Plural: die Türen.', audioAssetId: null, imageUrl: null },
+    ], notes: 'Feminine. Plural: die Türen.', audioAssetId: null, imageUrl: null, plural: null, synonyms: [], },
     srsState: makeSrsState('card-021', { masteryLevel: 3, state: 'review', intervalDays: 6, repetitions: 3, lastRating: 3, lastReviewedAt: daysAgo(5), nextDueAt: daysFromNow(1) }),
   },
 ];

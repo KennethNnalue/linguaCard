@@ -3,10 +3,13 @@ import { ConfigService } from '@nestjs/config';
 import type { AiConfig } from '../config/ai.config';
 import type {
   ArticleType,
+  EnrichOneRequest,
+  EnrichOneResult,
   EnrichWordsRequest,
   EnrichWordsResult,
   ImageExtractedWord,
   RawExtractedWord,
+  Synonym,
 } from '@lingua-card/shared/domain';
 import { OpenRouterAdapter } from '../ai/providers/openrouter.adapter';
 import { WordEnrichPromptBuilder } from './word-enrich-prompt.builder';
@@ -89,24 +92,71 @@ export class WordEnrichService {
     return this.parseEnrichmentResponse(rawText);
   }
 
+  async enrichOne(dto: EnrichOneRequest): Promise<EnrichOneResult> {
+    const raw: RawExtractedWord = { back: dto.back, article: null, rawText: dto.back };
+    const results = await this.enrichBatch([raw], dto.targetLanguage, dto.nativeLanguage);
+    // Prefer the result whose back matches the requested word — the LLM
+    // occasionally returns extra items before the one we asked for.
+    const requestedLower = dto.back.toLowerCase();
+    const match = results.find(r => r.back.toLowerCase() === requestedLower) ?? results[0];
+    return match ?? {
+      front: '', back: dto.back, article: null, plural: null,
+      categoryName: 'Other', exampleTarget: '', exampleNative: '',
+      synonyms: [], confidence: 1.0,
+    };
+  }
+
   private parseEnrichmentResponse(raw: string): ImageExtractedWord[] {
     const items = recoverJsonArray(raw);
     return items
-      .map(item => ({
-        front:         String(item['front']         ?? ''),
-        back:          String(item['back']          ?? ''),
-        article:       this.parseArticle(item['article']),
-        categoryName:  String(item['categoryName']  ?? 'Other'),
-        exampleTarget: String(item['exampleTarget'] ?? ''),
-        exampleNative: String(item['exampleNative'] ?? ''),
-        confidence:    typeof item['confidence'] === 'number' ? item['confidence'] : 1.0,
-      }))
+      .map(item => {
+        const article = this.parseArticle(item['article']);
+        return {
+          front:         String(item['front']         ?? ''),
+          back:          String(item['back']          ?? ''),
+          article,
+          plural:        this.parsePlural(item['plural'], article),
+          categoryName:  String(item['categoryName']  ?? 'Other'),
+          exampleTarget: String(item['exampleTarget'] ?? ''),
+          exampleNative: String(item['exampleNative'] ?? ''),
+          synonyms:      this.parseSynonyms(item['synonyms'], String(item['back'] ?? '')),
+          confidence:    typeof item['confidence'] === 'number' ? item['confidence'] : 1.0,
+        };
+      })
       .filter(w => w.back.length > 0);
   }
 
   private parseArticle(value: unknown): ArticleType | null {
     if (value === 'der' || value === 'die' || value === 'das') return value;
     return null;
+  }
+
+  /** plural is only meaningful for nouns (article present). Nullify for non-nouns. */
+  private parsePlural(value: unknown, article: ArticleType | null): string | null {
+    if (!article) return null;
+    const s = typeof value === 'string' ? value.trim() : '';
+    return s.length > 0 ? s : null;
+  }
+
+  private parseSynonyms(value: unknown, headword: string): Synonym[] {
+    if (!Array.isArray(value)) return [];
+    const headLower = headword.toLowerCase().replace(/^(der|die|das)\s+/, '');
+    const seen = new Set<string>();
+    return value
+      .map(s => ({
+        word:          String(s?.['word']          ?? '').trim(),
+        article:       this.parseArticle(s?.['article']),
+        translation:   String(s?.['translation']   ?? '').trim(),
+        example:       String(s?.['example']       ?? '').trim(),
+        exampleNative: String(s?.['exampleNative'] ?? '').trim(),
+      }))
+      .filter(s => {
+        const key = s.word.toLowerCase();
+        if (!s.word.length || key === headLower || seen.has(key)) return false;
+        seen.add(key);
+        return true;
+      })
+      .slice(0, 3);
   }
 
   private sleep(ms: number): Promise<void> {

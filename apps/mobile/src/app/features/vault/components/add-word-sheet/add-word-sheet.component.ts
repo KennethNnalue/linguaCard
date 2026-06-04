@@ -1,4 +1,4 @@
-import { Component, computed, inject, Input, OnInit, signal } from '@angular/core';
+import { Component, computed, inject, input, OnInit, signal } from '@angular/core';
 import { Router } from '@angular/router';
 import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { takeUntilDestroyed, toSignal } from '@angular/core/rxjs-interop';
@@ -45,15 +45,16 @@ export class AddWordSheetComponent implements OnInit {
   private readonly router = inject(Router);
   private readonly dedupService = inject(CardDedupService);
 
-  @Input() lockedCollectionId: string | null = null;
-  @Input() cardToEdit: Card | null = null;
+  readonly lockedCollectionId = input<string | null>(null);
+  readonly cardToEdit = input<Card | null>(null);
 
-  get isEditing(): boolean { return !!this.cardToEdit; }
+  readonly isEditing = computed(() => !!this.cardToEdit());
 
   readonly form = new FormGroup({
     front: new FormControl('', [Validators.required]),
     back: new FormControl('', [Validators.required]),
     article: new FormControl<ArticleType | null>(null),
+    plural: new FormControl(''),
     categoryId: new FormControl(''),
     collectionId: new FormControl<string | null>(null, [Validators.required]),
     exampleTarget: new FormControl(''),
@@ -64,6 +65,12 @@ export class AddWordSheetComponent implements OnInit {
     this.form.get('collectionId')!.valueChanges,
     { initialValue: this.form.get('collectionId')!.value },
   );
+
+  // Writable signal so ngOnInit can seed it from cardToEdit without relying on
+  // valueChanges (which patchValue with emitEvent:false would suppress).
+  private readonly _article = signal<ArticleType | null>(null);
+
+  readonly showPluralField = computed(() => !!this._article());
 
   readonly selectedCollectionLabel = computed(() => {
     const id = this._collectionId();
@@ -81,20 +88,25 @@ export class AddWordSheetComponent implements OnInit {
   readonly newCategoryName = signal('');
 
   ngOnInit(): void {
-    if (this.cardToEdit) {
-      const c = this.cardToEdit.content;
+    const card = this.cardToEdit();
+    if (card) {
+      const c = card.content;
       const ex = c.examples?.[0];
       this.form.patchValue({
         front: c.front,
         back: c.back,
         article: c.article ?? null,
-        categoryId: this.cardToEdit.categoryIds?.[0] ?? '',
-        collectionId: this.cardToEdit.collectionId ?? null,
+        plural: c.plural ?? '',
+        categoryId: card.categoryIds?.[0] ?? '',
+        collectionId: card.collectionId ?? null,
         exampleTarget: ex?.target ?? '',
         exampleNative: ex?.native ?? '',
       }, { emitEvent: false });
-    } else if (this.lockedCollectionId) {
-      this.form.patchValue({ collectionId: this.lockedCollectionId });
+      // Seed _article from card so showPluralField is correct immediately —
+      // patchValue with emitEvent:false would otherwise leave it null.
+      this._article.set(c.article ?? null);
+    } else if (this.lockedCollectionId()) {
+      this.form.patchValue({ collectionId: this.lockedCollectionId() });
     }
   }
 
@@ -124,6 +136,7 @@ export class AddWordSheetComponent implements OnInit {
             { article: art, back: val!.substring(4) },
             { emitEvent: false },
           );
+          this._article.set(art);
           return;
         }
       }
@@ -132,6 +145,7 @@ export class AddWordSheetComponent implements OnInit {
 
   selectArticle(art: ArticleType | null): void {
     this.form.patchValue({ article: art });
+    this._article.set(art);
   }
 
   selectCategory(id: string): void {
@@ -170,7 +184,7 @@ export class AddWordSheetComponent implements OnInit {
       return;
     }
     const article = this.form.get('article')!.value ?? null;
-    const selfId = this.cardToEdit?.id;
+    const selfId = this.cardToEdit()?.id;
 
     // Full-key lookup first (article + back). Covers enriched cards from any entry
     // point (manual add, CSV, image import) where article is confirmed.
@@ -229,12 +243,13 @@ export class AddWordSheetComponent implements OnInit {
     const examples: ExampleSentence[] = [];
     if (v.exampleTarget?.trim()) {
       examples.push({
-        id: this.cardToEdit?.content.examples?.[0]?.id ?? crypto.randomUUID(),
+        id: this.cardToEdit()?.content.examples?.[0]?.id ?? crypto.randomUUID(),
         target: v.exampleTarget.trim(),
         native: v.exampleNative?.trim() ?? '',
       });
     }
 
+    const card = this.cardToEdit();
     const art = v.article ?? null;
     const content: CardContent = {
       front: v.front!.trim(),
@@ -244,22 +259,24 @@ export class AddWordSheetComponent implements OnInit {
         : art === 'die' ? 'feminine'
         : art === 'das' ? 'neuter'
         : null,
+      plural: (art && v.plural?.trim()) ? v.plural.trim() : null,
       examples,
-      notes: this.cardToEdit?.content.notes ?? '',
-      audioAssetId: this.cardToEdit?.content.audioAssetId ?? null,
-      imageUrl: this.cardToEdit?.content.imageUrl ?? null,
-      phonetic: this.cardToEdit?.content.phonetic ?? null,
+      synonyms: card?.content.synonyms ?? [],
+      notes: card?.content.notes ?? '',
+      audioAssetId: card?.content.audioAssetId ?? null,
+      imageUrl: card?.content.imageUrl ?? null,
+      phonetic: card?.content.phonetic ?? null,
     };
 
     const categoryIds = v.categoryId ? [v.categoryId] : [];
 
-    if (this.isEditing) {
+    if (this.isEditing()) {
       const dto: UpdateCardDto = {
         content,
         categoryIds,
         collectionId: v.collectionId ?? null,
       };
-      this.cardApi.update(this.cardToEdit!.id, dto).subscribe({
+      this.cardApi.update(card!.id, dto).subscribe({
         next: (updated) => {
           this.cardStore.updateCard(updated);
           this.saving.set(false);

@@ -346,30 +346,117 @@
   line-height: 1.5;
 }
 
-// ─── RELATED WORDS ───────────────────────────────────────────────────────────
-.wd2-related-item {
+// ─── PLURAL LINE ─────────────────────────────────────────────────────────────
+.wd2-plural-row {
   display: flex;
   align-items: center;
   gap: t.$lc-space-2;
-  padding: t.$lc-space-1 + 2px 0;
-  border-bottom: 1px solid var(--lc-border);
-  cursor: pointer;
-  @include u.touch-state;
-
-  &--last {
-    border-bottom: none;
-  }
+  margin-top: t.$lc-space-2 + 1px;
+  padding-top: t.$lc-space-2 + 1px;
+  border-top: 1px dashed var(--lc-border);
 }
 
-.wd2-related-word {
-  @include u.lc-font('sm', t.$lc-font-weight-semibold);
+.wd2-plural-lbl {
+  @include u.lc-font('xxs', t.$lc-font-weight-bold);
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+  color: var(--lc-brand-mid);
+  background: var(--lc-brand-light);
+  padding: 2px t.$lc-space-2;
+  border-radius: t.$lc-radius-full;
+  flex-shrink: 0;
+}
+
+.wd2-plural-val {
+  @include u.lc-font('sm', t.$lc-font-weight-medium);
   color: var(--lc-text-primary);
   flex: 1;
 }
 
-.wd2-related-trans {
+.wd2-plural-play {
+  @include u.circle(22px);
+  @include u.flex-center;
+  border: 1px solid var(--lc-border);
+  background: var(--lc-surface);
+  cursor: pointer;
+  @include u.touch-state;
+  flex-shrink: 0;
+
+  ion-icon { font-size: 12px; color: var(--lc-brand-mid); }
+}
+
+// ─── SYNONYMS ─────────────────────────────────────────────────────────────────
+.syn-item {
+  border-bottom: 1px solid var(--lc-border);
+
+  &--last { border-bottom: none; }
+}
+
+.syn-head {
+  display: flex;
+  align-items: center;
+  gap: t.$lc-space-2 + 1px;
+  padding: t.$lc-space-3 - 1px 0;
+  cursor: pointer;
+  @include u.touch-state;
+}
+
+.syn-word {
+  @include u.lc-font('lg', t.$lc-font-weight-semibold);
+  color: var(--lc-text-primary);
+}
+
+.syn-trans {
   @include u.lc-font('xs');
   color: var(--lc-text-secondary);
+  flex: 1;
+}
+
+.syn-chev {
+  display: flex;
+  align-items: center;
+  flex-shrink: 0;
+  transition: transform var(--lc-transition-fast);
+
+  ion-icon { font-size: 14px; color: var(--lc-text-hint); }
+}
+
+.syn-item--open .syn-chev { transform: rotate(180deg); }
+
+.syn-body {
+  padding-bottom: t.$lc-space-3;
+}
+
+.syn-example {
+  background: var(--lc-surface);
+  border-radius: t.$lc-radius-md;
+  padding: t.$lc-space-3 - 1px t.$lc-space-3;
+}
+
+.syn-ex-row {
+  display: flex;
+  align-items: flex-start;
+  gap: t.$lc-space-2;
+}
+
+.syn-ex-de {
+  @include u.lc-font('sm');
+  color: var(--lc-text-primary);
+  line-height: 1.5;
+  margin: 0 0 2px;
+  flex: 1;
+}
+
+:host ::ng-deep .syn-ex-de strong {
+  color: var(--lc-brand);
+  font-weight: t.$lc-font-weight-semibold;
+}
+
+.syn-ex-en {
+  @include u.lc-font('xs');
+  color: var(--lc-text-hint);
+  font-style: italic;
+  margin: 0;
 }
 
 // ─── BOTTOM ACTIONS ──────────────────────────────────────────────────────────
