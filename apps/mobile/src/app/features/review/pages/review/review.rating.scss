@@ -2,7 +2,7 @@
 
 .rv-rating-area {
   padding: 4px 0 24px;
-  opacity: 0.3;
+  opacity: 0.45;
   pointer-events: none;
   transition: opacity var(--lc-transition-base);
 
@@ -14,7 +14,7 @@
 
 .rv-rating-prompt {
   font-size: 11px;
-  color: var(--lc-text-hint);
+  color: var(--lc-text-secondary);
   text-align: center;
   margin: 0 0 10px;
   font-weight: 500;
@@ -30,41 +30,86 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 3px;
-  padding: 8px 3px;
-  border-radius: 8px;
-  border: 1px solid var(--lc-border);
+  gap: 4px;
+  padding: 9px 3px 7px;
+  border-radius: 10px;
+  border: 1.5px solid var(--lc-border);
   background: var(--lc-card);
   cursor: pointer;
   font-family: var(--lc-font-body);
   transition: var(--lc-transition-fast);
 
   &:disabled { cursor: default; }
-  &:not(:disabled):active { transform: scale(0.93); }
+  &:not(:disabled):active { transform: scale(0.91); }
 }
 
 .rv-r-num {
   font-family: var(--lc-font-display);
-  font-size: 17px;
-  font-weight: 600;
-  color: var(--lc-text-primary);
+  font-size: 18px;
+  font-weight: 700;
   line-height: 1;
 }
 
 .rv-r-lbl {
   font-size: 7px;
-  font-weight: 600;
-  letter-spacing: 0.05em;
+  font-weight: 700;
+  letter-spacing: 0.06em;
   text-transform: uppercase;
-  color: var(--lc-text-hint);
 }
 
-.rv-rating-btn--0 { border-color: #E5E7EB; background: #F9FAFB; }
-.rv-rating-btn--1 { border-color: #FCA5A5; background: var(--lc-rating-1-bg); }
-.rv-rating-btn--2 { border-color: #FCD34D; background: var(--lc-rating-2-bg); }
-.rv-rating-btn--3 { border-color: #6EE7B7; background: var(--lc-rating-3-bg); }
-.rv-rating-btn--4 { border-color: #34D399; background: var(--lc-rating-4-bg); }
-.rv-rating-btn--5 { border-color: #059669; background: var(--lc-rating-5-bg); }
+// ── Rating 0 — Blank (neutral grey) ──────────────────────────────────────────
+.rv-rating-btn--0 {
+  border-color: var(--lc-rating-0-border);
+  background: var(--lc-rating-0-bg);
+
+  .rv-r-num { color: var(--lc-rating-0-text); }
+  .rv-r-lbl { color: var(--lc-rating-0-text); opacity: 0.7; }
+}
+
+// ── Rating 1 — Hard (red) ─────────────────────────────────────────────────────
+.rv-rating-btn--1 {
+  border-color: var(--lc-rating-1-border);
+  background: var(--lc-rating-1-bg);
+
+  .rv-r-num { color: var(--lc-rating-1-text); }
+  .rv-r-lbl { color: var(--lc-rating-1-text); opacity: 0.8; }
+}
+
+// ── Rating 2 — Hmm (amber) ────────────────────────────────────────────────────
+.rv-rating-btn--2 {
+  border-color: var(--lc-rating-2-border);
+  background: var(--lc-rating-2-bg);
+
+  .rv-r-num { color: var(--lc-rating-2-text); }
+  .rv-r-lbl { color: var(--lc-rating-2-text); opacity: 0.8; }
+}
+
+// ── Rating 3 — Good (light green) ────────────────────────────────────────────
+.rv-rating-btn--3 {
+  border-color: var(--lc-rating-3-border);
+  background: var(--lc-rating-3-bg);
+
+  .rv-r-num { color: var(--lc-rating-3-text); }
+  .rv-r-lbl { color: var(--lc-rating-3-text); opacity: 0.8; }
+}
+
+// ── Rating 4 — Easy (medium green) ───────────────────────────────────────────
+.rv-rating-btn--4 {
+  border-color: var(--lc-rating-4-border);
+  background: var(--lc-rating-4-bg);
+
+  .rv-r-num { color: var(--lc-rating-4-text); }
+  .rv-r-lbl { color: var(--lc-rating-4-text); opacity: 0.8; }
+}
+
+// ── Rating 5 — Nailed (deep green) ───────────────────────────────────────────
+.rv-rating-btn--5 {
+  border-color: var(--lc-rating-5-border);
+  background: var(--lc-rating-5-bg);
+
+  .rv-r-num { color: var(--lc-rating-5-text); }
+  .rv-r-lbl { color: var(--lc-rating-5-text); opacity: 0.8; }
+}
 
 // ─── SESSION COMPLETE ─────────────────────────────────────────────────────────
 

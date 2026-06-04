@@ -123,7 +123,19 @@
 .rv-art-badge {
   font-size: 11px !important;
   padding: 3px 12px !important;
-  margin-bottom: 8px;
+}
+
+.rv-art-row {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  margin-bottom: 12px;
+}
+
+.rv-art-gender {
+  font-size: 13px;
+  color: var(--lc-text-secondary);
+  font-weight: 500;
 }
 
 .rv-back-word {
