@@ -10,12 +10,13 @@ import {
   tvOutline,
   volumeHighOutline
 } from 'ionicons/icons';
+import { ReviewRoute } from '../features/review/models/review.model';
 
 // Routes where the tab bar should be hidden (player / complete screens)
 const HIDE_TAB_BAR_ROUTES = [
   '/listen/now-playing',
   '/listen/complete',
-  '/review/player',
+  ReviewRoute.PLAYER,
 ];
 
 @Component({

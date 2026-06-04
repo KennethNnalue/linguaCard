@@ -1,12 +1,11 @@
 import {
+  ChangeDetectionStrategy,
   Component,
   computed,
-  ElementRef,
   inject,
   OnDestroy,
   OnInit,
   signal,
-  ViewChild,
 } from '@angular/core';
 import { NgClass } from '@angular/common';
 import { ActivatedRoute, Router } from '@angular/router';
@@ -21,6 +20,7 @@ import type { Story, StoryKeyword, WordTimestamp } from '@lingua-card/shared/dom
 import { StoryStore } from '../../store/story.store';
 import { StoryApiService } from '../../services/story-api.service';
 import { ReviewStore } from '../../../review/store/review.store';
+import { ReviewRoute } from '../../../review/models/review.model';
 import { CardStore } from '../../../vault/store/card.store';
 import { AiAudioCacheService } from '../../../ai/audio/ai-audio-cache.service';
 import { WordAudioService } from '../../../../shared/audio/word-audio.service';
@@ -35,6 +35,7 @@ export type ReaderTab = 'story' | 'quiz' | 'keywords' | 'grammar';
   selector: 'lc-story-reader',
   templateUrl: './story-reader.page.html',
   styleUrls: ['./story-reader.page.scss'],
+  changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [
     IonContent,
     IonIcon,
@@ -45,8 +46,6 @@ export type ReaderTab = 'story' | 'quiz' | 'keywords' | 'grammar';
   ],
 })
 export class StoryReaderPage implements OnInit, OnDestroy, ViewWillLeave {
-  @ViewChild('audioEl') audioElRef!: ElementRef<HTMLAudioElement>;
-
   private readonly route = inject(ActivatedRoute);
   private readonly router = inject(Router);
   private readonly storyStore = inject(StoryStore);
@@ -347,7 +346,7 @@ export class StoryReaderPage implements OnInit, OnDestroy, ViewWillLeave {
     if (cards.length === 0) return;
 
     this.reviewStore.startSession(cards, null, `📖 ${s.title}`);
-    void this.router.navigate(['/review/player']);
+    void this.router.navigate([ReviewRoute.PLAYER]);
   }
 
   // ── Mark as learned ──────────────────────────────────────────────

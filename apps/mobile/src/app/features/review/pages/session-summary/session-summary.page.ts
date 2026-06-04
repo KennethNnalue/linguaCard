@@ -1,32 +1,35 @@
-import { Component, computed, inject, OnInit } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, inject, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
-import { NavController } from '@ionic/angular';
 import { IonContent, IonHeader, IonIcon, IonToolbar } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
 import { arrowBackOutline, checkmarkCircleOutline, repeatOutline, refreshOutline } from 'ionicons/icons';
-import {Card, ConfidenceRating} from '@lingua-card/shared/domain';
-import {ReviewStore} from '../../store/review.store';
-import {CategoryStore} from '../../../vault/store/category.store';
-import {WordCardComponent} from '../../../../shared/ui/word-card/word-card.component';
-import {getCategoryName} from '../../../../shared/helpers/helpers';
-import {WordAudioService} from '../../../../shared/audio/word-audio.service';
-
-const MASTERY_LABELS = ['New', 'Beginner', 'Learning', 'Familiar', 'Good', 'Mastered'];
-const RATING_LABELS = ['Blank', 'Hard', 'Hmm', 'Good', 'Easy', 'Nailed'];
+import { Card, ConfidenceRating } from '@lingua-card/shared/domain';
+import { ReviewStore } from '../../store/review.store';
+import { CategoryStore } from '../../../vault/store/category.store';
+import { WordCardComponent } from '../../../../shared/ui/word-card/word-card.component';
+import { getCategoryName } from '../../../../shared/helpers/helpers';
+import { WordAudioService } from '../../../../shared/audio/word-audio.service';
+import { SessionStatsService } from '../../shared/services/session-stats.service';
+import {
+  MASTERY_LABELS,
+  MASTERY_THRESHOLD,
+  RATING_LABELS,
+  ReviewRoute,
+} from '../../models/review.model';
 
 @Component({
   selector: 'lc-session-summary',
-  standalone: true,
   templateUrl: './session-summary.page.html',
   styleUrls: ['./session-summary.page.scss'],
+  changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [IonContent, IonHeader, IonToolbar, IonIcon, WordCardComponent],
 })
 export class SessionSummaryPage implements OnInit {
   private readonly reviewStore = inject(ReviewStore);
   private readonly categoryStore = inject(CategoryStore);
-  private readonly navCtrl = inject(NavController);
   private readonly router = inject(Router);
   private readonly wordAudio = inject(WordAudioService);
+  private readonly statsService = inject(SessionStatsService);
 
   constructor() {
     addIcons({ arrowBackOutline, checkmarkCircleOutline, repeatOutline, refreshOutline });
@@ -36,7 +39,7 @@ export class SessionSummaryPage implements OnInit {
 
   ngOnInit(): void {
     if (!this.session()) {
-      void this.navCtrl.navigateBack('/review');
+      void this.router.navigate([ReviewRoute.HUB], { replaceUrl: true });
     }
   }
 
@@ -47,24 +50,14 @@ export class SessionSummaryPage implements OnInit {
 
   readonly duration = computed(() => {
     const s = this.session();
-    if (!s?.completedAt || !s.startedAt) return '—';
-    const ms = new Date(s.completedAt).getTime() - new Date(s.startedAt).getTime();
-    const totalSecs = Math.max(0, Math.floor(ms / 1000));
-    const m = Math.floor(totalSecs / 60);
-    const sec = totalSecs % 60;
-    return m > 0 ? `${m}m ${sec}s` : `${sec}s`;
+    return s ? this.statsService.formatDuration(s) : '—';
   });
 
   readonly averageRating = computed(() => {
     const s = this.session();
-    if (!s) return '—';
-    const vals = Object.values(s.ratings) as number[];
-    if (!vals.length) return '—';
-    const avg = vals.reduce((a, b) => a + b, 0) / vals.length;
-    return avg.toFixed(1);
+    return s ? this.statsService.avgRating(s) : '—';
   });
 
-  // Rating breakdown: ordered 5 → 0 (best first)
   readonly ratingBreakdown = computed(() => {
     const s = this.session();
     const counts: Record<number, number> = { 0: 0, 1: 0, 2: 0, 3: 0, 4: 0, 5: 0 };
@@ -72,7 +65,7 @@ export class SessionSummaryPage implements OnInit {
       Object.values(s.ratings).forEach(r => { counts[r as number]++; });
     }
     const maxCount = Math.max(...Object.values(counts), 1);
-    return [5, 4, 3, 2, 1, 0].map(v => ({
+    return ([5, 4, 3, 2, 1, 0] as ConfidenceRating[]).map(v => ({
       value: v,
       label: RATING_LABELS[v],
       count: counts[v],
@@ -80,7 +73,6 @@ export class SessionSummaryPage implements OnInit {
     }));
   });
 
-  // Cards sorted by rating ascending (0=hardest first), only rated cards
   readonly reviewedCardRows = computed(() => {
     const s = this.session();
     if (!s) return [];
@@ -90,7 +82,7 @@ export class SessionSummaryPage implements OnInit {
         card: c,
         rating: s.ratings[c.id] as ConfidenceRating,
         masteryLevel: c.srsState?.masteryLevel ?? 0,
-        masteryLabel: MASTERY_LABELS[c.srsState?.masteryLevel ?? 0] ?? 'New',
+        masteryLabel: MASTERY_LABELS[c.srsState?.masteryLevel ?? 0],
       }))
       .sort((a, b) => a.rating - b.rating);
   });
@@ -99,9 +91,8 @@ export class SessionSummaryPage implements OnInit {
     this.reviewedCardRows().map(r => r.card)
   );
 
-  // Cards rated below "Good" (< 3) in this session — needs another pass
   readonly nonMasteredCards = computed((): Card[] =>
-    this.reviewedCardRows().filter(r => r.rating < 3).map(r => r.card)
+    this.reviewedCardRows().filter(r => r.rating < MASTERY_THRESHOLD).map(r => r.card)
   );
 
   readonly hasNonMasteredCards = computed(() => this.nonMasteredCards().length > 0);
@@ -110,14 +101,14 @@ export class SessionSummaryPage implements OnInit {
     const cards = this.allReviewedCards();
     if (!cards.length) return;
     this.reviewStore.startSession(cards, this.session()?.collectionId ?? null, this.session()?.collectionName ?? null);
-    void this.navCtrl.navigateForward('/review/player', { animated: true });
+    void this.router.navigate([ReviewRoute.PLAYER]);
   }
 
   reviewNonMastered(): void {
     const cards = this.nonMasteredCards();
     if (!cards.length) return;
     this.reviewStore.startSession(cards, this.session()?.collectionId ?? null, 'Struggled cards retry');
-    void this.navCtrl.navigateForward('/review/player', { animated: true });
+    void this.router.navigate([ReviewRoute.PLAYER]);
   }
 
   navigateToCard(card: Card): void {
@@ -134,6 +125,6 @@ export class SessionSummaryPage implements OnInit {
 
   goToHub(): void {
     this.reviewStore.clearSession();
-    void this.router.navigate(['/review']);
+    void this.router.navigate([ReviewRoute.HUB]);
   }
 }

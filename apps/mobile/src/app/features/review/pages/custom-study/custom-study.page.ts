@@ -1,44 +1,37 @@
-import { Component, computed, inject, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, inject, signal } from '@angular/core';
 import { Router } from '@angular/router';
-import { NavController, IonContent, IonHeader, IonIcon, IonToolbar, IonRange, ToastController, ActionSheetController } from '@ionic/angular/standalone';
+import { NavController, IonContent, IonHeader, IonIcon, IonToolbar, IonRange, ToastController } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
 import { chevronBackOutline, chevronDownOutline } from 'ionicons/icons';
-import { MasteryLevel } from '../../../../core/models/mock-data';
-import { CollectionStore } from '../../../vault/store/collection.store';
+import { MasteryLevel } from '@lingua-card/shared/domain';
 import { ReviewStore } from '../../store/review.store';
-import { ReviewFilterService, ReviewFilters } from '../../services/review-filter.service';
+import { ReviewFilterService } from '../../services/review-filter.service';
+import { SourcePickerService } from '../../shared/services/source-picker.service';
 import { FormsModule } from '@angular/forms';
-
-const MASTERY_INFO: { level: MasteryLevel; label: string; colour: string }[] = [
-  { level: 0, label: 'New', colour: '#D1D5DB' },
-  { level: 1, label: 'Beginner', colour: '#FCA5A5' },
-  { level: 2, label: 'Learning', colour: '#FCD34D' },
-  { level: 3, label: 'Familiar', colour: '#6EE7B7' },
-  { level: 4, label: 'Good', colour: '#34D399' },
-  { level: 5, label: 'Mastered', colour: '#059669' },
-];
-
-const SORT_OPTIONS: { value: ReviewFilters['sortOrder']; label: string }[] = [
-  { value: 'hardest', label: 'Hardest first' },
-  { value: 'oldest', label: 'Oldest first' },
-  { value: 'random', label: 'Random' },
-  { value: 'due_date', label: 'Due date' },
-];
+import {
+  MASTERY_INFO,
+  ReviewFilters,
+  ReviewLimit,
+  ReviewRoute,
+  ReviewSortOrder,
+  ReviewSource,
+  SORT_OPTIONS,
+} from '../../models/review.model';
 
 @Component({
   selector: 'lc-custom-study',
   templateUrl: './custom-study.page.html',
   styleUrls: ['./custom-study.page.scss'],
+  changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [IonContent, IonHeader, IonToolbar, IonIcon, IonRange, FormsModule],
 })
 export class CustomStudyPage {
   private readonly filterService = inject(ReviewFilterService);
   private readonly reviewStore = inject(ReviewStore);
-  private readonly collectionStore = inject(CollectionStore);
+  private readonly sourcePicker = inject(SourcePickerService);
   private readonly navCtrl = inject(NavController);
   private readonly router = inject(Router);
   private readonly toastCtrl = inject(ToastController);
-  private readonly actionSheetCtrl = inject(ActionSheetController);
 
   constructor() {
     addIcons({ chevronBackOutline, chevronDownOutline });
@@ -47,10 +40,10 @@ export class CustomStudyPage {
   readonly masteryInfo = MASTERY_INFO;
   readonly sortOptions = SORT_OPTIONS;
 
-  readonly source = signal<string>('all');
+  readonly source = signal<string>(ReviewSource.ALL);
   readonly masteryLevels = signal<MasteryLevel[]>([0, 1, 2]);
-  readonly sortOrder = signal<ReviewFilters['sortOrder']>('hardest');
-  readonly limit = signal<number>(30);
+  readonly sortOrder = signal<ReviewSortOrder>(ReviewSortOrder.HARDEST);
+  readonly limit = signal<number>(ReviewLimit.CUSTOM_DEFAULT);
 
   readonly filters = computed<ReviewFilters>(() => ({
     source: this.source(),
@@ -61,24 +54,18 @@ export class CustomStudyPage {
 
   readonly matchingCount = computed(() => {
     if (!this.masteryLevels().length) return 0;
-    return this.filterService.buildQueue({ ...this.filters(), limit: 9999 }).length;
+    return this.filterService.buildQueue({ ...this.filters(), limit: ReviewLimit.CUSTOM_MAX }).length;
   });
 
   readonly sessionCount = computed(() => Math.min(this.matchingCount(), this.limit()));
 
-  readonly sourceLabel = computed(() => {
-    const id = this.source();
-    if (id === 'all') return '📚 All collections';
-    const col = this.collectionStore.collections().find(c => c.id === id);
-    return col ? `${col.emoji ?? '📚'} ${col.name}` : 'All collections';
-  });
+  readonly sourceLabel = computed(() => this.sourcePicker.labelFor(this.source()));
 
-  readonly masteryCountMap = computed(() => {
-    const dist = this.filterService.getMasteryDistribution(
-      this.source() !== 'all' ? this.source() : undefined
-    );
-    return dist;
-  });
+  readonly masteryCountMap = computed(() =>
+    this.filterService.getMasteryDistribution(
+      this.source() !== ReviewSource.ALL ? this.source() : undefined
+    )
+  );
 
   isMasterySelected(level: MasteryLevel): boolean {
     return this.masteryLevels().includes(level);
@@ -93,7 +80,7 @@ export class CustomStudyPage {
     }
   }
 
-  setSortOrder(order: ReviewFilters['sortOrder']): void {
+  setSortOrder(order: ReviewSortOrder): void {
     this.sortOrder.set(order);
   }
 
@@ -102,22 +89,8 @@ export class CustomStudyPage {
   }
 
   async openSourcePicker(): Promise<void> {
-    const collections = this.collectionStore.collections();
-    const actionSheet = await this.actionSheetCtrl.create({
-      header: 'Select source',
-      buttons: [
-        {
-          text: '📚 All collections',
-          handler: () => this.source.set('all'),
-        },
-        ...collections.map(col => ({
-          text: `${col.emoji ?? '📚'} ${col.name}`,
-          handler: () => this.source.set(col.id),
-        })),
-        { text: 'Cancel', role: 'cancel' },
-      ],
-    });
-    await actionSheet.present();
+    const result = await this.sourcePicker.pick('Select source');
+    if (result !== null) this.source.set(result);
   }
 
   async startSession(): Promise<void> {
@@ -132,11 +105,11 @@ export class CustomStudyPage {
       return;
     }
     const queue = this.filterService.buildQueue(this.filters());
-    this.reviewStore.startSession(queue, this.source() !== 'all' ? this.source() : null, 'Custom study');
-    void this.navCtrl.navigateForward('/review/player');
+    this.reviewStore.startSession(queue, this.source() !== ReviewSource.ALL ? this.source() : null, 'Custom study');
+    void this.navCtrl.navigateForward(ReviewRoute.PLAYER);
   }
 
   goBack(): void {
-    void this.router.navigate(['/review']);
+    void this.router.navigate([ReviewRoute.HUB]);
   }
 }

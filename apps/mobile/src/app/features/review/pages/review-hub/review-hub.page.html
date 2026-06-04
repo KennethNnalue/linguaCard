@@ -127,7 +127,7 @@
           <div class="rh-session-info">
             <p class="rh-session-title">{{ session.collectionName ?? 'All due cards' }}</p>
             <p class="rh-session-meta">
-              {{ sessionDateLabel(session) }}
+              {{ session.startedAt | sessionDate }}
               · {{ session.totalCards }} cards
               · {{ sessionDuration(session) }}
             </p>

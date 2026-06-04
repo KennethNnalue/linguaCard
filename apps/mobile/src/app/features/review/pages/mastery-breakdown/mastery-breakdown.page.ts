@@ -1,50 +1,45 @@
-import { Component, computed, inject, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, inject, signal } from '@angular/core';
 import { Router } from '@angular/router';
-import { NavController, IonContent, IonHeader, IonIcon, IonToolbar, ActionSheetController } from '@ionic/angular/standalone';
+import { NavController, IonContent, IonHeader, IonIcon, IonToolbar } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
 import { chevronBackOutline, chevronDownOutline, playOutline } from 'ionicons/icons';
-import { MasteryLevel } from '../../../../core/models/mock-data';
-import { CollectionStore } from '../../../vault/store/collection.store';
+import { MasteryLevel } from '@lingua-card/shared/domain';
 import { ReviewStore } from '../../store/review.store';
 import { ReviewFilterService } from '../../services/review-filter.service';
-
-const MASTERY_ROWS: { level: MasteryLevel; label: string; colour: string }[] = [
-  { level: 5, label: 'Mastered', colour: '#059669' },
-  { level: 4, label: 'Good', colour: '#34D399' },
-  { level: 3, label: 'Familiar', colour: '#6EE7B7' },
-  { level: 2, label: 'Learning', colour: '#FCD34D' },
-  { level: 1, label: 'Beginner', colour: '#FCA5A5' },
-  { level: 0, label: 'New', colour: '#D1D5DB' },
-];
+import { SourcePickerService } from '../../shared/services/source-picker.service';
+import {
+  MASTERY_INFO_DESC,
+  ReviewLimit,
+  ReviewRoute,
+  ReviewSortOrder,
+  ReviewSource,
+} from '../../models/review.model';
 
 @Component({
   selector: 'lc-mastery-breakdown',
   templateUrl: './mastery-breakdown.page.html',
   styleUrls: ['./mastery-breakdown.page.scss'],
+  changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [IonContent, IonHeader, IonToolbar, IonIcon],
 })
 export class MasteryBreakdownPage {
   private readonly filterService = inject(ReviewFilterService);
   private readonly reviewStore = inject(ReviewStore);
-  private readonly collectionStore = inject(CollectionStore);
+  private readonly sourcePicker = inject(SourcePickerService);
   private readonly navCtrl = inject(NavController);
   private readonly router = inject(Router);
-  private readonly actionSheetCtrl = inject(ActionSheetController);
 
   constructor() {
     addIcons({ chevronBackOutline, chevronDownOutline, playOutline });
   }
 
-  readonly masteryRows = MASTERY_ROWS;
+  readonly masteryRows = MASTERY_INFO_DESC;
 
   readonly selectedCollectionId = signal<string | undefined>(undefined);
 
-  readonly sourceLabel = computed(() => {
-    const id = this.selectedCollectionId();
-    if (!id) return '📚 All collections';
-    const col = this.collectionStore.collections().find(c => c.id === id);
-    return col ? `${col.emoji ?? '📚'} ${col.name}` : 'All collections';
-  });
+  readonly sourceLabel = computed(() =>
+    this.sourcePicker.labelFor(this.selectedCollectionId() ?? ReviewSource.ALL)
+  );
 
   readonly distribution = computed(() =>
     this.filterService.getMasteryDistribution(this.selectedCollectionId())
@@ -64,38 +59,26 @@ export class MasteryBreakdownPage {
   }
 
   async openSourcePicker(): Promise<void> {
-    const collections = this.collectionStore.collections();
-    const actionSheet = await this.actionSheetCtrl.create({
-      header: 'Select collection',
-      buttons: [
-        {
-          text: '📚 All collections',
-          handler: () => this.selectedCollectionId.set(undefined),
-        },
-        ...collections.map(col => ({
-          text: `${col.emoji ?? '📚'} ${col.name}`,
-          handler: () => this.selectedCollectionId.set(col.id),
-        })),
-        { text: 'Cancel', role: 'cancel' },
-      ],
-    });
-    await actionSheet.present();
+    const result = await this.sourcePicker.pick('Select collection');
+    if (result === null) return;
+    this.selectedCollectionId.set(result === ReviewSource.ALL ? undefined : result);
   }
 
   reviewLevel(level: MasteryLevel): void {
-    const source = this.selectedCollectionId() ?? 'all';
+    const source = this.selectedCollectionId() ?? ReviewSource.ALL;
     const queue = this.filterService.buildQueue({
       source,
       masteryLevels: [level],
-      sortOrder: 'random',
-      limit: 50,
+      sortOrder: ReviewSortOrder.RANDOM,
+      limit: ReviewLimit.MASTERY_LEVEL,
     });
     if (!queue.length) return;
-    this.reviewStore.startSession(queue, source !== 'all' ? source : null, MASTERY_ROWS.find(r => r.level === level)?.label ?? null);
-    void this.navCtrl.navigateForward('/review/player');
+    const label = MASTERY_INFO_DESC.find(r => r.level === level)?.label ?? null;
+    this.reviewStore.startSession(queue, source !== ReviewSource.ALL ? source : null, label);
+    void this.navCtrl.navigateForward(ReviewRoute.PLAYER);
   }
 
   goBack(): void {
-    void this.router.navigate(['/review']);
+    void this.router.navigate([ReviewRoute.HUB]);
   }
 }

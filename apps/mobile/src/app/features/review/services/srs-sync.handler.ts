@@ -4,10 +4,11 @@ import type { SyncHandler } from '../../../core/models/sync-handler.model';
 import { LocalDataService, PendingSrsRating } from '../../../core/services/local-data.service';
 import { CardApiService } from '../../vault/services/card-api.service';
 import { CardStore } from '../../vault/store/card.store';
+import { SyncOperationType } from '../models/review.model';
 
 @Injectable({ providedIn: 'root' })
 export class SrsSyncHandler implements SyncHandler {
-  readonly type = 'FLUSH_SRS_RATINGS' as const;
+  readonly type = SyncOperationType.FLUSH_SRS_RATINGS;
 
   private readonly localData = inject(LocalDataService);
   private readonly cardApi = inject(CardApiService);

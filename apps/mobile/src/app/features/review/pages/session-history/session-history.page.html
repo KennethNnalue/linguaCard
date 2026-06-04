@@ -27,7 +27,7 @@
           <div class="sh-session-top">
             <div class="sh-session-info">
               <p class="sh-session-title">{{ session.collectionName ?? 'All due cards' }}</p>
-              <p class="sh-session-date">{{ dateLabel(session) }}</p>
+              <p class="sh-session-date">{{ session.startedAt | sessionDate: true }}</p>
             </div>
             <span class="sh-rating-pill" [class]="ratingPillClass(stats.avgRating)">
               {{ stats.avgRating }} avg

@@ -17,6 +17,7 @@ import {CardStore} from '../../../vault/store/card.store';
 import {CategoryStore} from '../../../vault/store/category.store';
 import {CollectionStore} from '../../../vault/store/collection.store';
 import {ReviewStore} from '../../../review/store/review.store';
+import {RING_CIRCUMFERENCE_OUTER, sessionCardIds} from '../../../review/models/review.model';
 import {getCategoryName} from '../../../../shared/helpers/helpers';
 import {UserMenuComponent} from '../../../../shared/components/user-menu/user-menu.component';
 import {AddWordSheetComponent} from '../../../vault/components/add-word-sheet/add-word-sheet.component';
@@ -74,14 +75,16 @@ export class HomePage {
   readonly totalDue = computed(() => {
     const id = this.selectedCollectionId();
     const due = this.cardStore.dueCards();
-    return id ? due.filter(c => c.collectionId === id).length : due.length;
+    const overdue = id ? due.filter(c => c.collectionId === id).length : due.length;
+    // Total study workload = overdue reviews + new cards (masteryLevel 0)
+    return overdue + this.newCardsCount();
   });
 
   readonly newCardsCount = computed(() => {
     const cards = this.cardStore.cards();
     const id = this.selectedCollectionId();
     const filtered = id ? cards.filter(c => c.collectionId === id) : cards;
-    return filtered.filter(c => !c.srsState || c.srsState.state === 'new').length;
+    return filtered.filter(c => (c.srsState?.masteryLevel ?? 0) === 0).length;
   });
 
   readonly reviewsCount = computed(() => {
@@ -90,9 +93,13 @@ export class HomePage {
 
   readonly completedToday = computed(() => {
     const today = new Date().toISOString().split('T')[0];
-    return this.reviewStore.sessionHistory()
-      .filter(s => s.completedAt?.startsWith(today))
-      .reduce((sum, s) => sum + (s.reviewedCards?.length ?? 0), 0);
+    const seenIds = new Set<string>();
+    for (const s of this.reviewStore.sessionHistory()) {
+      if (s.completedAt?.startsWith(today)) {
+        for (const id of sessionCardIds(s)) seenIds.add(id);
+      }
+    }
+    return seenIds.size;
   });
 
   readonly ringProgress = computed(() => {
@@ -101,11 +108,9 @@ export class HomePage {
     return Math.min(1, this.completedToday() / total);
   });
 
-  // SVG circumference for r=28: 2π*28 ≈ 175.93
-  readonly ringOffset = computed(() => {
-    const circumference = 2 * Math.PI * 28;
-    return circumference * (1 - this.ringProgress());
-  });
+  readonly ringOffset = computed(() =>
+    RING_CIRCUMFERENCE_OUTER * (1 - this.ringProgress())
+  );
 
   readonly selectedCollectionLabel = computed(() => {
     const id = this.selectedCollectionId();
@@ -116,19 +121,26 @@ export class HomePage {
 
   // ─── Stat cards ──────────────────────────────────────────────────────────────
   readonly dayStreak = computed(() => {
-    // Derive streak from session history — count consecutive days with sessions
     const sessions = this.reviewStore.sessionHistory();
     if (sessions.length === 0) return 0;
     const dates = new Set(sessions.map(s => s.completedAt?.split('T')[0]).filter(Boolean));
-    let streak = 0;
     const today = new Date();
-    for (let i = 0; i < 365; i++) {
-      const d = new Date(today);
-      d.setDate(today.getDate() - i);
+    const todayStr = today.toISOString().split('T')[0];
+
+    // A streak is active if there's a session today OR yesterday (grace period for
+    // users who review late at night before midnight). Start counting from whichever
+    // is the most recent day with activity.
+    const yesterdayStr = new Date(today.getTime() - 86_400_000).toISOString().split('T')[0];
+    const startOffset = dates.has(todayStr) ? 0 : dates.has(yesterdayStr) ? 1 : -1;
+    if (startOffset === -1) return 0;
+
+    let streak = 0;
+    for (let i = startOffset; i < 365; i++) {
+      const d = new Date(today.getTime() - i * 86_400_000);
       const dateStr = d.toISOString().split('T')[0];
       if (dates.has(dateStr)) {
         streak++;
-      } else if (i > 0) {
+      } else {
         break;
       }
     }
@@ -139,10 +151,29 @@ export class HomePage {
     const sessions = this.reviewStore.sessionHistory();
     const dates = new Set(sessions.map(s => s.completedAt?.split('T')[0]).filter(Boolean));
     const today = new Date();
+    const todayStr = today.toISOString().split('T')[0];
+    const streak = this.dayStreak();
+
+    // Build the set of dates that belong to the current consecutive streak so
+    // dots match the streak number exactly (not arbitrary historical activity days).
+    const streakDates = new Set<string>();
+    for (let i = 0; i < streak; i++) {
+      const d = new Date(today.getTime() - i * 86_400_000);
+      streakDates.add(d.toISOString().split('T')[0]);
+    }
+    // If streak started from yesterday (grace period), shift by 1
+    if (streak > 0 && !dates.has(todayStr)) {
+      streakDates.clear();
+      for (let i = 1; i <= streak; i++) {
+        const d = new Date(today.getTime() - i * 86_400_000);
+        streakDates.add(d.toISOString().split('T')[0]);
+      }
+    }
+
     return Array.from({length: 7}, (_, i) => {
       const d = new Date(today);
       d.setDate(today.getDate() - (6 - i));
-      return dates.has(d.toISOString().split('T')[0]);
+      return streakDates.has(d.toISOString().split('T')[0]);
     });
   });
 
@@ -168,10 +199,15 @@ export class HomePage {
       const d = new Date(today);
       d.setDate(today.getDate() - currentDayOfWeek + i);
       const dateStr = d.toISOString().split('T')[0];
-      const count = sessions
-        .filter(s => s.completedAt?.startsWith(dateStr))
-        .reduce((sum, s) => sum + (s.reviewedCards?.length ?? 0), 0);
-      return {label, count, isToday: i === currentDayOfWeek, isPast: i < currentDayOfWeek};
+      // Deduplicate by card ID — a card reviewed in multiple sessions on the same
+      // day should only count once toward the daily total.
+      const dayIds = new Set<string>();
+      for (const s of sessions) {
+        if (s.completedAt?.startsWith(dateStr)) {
+          for (const id of sessionCardIds(s)) dayIds.add(id);
+        }
+      }
+      return {label, count: dayIds.size, isToday: i === currentDayOfWeek, isPast: i < currentDayOfWeek};
     });
 
     const maxCount = Math.max(...data.map(d => d.count), 1);

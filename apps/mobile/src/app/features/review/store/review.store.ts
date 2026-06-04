@@ -1,200 +1,210 @@
-import {inject, Injectable, signal} from '@angular/core';
-import {firstValueFrom, Observable} from 'rxjs';
-import {Card, ConfidenceRating} from '@lingua-card/shared/domain';
-import {CardApiService} from '../../vault/services/card-api.service';
-import {CardStore} from '../../vault/store/card.store';
-import {Sm2Service} from '../../../shared/srs/sm2.service';
-import {LocalDataService, PendingSrsRating} from '../../../core/services/local-data.service';
-import {AuthService} from '../../../core/services/auth.service';
-import {SyncService} from '../../../core/services/sync.service';
+import { inject } from '@angular/core';
+import { firstValueFrom } from 'rxjs';
+import { patchState, signalStore, withMethods, withState } from '@ngrx/signals';
+import { Card, ConfidenceRating } from '@lingua-card/shared/domain';
+import { CardApiService } from '../../vault/services/card-api.service';
+import { CardStore } from '../../vault/store/card.store';
+import { Sm2Service } from '../../../shared/srs/sm2.service';
+import { LocalDataService, PendingSrsRating } from '../../../core/services/local-data.service';
+import { AuthService } from '../../../core/services/auth.service';
+import { SyncService } from '../../../core/services/sync.service';
+import { LocalReviewSession, MAX_SESSION_HISTORY, SyncOperationType } from '../models/review.model';
 
-export interface ReviewSession {
-  id: string;
-  startedAt: string;
-  completedAt: string;
-  totalCards: number;
-  ratings: Record<string, ConfidenceRating>;
-  collectionId: string | null;
-  collectionName: string | null;
-  reviewedCards: Card[];
-}
-
-// Keep at most this many sessions in local storage to avoid unbounded growth
-const MAX_HISTORY = 50;
+export type ReviewSession = LocalReviewSession;
 
 // Disk format — stores card IDs instead of full Card objects
-interface PersistedSession extends Omit<ReviewSession, 'reviewedCards'> {
+interface PersistedSession extends Omit<ReviewSession, 'reviewedCards' | 'completedAt'> {
   reviewedCardIds: string[];
+  completedAt: string | null;
 }
 
-@Injectable({providedIn: 'root'})
-export class ReviewStore {
-  private readonly cardApi = inject(CardApiService);
-  private readonly cardStore = inject(CardStore);
-  private readonly sm2 = inject(Sm2Service);
-  private readonly localData = inject(LocalDataService);
-  private readonly authService = inject(AuthService);
-  private readonly syncService = inject(SyncService);
-
-  private readonly _activeSession = signal<ReviewSession | null>(null);
-  private readonly _completedSession = signal<ReviewSession | null>(null);
-  private readonly _sessionHistory = signal<ReviewSession[]>([]);
-  private readonly _pendingQueue = signal<Card[]>([]);
-
-  readonly activeSession = this._activeSession.asReadonly();
-  readonly completedSession = this._completedSession.asReadonly();
-  readonly sessionHistory = this._sessionHistory.asReadonly();
-  readonly pendingQueue = this._pendingQueue.asReadonly();
-
-  // Called once at app startup after cards are loaded
-  async loadHistory(): Promise<void> {
-    const userId = this.authService.currentUser()?.id;
-    if (!userId) return;
-    const stored = await this.localData.getSessionHistory(userId) as PersistedSession[];
-    if (!stored?.length) return;
-
-    // Hydrate reviewedCards from CardStore using stored card IDs
-    const allCards = this.cardStore.cards();
-    const cardById = new Map(allCards.map(c => [c.id, c]));
-
-    const sessions: ReviewSession[] = stored.map(s => ({
-      ...s,
-      reviewedCards: (s.reviewedCardIds ?? [])
-        .map(id => cardById.get(id))
-        .filter((c): c is Card => c !== undefined),
-    }));
-
-    this._sessionHistory.set(sessions);
-  }
-
-  startSession(cards: Card[], collectionId: string | null, collectionName: string | null): void {
-    this._completedSession.set(null);
-    this._pendingQueue.set(cards);
-    this._activeSession.set({
-      id: crypto.randomUUID(),
-      startedAt: new Date().toISOString(),
-      completedAt: '',
-      totalCards: cards.length,
-      ratings: {},
-      collectionId,
-      collectionName,
-      reviewedCards: [],
-    });
-  }
-
-  rateCard(card: Card, rating: ConfidenceRating): Observable<Card> {
-    this._activeSession.update(s => {
-      if (!s) return s;
-      return {...s, ratings: {...s.ratings, [card.id]: rating}};
-    });
-
-    // 1. Compute new SRS state and apply optimistically to the store immediately
-    const existingSrs = card.srsState ?? this.sm2.freshState(card.id, card.userId);
-    const newSrs = this.sm2.compute(existingSrs, rating);
-    const optimisticCard: Card = {...card, srsState: newSrs};
-    this.cardStore.updateCard(optimisticCard);
-
-    // 2. Buffer locally — write to pending list regardless of connectivity
-    const sessionId = this._activeSession()?.id ?? crypto.randomUUID();
-    const pendingRating: PendingSrsRating = {
-      cardId: card.id,
-      rating,
-      reviewedAt: new Date().toISOString(),
-      sessionId,
-    };
-    void this.bufferRating(pendingRating);
-
-    // 3. If online, flush immediately
-    if (navigator.onLine) {
-      void this.flushRating(pendingRating);
-    }
-
-    return this.cardApi.update(card.id, {srsState: newSrs, updatedAt: new Date().toISOString()});
-  }
-
-  completeSession(finalQueue: Card[]): void {
-    const active = this._activeSession();
-    if (!active) return;
-    const completed: ReviewSession = {
-      ...active,
-      completedAt: new Date().toISOString(),
-      reviewedCards: finalQueue,
-    };
-    this._completedSession.set(completed);
-    this._activeSession.set(null);
-    this._pendingQueue.set([]);
-
-    // Prepend to in-memory history and persist to local storage
-    this._sessionHistory.update(history => {
-      const updated = [completed, ...history].slice(0, MAX_HISTORY);
-      void this.persistHistory(updated);
-      return updated;
-    });
-
-    // Flush any remaining buffered ratings now that the session is complete
-    if (navigator.onLine) {
-      void this.flushAllPending();
-    } else {
-      void this.syncService.enqueue({
-        type: 'FLUSH_SRS_RATINGS',
-        payload: {userId: this.authService.currentUser()?.id},
-      });
-    }
-  }
-
-  clearSession(): void {
-    this._completedSession.set(null);
-  }
-
-  clearPendingQueue(): void {
-    this._pendingQueue.set([]);
-  }
-
-  private async persistHistory(sessions: ReviewSession[]): Promise<void> {
-    const userId = this.authService.currentUser()?.id;
-    if (!userId) return;
-    // Persist card IDs instead of full Card objects — lean storage, but allows
-    // re-hydration on next launch so "Review again" works after a refresh
-    const slim: PersistedSession[] = sessions.map(({reviewedCards, ...rest}) => ({
-      ...rest,
-      reviewedCardIds: reviewedCards.map(c => c.id),
-    }));
-    await this.localData.setSessionHistory(userId, slim);
-  }
-
-  private async bufferRating(rating: PendingSrsRating): Promise<void> {
-    const userId = this.authService.currentUser()?.id;
-    if (!userId) return;
-    const existing = await this.localData.getPendingSrsRatings(userId);
-    const filtered = existing.filter(r => r.cardId !== rating.cardId);
-    await this.localData.setPendingSrsRatings(userId, [...filtered, rating]);
-  }
-
-  private async flushRating(rating: PendingSrsRating): Promise<void> {
-    const userId = this.authService.currentUser()?.id;
-    if (!userId) return;
-    try {
-      await firstValueFrom(this.cardApi.batchRateSrs([rating]));
-      const existing = await this.localData.getPendingSrsRatings(userId);
-      await this.localData.setPendingSrsRatings(
-        userId,
-        existing.filter(r => !(r.cardId === rating.cardId && r.reviewedAt === rating.reviewedAt))
-      );
-    } catch {
-      // Will be retried by SrsSyncHandler on reconnect
-    }
-  }
-
-  private async flushAllPending(): Promise<void> {
-    const userId = this.authService.currentUser()?.id;
-    if (!userId) return;
-    const pending = await this.localData.getPendingSrsRatings(userId);
-    if (pending.length === 0) return;
-    try {
-      await firstValueFrom(this.cardApi.batchRateSrs(pending));
-      await this.localData.setPendingSrsRatings(userId, []);
-    } catch {
-      void this.syncService.enqueue({type: 'FLUSH_SRS_RATINGS', payload: {userId}});
-    }
-  }
+interface ReviewState {
+  activeSession: ReviewSession | null;
+  completedSession: ReviewSession | null;
+  sessionHistory: ReviewSession[];
+  pendingQueue: Card[];
 }
+
+const initialState: ReviewState = {
+  activeSession: null,
+  completedSession: null,
+  sessionHistory: [],
+  pendingQueue: [],
+};
+
+export const ReviewStore = signalStore(
+  { providedIn: 'root' },
+  withState(initialState),
+  withMethods(store => {
+    const cardApi = inject(CardApiService);
+    const cardStore = inject(CardStore);
+    const sm2 = inject(Sm2Service);
+    const localData = inject(LocalDataService);
+    const authService = inject(AuthService);
+    const syncService = inject(SyncService);
+
+    // Serialises all IndexedDB rating writes to prevent read-modify-write races
+    // when multiple rateCard() calls fire before any write resolves.
+    let bufferChain: Promise<void> = Promise.resolve();
+
+    async function persistHistory(sessions: ReviewSession[]): Promise<void> {
+      const userId = authService.currentUser()?.id;
+      if (!userId) return;
+      const slim: PersistedSession[] = sessions.map(({ reviewedCards, ...rest }) => ({
+        ...rest,
+        reviewedCardIds: reviewedCards.map(c => c.id),
+      }));
+      await localData.setSessionHistory(userId, slim);
+    }
+
+    async function bufferRating(rating: PendingSrsRating): Promise<void> {
+      const userId = authService.currentUser()?.id;
+      if (!userId) return;
+      const existing = await localData.getPendingSrsRatings(userId);
+      // Replace any prior rating for the same card in this session (re-rate scenario)
+      const filtered = existing.filter(r => r.cardId !== rating.cardId);
+      await localData.setPendingSrsRatings(userId, [...filtered, rating]);
+    }
+
+    async function flushRating(rating: PendingSrsRating): Promise<void> {
+      const userId = authService.currentUser()?.id;
+      if (!userId) return;
+      try {
+        await firstValueFrom(cardApi.batchRateSrs([rating]));
+        const existing = await localData.getPendingSrsRatings(userId);
+        await localData.setPendingSrsRatings(
+          userId,
+          existing.filter(r => !(r.cardId === rating.cardId && r.reviewedAt === rating.reviewedAt)),
+        );
+      } catch {
+        // Will be retried by SrsSyncHandler on reconnect
+      }
+    }
+
+    async function flushAllPending(): Promise<void> {
+      const userId = authService.currentUser()?.id;
+      if (!userId) return;
+      const pending = await localData.getPendingSrsRatings(userId);
+      if (pending.length === 0) return;
+      try {
+        await firstValueFrom(cardApi.batchRateSrs(pending));
+        await localData.setPendingSrsRatings(userId, []);
+      } catch {
+        void syncService.enqueue({ type: SyncOperationType.FLUSH_SRS_RATINGS, payload: { userId } });
+      }
+    }
+
+    return {
+      async loadHistory(): Promise<void> {
+        const userId = authService.currentUser()?.id;
+        if (!userId) return;
+        const stored = (await localData.getSessionHistory(userId)) as PersistedSession[];
+        if (!stored?.length) return;
+
+        // Prefer the live store if already populated; fall back to the local cache
+        // so we don't race against CardStore.loadCards() which is also async.
+        let allCards = cardStore.cards();
+        if (allCards.length === 0) {
+          allCards = await localData.getCards(userId);
+        }
+        const cardById = new Map(allCards.map(c => [c.id, c]));
+
+        const sessions: ReviewSession[] = stored.map(s => ({
+          ...s,
+          completedAt: s.completedAt ?? null,
+          reviewedCards: (s.reviewedCardIds ?? [])
+            .map(id => cardById.get(id))
+            .filter((c): c is Card => c !== undefined),
+        }));
+
+        patchState(store, { sessionHistory: sessions });
+      },
+
+      startSession(cards: Card[], collectionId: string | null, collectionName: string | null): void {
+        patchState(store, {
+          completedSession: null,
+          pendingQueue: cards,
+          activeSession: {
+            id: crypto.randomUUID(),
+            startedAt: new Date().toISOString(),
+            completedAt: null,
+            totalCards: cards.length,
+            ratings: {},
+            collectionId,
+            collectionName,
+            reviewedCards: [],
+          },
+        });
+      },
+
+      rateCard(card: Card, rating: ConfidenceRating): void {
+        const active = store.activeSession();
+        if (active) {
+          patchState(store, {
+            activeSession: { ...active, ratings: { ...active.ratings, [card.id]: rating } },
+          });
+        }
+
+        // 1. Compute new SRS state and apply optimistically to the store immediately
+        const existingSrs = card.srsState ?? sm2.freshState(card.id, card.userId);
+        const newSrs = sm2.compute(existingSrs, rating);
+        cardStore.updateCard({ ...card, srsState: newSrs });
+
+        // 2. Buffer locally — serialise writes to avoid read-modify-write race
+        // Use the session ID captured before state update; fall back to a fresh UUID.
+        const sessionId = active?.id ?? crypto.randomUUID();
+        const pendingRating: PendingSrsRating = {
+          cardId: card.id,
+          rating,
+          reviewedAt: new Date().toISOString(),
+          sessionId,
+        };
+        bufferChain = bufferChain.then(() => bufferRating(pendingRating));
+
+        // 3. If online, flush this single rating immediately after it has been buffered.
+        // batchRateSrs is the single authoritative write path — no separate PATCH needed.
+        if (navigator.onLine) {
+          bufferChain = bufferChain.then(() => flushRating(pendingRating));
+        }
+      },
+
+      completeSession(finalQueue: Card[]): void {
+        const active = store.activeSession();
+        if (!active) return;
+        const completed: ReviewSession = {
+          ...active,
+          completedAt: new Date().toISOString(),
+          reviewedCards: finalQueue,
+        };
+
+        const updated = [completed, ...store.sessionHistory()].slice(0, MAX_SESSION_HISTORY);
+        patchState(store, {
+          completedSession: completed,
+          activeSession: null,
+          pendingQueue: [],
+          sessionHistory: updated,
+        });
+        void persistHistory(updated);
+
+        // Wait for any in-flight per-card buffer/flush, then flush the rest
+        bufferChain = bufferChain.then(() => {
+          if (navigator.onLine) return flushAllPending();
+          void syncService.enqueue({
+            type: SyncOperationType.FLUSH_SRS_RATINGS,
+            payload: { userId: authService.currentUser()?.id },
+          });
+          return Promise.resolve();
+        });
+      },
+
+      clearSession(): void {
+        patchState(store, { completedSession: null });
+      },
+
+      clearPendingQueue(): void {
+        patchState(store, { pendingQueue: [] });
+      },
+    };
+  }),
+);
+

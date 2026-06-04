@@ -55,9 +55,10 @@
             </div>
             <div class="rv-body-back">
               @if (currentCard().content.article) {
-                <span class="lc-article-badge lc-article-badge--{{ currentCard().content.article }} rv-art-badge">
-                  {{ currentArticleLabel() }}
-                </span>
+                <div class="rv-art-row">
+                  <lc-article-badge [article]="currentCard().content.article" />
+                  <span class="rv-art-gender">{{ currentArticleLabel() }}</span>
+                </div>
               }
               <p class="rv-back-word lc-display">{{ currentCard().content.back }}</p>
               @if (currentCard().content.phonetic) {
@@ -66,7 +67,7 @@
               @for (ex of currentCard().content.examples; track ex.id) {
                 <div class="rv-ex-block">
                   <div class="rv-ex-row">
-                    <p class="rv-ex-de" [innerHTML]="highlightWord(ex.target, currentCard().content.back)"></p>
+                    <p class="rv-ex-de" [innerHTML]="ex.target | highlightWord: currentCard().content.back"></p>
                     <button class="rv-ex-play-btn" (click)="playExample($event, ex.target)" aria-label="Play example">
                       <ion-icon name="volume-high-outline"></ion-icon>
                     </button>

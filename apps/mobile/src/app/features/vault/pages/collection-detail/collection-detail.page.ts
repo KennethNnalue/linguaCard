@@ -13,6 +13,7 @@ import {getCategoryName} from '../../../../shared/helpers/helpers';
 import {FabButtonComponent} from '../../../../shared/components/fab-button/fab-button.component';
 import {ReviewFilterService} from '../../../review/services/review-filter.service';
 import {ReviewStore} from '../../../review/store/review.store';
+import {ReviewLimit, ReviewRoute, ReviewSortOrder} from '../../../review/models/review.model';
 import {WordCardComponent} from '../../../../shared/ui/word-card/word-card.component';
 import {WordAudioService} from '../../../../shared/audio/word-audio.service';
 import {AudioReadinessStore} from '../../../../shared/audio/audio-readiness.store';
@@ -222,13 +223,13 @@ export class CollectionDetailPage implements OnInit {
     const queue = this.filterService.buildQueue({
       source: col.id,
       masteryLevels: [0, 1, 2, 3, 4, 5],
-      sortOrder: useDue ? 'due_date' : 'hardest',
-      limit: 50,
+      sortOrder: useDue ? ReviewSortOrder.DUE_DATE : ReviewSortOrder.HARDEST,
+      limit: ReviewLimit.DUE_TODAY,
     });
     if (!queue.length) return;
     const collectionName = `${col.emoji ?? ''} ${col.name}`.trim();
     this.reviewStore.startSession(queue, col.id, collectionName);
-    this.router.navigate(['/review/player']);
+    this.router.navigate([ReviewRoute.PLAYER]);
   }
 
   startListen(): void {

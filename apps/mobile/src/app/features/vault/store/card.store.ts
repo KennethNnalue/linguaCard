@@ -70,7 +70,7 @@ export const CardStore = signalStore(
     dueCards: computed(() => {
       const now = new Date();
       return cards().filter(
-        (c) => c.srsState && new Date(c.srsState.nextDueAt) <= now
+        (c) => c.srsState && (c.srsState.masteryLevel ?? 0) > 0 && new Date(c.srsState.nextDueAt) <= now
       );
     }),
 
@@ -85,7 +85,7 @@ export const CardStore = signalStore(
 
     totalCount: computed(() => cards().length),
     masteredCount: computed(() =>
-      cards().filter((c) => (c.srsState?.masteryLevel ?? 0) >= 4).length
+      cards().filter((c) => (c.srsState?.masteryLevel ?? 0) === 5).length
     ),
     learningCount: computed(() =>
       cards().filter(
@@ -94,7 +94,7 @@ export const CardStore = signalStore(
       ).length
     ),
     newCount: computed(() =>
-      cards().filter((c) => c.srsState?.state === 'new').length
+      cards().filter((c) => (c.srsState?.masteryLevel ?? 0) === 0).length
     ),
   })),
 
