@@ -209,6 +209,12 @@ export const RING_CIRCUMFERENCE_INNER = 2 * Math.PI * RING_RADIUS_INNER;
 
 // ─── REVIEW SESSION (LOCAL / FEATURE) ────────────────────────────────────────
 
+/**
+ * Mobile-side session record. `reviewedCards` holds full Card objects for
+ * display — this differs from the domain `ReviewSession` where `reviewedCards`
+ * is a plain count (number). The two types share a name root but are intentionally
+ * separate; session history is device-local and never POSTed to the backend.
+ */
 export interface LocalReviewSession {
   id: string;
   startedAt: string;

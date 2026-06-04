@@ -42,8 +42,10 @@ export class CollectionsService {
         `SELECT
            "collectionId",
            COUNT(*)::int AS "cardCount",
-           SUM(CASE WHEN "srsState"->>'state' = 'mastered' THEN 1 ELSE 0 END)::int AS "masteredCount",
-           SUM(CASE WHEN "srsState" IS NOT NULL AND "srsState"->>'nextDueAt' <= $1 THEN 1 ELSE 0 END)::int AS "dueCount"
+           SUM(CASE WHEN ("srsState"->>'masteryLevel')::int = 5 THEN 1 ELSE 0 END)::int AS "masteredCount",
+           SUM(CASE WHEN "srsState" IS NOT NULL
+                      AND "srsState"->>'lastReviewedAt' IS NOT NULL
+                      AND "srsState"->>'nextDueAt' <= $1 THEN 1 ELSE 0 END)::int AS "dueCount"
          FROM cards
          WHERE "collectionId" IS NOT NULL AND "userId" = $2
          GROUP BY "collectionId"`,

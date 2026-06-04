@@ -1,6 +1,7 @@
 import { inject, Injectable } from '@angular/core';
 import { Card, MasteryLevel } from '@lingua-card/shared/domain';
 import { CardStore } from '../../vault/store/card.store';
+import { isDue, isNew, isStruggling } from '../../../shared/srs/srs-status';
 import {
   ReviewFilters,
   ReviewLimit,
@@ -73,21 +74,12 @@ export class ReviewFilterService {
     );
 
     if (filters.sortOrder === ReviewSortOrder.DUE_DATE) {
-      // Include: overdue reviewed cards (masteryLevel > 0, nextDueAt <= now)
-      //          AND new cards (masteryLevel === 0, never studied)
-      cards = cards.filter(c => {
-        const level = c.srsState?.masteryLevel ?? 0;
-        if (level === 0) return true; // new card — always include in today's session
-        return c.srsState && new Date(c.srsState.nextDueAt) <= now;
-      });
+      // Include: due reviewed cards AND new cards (never studied)
+      cards = cards.filter(c => isNew(c) || isDue(c, now));
     }
 
     if (filters.sortOrder === ReviewSortOrder.MOST_LAPSES) {
-      cards = cards.filter(c => {
-        const s = c.srsState;
-        const level = s?.masteryLevel ?? 0;
-        return s && s.repetitions > 0 && level >= 1 && level <= STRUGGLING_MASTERY_MAX;
-      });
+      cards = cards.filter(c => isStruggling(c));
     }
 
     cards = this.sortCards(cards, filters.sortOrder);
@@ -136,28 +128,20 @@ export class ReviewFilterService {
     return dist;
   }
 
-  // Cards that have been reviewed at least once and whose next review date has passed.
-  // New (masteryLevel=0) cards are tracked separately via getNewCount().
+  // Cards that have been studied at least once and whose next review date has passed.
+  // New (never studied) cards are counted separately via getNewCount().
   getDueTodayCount(collectionId?: string): number {
     const now = new Date();
     let cards = this.cardStore.cards();
     if (collectionId) cards = cards.filter(c => c.collectionId === collectionId);
-    return cards.filter(c =>
-      c.srsState &&
-      (c.srsState.masteryLevel ?? 0) > 0 &&
-      new Date(c.srsState.nextDueAt) <= now
-    ).length;
+    return cards.filter(c => isDue(c, now)).length;
   }
 
   getDueTodayByMastery(collectionId?: string): Record<MasteryLevel, number> {
     const now = new Date();
     let cards = this.cardStore.cards();
     if (collectionId) cards = cards.filter(c => c.collectionId === collectionId);
-    const due = cards.filter(c =>
-      c.srsState &&
-      (c.srsState.masteryLevel ?? 0) > 0 &&
-      new Date(c.srsState.nextDueAt) <= now
-    );
+    const due = cards.filter(c => isDue(c, now));
     const dist = { 0: 0, 1: 0, 2: 0, 3: 0, 4: 0, 5: 0 } as Record<MasteryLevel, number>;
     due.forEach(c => {
       const level = (c.srsState?.masteryLevel ?? 0) as MasteryLevel;
@@ -168,27 +152,19 @@ export class ReviewFilterService {
 
   getStrugglingCards(limit: number = ReviewLimit.STRUGGLING): Card[] {
     return this.cardStore.cards()
-      .filter(c => {
-        const s = c.srsState;
-        const level = s?.masteryLevel ?? 0;
-        return s && s.repetitions > 0 && level >= 1 && level <= STRUGGLING_MASTERY_MAX;
-      })
+      .filter(isStruggling)
       .sort((a, b) => (a.srsState?.repetitions ?? 0) - (b.srsState?.repetitions ?? 0))
       .slice(0, limit);
   }
 
   getStrugglingCount(): number {
-    return this.cardStore.cards().filter(c => {
-      const s = c.srsState;
-      const level = s?.masteryLevel ?? 0;
-      return s && s.repetitions > 0 && level >= 1 && level <= STRUGGLING_MASTERY_MAX;
-    }).length;
+    return this.cardStore.cards().filter(isStruggling).length;
   }
 
   getNewCount(collectionId?: string): number {
     let cards = this.cardStore.cards();
     if (collectionId) cards = cards.filter(c => c.collectionId === collectionId);
-    return cards.filter(c => (c.srsState?.masteryLevel ?? 0) === 0).length;
+    return cards.filter(isNew).length;
   }
 }
 

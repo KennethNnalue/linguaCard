@@ -1,6 +1,7 @@
 import { Injectable, inject } from '@angular/core';
 import { firstValueFrom } from 'rxjs';
 import { Card } from '@lingua-card/shared/domain';
+import { UpdateCardDto } from '@lingua-card/shared/dto';
 import type { SyncHandler } from '../../../core/models/sync-handler.model';
 import { CardApiService } from './card-api.service';
 
@@ -16,7 +17,7 @@ export class CardSyncHandler implements SyncHandler {
         await firstValueFrom(this.api.create(p.data as Omit<Card, 'id'>));
         break;
       case 'UPDATE_CARD': {
-        const { id, patch } = p.data as { id: string; patch: Partial<Card> };
+        const { id, patch } = p.data as { id: string; patch: UpdateCardDto };
         await firstValueFrom(this.api.update(id, patch));
         break;
       }

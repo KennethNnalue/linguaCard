@@ -309,6 +309,12 @@ export interface ProgressStats {
 
 // ─── REVIEW SESSION ───────────────────────────────────────────────────────────
 
+/**
+ * Server-side / API shape for a completed review session.
+ * `reviewedCards` is a count (number), not an array.
+ * Do NOT confuse with `LocalReviewSession` in the mobile app which holds the
+ * full `Card[]` array for in-process and history display.
+ */
 export interface ReviewSession {
   id: string;
   userId: string;
@@ -325,7 +331,16 @@ export interface ReviewSession {
 
 export interface SyncOperation {
   id: string;
-  type: 'CREATE_CARD' | 'UPDATE_CARD' | 'DELETE_CARD' | 'RATE_CARD' | 'CREATE_CATEGORY';
+  type:
+    | 'CREATE_CARD'
+    | 'UPDATE_CARD'
+    | 'DELETE_CARD'
+    | 'RATE_CARD'
+    | 'CREATE_CATEGORY'
+    | 'CREATE_COLLECTION'
+    | 'UPDATE_COLLECTION'
+    | 'DELETE_COLLECTION'
+    | 'FLUSH_SRS_RATINGS';
   payload: unknown;
   createdAt: string;
   retryCount: number;

@@ -4,6 +4,7 @@ import {AlertController, IonContent, IonHeader, IonIcon, IonToolbar, ModalContro
 import {addIcons} from 'ionicons';
 import {chevronBackOutline, chevronForwardOutline, ellipsisHorizontalOutline, playOutline, timeOutline, volumeHighOutline,} from 'ionicons/icons';
 import {Card, Collection} from '@lingua-card/shared/domain';
+import {isDue, isMastered} from '../../../../shared/srs/srs-status';
 import {firstValueFrom} from 'rxjs';
 import {CollectionApiService} from '../../services/collection-api.service';
 import {CategoryStore} from '../../store/category.store';
@@ -68,9 +69,7 @@ export class CollectionDetailPage implements OnInit {
 
   readonly dueCount = computed(() => {
     const now = new Date();
-    return this.allCards().filter(
-      c => c.srsState && new Date(c.srsState.nextDueAt) <= now,
-    ).length;
+    return this.allCards().filter(c => isDue(c, now)).length;
   });
 
   readonly pendingGhosts = computed(() => {
@@ -114,7 +113,7 @@ export class CollectionDetailPage implements OnInit {
   });
 
   readonly masteredCount = computed(() =>
-    this.allCards().filter(c => (c.srsState?.masteryLevel ?? 0) >= 5).length,
+    this.allCards().filter(isMastered).length,
   );
 
   readonly progressPercent = computed(() => {

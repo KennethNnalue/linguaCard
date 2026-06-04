@@ -13,6 +13,7 @@ import { ReviewStore } from '../../store/review.store';
 import { ReviewFilterService } from '../../services/review-filter.service';
 import { SessionStatsService } from '../../shared/services/session-stats.service';
 import { SessionDatePipe } from '../../shared/pipes/session-date.pipe';
+import { ReviewStatsStore } from '../../../../shared/srs/review-stats.store';
 import {
   BreakdownTag,
   BreakdownTagLabel,
@@ -25,7 +26,6 @@ import {
   ReviewSource,
   RING_CIRCUMFERENCE_INNER,
   RING_CIRCUMFERENCE_OUTER,
-  sessionCardIds,
 } from '../../models/review.model';
 
 @Component({
@@ -38,6 +38,7 @@ import {
 export class ReviewHubPage {
   private readonly reviewStore = inject(ReviewStore);
   private readonly filterService = inject(ReviewFilterService);
+  private readonly reviewStats = inject(ReviewStatsStore);
   readonly stats = inject(SessionStatsService);
   private readonly router = inject(Router);
 
@@ -45,13 +46,13 @@ export class ReviewHubPage {
     addIcons({ alertCircleOutline, addCircleOutline, chevronForwardOutline, playOutline, informationCircleOutline });
   }
 
-  // Overdue reviews (masteryLevel > 0, nextDueAt <= now)
+  // Due reviews = studied cards with nextDueAt <= now
   readonly overdueCount = computed(() => this.filterService.getDueTodayCount());
 
-  // New cards never reviewed (masteryLevel === 0)
+  // New cards = never studied (srsState null or lastReviewedAt null)
   readonly newCount = computed(() => this.filterService.getNewCount());
 
-  // Total study workload shown on the ring = overdue + new
+  // Total study workload = due reviews + new cards
   readonly dueTodayCount = computed(() => this.overdueCount() + this.newCount());
 
   readonly dueTodayByMastery = computed(() => this.filterService.getDueTodayByMastery());
@@ -60,18 +61,8 @@ export class ReviewHubPage {
 
   readonly recentSessions = computed(() => this.reviewStore.sessionHistory().slice(0, 2));
 
-  // Count distinct card IDs reviewed today — prevents retried sessions from
-  // inflating the count beyond the total due, which breaks ring progress math.
-  readonly completedToday = computed(() => {
-    const today = new Date().toISOString().split('T')[0];
-    const seenIds = new Set<string>();
-    for (const s of this.reviewStore.sessionHistory()) {
-      if (s.completedAt?.startsWith(today)) {
-        for (const id of sessionCardIds(s)) seenIds.add(id);
-      }
-    }
-    return seenIds.size;
-  });
+  // Distinct card IDs reviewed today — from facade (local-time bucketed)
+  readonly completedToday = this.reviewStats.completedToday;
 
   readonly ringOffset = computed(() => {
     const due = this.dueTodayCount();
@@ -110,9 +101,9 @@ export class ReviewHubPage {
   readonly breakdownTags = computed((): BreakdownTag[] => {
     const dist = this.dueTodayByMastery();
     return [
-      // New = cards never reviewed (masteryLevel 0) — counted separately from overdue
+      // New = cards never studied
       { label: BreakdownTagLabel.NEW, count: this.newCount(), colour: MASTERY_COLOURS[0] },
-      // Overdue reviewed cards broken down by mastery
+      // Due reviewed cards broken down by mastery
       { label: BreakdownTagLabel.HARD, count: dist[1], colour: MASTERY_COLOURS[1] },
       { label: BreakdownTagLabel.LEARNING, count: dist[2], colour: MASTERY_COLOURS[2] },
       { label: BreakdownTagLabel.REVIEW, count: (dist[3] ?? 0) + (dist[4] ?? 0) + (dist[5] ?? 0), colour: MASTERY_COLOURS[3] },

@@ -14,6 +14,7 @@ import { CardApiService } from '../services/card-api.service';
 import { LocalDataService } from '../../../core/services/local-data.service';
 import { SyncService } from '../../../core/services/sync.service';
 import { AuthService } from '../../../core/services/auth.service';
+import { isDue, isMastered, isNew, isStruggling } from '../../../shared/srs/srs-status';
 
 export interface CardFilter {
   categoryId: string | null;
@@ -69,9 +70,7 @@ export const CardStore = signalStore(
 
     dueCards: computed(() => {
       const now = new Date();
-      return cards().filter(
-        (c) => c.srsState && (c.srsState.masteryLevel ?? 0) > 0 && new Date(c.srsState.nextDueAt) <= now
-      );
+      return cards().filter(c => isDue(c, now));
     }),
 
     recentCards: computed(() =>
@@ -84,18 +83,18 @@ export const CardStore = signalStore(
     ),
 
     totalCount: computed(() => cards().length),
-    masteredCount: computed(() =>
-      cards().filter((c) => (c.srsState?.masteryLevel ?? 0) === 5).length
-    ),
+    masteredCount: computed(() => cards().filter(isMastered).length),
     learningCount: computed(() =>
       cards().filter(
         (c) =>
           c.srsState?.state === 'learning' || c.srsState?.state === 'review'
       ).length
     ),
-    newCount: computed(() =>
-      cards().filter((c) => (c.srsState?.masteryLevel ?? 0) === 0).length
-    ),
+    // "new" = never studied (no srsState or lastReviewedAt is null)
+    newCount: computed(() => cards().filter(isNew).length),
+    // "reviews" = studied cards that are due today
+    reviewCount: computed(() => { const now = new Date(); return cards().filter(c => isDue(c, now)).length; }),
+    strugglingCount: computed(() => cards().filter(isStruggling).length),
   })),
 
   withMethods((store) => {

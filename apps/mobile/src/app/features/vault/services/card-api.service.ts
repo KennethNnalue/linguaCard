@@ -4,6 +4,7 @@ import { forkJoin, Observable, of, switchMap } from 'rxjs';
 import { map } from 'rxjs/operators';
 import { environment } from '../../../../environments/environment';
 import { Card } from '@lingua-card/shared/domain';
+import { UpdateCardDto } from '@lingua-card/shared/dto';
 
 @Injectable({ providedIn: 'root' })
 export class CardApiService {
@@ -24,8 +25,8 @@ export class CardApiService {
     return this.http.post<Card>(this.baseUrl, payload);
   }
 
-  update(id: string, patch: Partial<Card>): Observable<Card> {
-    return this.http.patch<Card>(`${this.baseUrl}/${id}`, patch);
+  update(id: string, dto: UpdateCardDto): Observable<Card> {
+    return this.http.patch<Card>(`${this.baseUrl}/${id}`, dto);
   }
 
   remove(id: string): Observable<void> {
