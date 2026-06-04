@@ -8,7 +8,6 @@ import {
   chevronBackOutline,
   createOutline,
   ellipsisHorizontalOutline,
-  micOutline,
   playOutline,
   trashOutline,
   volumeHighOutline,
@@ -20,6 +19,7 @@ import {WordAudioService} from '../../../../shared/audio/word-audio.service';
 import {AudioReadinessStore} from '../../../../shared/audio/audio-readiness.store';
 import {ArticleBadgeComponent} from '../../../../shared/components/article-badge/article-badge.component';
 import {AddWordSheetComponent} from '../../components/add-word-sheet/add-word-sheet.component';
+import {QuickRateSheetComponent} from '../../components/quick-rate-sheet/quick-rate-sheet.component';
 import {getCategoryName} from '../../../../shared/helpers/helpers';
 import {normalizeForAudio} from '../../../../shared/audio/normalize';
 
@@ -47,7 +47,6 @@ export class WordDetailComponent {
       chevronBackOutline,
       ellipsisHorizontalOutline,
       volumeHighOutline,
-      micOutline,
       playOutline,
       createOutline,
       trashOutline,
@@ -159,14 +158,26 @@ export class WordDetailComponent {
     void this.wordAudio.play(sentence, 'de-DE');
   }
 
+  async openQuickRate(): Promise<void> {
+    const card = this.card();
+    if (!card) return;
+    const modal = await this.modalCtrl.create({
+      component: QuickRateSheetComponent,
+      componentProps: { card },
+      breakpoints: [0, 0.6, 0.75],
+      initialBreakpoint: 0.75,
+      handleBehavior: 'cycle',
+    });
+    await modal.present();
+  }
+
   async openEdit(): Promise<void> {
     const card = this.card();
     const modal = await this.modalCtrl.create({
       component: AddWordSheetComponent,
-      componentProps: {cardToEdit: card},
+      componentProps: { cardToEdit: card },
       breakpoints: [0, 0.95, 1],
       initialBreakpoint: 0.95,
-      handleBehavior: 'cycle',
     });
     await modal.present();
     const {data} = await modal.onWillDismiss();

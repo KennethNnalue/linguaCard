@@ -44,26 +44,20 @@
           }
         </div>
 
-        <div class="wd2-audio-row">
-          <button class="wd2-audio-btn" (click)="playPronunciation()" [disabled]="isPronunciationLoading()">
-            @if (isPronunciationLoading()) {
-              <div class="wd-audio-spinner"></div>
-              Generating…
-            } @else {
-              <ion-icon name="volume-high-outline"></ion-icon>
-              Listen
-              @if (isAudioReady()) {
-                <span class="wd2-audio-dot wd2-audio-dot--ready" title="AI audio cached on device"></span>
-              } @else if (isAudioPending()) {
-                <span class="wd2-audio-dot wd2-audio-dot--pending" title="Generating audio…"></span>
-              }
+        <button class="wd2-listen-btn" (click)="playPronunciation()" [disabled]="isPronunciationLoading()">
+          @if (isPronunciationLoading()) {
+            <div class="wd-audio-spinner"></div>
+            <span>Generating…</span>
+          } @else {
+            <ion-icon name="volume-high-outline"></ion-icon>
+            <span>Listen to pronunciation</span>
+            @if (isAudioReady()) {
+              <span class="wd2-audio-dot wd2-audio-dot--ready" title="AI audio cached on device"></span>
+            } @else if (isAudioPending()) {
+              <span class="wd2-audio-dot wd2-audio-dot--pending" title="Generating audio…"></span>
             }
-          </button>
-          <button class="wd2-audio-btn wd2-audio-btn--accent" (click)="playPronunciation()">
-            <ion-icon name="mic-outline"></ion-icon>
-            Record
-          </button>
-        </div>
+          }
+        </button>
       </div>
 
       <!-- ── Mastery progress card ── -->
@@ -161,9 +155,9 @@
 
 <!-- Bottom actions -->
 <div class="wd2-actions">
-  <button class="wd2-btn-review" [routerLink]="['/review']">
+  <button class="wd2-btn-review" (click)="openQuickRate()">
     <ion-icon name="play-outline"></ion-icon>
-    Review this word
+    Rate this word
   </button>
   <button class="wd2-btn-icon" (click)="openEdit()">
     <ion-icon name="create-outline"></ion-icon>

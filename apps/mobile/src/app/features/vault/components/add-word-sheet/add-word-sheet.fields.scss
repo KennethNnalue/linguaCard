@@ -29,6 +29,28 @@
   &:active { opacity: 0.75; }
 }
 
+.aw-new-cat-row {
+  display: flex;
+  gap: t.$lc-space-2;
+  align-items: center;
+  margin-top: t.$lc-space-1;
+}
+
+.aw-new-cat-add-btn {
+  flex-shrink: 0;
+  padding: 9px t.$lc-space-4;
+  border-radius: t.$lc-radius-sm;
+  border: none;
+  background: var(--lc-brand);
+  color: white;
+  @include u.lc-font('xs', t.$lc-font-weight-semibold);
+  font-family: t.$lc-font-body;
+  cursor: pointer;
+  transition: var(--lc-transition-fast);
+  &:disabled { opacity: 0.45; cursor: not-allowed; }
+  &:not(:disabled):active { opacity: 0.8; }
+}
+
 // ─── EXAMPLE SENTENCE ─────────────────────────────────────────────────────────
 .aw-example-wrap {
   background: var(--lc-card); border: 1.5px solid var(--lc-border); border-radius: t.$lc-radius-sm;

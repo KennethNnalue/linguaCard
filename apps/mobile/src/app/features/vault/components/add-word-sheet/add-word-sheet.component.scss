@@ -58,14 +58,65 @@
 }
 .aw-duplicate-checking { @include u.lc-font('xxs'); color: var(--lc-text-hint); text-align: center; }
 
-.aw-back-row { display: flex; align-items: center; gap: t.$lc-space-2; }
-.aw-art-badge {
-  @include u.flex-center;
-  min-width: 40px; padding: 0 t.$lc-space-3; height: 40px;
-  border-radius: t.$lc-radius-full; border: 1.5px dashed var(--lc-border);
-  @include u.lc-font('xs', t.$lc-font-weight-bold); letter-spacing: 0.04em;
-  font-family: t.$lc-font-body; background: var(--lc-surface); color: var(--lc-text-hint);
-  cursor: pointer; flex-shrink: 0; transition: var(--lc-transition-fast);
-  &:not(.aw-art-badge--empty) { border-style: solid; }
-  &:active { transform: scale(0.95); }
+// ─── ARTICLE SEGMENTED SELECTOR ──────────────────────────────────────────────
+.aw-article-group {
+  display: flex;
+  align-items: center;
+  gap: t.$lc-space-3;
+  margin-top: t.$lc-space-1;
+}
+
+.aw-article-lbl {
+  @include u.lc-font('xxs', t.$lc-font-weight-semibold);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--lc-text-hint);
+  flex-shrink: 0;
+}
+
+.aw-article-seg {
+  display: flex;
+  gap: 0;
+  border: 1.5px solid var(--lc-border);
+  border-radius: t.$lc-radius-sm;
+  overflow: hidden;
+  flex: 1;
+}
+
+.aw-art-seg-btn {
+  flex: 1;
+  padding: 7px t.$lc-space-2;
+  border: none;
+  border-right: 1px solid var(--lc-border);
+  background: var(--lc-card);
+  @include u.lc-font('xs', t.$lc-font-weight-semibold);
+  font-family: t.$lc-font-body;
+  color: var(--lc-text-secondary);
+  cursor: pointer;
+  transition: var(--lc-transition-fast);
+
+  &:last-child { border-right: none; }
+  &:active:not(&--active) { background: var(--lc-surface); }
+
+  &--active {
+    color: white;
+    background: var(--lc-text-secondary);
+  }
+}
+
+// Article colour overrides when active — use design-system tokens
+.aw-art-seg-btn--der.aw-art-seg-btn--active {
+  background: var(--lc-masc-bg);
+  color: var(--lc-masc-text);
+  border-right-color: var(--lc-masc-border);
+}
+.aw-art-seg-btn--die.aw-art-seg-btn--active {
+  background: var(--lc-fem-bg);
+  color: var(--lc-fem-text);
+  border-right-color: var(--lc-fem-border);
+}
+.aw-art-seg-btn--das.aw-art-seg-btn--active {
+  background: var(--lc-neut-bg);
+  color: var(--lc-neut-text);
+  border-right-color: var(--lc-neut-border);
 }

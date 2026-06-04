@@ -18,9 +18,11 @@ import {
   volumeHighOutline,
 } from 'ionicons/icons';
 import type { ArticleType, Card, CardContent, ExampleSentence } from '@lingua-card/shared/domain';
+import { UpdateCardDto } from '@lingua-card/shared/dto';
 import { WordAudioService } from '../../../../shared/audio/word-audio.service';
 import { AuthService } from '../../../../core/services/auth.service';
 import { CardStore } from '../../store/card.store';
+import { CardApiService } from '../../services/card-api.service';
 import { CategoryStore } from '../../store/category.store';
 import { CollectionStore } from '../../store/collection.store';
 import { AssignCollectionSheetComponent } from '../assign-collection-sheet/assign-collection-sheet.component';
@@ -39,11 +41,15 @@ export class AddWordSheetComponent implements OnInit {
   private readonly wordAudio = inject(WordAudioService);
   private readonly authService = inject(AuthService);
   private readonly cardStore = inject(CardStore);
+  private readonly cardApi = inject(CardApiService);
   private readonly modalCtrl = inject(ModalController);
   private readonly router = inject(Router);
   private readonly dedupService = inject(CardDedupService);
 
   @Input() lockedCollectionId: string | null = null;
+  @Input() cardToEdit: Card | null = null;
+
+  get isEditing(): boolean { return !!this.cardToEdit; }
 
   readonly form = new FormGroup({
     front: new FormControl('', [Validators.required]),
@@ -67,9 +73,23 @@ export class AddWordSheetComponent implements OnInit {
   readonly articles: ArticleType[] = ['der', 'die', 'das'];
   readonly duplicateCard = signal<Card | null>(null);
   readonly suppressDuplicateWarning = signal(false);
+  readonly showNewCategoryInput = signal(false);
+  readonly newCategoryName = signal('');
 
   ngOnInit(): void {
-    if (this.lockedCollectionId) {
+    if (this.cardToEdit) {
+      const c = this.cardToEdit.content;
+      const ex = c.examples?.[0];
+      this.form.patchValue({
+        front: c.front,
+        back: c.back,
+        article: c.article ?? null,
+        categoryId: this.cardToEdit.categoryIds?.[0] ?? '',
+        collectionId: this.cardToEdit.collectionId ?? null,
+        exampleTarget: ex?.target ?? '',
+        exampleNative: ex?.native ?? '',
+      }, { emitEvent: false });
+    } else if (this.lockedCollectionId) {
       this.form.patchValue({ collectionId: this.lockedCollectionId });
     }
   }
@@ -106,14 +126,37 @@ export class AddWordSheetComponent implements OnInit {
     });
   }
 
-  selectArticle(art: ArticleType): void {
-    const current = this.form.get('article')!.value;
-    this.form.patchValue({ article: current === art ? null : art });
+  selectArticle(art: ArticleType | null): void {
+    this.form.patchValue({ article: art });
   }
 
   selectCategory(id: string): void {
     const current = this.form.get('categoryId')!.value;
     this.form.patchValue({ categoryId: current === id ? '' : id });
+  }
+
+  toggleNewCategoryInput(): void {
+    this.showNewCategoryInput.update(v => !v);
+    if (!this.showNewCategoryInput()) this.newCategoryName.set('');
+  }
+
+  addNewCategory(): void {
+    const name = this.newCategoryName().trim();
+    if (!name) return;
+    this.categoryStore.createCategory({ name });
+    // Select the category once it appears — watch for the next emission
+    const sub = this.categoryStore.categories;
+    const before = new Set(sub().map(c => c.id));
+    const check = setInterval(() => {
+      const added = sub().find(c => !before.has(c.id));
+      if (added) {
+        clearInterval(check);
+        this.form.patchValue({ categoryId: added.id });
+        this.newCategoryName.set('');
+        this.showNewCategoryInput.set(false);
+      }
+    }, 100);
+    setTimeout(() => clearInterval(check), 5000);
   }
 
   private _checkDuplicate(): void {
@@ -123,8 +166,11 @@ export class AddWordSheetComponent implements OnInit {
       return;
     }
     const article = this.form.get('article')!.value ?? null;
+    const found = this.dedupService.check(article, back);
+    // When editing, a match against the card itself is not a duplicate
+    const isDuplicate = found && found.id !== this.cardToEdit?.id;
     this.suppressDuplicateWarning.set(false);
-    this.duplicateCard.set(this.dedupService.check(article, back));
+    this.duplicateCard.set(isDuplicate ? found : null);
   }
 
   dismissDuplicateWarning(): void {
@@ -166,7 +212,7 @@ export class AddWordSheetComponent implements OnInit {
     const examples: ExampleSentence[] = [];
     if (v.exampleTarget?.trim()) {
       examples.push({
-        id: crypto.randomUUID(),
+        id: this.cardToEdit?.content.examples?.[0]?.id ?? crypto.randomUUID(),
         target: v.exampleTarget.trim(),
         native: v.exampleNative?.trim() ?? '',
       });
@@ -182,15 +228,32 @@ export class AddWordSheetComponent implements OnInit {
         : art === 'das' ? 'neuter'
         : null,
       examples,
-      notes: '',
-      audioAssetId: null,
-      imageUrl: null,
-      phonetic: null,
+      notes: this.cardToEdit?.content.notes ?? '',
+      audioAssetId: this.cardToEdit?.content.audioAssetId ?? null,
+      imageUrl: this.cardToEdit?.content.imageUrl ?? null,
+      phonetic: this.cardToEdit?.content.phonetic ?? null,
     };
 
     const categoryIds = v.categoryId ? [v.categoryId] : [];
-    const now = new Date().toISOString();
 
+    if (this.isEditing) {
+      const dto: UpdateCardDto = {
+        content,
+        categoryIds,
+        collectionId: v.collectionId ?? null,
+      };
+      this.cardApi.update(this.cardToEdit!.id, dto).subscribe({
+        next: (updated) => {
+          this.cardStore.updateCard(updated);
+          this.saving.set(false);
+          this.modalCtrl.dismiss({ created: true });
+        },
+        error: () => this.saving.set(false),
+      });
+      return;
+    }
+
+    const now = new Date().toISOString();
     const userId = this.authService.currentUser()?.id ?? '';
     this.cardStore.createCard({
       deckId: 'deck-001',

@@ -4,7 +4,7 @@
       <button class="aw-close-btn" (click)="dismiss()" aria-label="Close">
         <ion-icon name="close-outline"></ion-icon>
       </button>
-      <span class="aw-title lc-display">Add New Word</span>
+      <span class="aw-title lc-display">{{ isEditing ? 'Edit Word' : 'Add New Word' }}</span>
       <div class="aw-nav-spacer"></div>
     </div>
   </ion-toolbar>
@@ -38,30 +38,34 @@
     <!-- Back — German -->
     <div class="aw-field">
       <p class="aw-lbl">Back — German <span class="aw-lbl-hint">(article auto-detected)</span></p>
-      <div class="aw-back-row">
-        <!-- Tappable article badge — cycles through der / die / das / none -->
-        <button
-          type="button"
-          class="aw-art-badge"
-          [class.lc-article-badge--der]="form.get('article')?.value === 'der'"
-          [class.lc-article-badge--die]="form.get('article')?.value === 'die'"
-          [class.lc-article-badge--das]="form.get('article')?.value === 'das'"
-          [class.aw-art-badge--empty]="!form.get('article')?.value"
-          (click)="selectArticle(
-            form.get('article')?.value === 'der' ? 'die'
-            : form.get('article')?.value === 'die' ? 'das'
-            : form.get('article')?.value === 'das' ? null
-            : 'der'
-          )">
-          {{ form.get('article')?.value || '—' }}
-        </button>
-        <input
-          class="aw-input aw-input--grow"
-          [class.aw-input--error]="form.get('back')?.invalid && form.get('back')?.touched"
-          type="text"
-          placeholder="German word (e.g. Zug)"
-          formControlName="back"
-          autocomplete="off" />
+      <input
+        class="aw-input"
+        [class.aw-input--error]="form.get('back')?.invalid && form.get('back')?.touched"
+        type="text"
+        placeholder="German word (e.g. Zug)"
+        formControlName="back"
+        autocomplete="off" />
+      <!-- Article segmented selector -->
+      <div class="aw-article-group">
+        <span class="aw-article-lbl">Article</span>
+        <div class="aw-article-seg">
+          <button
+            type="button"
+            class="aw-art-seg-btn"
+            [class.aw-art-seg-btn--active]="!form.get('article')?.value"
+            (click)="selectArticle(null)">
+            None
+          </button>
+          @for (art of articles; track art) {
+            <button
+              type="button"
+              class="aw-art-seg-btn aw-art-seg-btn--{{ art }}"
+              [class.aw-art-seg-btn--active]="form.get('article')?.value === art"
+              (click)="selectArticle(art)">
+              {{ art }}
+            </button>
+          }
+        </div>
       </div>
     </div>
 
@@ -110,11 +114,34 @@
             {{ cat.name }}
           </button>
         }
-        <button type="button" class="aw-cat-chip aw-cat-chip--new">
-          <ion-icon name="add-outline"></ion-icon>
-          New
+        <button
+          type="button"
+          class="aw-cat-chip aw-cat-chip--new"
+          [class.aw-cat-chip--selected]="showNewCategoryInput()"
+          (click)="toggleNewCategoryInput()">
+          <ion-icon [name]="showNewCategoryInput() ? 'close-outline' : 'add-outline'"></ion-icon>
+          {{ showNewCategoryInput() ? 'Cancel' : 'New' }}
         </button>
       </div>
+      @if (showNewCategoryInput()) {
+        <div class="aw-new-cat-row">
+          <input
+            class="aw-input aw-input--grow"
+            type="text"
+            placeholder="Category name"
+            [value]="newCategoryName()"
+            (input)="newCategoryName.set($any($event.target).value)"
+            (keyup.enter)="addNewCategory()"
+            autocomplete="off" />
+          <button
+            type="button"
+            class="aw-new-cat-add-btn"
+            [disabled]="!newCategoryName().trim()"
+            (click)="addNewCategory()">
+            Add
+          </button>
+        </div>
+      }
     </div>
 
     <!-- Example sentence -->
@@ -152,12 +179,14 @@
 
     <!-- Save -->
     <button type="submit" class="aw-save-btn" [disabled]="saving()">
-      @if (saving()) { Saving… } @else { Save to Vault }
+      @if (saving()) { Saving… } @else if (isEditing) { Save changes } @else { Save to Vault }
     </button>
 
-    <p class="aw-import-link" (click)="navigateToImport()">
-      Add multiple words? Import a CSV →
-    </p>
+    @if (!isEditing) {
+      <p class="aw-import-link" (click)="navigateToImport()">
+        Add multiple words? Import a CSV →
+      </p>
+    }
 
     <div style="height: 40px;"></div>
   </form>

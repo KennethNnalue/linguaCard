@@ -108,34 +108,23 @@
   @include u.circle(6px);
 }
 
-.wd2-audio-row {
-  display: flex;
-  gap: t.$lc-space-2;
-}
-
-.wd2-audio-btn {
-  flex: 1;
+.wd2-listen-btn {
+  width: 100%;
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: t.$lc-space-1 + 2px;
+  gap: t.$lc-space-2;
   background: var(--lc-brand-light);
-  border: none;
+  border: 1px solid rgba(var(--lc-brand-rgb, 45, 90, 78), 0.15);
   border-radius: t.$lc-radius-md;
-  padding: t.$lc-space-2 + 2px t.$lc-space-3;
-  @include u.lc-font('xs', t.$lc-font-weight-semibold);
+  padding: t.$lc-space-3 t.$lc-space-4;
+  @include u.lc-font('sm', t.$lc-font-weight-semibold);
   color: var(--lc-brand);
   cursor: pointer;
   font-family: t.$lc-font-body;
   @include u.touch-state;
 
-  ion-icon { font-size: 14px; }
-
-  &--accent {
-    background: var(--lc-accent-light);
-    color: var(--lc-accent);
-    ion-icon { color: var(--lc-accent); }
-  }
+  ion-icon { font-size: 16px; flex-shrink: 0; }
 
   &:disabled { opacity: 0.6; cursor: not-allowed; }
 }

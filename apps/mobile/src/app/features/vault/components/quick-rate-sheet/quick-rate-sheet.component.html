@@ -1,0 +1,65 @@
+<ion-header class="ion-no-border">
+  <ion-toolbar>
+    <div class="qr-nav">
+      <span class="qr-title">Rate this word</span>
+      <button class="qr-close-btn" (click)="dismiss()" aria-label="Close">
+        <ion-icon name="close-outline"></ion-icon>
+      </button>
+    </div>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+  <div class="qr-body">
+
+    <!-- Card face -->
+    <div class="qr-card" [class.qr-card--revealed]="revealed()">
+
+      <!-- Front — tap to reveal -->
+      @if (!revealed()) {
+        <div class="qr-face qr-face--front" (click)="reveal()">
+          <p class="qr-prompt-lbl">Do you know this word?</p>
+          <p class="qr-front-word lc-display">{{ card.content.front }}</p>
+          <div class="qr-tap-hint">Tap to reveal German</div>
+        </div>
+      }
+
+      <!-- Back — revealed -->
+      @if (revealed()) {
+        <div class="qr-face qr-face--back">
+          <div class="qr-word-row">
+            <lc-article-badge [article]="card.content.article" />
+            <p class="qr-back-word lc-display">{{ card.content.back }}</p>
+          </div>
+          @if (card.content.phonetic) {
+            <p class="qr-phonetic">{{ card.content.phonetic }}</p>
+          }
+          <p class="qr-trans">{{ card.content.front }}</p>
+          <button class="qr-audio-btn" (click)="playAudio()" aria-label="Play pronunciation">
+            <ion-icon name="volume-high-outline"></ion-icon>
+            Listen
+          </button>
+        </div>
+      }
+
+    </div>
+
+    <!-- Rating buttons — shown after reveal -->
+    <div class="qr-rating-area" [class.qr-rating-area--active]="revealed()">
+      <p class="qr-rating-prompt">How well did you know this?</p>
+      <div class="qr-rating-row">
+        @for (r of ratings; track r.value) {
+          <button
+            class="qr-rating-btn qr-rating-btn--{{ r.value }}"
+            [disabled]="!revealed() || rated()"
+            [class.qr-rating-btn--done]="rated()"
+            (click)="rate(r.value)">
+            <span class="qr-r-num">{{ r.value }}</span>
+            <span class="qr-r-lbl">{{ r.label }}</span>
+          </button>
+        }
+      </div>
+    </div>
+
+  </div>
+</ion-content>
