@@ -212,9 +212,14 @@ export class WordDetailComponent {
   private deleteCard(): void {
     const id = this.cardId();
     if (!id) return;
+    const collectionId = this.card()?.collectionId;
     this.cardApi.remove(id).subscribe(() => {
       this.cardStore.loadCards();
-      this.router.navigate(['/vault']);
+      if (collectionId) {
+        this.router.navigate(['/vault/collections', collectionId]);
+      } else {
+        this.navCtrl.back();
+      }
     });
   }
 }
