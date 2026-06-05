@@ -4,13 +4,13 @@
       <button class="aw-close-btn" (click)="dismiss()" aria-label="Close">
         <ion-icon name="close-outline"></ion-icon>
       </button>
-      <span class="aw-title lc-display">{{ isEditing() ? 'Edit Word' : 'Add New Word' }}</span>
+      <span class="aw-title lc-display">{{ isEditing ? 'Edit Word' : 'Add New Word' }}</span>
       <div class="aw-nav-spacer"></div>
     </div>
   </ion-toolbar>
 </ion-header>
 
-<ion-content>
+<ion-content [scrollY]="true">
   <form [formGroup]="form" (ngSubmit)="save()" class="aw-form">
 
     <!-- Language direction (visual only) -->
@@ -23,28 +23,34 @@
       </div>
     </div>
 
-    <!-- Front — English -->
-    <div class="aw-field">
-      <p class="aw-lbl">Front — English</p>
-      <input
-        class="aw-input"
-        [class.aw-input--error]="form.get('front')?.invalid && form.get('front')?.touched"
-        type="text"
-        placeholder="e.g. the train"
-        formControlName="front"
-        autocomplete="off" />
-    </div>
-
-    <!-- Back — German -->
+    <!-- Back — German + Auto-generate button -->
     <div class="aw-field">
       <p class="aw-lbl">Back — German <span class="aw-lbl-hint">(article auto-detected)</span></p>
-      <input
-        class="aw-input"
-        [class.aw-input--error]="form.get('back')?.invalid && form.get('back')?.touched"
-        type="text"
-        placeholder="German word (e.g. Zug)"
-        formControlName="back"
-        autocomplete="off" />
+      <div class="aw-back-row">
+        <input
+          class="aw-input aw-input--flex"
+          [class.aw-input--error]="form.get('back')?.invalid && form.get('back')?.touched"
+          type="text"
+          placeholder="German word (e.g. Zug)"
+          formControlName="back"
+          autocomplete="off" />
+        <button
+          type="button"
+          class="aw-gen-btn"
+          [class.aw-gen-btn--loading]="generating()"
+          [disabled]="!canAutoGenerate()"
+          (click)="autoGenerate()"
+          aria-label="Auto-generate translation, plural and synonyms">
+          @if (generating()) {
+            <span class="aw-spinner"></span>
+            Generating…
+          } @else {
+            <ion-icon name="sparkles-outline"></ion-icon>
+            Auto
+          }
+        </button>
+      </div>
+
       <!-- Article segmented selector -->
       <div class="aw-article-group">
         <span class="aw-article-lbl">Article</span>
@@ -69,6 +75,18 @@
       </div>
     </div>
 
+    <!-- Front — English -->
+    <div class="aw-field">
+      <p class="aw-lbl">Front — English</p>
+      <input
+        class="aw-input"
+        [class.aw-input--error]="form.get('front')?.invalid && form.get('front')?.touched"
+        type="text"
+        placeholder="e.g. the train"
+        formControlName="front"
+        autocomplete="off" />
+    </div>
+
     <!-- Plural — only shown when an article is selected -->
     @if (showPluralField()) {
       <div class="aw-field">
@@ -81,6 +99,55 @@
           autocomplete="off" />
       </div>
     }
+
+    <!-- Synonyms chip editor (LC-136) -->
+    <div class="aw-field">
+      <p class="aw-lbl">Synonyms</p>
+      <div class="aw-syn-list" formArrayName="synonyms">
+        @for (group of synonymsArray.controls; track $index; let i = $index) {
+          <div class="aw-syn-chip" [formGroupName]="i">
+            <div class="aw-syn-chip-row" (click)="toggleSynonymExpand(i)">
+              @if (getSynonymGroup(i).get('article')?.value; as art) {
+                <span class="aw-syn-art aw-syn-art--{{ art }}">{{ art }}</span>
+              }
+              <span class="aw-syn-chip-word">
+                {{ getSynonymGroup(i).get('word')?.value || 'New synonym' }}
+              </span>
+              <span class="aw-syn-chip-trans">
+                {{ getSynonymGroup(i).get('translation')?.value }}
+              </span>
+              <button
+                type="button"
+                class="aw-syn-chip-x"
+                (click)="$event.stopPropagation(); removeSynonym(i)"
+                aria-label="Remove synonym">
+                <ion-icon name="close-outline"></ion-icon>
+              </button>
+            </div>
+            @if (expandedSynonymIdx() === i) {
+              <div class="aw-syn-fields">
+                <div class="aw-syn-field-row">
+                  <input class="aw-input aw-input--sm" placeholder="Synonym word" formControlName="word" autocomplete="off" />
+                  <div class="aw-syn-art-seg">
+                    <button type="button" class="aw-syn-art-btn" [class.active]="!getSynonymGroup(i).get('article')?.value" (click)="getSynonymGroup(i).get('article')!.setValue(null)">—</button>
+                    @for (art of articles; track art) {
+                      <button type="button" class="aw-syn-art-btn aw-syn-art-btn--{{ art }}" [class.active]="getSynonymGroup(i).get('article')?.value === art" (click)="getSynonymGroup(i).get('article')!.setValue(art)">{{ art }}</button>
+                    }
+                  </div>
+                </div>
+                <input class="aw-input aw-input--sm" placeholder="Translation (English)" formControlName="translation" autocomplete="off" />
+                <input class="aw-input aw-input--sm" placeholder="Example sentence (German)" formControlName="example" autocomplete="off" />
+                <input class="aw-input aw-input--sm" placeholder="Example translation (English)" formControlName="exampleNative" autocomplete="off" />
+              </div>
+            }
+          </div>
+        }
+        <button type="button" class="aw-syn-add" (click)="addSynonym()">
+          <ion-icon name="add-outline"></ion-icon>
+          Add synonym
+        </button>
+      </div>
+    </div>
 
     <!-- Duplicate warning -->
     @if (showDuplicateWarning()) {
@@ -100,7 +167,7 @@
     <!-- Collection -->
     <div class="aw-field">
       <p class="aw-lbl">Collection <span class="aw-lbl-hint aw-lbl-hint--required">*required</span></p>
-      @if (lockedCollectionId()) {
+      @if (lockedCollectionId) {
         <div class="aw-collection-locked">{{ selectedCollectionLabel() }}</div>
       } @else {
         <button
@@ -192,15 +259,14 @@
 
     <!-- Save -->
     <button type="submit" class="aw-save-btn" [disabled]="saving()">
-      @if (saving()) { Saving… } @else if (isEditing()) { Save changes } @else { Save to Vault }
+      @if (saving()) { Saving… } @else if (isEditing) { Save changes } @else { Save to Vault }
     </button>
 
-    @if (!isEditing()) {
+    @if (!isEditing) {
       <p class="aw-import-link" (click)="navigateToImport()">
         Add multiple words? Import a CSV →
       </p>
     }
 
-    <div style="height: 40px;"></div>
   </form>
 </ion-content>

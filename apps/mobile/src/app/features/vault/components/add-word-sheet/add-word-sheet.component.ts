@@ -1,23 +1,25 @@
-import { Component, computed, inject, input, OnInit, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, DestroyRef, inject, Input, OnInit, signal } from '@angular/core';
 import { Router } from '@angular/router';
-import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
+import { FormArray, FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { takeUntilDestroyed, toSignal } from '@angular/core/rxjs-interop';
-import { distinctUntilChanged } from 'rxjs/operators';
+import { distinctUntilChanged } from 'rxjs';
 import {
   IonContent,
   IonHeader,
   IonIcon,
   IonToolbar,
   ModalController,
+  ToastController,
 } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
 import {
   addOutline,
   closeOutline,
   micOutline,
+  sparklesOutline,
   volumeHighOutline,
 } from 'ionicons/icons';
-import type { ArticleType, Card, CardContent, ExampleSentence } from '@lingua-card/shared/domain';
+import type { ArticleType, Card, CardContent, ExampleSentence, Synonym } from '@lingua-card/shared/domain';
 import { UpdateCardDto } from '@lingua-card/shared/dto';
 import { WordAudioService } from '../../../../shared/audio/word-audio.service';
 import { AuthService } from '../../../../core/services/auth.service';
@@ -27,11 +29,25 @@ import { CategoryStore } from '../../store/category.store';
 import { CollectionStore } from '../../store/collection.store';
 import { AssignCollectionSheetComponent } from '../assign-collection-sheet/assign-collection-sheet.component';
 import { CardDedupService } from '../../../../shared/dedup/card-dedup.service';
+import { EnrichOneApiService } from '../../import/services/enrich-one-api.service';
+
+// ─── Synonym form group shape ────────────────────────────────────────────────
+
+function makeSynonymGroup(s?: Partial<Synonym>): FormGroup {
+  return new FormGroup({
+    word:          new FormControl(s?.word ?? '', [Validators.required]),
+    article:       new FormControl<ArticleType | null>(s?.article ?? null),
+    translation:   new FormControl(s?.translation ?? '', [Validators.required]),
+    example:       new FormControl(s?.example ?? ''),
+    exampleNative: new FormControl(s?.exampleNative ?? ''),
+  });
+}
 
 @Component({
   selector: 'lc-add-word-sheet',
   templateUrl: './add-word-sheet.component.html',
   styleUrls: ['./add-word-sheet.component.scss', './add-word-sheet.fields.scss'],
+  changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [IonHeader, IonToolbar, IonContent, IonIcon, ReactiveFormsModule],
 })
 export class AddWordSheetComponent implements OnInit {
@@ -41,34 +57,53 @@ export class AddWordSheetComponent implements OnInit {
   private readonly authService = inject(AuthService);
   private readonly cardStore = inject(CardStore);
   private readonly cardApi = inject(CardApiService);
+  private readonly enrichOneApi = inject(EnrichOneApiService);
   private readonly modalCtrl = inject(ModalController);
+  private readonly toastCtrl = inject(ToastController);
   private readonly router = inject(Router);
   private readonly dedupService = inject(CardDedupService);
+  private readonly destroyRef = inject(DestroyRef);
 
-  readonly lockedCollectionId = input<string | null>(null);
-  readonly cardToEdit = input<Card | null>(null);
+  // @Input() required — Ionic ModalController sets componentProps via Object.assign(),
+  // bypassing Angular's setInput() API. input() signals are overwritten with plain values.
+  @Input() lockedCollectionId: string | null = null;
+  @Input() cardToEdit: Card | null = null;
 
-  readonly isEditing = computed(() => !!this.cardToEdit());
+  get isEditing(): boolean { return !!this.cardToEdit; }
 
   readonly form = new FormGroup({
-    front: new FormControl('', [Validators.required]),
-    back: new FormControl('', [Validators.required]),
-    article: new FormControl<ArticleType | null>(null),
-    plural: new FormControl(''),
-    categoryId: new FormControl(''),
-    collectionId: new FormControl<string | null>(null, [Validators.required]),
+    front:         new FormControl('', [Validators.required]),
+    back:          new FormControl('', [Validators.required]),
+    article:       new FormControl<ArticleType | null>(null),
+    plural:        new FormControl(''),
+    categoryId:    new FormControl(''),
+    collectionId:  new FormControl<string | null>(null, [Validators.required]),
     exampleTarget: new FormControl(''),
     exampleNative: new FormControl(''),
+    synonyms:      new FormArray<ReturnType<typeof makeSynonymGroup>>([]),
   });
+
+  get synonymsArray(): FormArray { return this.form.get('synonyms') as FormArray; }
+
+  // ─── Form value as signals (reactive with OnPush) ─────────────────────────
 
   private readonly _collectionId = toSignal(
     this.form.get('collectionId')!.valueChanges,
     { initialValue: this.form.get('collectionId')!.value },
   );
 
-  // Writable signal so ngOnInit can seed it from cardToEdit without relying on
-  // valueChanges (which patchValue with emitEvent:false would suppress).
+  // article tracks both user taps (emitEvent:true) and auto-detect from back
+  // field (emitEvent:false via patchValue). We use a writable signal seeded in
+  // ngOnInit so that patchValue with emitEvent:false is reflected immediately.
   private readonly _article = signal<ArticleType | null>(null);
+
+  // back value as signal — drives canAutoGenerate reactively under OnPush
+  private readonly _back = toSignal(
+    this.form.get('back')!.valueChanges,
+    { initialValue: this.form.get('back')!.value },
+  );
+
+  // ─── Derived state ─────────────────────────────────────────────────────────
 
   readonly showPluralField = computed(() => !!this._article());
 
@@ -79,52 +114,70 @@ export class AddWordSheetComponent implements OnInit {
     return col ? `${col.emoji} ${col.name}` : 'No collection';
   });
 
+  readonly canAutoGenerate = computed(() =>
+    !!this._back()?.trim() && !this.generating(),
+  );
+
+  readonly showDuplicateWarning = computed(() =>
+    !this.suppressDuplicateWarning() && !!this.duplicateCard(),
+  );
+
+  readonly duplicateCollectionName = computed(() => {
+    const card = this.duplicateCard();
+    if (!card?.collectionId) return null;
+    const col = this.collectionStore.collections().find(c => c.id === card.collectionId);
+    return col ? `${col.emoji ? col.emoji + ' ' : ''}${col.name}` : null;
+  });
+
+  // ─── Local state ───────────────────────────────────────────────────────────
+
   readonly categories = this.categoryStore.categories;
   readonly saving = signal(false);
+  readonly generating = signal(false);
   readonly articles: ArticleType[] = ['der', 'die', 'das'];
   readonly duplicateCard = signal<Card | null>(null);
   readonly suppressDuplicateWarning = signal(false);
   readonly showNewCategoryInput = signal(false);
   readonly newCategoryName = signal('');
+  readonly expandedSynonymIdx = signal<number | null>(null);
+
+  // ─── Lifecycle ─────────────────────────────────────────────────────────────
 
   ngOnInit(): void {
-    const card = this.cardToEdit();
+    const card = this.cardToEdit;
     if (card) {
       const c = card.content;
       const ex = c.examples?.[0];
       this.form.patchValue({
-        front: c.front,
-        back: c.back,
-        article: c.article ?? null,
-        plural: c.plural ?? '',
-        categoryId: card.categoryIds?.[0] ?? '',
-        collectionId: card.collectionId ?? null,
+        front:         c.front,
+        back:          c.back,
+        article:       c.article ?? null,
+        plural:        c.plural ?? '',
+        categoryId:    card.categoryIds?.[0] ?? '',
+        collectionId:  card.collectionId ?? null,
         exampleTarget: ex?.target ?? '',
         exampleNative: ex?.native ?? '',
       }, { emitEvent: false });
-      // Seed _article from card so showPluralField is correct immediately —
-      // patchValue with emitEvent:false would otherwise leave it null.
+
       this._article.set(c.article ?? null);
-    } else if (this.lockedCollectionId()) {
-      this.form.patchValue({ collectionId: this.lockedCollectionId() });
+
+      this.synonymsArray.clear({ emitEvent: false });
+      for (const syn of (c.synonyms ?? [])) {
+        this.synonymsArray.push(makeSynonymGroup(syn), { emitEvent: false });
+      }
+    } else if (this.lockedCollectionId) {
+      this.form.patchValue({ collectionId: this.lockedCollectionId });
     }
   }
 
   constructor() {
-    addIcons({ closeOutline, micOutline, volumeHighOutline, addOutline });
+    addIcons({ closeOutline, micOutline, volumeHighOutline, addOutline, sparklesOutline });
 
-    // Duplicate check: synchronous O(1) lookup — no debounce needed.
+    // Single back subscription handles both duplicate-check and article auto-detect.
+    // Merging avoids two separate subscriptions on the same control.
     this.form.get('back')!.valueChanges.pipe(
       takeUntilDestroyed(),
       distinctUntilChanged(),
-    ).subscribe(() => this._checkDuplicate());
-
-    this.form.get('article')!.valueChanges.pipe(
-      takeUntilDestroyed(),
-    ).subscribe(() => this._checkDuplicate());
-
-    this.form.get('back')!.valueChanges.pipe(
-      takeUntilDestroyed(),
     ).subscribe(val => {
       const lower = (val ?? '').toLowerCase();
       const prefixes: Array<[string, ArticleType]> = [
@@ -137,16 +190,26 @@ export class AddWordSheetComponent implements OnInit {
             { emitEvent: false },
           );
           this._article.set(art);
+          this._checkDuplicate();
           return;
         }
       }
+      this._checkDuplicate();
     });
+
+    this.form.get('article')!.valueChanges.pipe(
+      takeUntilDestroyed(),
+    ).subscribe(() => this._checkDuplicate());
   }
 
+  // ─── Article selection ─────────────────────────────────────────────────────
+
   selectArticle(art: ArticleType | null): void {
-    this.form.patchValue({ article: art });
+    this.form.patchValue({ article: art, ...(art ? {} : { plural: '' }) });
     this._article.set(art);
   }
+
+  // ─── Category ──────────────────────────────────────────────────────────────
 
   selectCategory(id: string): void {
     const current = this.form.get('categoryId')!.value;
@@ -162,11 +225,10 @@ export class AddWordSheetComponent implements OnInit {
     const name = this.newCategoryName().trim();
     if (!name) return;
     this.categoryStore.createCategory({ name });
-    // Select the category once it appears — watch for the next emission
-    const sub = this.categoryStore.categories;
-    const before = new Set(sub().map(c => c.id));
+    const categories = this.categoryStore.categories;
+    const before = new Set(categories().map(c => c.id));
     const check = setInterval(() => {
-      const added = sub().find(c => !before.has(c.id));
+      const added = categories().find(c => !before.has(c.id));
       if (added) {
         clearInterval(check);
         this.form.patchValue({ categoryId: added.id });
@@ -177,36 +239,89 @@ export class AddWordSheetComponent implements OnInit {
     setTimeout(() => clearInterval(check), 5000);
   }
 
+  // ─── Auto-generate (LC-137) ────────────────────────────────────────────────
+
+  autoGenerate(): void {
+    const back = this._back()?.trim();
+    if (!back || this.generating()) return;
+
+    this.generating.set(true);
+
+    this.enrichOneApi.enrich({
+      back,
+      targetLanguage: 'de',
+      nativeLanguage: 'en',
+    }).pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
+      next: result => {
+        const v = this.form.getRawValue();
+        this.form.patchValue({
+          front:         v.front?.trim() ? v.front : result.front,
+          article:       v.article ?? result.article ?? null,
+          plural:        result.plural ?? '',
+          exampleTarget: v.exampleTarget?.trim() ? v.exampleTarget : result.exampleTarget,
+          exampleNative: v.exampleNative?.trim() ? v.exampleNative : result.exampleNative,
+        });
+        this._article.set(this.form.get('article')!.value);
+
+        this.synonymsArray.clear({ emitEvent: false });
+        for (const syn of result.synonyms) {
+          this.synonymsArray.push(makeSynonymGroup(syn));
+        }
+        this.generating.set(false);
+      },
+      error: async () => {
+        this.generating.set(false);
+        const toast = await this.toastCtrl.create({
+          message: 'Auto-generate failed. Fill in manually or try again.',
+          duration: 3000,
+          color: 'danger',
+          position: 'bottom',
+        });
+        await toast.present();
+      },
+    });
+  }
+
+  // ─── Synonym chip editor (LC-136) ─────────────────────────────────────────
+
+  addSynonym(): void {
+    this.synonymsArray.push(makeSynonymGroup());
+    this.expandedSynonymIdx.set(this.synonymsArray.length - 1);
+  }
+
+  removeSynonym(idx: number): void {
+    this.synonymsArray.removeAt(idx);
+    const current = this.expandedSynonymIdx();
+    if (current === idx) this.expandedSynonymIdx.set(null);
+    else if (current !== null && current > idx) this.expandedSynonymIdx.update(i => i! - 1);
+  }
+
+  toggleSynonymExpand(idx: number): void {
+    this.expandedSynonymIdx.set(this.expandedSynonymIdx() === idx ? null : idx);
+  }
+
+  getSynonymGroup(idx: number): FormGroup {
+    return this.synonymsArray.at(idx) as FormGroup;
+  }
+
+  // ─── Duplicate check ───────────────────────────────────────────────────────
+
   private _checkDuplicate(): void {
     const back = this.form.get('back')!.value?.trim();
-    if (!back) {
-      this.duplicateCard.set(null);
-      return;
-    }
+    if (!back) { this.duplicateCard.set(null); return; }
+
     const article = this.form.get('article')!.value ?? null;
-    const selfId = this.cardToEdit()?.id;
+    const selfId = this.cardToEdit?.id;
 
-    // Full-key lookup first (article + back). Covers enriched cards from any entry
-    // point (manual add, CSV, image import) where article is confirmed.
     let found = this.dedupService.check(article, back);
-
-    // Fallback to back-only lookup when:
-    //   - Full-key missed (no match with this article)
-    //   - The existing vault card may have a different or missing article
-    //     (e.g. verbs stored without article, or article-mismatch from Phase 1 import)
     if (!found || found.id === selfId) {
       found = this.dedupService.checkByBackOnly(back) ?? found;
     }
-
-    // Suppress if the only match is the card currently being edited
-    const isDuplicate = found && found.id !== selfId;
     this.suppressDuplicateWarning.set(false);
-    this.duplicateCard.set(isDuplicate ? found : null);
+    this.duplicateCard.set(found && found.id !== selfId ? found : null);
   }
 
-  dismissDuplicateWarning(): void {
-    this.suppressDuplicateWarning.set(true);
-  }
+  dismissDuplicateWarning(): void { this.suppressDuplicateWarning.set(true); }
 
   goToExisting(): void {
     const id = this.duplicateCard()?.id;
@@ -215,24 +330,16 @@ export class AddWordSheetComponent implements OnInit {
     this.router.navigate(['/vault/word', id]);
   }
 
-  readonly showDuplicateWarning = computed(() =>
-    !this.suppressDuplicateWarning() && !!this.duplicateCard(),
-  );
-
-  /** Collection name of the duplicate, e.g. "Tiere (Chapter 3)". Null if no collection. */
-  readonly duplicateCollectionName = computed(() => {
-    const card = this.duplicateCard();
-    if (!card?.collectionId) return null;
-    const col = this.collectionStore.collections().find(c => c.id === card.collectionId);
-    return col ? `${col.emoji ? col.emoji + ' ' : ''}${col.name}` : null;
-  });
+  // ─── Audio ─────────────────────────────────────────────────────────────────
 
   playTTS(): void {
-    const word = this.form.get('back')!.value?.trim();
+    const word = this._back()?.trim();
     if (!word) return;
     const article = this.form.get('article')!.value;
     void this.wordAudio.play(article ? `${article} ${word}` : word, 'de-DE');
   }
+
+  // ─── Save ──────────────────────────────────────────────────────────────────
 
   save(): void {
     this.form.markAllAsTouched();
@@ -240,44 +347,45 @@ export class AddWordSheetComponent implements OnInit {
     this.saving.set(true);
 
     const v = this.form.getRawValue();
-    const examples: ExampleSentence[] = [];
-    if (v.exampleTarget?.trim()) {
-      examples.push({
-        id: this.cardToEdit()?.content.examples?.[0]?.id ?? crypto.randomUUID(),
-        target: v.exampleTarget.trim(),
-        native: v.exampleNative?.trim() ?? '',
-      });
-    }
+    const examples: ExampleSentence[] = v.exampleTarget?.trim()
+      ? [{
+          id: this.cardToEdit?.content.examples?.[0]?.id ?? crypto.randomUUID(),
+          target: v.exampleTarget.trim(),
+          native: v.exampleNative?.trim() ?? '',
+        }]
+      : [];
 
-    const card = this.cardToEdit();
     const art = v.article ?? null;
+    const synonyms: Synonym[] = (v.synonyms ?? [])
+      .filter((s: ReturnType<typeof makeSynonymGroup>['value']) => s.word?.trim())
+      .map((s: ReturnType<typeof makeSynonymGroup>['value']) => ({
+        word:          s.word!.trim(),
+        article:       s.article ?? null,
+        translation:   s.translation?.trim() ?? '',
+        example:       s.example?.trim() ?? '',
+        exampleNative: s.exampleNative?.trim() ?? '',
+      }));
+
+    const card = this.cardToEdit;
     const content: CardContent = {
-      front: v.front!.trim(),
-      back: v.back!.trim(),
-      article: art,
-      gender: art === 'der' ? 'masculine'
-        : art === 'die' ? 'feminine'
-        : art === 'das' ? 'neuter'
-        : null,
-      plural: (art && v.plural?.trim()) ? v.plural.trim() : null,
+      front:        v.front!.trim(),
+      back:         v.back!.trim(),
+      article:      art,
+      gender:       art === 'der' ? 'masculine' : art === 'die' ? 'feminine' : art === 'das' ? 'neuter' : null,
+      plural:       (art && v.plural?.trim()) ? v.plural.trim() : null,
       examples,
-      synonyms: card?.content.synonyms ?? [],
-      notes: card?.content.notes ?? '',
-      audioAssetId: card?.content.audioAssetId ?? null,
-      imageUrl: card?.content.imageUrl ?? null,
-      phonetic: card?.content.phonetic ?? null,
+      synonyms,
+      notes:        card?.content.notes ?? '',
+      audioAssetId: card?.content.audioAssetId ?? null, // preserved until Word Audio Registry epic
+      imageUrl:     card?.content.imageUrl ?? null,
+      phonetic:     card?.content.phonetic ?? null,
     };
 
     const categoryIds = v.categoryId ? [v.categoryId] : [];
 
-    if (this.isEditing()) {
-      const dto: UpdateCardDto = {
-        content,
-        categoryIds,
-        collectionId: v.collectionId ?? null,
-      };
-      this.cardApi.update(card!.id, dto).subscribe({
-        next: (updated) => {
+    if (this.isEditing) {
+      this.cardApi.update(card!.id, { content, categoryIds, collectionId: v.collectionId ?? null } satisfies UpdateCardDto).subscribe({
+        next: updated => {
           this.cardStore.updateCard(updated);
           this.saving.set(false);
           this.modalCtrl.dismiss({ created: true });
@@ -315,17 +423,14 @@ export class AddWordSheetComponent implements OnInit {
         state: 'new',
       },
     }).subscribe({
-      next: () => {
-        this.saving.set(false);
-        this.modalCtrl.dismiss({ created: true });
-      },
+      next: () => { this.saving.set(false); this.modalCtrl.dismiss({ created: true }); },
       error: () => this.saving.set(false),
     });
   }
 
-  dismiss(): void {
-    this.modalCtrl.dismiss();
-  }
+  // ─── Navigation / overlay ──────────────────────────────────────────────────
+
+  dismiss(): void { this.modalCtrl.dismiss(); }
 
   async openCollectionSheet(): Promise<void> {
     const modal = await this.modalCtrl.create({

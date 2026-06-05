@@ -184,7 +184,7 @@ export class WordDetailComponent {
       component: AddWordSheetComponent,
       componentProps: { cardToEdit: card },
       breakpoints: [0, 0.95, 1],
-      initialBreakpoint: 0.95,
+      initialBreakpoint: 1,
     });
     await modal.present();
     const {data} = await modal.onWillDismiss();

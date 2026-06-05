@@ -1,6 +1,170 @@
 @use 'theme/tokens' as t;
 @use 'theme/utils' as u;
 
+// ─── BACK ROW + AUTO-GENERATE BUTTON ─────────────────────────────────────────
+.aw-back-row {
+  display: flex;
+  gap: t.$lc-space-2;
+  align-items: center;
+}
+
+.aw-input--flex { flex: 1; }
+
+.aw-gen-btn {
+  flex-shrink: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: t.$lc-space-1 + 2px;
+  background: var(--lc-accent);
+  color: t.$lc-text-inverse;
+  border: none;
+  border-radius: t.$lc-radius-md;
+  padding: t.$lc-space-3 t.$lc-space-3 + 2px;
+  @include u.lc-font('xs', t.$lc-font-weight-bold);
+  font-family: t.$lc-font-body;
+  white-space: nowrap;
+  cursor: pointer;
+  box-shadow: 0 3px 10px rgba(224, 123, 63, 0.3);
+  transition: var(--lc-transition-fast);
+  ion-icon { font-size: t.$lc-text-sm; }
+  &:disabled { opacity: 0.5; cursor: not-allowed; box-shadow: none; }
+  &:not(:disabled):active { opacity: 0.85; transform: scale(0.97); }
+  &--loading { opacity: 0.85; cursor: not-allowed; }
+}
+
+.aw-spinner {
+  width: 13px; height: 13px;
+  border: 2px solid rgba(255, 255, 255, 0.4);
+  border-top-color: white;
+  border-radius: 50%;
+  animation: aw-spin 0.7s linear infinite;
+  flex-shrink: 0;
+}
+@keyframes aw-spin { to { transform: rotate(360deg); } }
+
+// ─── SYNONYMS CHIP EDITOR ────────────────────────────────────────────────────
+.aw-syn-list {
+  display: flex;
+  flex-direction: column;
+  gap: t.$lc-space-2;
+}
+
+.aw-syn-chip {
+  background: var(--lc-surface);
+  border: 1.5px solid var(--lc-border);
+  border-radius: t.$lc-radius-md;
+  overflow: hidden;
+  transition: border-color var(--lc-transition-fast);
+  &:focus-within { border-color: var(--lc-brand); }
+}
+
+.aw-syn-chip-row {
+  display: flex;
+  align-items: center;
+  gap: t.$lc-space-2;
+  padding: t.$lc-space-2 + 1px t.$lc-space-3;
+  cursor: pointer;
+  @include u.touch-state;
+}
+
+.aw-syn-art {
+  flex-shrink: 0;
+  @include u.lc-font('xxs', t.$lc-font-weight-bold);
+  letter-spacing: 0.04em;
+  padding: 2px t.$lc-space-2;
+  border-radius: t.$lc-radius-full;
+  border: 1px solid;
+}
+.aw-syn-art--der { background: var(--lc-masc-bg); color: var(--lc-masc-text); border-color: var(--lc-masc-border); }
+.aw-syn-art--die { background: var(--lc-fem-bg);  color: var(--lc-fem-text);  border-color: var(--lc-fem-border); }
+.aw-syn-art--das { background: var(--lc-neut-bg); color: var(--lc-neut-text); border-color: var(--lc-neut-border); }
+
+.aw-syn-chip-word {
+  @include u.lc-font('sm', t.$lc-font-weight-semibold);
+  color: var(--lc-text-primary);
+}
+
+.aw-syn-chip-trans {
+  @include u.lc-font('xs');
+  color: var(--lc-text-secondary);
+  flex: 1;
+  @include u.text-overflow;
+}
+
+.aw-syn-chip-x {
+  flex-shrink: 0;
+  @include u.circle(20px);
+  @include u.flex-center;
+  background: var(--lc-border);
+  border: none;
+  cursor: pointer;
+  transition: var(--lc-transition-fast);
+  ion-icon { font-size: t.$lc-text-xs; color: var(--lc-text-secondary); }
+  &:active { background: var(--lc-fem-bg); ion-icon { color: var(--lc-fem-text); } }
+}
+
+.aw-syn-fields {
+  display: flex;
+  flex-direction: column;
+  gap: t.$lc-space-2;
+  padding: t.$lc-space-1 t.$lc-space-3 t.$lc-space-3;
+  border-top: 1px solid var(--lc-border);
+}
+
+.aw-syn-field-row {
+  display: flex;
+  gap: t.$lc-space-2;
+  align-items: center;
+}
+
+.aw-input--sm { @include u.lc-font('xs'); padding: t.$lc-space-2 t.$lc-space-2 + 2px; }
+
+.aw-syn-art-seg {
+  display: flex;
+  gap: 0;
+  border: 1.5px solid var(--lc-border);
+  border-radius: t.$lc-radius-sm;
+  overflow: hidden;
+  flex-shrink: 0;
+}
+
+.aw-syn-art-btn {
+  flex: 1;
+  padding: 5px t.$lc-space-2;
+  border: none;
+  border-right: 1px solid var(--lc-border);
+  background: var(--lc-card);
+  @include u.lc-font('xxs', t.$lc-font-weight-semibold);
+  font-family: t.$lc-font-body;
+  color: var(--lc-text-hint);
+  cursor: pointer;
+  transition: var(--lc-transition-fast);
+  &:last-child { border-right: none; }
+  &.active { background: var(--lc-brand-light); color: var(--lc-brand); }
+  &.aw-syn-art-btn--der.active { background: var(--lc-masc-bg); color: var(--lc-masc-text); }
+  &.aw-syn-art-btn--die.active { background: var(--lc-fem-bg);  color: var(--lc-fem-text); }
+  &.aw-syn-art-btn--das.active { background: var(--lc-neut-bg); color: var(--lc-neut-text); }
+}
+
+.aw-syn-add {
+  align-self: flex-start;
+  display: inline-flex;
+  align-items: center;
+  gap: t.$lc-space-1 + 2px;
+  background: none;
+  border: 1.5px dashed var(--lc-brand-mid);
+  border-radius: t.$lc-radius-md;
+  padding: t.$lc-space-2 t.$lc-space-3;
+  @include u.lc-font('xs', t.$lc-font-weight-semibold);
+  font-family: t.$lc-font-body;
+  color: var(--lc-brand);
+  cursor: pointer;
+  transition: var(--lc-transition-fast);
+  ion-icon { font-size: t.$lc-text-sm; }
+  &:active { background: var(--lc-brand-light); }
+}
+
 // ─── COLLECTION FIELD ─────────────────────────────────────────────────────────
 .aw-collection-btn {
   width: 100%; @include u.flex-between;
