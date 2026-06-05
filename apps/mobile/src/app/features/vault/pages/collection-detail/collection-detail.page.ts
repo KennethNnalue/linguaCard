@@ -1,4 +1,4 @@
-import {Component, computed, inject, OnInit, signal} from '@angular/core';
+import {Component, computed, effect, inject, OnInit, signal} from '@angular/core';
 import {ActivatedRoute, Router} from '@angular/router';
 import {AlertController, IonContent, IonHeader, IonIcon, IonToolbar, ModalController, ToastController,} from '@ionic/angular/standalone';
 import {addIcons} from 'ionicons';
@@ -7,6 +7,7 @@ import {Card, Collection} from '@lingua-card/shared/domain';
 import {isDue, isMastered} from '../../../../shared/srs/srs-status';
 import {firstValueFrom} from 'rxjs';
 import {CollectionApiService} from '../../services/collection-api.service';
+import {CardStore} from '../../store/card.store';
 import {CategoryStore} from '../../store/category.store';
 import {CollectionStore} from '../../store/collection.store';
 import {AddWordSheetComponent} from '../../components/add-word-sheet/add-word-sheet.component';
@@ -44,11 +45,20 @@ export class CollectionDetailPage implements OnInit {
   private readonly audioReadiness = inject(AudioReadinessStore);
   private readonly audioPrefetch = inject(CollectionAudioPrefetchService);
   private readonly importApi = inject(ImageImportApiService);
+  private readonly cardStore = inject(CardStore);
+
+  // Derived from the global CardStore — automatically reflects edits and deletes
+  // made from word-detail without any manual reload.
+  private readonly collectionId = signal<string | null>(null);
 
   readonly collection = signal<Collection | null>(null);
   readonly completing = signal(false);
   readonly justCompleted = signal(false);
-  readonly allCards = signal<Card[]>([]);
+  readonly allCards = computed(() => {
+    const id = this.collectionId();
+    if (!id) return [];
+    return this.cardStore.cards().filter(c => c.collectionId === id);
+  });
   readonly activeCategoryId = signal<string | null>(null);
   readonly loading = signal(true);
 
@@ -124,6 +134,8 @@ export class CollectionDetailPage implements OnInit {
 
   protected readonly getCategoryName = getCategoryName;
 
+  private _audioPrefetched = false;
+
   constructor() {
     addIcons({
       chevronBackOutline,
@@ -133,29 +145,31 @@ export class CollectionDetailPage implements OnInit {
       ellipsisHorizontalOutline,
       timeOutline,
     });
+
+    // Trigger audio prefetch once, the first time cards for this collection are
+    // available in the store. Runs in the injection context so effect() is valid.
+    effect(() => {
+      const cards = this.allCards();
+      if (cards.length > 0 && !this._audioPrefetched) {
+        this._audioPrefetched = true;
+        this.audioPrefetch.prefetchCollection(cards);
+      }
+    });
   }
 
   ngOnInit(): void {
     const id = this.route.snapshot.paramMap.get('id')!;
+    this.collectionId.set(id);
     this.collectionApi.getById(id).subscribe({
       next: col => this.collection.set(col),
       error: () => this.goBack(),
     });
-    this.loadCards(true);
+    this.loadCards();
   }
 
-  loadCards(prefetchAudio = false): void {
-    const id = this.route.snapshot.paramMap.get('id')!;
-    this.collectionApi.getCards(id).subscribe({
-      next: cards => {
-        this.allCards.set(cards);
-        this.loading.set(false);
-        if (prefetchAudio && cards.length > 0) {
-          this.audioPrefetch.prefetchCollection(cards);
-        }
-      },
-      error: () => this.loading.set(false),
-    });
+  loadCards(): void {
+    this.cardStore.loadCards();
+    this.loading.set(false);
   }
 
   async completeImport(): Promise<void> {
@@ -174,7 +188,7 @@ export class CollectionDetailPage implements OnInit {
         cardCount:    c.cardCount + result.newCards,
       } : c);
 
-      this.loadCards(true);
+      this.loadCards();
       this.collectionStore.loadCollections();
 
       if (result.isComplete) {
@@ -250,8 +264,7 @@ export class CollectionDetailPage implements OnInit {
     await modal.present();
     const {data} = await modal.onWillDismiss();
     if (data?.created) {
-      const id = this.route.snapshot.paramMap.get('id')!;
-      this.collectionApi.getCards(id).subscribe(cards => this.allCards.set(cards));
+      this.cardStore.loadCards();
       this.collectionStore.loadCollections();
     }
   }
@@ -300,7 +313,7 @@ export class CollectionDetailPage implements OnInit {
     const col = this.collection();
     if (!col) return;
     this.collectionApi.clearCards(col.id).subscribe(() => {
-      this.allCards.set([]);
+      this.cardStore.loadCards();
       this.collectionStore.loadCollections();
     });
   }

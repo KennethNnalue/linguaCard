@@ -87,10 +87,9 @@ export class AddWordSheetComponent implements OnInit {
 
   // ─── Form value as signals (reactive with OnPush) ─────────────────────────
 
-  private readonly _collectionId = toSignal(
-    this.form.get('collectionId')!.valueChanges,
-    { initialValue: this.form.get('collectionId')!.value },
-  );
+  // Same pattern as _article: patchValue with emitEvent:false won't fire valueChanges,
+  // so toSignal would stay stale in edit mode. Writable signal seeded in ngOnInit.
+  private readonly _collectionId = signal<string | null>(null);
 
   // article tracks both user taps (emitEvent:true) and auto-detect from back
   // field (emitEvent:false via patchValue). We use a writable signal seeded in
@@ -160,6 +159,7 @@ export class AddWordSheetComponent implements OnInit {
       }, { emitEvent: false });
 
       this._article.set(c.article ?? null);
+      this._collectionId.set(card.collectionId ?? null);
 
       this.synonymsArray.clear({ emitEvent: false });
       for (const syn of (c.synonyms ?? [])) {
@@ -167,6 +167,7 @@ export class AddWordSheetComponent implements OnInit {
       }
     } else if (this.lockedCollectionId) {
       this.form.patchValue({ collectionId: this.lockedCollectionId });
+      this._collectionId.set(this.lockedCollectionId);
     }
   }
 
@@ -200,6 +201,10 @@ export class AddWordSheetComponent implements OnInit {
     this.form.get('article')!.valueChanges.pipe(
       takeUntilDestroyed(),
     ).subscribe(() => this._checkDuplicate());
+
+    this.form.get('collectionId')!.valueChanges.pipe(
+      takeUntilDestroyed(),
+    ).subscribe(id => this._collectionId.set(id));
   }
 
   // ─── Article selection ─────────────────────────────────────────────────────
