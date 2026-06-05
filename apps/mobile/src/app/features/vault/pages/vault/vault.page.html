@@ -1,18 +1,53 @@
 <ion-header class="ion-no-border">
   <ion-toolbar>
-    <div class="vault-nav">
-      <div>
-        <h1 class="vault-title">Vault <span class="vault-title-count">{{ totalCount() }}</span></h1>
-      </div>
-      <div class="vault-nav-actions">
-        <button class="vault-icon-btn" (click)="navigateToImport()" aria-label="Import">
-          <ion-icon name="cloud-upload-outline"></ion-icon>
-        </button>
-        <button class="vault-fab" (click)="openAddWord()" aria-label="Add word">
-          <ion-icon name="add-outline"></ion-icon>
-        </button>
-      </div>
+    <div class="vault-header">
+      <h1 class="vault-title">Vault <span class="vault-title-count">{{ totalCount() }}</span></h1>
     </div>
+
+    <!-- Contextual action bar — adapts to active tab -->
+    <div class="action-bar">
+      @if (activeTab() === 'words') {
+        <button class="ab-primary" (click)="openAddWord()" aria-label="Add card">
+          <ion-icon name="add-outline"></ion-icon>
+          Add Card
+        </button>
+        <button class="ab-secondary" (click)="openImportSheet()" aria-label="Import">
+          <ion-icon name="cloud-upload-outline"></ion-icon>
+          Import
+        </button>
+        <button class="ab-overflow" (click)="openImportSheet()" aria-label="Import">
+          <ion-icon name="ellipsis-vertical-outline"></ion-icon>
+        </button>
+      }
+      @if (activeTab() === 'collections') {
+        <button class="ab-primary ab-primary--full" (click)="openCreateCollection()" aria-label="New collection">
+          <ion-icon name="add-outline"></ion-icon>
+          New Collection
+        </button>
+        <button class="ab-overflow" (click)="openImportSheet()" aria-label="Import">
+          <ion-icon name="ellipsis-vertical-outline"></ion-icon>
+        </button>
+      }
+    </div>
+
+    <!-- Line tab rail -->
+    <div class="tab-rail">
+      <button
+        class="tab-item"
+        [class.tab-item--active]="activeTab() === 'words'"
+        (click)="activeTab.set('words')"
+        aria-label="Words tab">
+        Words
+      </button>
+      <button
+        class="tab-item"
+        [class.tab-item--active]="activeTab() === 'collections'"
+        (click)="activeTab.set('collections')"
+        aria-label="Collections tab">
+        Collections
+      </button>
+    </div>
+    <div class="tab-divider"></div>
   </ion-toolbar>
 </ion-header>
 
@@ -20,12 +55,6 @@
   <ion-refresher slot="fixed" (ionRefresh)="handleRefresh($event)">
     <ion-refresher-content></ion-refresher-content>
   </ion-refresher>
-
-  <!-- Segment tabs -->
-  <ion-segment [value]="activeTab()" (ionChange)="onTabChange($event)" mode="ios" class="vault-segment">
-    <ion-segment-button value="words"><ion-label>All words</ion-label></ion-segment-button>
-    <ion-segment-button value="collections"><ion-label>Collections</ion-label></ion-segment-button>
-  </ion-segment>
 
   @if (activeTab() === 'words') {
 
@@ -47,29 +76,29 @@
         All <span class="v2-filter-count">{{ totalCount() }}</span>
       </button>
       <button class="v2-filter-chip" [class.v2-filter-on]="masteryFilter() === 'due'" [class.v2-filter-off]="masteryFilter() !== 'due'" (click)="setMasteryFilter('due')">
-        Due now
+        Due <span class="v2-filter-count v2-filter-count--urgent">{{ dueCount() }}</span>
       </button>
       <button class="v2-filter-chip" [class.v2-filter-on]="masteryFilter() === 'new'" [class.v2-filter-off]="masteryFilter() !== 'new'" (click)="setMasteryFilter('new')">
-        New
+        New <span class="v2-filter-count">{{ newCount() }}</span>
       </button>
       <button class="v2-filter-chip" [class.v2-filter-on]="masteryFilter() === 'mastered'" [class.v2-filter-off]="masteryFilter() !== 'mastered'" (click)="setMasteryFilter('mastered')">
-        Mastered
+        Mastered <span class="v2-filter-count">{{ masteredCount() }}</span>
       </button>
     </div>
 
     <!-- Article legend + sort -->
     <div class="v2-article-legend">
       <div class="v2-art-pill">
-        <div class="v2-art-dot" style="background: var(--lc-masc-text);"></div>
-        <span>der</span>
+        <span class="art-badge art-badge--der">der</span>
+        <span class="v2-art-lbl">Masc.</span>
       </div>
       <div class="v2-art-pill">
-        <div class="v2-art-dot" style="background: var(--lc-fem-text);"></div>
-        <span>die</span>
+        <span class="art-badge art-badge--die">die</span>
+        <span class="v2-art-lbl">Fem.</span>
       </div>
       <div class="v2-art-pill">
-        <div class="v2-art-dot" style="background: var(--lc-neut-text);"></div>
-        <span>das</span>
+        <span class="art-badge art-badge--das">das</span>
+        <span class="v2-art-lbl">Neut.</span>
       </div>
       <div class="v2-art-spacer"></div>
       <button class="v2-sort-btn" (click)="openSortSheet()">
@@ -104,70 +133,95 @@
   }
 
   @if (activeTab() === 'collections') {
-    <!-- Collections hero bar -->
-    <div class="col-hero">
-      <div class="col-hero-inner">
-        <div>
-          <div class="col-hero-lbl">Total across all collections</div>
-          <div class="col-hero-count">{{ totalCards() }} words</div>
-        </div>
-        <div class="col-hero-right">
-          <div class="col-hero-due-lbl">Due today</div>
-          <div class="col-hero-due">{{ totalDue() }}</div>
-        </div>
+
+    <!-- Stats banner: 3-stat layout -->
+    <div class="stats-banner">
+      <div class="stats-item">
+        <div class="stats-val">{{ totalCards() }}</div>
+        <div class="stats-lbl">Total words</div>
+      </div>
+      <div class="stats-div"></div>
+      <div class="stats-item">
+        <div class="stats-val">{{ collections().length }}</div>
+        <div class="stats-lbl">Collections</div>
+      </div>
+      <div class="stats-div"></div>
+      <div class="stats-item">
+        <div class="stats-val stats-val--due">{{ totalDue() }}</div>
+        <div class="stats-lbl">Due today</div>
       </div>
     </div>
 
     <!-- Collection list -->
     <div class="col-list">
-      @if (collectionStore.isLoading()) {
+      @if (collectionsLoading()) {
         @for (i of [1, 2, 3]; track i) {
           <div class="col-card">
-            <div class="lc-skeleton" style="height:14px;width:60%;border-radius:4px;margin-bottom:6px;"></div>
-            <div class="lc-skeleton" style="height:11px;width:40%;border-radius:4px;margin-bottom:12px;"></div>
-            <div class="lc-skeleton" style="height:3px;border-radius:3px;"></div>
+            <div class="col-urgency-bar"></div>
+            <div class="col-body">
+              <div class="lc-skeleton" style="height:14px;width:60%;border-radius:4px;margin-bottom:8px;"></div>
+              <div class="lc-skeleton" style="height:11px;width:40%;border-radius:4px;margin-bottom:12px;"></div>
+              <div class="lc-skeleton" style="height:4px;border-radius:4px;"></div>
+            </div>
           </div>
         }
       } @else {
         @for (col of collections(); track col.id) {
-          <div
-            class="col-card"
-            [class.col-card--empty]="col.cardCount === 0"
-            (click)="openCollectionDetail(col)">
+          @let urgency = urgencyLevel(col);
+          <div class="col-card" [class.col-card--empty]="col.cardCount === 0" (click)="openCollectionDetail(col)">
 
-            <div class="col-card-top">
-              <div class="col-card-left">
-                <div class="col-card-name-row">
-                  <span class="col-card-emoji">{{ col.emoji }}</span>
-                  <span class="col-card-name">{{ col.name }}</span>
-                </div>
-                <div class="col-card-meta">
-                  {{ col.cardCount }} words
-                  @if (col.description) { · {{ col.description | slice:0:40 }} }
-                </div>
-              </div>
-              @if (col.dueCount > 0) {
-                <div class="col-due-badge col-due-badge--amber">{{ col.dueCount }} due</div>
-              } @else if (col.cardCount > 0) {
-                <div class="col-due-badge col-due-badge--green">✓ up to date</div>
-              }
+            <!-- Left urgency strip -->
+            <div
+              class="col-urgency-bar"
+              [class.col-urgency-bar--high]="urgency === 'high'"
+              [class.col-urgency-bar--medium]="urgency === 'medium'"
+              [class.col-urgency-bar--low]="urgency === 'none' && col.cardCount > 0">
             </div>
 
-            @if (col.cardCount > 0) {
-              <div class="col-progress-bar">
+            <div class="col-body">
+              <!-- Top row: name + due badge -->
+              <div class="col-top">
+                <div class="col-name-row">
+                  <span class="col-emoji">{{ col.emoji }}</span>
+                  <span class="col-name">{{ col.name }}</span>
+                  @if (col.importStatus === 'incomplete') {
+                    <span class="col-incomplete-dot" [title]="col.pendingWords.length + ' cards pending'"></span>
+                  }
+                </div>
+                @if (col.dueCount > 0) {
+                  <span class="col-due-badge" [class.col-due-badge--urgent]="urgency === 'high'">
+                    {{ col.dueCount }} due
+                  </span>
+                } @else if (col.cardCount > 0) {
+                  <span class="col-due-badge col-due-badge--ok">✓ up to date</span>
+                }
+              </div>
+
+              <!-- Meta row: words · mastered -->
+              <div class="col-meta">
+                <span><strong>{{ col.cardCount }}</strong> words</span>
+                <span><strong>{{ col.masteredCount }}</strong> mastered</span>
+              </div>
+
+              <!-- Progress bar -->
+              <div class="col-progress-track">
                 <div class="col-progress-fill" [style.width.%]="progressPercent(col)"></div>
               </div>
-              <div class="col-progress-meta">
-                <span>{{ col.masteredCount }} mastered</span>
+
+              <!-- Footer labels -->
+              <div class="col-progress-footer">
                 <span>{{ progressPercent(col) }}% complete</span>
+                @if (col.cardCount > 0) {
+                  <span>{{ duePercent(col) }}% due</span>
+                }
               </div>
-            }
+            </div>
           </div>
         } @empty {
           <div class="lc-empty-state">
             <span class="lc-empty-icon">📚</span>
             <p class="lc-empty-title">No collections yet</p>
-            <p class="lc-empty-sub">Tap + to create your first collection</p>
+            <p class="lc-empty-sub">Tap + New Collection to get started</p>
           </div>
         }
       }
@@ -175,3 +229,9 @@
   }
 
 </ion-content>
+
+<lc-speed-dial-fab
+  (addCard)="openAddWord()"
+  (newCollection)="openCreateCollection()"
+  (import)="openImportSheet()"
+/>

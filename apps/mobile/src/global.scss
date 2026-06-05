@@ -56,3 +56,19 @@ lc-import-review ion-content::part(scroll) {
 .pss-modal ion-modal {
   --height: auto;
 }
+
+/* Import modal — full-height sheet with rounded top corners */
+.lc-import-modal {
+  --border-radius: 28px 28px 0 0;
+  --box-shadow: 0 -8px 40px rgba(45, 90, 78, 0.14), 0 -2px 8px rgba(0, 0, 0, 0.06);
+  align-items: flex-end;
+}
+
+/* Shared bottom-sheet modal (replaces all ActionSheets) */
+.lc-bottom-sheet-modal {
+  --border-radius: 28px 28px 0 0;
+  --box-shadow: 0 -8px 40px rgba(45, 90, 78, 0.14), 0 -2px 8px rgba(0, 0, 0, 0.06);
+  align-items: flex-end;
+  --height: auto;
+  --max-height: 80vh;
+}

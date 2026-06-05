@@ -1,0 +1,25 @@
+<div class="sheet-handle"></div>
+
+@if (title()) {
+  <div class="sheet-header">
+    <span class="sheet-title">{{ title() }}</span>
+    <button class="sheet-close" (click)="dismiss()" aria-label="Close">
+      <ion-icon name="close-outline"></ion-icon>
+    </button>
+  </div>
+}
+
+<div class="sheet-actions">
+  @for (action of actions(); track action.label) {
+    <button
+      class="sheet-action"
+      [class.sheet-action--cancel]="action.role === 'cancel'"
+      [class.sheet-action--destructive]="action.role === 'destructive'"
+      (click)="select(action)">
+      @if (action.icon) {
+        <ion-icon [name]="action.icon" class="action-icon"></ion-icon>
+      }
+      <span class="action-label">{{ action.label }}</span>
+    </button>
+  }
+</div>

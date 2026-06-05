@@ -1,3 +1,4 @@
+// TODO: delete after LC-202 ships — route redirected to /vault?tab=collections
 import { Component, computed, inject } from '@angular/core';
 import { SlicePipe } from '@angular/common';
 import { Router } from '@angular/router';

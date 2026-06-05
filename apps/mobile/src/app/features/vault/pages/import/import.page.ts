@@ -1,23 +1,25 @@
-import { Component, ElementRef, inject, signal, ViewChild } from '@angular/core';
-import { Router } from '@angular/router';
+import {Component, ElementRef, inject, signal, ViewChild} from '@angular/core';
+import {Router} from '@angular/router';
 import {
   IonContent,
   IonHeader,
   IonIcon,
   IonToolbar,
+  ModalController,
   ToastController,
 } from '@ionic/angular/standalone';
-import { addIcons } from 'ionicons';
+import {addIcons} from 'ionicons';
 import {
   arrowBackOutline,
   cameraOutline,
   cloudUploadOutline,
+  closeOutline,
   documentOutline,
   downloadOutline,
 } from 'ionicons/icons';
-import { CsvParserService } from '../../../../shared/csv/csv-parser.service';
-import { CategoryStore } from '../../store/category.store';
-import { ImportStateService } from '../../services/import-state.service';
+import {CsvParserService} from '../../../../shared/csv/csv-parser.service';
+import {CategoryStore} from '../../store/category.store';
+import {ImportStateService} from '../../services/import-state.service';
 
 @Component({
   selector: 'lc-import',
@@ -34,11 +36,16 @@ export class ImportPage {
   private readonly importState = inject(ImportStateService);
   private readonly router = inject(Router);
   private readonly toastCtrl = inject(ToastController);
+  private readonly modalCtrl = inject(ModalController);
+
+  /** Set via componentProps when opened as a modal. */
+  set isModal(v: boolean) { this._isModal.set(v ?? false); }
+  readonly _isModal = signal(false);
 
   readonly dragActive = signal(false);
 
   constructor() {
-    addIcons({ arrowBackOutline, cameraOutline, cloudUploadOutline, documentOutline, downloadOutline });
+    addIcons({arrowBackOutline, cameraOutline, cloudUploadOutline, closeOutline, documentOutline, downloadOutline});
   }
 
   onDragOver(event: DragEvent): void {
@@ -81,12 +88,19 @@ export class ImportPage {
       });
   }
 
-  navigateToImageImport(): void {
+  async navigateToImageImport(): Promise<void> {
+    if (this._isModal()) {
+      await this.modalCtrl.dismiss();
+    }
     this.router.navigate(['/vault/import/image']);
   }
 
-  goBack(): void {
-    this.router.navigate(['/vault']);
+  async goBack(): Promise<void> {
+    if (this._isModal()) {
+      await this.modalCtrl.dismiss();
+    } else {
+      this.router.navigate(['/vault']);
+    }
   }
 
   private processFile(file: File): void {
@@ -95,7 +109,7 @@ export class ImportPage {
       return;
     }
     const reader = new FileReader();
-    reader.onload = (e) => {
+    reader.onload = async (e) => {
       const text = e.target?.result as string;
       const result = this.csvService.parse(text, file.name, this.categoryStore.categories());
       if (result.totalRows === 0) {
@@ -103,6 +117,7 @@ export class ImportPage {
         return;
       }
       this.importState.set(result);
+      if (this._isModal()) await this.modalCtrl.dismiss();
       this.router.navigate(['/vault/import/review']);
     };
     reader.readAsText(file, 'UTF-8');

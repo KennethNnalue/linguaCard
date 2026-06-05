@@ -1,0 +1,1224 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>LinguaCard — Vault UX Redesign · UI Reference</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,500;0,600;1,400&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600&family=Fira+Code:wght@400;500&display=swap" rel="stylesheet">
+<style>
+/* ─── DESIGN TOKENS (mirrors LDS) ──────────────────────────── */
+:root {
+  --lc-brand: #2D5A4E;
+  --lc-brand-light: #E8F2EE;
+  --lc-brand-mid: #4A8C7A;
+  --lc-brand-dark: #1A3830;
+  --lc-accent: #E07B3F;
+  --lc-accent-light: #FDF0E6;
+  --lc-accent-hover: #C96A2E;
+  --lc-masc-bg: #EAF2FC; --lc-masc-text: #1A56A3; --lc-masc-border: #85B7EB;
+  --lc-fem-bg: #FEF2F2;  --lc-fem-text: #B91C1C;  --lc-fem-border: #FCA5A5;
+  --lc-neut-bg: #F1EFE8; --lc-neut-text: #5F5E5A; --lc-neut-border: #B4B2A9;
+  --lc-mastery-0: #D1D5DB; --lc-mastery-1: #FCA5A5; --lc-mastery-2: #FCD34D;
+  --lc-mastery-3: #6EE7B7; --lc-mastery-4: #34D399; --lc-mastery-5: #059669;
+  --lc-surface: #FAFAF8;
+  --lc-card: #FFFFFF;
+  --lc-border: rgba(45,90,78,0.12);
+  --lc-text-primary: #1A2B26;
+  --lc-text-secondary: #6B7C78;
+  --lc-text-hint: #9BAAA6;
+  --lc-shadow-card: 0 2px 12px rgba(45,90,78,0.08), 0 1px 3px rgba(0,0,0,0.04);
+  --lc-shadow-float: 0 8px 32px rgba(45,90,78,0.14), 0 2px 8px rgba(0,0,0,0.06);
+  --lc-font-display: 'Lora', Georgia, serif;
+  --lc-font-body: 'DM Sans', system-ui, sans-serif;
+  --lc-font-mono: 'Fira Code', 'Courier New', monospace;
+  --lc-radius-sm: 8px; --lc-radius-md: 12px; --lc-radius-lg: 20px; --lc-radius-xl: 28px;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+  font-family: var(--lc-font-body);
+  background: #ECEAE5;
+  color: var(--lc-text-primary);
+  min-height: 100vh;
+}
+
+/* ─── PAGE CHROME ───────────────────────────────────────────── */
+.doc-header {
+  background: var(--lc-brand-dark);
+  padding: 28px 40px 24px;
+  position: sticky; top: 0; z-index: 200;
+  box-shadow: 0 4px 24px rgba(0,0,0,0.25);
+}
+.doc-header-inner {
+  max-width: 1360px; margin: 0 auto;
+  display: flex; align-items: center; justify-content: space-between; gap: 20px; flex-wrap: wrap;
+}
+.doc-logo { font-family: var(--lc-font-display); font-size: 20px; font-weight: 600; color: white; }
+.doc-logo span { color: rgba(255,255,255,0.45); font-size: 13px; font-weight: 400; margin-left: 10px; font-family: var(--lc-font-body); }
+.epic-badge {
+  background: var(--lc-accent); color: white;
+  font-size: 11px; font-weight: 700; letter-spacing: .06em;
+  padding: 4px 12px; border-radius: 20px;
+}
+.doc-main { max-width: 1360px; margin: 0 auto; padding: 40px 40px 80px; }
+
+/* ─── SECTION ───────────────────────────────────────────────── */
+.doc-section { margin-bottom: 64px; }
+.section-label {
+  font-size: 10px; font-weight: 700; letter-spacing: .1em; text-transform: uppercase;
+  color: var(--lc-brand-mid); margin-bottom: 6px;
+}
+.section-title {
+  font-family: var(--lc-font-display); font-size: 24px; font-weight: 600;
+  color: var(--lc-text-primary); margin-bottom: 6px;
+}
+.section-desc {
+  font-size: 13px; color: var(--lc-text-secondary); line-height: 1.65;
+  max-width: 680px; margin-bottom: 28px;
+}
+.problem-tag {
+  display: inline-flex; align-items: center; gap: 5px;
+  background: #FEF3C7; border: 1px solid #FCD34D;
+  color: #92400E; font-size: 11px; font-weight: 600;
+  padding: 3px 10px; border-radius: 20px; margin-right: 6px; margin-bottom: 6px;
+}
+.fix-tag {
+  display: inline-flex; align-items: center; gap: 5px;
+  background: var(--lc-brand-light); border: 1px solid rgba(45,90,78,0.25);
+  color: var(--lc-brand); font-size: 11px; font-weight: 600;
+  padding: 3px 10px; border-radius: 20px; margin-right: 6px; margin-bottom: 6px;
+}
+
+/* ─── PHONE GRID ─────────────────────────────────────────────── */
+.phones-row { display: flex; gap: 28px; align-items: flex-start; overflow-x: auto; padding-bottom: 12px; }
+.phone-wrap { display: flex; flex-direction: column; align-items: center; gap: 12px; flex: 0 0 auto; }
+.phone-label {
+  font-size: 11px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase;
+  color: var(--lc-text-hint);
+}
+.phone-sublabel {
+  font-size: 10px; color: var(--lc-text-hint); margin-top: -6px;
+}
+.phone {
+  width: 288px;
+  background: var(--lc-surface);
+  border-radius: 44px;
+  border: 9px solid #1C1C1E;
+  box-shadow: 0 0 0 1px #2C2C2E, var(--lc-shadow-float), 0 28px 56px rgba(0,0,0,0.22);
+  overflow: hidden; position: relative;
+}
+.phone::before {
+  content: ''; position: absolute; top: 0; left: 50%; transform: translateX(-50%);
+  width: 88px; height: 7px; background: #1C1C1E; border-radius: 0 0 10px 10px; z-index: 10;
+}
+.phone-inner {
+  background: var(--lc-surface); min-height: 620px;
+  display: flex; flex-direction: column; padding-top: 10px;
+}
+
+/* ─── STATUS BAR ─────────────────────────────────────────────── */
+.status-bar {
+  display: flex; justify-content: space-between; align-items: center;
+  padding: 10px 20px 6px; font-size: 11px; font-weight: 600; color: var(--lc-text-secondary);
+}
+.sig { display: flex; gap: 3px; align-items: flex-end; }
+.sig span { width: 3px; background: var(--lc-text-secondary); border-radius: 1px; }
+.sig span:nth-child(1) { height: 4px; } .sig span:nth-child(2) { height: 7px; } .sig span:nth-child(3) { height: 10px; }
+.batt { width: 20px; height: 10px; border: 1.5px solid var(--lc-text-secondary); border-radius: 3px; position: relative; margin-left: 4px; }
+.batt::after { content: ''; position: absolute; top: 1.5px; left: 1.5px; width: 65%; height: 5px; background: var(--lc-text-secondary); border-radius: 1px; }
+
+/* ─── VAULT HEADER ───────────────────────────────────────────── */
+.vault-header {
+  padding: 4px 16px 0;
+  display: flex; align-items: center; justify-content: space-between;
+}
+.vault-title {
+  font-family: var(--lc-font-display); font-size: 22px; font-weight: 600;
+  color: var(--lc-text-primary);
+}
+.vault-count {
+  font-size: 13px; font-weight: 400; color: var(--lc-text-hint); margin-left: 6px;
+}
+.header-actions { display: flex; align-items: center; gap: 8px; }
+
+/* ─── CONTEXTUAL ACTION BAR ──────────────────────────────────── */
+.action-bar {
+  padding: 10px 16px 0;
+  display: flex; align-items: center; gap: 8px;
+}
+.action-btn-primary {
+  display: flex; align-items: center; gap: 6px;
+  background: var(--lc-accent); color: white;
+  font-size: 12px; font-weight: 600;
+  padding: 8px 14px; border-radius: 10px; border: none; cursor: pointer;
+  font-family: var(--lc-font-body);
+  box-shadow: 0 3px 10px rgba(224,123,63,0.35);
+  flex: 1;
+  justify-content: center;
+}
+.action-btn-primary svg { width: 13px; height: 13px; stroke: white; fill: none; stroke-width: 2.2; stroke-linecap: round; }
+.action-btn-secondary {
+  display: flex; align-items: center; gap: 6px;
+  background: var(--lc-card); color: var(--lc-text-primary);
+  font-size: 12px; font-weight: 600;
+  padding: 8px 14px; border-radius: 10px;
+  border: 1px solid var(--lc-border); cursor: pointer;
+  font-family: var(--lc-font-body);
+  box-shadow: var(--lc-shadow-card);
+  flex: 1;
+  justify-content: center;
+}
+.action-btn-secondary svg { width: 13px; height: 13px; stroke: var(--lc-text-primary); fill: none; stroke-width: 2.2; stroke-linecap: round; }
+.action-btn-overflow {
+  width: 36px; height: 36px; border-radius: 10px;
+  background: var(--lc-card); border: 1px solid var(--lc-border);
+  display: flex; align-items: center; justify-content: center;
+  cursor: pointer; box-shadow: var(--lc-shadow-card); flex-shrink: 0;
+}
+.action-btn-overflow svg { width: 14px; height: 14px; stroke: var(--lc-text-secondary); fill: none; stroke-width: 2; stroke-linecap: round; }
+
+/* ─── TAB RAIL ───────────────────────────────────────────────── */
+.tab-rail {
+  display: flex; padding: 12px 16px 0; gap: 0;
+}
+.tab-item {
+  flex: 1; text-align: center;
+  padding: 8px 4px 9px;
+  font-size: 13px; font-weight: 600;
+  color: var(--lc-text-hint);
+  border-bottom: 2px solid transparent;
+  cursor: pointer;
+}
+.tab-item.active {
+  color: var(--lc-brand);
+  border-bottom-color: var(--lc-brand);
+}
+.tab-divider { height: 1px; background: var(--lc-border); margin: 0 16px; }
+
+/* ─── SEARCH BAR ─────────────────────────────────────────────── */
+.search-bar {
+  margin: 10px 14px 0;
+  background: var(--lc-card); border: 1px solid var(--lc-border);
+  border-radius: 10px; padding: 9px 12px;
+  display: flex; align-items: center; gap: 8px;
+  box-shadow: var(--lc-shadow-card);
+}
+.search-bar svg { width: 13px; height: 13px; stroke: var(--lc-text-hint); fill: none; stroke-width: 2; stroke-linecap: round; flex-shrink: 0; }
+.search-bar span { font-size: 12px; color: var(--lc-text-hint); }
+
+/* ─── FILTER CHIPS ───────────────────────────────────────────── */
+.filter-row {
+  display: flex; gap: 7px; padding: 10px 14px 0; overflow-x: hidden;
+}
+.filter-chip {
+  flex: 0 0 auto; display: flex; align-items: center; gap: 5px;
+  padding: 5px 11px; border-radius: 20px;
+  font-size: 11px; font-weight: 600; border: 1px solid; cursor: pointer;
+  font-family: var(--lc-font-body);
+}
+.filter-chip.on  { background: var(--lc-brand); color: white; border-color: var(--lc-brand); }
+.filter-chip.off { background: var(--lc-card); color: var(--lc-text-secondary); border-color: var(--lc-border); }
+.chip-badge {
+  font-size: 9px; font-weight: 700;
+  padding: 1px 5px; border-radius: 8px;
+}
+.filter-chip.on .chip-badge  { background: rgba(255,255,255,0.25); color: white; }
+.filter-chip.off .chip-badge { background: var(--lc-accent-light); color: var(--lc-accent); }
+.chip-badge-urgent { background: #FEF2F2 !important; color: #B91C1C !important; }
+
+/* ─── ARTICLE LEGEND ─────────────────────────────────────────── */
+.art-legend { display: flex; gap: 8px; padding: 8px 14px 6px; flex-wrap: wrap; }
+.art-leg-item { display: flex; align-items: center; gap: 4px; }
+.art-leg-lbl { font-size: 9px; font-weight: 500; color: var(--lc-text-hint); }
+.art-badge { font-size: 9px; font-weight: 700; padding: 2px 7px; border-radius: 20px; border: 1px solid; flex-shrink: 0; letter-spacing: .04em; }
+.art-der { background: var(--lc-masc-bg); color: var(--lc-masc-text); border-color: var(--lc-masc-border); }
+.art-die { background: var(--lc-fem-bg);  color: var(--lc-fem-text);  border-color: var(--lc-fem-border); }
+.art-das { background: var(--lc-neut-bg); color: var(--lc-neut-text); border-color: var(--lc-neut-border); }
+
+/* ─── WORD LIST ───────────────────────────────────────────────── */
+.word-list { padding: 0 14px; display: flex; flex-direction: column; gap: 7px; }
+.word-item {
+  display: flex; align-items: center; gap: 8px;
+  padding: 10px 12px; background: var(--lc-card);
+  border: 1px solid var(--lc-border); border-radius: 12px;
+  box-shadow: var(--lc-shadow-card);
+}
+.m-dot { width: 7px; height: 7px; border-radius: 50%; flex-shrink: 0; }
+.m0 { background: var(--lc-mastery-0); } .m1 { background: var(--lc-mastery-1); }
+.m2 { background: var(--lc-mastery-2); } .m3 { background: var(--lc-mastery-3); }
+.m4 { background: var(--lc-mastery-4); } .m5 { background: var(--lc-mastery-5); }
+.w-front { font-size: 12px; font-weight: 500; color: var(--lc-text-primary); }
+.w-back  { font-size: 10px; color: var(--lc-text-secondary); }
+.w-tag {
+  font-size: 8px; font-weight: 600; letter-spacing: .06em; text-transform: uppercase;
+  color: var(--lc-brand-mid); background: var(--lc-brand-light);
+  padding: 2px 6px; border-radius: 20px; flex-shrink: 0;
+}
+
+/* ─── COLLECTION CARDS (REDESIGNED) ─────────────────────────── */
+.collections-list { padding: 10px 14px 0; display: flex; flex-direction: column; gap: 10px; }
+
+.coll-card {
+  background: var(--lc-card); border: 1px solid var(--lc-border);
+  border-radius: 14px; overflow: hidden;
+  box-shadow: var(--lc-shadow-card); cursor: pointer;
+  display: flex; position: relative;
+}
+.coll-urgency-bar { width: 4px; flex-shrink: 0; }
+.urgency-high   { background: #EF4444; }
+.urgency-medium { background: #F59E0B; }
+.urgency-low    { background: var(--lc-brand-light); }
+.urgency-none   { background: transparent; }
+
+.coll-body { flex: 1; padding: 12px 13px 10px; min-width: 0; }
+.coll-top { display: flex; align-items: flex-start; justify-content: space-between; margin-bottom: 6px; }
+.coll-name-row { display: flex; align-items: center; gap: 7px; }
+.coll-emoji { font-size: 15px; line-height: 1; }
+.coll-name { font-size: 14px; font-weight: 600; color: var(--lc-text-primary); }
+.coll-due-badge {
+  font-size: 11px; font-weight: 700;
+  padding: 3px 9px; border-radius: 20px;
+  border: 1.5px solid var(--lc-accent); color: var(--lc-accent);
+  background: var(--lc-accent-light); flex-shrink: 0;
+}
+.coll-due-badge.urgent {
+  background: #FEF2F2; border-color: #EF4444; color: #EF4444;
+}
+.coll-meta { display: flex; align-items: center; gap: 10px; margin-bottom: 9px; }
+.coll-meta-item { font-size: 11px; color: var(--lc-text-hint); }
+.coll-meta-item strong { color: var(--lc-text-secondary); font-weight: 600; }
+.coll-progress-track {
+  height: 4px; background: rgba(45,90,78,0.08);
+  border-radius: 4px; overflow: hidden;
+}
+.coll-progress-fill { height: 100%; border-radius: 4px; background: var(--lc-mastery-4); }
+.coll-progress-label {
+  display: flex; justify-content: space-between;
+  margin-top: 4px; font-size: 9px; color: var(--lc-text-hint);
+}
+
+/* ─── STATS BANNER ───────────────────────────────────────────── */
+.stats-banner {
+  margin: 10px 14px 0;
+  background: var(--lc-brand); border-radius: 14px;
+  padding: 14px 16px; display: flex; align-items: center; justify-content: space-between;
+  position: relative; overflow: hidden;
+}
+.stats-banner::before {
+  content: ''; position: absolute; top: -16px; right: -16px;
+  width: 80px; height: 80px; border-radius: 50%; background: rgba(255,255,255,0.06);
+}
+.stats-banner::after {
+  content: ''; position: absolute; bottom: -24px; left: 20px;
+  width: 60px; height: 60px; border-radius: 50%; background: rgba(255,255,255,0.04);
+}
+.stats-b-item { text-align: center; position: relative; z-index: 1; }
+.stats-b-val {
+  font-family: var(--lc-font-display); font-size: 22px; font-weight: 600;
+  color: white; line-height: 1;
+}
+.stats-b-lbl { font-size: 9px; color: rgba(255,255,255,0.55); font-weight: 500; margin-top: 3px; letter-spacing: .04em; }
+.stats-b-div { width: 1px; height: 32px; background: rgba(255,255,255,0.15); }
+
+/* ─── SPEED DIAL FAB ─────────────────────────────────────────── */
+.speed-dial-wrap {
+  position: absolute; bottom: 54px; right: 14px;
+  display: flex; flex-direction: column; align-items: flex-end; gap: 8px;
+}
+.sd-mini-item { display: flex; align-items: center; gap: 8px; }
+.sd-mini-label {
+  background: var(--lc-brand-dark); color: white;
+  font-size: 10px; font-weight: 600;
+  padding: 4px 10px; border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.25);
+  white-space: nowrap;
+}
+.sd-mini-btn {
+  width: 36px; height: 36px; border-radius: 50%;
+  background: var(--lc-card); border: 1.5px solid var(--lc-border);
+  display: flex; align-items: center; justify-content: center;
+  box-shadow: 0 4px 14px rgba(0,0,0,0.12); cursor: pointer;
+  flex-shrink: 0;
+}
+.sd-mini-btn svg { width: 15px; height: 15px; stroke: var(--lc-brand); fill: none; stroke-width: 2; stroke-linecap: round; }
+.sd-main-btn {
+  width: 48px; height: 48px; border-radius: 50%;
+  background: var(--lc-accent);
+  display: flex; align-items: center; justify-content: center;
+  box-shadow: 0 5px 18px rgba(224,123,63,0.45); cursor: pointer; border: none;
+}
+.sd-main-btn svg { width: 20px; height: 20px; stroke: white; fill: none; stroke-width: 2.5; stroke-linecap: round; }
+.sd-backdrop {
+  position: absolute; inset: 0;
+  background: rgba(250,250,248,0.85); backdrop-filter: blur(2px);
+  z-index: 5; border-radius: 35px;
+}
+.speed-dial-wrap { z-index: 10; }
+
+/* ─── BOTTOM NAV ─────────────────────────────────────────────── */
+.bottom-nav {
+  display: flex; background: var(--lc-card);
+  border-top: 1px solid var(--lc-border);
+  padding: 9px 0 8px; margin-top: auto;
+}
+.nav-item { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 3px; cursor: pointer; }
+.nav-item svg { width: 18px; height: 18px; stroke: var(--lc-text-hint); fill: none; stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round; }
+.nav-item.on svg { stroke: var(--lc-brand); }
+.nav-lbl { font-size: 9px; font-weight: 600; color: var(--lc-text-hint); }
+.nav-item.on .nav-lbl { color: var(--lc-brand); }
+.nav-dot { width: 4px; height: 4px; border-radius: 50%; background: var(--lc-brand); margin: 1px auto 0; }
+
+/* ─── OVERFLOW MENU ──────────────────────────────────────────── */
+.overflow-menu {
+  position: absolute; top: 42px; right: 14px; z-index: 20;
+  background: var(--lc-card); border: 1px solid var(--lc-border);
+  border-radius: 12px; overflow: hidden;
+  box-shadow: 0 8px 28px rgba(45,90,78,0.16), 0 2px 6px rgba(0,0,0,0.06);
+  min-width: 160px;
+}
+.overflow-item {
+  display: flex; align-items: center; gap: 10px;
+  padding: 11px 14px; font-size: 12px; font-weight: 500;
+  color: var(--lc-text-primary); cursor: pointer;
+  border-bottom: 1px solid var(--lc-border);
+}
+.overflow-item:last-child { border-bottom: none; }
+.overflow-item svg { width: 14px; height: 14px; stroke: var(--lc-text-secondary); fill: none; stroke-width: 2; stroke-linecap: round; flex-shrink: 0; }
+.overflow-item:hover { background: var(--lc-surface); }
+
+/* ─── BEFORE / AFTER COMPARISON ─────────────────────────────── */
+.compare-wrap { display: flex; gap: 24px; align-items: flex-start; }
+.compare-col { flex: 1; }
+.compare-label {
+  font-size: 11px; font-weight: 700; letter-spacing: .07em; text-transform: uppercase;
+  margin-bottom: 10px; display: flex; align-items: center; gap: 6px;
+}
+.label-before { color: #B91C1C; }
+.label-after  { color: var(--lc-brand); }
+.label-dot { width: 8px; height: 8px; border-radius: 50%; }
+.dot-before { background: #EF4444; }
+.dot-after  { background: var(--lc-brand); }
+
+/* ─── ANNOTATION CALLOUTS ────────────────────────────────────── */
+.annotation {
+  display: flex; gap: 10px; align-items: flex-start;
+  background: white; border: 1px solid var(--lc-border);
+  border-radius: 10px; padding: 10px 14px;
+  margin-bottom: 8px;
+  box-shadow: var(--lc-shadow-card);
+  font-size: 12px; color: var(--lc-text-secondary); line-height: 1.5;
+}
+.ann-num {
+  width: 20px; height: 20px; border-radius: 50%;
+  background: var(--lc-brand); color: white;
+  font-size: 10px; font-weight: 700;
+  display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+}
+.ann-num.accent { background: var(--lc-accent); }
+.annotation strong { color: var(--lc-text-primary); }
+
+/* ─── COMPONENT SPEC TABLE ───────────────────────────────────── */
+.spec-table { width: 100%; border-collapse: collapse; font-size: 12px; }
+.spec-table th {
+  text-align: left; padding: 8px 12px;
+  font-size: 10px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase;
+  color: var(--lc-text-hint); border-bottom: 2px solid var(--lc-border);
+}
+.spec-table td {
+  padding: 10px 12px; border-bottom: 1px solid var(--lc-border);
+  vertical-align: top; color: var(--lc-text-secondary);
+}
+.spec-table td:first-child { font-weight: 600; color: var(--lc-text-primary); }
+.spec-table tr:last-child td { border-bottom: none; }
+.token { font-family: var(--lc-font-mono); font-size: 11px; color: var(--lc-brand); background: var(--lc-brand-light); padding: 2px 6px; border-radius: 4px; }
+
+/* ─── FLOW DIAGRAM ────────────────────────────────────────────── */
+.flow-diagram {
+  background: white; border: 1px solid var(--lc-border);
+  border-radius: 14px; padding: 24px;
+  box-shadow: var(--lc-shadow-card);
+}
+.flow-row { display: flex; align-items: center; gap: 0; flex-wrap: wrap; }
+.flow-node {
+  background: var(--lc-brand-light); border: 1.5px solid rgba(45,90,78,0.2);
+  border-radius: 8px; padding: 7px 14px;
+  font-size: 11px; font-weight: 600; color: var(--lc-brand);
+  white-space: nowrap;
+}
+.flow-node.start { background: var(--lc-brand); color: white; border-color: var(--lc-brand); }
+.flow-node.end   { background: #D1FAE5; border-color: #34D399; color: #065F46; }
+.flow-node.action { background: var(--lc-accent-light); border-color: rgba(224,123,63,0.3); color: #92400E; }
+.flow-node.screen { background: #EDE9FE; border-color: #A78BFA; color: #4C1D95; }
+.flow-arrow {
+  font-size: 14px; color: var(--lc-text-hint); padding: 0 6px; font-weight: 300;
+}
+.flow-label { font-size: 9px; color: var(--lc-text-hint); font-style: italic; padding: 0 3px; }
+
+/* ─── DIVIDER ─────────────────────────────────────────────────── */
+.divider { height: 1px; background: var(--lc-border); margin: 32px 0; }
+
+/* ─── EMPTY STATE ─────────────────────────────────────────────── */
+.empty-state {
+  display: flex; flex-direction: column; align-items: center;
+  padding: 28px 16px; gap: 8px; text-align: center;
+}
+.empty-icon { font-size: 32px; margin-bottom: 4px; }
+.empty-title { font-size: 14px; font-weight: 600; color: var(--lc-text-primary); }
+.empty-sub   { font-size: 11px; color: var(--lc-text-hint); line-height: 1.5; max-width: 180px; }
+.empty-cta {
+  margin-top: 4px; background: var(--lc-brand); color: white;
+  font-size: 12px; font-weight: 600; padding: 8px 18px;
+  border-radius: 10px; border: none; cursor: pointer; font-family: var(--lc-font-body);
+}
+</style>
+</head>
+<body>
+
+<!-- ──────────────────────────────────────────────────────────── -->
+<!-- PAGE HEADER                                                  -->
+<!-- ──────────────────────────────────────────────────────────── -->
+<div class="doc-header">
+  <div class="doc-header-inner">
+    <div>
+      <div class="doc-logo">LinguaCard <span>Design System</span></div>
+      <div style="font-size:11px;color:rgba(255,255,255,0.4);margin-top:4px;font-family:var(--lc-font-body);">Vault UX Redesign · Epic LC-200 · UI Reference</div>
+    </div>
+    <div style="display:flex;align-items:center;gap:10px;">
+      <span class="epic-badge">LC-200</span>
+      <div style="font-size:11px;color:rgba(255,255,255,0.45);">📋 Planned</div>
+    </div>
+  </div>
+</div>
+
+<div class="doc-main">
+
+<!-- ──────────────────────────────────────────────────────────── -->
+<!-- SECTION 0 — PROBLEM SUMMARY                                 -->
+<!-- ──────────────────────────────────────────────────────────── -->
+<div class="doc-section">
+  <div class="section-label">Overview</div>
+  <div class="section-title">What we're fixing</div>
+  <div class="section-desc">
+    The Vault is the highest-frequency screen in LinguaCard. These six UX issues cause friction every session. This reference documents the redesigned states and components.
+  </div>
+  <div>
+    <span class="problem-tag">⚠ Icon-only actions — no labels</span>
+    <span class="problem-tag">⚠ Orphaned "My Collections" page</span>
+    <span class="problem-tag">⚠ All / Collections toggle is ambiguous</span>
+    <span class="problem-tag">⚠ No contextual card creation</span>
+    <span class="problem-tag">⚠ Collections have no urgency signal</span>
+    <span class="problem-tag">⚠ Filter chips have no count badges</span>
+  </div>
+  <div style="margin-top:10px;">
+    <span class="fix-tag">✓ Contextual action bar (labelled)</span>
+    <span class="fix-tag">✓ Tab rail (Words / Collections)</span>
+    <span class="fix-tag">✓ Speed-dial FAB</span>
+    <span class="fix-tag">✓ Urgency strips on collection cards</span>
+    <span class="fix-tag">✓ Filter chips with count badges</span>
+    <span class="fix-tag">✓ Collections as first-class tab</span>
+  </div>
+</div>
+
+<!-- ──────────────────────────────────────────────────────────── -->
+<!-- SECTION 1 — BEFORE / AFTER                                  -->
+<!-- ──────────────────────────────────────────────────────────── -->
+<div class="doc-section">
+  <div class="section-label">LC-200 · Screen States</div>
+  <div class="section-title">Before → After</div>
+  <div class="section-desc">
+    Side-by-side comparison of the current Vault header + Collections view against the redesigned versions.
+  </div>
+
+  <div class="compare-wrap" style="gap:40px;flex-wrap:wrap;">
+
+    <!-- ── BEFORE col ── -->
+    <div class="compare-col">
+      <div class="compare-label"><span class="label-dot dot-before"></span><span class="label-before">Before — current</span></div>
+
+      <!-- Before: Collections view -->
+      <div class="phones-row" style="gap:0;">
+        <div class="phone-wrap">
+          <div class="phone-label">Collections</div>
+          <div class="phone">
+            <div class="phone-inner">
+              <div class="status-bar"><span>9:41</span><div style="display:flex;align-items:center;gap:3px;"><div class="sig"><span></span><span></span><span></span></div><div class="batt"></div></div></div>
+              <!-- old nav: title + two icon buttons -->
+              <div style="display:flex;align-items:center;justify-content:space-between;padding:6px 16px 8px;">
+                <span style="font-family:var(--lc-font-display);font-size:18px;font-weight:600;color:var(--lc-text-primary);">Vault <span style="font-size:13px;font-weight:400;color:var(--lc-text-hint);">665</span></span>
+                <div style="display:flex;gap:8px;align-items:center;">
+                  <!-- upload icon — no label -->
+                  <div style="width:34px;height:34px;border-radius:50%;background:var(--lc-brand-light);display:flex;align-items:center;justify-content:center;">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--lc-brand)" stroke-width="2" stroke-linecap="round"><polyline points="16,16 12,12 8,16"/><line x1="12" y1="12" x2="12" y2="21"/><path d="M20.39,18.39A5,5,0,0,0,18,9h-1.26A8,8,0,1,0,3,16.3"/></svg>
+                  </div>
+                  <!-- + FAB — orange but no label -->
+                  <div style="width:34px;height:34px;border-radius:50%;background:var(--lc-accent);display:flex;align-items:center;justify-content:center;box-shadow:0 4px 12px rgba(224,123,63,0.4);">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+                  </div>
+                </div>
+              </div>
+
+              <!-- toggle: All words / Collections -->
+              <div style="display:flex;margin:0 14px 12px;background:#F0EDEA;border-radius:10px;padding:3px;">
+                <div style="flex:1;text-align:center;padding:7px;font-size:12px;font-weight:500;color:var(--lc-text-hint);">All words</div>
+                <div style="flex:1;text-align:center;padding:7px;font-size:12px;font-weight:600;color:var(--lc-text-primary);background:white;border-radius:8px;">Collections</div>
+              </div>
+
+              <!-- old stats banner (dark green) -->
+              <div style="margin:0 14px 12px;background:var(--lc-brand);border-radius:14px;padding:14px 16px;">
+                <div style="font-size:9px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:rgba(255,255,255,0.5);margin-bottom:4px;">TOTAL ACROSS ALL COLLECTIONS</div>
+                <div style="display:flex;align-items:flex-end;justify-content:space-between;">
+                  <div style="font-family:var(--lc-font-display);font-size:26px;font-weight:600;color:white;">211 words</div>
+                  <div style="text-align:right;"><div style="font-size:9px;color:rgba(255,255,255,0.5);">Due today</div><div style="font-family:var(--lc-font-display);font-size:22px;font-weight:600;color:white;">184</div></div>
+                </div>
+              </div>
+
+              <!-- old collection cards — flat, all identical -->
+              <div style="display:flex;flex-direction:column;gap:8px;padding:0 14px;">
+                <div style="background:white;border:1px solid var(--lc-border);border-radius:12px;padding:13px 14px;box-shadow:var(--lc-shadow-card);">
+                  <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:5px;">
+                    <div style="display:flex;align-items:center;gap:7px;">
+                      <span style="font-size:14px;">📚</span>
+                      <span style="font-size:13px;font-weight:600;">Time with friends</span>
+                    </div>
+                    <span style="font-size:11px;font-weight:700;padding:3px 9px;border-radius:20px;border:1.5px solid var(--lc-accent);color:var(--lc-accent);">71 due</span>
+                  </div>
+                  <div style="font-size:11px;color:var(--lc-text-hint);">95 words</div>
+                  <div style="height:1px;background:var(--lc-border);margin:8px 0;"></div>
+                  <div style="display:flex;justify-content:space-between;font-size:10px;color:var(--lc-text-hint);">
+                    <span>0 mastered</span><span>0% complete</span>
+                  </div>
+                </div>
+                <div style="background:white;border:1px solid var(--lc-border);border-radius:12px;padding:13px 14px;box-shadow:var(--lc-shadow-card);">
+                  <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:5px;">
+                    <div style="display:flex;align-items:center;gap:7px;">
+                      <span style="font-size:14px;">📚</span>
+                      <span style="font-size:13px;font-weight:600;">German Food</span>
+                    </div>
+                    <span style="font-size:11px;font-weight:700;padding:3px 9px;border-radius:20px;border:1.5px solid var(--lc-accent);color:var(--lc-accent);">69 due</span>
+                  </div>
+                  <div style="font-size:11px;color:var(--lc-text-hint);">71 words</div>
+                  <div style="height:1px;background:var(--lc-border);margin:8px 0;"></div>
+                  <div style="display:flex;justify-content:space-between;font-size:10px;color:var(--lc-text-hint);">
+                    <span>0 mastered</span><span>0% complete</span>
+                  </div>
+                </div>
+                <div style="background:white;border:1px solid var(--lc-border);border-radius:12px;padding:13px 14px;box-shadow:var(--lc-shadow-card);">
+                  <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:5px;">
+                    <div style="display:flex;align-items:center;gap:7px;">
+                      <span style="font-size:14px;">📚</span>
+                      <span style="font-size:13px;font-weight:600;">example</span>
+                    </div>
+                    <span style="font-size:11px;font-weight:700;padding:3px 9px;border-radius:20px;border:1.5px solid var(--lc-accent);color:var(--lc-accent);">34 due</span>
+                  </div>
+                  <div style="font-size:11px;color:var(--lc-text-hint);">35 words</div>
+                  <div style="height:1px;background:var(--lc-border);margin:8px 0;"></div>
+                  <div style="display:flex;justify-content:space-between;font-size:10px;color:var(--lc-text-hint);">
+                    <span>0 mastered</span><span>0% complete</span>
+                  </div>
+                </div>
+              </div>
+
+              <div style="height:12px;"></div>
+              <div class="bottom-nav">
+                <div class="nav-item"><svg viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9,22 9,12 15,12 15,22"/></svg><div class="nav-lbl">Home</div></div>
+                <div class="nav-item on"><svg viewBox="0 0 24 24"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg><div class="nav-lbl">Vault</div><div class="nav-dot"></div></div>
+                <div class="nav-item"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polygon points="10,8 16,12 10,16 10,8"/></svg><div class="nav-lbl">Review</div></div>
+                <div class="nav-item"><svg viewBox="0 0 24 24"><path d="M2 3h6a4 4 0 014 4v14a3 3 0 00-3-3H2z"/><path d="M22 3h-6a4 4 0 00-4 4v14a3 3 0 013-3h7z"/></svg><div class="nav-lbl">Stories</div></div>
+                <div class="nav-item"><svg viewBox="0 0 24 24"><polygon points="11,5 6,9 2,9 2,15 6,15 11,19 11,5"/><path d="M15.54,8.46a5,5,0,0,1,0,7.07"/></svg><div class="nav-lbl">Listen</div></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Problems annotated -->
+      <div style="margin-top:14px;max-width:288px;">
+        <div class="annotation"><div class="ann-num" style="background:#EF4444;">1</div><div><strong>Icon-only actions.</strong> Upload icon and orange + have no labels. Users must guess what each does — especially newcomers.</div></div>
+        <div class="annotation"><div class="ann-num" style="background:#EF4444;">2</div><div><strong>Ambiguous toggle.</strong> "All words / Collections" toggle puts two very different views side-by-side without clear hierarchy.</div></div>
+        <div class="annotation"><div class="ann-num" style="background:#EF4444;">3</div><div><strong>Flat collection cards.</strong> All cards look identical. No sense of urgency, no progress indicator.</div></div>
+      </div>
+    </div>
+
+    <!-- ── AFTER col ── -->
+    <div class="compare-col">
+      <div class="compare-label"><span class="label-dot dot-after"></span><span class="label-after">After — redesigned</span></div>
+
+      <div class="phones-row" style="gap:20px;">
+
+        <!-- AFTER: Words tab -->
+        <div class="phone-wrap">
+          <div class="phone-label">Words Tab</div>
+          <div class="phone">
+            <div class="phone-inner">
+              <div class="status-bar"><span>9:41</span><div style="display:flex;align-items:center;gap:3px;"><div class="sig"><span></span><span></span><span></span></div><div class="batt"></div></div></div>
+
+              <!-- new header — title only -->
+              <div class="vault-header">
+                <div><span class="vault-title">Vault</span><span class="vault-count">665</span></div>
+              </div>
+
+              <!-- contextual action bar: Words tab -->
+              <div class="action-bar">
+                <button class="action-btn-primary">
+                  <svg viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+                  Add Card
+                </button>
+                <button class="action-btn-secondary">
+                  <svg viewBox="0 0 24 24"><polyline points="16,16 12,12 8,16"/><line x1="12" y1="12" x2="12" y2="21"/><path d="M20.39,18.39A5,5,0,0,0,18,9h-1.26A8,8,0,1,0,3,16.3"/></svg>
+                  Import
+                </button>
+                <div class="action-btn-overflow">
+                  <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="1"/><circle cx="12" cy="5" r="1"/><circle cx="12" cy="19" r="1"/></svg>
+                </div>
+              </div>
+
+              <!-- tab rail -->
+              <div class="tab-rail">
+                <div class="tab-item active">Words</div>
+                <div class="tab-item">Collections</div>
+              </div>
+              <div class="tab-divider"></div>
+
+              <!-- search -->
+              <div class="search-bar"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg><span>Search words…</span></div>
+
+              <!-- filter chips with count badges -->
+              <div class="filter-row">
+                <div class="filter-chip on">All <span class="chip-badge">665</span></div>
+                <div class="filter-chip off">Due <span class="chip-badge chip-badge-urgent">184</span></div>
+                <div class="filter-chip off">New <span class="chip-badge">42</span></div>
+                <div class="filter-chip off">Mastered</div>
+              </div>
+
+              <!-- article legend -->
+              <div class="art-legend">
+                <div class="art-leg-item"><span class="art-badge art-der">der</span><span class="art-leg-lbl">Masc.</span></div>
+                <div class="art-leg-item"><span class="art-badge art-die">die</span><span class="art-leg-lbl">Fem.</span></div>
+                <div class="art-leg-item"><span class="art-badge art-das">das</span><span class="art-leg-lbl">Neut.</span></div>
+              </div>
+
+              <!-- word list -->
+              <div class="word-list" style="margin-top:4px;">
+                <div class="word-item"><div class="m-dot m5"></div><span class="art-badge art-die">die</span><div style="flex:1;min-width:0;"><div class="w-front">der Fluss, Flüsse</div><div class="w-back">river</div></div><span class="w-tag">Travel</span></div>
+                <div class="word-item"><div class="m-dot m0"></div><span class="art-badge art-das">das</span><div style="flex:1;min-width:0;"><div class="w-front">das Gleis, -e</div><div class="w-back">platform, track</div></div><span class="w-tag">Travel</span></div>
+                <div class="word-item"><div class="m-dot m2"></div><span class="art-badge art-die">die</span><div style="flex:1;min-width:0;"><div class="w-front">die Hinfahrt, -en</div><div class="w-back">outward journey</div></div><span class="w-tag">Travel</span></div>
+                <div class="word-item"><div class="m-dot m3"></div><span style="font-size:9px;font-weight:700;padding:2px 7px;border-radius:20px;color:var(--lc-text-hint);border:1px solid var(--lc-border);flex-shrink:0;">—</span><div style="flex:1;min-width:0;"><div class="w-front">an, in, von, zu</div><div class="w-back">prepositions</div></div></div>
+                <div class="word-item"><div class="m-dot m4"></div><span class="art-badge art-das">das</span><div style="flex:1;min-width:0;"><div class="w-front">das Gepäck (Sg.)</div><div class="w-back">luggage, baggage</div></div><span class="w-tag">Travel</span></div>
+              </div>
+              <div style="height:12px;"></div>
+
+              <div class="bottom-nav">
+                <div class="nav-item"><svg viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9,22 9,12 15,12 15,22"/></svg><div class="nav-lbl">Home</div></div>
+                <div class="nav-item on"><svg viewBox="0 0 24 24"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg><div class="nav-lbl">Vault</div><div class="nav-dot"></div></div>
+                <div class="nav-item"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polygon points="10,8 16,12 10,16 10,8"/></svg><div class="nav-lbl">Review</div></div>
+                <div class="nav-item"><svg viewBox="0 0 24 24"><path d="M2 3h6a4 4 0 014 4v14a3 3 0 00-3-3H2z"/><path d="M22 3h-6a4 4 0 00-4 4v14a3 3 0 013-3h7z"/></svg><div class="nav-lbl">Stories</div></div>
+                <div class="nav-item"><svg viewBox="0 0 24 24"><polygon points="11,5 6,9 2,9 2,15 6,15 11,19 11,5"/><path d="M15.54,8.46a5,5,0,0,1,0,7.07"/></svg><div class="nav-lbl">Listen</div></div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- AFTER: Collections tab -->
+        <div class="phone-wrap">
+          <div class="phone-label">Collections Tab</div>
+          <div class="phone">
+            <div class="phone-inner" style="position:relative;">
+              <div class="status-bar"><span>9:41</span><div style="display:flex;align-items:center;gap:3px;"><div class="sig"><span></span><span></span><span></span></div><div class="batt"></div></div></div>
+
+              <div class="vault-header">
+                <div><span class="vault-title">Vault</span><span class="vault-count">665</span></div>
+              </div>
+
+              <!-- contextual action bar: Collections tab -->
+              <div class="action-bar">
+                <button class="action-btn-primary">
+                  <svg viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+                  New Collection
+                </button>
+                <div class="action-btn-overflow">
+                  <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="1"/><circle cx="12" cy="5" r="1"/><circle cx="12" cy="19" r="1"/></svg>
+                </div>
+              </div>
+
+              <!-- tab rail -->
+              <div class="tab-rail">
+                <div class="tab-item">Words</div>
+                <div class="tab-item active">Collections</div>
+              </div>
+              <div class="tab-divider"></div>
+
+              <!-- stats banner -->
+              <div class="stats-banner">
+                <div class="stats-b-item"><div class="stats-b-val">211</div><div class="stats-b-lbl">Total words</div></div>
+                <div class="stats-b-div"></div>
+                <div class="stats-b-item"><div class="stats-b-val">4</div><div class="stats-b-lbl">Collections</div></div>
+                <div class="stats-b-div"></div>
+                <div class="stats-b-item"><div class="stats-b-val" style="color:#FCD34D;">184</div><div class="stats-b-lbl">Due today</div></div>
+              </div>
+
+              <!-- redesigned collection cards -->
+              <div class="collections-list">
+
+                <div class="coll-card">
+                  <div class="coll-urgency-bar urgency-high"></div>
+                  <div class="coll-body">
+                    <div class="coll-top">
+                      <div class="coll-name-row">
+                        <span class="coll-emoji">📚</span>
+                        <span class="coll-name">Time with friends</span>
+                      </div>
+                      <span class="coll-due-badge urgent">71 due</span>
+                    </div>
+                    <div class="coll-meta">
+                      <span class="coll-meta-item"><strong>95</strong> words</span>
+                      <span class="coll-meta-item"><strong>0</strong> mastered</span>
+                    </div>
+                    <div class="coll-progress-track"><div class="coll-progress-fill" style="width:0%;"></div></div>
+                    <div class="coll-progress-label"><span>0% complete</span><span>75% due</span></div>
+                  </div>
+                </div>
+
+                <div class="coll-card">
+                  <div class="coll-urgency-bar urgency-high"></div>
+                  <div class="coll-body">
+                    <div class="coll-top">
+                      <div class="coll-name-row">
+                        <span class="coll-emoji">🍽️</span>
+                        <span class="coll-name">German Food</span>
+                      </div>
+                      <span class="coll-due-badge urgent">69 due</span>
+                    </div>
+                    <div class="coll-meta">
+                      <span class="coll-meta-item"><strong>71</strong> words</span>
+                      <span class="coll-meta-item"><strong>0</strong> mastered</span>
+                    </div>
+                    <div class="coll-progress-track"><div class="coll-progress-fill" style="width:0%;"></div></div>
+                    <div class="coll-progress-label"><span>0% complete</span><span>97% due</span></div>
+                  </div>
+                </div>
+
+                <div class="coll-card">
+                  <div class="coll-urgency-bar urgency-medium"></div>
+                  <div class="coll-body">
+                    <div class="coll-top">
+                      <div class="coll-name-row">
+                        <span class="coll-emoji">📝</span>
+                        <span class="coll-name">example</span>
+                      </div>
+                      <span class="coll-due-badge">34 due</span>
+                    </div>
+                    <div class="coll-meta">
+                      <span class="coll-meta-item"><strong>35</strong> words</span>
+                      <span class="coll-meta-item"><strong>0</strong> mastered</span>
+                    </div>
+                    <div class="coll-progress-track"><div class="coll-progress-fill" style="width:0%;"></div></div>
+                    <div class="coll-progress-label"><span>0% complete</span><span>97% due</span></div>
+                  </div>
+                </div>
+
+                <div class="coll-card">
+                  <div class="coll-urgency-bar urgency-low" style="background:var(--lc-brand-light);"></div>
+                  <div class="coll-body">
+                    <div class="coll-top">
+                      <div class="coll-name-row">
+                        <span class="coll-emoji">🧪</span>
+                        <span class="coll-name">test</span>
+                      </div>
+                      <span class="coll-due-badge">10 due</span>
+                    </div>
+                    <div class="coll-meta">
+                      <span class="coll-meta-item"><strong>10</strong> words</span>
+                      <span class="coll-meta-item"><strong>0</strong> mastered</span>
+                    </div>
+                    <div class="coll-progress-track"><div class="coll-progress-fill" style="width:0%;"></div></div>
+                    <div class="coll-progress-label"><span>0% complete</span><span>100% due</span></div>
+                  </div>
+                </div>
+              </div>
+
+              <div style="height:12px;"></div>
+
+              <div class="bottom-nav">
+                <div class="nav-item"><svg viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9,22 9,12 15,12 15,22"/></svg><div class="nav-lbl">Home</div></div>
+                <div class="nav-item on"><svg viewBox="0 0 24 24"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg><div class="nav-lbl">Vault</div><div class="nav-dot"></div></div>
+                <div class="nav-item"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polygon points="10,8 16,12 10,16 10,8"/></svg><div class="nav-lbl">Review</div></div>
+                <div class="nav-item"><svg viewBox="0 0 24 24"><path d="M2 3h6a4 4 0 014 4v14a3 3 0 00-3-3H2z"/><path d="M22 3h-6a4 4 0 00-4 4v14a3 3 0 013-3h7z"/></svg><div class="nav-lbl">Stories</div></div>
+                <div class="nav-item"><svg viewBox="0 0 24 24"><polygon points="11,5 6,9 2,9 2,15 6,15 11,19 11,5"/><path d="M15.54,8.46a5,5,0,0,1,0,7.07"/></svg><div class="nav-lbl">Listen</div></div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div><!-- /phones-row -->
+
+      <!-- Fixes annotated -->
+      <div style="margin-top:14px;max-width:620px;">
+        <div class="annotation"><div class="ann-num">1</div><div><strong>Contextual action bar.</strong> Primary action is labelled ("Add Card" or "New Collection") and adapts per tab. Import is demoted to a secondary labelled button, overflow in ⋯ menu.</div></div>
+        <div class="annotation"><div class="ann-num">2</div><div><strong>Tab rail.</strong> Words and Collections are explicit tabs — always visible, always one tap away. Replaces the ambiguous toggle and retires the orphaned "My Collections" page.</div></div>
+        <div class="annotation"><div class="ann-num">3</div><div><strong>Urgency strips.</strong> Red left border = >50% due. Amber = >20%. Progress bar and "% due" label give at-a-glance health. Stats banner replaces the old opaque green hero.</div></div>
+        <div class="annotation"><div class="ann-num">4</div><div><strong>Filter chips with count badges.</strong> "Due 184" in red-tinted badge signals urgency without opening the view. "New 42" gives context on uncommitted words.</div></div>
+      </div>
+    </div>
+
+  </div><!-- /compare-wrap -->
+</div>
+
+<!-- ──────────────────────────────────────────────────────────── -->
+<!-- SECTION 2 — SPEED-DIAL FAB                                  -->
+<!-- ──────────────────────────────────────────────────────────── -->
+<div class="doc-section">
+  <div class="section-label">LC-204 · Component</div>
+  <div class="section-title">Speed-dial FAB (expanded state)</div>
+  <div class="section-desc">
+    The accent FAB expands on single tap into three labelled mini-actions. The backdrop blurs the list so the actions are clearly in focus. Dismisses on tap outside or on second tap of the FAB (which becomes an ✕).
+  </div>
+
+  <div class="phones-row">
+    <div class="phone-wrap">
+      <div class="phone-label">FAB — collapsed</div>
+      <div class="phone">
+        <div class="phone-inner" style="position:relative;">
+          <div class="status-bar"><span>9:41</span><div style="display:flex;align-items:center;gap:3px;"><div class="sig"><span></span><span></span><span></span></div><div class="batt"></div></div></div>
+          <div class="vault-header"><div><span class="vault-title">Vault</span><span class="vault-count">665</span></div></div>
+          <div class="action-bar">
+            <button class="action-btn-primary"><svg viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>Add Card</button>
+            <button class="action-btn-secondary"><svg viewBox="0 0 24 24"><polyline points="16,16 12,12 8,16"/><line x1="12" y1="12" x2="12" y2="21"/><path d="M20.39,18.39A5,5,0,0,0,18,9h-1.26A8,8,0,1,0,3,16.3"/></svg>Import</button>
+          </div>
+          <div class="tab-rail"><div class="tab-item active">Words</div><div class="tab-item">Collections</div></div>
+          <div class="tab-divider"></div>
+          <div style="flex:1;"></div>
+          <!-- FAB collapsed -->
+          <div style="position:relative;height:64px;">
+            <div style="position:absolute;bottom:10px;right:14px;width:48px;height:48px;border-radius:50%;background:var(--lc-accent);display:flex;align-items:center;justify-content:center;box-shadow:0 5px 18px rgba(224,123,63,0.45);cursor:pointer;">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+            </div>
+          </div>
+          <div class="bottom-nav">
+            <div class="nav-item"><svg viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9,22 9,12 15,12 15,22"/></svg><div class="nav-lbl">Home</div></div>
+            <div class="nav-item on"><svg viewBox="0 0 24 24"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg><div class="nav-lbl">Vault</div><div class="nav-dot"></div></div>
+            <div class="nav-item"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polygon points="10,8 16,12 10,16 10,8"/></svg><div class="nav-lbl">Review</div></div>
+            <div class="nav-item"><svg viewBox="0 0 24 24"><path d="M2 3h6a4 4 0 014 4v14a3 3 0 00-3-3H2z"/><path d="M22 3h-6a4 4 0 00-4 4v14a3 3 0 013-3h7z"/></svg><div class="nav-lbl">Stories</div></div>
+            <div class="nav-item"><svg viewBox="0 0 24 24"><polygon points="11,5 6,9 2,9 2,15 6,15 11,19 11,5"/><path d="M15.54,8.46a5,5,0,0,1,0,7.07"/></svg><div class="nav-lbl">Listen</div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="phone-wrap">
+      <div class="phone-label">FAB — expanded</div>
+      <div class="phone">
+        <div class="phone-inner" style="position:relative;">
+          <!-- backdrop -->
+          <div class="sd-backdrop"></div>
+
+          <div class="status-bar"><span>9:41</span><div style="display:flex;align-items:center;gap:3px;"><div class="sig"><span></span><span></span><span></span></div><div class="batt"></div></div></div>
+          <div class="vault-header"><div><span class="vault-title">Vault</span><span class="vault-count">665</span></div></div>
+          <div class="action-bar">
+            <button class="action-btn-primary"><svg viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>Add Card</button>
+            <button class="action-btn-secondary"><svg viewBox="0 0 24 24"><polyline points="16,16 12,12 8,16"/><line x1="12" y1="12" x2="12" y2="21"/><path d="M20.39,18.39A5,5,0,0,0,18,9h-1.26A8,8,0,1,0,3,16.3"/></svg>Import</button>
+          </div>
+          <div class="tab-rail"><div class="tab-item active">Words</div><div class="tab-item">Collections</div></div>
+          <div class="tab-divider"></div>
+          <div style="flex:1;"></div>
+
+          <!-- speed dial expanded -->
+          <div class="speed-dial-wrap">
+            <div class="sd-mini-item">
+              <div class="sd-mini-label">Add Card</div>
+              <div class="sd-mini-btn"><svg viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg></div>
+            </div>
+            <div class="sd-mini-item">
+              <div class="sd-mini-label">New Collection</div>
+              <div class="sd-mini-btn"><svg viewBox="0 0 24 24"><path d="M22 19a2 2 0 01-2 2H4a2 2 0 01-2-2V5a2 2 0 012-2h5l2 3h9a2 2 0 012 2z"/><line x1="12" y1="10" x2="12" y2="16"/><line x1="9" y1="13" x2="15" y2="13"/></svg></div>
+            </div>
+            <div class="sd-mini-item">
+              <div class="sd-mini-label">Import</div>
+              <div class="sd-mini-btn"><svg viewBox="0 0 24 24"><polyline points="16,16 12,12 8,16"/><line x1="12" y1="12" x2="12" y2="21"/><path d="M20.39,18.39A5,5,0,0,0,18,9h-1.26A8,8,0,1,0,3,16.3"/></svg></div>
+            </div>
+            <!-- main button becomes × -->
+            <div class="sd-main-btn">
+              <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+            </div>
+          </div>
+
+          <div class="bottom-nav" style="position:relative;z-index:10;">
+            <div class="nav-item"><svg viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9,22 9,12 15,12 15,22"/></svg><div class="nav-lbl">Home</div></div>
+            <div class="nav-item on"><svg viewBox="0 0 24 24"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg><div class="nav-lbl">Vault</div><div class="nav-dot"></div></div>
+            <div class="nav-item"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polygon points="10,8 16,12 10,16 10,8"/></svg><div class="nav-lbl">Review</div></div>
+            <div class="nav-item"><svg viewBox="0 0 24 24"><path d="M2 3h6a4 4 0 014 4v14a3 3 0 00-3-3H2z"/><path d="M22 3h-6a4 4 0 00-4 4v14a3 3 0 013-3h7z"/></svg><div class="nav-lbl">Stories</div></div>
+            <div class="nav-item"><svg viewBox="0 0 24 24"><polygon points="11,5 6,9 2,9 2,15 6,15 11,19 11,5"/><path d="M15.54,8.46a5,5,0,0,1,0,7.07"/></svg><div class="nav-lbl">Listen</div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Overflow menu example -->
+    <div class="phone-wrap">
+      <div class="phone-label">Overflow Menu</div>
+      <div class="phone-sublabel">⋯ tapped on Words tab</div>
+      <div class="phone">
+        <div class="phone-inner" style="position:relative;">
+          <div class="status-bar"><span>9:41</span><div style="display:flex;align-items:center;gap:3px;"><div class="sig"><span></span><span></span><span></span></div><div class="batt"></div></div></div>
+          <div class="vault-header"><div><span class="vault-title">Vault</span><span class="vault-count">665</span></div></div>
+          <div class="action-bar">
+            <button class="action-btn-primary" style="opacity:0.4;"><svg viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>Add Card</button>
+            <button class="action-btn-secondary" style="opacity:0.4;"><svg viewBox="0 0 24 24"><polyline points="16,16 12,12 8,16"/><line x1="12" y1="12" x2="12" y2="21"/><path d="M20.39,18.39A5,5,0,0,0,18,9h-1.26A8,8,0,1,0,3,16.3"/></svg>Import</button>
+            <div class="action-btn-overflow" style="background:var(--lc-brand-light);border-color:rgba(45,90,78,0.3);">
+              <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="var(--lc-brand)" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="1"/><circle cx="12" cy="5" r="1"/><circle cx="12" cy="19" r="1"/></svg>
+            </div>
+          </div>
+
+          <!-- Overflow menu dropdown -->
+          <div class="overflow-menu">
+            <div class="overflow-item">
+              <svg viewBox="0 0 24 24"><polyline points="16,16 12,12 8,16"/><line x1="12" y1="12" x2="12" y2="21"/><path d="M20.39,18.39A5,5,0,0,0,18,9h-1.26A8,8,0,1,0,3,16.3"/></svg>
+              Import CSV
+            </div>
+            <div class="overflow-item">
+              <svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21,15 16,10 5,21"/></svg>
+              Import from image
+            </div>
+            <div class="overflow-item">
+              <svg viewBox="0 0 24 24"><polyline points="8,17 12,21 16,17"/><line x1="12" y1="12" x2="12" y2="21"/><path d="M20.88,18.09A5,5,0,1,0,9,13H7A7,7,0,1,0,7,27"/></svg>
+              Export words
+            </div>
+            <div class="overflow-item" style="color:var(--lc-brand-mid);">
+              <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+              About Vault
+            </div>
+          </div>
+
+          <div style="flex:1;"></div>
+          <div class="bottom-nav">
+            <div class="nav-item"><svg viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9,22 9,12 15,12 15,22"/></svg><div class="nav-lbl">Home</div></div>
+            <div class="nav-item on"><svg viewBox="0 0 24 24"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg><div class="nav-lbl">Vault</div><div class="nav-dot"></div></div>
+            <div class="nav-item"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polygon points="10,8 16,12 10,16 10,8"/></svg><div class="nav-lbl">Review</div></div>
+            <div class="nav-item"><svg viewBox="0 0 24 24"><path d="M2 3h6a4 4 0 014 4v14a3 3 0 00-3-3H2z"/><path d="M22 3h-6a4 4 0 00-4 4v14a3 3 0 013-3h7z"/></svg><div class="nav-lbl">Stories</div></div>
+            <div class="nav-item"><svg viewBox="0 0 24 24"><polygon points="11,5 6,9 2,9 2,15 6,15 11,19 11,5"/><path d="M15.54,8.46a5,5,0,0,1,0,7.07"/></svg><div class="nav-lbl">Listen</div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ──────────────────────────────────────────────────────────── -->
+<!-- SECTION 3 — NAVIGATION FLOWS                                -->
+<!-- ──────────────────────────────────────────────────────────── -->
+<div class="doc-section">
+  <div class="section-label">LC-201 + LC-202 · Navigation</div>
+  <div class="section-title">Retired flow vs. new flow</div>
+  <div class="section-desc">
+    The orphaned "My Collections" page is retired. Back navigation from collection detail now returns to <code>Vault?tab=collections</code>, not a standalone page. The Collections tab is the canonical entry point.
+  </div>
+
+  <div style="display:flex;flex-direction:column;gap:16px;">
+
+    <!-- OLD FLOW -->
+    <div>
+      <div style="font-size:11px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;color:#B91C1C;margin-bottom:10px;">❌ Old — confusing flow</div>
+      <div class="flow-diagram">
+        <div class="flow-row" style="gap:0;flex-wrap:wrap;">
+          <div class="flow-node start">Vault (toggle)</div>
+          <div class="flow-arrow">→</div>
+          <div class="flow-node screen">Collection detail</div>
+          <div class="flow-arrow">→ back</div>
+          <div class="flow-node" style="background:#FEF2F2;border-color:#FCA5A5;color:#B91C1C;">My Collections <br><span style="font-size:9px;font-weight:400;">(orphaned page)</span></div>
+          <div class="flow-arrow">→ back</div>
+          <div class="flow-node screen">Vault (toggle)</div>
+        </div>
+        <div style="margin-top:10px;font-size:11px;color:var(--lc-text-hint);">The "My Collections" page only appears as a side-effect of back navigation. Users cannot navigate there intentionally.</div>
+      </div>
+    </div>
+
+    <!-- NEW FLOW -->
+    <div>
+      <div style="font-size:11px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;color:var(--lc-brand);margin-bottom:10px;">✓ New — intentional flow</div>
+      <div class="flow-diagram">
+        <div class="flow-row" style="margin-bottom:12px;">
+          <div class="flow-node start">Vault / Words tab</div>
+          <div class="flow-arrow">→</div>
+          <div class="flow-node">tap Collections tab</div>
+          <div class="flow-arrow">→</div>
+          <div class="flow-node screen">Vault / Collections tab</div>
+          <div class="flow-arrow">→</div>
+          <div class="flow-node screen">Collection detail</div>
+          <div class="flow-arrow">→ back</div>
+          <div class="flow-node end">Vault / Collections tab</div>
+        </div>
+        <div class="flow-row">
+          <div class="flow-node action">Any Vault view</div>
+          <div class="flow-arrow">→ FAB speed-dial</div>
+          <div class="flow-node action">"New Collection"</div>
+          <div class="flow-arrow">→</div>
+          <div class="flow-node screen">New collection sheet</div>
+        </div>
+        <div style="margin-top:10px;font-size:11px;color:var(--lc-text-hint);">Route <code>/vault/collections</code> redirects to <code>/vault?tab=collections</code>. <code>CollectionDetailPage</code> back button navigates to <code>/vault?tab=collections</code>.</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ──────────────────────────────────────────────────────────── -->
+<!-- SECTION 4 — COMPONENT SPECS                                 -->
+<!-- ──────────────────────────────────────────────────────────── -->
+<div class="doc-section">
+  <div class="section-label">Component Specifications</div>
+  <div class="section-title">New & modified components</div>
+  <div class="section-desc">Token references, selector names, and key inputs for each new or modified component in this epic.</div>
+
+  <div style="background:white;border:1px solid var(--lc-border);border-radius:14px;overflow:hidden;box-shadow:var(--lc-shadow-card);">
+    <table class="spec-table">
+      <thead>
+        <tr>
+          <th>Component</th>
+          <th>Story</th>
+          <th>Location</th>
+          <th>Key tokens / notes</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>Tab Rail</td>
+          <td>LC-201</td>
+          <td><span class="token">vault.page.html</span></td>
+          <td>Active underline: <span class="token">--lc-brand</span>, 2px. Font: 13px 600. Replaces toggle entirely.</td>
+        </tr>
+        <tr>
+          <td>Contextual Action Bar</td>
+          <td>LC-203</td>
+          <td><span class="token">vault.page.html</span> header</td>
+          <td>Primary: <span class="token">--lc-accent</span> bg + shadow. Secondary: card bg + border. Overflow: 36×36 icon btn. Adapts based on active tab signal.</td>
+        </tr>
+        <tr>
+          <td>SpeedDialFabComponent</td>
+          <td>LC-204</td>
+          <td><span class="token">shared/components/speed-dial-fab/</span></td>
+          <td>FAB: <span class="token">--lc-accent</span> 48px. Mini: card bg 36px. Labels: <span class="token">--lc-brand-dark</span> bg, white text. Backdrop: 85% surface + blur(2px). Emits: <span class="token">actionSelected</span> event with action enum.</td>
+        </tr>
+        <tr>
+          <td>CollectionCardComponent</td>
+          <td>LC-205</td>
+          <td><span class="token">vault/components/collection-card/</span></td>
+          <td>Urgency bar: 4px wide. Red ≥50% due, Amber ≥20%, transparent otherwise. Progress bar: <span class="token">--lc-mastery-4</span> fill, 4px height. <span class="token">dueRatio</span> computed signal from CollectionStore.</td>
+        </tr>
+        <tr>
+          <td>Filter Chips (updated)</td>
+          <td>LC-207</td>
+          <td><span class="token">vault.page.html</span></td>
+          <td>Count badge: inactive chips use <span class="token">--lc-accent-light</span> + <span class="token">--lc-accent</span>. "Due" badge with urgency count uses <span class="token">#FEF2F2</span> + <span class="token">#B91C1C</span>. Active chip badge: rgba(255,255,255,0.25).</td>
+        </tr>
+        <tr>
+          <td>Overflow Menu</td>
+          <td>LC-203</td>
+          <td><span class="token">vault.page.html</span> (inline sheet)</td>
+          <td>Card bg, <span class="token">--lc-radius-md</span> 12px, border + float shadow. Items: 12px 500, 11px icon. Dismiss on tap-outside via backdrop overlay.</td>
+        </tr>
+        <tr>
+          <td>Stats Banner</td>
+          <td>LC-205</td>
+          <td>Inside Collections tab</td>
+          <td>Brand dark bg. Three stat columns separated by 1px rgba dividers. "Due today" value in <span class="token">#FCD34D</span> when count &gt; 0. Decorative circle pseudos for depth.</td>
+        </tr>
+        <tr>
+          <td>Empty State (collections)</td>
+          <td>LC-201</td>
+          <td>Collections tab, zero state</td>
+          <td>Reuses <span class="token">&lt;lc-empty-state&gt;</span>. Icon 📁, title "No collections yet", CTA "Create your first one" → triggers New Collection sheet.</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<!-- ──────────────────────────────────────────────────────────── -->
+<!-- SECTION 5 — EMPTY STATES                                    -->
+<!-- ──────────────────────────────────────────────────────────── -->
+<div class="doc-section">
+  <div class="section-label">LC-201 · Empty States</div>
+  <div class="section-title">Zero-data states for each tab</div>
+  <div class="section-desc">Both tabs need empty states that guide the user to the correct action rather than showing a blank screen.</div>
+
+  <div class="phones-row">
+    <div class="phone-wrap">
+      <div class="phone-label">Words — empty</div>
+      <div class="phone">
+        <div class="phone-inner">
+          <div class="status-bar"><span>9:41</span><div style="display:flex;align-items:center;gap:3px;"><div class="sig"><span></span><span></span><span></span></div><div class="batt"></div></div></div>
+          <div class="vault-header"><div><span class="vault-title">Vault</span><span class="vault-count">0</span></div></div>
+          <div class="action-bar">
+            <button class="action-btn-primary"><svg viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>Add Card</button>
+            <button class="action-btn-secondary"><svg viewBox="0 0 24 24"><polyline points="16,16 12,12 8,16"/><line x1="12" y1="12" x2="12" y2="21"/><path d="M20.39,18.39A5,5,0,0,0,18,9h-1.26A8,8,0,1,0,3,16.3"/></svg>Import</button>
+          </div>
+          <div class="tab-rail"><div class="tab-item active">Words</div><div class="tab-item">Collections</div></div>
+          <div class="tab-divider"></div>
+          <div class="empty-state" style="flex:1;justify-content:center;">
+            <div class="empty-icon">📭</div>
+            <div class="empty-title">No words yet</div>
+            <div class="empty-sub">Start by adding your first card or importing a CSV file.</div>
+            <button class="empty-cta">Add first card</button>
+            <div style="font-size:11px;color:var(--lc-brand-mid);margin-top:8px;cursor:pointer;">or import a file →</div>
+          </div>
+          <div class="bottom-nav">
+            <div class="nav-item"><svg viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9,22 9,12 15,12 15,22"/></svg><div class="nav-lbl">Home</div></div>
+            <div class="nav-item on"><svg viewBox="0 0 24 24"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg><div class="nav-lbl">Vault</div><div class="nav-dot"></div></div>
+            <div class="nav-item"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polygon points="10,8 16,12 10,16 10,8"/></svg><div class="nav-lbl">Review</div></div>
+            <div class="nav-item"><svg viewBox="0 0 24 24"><path d="M2 3h6a4 4 0 014 4v14a3 3 0 00-3-3H2z"/><path d="M22 3h-6a4 4 0 00-4 4v14a3 3 0 013-3h7z"/></svg><div class="nav-lbl">Stories</div></div>
+            <div class="nav-item"><svg viewBox="0 0 24 24"><polygon points="11,5 6,9 2,9 2,15 6,15 11,19 11,5"/><path d="M15.54,8.46a5,5,0,0,1,0,7.07"/></svg><div class="nav-lbl">Listen</div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="phone-wrap">
+      <div class="phone-label">Collections — empty</div>
+      <div class="phone">
+        <div class="phone-inner">
+          <div class="status-bar"><span>9:41</span><div style="display:flex;align-items:center;gap:3px;"><div class="sig"><span></span><span></span><span></span></div><div class="batt"></div></div></div>
+          <div class="vault-header"><div><span class="vault-title">Vault</span><span class="vault-count">665</span></div></div>
+          <div class="action-bar">
+            <button class="action-btn-primary"><svg viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>New Collection</button>
+            <div class="action-btn-overflow"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="1"/><circle cx="12" cy="5" r="1"/><circle cx="12" cy="19" r="1"/></svg></div>
+          </div>
+          <div class="tab-rail"><div class="tab-item">Words</div><div class="tab-item active">Collections</div></div>
+          <div class="tab-divider"></div>
+          <div class="empty-state" style="flex:1;justify-content:center;">
+            <div class="empty-icon">📁</div>
+            <div class="empty-title">No collections yet</div>
+            <div class="empty-sub">Group your words by topic, lesson, or chapter to study them together.</div>
+            <button class="empty-cta">Create first collection</button>
+          </div>
+          <div class="bottom-nav">
+            <div class="nav-item"><svg viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9,22 9,12 15,12 15,22"/></svg><div class="nav-lbl">Home</div></div>
+            <div class="nav-item on"><svg viewBox="0 0 24 24"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg><div class="nav-lbl">Vault</div><div class="nav-dot"></div></div>
+            <div class="nav-item"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polygon points="10,8 16,12 10,16 10,8"/></svg><div class="nav-lbl">Review</div></div>
+            <div class="nav-item"><svg viewBox="0 0 24 24"><path d="M2 3h6a4 4 0 014 4v14a3 3 0 00-3-3H2z"/><path d="M22 3h-6a4 4 0 00-4 4v14a3 3 0 013-3h7z"/></svg><div class="nav-lbl">Stories</div></div>
+            <div class="nav-item"><svg viewBox="0 0 24 24"><polygon points="11,5 6,9 2,9 2,15 6,15 11,19 11,5"/><path d="M15.54,8.46a5,5,0,0,1,0,7.07"/></svg><div class="nav-lbl">Listen</div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ──────────────────────────────────────────────────────────── -->
+<!-- FOOTER                                                       -->
+<!-- ──────────────────────────────────────────────────────────── -->
+<div class="divider"></div>
+<div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;">
+  <div>
+    <div style="font-family:var(--lc-font-display);font-size:15px;font-weight:600;color:var(--lc-text-primary);">LinguaCard Design System</div>
+    <div style="font-size:11px;color:var(--lc-text-hint);margin-top:3px;">Epic LC-200 · Vault UX Redesign · UI Reference</div>
+  </div>
+  <div style="display:flex;gap:16px;flex-wrap:wrap;">
+    <div style="font-size:11px;color:var(--lc-text-hint);">📄 Epic doc: <span style="color:var(--lc-brand);font-weight:600;">epic-vault-ux-redesign.md</span></div>
+    <div style="font-size:11px;color:var(--lc-text-hint);">🎨 Tokens: <span style="color:var(--lc-brand);font-weight:600;">apps/mobile/src/theme/_tokens.scss</span></div>
+    <div style="font-size:11px;color:var(--lc-text-hint);">🏗 Feature: <span style="color:var(--lc-brand);font-weight:600;">apps/mobile/src/app/features/vault/</span></div>
+  </div>
+</div>
+
+</div><!-- /doc-main -->
+</body>
+</html>

@@ -1,0 +1,97 @@
+@use 'theme/tokens' as t;
+@use 'theme/utils' as u;
+
+:host {
+  display: flex;
+  flex-direction: column;
+  background: var(--lc-card);
+  border-radius: t.$lc-radius-xl t.$lc-radius-xl 0 0;
+  padding-bottom: env(safe-area-inset-bottom, 16px);
+}
+
+.sheet-handle {
+  width: 36px;
+  height: 4px;
+  border-radius: t.$lc-radius-full;
+  background: var(--lc-border);
+  margin: t.$lc-space-2 auto t.$lc-space-1;
+  flex-shrink: 0;
+}
+
+.sheet-header {
+  @include u.flex-between;
+  padding: t.$lc-space-2 t.$lc-space-4 t.$lc-space-3;
+  border-bottom: 1px solid var(--lc-border);
+}
+
+.sheet-title {
+  @include u.lc-font('sm', t.$lc-font-weight-semibold);
+  color: var(--lc-text-hint);
+  letter-spacing: 0.04em;
+}
+
+.sheet-close {
+  @include u.circle(28px);
+  @include u.flex-center;
+  background: var(--lc-surface);
+  border: 1px solid var(--lc-border);
+  cursor: pointer;
+
+  ion-icon {
+    font-size: 15px;
+    color: var(--lc-text-secondary);
+  }
+}
+
+.sheet-actions {
+  display: flex;
+  flex-direction: column;
+  padding: t.$lc-space-2 0 t.$lc-space-2;
+}
+
+.sheet-action {
+  display: flex;
+  align-items: center;
+  gap: t.$lc-space-3;
+  padding: t.$lc-space-3 + 2px t.$lc-space-4 + 4px;
+  background: transparent;
+  border: none;
+  border-bottom: 1px solid var(--lc-border);
+  @include u.lc-font('lg', t.$lc-font-weight-medium);
+  font-family: t.$lc-font-body;
+  color: var(--lc-text-primary);
+  cursor: pointer;
+  text-align: left;
+  transition: var(--lc-transition-fast);
+  @include u.touch-state;
+
+  &:last-child { border-bottom: none; }
+
+  &--cancel {
+    color: var(--lc-text-hint);
+    @include u.lc-font('md', t.$lc-font-weight-medium);
+    justify-content: center;
+    margin-top: t.$lc-space-1;
+    border-top: 1px solid var(--lc-border);
+    border-bottom: none;
+  }
+
+  &--destructive {
+    color: #EF4444;
+  }
+}
+
+.action-icon {
+  font-size: 20px;
+  color: var(--lc-text-secondary);
+  flex-shrink: 0;
+  width: 24px;
+  text-align: center;
+
+  .sheet-action--cancel & { display: none; }
+  .sheet-action--destructive & { color: #EF4444; }
+}
+
+.action-label {
+  flex: 1;
+}

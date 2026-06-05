@@ -1,7 +1,6 @@
 import {Component, computed, inject, signal} from '@angular/core';
 import {Router, RouterLink} from '@angular/router';
 import {
-  ActionSheetController,
   IonContent,
   IonHeader,
   IonIcon,
@@ -11,7 +10,7 @@ import {
   ModalController,
 } from '@ionic/angular/standalone';
 import {addIcons} from 'ionicons';
-import {playOutline} from 'ionicons/icons';
+import {libraryOutline, playOutline} from 'ionicons/icons';
 import {AuthService} from '../../../../core/services/auth.service';
 import {CardStore} from '../../../vault/store/card.store';
 import {CategoryStore} from '../../../vault/store/category.store';
@@ -24,6 +23,7 @@ import {ResetDataSheetComponent} from '../../../auth/components/reset-data-sheet
 import {WordCardComponent} from '../../../../shared/ui/word-card/word-card.component';
 import {WordAudioService} from '../../../../shared/audio/word-audio.service';
 import {ReviewStatsStore} from '../../../../shared/srs/review-stats.store';
+import {BottomSheetService} from '../../../../shared/components/bottom-sheet/bottom-sheet.service';
 import {isDue, isNew} from '../../../../shared/srs/srs-status';
 import {Card} from '@lingua-card/shared/domain';
 
@@ -50,12 +50,12 @@ export class HomePage {
   private readonly reviewStats = inject(ReviewStatsStore);
   private readonly wordAudio = inject(WordAudioService);
   private readonly modalCtrl = inject(ModalController);
-  private readonly actionSheetCtrl = inject(ActionSheetController);
+  private readonly bottomSheet = inject(BottomSheetService);
   private readonly authService = inject(AuthService);
   private readonly router = inject(Router);
 
   constructor() {
-    addIcons({playOutline});
+    addIcons({playOutline, libraryOutline});
   }
 
   readonly user = this.authService.currentUser;
@@ -173,18 +173,14 @@ export class HomePage {
 
   async openCollectionPicker(): Promise<void> {
     const collections = this.collectionStore.collections();
-    const actionSheet = await this.actionSheetCtrl.create({
-      header: 'Filter by collection',
-      buttons: [
-        {text: 'All collections', handler: () => this.selectedCollectionId.set(null)},
-        ...collections.map(col => ({
-          text: `${col.emoji} ${col.name}`,
-          handler: () => this.selectedCollectionId.set(col.id),
-        })),
-        {text: 'Cancel', role: 'cancel'},
-      ],
-    });
-    await actionSheet.present();
+    await this.bottomSheet.open('Filter by collection', [
+      {label: 'All collections', icon: 'library-outline', handler: () => this.selectedCollectionId.set(null)},
+      ...collections.map(col => ({
+        label: `${col.emoji ?? '📚'} ${col.name}`,
+        handler: () => this.selectedCollectionId.set(col.id),
+      })),
+      {label: 'Cancel', role: 'cancel' as const},
+    ]);
   }
 
   handleRefresh(event: any): void {

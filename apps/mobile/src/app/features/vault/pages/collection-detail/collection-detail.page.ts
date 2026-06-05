@@ -241,7 +241,7 @@ export class CollectionDetailPage implements OnInit {
   }
 
   goBack(): void {
-    this.router.navigate(['/vault/collections']);
+    this.router.navigate(['/vault'], {queryParams: {tab: 'collections'}});
   }
 
   startReview(): void {
@@ -345,7 +345,7 @@ export class CollectionDetailPage implements OnInit {
           role: 'destructive',
           handler: () => {
             this.collectionStore.deleteCollection(col.id).subscribe();
-            this.router.navigate(['/vault/collections']);
+            this.router.navigate(['/vault'], {queryParams: {tab: 'collections'}});
           },
         },
         {text: 'Cancel', role: 'cancel'},

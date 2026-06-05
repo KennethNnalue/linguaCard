@@ -1,8 +1,12 @@
 <ion-header class="ion-no-border">
   <ion-toolbar>
     <div class="imp-nav">
-      <button class="imp-back-btn" (click)="goBack()" aria-label="Back">
-        <ion-icon name="arrow-back-outline"></ion-icon>
+      <button class="imp-back-btn" (click)="goBack()" [attr.aria-label]="_isModal() ? 'Close' : 'Back'">
+        @if (_isModal()) {
+          <ion-icon name="close-outline"></ion-icon>
+        } @else {
+          <ion-icon name="arrow-back-outline"></ion-icon>
+        }
       </button>
       <span class="imp-title lc-display">Import Words</span>
       <div class="imp-nav-spacer"></div>
@@ -72,12 +76,18 @@
 
     <!-- Format spec -->
     <div class="imp-format-box">
-      <p class="imp-format-title">Required CSV columns</p>
-      <p class="imp-format-row">front, back, article, categoryId,</p>
+      <p class="imp-format-title">CSV columns</p>
+      <p class="imp-format-row"><strong>Required:</strong> front, back</p>
+      <p class="imp-format-row"><strong>Optional:</strong> article, plural, category,</p>
       <p class="imp-format-row">exampleTarget, exampleNative</p>
+      <p class="imp-format-row"><strong>Synonyms (×3):</strong> synWord, synArticle,</p>
+      <p class="imp-format-row">synTranslation, synExample, synExampleNative</p>
       <p class="imp-format-note">
-        <strong>article:</strong> der / die / das or leave empty.<br>
-        <strong>categoryId:</strong> Animals, Food, Travel …
+        <strong>front:</strong> English translation (e.g. dog)<br>
+        <strong>back:</strong> German word without article (e.g. Hund)<br>
+        <strong>article:</strong> der / die / das — omit for verbs &amp; phrases<br>
+        <strong>plural:</strong> full form incl. article (e.g. die Hunde)<br>
+        <strong>category:</strong> Animals, Food, Travel … (name, not ID)
       </p>
     </div>
 

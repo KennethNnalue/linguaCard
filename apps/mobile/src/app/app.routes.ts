@@ -55,8 +55,8 @@ export const routes: Routes = [
       },
       {
         path: 'vault/collections',
-        loadComponent: () =>
-          import('./features/vault/pages/collections/collections.page').then(m => m.CollectionsPage),
+        redirectTo: '/vault?tab=collections',
+        pathMatch: 'full',
       },
       {
         path: 'vault/collections/:id',
