@@ -13,12 +13,13 @@
 <ion-content>
   <div class="sh-content">
 
-    <!-- Filter chips -->
+    <!-- Line tab filters -->
     <div class="sh-filters">
-      <button class="sh-filter-chip" [class.active]="filter() === 'all'" (click)="setFilter('all')">All sessions</button>
-      <button class="sh-filter-chip" [class.active]="filter() === 'week'" (click)="setFilter('week')">This week</button>
-      <button class="sh-filter-chip" [class.active]="filter() === 'month'" (click)="setFilter('month')">This month</button>
+      <button class="sh-tab" [class.active]="filter() === 'all'" (click)="setFilter('all')">All sessions</button>
+      <button class="sh-tab" [class.active]="filter() === 'week'" (click)="setFilter('week')">This week</button>
+      <button class="sh-tab" [class.active]="filter() === 'month'" (click)="setFilter('month')">This month</button>
     </div>
+    <div class="sh-tab-divider"></div>
 
     @if (filteredSessions().length > 0) {
       @for (session of filteredSessions(); track session.id) {

@@ -70,42 +70,41 @@
       />
     </div>
 
-    <!-- Mastery filter chips -->
-    <div class="v2-filter-row">
-      <button class="v2-filter-chip" [class.v2-filter-on]="masteryFilter() === 'all'" [class.v2-filter-off]="masteryFilter() !== 'all'" (click)="setMasteryFilter('all')">
-        All <span class="v2-filter-count">{{ totalCount() }}</span>
+    <!-- Text-tab filter toolbar + sort -->
+    <div class="n-toolbar">
+      <button class="n-filter" [class.active]="masteryFilter() === 'all'" (click)="setMasteryFilter('all')">
+        All ({{ totalCount() }})
       </button>
-      <button class="v2-filter-chip" [class.v2-filter-on]="masteryFilter() === 'due'" [class.v2-filter-off]="masteryFilter() !== 'due'" (click)="setMasteryFilter('due')">
-        Due <span class="v2-filter-count v2-filter-count--urgent">{{ dueCount() }}</span>
+      @if (dueCount() > 0) {
+        <button class="n-filter" [class.active]="masteryFilter() === 'due'" (click)="setMasteryFilter('due')">
+          Due ({{ dueCount() }})
+        </button>
+      }
+      @if (newCount() > 0) {
+        <button class="n-filter" [class.active]="masteryFilter() === 'new'" (click)="setMasteryFilter('new')">
+          New ({{ newCount() }})
+        </button>
+      }
+      <button class="n-filter" [class.active]="masteryFilter() === 'mastered'" (click)="setMasteryFilter('mastered')">
+        Mastered ({{ masteredCount() }})
       </button>
-      <button class="v2-filter-chip" [class.v2-filter-on]="masteryFilter() === 'new'" [class.v2-filter-off]="masteryFilter() !== 'new'" (click)="setMasteryFilter('new')">
-        New <span class="v2-filter-count">{{ newCount() }}</span>
-      </button>
-      <button class="v2-filter-chip" [class.v2-filter-on]="masteryFilter() === 'mastered'" [class.v2-filter-off]="masteryFilter() !== 'mastered'" (click)="setMasteryFilter('mastered')">
-        Mastered <span class="v2-filter-count">{{ masteredCount() }}</span>
-      </button>
-    </div>
-
-    <!-- Article legend + sort -->
-    <div class="v2-article-legend">
-      <div class="v2-art-pill">
-        <span class="art-badge art-badge--der">der</span>
-        <span class="v2-art-lbl">Masc.</span>
-      </div>
-      <div class="v2-art-pill">
-        <span class="art-badge art-badge--die">die</span>
-        <span class="v2-art-lbl">Fem.</span>
-      </div>
-      <div class="v2-art-pill">
-        <span class="art-badge art-badge--das">das</span>
-        <span class="v2-art-lbl">Neut.</span>
-      </div>
-      <div class="v2-art-spacer"></div>
-      <button class="v2-sort-btn" (click)="openSortSheet()">
+      <button class="n-sort" (click)="openSortSheet()">
         <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><polyline points="19,12 12,19 5,12"/></svg>
         {{ sortLabel() }}
       </button>
     </div>
+
+    <!-- Context summary — visible only on "All" filter -->
+    @if (masteryFilter() === 'all') {
+      <p class="n-context">
+        @if (dueCount() > 0) {
+          <span class="n-context-accent">{{ dueCount() }}</span> need review&nbsp;·&nbsp;
+        }
+        @if (newCount() > 0) {
+          <span class="n-context-accent">{{ newCount() }}</span> never studied
+        }
+      </p>
+    }
 
     <!-- Word list -->
     <div class="word-list">

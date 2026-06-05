@@ -33,34 +33,39 @@
 
 .sh-content { padding-bottom: env(safe-area-inset-bottom, t.$lc-space-6); }
 
-// ── Filter chips ──────────────────────────────────────────────────
+// ── Line tab filters ──────────────────────────────────────────────
 .sh-filters {
   display: flex;
-  gap: t.$lc-space-2;
-  padding: t.$lc-space-1 t.$lc-space-4 t.$lc-space-3;
+  gap: t.$lc-space-4;
+  padding: t.$lc-space-1 t.$lc-space-4 0;
   overflow-x: auto;
   scrollbar-width: none;
   &::-webkit-scrollbar { display: none; }
 }
 
-.sh-filter-chip {
-  flex: 0 0 auto;
-  padding: 5px t.$lc-space-3;
-  border-radius: t.$lc-radius-full;
-  @include u.lc-font('xxs', t.$lc-font-weight-semibold);
-  border: 1px solid var(--lc-border);
-  background: var(--lc-card);
-  color: var(--lc-text-secondary);
-  cursor: pointer;
+.sh-tab {
+  flex-shrink: 0;
+  padding: t.$lc-space-1 0 9px;
+  background: transparent;
+  border: none;
+  border-bottom: 2px solid transparent;
+  @include u.lc-font('sm', t.$lc-font-weight-regular);
   font-family: t.$lc-font-body;
+  color: var(--lc-text-hint);
+  cursor: pointer;
   transition: var(--lc-transition-fast);
-  @include u.touch-state;
 
   &.active {
-    background: var(--lc-brand);
-    color: white;
-    border-color: var(--lc-brand);
+    color: var(--lc-text-primary);
+    font-weight: t.$lc-font-weight-semibold;
+    border-bottom-color: var(--lc-brand);
   }
+}
+
+.sh-tab-divider {
+  height: 1px;
+  background: var(--lc-border);
+  margin: 0 t.$lc-space-4 t.$lc-space-3;
 }
 
 // ── Session card ──────────────────────────────────────────────────

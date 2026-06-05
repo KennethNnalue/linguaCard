@@ -31,14 +31,14 @@
 }
 
 .sheet-close {
-  @include u.circle(28px);
   @include u.flex-center;
-  background: var(--lc-surface);
-  border: 1px solid var(--lc-border);
+  background: transparent;
+  border: none;
   cursor: pointer;
+  padding: t.$lc-space-2;
 
   ion-icon {
-    font-size: 15px;
+    font-size: 24px;
     color: var(--lc-text-secondary);
   }
 }
@@ -67,15 +67,6 @@
 
   &:last-child { border-bottom: none; }
 
-  &--cancel {
-    color: var(--lc-text-hint);
-    @include u.lc-font('md', t.$lc-font-weight-medium);
-    justify-content: center;
-    margin-top: t.$lc-space-1;
-    border-top: 1px solid var(--lc-border);
-    border-bottom: none;
-  }
-
   &--destructive {
     color: #EF4444;
   }
@@ -88,7 +79,6 @@
   width: 24px;
   text-align: center;
 
-  .sheet-action--cancel & { display: none; }
   .sheet-action--destructive & { color: #EF4444; }
 }
 

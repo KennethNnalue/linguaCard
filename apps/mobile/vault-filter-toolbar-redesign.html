@@ -1,0 +1,742 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>LinguaCard — Vault Filter Toolbar Redesign · UI Reference</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,500;0,600;1,400&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600&family=Fira+Code:wght@400;500&display=swap" rel="stylesheet">
+<style>
+/* ─── LDS TOKENS ───────────────────────────────────────────────── */
+:root {
+  --lc-brand:#2D5A4E;--lc-brand-light:#E8F2EE;--lc-brand-mid:#4A8C7A;--lc-brand-dark:#1A3830;
+  --lc-accent:#E07B3F;--lc-accent-light:#FDF0E6;
+  --lc-masc-bg:#EAF2FC;--lc-masc-text:#1A56A3;--lc-masc-border:#85B7EB;
+  --lc-fem-bg:#FEF2F2;--lc-fem-text:#B91C1C;--lc-fem-border:#FCA5A5;
+  --lc-neut-bg:#F1EFE8;--lc-neut-text:#5F5E5A;--lc-neut-border:#B4B2A9;
+  --lc-mastery-0:#D1D5DB;--lc-mastery-1:#FCA5A5;--lc-mastery-2:#FCD34D;
+  --lc-mastery-3:#6EE7B7;--lc-mastery-4:#34D399;--lc-mastery-5:#059669;
+  --lc-surface:#FAFAF8;--lc-card:#FFFFFF;--lc-border:rgba(45,90,78,0.12);
+  --lc-text-primary:#1A2B26;--lc-text-secondary:#6B7C78;--lc-text-hint:#9BAAA6;
+  --lc-shadow-card:0 2px 12px rgba(45,90,78,0.08),0 1px 3px rgba(0,0,0,0.04);
+  --lc-shadow-float:0 8px 32px rgba(45,90,78,0.14),0 2px 8px rgba(0,0,0,0.06);
+  --lc-font-display:'Lora',Georgia,serif;
+  --lc-font-body:'DM Sans',system-ui,sans-serif;
+  --lc-font-mono:'Fira Code','Courier New',monospace;
+  --lc-radius-sm:8px;--lc-radius-md:12px;--lc-radius-lg:20px;--lc-radius-xl:28px;
+}
+
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:var(--lc-font-body);background:#ECEAE5;color:var(--lc-text-primary);min-height:100vh;}
+
+/* ─── DOC CHROME ───────────────────────────────────────────────── */
+.doc-header{background:var(--lc-brand-dark);padding:24px 40px;position:sticky;top:0;z-index:200;box-shadow:0 4px 24px rgba(0,0,0,0.25);}
+.doc-header-inner{max-width:1360px;margin:0 auto;display:flex;align-items:center;justify-content:space-between;gap:20px;flex-wrap:wrap;}
+.doc-logo{font-family:var(--lc-font-display);font-size:18px;font-weight:600;color:white;}
+.doc-logo span{font-size:12px;color:rgba(255,255,255,0.4);margin-left:8px;font-family:var(--lc-font-body);font-weight:400;}
+.doc-sub{font-size:11px;color:rgba(255,255,255,0.4);margin-top:3px;}
+.doc-badge{background:var(--lc-accent);color:white;font-size:10px;font-weight:700;padding:3px 10px;border-radius:20px;letter-spacing:.05em;}
+.doc-main{max-width:1360px;margin:0 auto;padding:40px 40px 80px;}
+
+/* ─── SECTIONS ─────────────────────────────────────────────────── */
+.doc-section{margin-bottom:64px;}
+.section-label{font-size:10px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--lc-brand-mid);margin-bottom:6px;}
+.section-title{font-family:var(--lc-font-display);font-size:22px;font-weight:600;color:var(--lc-text-primary);margin-bottom:6px;}
+.section-desc{font-size:13px;color:var(--lc-text-secondary);line-height:1.65;max-width:680px;margin-bottom:24px;}
+
+/* ─── PHONE FRAMES ─────────────────────────────────────────────── */
+.phones-row{display:flex;gap:28px;align-items:flex-start;overflow-x:auto;padding-bottom:12px;}
+.phone-wrap{display:flex;flex-direction:column;align-items:center;gap:12px;flex:0 0 auto;}
+.phone-label{font-size:11px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--lc-text-hint);}
+.phone-sublabel{font-size:10px;color:var(--lc-text-hint);margin-top:-6px;max-width:300px;text-align:center;line-height:1.4;}
+.phone{width:300px;background:var(--lc-surface);border-radius:44px;border:9px solid #1C1C1E;box-shadow:0 0 0 1px #2C2C2E,var(--lc-shadow-float),0 28px 56px rgba(0,0,0,0.22);overflow:hidden;position:relative;}
+.phone::before{content:'';position:absolute;top:0;left:50%;transform:translateX(-50%);width:88px;height:7px;background:#1C1C1E;border-radius:0 0 10px 10px;z-index:10;}
+.phone-inner{background:var(--lc-surface);min-height:620px;display:flex;flex-direction:column;padding-top:10px;}
+
+/* ─── STATUS BAR ───────────────────────────────────────────────── */
+.status-bar{display:flex;justify-content:space-between;align-items:center;padding:10px 20px 6px;font-size:11px;font-weight:600;color:var(--lc-text-secondary);}
+.sig{display:flex;gap:3px;align-items:flex-end;}
+.sig span{width:3px;background:var(--lc-text-secondary);border-radius:1px;}
+.sig span:nth-child(1){height:4px;}.sig span:nth-child(2){height:7px;}.sig span:nth-child(3){height:10px;}
+.batt{width:20px;height:10px;border:1.5px solid var(--lc-text-secondary);border-radius:3px;position:relative;margin-left:4px;}
+.batt::after{content:'';position:absolute;top:1.5px;left:1.5px;width:65%;height:5px;background:var(--lc-text-secondary);border-radius:1px;}
+
+/* ─── BOTTOM NAV ───────────────────────────────────────────────── */
+.bottom-nav{display:flex;background:var(--lc-card);border-top:1px solid var(--lc-border);padding:9px 0 8px;margin-top:auto;}
+.nav-item{flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;cursor:pointer;}
+.nav-item svg{width:18px;height:18px;stroke:var(--lc-text-hint);fill:none;stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round;}
+.nav-item.on svg{stroke:var(--lc-brand);}.nav-lbl{font-size:9px;font-weight:600;color:var(--lc-text-hint);}
+.nav-item.on .nav-lbl{color:var(--lc-brand);}.nav-dot{width:4px;height:4px;border-radius:50%;background:var(--lc-brand);margin:1px auto 0;}
+
+/* ─── SHARED CARD PIECES ───────────────────────────────────────── */
+.art-badge{font-size:9px;font-weight:700;padding:2px 7px;border-radius:20px;border:1px solid;flex-shrink:0;letter-spacing:.04em;}
+.art-der{background:var(--lc-masc-bg);color:var(--lc-masc-text);border-color:var(--lc-masc-border);}
+.art-die{background:var(--lc-fem-bg);color:var(--lc-fem-text);border-color:var(--lc-fem-border);}
+.art-das{background:var(--lc-neut-bg);color:var(--lc-neut-text);border-color:var(--lc-neut-border);}
+.m-dot{width:7px;height:7px;border-radius:50%;flex-shrink:0;}
+.m0{background:var(--lc-mastery-0);}.m1{background:var(--lc-mastery-1);}.m2{background:var(--lc-mastery-2);}
+.m3{background:var(--lc-mastery-3);}.m4{background:var(--lc-mastery-4);}.m5{background:var(--lc-mastery-5);}
+
+/* ─── WORD CARD (reused in all phones) ─────────────────────────── */
+.wc{background:var(--lc-card);border:1px solid var(--lc-border);border-radius:14px;overflow:hidden;box-shadow:var(--lc-shadow-card);cursor:pointer;display:flex;}
+.wc-bar{width:4px;flex-shrink:0;}
+.wc-body{flex:1;padding:11px 12px 9px;min-width:0;}
+.wc-row1{display:flex;align-items:center;gap:6px;margin-bottom:3px;}
+.wc-word{font-family:var(--lc-font-display);font-size:15px;font-weight:600;color:var(--lc-text-primary);line-height:1.2;}
+.wc-row2{display:flex;align-items:center;gap:6px;margin-bottom:5px;}
+.wc-trans{font-size:12px;color:var(--lc-text-secondary);flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.wc-tag{font-size:8px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--lc-brand-mid);background:var(--lc-brand-light);padding:2px 6px;border-radius:20px;flex-shrink:0;}
+.wc-ex{font-size:11px;color:var(--lc-text-hint);font-style:italic;margin-bottom:5px;line-height:1.4;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.wc-ex strong{color:var(--lc-brand);font-style:normal;}
+.wc-row4{display:flex;align-items:center;gap:6px;}
+.wc-mast{display:flex;align-items:center;gap:4px;font-size:10px;font-weight:500;color:var(--lc-text-hint);}
+.wc-due{font-size:9px;font-weight:700;color:#B91C1C;background:#FEF2F2;padding:1px 6px;border-radius:20px;border:1px solid #FCA5A5;}
+.wc-spacer{flex:1;}
+.wc-audio{width:28px;height:28px;border-radius:50%;background:var(--lc-surface);border:1px solid var(--lc-border);display:flex;align-items:center;justify-content:center;cursor:pointer;flex-shrink:0;}
+.wc-audio svg{width:13px;height:13px;stroke:var(--lc-text-secondary);fill:none;stroke-width:1.8;stroke-linecap:round;}
+
+/* ─── ANNOTATIONS ──────────────────────────────────────────────── */
+.ann{display:flex;gap:10px;align-items:flex-start;background:white;border:1px solid var(--lc-border);border-radius:10px;padding:10px 14px;margin-bottom:8px;box-shadow:var(--lc-shadow-card);font-size:12px;color:var(--lc-text-secondary);line-height:1.5;}
+.ann-num{width:20px;height:20px;border-radius:50%;font-size:10px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0;color:white;}
+.ann strong{color:var(--lc-text-primary);}
+.problem-tag{display:inline-flex;align-items:center;gap:4px;background:#FEF3C7;border:1px solid #FCD34D;color:#92400E;font-size:11px;font-weight:600;padding:3px 10px;border-radius:20px;margin-right:6px;margin-bottom:6px;}
+.fix-tag{display:inline-flex;align-items:center;gap:4px;background:var(--lc-brand-light);border:1px solid rgba(45,90,78,0.25);color:var(--lc-brand);font-size:11px;font-weight:600;padding:3px 10px;border-radius:20px;margin-right:6px;margin-bottom:6px;}
+.divider{height:1px;background:var(--lc-border);margin:32px 0;}
+
+/* ─── HEADER BAR (both before/after share this) ─────────────────── */
+.v-header{padding:4px 16px 0;display:flex;align-items:center;justify-content:space-between;}
+.v-title{font-family:var(--lc-font-display);font-size:22px;font-weight:600;color:var(--lc-text-primary);}
+.v-count{font-size:13px;font-weight:400;color:var(--lc-text-hint);margin-left:6px;}
+
+/* ─── ACTION BAR (both share this) ──────────────────────────────── */
+.v-actions{display:flex;align-items:center;gap:8px;padding:10px 14px 0;}
+.v-act-primary{display:flex;align-items:center;gap:6px;background:var(--lc-accent);color:white;font-size:12px;font-weight:600;padding:8px 14px;border-radius:10px;border:none;cursor:pointer;font-family:var(--lc-font-body);box-shadow:0 3px 10px rgba(224,123,63,0.35);flex:1;justify-content:center;}
+.v-act-primary svg{width:13px;height:13px;stroke:white;fill:none;stroke-width:2.2;stroke-linecap:round;}
+.v-act-secondary{display:flex;align-items:center;gap:6px;background:var(--lc-card);color:var(--lc-text-primary);font-size:12px;font-weight:600;padding:8px 14px;border-radius:10px;border:1px solid var(--lc-border);cursor:pointer;font-family:var(--lc-font-body);box-shadow:var(--lc-shadow-card);flex:1;justify-content:center;}
+.v-act-secondary svg{width:13px;height:13px;stroke:var(--lc-text-primary);fill:none;stroke-width:2.2;stroke-linecap:round;}
+.v-act-overflow{width:36px;height:36px;border-radius:10px;background:var(--lc-card);border:1px solid var(--lc-border);display:flex;align-items:center;justify-content:center;cursor:pointer;box-shadow:var(--lc-shadow-card);flex-shrink:0;}
+.v-act-overflow svg{width:14px;height:14px;stroke:var(--lc-text-secondary);fill:none;stroke-width:2;stroke-linecap:round;}
+
+/* ─── TAB RAIL ─────────────────────────────────────────────────── */
+.v-tabs{display:flex;padding:12px 16px 0;gap:0;}
+.v-tab{flex:1;text-align:center;padding:8px 4px 9px;font-size:13px;font-weight:600;color:var(--lc-text-hint);border-bottom:2px solid transparent;cursor:pointer;}
+.v-tab.on{color:var(--lc-brand);border-bottom-color:var(--lc-brand);}
+.v-tab-div{height:1px;background:var(--lc-border);margin:0 16px;}
+
+/* ─── SEARCH BAR ───────────────────────────────────────────────── */
+.v-search{margin:10px 14px 0;background:var(--lc-card);border:1px solid var(--lc-border);border-radius:10px;padding:9px 12px;display:flex;align-items:center;gap:8px;box-shadow:var(--lc-shadow-card);}
+.v-search svg{width:13px;height:13px;stroke:var(--lc-text-hint);fill:none;stroke-width:2;stroke-linecap:round;flex-shrink:0;}
+.v-search span{font-size:12px;color:var(--lc-text-hint);}
+
+/* ═══════════════════════════════════════════════════════════════
+   BEFORE STATE — current tacky pills
+   ═══════════════════════════════════════════════════════════════ */
+.old-filter-row{display:flex;gap:7px;padding:10px 14px 0;overflow-x:hidden;}
+.old-chip{flex:0 0 auto;display:flex;align-items:center;gap:5px;padding:5px 11px;border-radius:20px;font-size:11px;font-weight:600;border:1px solid;cursor:pointer;font-family:var(--lc-font-body);}
+.old-chip.on{background:var(--lc-brand);color:white;border-color:var(--lc-brand);}
+.old-chip.off{background:var(--lc-card);color:var(--lc-text-secondary);border-color:var(--lc-border);}
+.old-badge{font-size:9px;font-weight:700;padding:1px 5px;border-radius:8px;}
+.old-chip.on .old-badge{background:rgba(255,255,255,0.25);color:white;}
+.old-badge-due{background:#FEF2F2;color:#B91C1C;}
+.old-badge-new{background:var(--lc-accent-light);color:var(--lc-accent);}
+.old-badge-mast{background:var(--lc-brand-light);color:var(--lc-brand);}
+
+.old-legend{display:flex;align-items:center;gap:6px;padding:8px 14px 6px;}
+.old-art{display:flex;align-items:center;gap:4px;font-size:9px;font-weight:500;color:var(--lc-text-hint);padding:3px 8px;border-radius:12px;cursor:pointer;}
+.old-art-dot{width:8px;height:8px;border-radius:50%;}
+.old-art-label{font-size:8px;color:var(--lc-text-hint);margin-left:1px;}
+.old-spacer{flex:1;}
+.old-sort{display:flex;align-items:center;gap:3px;font-size:10px;font-weight:600;color:var(--lc-text-hint);cursor:pointer;}
+.old-sort svg{width:10px;height:10px;stroke:var(--lc-text-hint);fill:none;stroke-width:2;stroke-linecap:round;}
+
+/* ═══════════════════════════════════════════════════════════════
+   NEW DESIGN — Text-tab filter toolbar
+   ═══════════════════════════════════════════════════════════════ */
+
+/* Filter toolbar — single compact row */
+.n-toolbar{
+  display:flex;align-items:center;
+  padding:10px 14px 0;
+  gap:0;
+}
+
+/* Each filter is a text link, not a pill */
+.n-filter{
+  position:relative;
+  padding:6px 0;
+  margin-right:18px;
+  font-size:12px;
+  font-weight:500;
+  color:var(--lc-text-hint);
+  cursor:pointer;
+  border:none;background:none;
+  font-family:var(--lc-font-body);
+  transition:color 0.15s;
+  white-space:nowrap;
+}
+.n-filter:hover{color:var(--lc-text-secondary);}
+
+.n-filter.active{
+  color:var(--lc-text-primary);
+  font-weight:600;
+}
+
+/* Active underline — 2px brand-colored bar below the text */
+.n-filter.active::after{
+  content:'';
+  position:absolute;
+  bottom:0;left:0;right:0;
+  height:2px;
+  background:var(--lc-brand);
+  border-radius:1px;
+}
+
+/* Count shown as parenthetical, not a badge */
+.n-filter-count{
+  font-size:10px;
+  font-weight:500;
+  color:var(--lc-text-hint);
+  margin-left:3px;
+}
+.n-filter.active .n-filter-count{
+  color:var(--lc-brand-mid);
+}
+
+/* Sort control at the right end */
+.n-sort{
+  margin-left:auto;
+  display:flex;align-items:center;gap:4px;
+  font-size:11px;font-weight:500;
+  color:var(--lc-text-hint);
+  cursor:pointer;
+  border:none;background:none;
+  font-family:var(--lc-font-body);
+  padding:6px 0;
+  white-space:nowrap;
+}
+.n-sort svg{width:12px;height:12px;stroke:var(--lc-text-hint);fill:none;stroke-width:2;stroke-linecap:round;}
+.n-sort:hover{color:var(--lc-text-secondary);}
+
+/* Subtle divider below toolbar */
+.n-toolbar-line{
+  height:1px;
+  background:var(--lc-border);
+  margin:0 14px;
+}
+
+/* ── Context summary — the "smart" line ──────────────────────── */
+.n-context{
+  display:flex;align-items:center;gap:6px;
+  padding:8px 14px 4px;
+  font-size:11px;
+  color:var(--lc-text-hint);
+}
+.n-context-highlight{
+  font-weight:600;
+  color:var(--lc-accent);
+}
+.n-context-sep{
+  width:3px;height:3px;
+  border-radius:50%;
+  background:var(--lc-border);
+  flex-shrink:0;
+}
+
+/* ─── WORD LIST ────────────────────────────────────────────────── */
+.word-list{padding:4px 14px 0;display:flex;flex-direction:column;gap:8px;}
+
+/* ═══════════════════════════════════════════════════════════════
+   HIGHLIGHTED COMPARISON AREA
+   ═══════════════════════════════════════════════════════════════ */
+.highlight-box{
+  background:white;
+  border:1px solid var(--lc-border);
+  border-radius:14px;
+  padding:20px;
+  box-shadow:var(--lc-shadow-card);
+  margin-bottom:20px;
+}
+.hl-label{font-size:10px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;margin-bottom:10px;}
+.hl-before{color:#B91C1C;}
+.hl-after{color:var(--lc-brand);}
+
+/* ─── METRIC CALLOUT ───────────────────────────────────────────── */
+.metric-row{display:flex;gap:12px;margin-top:16px;flex-wrap:wrap;}
+.metric-card{flex:1;min-width:120px;background:var(--lc-surface);border:1px solid var(--lc-border);border-radius:10px;padding:12px 14px;}
+.metric-val{font-family:var(--lc-font-display);font-size:24px;font-weight:600;color:var(--lc-text-primary);line-height:1;}
+.metric-label{font-size:10px;color:var(--lc-text-hint);margin-top:3px;}
+.metric-val.green{color:var(--lc-brand);}
+.metric-val.red{color:#B91C1C;}
+
+/* ─── SPEC TABLE ───────────────────────────────────────────────── */
+.spec-table{width:100%;border-collapse:collapse;font-size:12px;}
+.spec-table th{text-align:left;padding:8px 12px;font-size:10px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--lc-text-hint);border-bottom:2px solid var(--lc-border);}
+.spec-table td{padding:10px 12px;border-bottom:1px solid var(--lc-border);vertical-align:top;color:var(--lc-text-secondary);}
+.spec-table td:first-child{font-weight:600;color:var(--lc-text-primary);}
+.spec-table tr:last-child td{border-bottom:none;}
+.token{font-family:var(--lc-font-mono);font-size:11px;color:var(--lc-brand);background:var(--lc-brand-light);padding:2px 6px;border-radius:4px;}
+</style>
+</head>
+<body>
+
+<div class="doc-header">
+  <div class="doc-header-inner">
+    <div>
+      <div class="doc-logo">LinguaCard <span>Design System</span></div>
+      <div class="doc-sub">Vault Filter Toolbar Redesign · UI Reference</div>
+    </div>
+    <div class="doc-badge">FILTER UX</div>
+  </div>
+</div>
+
+<div class="doc-main">
+
+<!-- ══════════════════════════════════════════════════════════════ -->
+<!-- SECTION 0 — PROBLEM ANALYSIS                                 -->
+<!-- ══════════════════════════════════════════════════════════════ -->
+<div class="doc-section">
+  <div class="section-label">Analysis</div>
+  <div class="section-title">Why the current filters feel tacky</div>
+  <div class="section-desc">
+    The filter area consumes 3 rows of vertical space (filter chips, article legend, word list) and creates visual noise through colored pill badges, redundant article dots, and notification-style count indicators. Here are the specific UX problems.
+  </div>
+
+  <div>
+    <span class="problem-tag">⚠ Notification-style count badges</span>
+    <span class="problem-tag">⚠ Redundant article legend row</span>
+    <span class="problem-tag">⚠ Too many competing colored elements</span>
+    <span class="problem-tag">⚠ 3 rows of chrome before first card</span>
+    <span class="problem-tag">⚠ Pill chips feel generic / app-store default</span>
+  </div>
+
+  <div class="metric-row">
+    <div class="metric-card">
+      <div class="metric-val red">~92px</div>
+      <div class="metric-label">Vertical space consumed by filters + legend (before)</div>
+    </div>
+    <div class="metric-card">
+      <div class="metric-val green">~40px</div>
+      <div class="metric-label">Vertical space consumed (after redesign)</div>
+    </div>
+    <div class="metric-card">
+      <div class="metric-val red">7</div>
+      <div class="metric-label">Colored UI elements competing for attention</div>
+    </div>
+    <div class="metric-card">
+      <div class="metric-val green">1</div>
+      <div class="metric-label">Colored element in the redesigned toolbar</div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════════════ -->
+<!-- SECTION 1 — BEFORE vs AFTER                                  -->
+<!-- ══════════════════════════════════════════════════════════════ -->
+<div class="doc-section">
+  <div class="section-label">Comparison</div>
+  <div class="section-title">Before → After</div>
+  <div class="section-desc">
+    The redesign replaces pill chips + article legend with a single text-tab filter row. Counts become parenthetical text, not badges. The article legend is removed — each word card's <code>der/die/das</code> badge is self-documenting. Sort moves to the same row.
+  </div>
+
+  <div class="phones-row" style="gap:40px;">
+
+    <!-- ── BEFORE ──────────────────────────────────────────── -->
+    <div class="phone-wrap">
+      <div class="phone-label" style="color:#B91C1C;">Before — current</div>
+      <div class="phone-sublabel">Pill chips + colored badges + article legend row</div>
+      <div class="phone">
+        <div class="phone-inner">
+          <div class="status-bar"><span>9:41</span><div style="display:flex;align-items:center;gap:3px;"><div class="sig"><span></span><span></span><span></span></div><div class="batt"></div></div></div>
+
+          <div class="v-header"><div><span class="v-title">Vault</span><span class="v-count">666</span></div></div>
+
+          <div class="v-actions">
+            <button class="v-act-primary"><svg viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>Add Card</button>
+            <button class="v-act-secondary"><svg viewBox="0 0 24 24"><polyline points="16,16 12,12 8,16"/><line x1="12" y1="12" x2="12" y2="21"/><path d="M20.39,18.39A5,5,0,0,0,18,9h-1.26A8,8,0,1,0,3,16.3"/></svg>Import</button>
+            <div class="v-act-overflow"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="1"/><circle cx="12" cy="5" r="1"/><circle cx="12" cy="19" r="1"/></svg></div>
+          </div>
+
+          <div class="v-tabs"><div class="v-tab on">Words</div><div class="v-tab">Collections</div></div>
+          <div class="v-tab-div"></div>
+
+          <div class="v-search"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg><span>Search words…</span></div>
+
+          <!-- ★ THE PROBLEM AREA ★ -->
+          <!-- Row 1: filter chips with colored badges -->
+          <div class="old-filter-row">
+            <div class="old-chip on">All <span class="old-badge" style="background:rgba(255,255,255,0.25);color:white;">666</span></div>
+            <div class="old-chip off">Due <span class="old-badge old-badge-due">631</span></div>
+            <div class="old-chip off">New <span class="old-badge old-badge-new">555</span></div>
+            <div class="old-chip off">Mastered <span class="old-badge old-badge-mast">0</span></div>
+          </div>
+
+          <!-- Row 2: article legend + sort -->
+          <div class="old-legend">
+            <div class="old-art">
+              <div class="old-art-dot" style="background:var(--lc-masc-text);"></div>
+              <span class="art-badge art-der" style="font-size:8px;padding:1px 5px;">der</span>
+              <span class="old-art-label">Masc.</span>
+            </div>
+            <div class="old-art">
+              <div class="old-art-dot" style="background:var(--lc-fem-text);"></div>
+              <span class="art-badge art-die" style="font-size:8px;padding:1px 5px;">die</span>
+              <span class="old-art-label">Fem.</span>
+            </div>
+            <div class="old-art">
+              <div class="old-art-dot" style="background:var(--lc-neut-text);"></div>
+              <span class="art-badge art-das" style="font-size:8px;padding:1px 5px;">das</span>
+              <span class="old-art-label">Neut.</span>
+            </div>
+            <div class="old-spacer"></div>
+            <div class="old-sort">
+              <svg viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><polyline points="19,12 12,19 5,12"/></svg>
+              Newest
+            </div>
+          </div>
+          <!-- ★ END PROBLEM AREA ★ -->
+
+          <div class="word-list">
+            <div class="wc"><div class="wc-bar" style="background:var(--lc-mastery-0);"></div><div class="wc-body"><div class="wc-row1"><span class="art-badge art-die" style="font-size:8px;padding:1px 5px;">die</span><span class="wc-word">Möglichkeit</span></div><div class="wc-row2"><span class="wc-trans">possibility, opportunity</span><span class="wc-tag">DEV TEST</span></div><div class="wc-ex"><strong>Ich habe die Möglichkeit</strong>, nächsten Monat nach Berlin zu fahren.</div><div class="wc-row4"><div class="wc-mast"><div class="m-dot m0"></div>New</div><span class="wc-due">Due</span><div class="wc-spacer"></div><div class="wc-audio"><svg viewBox="0 0 24 24"><polygon points="11,5 6,9 2,9 2,15 6,15 11,19 11,5"/><path d="M15.54,8.46a5,5,0,0,1,0,7.07"/></svg></div></div></div></div>
+            <div class="wc"><div class="wc-bar" style="background:var(--lc-mastery-0);"></div><div class="wc-body"><div class="wc-row1"><span class="art-badge art-der" style="font-size:8px;padding:1px 5px;">der</span><span class="wc-word">Rucksack</span></div><div class="wc-row2"><span class="wc-trans">backpack</span><span class="wc-tag">TRAVEL</span></div><div class="wc-ex"><strong>Ich trage meinen Rucksack</strong> auf der Wanderung.</div><div class="wc-row4"><div class="wc-mast"><div class="m-dot m0"></div>New</div><span class="wc-due">Due</span><div class="wc-spacer"></div><div class="wc-audio"><svg viewBox="0 0 24 24"><polygon points="11,5 6,9 2,9 2,15 6,15 11,19 11,5"/><path d="M15.54,8.46a5,5,0,0,1,0,7.07"/></svg></div></div></div></div>
+          </div>
+
+          <div style="flex:1;"></div>
+          <div class="bottom-nav">
+            <div class="nav-item"><svg viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9,22 9,12 15,12 15,22"/></svg><div class="nav-lbl">Home</div></div>
+            <div class="nav-item on"><svg viewBox="0 0 24 24"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg><div class="nav-lbl">Vault</div><div class="nav-dot"></div></div>
+            <div class="nav-item"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polygon points="10,8 16,12 10,16 10,8"/></svg><div class="nav-lbl">Review</div></div>
+            <div class="nav-item"><svg viewBox="0 0 24 24"><path d="M2 3h6a4 4 0 014 4v14a3 3 0 00-3-3H2z"/><path d="M22 3h-6a4 4 0 00-4 4v14a3 3 0 013-3h7z"/></svg><div class="nav-lbl">Stories</div></div>
+            <div class="nav-item"><svg viewBox="0 0 24 24"><polygon points="11,5 6,9 2,9 2,15 6,15 11,19 11,5"/><path d="M15.54,8.46a5,5,0,0,1,0,7.07"/></svg><div class="nav-lbl">Listen</div></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Problem annotations -->
+      <div style="margin-top:14px;max-width:300px;">
+        <div class="ann"><div class="ann-num" style="background:#EF4444;">1</div><div><strong>Colored badge overload.</strong> Four pill chips, each with a colored count badge. Red, orange, green — competing for attention. Feels like an app notifications tray, not a learning tool.</div></div>
+        <div class="ann"><div class="ann-num" style="background:#EF4444;">2</div><div><strong>Redundant article legend.</strong> <code>der/die/das</code> with dots + full badges + "Masc./Fem./Neut." labels. Each card already shows its own article badge — this row adds nothing.</div></div>
+        <div class="ann"><div class="ann-num" style="background:#EF4444;">3</div><div><strong>~92px of chrome</strong> between search bar and first word card. Two full rows of UI that push content below the fold.</div></div>
+      </div>
+    </div>
+
+    <!-- ── AFTER ───────────────────────────────────────────── -->
+    <div class="phone-wrap">
+      <div class="phone-label" style="color:var(--lc-brand);">After — text-tab toolbar</div>
+      <div class="phone-sublabel">Text links with underline active state. No pills, no badges, no legend row.</div>
+      <div class="phone">
+        <div class="phone-inner">
+          <div class="status-bar"><span>9:41</span><div style="display:flex;align-items:center;gap:3px;"><div class="sig"><span></span><span></span><span></span></div><div class="batt"></div></div></div>
+
+          <div class="v-header"><div><span class="v-title">Vault</span><span class="v-count">666</span></div></div>
+
+          <div class="v-actions">
+            <button class="v-act-primary"><svg viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>Add Card</button>
+            <button class="v-act-secondary"><svg viewBox="0 0 24 24"><polyline points="16,16 12,12 8,16"/><line x1="12" y1="12" x2="12" y2="21"/><path d="M20.39,18.39A5,5,0,0,0,18,9h-1.26A8,8,0,1,0,3,16.3"/></svg>Import</button>
+            <div class="v-act-overflow"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="1"/><circle cx="12" cy="5" r="1"/><circle cx="12" cy="19" r="1"/></svg></div>
+          </div>
+
+          <div class="v-tabs"><div class="v-tab on">Words</div><div class="v-tab">Collections</div></div>
+          <div class="v-tab-div"></div>
+
+          <div class="v-search"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg><span>Search words…</span></div>
+
+          <!-- ★ THE NEW FILTER TOOLBAR ★ -->
+          <div class="n-toolbar">
+            <button class="n-filter active">All<span class="n-filter-count">(666)</span></button>
+            <button class="n-filter">Due<span class="n-filter-count">(631)</span></button>
+            <button class="n-filter">New<span class="n-filter-count">(555)</span></button>
+            <button class="n-filter">Mastered<span class="n-filter-count">(0)</span></button>
+            <button class="n-sort">
+              <svg viewBox="0 0 24 24"><line x1="4" y1="6" x2="20" y2="6"/><line x1="4" y1="12" x2="16" y2="12"/><line x1="4" y1="18" x2="12" y2="18"/></svg>
+              Newest
+            </button>
+          </div>
+          <div class="n-toolbar-line"></div>
+
+          <!-- Context summary — muted, informative, not alarming -->
+          <div class="n-context">
+            <span><span class="n-context-highlight">631</span> need review</span>
+            <div class="n-context-sep"></div>
+            <span><span class="n-context-highlight">555</span> never studied</span>
+          </div>
+          <!-- ★ END NEW TOOLBAR ★ -->
+
+          <div class="word-list">
+            <div class="wc"><div class="wc-bar" style="background:var(--lc-mastery-0);"></div><div class="wc-body"><div class="wc-row1"><span class="art-badge art-die" style="font-size:8px;padding:1px 5px;">die</span><span class="wc-word">Möglichkeit</span></div><div class="wc-row2"><span class="wc-trans">possibility, opportunity</span><span class="wc-tag">DEV TEST</span></div><div class="wc-ex"><strong>Ich habe die Möglichkeit</strong>, nächsten Monat nach Berlin zu fahren.</div><div class="wc-row4"><div class="wc-mast"><div class="m-dot m0"></div>New</div><span class="wc-due">Due</span><div class="wc-spacer"></div><div class="wc-audio"><svg viewBox="0 0 24 24"><polygon points="11,5 6,9 2,9 2,15 6,15 11,19 11,5"/><path d="M15.54,8.46a5,5,0,0,1,0,7.07"/></svg></div></div></div></div>
+            <div class="wc"><div class="wc-bar" style="background:var(--lc-mastery-0);"></div><div class="wc-body"><div class="wc-row1"><span class="art-badge art-der" style="font-size:8px;padding:1px 5px;">der</span><span class="wc-word">Rucksack</span></div><div class="wc-row2"><span class="wc-trans">backpack</span><span class="wc-tag">TRAVEL</span></div><div class="wc-ex"><strong>Ich trage meinen Rucksack</strong> auf der Wanderung.</div><div class="wc-row4"><div class="wc-mast"><div class="m-dot m0"></div>New</div><span class="wc-due">Due</span><div class="wc-spacer"></div><div class="wc-audio"><svg viewBox="0 0 24 24"><polygon points="11,5 6,9 2,9 2,15 6,15 11,19 11,5"/><path d="M15.54,8.46a5,5,0,0,1,0,7.07"/></svg></div></div></div></div>
+            <div class="wc"><div class="wc-bar" style="background:var(--lc-mastery-3);"></div><div class="wc-body"><div class="wc-row1"><span class="art-badge art-das" style="font-size:8px;padding:1px 5px;">das</span><span class="wc-word">Gepäck</span></div><div class="wc-row2"><span class="wc-trans">luggage, baggage</span><span class="wc-tag">TRAVEL</span></div><div class="wc-ex"><strong>Mein Gepäck</strong> ist zu schwer für den Flug.</div><div class="wc-row4"><div class="wc-mast"><div class="m-dot m3"></div>Familiar</div><span style="font-size:9px;color:var(--lc-text-hint);">3d</span><div class="wc-spacer"></div><div class="wc-audio"><svg viewBox="0 0 24 24"><polygon points="11,5 6,9 2,9 2,15 6,15 11,19 11,5"/><path d="M15.54,8.46a5,5,0,0,1,0,7.07"/></svg></div></div></div></div>
+          </div>
+
+          <div style="flex:1;"></div>
+          <div class="bottom-nav">
+            <div class="nav-item"><svg viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9,22 9,12 15,12 15,22"/></svg><div class="nav-lbl">Home</div></div>
+            <div class="nav-item on"><svg viewBox="0 0 24 24"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg><div class="nav-lbl">Vault</div><div class="nav-dot"></div></div>
+            <div class="nav-item"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polygon points="10,8 16,12 10,16 10,8"/></svg><div class="nav-lbl">Review</div></div>
+            <div class="nav-item"><svg viewBox="0 0 24 24"><path d="M2 3h6a4 4 0 014 4v14a3 3 0 00-3-3H2z"/><path d="M22 3h-6a4 4 0 00-4 4v14a3 3 0 013-3h7z"/></svg><div class="nav-lbl">Stories</div></div>
+            <div class="nav-item"><svg viewBox="0 0 24 24"><polygon points="11,5 6,9 2,9 2,15 6,15 11,19 11,5"/><path d="M15.54,8.46a5,5,0,0,1,0,7.07"/></svg><div class="nav-lbl">Listen</div></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Fix annotations -->
+      <div style="margin-top:14px;max-width:300px;">
+        <div class="ann"><div class="ann-num" style="background:var(--lc-brand);">1</div><div><strong>Text-tab filters.</strong> Labels + parenthetical counts. Active state: dark text + brand-colored underline. No pills, no colored badges. Feels editorial, not notification-heavy.</div></div>
+        <div class="ann"><div class="ann-num" style="background:var(--lc-brand);">2</div><div><strong>Article legend removed.</strong> Each word card already shows its colored <code>der/die/das</code> badge — the legend was redundant decoration consuming ~32px.</div></div>
+        <div class="ann"><div class="ann-num" style="background:var(--lc-brand);">3</div><div><strong>Context summary line.</strong> "631 need review · 555 never studied" — accent-colored numbers give urgency context without the anxiety of red notification badges. Disappears when filter is active (content speaks for itself).</div></div>
+        <div class="ann"><div class="ann-num" style="background:var(--lc-brand);">4</div><div><strong>Sort integrated.</strong> Small sort icon + label at the right end of the same row. No extra line needed.</div></div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════════════ -->
+<!-- SECTION 2 — FILTER STATES                                    -->
+<!-- ══════════════════════════════════════════════════════════════ -->
+<div class="doc-section">
+  <div class="section-label">Interactive states</div>
+  <div class="section-title">Filter toolbar in different active states</div>
+  <div class="section-desc">
+    When a filter is active, the context summary line hides — the filtered word list itself communicates the scope. The active filter gets the brand underline while siblings fade to hint color.
+  </div>
+
+  <div class="phones-row">
+
+    <!-- State: All active -->
+    <div class="phone-wrap">
+      <div class="phone-label">All (default)</div>
+      <div class="phone" style="min-height:0;">
+        <div class="phone-inner" style="min-height:280px;">
+          <div class="status-bar"><span>9:41</span><div style="display:flex;align-items:center;gap:3px;"><div class="sig"><span></span><span></span><span></span></div><div class="batt"></div></div></div>
+          <div class="v-search" style="margin-top:4px;"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg><span>Search words…</span></div>
+          <div class="n-toolbar">
+            <button class="n-filter active">All<span class="n-filter-count">(666)</span></button>
+            <button class="n-filter">Due<span class="n-filter-count">(631)</span></button>
+            <button class="n-filter">New<span class="n-filter-count">(555)</span></button>
+            <button class="n-filter">Mastered</button>
+            <button class="n-sort"><svg viewBox="0 0 24 24"><line x1="4" y1="6" x2="20" y2="6"/><line x1="4" y1="12" x2="16" y2="12"/><line x1="4" y1="18" x2="12" y2="18"/></svg>Newest</button>
+          </div>
+          <div class="n-toolbar-line"></div>
+          <div class="n-context"><span><span class="n-context-highlight">631</span> need review</span><div class="n-context-sep"></div><span><span class="n-context-highlight">555</span> never studied</span></div>
+          <div style="padding:4px 14px;font-size:11px;color:var(--lc-text-hint);">↓ word cards…</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- State: Due active -->
+    <div class="phone-wrap">
+      <div class="phone-label">Due (filtered)</div>
+      <div class="phone" style="min-height:0;">
+        <div class="phone-inner" style="min-height:280px;">
+          <div class="status-bar"><span>9:41</span><div style="display:flex;align-items:center;gap:3px;"><div class="sig"><span></span><span></span><span></span></div><div class="batt"></div></div></div>
+          <div class="v-search" style="margin-top:4px;"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg><span>Search words…</span></div>
+          <div class="n-toolbar">
+            <button class="n-filter">All<span class="n-filter-count">(666)</span></button>
+            <button class="n-filter active">Due<span class="n-filter-count">(631)</span></button>
+            <button class="n-filter">New</button>
+            <button class="n-filter">Mastered</button>
+            <button class="n-sort"><svg viewBox="0 0 24 24"><line x1="4" y1="6" x2="20" y2="6"/><line x1="4" y1="12" x2="16" y2="12"/><line x1="4" y1="18" x2="12" y2="18"/></svg>Due date</button>
+          </div>
+          <div class="n-toolbar-line"></div>
+          <!-- no context line when filtered — the list IS the context -->
+          <div style="padding:8px 14px 4px;font-size:11px;color:var(--lc-text-hint);">Showing 631 words due for review</div>
+          <div style="padding:4px 14px;font-size:11px;color:var(--lc-text-hint);">↓ word cards…</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- State: Mastered active (zero) -->
+    <div class="phone-wrap">
+      <div class="phone-label">Mastered (empty)</div>
+      <div class="phone" style="min-height:0;">
+        <div class="phone-inner" style="min-height:280px;">
+          <div class="status-bar"><span>9:41</span><div style="display:flex;align-items:center;gap:3px;"><div class="sig"><span></span><span></span><span></span></div><div class="batt"></div></div></div>
+          <div class="v-search" style="margin-top:4px;"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg><span>Search words…</span></div>
+          <div class="n-toolbar">
+            <button class="n-filter">All<span class="n-filter-count">(666)</span></button>
+            <button class="n-filter">Due</button>
+            <button class="n-filter">New</button>
+            <button class="n-filter active">Mastered<span class="n-filter-count">(0)</span></button>
+            <button class="n-sort"><svg viewBox="0 0 24 24"><line x1="4" y1="6" x2="20" y2="6"/><line x1="4" y1="12" x2="16" y2="12"/><line x1="4" y1="18" x2="12" y2="18"/></svg>Mastery</button>
+          </div>
+          <div class="n-toolbar-line"></div>
+          <!-- Empty state for mastered -->
+          <div style="display:flex;flex-direction:column;align-items:center;justify-content:center;padding:32px 16px;text-align:center;gap:6px;">
+            <div style="font-size:28px;">🎯</div>
+            <div style="font-size:14px;font-weight:600;color:var(--lc-text-primary);">No mastered words yet</div>
+            <div style="font-size:11px;color:var(--lc-text-hint);line-height:1.5;max-width:180px;">Review your due cards to start building mastery.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════════════ -->
+<!-- SECTION 3 — DESIGN DECISIONS                                 -->
+<!-- ══════════════════════════════════════════════════════════════ -->
+<div class="doc-section">
+  <div class="section-label">Rationale</div>
+  <div class="section-title">Why each change was made</div>
+
+  <div class="highlight-box">
+    <div style="margin-bottom:16px;">
+      <div style="font-family:var(--lc-font-display);font-size:15px;font-weight:600;margin-bottom:6px;">1. Text-tabs replace pill chips</div>
+      <div style="font-size:12px;color:var(--lc-text-secondary);line-height:1.65;">
+        Pill chips with colored count badges borrow the visual language of notification indicators — red circles with numbers trigger the same "unread count" anxiety as email badges. This is wrong for a learning tool. Filters should feel like calm navigation, not alerts. Text labels with an underline active state (borrowed from tab navigation patterns) are the standard in tools like Linear, Notion, and Things 3 — apps known for low-friction, high-clarity UI. The underline is the only colored element, keeping the toolbar visually quiet while clearly showing which filter is active.
+      </div>
+    </div>
+    <div style="margin-bottom:16px;">
+      <div style="font-family:var(--lc-font-display);font-size:15px;font-weight:600;margin-bottom:6px;">2. Counts become parenthetical text, not badges</div>
+      <div style="font-size:12px;color:var(--lc-text-secondary);line-height:1.65;">
+        "Due (631)" reads as data. <span style="display:inline-block;font-size:9px;font-weight:700;padding:1px 5px;border-radius:8px;background:#FEF2F2;color:#B91C1C;">631</span> reads as an alarm. Both convey the same number, but the emotional weight is completely different. The parenthetical format is informative without being anxiety-inducing.
+      </div>
+    </div>
+    <div style="margin-bottom:16px;">
+      <div style="font-family:var(--lc-font-display);font-size:15px;font-weight:600;margin-bottom:6px;">3. Article legend removed entirely</div>
+      <div style="font-size:12px;color:var(--lc-text-secondary);line-height:1.65;">
+        Every word card already displays its <code>der/die/das</code> badge in the appropriate gender color. The legend row (● der Masc.  ● die Fem.  ● das Neut.) is tutorial information the user learns within the first 30 seconds and then never needs again. It consumes ~32px of prime vertical real estate on every single visit. Removing it pushes the first word card ~50px higher — a meaningful improvement on a 5.8" phone screen.
+      </div>
+    </div>
+    <div>
+      <div style="font-family:var(--lc-font-display);font-size:15px;font-weight:600;margin-bottom:6px;">4. Context summary as a soft nudge</div>
+      <div style="font-size:12px;color:var(--lc-text-secondary);line-height:1.65;">
+        The line "631 need review · 555 never studied" uses the app's accent color for the numbers — warm, motivating, not alarming. It appears only on the "All" view (when the user hasn't filtered yet) and disappears once they activate a specific filter, because the filtered list itself communicates the scope. This prevents redundant information and keeps the UI adaptive.
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════════════ -->
+<!-- SECTION 4 — IMPLEMENTATION SPEC                              -->
+<!-- ══════════════════════════════════════════════════════════════ -->
+<div class="doc-section">
+  <div class="section-label">Implementation</div>
+  <div class="section-title">Angular component changes</div>
+  <div class="section-desc">
+    All changes are in <code>vault.page.html</code> and <code>vault.page.scss</code>. No store changes needed — filter logic and computed signals already exist.
+  </div>
+
+  <div style="background:white;border:1px solid var(--lc-border);border-radius:14px;overflow:hidden;box-shadow:var(--lc-shadow-card);">
+    <table class="spec-table">
+      <thead><tr><th>Element</th><th>Action</th><th>Implementation detail</th></tr></thead>
+      <tbody>
+        <tr>
+          <td>.v2-filter-row</td>
+          <td>Replace</td>
+          <td>Delete entire <span class="token">.v2-filter-row</span> div + <span class="token">.v2-filter-chip</span> buttons. Replace with <span class="token">.n-toolbar</span> containing <span class="token">.n-filter</span> buttons. Remove <span class="token">.v2-filter-count</span> badge styles.</td>
+        </tr>
+        <tr>
+          <td>.v2-article-legend</td>
+          <td>Delete</td>
+          <td>Remove the entire <span class="token">.v2-article-legend</span> div from template. Delete <span class="token">.v2-art-pill</span>, <span class="token">.v2-art-dot</span>, <span class="token">.v2-art-spacer</span>, <span class="token">.v2-sort-btn</span> styles from SCSS.</td>
+        </tr>
+        <tr>
+          <td>.n-toolbar</td>
+          <td>Create</td>
+          <td>Single flex row. Filters use <span class="token">[class.active]="masteryFilter() === 'all'"</span> etc. Active state: <span class="token">font-weight:600</span> + <span class="token">::after</span> pseudo (2px <span class="token">--lc-brand</span> underline). Sort button at <span class="token">margin-left:auto</span>.</td>
+        </tr>
+        <tr>
+          <td>.n-context</td>
+          <td>Create</td>
+          <td>Conditional: <span class="token">@if (masteryFilter() === 'all')</span>. Shows <span class="token">dueCount()</span> + <span class="token">newCount()</span> in accent color. Hidden when any filter is active.</td>
+        </tr>
+        <tr>
+          <td>Sort button</td>
+          <td>Move</td>
+          <td>Sort moves from deleted article legend row into the <span class="token">.n-toolbar</span> row, using <span class="token">(click)="openSortSheet()"</span> — same handler, new location.</td>
+        </tr>
+        <tr>
+          <td>Counts (inactive filters)</td>
+          <td>Simplify</td>
+          <td>Only show parenthetical counts on filters that have non-zero values. <span class="token">@if (dueCount() > 0) { ({{ dueCount() }}) }</span>. "Mastered (0)" shows <span class="token">(0)</span> to communicate progress gap; could hide with <span class="token">@if (masteredCount() > 0)</span>.</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- Template diff -->
+  <div style="margin-top:24px;">
+    <div style="font-family:var(--lc-font-display);font-size:15px;font-weight:600;margin-bottom:10px;">Template — before / after</div>
+    <div style="display:flex;gap:16px;flex-wrap:wrap;">
+      <!-- BEFORE -->
+      <div style="flex:1;min-width:280px;background:#FEF2F2;border:1px solid #FCA5A5;border-radius:10px;padding:14px;font-family:var(--lc-font-mono);font-size:10px;line-height:1.6;color:#92400E;overflow-x:auto;">
+        <div style="font-family:var(--lc-font-body);font-weight:700;font-size:11px;margin-bottom:8px;color:#B91C1C;">✗ Remove</div>
+        <pre style="margin:0;white-space:pre-wrap;">&lt;!-- Filter chips --&gt;
+&lt;div class="v2-filter-row"&gt;
+  &lt;button class="v2-filter-chip" ...&gt;
+    All &lt;span class="v2-filter-count"&gt;{{ totalCount() }}&lt;/span&gt;
+  &lt;/button&gt;
+  &lt;button class="v2-filter-chip" ...&gt;Due now&lt;/button&gt;
+  ...
+&lt;/div&gt;
+
+&lt;!-- Article legend + sort --&gt;
+&lt;div class="v2-article-legend"&gt;
+  &lt;div class="v2-art-pill"&gt;...der...&lt;/div&gt;
+  &lt;div class="v2-art-pill"&gt;...die...&lt;/div&gt;
+  &lt;div class="v2-art-pill"&gt;...das...&lt;/div&gt;
+  &lt;button class="v2-sort-btn"&gt;...&lt;/button&gt;
+&lt;/div&gt;</pre>
+      </div>
+      <!-- AFTER -->
+      <div style="flex:1;min-width:280px;background:var(--lc-brand-light);border:1px solid rgba(45,90,78,0.25);border-radius:10px;padding:14px;font-family:var(--lc-font-mono);font-size:10px;line-height:1.6;color:var(--lc-brand-dark);overflow-x:auto;">
+        <div style="font-family:var(--lc-font-body);font-weight:700;font-size:11px;margin-bottom:8px;color:var(--lc-brand);">✓ Replace with</div>
+        <pre style="margin:0;white-space:pre-wrap;">&lt;!-- Filter toolbar --&gt;
+&lt;div class="n-toolbar"&gt;
+  @for (f of filters; track f.key) {
+    &lt;button class="n-filter"
+      [class.active]="masteryFilter() === f.key"
+      (click)="setMasteryFilter(f.key)"&gt;
+      {{ f.label }}
+      @if (f.count() > 0 || f.key === 'all') {
+        &lt;span class="n-filter-count"&gt;
+          ({{ f.count() }})
+        &lt;/span&gt;
+      }
+    &lt;/button&gt;
+  }
+  &lt;button class="n-sort" (click)="openSortSheet()"&gt;
+    &lt;ion-icon name="filter-outline" /&gt;
+    {{ sortLabel() }}
+  &lt;/button&gt;
+&lt;/div&gt;
+&lt;div class="n-toolbar-line"&gt;&lt;/div&gt;
+
+@if (masteryFilter() === 'all') {
+  &lt;div class="n-context"&gt;
+    &lt;span&gt;&lt;span class="n-context-highlight"&gt;
+      {{ dueCount() }}&lt;/span&gt; need review
+    &lt;/span&gt;
+    &lt;div class="n-context-sep"&gt;&lt;/div&gt;
+    &lt;span&gt;&lt;span class="n-context-highlight"&gt;
+      {{ newCount() }}&lt;/span&gt; never studied
+    &lt;/span&gt;
+  &lt;/div&gt;
+}</pre>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════════════ -->
+<!-- FOOTER                                                       -->
+<!-- ══════════════════════════════════════════════════════════════ -->
+<div class="divider"></div>
+<div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;">
+  <div>
+    <div style="font-family:var(--lc-font-display);font-size:15px;font-weight:600;">LinguaCard Design System</div>
+    <div style="font-size:11px;color:var(--lc-text-hint);margin-top:3px;">Vault Filter Toolbar Redesign · UI Reference</div>
+  </div>
+  <div style="display:flex;gap:16px;flex-wrap:wrap;">
+    <div style="font-size:11px;color:var(--lc-text-hint);">📄 Files: <span style="color:var(--lc-brand);font-weight:600;">vault.page.html + vault.page.scss</span></div>
+    <div style="font-size:11px;color:var(--lc-text-hint);">🔧 Stores: <span style="color:var(--lc-brand);font-weight:600;">no changes needed</span></div>
+  </div>
+</div>
+
+</div>
+</body>
+</html>

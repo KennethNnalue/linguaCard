@@ -1,5 +1,5 @@
 import { ChangeDetectionStrategy, Component, computed, inject, signal } from '@angular/core';
-import { Router } from '@angular/router';
+import { Location } from '@angular/common';
 import { IonContent, IonHeader, IonIcon, IonToolbar } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
 import { chevronBackOutline } from 'ionicons/icons';
@@ -11,7 +11,6 @@ import {
   FilterPeriod,
   MS_PER_DAY,
   RatingPillClass,
-  ReviewRoute,
   SessionStats,
 } from '../../models/review.model';
 
@@ -27,7 +26,7 @@ export type { FilterPeriod, SessionStats };
 export class SessionHistoryPage {
   private readonly reviewStore = inject(ReviewStore);
   readonly statsService = inject(SessionStatsService);
-  private readonly router = inject(Router);
+  private readonly location = inject(Location);
 
   constructor() {
     addIcons({ chevronBackOutline });
@@ -57,6 +56,6 @@ export class SessionHistoryPage {
   }
 
   goBack(): void {
-    void this.router.navigate([ReviewRoute.HUB]);
+    this.location.back();
   }
 }
