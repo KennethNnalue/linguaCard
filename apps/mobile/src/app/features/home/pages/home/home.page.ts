@@ -24,7 +24,7 @@ import {ResetDataSheetComponent} from '../../../auth/components/reset-data-sheet
 import {WordCardComponent} from '../../../../shared/ui/word-card/word-card.component';
 import {WordAudioService} from '../../../../shared/audio/word-audio.service';
 import {ReviewStatsStore} from '../../../../shared/srs/review-stats.store';
-import {isNew, isDue} from '../../../../shared/srs/srs-status';
+import {isDue, isNew} from '../../../../shared/srs/srs-status';
 import {Card} from '@lingua-card/shared/domain';
 
 @Component({
@@ -153,7 +153,7 @@ export class HomePage {
     const modal = await this.modalCtrl.create({
       component: AddWordSheetComponent,
       breakpoints: [0, 0.95, 1],
-      initialBreakpoint: 0.95,
+      initialBreakpoint: 1,
       handleBehavior: 'cycle',
     });
     await modal.present();

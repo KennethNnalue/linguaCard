@@ -1,8 +1,23 @@
 import {Component, computed, effect, inject, OnInit, signal} from '@angular/core';
 import {ActivatedRoute, Router} from '@angular/router';
-import {AlertController, IonContent, IonHeader, IonIcon, IonToolbar, ModalController, ToastController,} from '@ionic/angular/standalone';
+import {
+  AlertController,
+  IonContent,
+  IonHeader,
+  IonIcon,
+  IonToolbar,
+  ModalController,
+  ToastController,
+} from '@ionic/angular/standalone';
 import {addIcons} from 'ionicons';
-import {chevronBackOutline, chevronForwardOutline, ellipsisHorizontalOutline, playOutline, timeOutline, volumeHighOutline,} from 'ionicons/icons';
+import {
+  chevronBackOutline,
+  chevronForwardOutline,
+  ellipsisHorizontalOutline,
+  playOutline,
+  timeOutline,
+  volumeHighOutline,
+} from 'ionicons/icons';
 import {Card, Collection} from '@lingua-card/shared/domain';
 import {isDue, isMastered} from '../../../../shared/srs/srs-status';
 import {firstValueFrom} from 'rxjs';
@@ -84,7 +99,7 @@ export class CollectionDetailPage implements OnInit {
 
   readonly pendingGhosts = computed(() => {
     const count = this.collection()?.pendingWords.length ?? 0;
-    return Array.from({ length: Math.min(count, 5) }, (_, i) => i);
+    return Array.from({length: Math.min(count, 5)}, (_, i) => i);
   });
 
   readonly ghostWidths: [string, string][] = [
@@ -185,7 +200,7 @@ export class CollectionDetailPage implements OnInit {
         ...c,
         importStatus: result.isComplete ? 'complete' : 'incomplete',
         pendingWords: result.pendingWords,
-        cardCount:    c.cardCount + result.newCards,
+        cardCount: c.cardCount + result.newCards,
       } : c);
 
       this.loadCards();
@@ -248,7 +263,7 @@ export class CollectionDetailPage implements OnInit {
   startListen(): void {
     const col = this.collection();
     if (!col) return;
-    this.router.navigate(['/listen'], { queryParams: { collectionId: col.id, collectionName: col.name } });
+    this.router.navigate(['/listen'], {queryParams: {collectionId: col.id, collectionName: col.name}});
   }
 
   async openAddWord(): Promise<void> {
@@ -257,7 +272,7 @@ export class CollectionDetailPage implements OnInit {
     const modal = await this.modalCtrl.create({
       component: AddWordSheetComponent,
       breakpoints: [0, 0.95, 1],
-      initialBreakpoint: 0.95,
+      initialBreakpoint: 1,
       handleBehavior: 'cycle',
       componentProps: {lockedCollectionId: col.id},
     });

@@ -147,7 +147,7 @@ export class VaultPage {
     const modal = await this.modalCtrl.create({
       component: AddWordSheetComponent,
       breakpoints: [0, 0.95, 1],
-      initialBreakpoint: 0.95,
+      initialBreakpoint: 1,
       handleBehavior: 'cycle',
     });
     await modal.present();
