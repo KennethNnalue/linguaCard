@@ -15,6 +15,7 @@ import {
 } from 'ionicons/icons';
 import {CardStore} from '../../store/card.store';
 import {CategoryStore} from '../../store/category.store';
+import {CollectionStore} from '../../store/collection.store';
 import {CardApiService} from '../../services/card-api.service';
 import {WordAudioService} from '../../../../shared/audio/word-audio.service';
 import {AudioReadinessStore} from '../../../../shared/audio/audio-readiness.store';
@@ -34,6 +35,7 @@ import {normalizeForAudio} from '../../../../shared/audio/normalize';
 export class WordDetailComponent {
   private readonly cardStore = inject(CardStore);
   private readonly categoryStore = inject(CategoryStore);
+  private readonly collectionStore = inject(CollectionStore);
   private readonly cardApi = inject(CardApiService);
   private readonly wordAudio = inject(WordAudioService);
   private readonly audioReadiness = inject(AudioReadinessStore);
@@ -227,14 +229,35 @@ export class WordDetailComponent {
   private deleteCard(): void {
     const id = this.cardId();
     if (!id) return;
-    const collectionId = this.card()?.collectionId;
-    this.cardApi.remove(id).subscribe(() => {
-      this.cardStore.loadCards();
-      if (collectionId) {
-        this.router.navigate(['/vault/collections', collectionId]);
-      } else {
-        this.navCtrl.back();
-      }
+    const card = this.card();
+    const collectionId = card?.collectionId ?? null;
+
+    // Optimistic: remove from CardStore immediately
+    this.cardStore.setCardsFromSync(this.cardStore.cards().filter(c => c.id !== id));
+
+    // Optimistic: decrement the collection's cardCount so the vault list updates instantly
+    if (collectionId) {
+      this.collectionStore.setCollectionsFromSync(
+        this.collectionStore.collections().map(c =>
+          c.id === collectionId
+            ? { ...c, cardCount: Math.max(0, c.cardCount - 1) }
+            : c
+        )
+      );
+    }
+
+    this.cardApi.remove(id).subscribe({
+      error: () => {
+        // Rollback: reload from cache on failure
+        this.cardStore.loadCards();
+        if (collectionId) this.collectionStore.loadCollections();
+      },
     });
+
+    if (collectionId) {
+      this.router.navigate(['/vault/collections', collectionId]);
+    } else {
+      this.navCtrl.back();
+    }
   }
 }
