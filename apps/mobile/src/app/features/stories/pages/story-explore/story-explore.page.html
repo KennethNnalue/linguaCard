@@ -1,0 +1,88 @@
+<ion-header class="ion-no-border">
+  <ion-toolbar>
+    <div class="p-nav">
+      <button class="back-btn" (click)="goBack()" aria-label="Back">
+        <ion-icon name="arrow-back-outline"></ion-icon>
+      </button>
+      <span class="p-nav-title">{{ pageTitle() }}</span>
+      <div class="p-nav-spacer"></div>
+    </div>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+
+  <!-- Level filter chips -->
+  <div class="filter-row">
+    @for (f of levelFilters; track f.label) {
+      <button
+        class="filter-chip"
+        [class.active]="selectedLevel() === f.value"
+        (click)="selectLevel(f.value)"
+      >{{ f.label }}</button>
+    }
+  </div>
+
+  <!-- Category chips -->
+  <div class="cat-row">
+    @for (cat of categoryFilters; track cat.value) {
+      <button
+        class="cat-chip"
+        [class.active]="selectedCategory() === cat.value"
+        (click)="selectCategory(cat.value)"
+      >
+        <span class="cat-emoji">{{ cat.icon }}</span>
+        {{ cat.label }}
+      </button>
+    }
+  </div>
+
+  <!-- Story count header -->
+  @if (!isLoading() || stories().length > 0) {
+    <div class="results-header">
+      <span class="results-count">{{ stories().length }} stories</span>
+    </div>
+  }
+
+  <!-- Grid loading skeleton -->
+  @if (isLoading() && stories().length === 0) {
+    <div class="explore-grid">
+      @for (i of [1, 2, 3, 4, 5, 6]; track i) {
+        <div class="browse-card-skeleton"></div>
+      }
+    </div>
+  } @else if (stories().length === 0 && !isLoading()) {
+    <div class="empty-state">
+      <ion-icon name="book-outline"></ion-icon>
+      <div class="empty-title">No stories found</div>
+      <div class="empty-sub">Try a different level or category filter.</div>
+    </div>
+  } @else {
+    <div class="explore-grid">
+      @for (story of stories(); track story.id) {
+        <div class="browse-card" (click)="openStory(story.id)" role="button" [attr.aria-label]="'Open: ' + story.title">
+          <div class="browse-img">
+            <span class="browse-lvl">{{ story.level }}</span>
+            @if (story.isPremium) {
+              <span class="browse-premium">⭐</span>
+            }
+          </div>
+          <div class="browse-body">
+            <div class="browse-title">{{ story.title }}</div>
+            <div class="browse-meta">
+              🕐 {{ story.estimatedReadMinutes }} min
+              · {{ story.quizCount }} quiz
+            </div>
+          </div>
+        </div>
+      }
+    </div>
+  }
+
+  <!-- Infinite scroll -->
+  <ion-infinite-scroll [disabled]="!hasMore()" (ionInfinite)="onInfiniteScroll($event)">
+    <ion-infinite-scroll-content loadingSpinner="crescent"></ion-infinite-scroll-content>
+  </ion-infinite-scroll>
+
+  <div style="height: 32px;"></div>
+</ion-content>

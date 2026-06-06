@@ -125,6 +125,16 @@ export const routes: Routes = [
           import('./features/stories/pages/story-library/story-library.page').then(m => m.StoryLibraryPage),
       },
       {
+        path: 'stories/explore',
+        loadComponent: () =>
+          import('./features/stories/pages/story-explore/story-explore.page').then(m => m.StoryExplorePage),
+      },
+      {
+        path: 'stories/platform/:id',
+        loadComponent: () =>
+          import('./features/stories/pages/platform-story-reader/platform-story-reader.page').then(m => m.PlatformStoryReaderPage),
+      },
+      {
         path: 'stories/:id',
         loadComponent: () =>
           import('./features/stories/pages/story-reader/story-reader.page').then(m => m.StoryReaderPage),

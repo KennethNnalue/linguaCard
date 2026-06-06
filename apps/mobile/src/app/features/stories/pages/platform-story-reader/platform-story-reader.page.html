@@ -1,0 +1,152 @@
+<ion-content [fullscreen]="true">
+  @if (isLoading()) {
+    <div class="psr-loading">
+      <div class="psr-loading-spinner"></div>
+    </div>
+  } @else if (story(); as s) {
+
+    <!-- ── Cover ─────────────────────────────────────────────────── -->
+    <div class="sr2-cover">
+      @if (s.coverImageUrl) {
+        <img [src]="s.coverImageUrl" class="sr2-cover-img" alt="" />
+      }
+      <div class="sr2-cover-overlay"></div>
+
+      <div class="sr2-top-bar">
+        <button class="sr2-back-btn" (click)="goBack()" aria-label="Back">
+          <ion-icon name="arrow-back-outline"></ion-icon>
+        </button>
+        <div class="sr2-top-actions">
+          <!-- Level + category pill -->
+          <span class="psr-meta-pill">{{ s.level }} · {{ categoryLabel() }}</span>
+          @if (s.isPremium) {
+            <span class="psr-premium-pill">⭐ Pro</span>
+          }
+        </div>
+      </div>
+    </div>
+
+    <!-- ── Tab bar ────────────────────────────────────────────────── -->
+    <div class="sr2-section-tabs">
+      <button class="sr2-section-tab" [class.active]="activeTab() === 'story'"    (click)="setTab('story')"   >Story</button>
+      <button class="sr2-section-tab" [class.active]="activeTab() === 'quiz'"     (click)="setTab('quiz')"    >Quiz</button>
+      <button class="sr2-section-tab" [class.active]="activeTab() === 'keywords'" (click)="setTab('keywords')">Keywords</button>
+      <button class="sr2-section-tab" [class.active]="activeTab() === 'grammar'"  (click)="setTab('grammar')" >Grammar</button>
+    </div>
+
+    <!-- ── STORY TAB ──────────────────────────────────────────────── -->
+    @if (activeTab() === 'story') {
+      <div class="sr2-story-meta">
+        <div class="sr2-story-title">{{ s.title }}</div>
+        <div class="sr2-meta-row">
+          <span class="sr2-level-pill" [ngClass]="'level-' + s.level">{{ s.level }}</span>
+          <button
+            class="sr2-icon-btn"
+            [class.active]="showTranslation()"
+            (click)="showTranslation.update(v => !v)"
+            aria-label="Toggle translation"
+          >
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="14" height="14">
+              <circle cx="12" cy="12" r="10"/>
+              <line x1="2" y1="12" x2="22" y2="12"/>
+              <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/>
+            </svg>
+          </button>
+          @if (progress()?.isRead) {
+            <span class="psr-read-badge">✓ Read</span>
+          }
+        </div>
+      </div>
+
+      <div class="sr2-text-block">
+        @for (sent of s.sentences; track sent.index) {
+          <div class="sr2-sent-block">
+            <p class="sr2-sent-de">{{ sent.german }}</p>
+            @if (showTranslation()) {
+              <p class="sr2-sent-en">{{ sent.english }}</p>
+            }
+          </div>
+        }
+      </div>
+
+      <div style="height: 140px;"></div>
+    }
+
+    <!-- ── QUIZ TAB ────────────────────────────────────────────────── -->
+    @if (activeTab() === 'quiz') {
+      <lc-quiz-tab
+        [questions]="s.quizQuestions"
+        [loading]="false"
+        [pronunciationLoading]="pronunciationLoading()"
+        [(currentIdx)]="quizCurrentIdx"
+        [(answered)]="quizAnswered"
+      />
+    }
+
+    <!-- ── KEYWORDS TAB ────────────────────────────────────────────── -->
+    @if (activeTab() === 'keywords') {
+      <lc-keywords-tab
+        [keywords]="s.keywords"
+        [loading]="false"
+        [pronunciationLoading]="pronunciationLoading()"
+        (playWord)="onKeywordsPlayWord($event)"
+        (addToTraining)="onAddToTraining($event)"
+        (memorizeAll)="onMemorizeAll()"
+        (cardClick)="onKeywordCardClick($event)"
+      />
+    }
+
+    <!-- ── GRAMMAR TAB ─────────────────────────────────────────────── -->
+    @if (activeTab() === 'grammar') {
+      <lc-grammar-tab
+        [grammarNotes]="s.grammarNotes"
+        [loading]="false"
+      />
+    }
+
+  } @else if (!isLoading()) {
+    <div class="psr-error">
+      <div class="psr-error-icon">📖</div>
+      <div class="psr-error-text">Story not found</div>
+      <button class="psr-error-btn" (click)="goBack()">Back to Stories</button>
+    </div>
+  }
+</ion-content>
+
+<!-- ── Floating audio pill — only on Story tab when audio exists ── -->
+@if (story(); as s) {
+  @if (activeTab() === 'story' && s.audioUrl) {
+    <div class="sr-float-pill">
+      <div class="sr-pill-progress">
+        <div class="sr-pill-progress-fill" [style.width.%]="progressPct()"></div>
+      </div>
+
+      <button
+        class="sr-pill-play"
+        (click)="togglePlay()"
+        [attr.aria-label]="isPlaying() ? 'Pause' : 'Play'"
+      >
+        @if (isPlaying()) {
+          <svg viewBox="0 0 24 24" width="12" height="12" fill="white" stroke="white" stroke-width="2" stroke-linecap="round">
+            <rect x="6" y="4" width="4" height="16"/><rect x="14" y="4" width="4" height="16"/>
+          </svg>
+        } @else {
+          <svg viewBox="0 0 24 24" width="12" height="12" fill="white" stroke="white" stroke-width="2.5" stroke-linecap="round">
+            <polygon points="6,4 20,12 6,20"/>
+          </svg>
+        }
+      </button>
+
+      <span class="sr-pill-label">{{ currentTimeLabel() }} / {{ durationLabel() }}</span>
+
+      <button class="sr-pill-speed" (click)="cycleSpeed()">{{ speedLabel() }}</button>
+
+      <button class="sr-pill-repeat" (click)="restart()" aria-label="Restart">
+        <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <polyline points="1,4 1,10 7,10"/>
+          <path d="M3.51 15a9 9 0 1 0 .49-4.95"/>
+        </svg>
+      </button>
+    </div>
+  }
+}

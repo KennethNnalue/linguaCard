@@ -15,7 +15,7 @@ import {
   ViewWillLeave,
 } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
-import { arrowBackOutline, playOutline, pauseOutline, playSkipBackOutline, repeatOutline } from 'ionicons/icons';
+import { arrowBackOutline } from 'ionicons/icons';
 import type { Story, StoryKeyword, WordTimestamp } from '@lingua-card/shared/domain';
 import { StoryStore } from '../../store/story.store';
 import { StoryApiService } from '../../services/story-api.service';
@@ -103,7 +103,7 @@ export class StoryReaderPage implements OnInit, OnDestroy, ViewWillLeave {
   });
 
   constructor() {
-    addIcons({ arrowBackOutline, playOutline, pauseOutline, playSkipBackOutline, repeatOutline });
+    addIcons({ arrowBackOutline });
   }
 
   async ngOnInit(): Promise<void> {

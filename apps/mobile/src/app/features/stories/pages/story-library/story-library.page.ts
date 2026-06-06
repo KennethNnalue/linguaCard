@@ -1,7 +1,16 @@
-import { Component, effect, inject, OnInit } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  computed,
+  effect,
+  inject,
+  OnInit,
+  signal,
+} from '@angular/core';
 import { NgClass, TitleCasePipe } from '@angular/common';
 import { Router } from '@angular/router';
 import {
+  ActionSheetController,
   AlertController,
   IonContent,
   IonHeader,
@@ -24,37 +33,80 @@ import {
   chevronDownCircleOutline,
   warningOutline,
   addCircleOutline,
+  gridOutline,
+  ellipsisHorizontalOutline,
 } from 'ionicons/icons';
-import type { Story } from '@lingua-card/shared/domain';
+import type { Story, PlatformStoryCard, StoryDifficulty, StoryCategory } from '@lingua-card/shared/domain';
+import { STORY_CATEGORIES } from '@lingua-card/shared/domain';
 import { StoryStore } from '../../store/story.store';
 import { SyncService } from '../../../../core/services/sync.service';
 import { GenerateStorySheetComponent } from '../../components/generate-story-sheet/generate-story-sheet.component';
 import { SubscriptionStore } from '../../../subscription/store/subscription.store';
 import { PaywallModalComponent } from '../../../subscription/components/paywall-modal/paywall-modal.component';
+import { PlatformStoryApiService } from '../../services/platform-story-api.service';
+
+const LEVEL_FILTERS: Array<{ value: StoryDifficulty | null; label: string }> = [
+  { value: null, label: 'All' },
+  { value: 'A1', label: 'A1' },
+  { value: 'A2', label: 'A2' },
+  { value: 'B1', label: 'B1' },
+  { value: 'B2', label: 'B2' },
+];
 
 @Component({
   selector: 'lc-story-library',
   templateUrl: './story-library.page.html',
   styleUrls: ['./story-library.page.scss'],
-  imports: [IonContent, IonHeader, IonToolbar, IonIcon, IonRefresher, IonRefresherContent, IonSpinner, NgClass, TitleCasePipe],
+  changeDetection: ChangeDetectionStrategy.OnPush,
+  imports: [
+    IonContent, IonHeader, IonToolbar, IonIcon,
+    IonRefresher, IonRefresherContent, IonSpinner,
+    NgClass, TitleCasePipe,
+  ],
 })
 export class StoryLibraryPage implements OnInit {
-  private readonly storyStore = inject(StoryStore);
-  private readonly syncService = inject(SyncService);
-  private readonly router = inject(Router);
-  private readonly modalCtrl = inject(ModalController);
-  private readonly alertCtrl = inject(AlertController);
-  private readonly toastCtrl = inject(ToastController);
-  private readonly subscriptionStore = inject(SubscriptionStore);
+  private readonly storyStore          = inject(StoryStore);
+  private readonly syncService         = inject(SyncService);
+  private readonly router              = inject(Router);
+  private readonly modalCtrl           = inject(ModalController);
+  private readonly alertCtrl           = inject(AlertController);
+  private readonly toastCtrl           = inject(ToastController);
+  private readonly subscriptionStore   = inject(SubscriptionStore);
+  private readonly platformApi         = inject(PlatformStoryApiService);
+  private readonly actionSheetCtrl     = inject(ActionSheetController);
 
-  readonly stories = this.storyStore.sortedStories;
-  readonly isLoading = this.storyStore.isLoading;
-  readonly isRefreshing = this.storyStore.isRefreshing;
-  readonly isGenerating = this.storyStore.isGenerating;
-  readonly extendingId = this.storyStore.extendingId;
+  // ── My Stories (user-generated) ──────────────────────────────────────────
+  readonly stories       = this.storyStore.sortedStories;
+  readonly isLoading     = this.storyStore.isLoading;
+  readonly isRefreshing  = this.storyStore.isRefreshing;
+  readonly isGenerating  = this.storyStore.isGenerating;
+  readonly extendingId   = this.storyStore.extendingId;
+
+  // ── Explore (platform stories) ───────────────────────────────────────────
+  readonly platformStories     = signal<PlatformStoryCard[]>([]);
+  readonly isLoadingExplore    = signal(false);
+  readonly selectedLevel       = signal<StoryDifficulty | null>(null);
+  readonly selectedCategory    = signal<StoryCategory | null>(null);
+
+  readonly levelFilters    = LEVEL_FILTERS;
+  readonly categoryFilters = STORY_CATEGORIES;
+
+  readonly filteredPlatformStories = computed(() => {
+    const level    = this.selectedLevel();
+    const category = this.selectedCategory();
+    return this.platformStories().filter(s => {
+      if (level    && s.level    !== level)    return false;
+      if (category && s.category !== category) return false;
+      return true;
+    });
+  });
 
   constructor() {
-    addIcons({ bookOutline, addOutline, playOutline, timeOutline, sparklesOutline, trashOutline, chevronDownCircleOutline, warningOutline, addCircleOutline });
+    addIcons({
+      bookOutline, addOutline, playOutline, timeOutline, sparklesOutline,
+      trashOutline, chevronDownCircleOutline, warningOutline, addCircleOutline,
+      gridOutline, ellipsisHorizontalOutline,
+    });
 
     effect(async () => {
       const err = this.storyStore.extendError();
@@ -72,7 +124,28 @@ export class StoryLibraryPage implements OnInit {
 
   ngOnInit(): void {
     this.storyStore.loadStories();
+    this.loadPlatformStories();
   }
+
+  // ── Explore actions ───────────────────────────────────────────────────────
+
+  selectLevel(level: StoryDifficulty | null): void {
+    this.selectedLevel.set(this.selectedLevel() === level ? null : level);
+  }
+
+  selectCategory(category: StoryCategory): void {
+    this.selectedCategory.set(this.selectedCategory() === category ? null : category);
+  }
+
+  navigateToPlatformStory(id: string): void {
+    this.router.navigate(['/stories/platform', id]);
+  }
+
+  navigateToExplore(): void {
+    this.router.navigate(['/stories/explore']);
+  }
+
+  // ── My Stories actions ────────────────────────────────────────────────────
 
   async onRefresh(event: Event): Promise<void> {
     if (!navigator.onLine) {
@@ -80,6 +153,7 @@ export class StoryLibraryPage implements OnInit {
       return;
     }
     await this.syncService.forceSync();
+    this.loadPlatformStories();
     (event.target as HTMLIonRefresherElement).complete();
   }
 
@@ -120,34 +194,27 @@ export class StoryLibraryPage implements OnInit {
     this.router.navigate(['/stories', story.id], { queryParams: { autoPlay: '1' } });
   }
 
-  readingTime(story: Story): string {
-    const mins = Math.max(1, Math.ceil(story.audioDurationMs / 60000));
-    return `${mins} min`;
-  }
-
-  levelStyle(level: string): { background: string; color: string } {
-    const map: Record<string, { background: string; color: string }> = {
-      A2: { background: '#D1FAE5', color: '#059669' },
-      B1: { background: '#FEF3C7', color: '#D97706' },
-      B2: { background: '#EAF2FC', color: '#1A56A3' },
-    };
-    return map[level] ?? { background: '#F1EFE8', color: '#5F5E5A' };
-  }
-
-  articleClass(article: string | null): string {
-    if (article === 'der') return 'art-der';
-    if (article === 'die') return 'art-die';
-    if (article === 'das') return 'art-das';
-    return '';
-  }
-
   onExtend(event: Event, id: string): void {
     event.stopPropagation();
     this.storyStore.extendStory(id);
   }
 
-  async confirmDelete(event: Event, story: Story): Promise<void> {
+  async openMoreSheet(event: Event, story: Story): Promise<void> {
     event.stopPropagation();
+    const sheet = await this.actionSheetCtrl.create({
+      buttons: [
+        {
+          text: 'Delete story',
+          role: 'destructive',
+          handler: () => this.confirmDelete(story),
+        },
+        { text: 'Cancel', role: 'cancel' },
+      ],
+    });
+    await sheet.present();
+  }
+
+  private async confirmDelete(story: Story): Promise<void> {
     const alert = await this.alertCtrl.create({
       header: 'Delete story',
       message: `Remove "${story.title}"? The audio will also be deleted.`,
@@ -161,5 +228,55 @@ export class StoryLibraryPage implements OnInit {
       ],
     });
     await alert.present();
+  }
+
+  // ── Helpers ───────────────────────────────────────────────────────────────
+
+  readingTime(story: Story): string {
+    const mins = Math.max(1, Math.ceil(story.audioDurationMs / 60000));
+    return `${mins} min`;
+  }
+
+  storyWordCount(story: Story): number {
+    return story.sentences.reduce((acc, s) => acc + s.german.split(/\s+/).length, 0);
+  }
+
+  thumbEmoji(story: Story): string {
+    const emojis = ['📖', '🎓', '🌍', '✈️', '🍽️', '💼', '🎵', '🏔️', '🎭', '🔬'];
+    // Deterministic per story — simple char-code sum mod pool length
+    const code = story.id.split('').reduce((n, c) => n + c.charCodeAt(0), 0);
+    return emojis[code % emojis.length];
+  }
+
+  platformReadingTime(story: PlatformStoryCard): string {
+    return `${story.estimatedReadMinutes} min`;
+  }
+
+  categoryLabel(value: StoryCategory): string {
+    return STORY_CATEGORIES.find(c => c.value === value)?.label ?? value;
+  }
+
+  categoryIcon(value: StoryCategory): string {
+    return STORY_CATEGORIES.find(c => c.value === value)?.icon ?? '📖';
+  }
+
+  articleClass(article: string | null): string {
+    if (article === 'der') return 'art-der';
+    if (article === 'die') return 'art-die';
+    if (article === 'das') return 'art-das';
+    return '';
+  }
+
+  // ── Private ───────────────────────────────────────────────────────────────
+
+  private loadPlatformStories(): void {
+    this.isLoadingExplore.set(true);
+    this.platformApi.getAll({ limit: 20 }).subscribe({
+      next: res => {
+        this.platformStories.set(res.stories);
+        this.isLoadingExplore.set(false);
+      },
+      error: () => this.isLoadingExplore.set(false),
+    });
   }
 }

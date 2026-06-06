@@ -18,120 +18,177 @@
     </ion-refresher-content>
   </ion-refresher>
 
-  <!-- Silent background-refresh indicator (2px linear progress bar) -->
+  <!-- Silent background-refresh indicator -->
   @if (isRefreshing()) {
     <div class="ss-refresh-bar"></div>
   }
 
-  <!-- Hero generate CTA -->
-  <div class="ss-hero">
-    <div class="ss-hero-label">AI-powered reading</div>
-    <div class="ss-hero-title">Stories built from<br>your vocabulary</div>
-    <div class="ss-hero-sub">Every story uses your words in natural everyday context</div>
-    <button class="ss-hero-btn" (click)="openGenerateSheet()">
-      <ion-icon name="sparkles-outline"></ion-icon>
-      Generate a new story
-    </button>
+  <!-- ═══════════════ EXPLORE SECTION ═══════════════ -->
+  <div class="sec-hdr">
+    <span class="sec-t">Explore</span>
+    <button class="sec-link" (click)="navigateToExplore()">See all →</button>
   </div>
 
-  <!-- Full skeleton: only on first-ever load with no cache -->
+  <!-- Level filter chips -->
+  <div class="filter-row">
+    @for (f of levelFilters; track f.label) {
+      <button
+        class="filter-chip"
+        [class.active]="selectedLevel() === f.value"
+        (click)="selectLevel(f.value)"
+      >{{ f.label }}</button>
+    }
+  </div>
+
+  <!-- Category chips -->
+  <div class="cat-row">
+    @for (cat of categoryFilters; track cat.value) {
+      <button
+        class="cat-chip"
+        [class.active]="selectedCategory() === cat.value"
+        (click)="selectCategory(cat.value)"
+      >
+        <span class="cat-emoji">{{ cat.icon }}</span>
+        {{ cat.label }}
+      </button>
+    }
+  </div>
+
+  <!-- Browse cards (horizontal scroll) -->
+  @if (isLoadingExplore() && platformStories().length === 0) {
+    <div class="browse-scroll">
+      <div class="browse-card-skeleton"></div>
+      <div class="browse-card-skeleton"></div>
+      <div class="browse-card-skeleton"></div>
+    </div>
+  } @else if (filteredPlatformStories().length === 0 && !isLoadingExplore()) {
+    <div class="explore-empty">
+      <ion-icon name="book-outline"></ion-icon>
+      <span>No stories yet for this filter</span>
+    </div>
+  } @else {
+    <div class="browse-scroll">
+      @for (story of filteredPlatformStories(); track story.id) {
+        <div class="browse-card" (click)="navigateToPlatformStory(story.id)" role="button" [attr.aria-label]="'Open: ' + story.title">
+          <div class="browse-img">
+            <span class="browse-lvl">{{ story.level }}</span>
+            @if (story.isPremium) {
+              <span class="browse-premium">⭐</span>
+            }
+          </div>
+          <div class="browse-body">
+            <div class="browse-title">{{ story.title }}</div>
+            <div class="browse-meta">
+              🕐 {{ platformReadingTime(story) }}
+              · {{ categoryIcon(story.category) }} {{ categoryLabel(story.category) }}
+              @if (story.isPremium) { · Pro }
+            </div>
+          </div>
+        </div>
+      }
+    </div>
+  }
+
+  <div class="divider"></div>
+
+  <!-- ═══════════════ MY STORIES SECTION ═══════════════ -->
+  <div class="sec-hdr">
+    <span class="sec-t">My Stories</span>
+    @if (stories().length > 0) {
+      <span class="sec-count">{{ stories().length }} saved</span>
+    } @else {
+      <button class="sec-link" (click)="openGenerateSheet()">Generate first →</button>
+    }
+  </div>
+
   @if (isLoading() && stories().length === 0) {
-    <div class="loading-state">
-      <div class="skeleton-card"></div>
-      <div class="skeleton-card"></div>
+    <div class="my-loading">
+      <div class="my-skeleton"></div>
+      <div class="my-skeleton"></div>
     </div>
   } @else if (stories().length === 0) {
-    <div class="empty-state">
-      <div class="empty-icon">
-        <ion-icon name="book-outline"></ion-icon>
-      </div>
-      <div class="empty-title">No stories yet</div>
-      <div class="empty-sub">Generate your first story from your vocabulary collections.</div>
-      <button class="empty-cta" (click)="openGenerateSheet()">
+    <div class="my-empty">
+      <ion-icon name="sparkles-outline"></ion-icon>
+      <div class="my-empty-title">No stories yet</div>
+      <div class="my-empty-sub">Generate your first story from your vocabulary.</div>
+      <button class="my-empty-cta" (click)="openGenerateSheet()">
         <ion-icon name="sparkles-outline"></ion-icon>
-        Generate your first story
+        Generate a story
       </button>
     </div>
   } @else {
-    <div class="section-header">
-      <span class="section-title">Your stories</span>
-      <span class="section-count">{{ stories().length }} saved</span>
-    </div>
-
     @for (story of stories(); track story.id) {
-      <div class="ss-story-card" (click)="openStory(null, story)" role="button" [attr.aria-label]="'Open story: ' + story.title">
-        <div class="ss-story-top">
-          <div class="ss-story-title">{{ story.title }}</div>
-          @if (story.generationStatus === 'partial') {
-            <div class="sl-incomplete-badge">
-              <ion-icon name="warning-outline"></ion-icon>
-              Incomplete
+      <div class="my-card" (click)="openStory(null, story)" role="button" [attr.aria-label]="'Open story: ' + story.title">
+
+        <div class="my-card-top">
+          <div class="my-card-thumb">{{ thumbEmoji(story) }}</div>
+          <div class="my-card-info">
+            <div class="my-card-title">{{ story.title }}</div>
+            <div class="my-card-meta">
+              <span>🕐 {{ readingTime(story) }}</span>
+              <span>·</span>
+              <span>{{ storyWordCount(story) }} words</span>
             </div>
-          }
-          <div class="ss-story-meta">
-            <span>
-              <ion-icon name="time-outline"></ion-icon>
-              {{ readingTime(story) }} read
-            </span>
-            <span>·</span>
-            <span>{{ story.vocabWords.length }} vocab words</span>
+            <div class="my-card-badges">
+              <span class="my-card-badge badge-level">{{ story.difficultyLevel }}</span>
+              <span class="my-card-badge badge-length">{{ story.lengthType | titlecase }}</span>
+              @if (story.generationStatus === 'partial') {
+                <span class="my-card-badge badge-incomplete">
+                  <ion-icon name="warning-outline"></ion-icon>
+                  Incomplete
+                </span>
+              }
+            </div>
           </div>
-          <!-- Vocab word chips (first 3) -->
-          <div class="ss-word-chips">
+        </div>
+
+        <!-- Vocab word chips -->
+        @if (story.vocabWords.length > 0) {
+          <div class="my-card-chips">
             @for (vw of story.vocabWords.slice(0, 3); track $index) {
-              <span class="ss-word-chip" [ngClass]="articleClass(vw.article)">
-                {{ vw.german }}
-              </span>
+              <span class="my-chip" [ngClass]="articleClass(vw.article)">{{ vw.german }}</span>
             }
             @if (story.vocabWords.length > 3) {
-              <span class="ss-word-chip chip-more">
-                +{{ story.vocabWords.length - 3 }} more
-              </span>
+              <span class="my-chip-more">+{{ story.vocabWords.length - 3 }} more</span>
             }
           </div>
+        }
+
+        <div class="my-card-footer">
+          @if (story.generationStatus === 'partial') {
+            <button
+              class="my-action my-action-extend"
+              [class.is-loading]="extendingId() === story.id"
+              [disabled]="extendingId() === story.id"
+              (click)="onExtend($event, story.id)"
+              aria-label="Extend incomplete story"
+            >
+              @if (extendingId() === story.id) {
+                <ion-spinner name="dots"></ion-spinner>
+                Extending…
+              } @else {
+                <ion-icon name="add-circle-outline"></ion-icon>
+                Extend
+              }
+            </button>
+          } @else {
+            <button class="my-action my-action-listen" (click)="listenStory($event, story)" aria-label="Listen">
+              <ion-icon name="play-outline"></ion-icon>
+              Listen
+            </button>
+            <button class="my-action my-action-read" (click)="openStory($event, story)" aria-label="Read">
+              <ion-icon name="book-outline"></ion-icon>
+              Read
+            </button>
+          }
+          <button class="my-action-more" (click)="openMoreSheet($event, story)" aria-label="More options">
+            •••
+          </button>
         </div>
 
-        <div class="ss-story-footer">
-          <span class="ss-level-pill"
-                [style.background]="levelStyle(story.difficultyLevel).background"
-                [style.color]="levelStyle(story.difficultyLevel).color">
-            {{ story.difficultyLevel }} · {{ story.lengthType | titlecase }}
-          </span>
-          <div class="ss-story-footer-right">
-            @if (story.generationStatus === 'partial') {
-              <button
-                class="sl-btn-extend"
-                [class.sl-btn-extend--loading]="extendingId() === story.id"
-                [disabled]="extendingId() === story.id"
-                (click)="onExtend($event, story.id)"
-                aria-label="Extend incomplete story"
-              >
-                @if (extendingId() === story.id) {
-                  <ion-spinner name="dots"></ion-spinner>
-                  Extending…
-                } @else {
-                  <ion-icon name="add-circle-outline"></ion-icon>
-                  Extend
-                }
-              </button>
-            } @else {
-              <button class="ss-story-action-btn ss-listen-btn" (click)="listenStory($event, story)" aria-label="Listen to story">
-                <ion-icon name="play-outline"></ion-icon>
-                Listen
-              </button>
-              <button class="ss-story-action-btn ss-read-btn" (click)="openStory($event, story)" aria-label="Read story">
-                <ion-icon name="book-outline"></ion-icon>
-                Read
-              </button>
-            }
-            <button class="ss-delete-btn" (click)="confirmDelete($event, story)" aria-label="Delete story">
-              <ion-icon name="trash-outline"></ion-icon>
-            </button>
-          </div>
-        </div>
       </div>
     }
   }
 
-  <div style="height: 24px;"></div>
+  <div style="height: 32px;"></div>
 </ion-content>

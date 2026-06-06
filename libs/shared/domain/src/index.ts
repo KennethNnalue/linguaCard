@@ -643,3 +643,91 @@ export interface UpgradeRequestDto {
   email:   string;
   message: string;
 }
+
+// ─── STORY STUDIO 2.0: PLATFORM STORIES ──────────────────────────────────────
+
+export type StoryCategory =
+  | 'daily-life'
+  | 'travel'
+  | 'food-culture'
+  | 'work-career'
+  | 'technology'
+  | 'health-fitness'
+  | 'education'
+  | 'nature-environment'
+  | 'entertainment'
+  | 'fiction';
+
+export const STORY_CATEGORIES: { value: StoryCategory; label: string; icon: string }[] = [
+  { value: 'daily-life',        label: 'Daily Life',      icon: '🏠' },
+  { value: 'travel',            label: 'Travel',          icon: '✈️' },
+  { value: 'food-culture',      label: 'Food & Culture',  icon: '🍽️' },
+  { value: 'work-career',       label: 'Work & Career',   icon: '💼' },
+  { value: 'technology',        label: 'Technology',      icon: '💻' },
+  { value: 'health-fitness',    label: 'Health & Fitness',icon: '🏃' },
+  { value: 'education',         label: 'Education',       icon: '📚' },
+  { value: 'nature-environment',label: 'Nature',          icon: '🌿' },
+  { value: 'entertainment',     label: 'Entertainment',   icon: '🎬' },
+  { value: 'fiction',           label: 'Fiction',         icon: '📖' },
+];
+
+export interface PlatformStory {
+  id: string;
+  title: string;
+  titleTranslation: string;
+  bodyDe: string;
+  bodyEn: string;
+  sentences: StorySentence[];
+  wordTimestamps: WordTimestamp[];
+  keywords: StoryKeyword[];
+  quizQuestions: StoryQuizQuestion[];
+  grammarNotes: StoryGrammarNote[];
+  audioUrl: string | null;
+  audioDurationMs: number;
+  coverImageUrl: string;
+  level: StoryDifficulty;
+  category: StoryCategory;
+  topics: string[];
+  isFiction: boolean;
+  isPremium: boolean;
+  wordCount: number;
+  estimatedReadMinutes: number;
+  publishedAt: string;
+  readCount: number;
+}
+
+/** Lightweight card for browse/list views — no body text or full data */
+export interface PlatformStoryCard {
+  id: string;
+  title: string;
+  titleTranslation: string;
+  coverImageUrl: string;
+  level: StoryDifficulty;
+  category: StoryCategory;
+  topics: string[];
+  isFiction: boolean;
+  isPremium: boolean;
+  wordCount: number;
+  estimatedReadMinutes: number;
+  keywordCount: number;
+  quizCount: number;
+}
+
+/** User's reading progress on a platform story */
+export interface UserStoryProgress {
+  storyId: string;
+  userId: string;
+  isRead: boolean;
+  quizScore: number | null;
+  lastReadAt: string | null;
+  savedWordIds: string[];
+}
+
+/**
+ * Calculate quiz question count based on story sentence count.
+ * Minimum 5 for short stories, scales up for longer ones.
+ * Formula: max(5, ceil(sentenceCount / 3))
+ */
+export function calculateQuizCount(sentenceCount: number): number {
+  return Math.max(5, Math.ceil(sentenceCount / 3));
+}

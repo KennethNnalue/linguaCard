@@ -1,0 +1,1158 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>LinguaCard — Story Studio 2.0 Design Reference</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,500;0,600;1,400&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600&family=Fira+Code:wght@400;500&display=swap" rel="stylesheet">
+<style>
+/* ─── DESIGN TOKENS (LDS) ──────────────────────────────────── */
+:root {
+  --lc-brand:#2D5A4E;--lc-brand-light:#E8F2EE;--lc-brand-mid:#4A8C7A;--lc-brand-dark:#1A3830;
+  --lc-accent:#E07B3F;--lc-accent-light:#FDF0E6;
+  --lc-masc-bg:#EAF2FC;--lc-masc-text:#1A56A3;--lc-masc-border:#85B7EB;
+  --lc-fem-bg:#FEF2F2;--lc-fem-text:#B91C1C;--lc-fem-border:#FCA5A5;
+  --lc-neut-bg:#F1EFE8;--lc-neut-text:#5F5E5A;--lc-neut-border:#B4B2A9;
+  --lc-mastery-0:#D1D5DB;--lc-mastery-1:#FCA5A5;--lc-mastery-2:#FCD34D;
+  --lc-mastery-3:#6EE7B7;--lc-mastery-4:#34D399;--lc-mastery-5:#059669;
+  --lc-surface:#FAFAF8;--lc-card:#FFFFFF;--lc-border:rgba(45,90,78,0.12);
+  --lc-text-primary:#1A2B26;--lc-text-secondary:#6B7C78;--lc-text-hint:#9BAAA6;
+  --lc-shadow-card:0 2px 12px rgba(45,90,78,0.08),0 1px 3px rgba(0,0,0,0.04);
+  --lc-shadow-float:0 8px 32px rgba(45,90,78,0.14),0 2px 8px rgba(0,0,0,0.06);
+  --lc-font-display:'Lora',Georgia,serif;
+  --lc-font-body:'DM Sans',system-ui,sans-serif;
+  --lc-font-mono:'Fira Code','Courier New',monospace;
+  --lc-radius-sm:8px;--lc-radius-md:12px;--lc-radius-lg:20px;--lc-radius-xl:28px;
+  --lc-transition-fast:0.15s ease;
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:var(--lc-font-body);background:#F0EDEA;color:var(--lc-text-primary);min-height:100vh;}
+
+/* ─── PAGE LAYOUT ──────────────────────────────────────────── */
+.page-header{background:var(--lc-brand);padding:28px 40px 24px;position:sticky;top:0;z-index:100;box-shadow:0 4px 20px rgba(0,0,0,0.2);}
+.page-header-inner{max-width:1400px;margin:0 auto;display:flex;align-items:center;justify-content:space-between;gap:20px;flex-wrap:wrap;}
+.logo{font-family:var(--lc-font-display);font-size:24px;font-weight:600;color:white;}
+.logo-sub{font-size:12px;color:rgba(255,255,255,0.6);margin-top:2px;}
+.header-tabs{display:flex;gap:4px;}
+.header-tab{padding:7px 16px;border-radius:20px;font-size:12px;font-weight:600;cursor:pointer;border:none;color:rgba(255,255,255,0.7);background:transparent;transition:all 0.2s;font-family:var(--lc-font-body);}
+.header-tab.active,.header-tab:hover{background:rgba(255,255,255,0.15);color:white;}
+.main{max-width:1400px;margin:0 auto;padding:40px;}
+.section{margin-bottom:56px;}
+.section-title{font-family:var(--lc-font-display);font-size:22px;font-weight:600;color:var(--lc-text-primary);margin-bottom:6px;}
+.section-sub{font-size:13px;color:var(--lc-text-secondary);margin-bottom:24px;}
+
+/* ─── PHONE SHELL ──────────────────────────────────────────── */
+.phones-row{display:flex;gap:24px;align-items:flex-start;overflow-x:auto;padding-bottom:8px;scroll-snap-type:x proximity;}
+.phone-wrap{display:flex;flex-direction:column;align-items:center;gap:10px;flex:0 0 auto;scroll-snap-align:start;}
+.phone-label{font-size:11px;font-weight:600;letter-spacing:0.07em;text-transform:uppercase;color:var(--lc-text-hint);}
+.phone{width:300px;background:var(--lc-surface);border-radius:40px;border:8px solid #1A1A1A;box-shadow:0 0 0 1px #333,var(--lc-shadow-float),0 24px 48px rgba(0,0,0,0.2);overflow:hidden;position:relative;}
+.phone::before{content:'';position:absolute;top:0;left:50%;transform:translateX(-50%);width:80px;height:6px;background:#1A1A1A;border-radius:0 0 8px 8px;z-index:10;}
+.phone-inner{background:var(--lc-surface);min-height:600px;display:flex;flex-direction:column;padding-top:8px;}
+.status-bar{display:flex;justify-content:space-between;align-items:center;padding:10px 20px 6px;font-size:11px;font-weight:600;color:var(--lc-text-secondary);}
+
+/* ─── BOTTOM NAV ───────────────────────────────────────────── */
+.bottom-nav{display:flex;justify-content:space-around;padding:8px 0 6px;border-top:1px solid var(--lc-border);background:var(--lc-card);margin-top:auto;}
+.nav-item{display:flex;flex-direction:column;align-items:center;gap:2px;cursor:pointer;opacity:0.45;}
+.nav-item.on{opacity:1;color:var(--lc-brand);}
+.nav-item svg{width:20px;height:20px;stroke:currentColor;stroke-width:2;fill:none;stroke-linecap:round;stroke-linejoin:round;}
+.nav-lbl{font-size:9px;font-weight:600;}
+
+/* ─── PAGE NAV ─────────────────────────────────────────────── */
+.p-nav{display:flex;justify-content:space-between;align-items:center;padding:6px 16px 10px;}
+.p-nav-title{font-family:var(--lc-font-display);font-size:20px;font-weight:600;color:var(--lc-text-primary);}
+.p-fab{width:32px;height:32px;border-radius:50%;background:var(--lc-brand);display:flex;align-items:center;justify-content:center;cursor:pointer;}
+.p-fab svg{width:16px;height:16px;stroke:white;stroke-width:2.5;fill:none;stroke-linecap:round;}
+
+/* ─── SECTION HEADERS ──────────────────────────────────────── */
+.sec-hdr{display:flex;justify-content:space-between;align-items:center;padding:2px 16px 8px;}
+.sec-t{font-size:13px;font-weight:600;color:var(--lc-text-primary);letter-spacing:0.03em;text-transform:uppercase;}
+.sec-link{font-size:11px;font-weight:600;color:var(--lc-brand-mid);cursor:pointer;}
+
+/* ─── LEVEL FILTER CHIPS ───────────────────────────────────── */
+.filter-row{display:flex;gap:6px;padding:0 16px 10px;overflow-x:auto;-webkit-overflow-scrolling:touch;}
+.filter-row::-webkit-scrollbar{display:none;}
+.filter-chip{padding:5px 14px;border-radius:20px;font-size:11px;font-weight:600;border:1px solid var(--lc-border);background:var(--lc-card);color:var(--lc-text-secondary);cursor:pointer;white-space:nowrap;font-family:var(--lc-font-body);transition:all 0.15s;}
+.filter-chip.active{background:var(--lc-brand);color:white;border-color:var(--lc-brand);}
+
+/* ─── CATEGORY CHIPS ───────────────────────────────────────── */
+.cat-row{display:flex;gap:6px;padding:0 16px 12px;overflow-x:auto;-webkit-overflow-scrolling:touch;}
+.cat-row::-webkit-scrollbar{display:none;}
+.cat-chip{padding:5px 12px;border-radius:20px;font-size:10px;font-weight:600;border:1px solid var(--lc-border);background:var(--lc-card);color:var(--lc-text-secondary);cursor:pointer;white-space:nowrap;font-family:var(--lc-font-body);display:flex;align-items:center;gap:4px;transition:all 0.15s;}
+.cat-chip.active{background:var(--lc-brand-light);color:var(--lc-brand);border-color:var(--lc-brand-mid);}
+.cat-emoji{font-size:12px;}
+
+/* ─── BROWSE CARDS (Explore) ───────────────────────────────── */
+.browse-scroll{display:flex;gap:10px;padding:0 16px 8px;overflow-x:auto;-webkit-overflow-scrolling:touch;}
+.browse-scroll::-webkit-scrollbar{display:none;}
+.browse-card{flex:0 0 145px;border-radius:var(--lc-radius-md);background:var(--lc-card);box-shadow:var(--lc-shadow-card);overflow:hidden;cursor:pointer;transition:transform 0.15s;}
+.browse-card:active{transform:scale(0.97);}
+.browse-img{width:100%;height:88px;object-fit:cover;background:linear-gradient(135deg,var(--lc-brand-light),var(--lc-brand-mid));position:relative;display:flex;align-items:flex-start;padding:6px;}
+.browse-lvl{font-size:9px;font-weight:700;background:var(--lc-brand);color:white;padding:2px 8px;border-radius:10px;letter-spacing:0.05em;}
+.browse-premium{font-size:9px;margin-left:4px;}
+.browse-body{padding:8px 10px 10px;}
+.browse-title{font-family:var(--lc-font-display);font-size:12px;font-weight:600;color:var(--lc-text-primary);line-height:1.3;margin-bottom:4px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;}
+.browse-meta{font-size:9px;color:var(--lc-text-hint);display:flex;align-items:center;gap:4px;}
+
+/* ─── MY STORIES CARD (Refined) ────────────────────────────── */
+.my-card{margin:0 14px 10px;border-radius:var(--lc-radius-lg);background:var(--lc-card);box-shadow:var(--lc-shadow-card);overflow:hidden;cursor:pointer;transition:transform 0.15s;}
+.my-card:active{transform:scale(0.99);}
+.my-card-top{display:flex;gap:10px;padding:12px 14px 8px;}
+.my-card-thumb{width:44px;height:44px;border-radius:var(--lc-radius-sm);background:linear-gradient(135deg,var(--lc-brand-light),var(--lc-brand-mid));flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:18px;}
+.my-card-info{flex:1;min-width:0;}
+.my-card-title{font-family:var(--lc-font-display);font-size:14px;font-weight:600;color:var(--lc-text-primary);line-height:1.3;margin-bottom:2px;}
+.my-card-meta{font-size:10px;color:var(--lc-text-hint);display:flex;align-items:center;gap:4px;flex-wrap:wrap;}
+.my-card-badges{display:flex;gap:4px;margin-top:2px;}
+.my-card-badge{font-size:9px;font-weight:600;padding:1px 7px;border-radius:10px;}
+.badge-level{background:var(--lc-brand-light);color:var(--lc-brand);}
+.badge-length{background:#F3F4F6;color:var(--lc-text-secondary);}
+.my-card-chips{display:flex;gap:4px;padding:0 14px 8px;flex-wrap:wrap;}
+.my-chip{font-size:10px;font-weight:600;padding:2px 8px;border-radius:12px;border:1px solid var(--lc-border);background:var(--lc-surface);color:var(--lc-text-secondary);}
+.my-chip.art-der{background:var(--lc-masc-bg);color:var(--lc-masc-text);border-color:var(--lc-masc-border);}
+.my-chip.art-die{background:var(--lc-fem-bg);color:var(--lc-fem-text);border-color:var(--lc-fem-border);}
+.my-chip.art-das{background:var(--lc-neut-bg);color:var(--lc-neut-text);border-color:var(--lc-neut-border);}
+.my-chip-more{font-size:9px;color:var(--lc-text-hint);padding:2px 4px;}
+.my-card-footer{display:flex;align-items:center;gap:8px;padding:6px 14px 10px;border-top:1px solid var(--lc-border);}
+.my-action{display:flex;align-items:center;gap:4px;font-size:11px;font-weight:600;padding:5px 12px;border-radius:16px;border:none;cursor:pointer;font-family:var(--lc-font-body);transition:all 0.15s;}
+.my-action:active{opacity:0.8;}
+.my-action-listen{background:var(--lc-brand);color:white;}
+.my-action-read{background:var(--lc-card);color:var(--lc-brand);border:1px solid var(--lc-brand);}
+.my-action-more{margin-left:auto;background:transparent;border:none;color:var(--lc-text-hint);font-size:16px;cursor:pointer;padding:4px 8px;letter-spacing:3px;}
+
+/* ─── STORY READER — COVER ─────────────────────────────────── */
+.reader-cover{position:relative;min-height:180px;background:linear-gradient(135deg,var(--lc-brand-dark),var(--lc-brand));padding:16px;display:flex;flex-direction:column;justify-content:flex-end;color:white;}
+.reader-cover-img{position:absolute;inset:0;object-fit:cover;opacity:0.35;}
+.reader-back{position:absolute;top:14px;left:14px;width:28px;height:28px;border-radius:50%;background:rgba(0,0,0,0.3);display:flex;align-items:center;justify-content:center;cursor:pointer;z-index:2;}
+.reader-back svg{width:14px;height:14px;stroke:white;stroke-width:2.5;fill:none;stroke-linecap:round;stroke-linejoin:round;}
+.reader-mark{position:absolute;top:14px;right:14px;font-size:10px;font-weight:600;color:rgba(255,255,255,0.8);display:flex;align-items:center;gap:4px;z-index:2;cursor:pointer;}
+.reader-mark svg{width:14px;height:14px;stroke:currentColor;stroke-width:2;fill:none;}
+.reader-settings{position:absolute;top:14px;right:120px;width:24px;height:24px;display:flex;align-items:center;justify-content:center;cursor:pointer;z-index:2;opacity:0.7;}
+.reader-settings svg{width:16px;height:16px;stroke:white;stroke-width:2;fill:none;stroke-linecap:round;}
+.reader-cover-title{font-family:var(--lc-font-display);font-size:18px;font-weight:600;z-index:2;line-height:1.3;}
+.reader-cover-meta{font-size:11px;opacity:0.7;margin-top:4px;display:flex;align-items:center;gap:6px;z-index:2;}
+
+/* ─── ACTIVE WORD COVER STATE ──────────────────────────────── */
+.reader-cover-word{position:relative;min-height:160px;background:linear-gradient(135deg,var(--lc-brand-dark),var(--lc-brand));padding:16px;display:flex;flex-direction:column;justify-content:flex-end;color:white;}
+.reader-cover-word-bg{position:absolute;inset:0;object-fit:cover;opacity:0.25;}
+.word-main{font-family:var(--lc-font-display);font-size:20px;font-weight:600;z-index:2;}
+.word-plural{font-size:13px;opacity:0.85;z-index:2;display:flex;align-items:center;gap:6px;margin-top:2px;}
+.word-plural-badge{font-size:9px;font-weight:700;background:var(--lc-brand-mid);color:white;padding:1px 7px;border-radius:8px;letter-spacing:0.03em;}
+.word-translation{font-size:13px;opacity:0.7;z-index:2;margin-top:2px;}
+.word-type-badge{font-size:9px;font-weight:700;background:rgba(255,255,255,0.2);color:white;padding:1px 7px;border-radius:8px;margin-top:4px;display:inline-block;z-index:2;}
+.word-actions{position:absolute;bottom:14px;right:14px;display:flex;flex-direction:column;gap:8px;z-index:2;}
+.word-action-btn{width:34px;height:34px;border-radius:50%;background:rgba(255,255,255,0.2);backdrop-filter:blur(4px);display:flex;align-items:center;justify-content:center;cursor:pointer;border:none;transition:all 0.15s;}
+.word-action-btn:active{transform:scale(0.9);}
+.word-action-btn svg{width:16px;height:16px;stroke:white;stroke-width:2;fill:none;stroke-linecap:round;stroke-linejoin:round;}
+.word-conj-btn{font-size:10px;font-weight:600;background:rgba(255,255,255,0.15);color:white;border:1px solid rgba(255,255,255,0.3);padding:5px 12px;border-radius:16px;cursor:pointer;z-index:2;margin-top:6px;display:inline-flex;align-items:center;gap:4px;font-family:var(--lc-font-body);}
+
+/* ─── TAB BAR ──────────────────────────────────────────────── */
+.reader-tabs{display:flex;background:var(--lc-card);border-bottom:1px solid var(--lc-border);}
+.reader-tab{flex:1;padding:10px 4px;font-size:12px;font-weight:500;color:var(--lc-text-secondary);background:transparent;border:none;cursor:pointer;text-align:center;font-family:var(--lc-font-body);border-radius:0;transition:all 0.15s;}
+.reader-tab.active{background:var(--lc-brand);color:white;border-radius:20px;margin:4px;padding:6px 4px;}
+
+/* ─── STORY TEXT ───────────────────────────────────────────── */
+.story-text{padding:16px;flex:1;}
+.story-sentence{margin-bottom:12px;}
+.story-de{font-size:14px;color:var(--lc-text-primary);line-height:1.6;}
+.story-en{font-size:12px;color:var(--lc-brand-mid);line-height:1.5;margin-top:2px;}
+.story-word{cursor:pointer;border-radius:3px;padding:0 2px;transition:background 0.12s,color 0.12s;}
+.story-word:hover{background:var(--lc-brand-light);}
+.story-word.active{background:var(--lc-brand);color:white;border-radius:4px;padding:1px 4px;}
+.story-word.vocab{color:var(--lc-brand);font-weight:600;}
+
+/* ─── FLOATING AUDIO PILL ──────────────────────────────────── */
+.float-pill{position:absolute;bottom:52px;left:50%;transform:translateX(-50%);background:var(--lc-brand);color:white;border-radius:var(--lc-radius-xl);padding:6px 16px;display:flex;align-items:center;gap:10px;box-shadow:var(--lc-shadow-float);z-index:20;font-size:12px;font-weight:600;}
+.pill-play{width:28px;height:28px;border-radius:50%;background:rgba(255,255,255,0.2);display:flex;align-items:center;justify-content:center;cursor:pointer;}
+.pill-play svg{width:12px;height:12px;stroke:white;stroke-width:2.5;fill:white;stroke-linecap:round;}
+.pill-label{font-size:11px;}
+.pill-speed{font-size:10px;font-weight:700;background:rgba(255,255,255,0.2);padding:2px 8px;border-radius:10px;}
+.pill-repeat{width:24px;height:24px;display:flex;align-items:center;justify-content:center;cursor:pointer;opacity:0.7;}
+.pill-repeat svg{width:14px;height:14px;stroke:white;stroke-width:2;fill:none;stroke-linecap:round;stroke-linejoin:round;}
+
+/* ─── QUIZ TAB ─────────────────────────────────────────────── */
+.quiz-area{flex:1;background:var(--lc-brand-dark);padding:0;display:flex;flex-direction:column;}
+.quiz-progress-bar{background:var(--lc-brand-mid);padding:20px 0;display:flex;align-items:center;justify-content:center;position:relative;}
+.quiz-ring{width:56px;height:56px;border-radius:50%;border:3px solid rgba(255,255,255,0.2);display:flex;align-items:center;justify-content:center;font-size:15px;font-weight:700;color:white;position:relative;}
+.quiz-ring::after{content:'';position:absolute;inset:-3px;border-radius:50%;border:3px solid white;border-top-color:transparent;border-right-color:transparent;transform:rotate(-45deg);}
+.quiz-audio-btn{position:absolute;right:20px;top:50%;transform:translateY(-50%);width:36px;height:36px;border-radius:50%;border:1px solid rgba(255,255,255,0.3);background:transparent;display:flex;align-items:center;justify-content:center;cursor:pointer;}
+.quiz-audio-btn svg{width:16px;height:16px;stroke:white;stroke-width:2;fill:none;}
+.quiz-content{flex:1;padding:24px 20px;display:flex;flex-direction:column;gap:14px;}
+.quiz-sentence{font-size:17px;color:white;text-align:center;line-height:1.5;font-family:var(--lc-font-display);}
+.quiz-blank{border-bottom:2px solid white;padding:0 4px;min-width:40px;display:inline-block;}
+.quiz-option{width:100%;padding:14px;border-radius:var(--lc-radius-md);background:rgba(255,255,255,0.1);border:1px solid rgba(255,255,255,0.15);color:white;font-size:15px;text-align:center;font-weight:500;cursor:pointer;font-family:var(--lc-font-body);transition:all 0.15s;}
+.quiz-option:active{background:rgba(255,255,255,0.2);}
+.quiz-option.correct{background:rgba(52,211,153,0.3);border-color:var(--lc-mastery-4);}
+.quiz-option.wrong{background:rgba(252,165,165,0.3);border-color:var(--lc-mastery-1);}
+.quiz-toggle{display:flex;align-items:center;justify-content:space-between;padding:14px 0;border-top:1px solid rgba(255,255,255,0.1);margin-top:auto;}
+.quiz-toggle-label{font-size:12px;font-weight:600;color:white;}
+.quiz-toggle-sub{font-size:10px;color:rgba(255,255,255,0.5);margin-top:1px;}
+.toggle-track{width:42px;height:24px;border-radius:12px;background:var(--lc-brand-mid);position:relative;cursor:pointer;transition:background 0.2s;}
+.toggle-track.on{background:var(--lc-mastery-4);}
+.toggle-thumb{width:20px;height:20px;border-radius:50%;background:white;position:absolute;top:2px;left:2px;transition:transform 0.2s;box-shadow:0 1px 3px rgba(0,0,0,0.2);}
+.toggle-track.on .toggle-thumb{transform:translateX(18px);}
+
+/* ─── CONJUGATION SHEET ────────────────────────────────────── */
+.conj-sheet{background:var(--lc-card);border-radius:20px 20px 0 0;padding:0 16px 20px;box-shadow:0 -8px 32px rgba(0,0,0,0.14);}
+.conj-handle{display:flex;justify-content:center;padding:10px 0 8px;}
+.conj-handle div{width:36px;height:4px;border-radius:2px;background:var(--lc-border);}
+.conj-title{font-family:var(--lc-font-display);font-size:16px;font-weight:600;color:var(--lc-text-primary);margin-bottom:4px;}
+.conj-sub{font-size:12px;color:var(--lc-text-hint);margin-bottom:14px;}
+.conj-table{width:100%;border-collapse:collapse;margin-bottom:12px;}
+.conj-table th{font-size:10px;font-weight:600;color:var(--lc-brand);text-align:left;padding:6px 8px;border-bottom:1px solid var(--lc-border);text-transform:uppercase;letter-spacing:0.05em;}
+.conj-table td{font-size:12px;padding:5px 8px;color:var(--lc-text-primary);border-bottom:1px solid rgba(45,90,78,0.06);}
+.conj-table td:first-child{font-weight:500;color:var(--lc-text-secondary);font-size:11px;}
+.conj-extra{font-size:11px;color:var(--lc-text-secondary);padding:6px 0;border-top:1px solid var(--lc-border);}
+.conj-extra strong{color:var(--lc-text-primary);}
+
+/* ─── EXPLORE GRID (See All) ───────────────────────────────── */
+.explore-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;padding:0 14px;}
+.explore-grid .browse-card{flex:unset;width:100%;}
+.explore-grid .browse-img{height:96px;}
+
+/* ─── ANNOTATION / NOTES ───────────────────────────────────── */
+.annotation{margin:0 14px 10px;padding:10px 14px;border-radius:var(--lc-radius-md);background:var(--lc-accent-light);border:1px solid var(--lc-accent);font-size:11px;color:#8B4513;line-height:1.5;}
+.annotation strong{color:var(--lc-accent);}
+.annotation-green{background:var(--lc-brand-light);border-color:var(--lc-brand-mid);color:var(--lc-brand-dark);}
+
+/* ─── MISC ─────────────────────────────────────────────────── */
+.divider{height:1px;background:var(--lc-border);margin:4px 16px 8px;}
+.spacer{height:8px;}
+</style>
+</head>
+<body>
+
+<!-- ═══════════════ HEADER ═══════════════ -->
+<div class="page-header">
+  <div class="page-header-inner">
+    <div>
+      <div class="logo">LinguaCard — Design Reference</div>
+      <div class="logo-sub">Epic 14 · Story Studio 2.0 — Explore, Read, Interact</div>
+    </div>
+    <div class="header-tabs">
+      <button class="header-tab active" onclick="showTab('studio')">Story Studio</button>
+      <button class="header-tab" onclick="showTab('reader')">Story Reader</button>
+      <button class="header-tab" onclick="showTab('quiz')">Quiz</button>
+      <button class="header-tab" onclick="showTab('interactions')">Word Interactions</button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════ STORY STUDIO SCREENS ═══════════════ -->
+<div id="tab-studio" class="main">
+  <div class="section">
+    <div class="section-title">Story Studio — Redesigned Home</div>
+    <div class="section-sub">Two-section layout: Explore (platform stories) + My Stories (user-generated). LC-310, LC-311, LC-312, LC-314.</div>
+
+    <div class="phones-row">
+
+      <!-- SCREEN SS-01: STORY STUDIO HOME -->
+      <div class="phone-wrap">
+        <div class="phone-label">SS-01 · Story Studio Home</div>
+        <div class="phone">
+          <div class="phone-inner">
+            <div class="status-bar"><span>11:00</span><span style="font-size:10px;color:var(--lc-text-hint);">●●●</span></div>
+            <div class="p-nav">
+              <span class="p-nav-title">Story Studio</span>
+              <div class="p-fab"><svg viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg></div>
+            </div>
+
+            <!-- EXPLORE SECTION -->
+            <div class="sec-hdr"><span class="sec-t">Explore</span><span class="sec-link">See all →</span></div>
+
+            <!-- Level filter chips -->
+            <div class="filter-row">
+              <span class="filter-chip active">All</span>
+              <span class="filter-chip">A1</span>
+              <span class="filter-chip">A2</span>
+              <span class="filter-chip">B1</span>
+              <span class="filter-chip">B2</span>
+            </div>
+
+            <!-- Category chips -->
+            <div class="cat-row">
+              <span class="cat-chip"><span class="cat-emoji">🏠</span> Daily Life</span>
+              <span class="cat-chip active"><span class="cat-emoji">✈️</span> Travel</span>
+              <span class="cat-chip"><span class="cat-emoji">🍽️</span> Food</span>
+              <span class="cat-chip"><span class="cat-emoji">💼</span> Work</span>
+              <span class="cat-chip"><span class="cat-emoji">💻</span> Tech</span>
+              <span class="cat-chip"><span class="cat-emoji">📖</span> Fiction</span>
+            </div>
+
+            <!-- Browse cards (horizontal scroll) -->
+            <div class="browse-scroll">
+              <div class="browse-card">
+                <div class="browse-img" style="background:linear-gradient(135deg,#3B6F60,#8CB5A4);">
+                  <span class="browse-lvl">A1</span>
+                </div>
+                <div class="browse-body">
+                  <div class="browse-title">Am Bahnhof</div>
+                  <div class="browse-meta">🕐 2 min · ✈️ Travel</div>
+                </div>
+              </div>
+              <div class="browse-card">
+                <div class="browse-img" style="background:linear-gradient(135deg,#4A7C6B,#A8D0C0);">
+                  <span class="browse-lvl">A2</span>
+                </div>
+                <div class="browse-body">
+                  <div class="browse-title">Mein erster Flug</div>
+                  <div class="browse-meta">🕐 3 min · ✈️ Travel</div>
+                </div>
+              </div>
+              <div class="browse-card">
+                <div class="browse-img" style="background:linear-gradient(135deg,#2D5A4E,#6BA08E);">
+                  <span class="browse-lvl">B1</span>
+                </div>
+                <div class="browse-body">
+                  <div class="browse-title">Nachtzüge durch Europa</div>
+                  <div class="browse-meta">🕐 4 min · ✈️ Travel</div>
+                </div>
+              </div>
+              <div class="browse-card">
+                <div class="browse-img" style="background:linear-gradient(135deg,#1A3830,#4A8C7A);">
+                  <span class="browse-lvl">B2</span>
+                  <span class="browse-premium">⭐</span>
+                </div>
+                <div class="browse-body">
+                  <div class="browse-title">Interrail: Grenzen-los reisen</div>
+                  <div class="browse-meta">🕐 5 min · ✈️ · Pro</div>
+                </div>
+              </div>
+            </div>
+
+            <div class="divider"></div>
+
+            <!-- MY STORIES SECTION -->
+            <div class="sec-hdr"><span class="sec-t">My Stories</span><span class="sec-link" style="color:var(--lc-text-hint);">5 saved</span></div>
+
+            <!-- Refined story card 1 -->
+            <div class="my-card">
+              <div class="my-card-top">
+                <div class="my-card-thumb">📖</div>
+                <div class="my-card-info">
+                  <div class="my-card-title">Ein gesundes neues Leben</div>
+                  <div class="my-card-meta">
+                    <span>🕐 2 min</span> · <span>68 words</span>
+                  </div>
+                  <div class="my-card-badges">
+                    <span class="my-card-badge badge-level">A1</span>
+                    <span class="my-card-badge badge-length">Medium</span>
+                  </div>
+                </div>
+              </div>
+              <div class="my-card-chips">
+                <span class="my-chip art-die">die Serviette</span>
+                <span class="my-chip art-die">die Bar</span>
+                <span class="my-chip">hoffentlich</span>
+                <span class="my-chip-more">+65 more</span>
+              </div>
+              <div class="my-card-footer">
+                <button class="my-action my-action-listen">▶ Listen</button>
+                <button class="my-action my-action-read">📖 Read</button>
+                <button class="my-action-more">•••</button>
+              </div>
+            </div>
+
+            <!-- Refined story card 2 -->
+            <div class="my-card">
+              <div class="my-card-top">
+                <div class="my-card-thumb">🎿</div>
+                <div class="my-card-info">
+                  <div class="my-card-title">Ein Wochenende voller Pläne</div>
+                  <div class="my-card-meta">
+                    <span>🕐 1 min</span> · <span>177 words</span>
+                  </div>
+                  <div class="my-card-badges">
+                    <span class="my-card-badge badge-level">A1</span>
+                    <span class="my-card-badge badge-length">Long</span>
+                  </div>
+                </div>
+              </div>
+              <div class="my-card-chips">
+                <span class="my-chip">Ski fahren</span>
+                <span class="my-chip">Alles klar?</span>
+                <span class="my-chip-more">+174 more</span>
+              </div>
+              <div class="my-card-footer">
+                <button class="my-action my-action-listen">▶ Listen</button>
+                <button class="my-action my-action-read">📖 Read</button>
+                <button class="my-action-more">•••</button>
+              </div>
+            </div>
+
+            <div class="spacer"></div>
+
+            <!-- Bottom nav -->
+            <div class="bottom-nav">
+              <div class="nav-item"><svg viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9,22 9,12 15,12 15,22"/></svg><div class="nav-lbl">Home</div></div>
+              <div class="nav-item"><svg viewBox="0 0 24 24"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg><div class="nav-lbl">Vault</div></div>
+              <div class="nav-item"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polygon points="10,8 16,12 10,16 10,8"/></svg><div class="nav-lbl">Review</div></div>
+              <div class="nav-item on"><svg viewBox="0 0 24 24"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg><div class="nav-lbl">Stories</div></div>
+              <div class="nav-item"><svg viewBox="0 0 24 24"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg><div class="nav-lbl">Progress</div></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- SCREEN SS-02: A1 FILTERED VIEW -->
+      <div class="phone-wrap">
+        <div class="phone-label">SS-02 · Filtered: A1 + Daily Life</div>
+        <div class="phone">
+          <div class="phone-inner">
+            <div class="status-bar"><span>11:02</span><span style="font-size:10px;color:var(--lc-text-hint);">●●●</span></div>
+            <div class="p-nav">
+              <span class="p-nav-title">Story Studio</span>
+              <div class="p-fab"><svg viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg></div>
+            </div>
+
+            <div class="sec-hdr"><span class="sec-t">Explore</span><span class="sec-link">See all →</span></div>
+
+            <div class="filter-row">
+              <span class="filter-chip">All</span>
+              <span class="filter-chip active">A1</span>
+              <span class="filter-chip">A2</span>
+              <span class="filter-chip">B1</span>
+              <span class="filter-chip">B2</span>
+            </div>
+
+            <div class="cat-row">
+              <span class="cat-chip active"><span class="cat-emoji">🏠</span> Daily Life</span>
+              <span class="cat-chip"><span class="cat-emoji">✈️</span> Travel</span>
+              <span class="cat-chip"><span class="cat-emoji">🍽️</span> Food</span>
+              <span class="cat-chip"><span class="cat-emoji">💼</span> Work</span>
+            </div>
+
+            <div class="browse-scroll">
+              <div class="browse-card">
+                <div class="browse-img" style="background:linear-gradient(135deg,#5A8F7C,#B8D8CB);">
+                  <span class="browse-lvl">A1</span>
+                </div>
+                <div class="browse-body">
+                  <div class="browse-title">Ein Tag in Berlin</div>
+                  <div class="browse-meta">🕐 2 min · 🏠</div>
+                </div>
+              </div>
+              <div class="browse-card">
+                <div class="browse-img" style="background:linear-gradient(135deg,#6BA08E,#D4E8DE);">
+                  <span class="browse-lvl">A1</span>
+                </div>
+                <div class="browse-body">
+                  <div class="browse-title">Morgens in der WG</div>
+                  <div class="browse-meta">🕐 2 min · 🏠</div>
+                </div>
+              </div>
+              <div class="browse-card">
+                <div class="browse-img" style="background:linear-gradient(135deg,#4A8C7A,#9CC4B4);">
+                  <span class="browse-lvl">A1</span>
+                </div>
+                <div class="browse-body">
+                  <div class="browse-title">Im Supermarkt</div>
+                  <div class="browse-meta">🕐 1 min · 🏠</div>
+                </div>
+              </div>
+            </div>
+
+            <div class="annotation" style="margin-top:8px;">
+              <strong>Design note:</strong> Level + category filters compose. "A1 + Daily Life" shows only beginner daily-life stories. Tapping the active chip toggles it off.
+            </div>
+
+            <div class="divider"></div>
+            <div class="sec-hdr"><span class="sec-t">My Stories</span><span class="sec-link" style="color:var(--lc-text-hint);">5 saved</span></div>
+
+            <div class="my-card">
+              <div class="my-card-top">
+                <div class="my-card-thumb">🎓</div>
+                <div class="my-card-info">
+                  <div class="my-card-title">Ein Mittwoch mit Mia</div>
+                  <div class="my-card-meta"><span>🕐 1 min</span> · <span>82 words</span></div>
+                  <div class="my-card-badges">
+                    <span class="my-card-badge badge-level">A1</span>
+                    <span class="my-card-badge badge-length">Medium</span>
+                  </div>
+                </div>
+              </div>
+              <div class="my-card-footer">
+                <button class="my-action my-action-listen">▶ Listen</button>
+                <button class="my-action my-action-read">📖 Read</button>
+                <button class="my-action-more">•••</button>
+              </div>
+            </div>
+
+            <div class="spacer"></div>
+            <div class="bottom-nav">
+              <div class="nav-item"><svg viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg><div class="nav-lbl">Home</div></div>
+              <div class="nav-item"><svg viewBox="0 0 24 24"><rect x="2" y="3" width="20" height="14" rx="2"/></svg><div class="nav-lbl">Vault</div></div>
+              <div class="nav-item"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/></svg><div class="nav-lbl">Review</div></div>
+              <div class="nav-item on"><svg viewBox="0 0 24 24"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg><div class="nav-lbl">Stories</div></div>
+              <div class="nav-item"><svg viewBox="0 0 24 24"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/></svg><div class="nav-lbl">Progress</div></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- SCREEN SS-03: SEE ALL GRID -->
+      <div class="phone-wrap">
+        <div class="phone-label">SS-03 · See All — Travel (A1)</div>
+        <div class="phone">
+          <div class="phone-inner">
+            <div class="status-bar"><span>11:05</span><span style="font-size:10px;color:var(--lc-text-hint);">●●●</span></div>
+            <div class="p-nav">
+              <div class="reader-back" style="position:static;"><svg viewBox="0 0 24 24"><polyline points="15,18 9,12 15,6"/></svg></div>
+              <span class="p-nav-title" style="font-size:16px;">Travel · A1</span>
+              <div style="width:32px;"></div>
+            </div>
+
+            <div class="explore-grid">
+              <div class="browse-card">
+                <div class="browse-img" style="background:linear-gradient(135deg,#3B6F60,#8CB5A4);"><span class="browse-lvl">A1</span></div>
+                <div class="browse-body">
+                  <div class="browse-title">Am Bahnhof</div>
+                  <div class="browse-meta">🕐 2 min · 5 quiz</div>
+                </div>
+              </div>
+              <div class="browse-card">
+                <div class="browse-img" style="background:linear-gradient(135deg,#4A7C6B,#A8D0C0);"><span class="browse-lvl">A1</span></div>
+                <div class="browse-body">
+                  <div class="browse-title">Mein erster Flug</div>
+                  <div class="browse-meta">🕐 3 min · 5 quiz</div>
+                </div>
+              </div>
+              <div class="browse-card">
+                <div class="browse-img" style="background:linear-gradient(135deg,#2D5A4E,#6BA08E);"><span class="browse-lvl">A1</span></div>
+                <div class="browse-body">
+                  <div class="browse-title">Im Hotel einchecken</div>
+                  <div class="browse-meta">🕐 2 min · 5 quiz</div>
+                </div>
+              </div>
+              <div class="browse-card">
+                <div class="browse-img" style="background:linear-gradient(135deg,#5A8F7C,#B8D8CB);"><span class="browse-lvl">A1</span></div>
+                <div class="browse-body">
+                  <div class="browse-title">Nach dem Weg fragen</div>
+                  <div class="browse-meta">🕐 2 min · 6 quiz</div>
+                </div>
+              </div>
+              <div class="browse-card">
+                <div class="browse-img" style="background:linear-gradient(135deg,#1A3830,#4A8C7A);"><span class="browse-lvl">A1</span></div>
+                <div class="browse-body">
+                  <div class="browse-title">Mit dem Bus fahren</div>
+                  <div class="browse-meta">🕐 1 min · 5 quiz</div>
+                </div>
+              </div>
+              <div class="browse-card">
+                <div class="browse-img" style="background:linear-gradient(135deg,#6BA08E,#D4E8DE);"><span class="browse-lvl">A1</span></div>
+                <div class="browse-body">
+                  <div class="browse-title">Am Flughafen</div>
+                  <div class="browse-meta">🕐 3 min · 7 quiz</div>
+                </div>
+              </div>
+            </div>
+
+            <div class="spacer"></div>
+            <div class="bottom-nav">
+              <div class="nav-item"><svg viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg><div class="nav-lbl">Home</div></div>
+              <div class="nav-item"><svg viewBox="0 0 24 24"><rect x="2" y="3" width="20" height="14" rx="2"/></svg><div class="nav-lbl">Vault</div></div>
+              <div class="nav-item"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/></svg><div class="nav-lbl">Review</div></div>
+              <div class="nav-item on"><svg viewBox="0 0 24 24"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg><div class="nav-lbl">Stories</div></div>
+              <div class="nav-item"><svg viewBox="0 0 24 24"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/></svg><div class="nav-lbl">Progress</div></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════ STORY READER SCREENS ═══════════════ -->
+<div id="tab-reader" class="main" style="display:none;">
+  <div class="section">
+    <div class="section-title">Story Reader — Refined Layout</div>
+    <div class="section-sub">Floating audio pill, scrollable text, sticky tab bar. LC-320, LC-326.</div>
+
+    <div class="phones-row">
+
+      <!-- SCREEN SR-01: READER DEFAULT STATE -->
+      <div class="phone-wrap">
+        <div class="phone-label">SR-01 · Reader — Default</div>
+        <div class="phone">
+          <div class="phone-inner" style="position:relative;">
+            <!-- Cover -->
+            <div class="reader-cover">
+              <div class="reader-back"><svg viewBox="0 0 24 24"><polyline points="15,18 9,12 15,6"/></svg></div>
+              <div class="reader-mark"><svg viewBox="0 0 24 24"><polyline points="20,6 9,17 4,12"/></svg> Mark as learned</div>
+              <div class="reader-cover-title">Nachtzüge durch Europa</div>
+              <div class="reader-cover-meta"><span>A1</span> · <span>📖 3 min</span> · <span>✈️ Travel</span></div>
+            </div>
+
+            <!-- Tab bar (sticky simulation) -->
+            <div class="reader-tabs">
+              <button class="reader-tab active">Story</button>
+              <button class="reader-tab">Quiz</button>
+              <button class="reader-tab">Keywords</button>
+              <button class="reader-tab">Grammar</button>
+            </div>
+
+            <!-- Story text -->
+            <div class="story-text">
+              <div class="story-sentence">
+                <div class="story-de">
+                  <span class="story-word">Nachtzüge</span>
+                  <span class="story-word">helfen</span>
+                  <span class="story-word vocab">Menschen,</span>
+                  <span class="story-word">in</span>
+                  <span class="story-word">der</span>
+                  <span class="story-word">Nacht</span>
+                  <span class="story-word">zu</span>
+                  <span class="story-word vocab">reisen.</span>
+                </div>
+                <div class="story-en">Night trains help people to travel at night.</div>
+              </div>
+
+              <div class="story-sentence">
+                <div class="story-de">
+                  <span class="story-word">Man</span>
+                  <span class="story-word vocab">schläft</span>
+                  <span class="story-word">im</span>
+                  <span class="story-word">Zug</span>
+                  <span class="story-word">und</span>
+                  <span class="story-word vocab">wacht</span>
+                  <span class="story-word">am</span>
+                  <span class="story-word">neuen</span>
+                  <span class="story-word">Ort</span>
+                  <span class="story-word">auf.</span>
+                </div>
+                <div class="story-en">You sleep on the train and wake up in a new place.</div>
+              </div>
+
+              <div class="story-sentence">
+                <div class="story-de">
+                  <span class="story-word">Es</span>
+                  <span class="story-word">gibt</span>
+                  <span class="story-word">viele</span>
+                  <span class="story-word">neue</span>
+                  <span class="story-word vocab">Züge</span>
+                  <span class="story-word">in</span>
+                  <span class="story-word">Europa.</span>
+                </div>
+                <div class="story-en">There are many new trains in Europe.</div>
+              </div>
+
+              <div class="story-sentence">
+                <div class="story-de">
+                  <span class="story-word">Ein</span>
+                  <span class="story-word">Zug</span>
+                  <span class="story-word vocab">fährt</span>
+                  <span class="story-word">zwischen</span>
+                  <span class="story-word">Brüssel</span>
+                  <span class="story-word">und</span>
+                  <span class="story-word">Berlin.</span>
+                </div>
+                <div class="story-en">One train runs between Brussels and Berlin.</div>
+              </div>
+            </div>
+
+            <!-- Floating audio pill -->
+            <div class="float-pill">
+              <div class="pill-play"><svg viewBox="0 0 24 24"><polygon points="6,4 20,12 6,20"/></svg></div>
+              <span class="pill-label">story</span>
+              <span class="pill-speed">1.05x</span>
+              <div class="pill-repeat"><svg viewBox="0 0 24 24"><polyline points="17,1 21,5 17,9"/><path d="M3 11V9a4 4 0 0 1 4-4h14"/><polyline points="7,23 3,19 7,15"/><path d="M21 13v2a4 4 0 0 1-4 4H3"/></svg></div>
+            </div>
+
+            <div class="bottom-nav">
+              <div class="nav-item"><svg viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg><div class="nav-lbl">Home</div></div>
+              <div class="nav-item"><svg viewBox="0 0 24 24"><rect x="2" y="3" width="20" height="14" rx="2"/></svg><div class="nav-lbl">Vault</div></div>
+              <div class="nav-item"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/></svg><div class="nav-lbl">Review</div></div>
+              <div class="nav-item on"><svg viewBox="0 0 24 24"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg><div class="nav-lbl">Stories</div></div>
+              <div class="nav-item"><svg viewBox="0 0 24 24"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/></svg><div class="nav-lbl">Progress</div></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- SCREEN SR-02: READER WITH SENTENCE PLAY BUTTON -->
+      <div class="phone-wrap">
+        <div class="phone-label">SR-02 · Floating Pill Detail</div>
+        <div class="phone">
+          <div class="phone-inner" style="position:relative;">
+            <div class="reader-cover" style="min-height:140px;">
+              <div class="reader-back"><svg viewBox="0 0 24 24"><polyline points="15,18 9,12 15,6"/></svg></div>
+              <div class="reader-cover-title">Tips for getting a job</div>
+              <div class="reader-cover-meta"><span>A1</span> · <span>📖 2 min</span> · <span>💼 Work</span></div>
+            </div>
+
+            <div class="reader-tabs">
+              <button class="reader-tab active">Story</button>
+              <button class="reader-tab">Quiz</button>
+              <button class="reader-tab">Keywords</button>
+              <button class="reader-tab">Grammar</button>
+            </div>
+
+            <div class="story-text">
+              <div class="story-sentence">
+                <div class="story-de">
+                  <span class="story-word">Viele</span>
+                  <span class="story-word">Dinge</span>
+                  <span class="story-word">sind</span>
+                  <span class="story-word">bei</span>
+                  <span class="story-word">der</span>
+                  <span class="story-word">Suche</span>
+                  <span class="story-word">nach</span>
+                  <span class="story-word vocab">Arbeit</span>
+                  <span class="story-word vocab">wichtig.</span>
+                </div>
+                <div class="story-en">Many things are important when looking for work.</div>
+              </div>
+              <div class="story-sentence">
+                <div class="story-de">
+                  <span class="story-word">Man</span>
+                  <span class="story-word">muss</span>
+                  <span class="story-word">einen</span>
+                  <span class="story-word">guten</span>
+                  <span class="story-word vocab">Lebenslauf</span>
+                  <span class="story-word">ohne</span>
+                  <span class="story-word">Fehler</span>
+                  <span class="story-word vocab">schreiben.</span>
+                </div>
+                <div class="story-en">You have to write a good CV without mistakes.</div>
+              </div>
+              <div class="story-sentence">
+                <div class="story-de">
+                  <span class="story-word">Man</span>
+                  <span class="story-word">muss</span>
+                  <span class="story-word">auf</span>
+                  <span class="story-word">die</span>
+                  <span class="story-word vocab">Rechtschreibung</span>
+                  <span class="story-word vocab">achten.</span>
+                </div>
+                <div class="story-en">You have to pay attention to spelling.</div>
+              </div>
+            </div>
+
+            <div class="annotation annotation-green" style="margin-top:auto;">
+              <strong>Floating pill:</strong> Sits above the bottom nav. Contains play/pause, "story" label, speed control, repeat toggle. Disappears on Quiz/Keywords/Grammar tabs.
+            </div>
+
+            <div class="float-pill">
+              <div class="pill-play"><svg viewBox="0 0 24 24"><polygon points="6,4 20,12 6,20"/></svg></div>
+              <span class="pill-label">story</span>
+              <span class="pill-speed">1.05x</span>
+              <div class="pill-repeat"><svg viewBox="0 0 24 24"><polyline points="17,1 21,5 17,9"/><path d="M3 11V9a4 4 0 0 1 4-4h14"/></svg></div>
+              <!-- sentence play -->
+              <div style="width:1px;height:16px;background:rgba(255,255,255,0.3);"></div>
+              <div class="pill-play" style="width:24px;height:24px;"><svg viewBox="0 0 24 24" style="width:10px;height:10px;"><polygon points="6,4 20,12 6,20"/></svg></div>
+              <span class="pill-label" style="font-size:10px;">sentence</span>
+            </div>
+
+            <div class="bottom-nav">
+              <div class="nav-item"><svg viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg><div class="nav-lbl">Home</div></div>
+              <div class="nav-item"><svg viewBox="0 0 24 24"><rect x="2" y="3" width="20" height="14" rx="2"/></svg><div class="nav-lbl">Vault</div></div>
+              <div class="nav-item"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/></svg><div class="nav-lbl">Review</div></div>
+              <div class="nav-item on"><svg viewBox="0 0 24 24"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg><div class="nav-lbl">Stories</div></div>
+              <div class="nav-item"><svg viewBox="0 0 24 24"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/></svg><div class="nav-lbl">Progress</div></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════ QUIZ SCREENS ═══════════════ -->
+<div id="tab-quiz" class="main" style="display:none;">
+  <div class="section">
+    <div class="section-title">Quiz — Refined Experience</div>
+    <div class="section-sub">"Pause on mistakes" toggle (default ON), dynamic question count, auto-play audio. LC-330, LC-331, LC-332.</div>
+
+    <div class="phones-row">
+
+      <!-- SCREEN Q-01: QUIZ WITH PAUSE ON MISTAKES -->
+      <div class="phone-wrap">
+        <div class="phone-label">Q-01 · Quiz — Pause on Mistakes (ON)</div>
+        <div class="phone">
+          <div class="phone-inner">
+            <div class="status-bar" style="color:rgba(255,255,255,0.6);background:var(--lc-brand-dark);"><span>2:30</span><span>●●●</span></div>
+            <div style="display:flex;justify-content:space-between;align-items:center;padding:6px 16px 4px;background:var(--lc-brand-dark);">
+              <div class="reader-back" style="position:static;"><svg viewBox="0 0 24 24"><polyline points="15,18 9,12 15,6"/></svg></div>
+              <div class="reader-mark" style="position:static;"><svg viewBox="0 0 24 24"><polyline points="20,6 9,17 4,12"/></svg> Mark as learned</div>
+            </div>
+
+            <!-- Tab bar -->
+            <div class="reader-tabs" style="background:var(--lc-brand-dark);border-color:rgba(255,255,255,0.1);">
+              <button class="reader-tab" style="color:rgba(255,255,255,0.5);">Story</button>
+              <button class="reader-tab active">Quiz</button>
+              <button class="reader-tab" style="color:rgba(255,255,255,0.5);">Keywords</button>
+              <button class="reader-tab" style="color:rgba(255,255,255,0.5);">Grammar</button>
+            </div>
+
+            <!-- Quiz area -->
+            <div class="quiz-area">
+              <div class="quiz-progress-bar">
+                <div class="quiz-ring">3/7</div>
+                <div class="quiz-audio-btn"><svg viewBox="0 0 24 24"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14"/><path d="M15.54 8.46a5 5 0 0 1 0 7.07"/></svg></div>
+              </div>
+
+              <div class="quiz-content">
+                <div class="quiz-sentence">Der Trainer <span class="quiz-blank"></span> Anna am ersten Tag.</div>
+
+                <button class="quiz-option">beraten</button>
+                <button class="quiz-option">berate</button>
+                <button class="quiz-option">berät</button>
+
+                <div class="quiz-toggle">
+                  <div>
+                    <div class="quiz-toggle-label">Pause on mistakes</div>
+                    <div class="quiz-toggle-sub">Review the correct answer before continuing</div>
+                  </div>
+                  <div class="toggle-track on">
+                    <div class="toggle-thumb"></div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="bottom-nav" style="background:var(--lc-brand-dark);border-color:rgba(255,255,255,0.1);">
+              <div class="nav-item" style="color:rgba(255,255,255,0.4);"><svg viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg><div class="nav-lbl">Home</div></div>
+              <div class="nav-item" style="color:rgba(255,255,255,0.4);"><svg viewBox="0 0 24 24"><rect x="2" y="3" width="20" height="14" rx="2"/></svg><div class="nav-lbl">Vault</div></div>
+              <div class="nav-item" style="color:rgba(255,255,255,0.4);"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/></svg><div class="nav-lbl">Review</div></div>
+              <div class="nav-item on" style="color:white;"><svg viewBox="0 0 24 24"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg><div class="nav-lbl">Stories</div></div>
+              <div class="nav-item" style="color:rgba(255,255,255,0.4);"><svg viewBox="0 0 24 24"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/></svg><div class="nav-lbl">Progress</div></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- SCREEN Q-02: QUIZ WRONG ANSWER STATE -->
+      <div class="phone-wrap">
+        <div class="phone-label">Q-02 · Wrong Answer — Paused</div>
+        <div class="phone">
+          <div class="phone-inner">
+            <div class="status-bar" style="color:rgba(255,255,255,0.6);background:var(--lc-brand-dark);"><span>2:31</span><span>●●●</span></div>
+            <div style="display:flex;justify-content:space-between;align-items:center;padding:6px 16px 4px;background:var(--lc-brand-dark);">
+              <div class="reader-back" style="position:static;"><svg viewBox="0 0 24 24"><polyline points="15,18 9,12 15,6"/></svg></div>
+              <div class="reader-mark" style="position:static;">Mark as learned</div>
+            </div>
+
+            <div class="reader-tabs" style="background:var(--lc-brand-dark);border-color:rgba(255,255,255,0.1);">
+              <button class="reader-tab" style="color:rgba(255,255,255,0.5);">Story</button>
+              <button class="reader-tab active">Quiz</button>
+              <button class="reader-tab" style="color:rgba(255,255,255,0.5);">Keywords</button>
+              <button class="reader-tab" style="color:rgba(255,255,255,0.5);">Grammar</button>
+            </div>
+
+            <div class="quiz-area">
+              <div class="quiz-progress-bar">
+                <div class="quiz-ring">3/7</div>
+              </div>
+
+              <div class="quiz-content">
+                <div class="quiz-sentence">Der Trainer <span class="quiz-blank" style="border-color:var(--lc-mastery-4);">berät</span> Anna am ersten Tag.</div>
+
+                <button class="quiz-option wrong">beraten</button>
+                <button class="quiz-option" style="opacity:0.4;">berate</button>
+                <button class="quiz-option correct">berät ✓</button>
+
+                <!-- Hint shown when paused -->
+                <div style="background:rgba(255,255,255,0.08);border-radius:var(--lc-radius-md);padding:12px;margin-top:4px;">
+                  <div style="font-size:11px;font-weight:600;color:var(--lc-mastery-4);margin-bottom:4px;">💡 Hint</div>
+                  <div style="font-size:12px;color:rgba(255,255,255,0.8);line-height:1.5;">"beraten" is the infinitive. The third person singular present tense of "beraten" is "berät" — the vowel changes (a → ä).</div>
+                </div>
+
+                <button style="width:100%;padding:12px;border-radius:var(--lc-radius-md);background:var(--lc-brand-mid);border:none;color:white;font-size:13px;font-weight:600;cursor:pointer;font-family:var(--lc-font-body);margin-top:8px;">Continue →</button>
+              </div>
+            </div>
+
+            <div class="bottom-nav" style="background:var(--lc-brand-dark);border-color:rgba(255,255,255,0.1);">
+              <div class="nav-item" style="color:rgba(255,255,255,0.4);"><svg viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg><div class="nav-lbl">Home</div></div>
+              <div class="nav-item" style="color:rgba(255,255,255,0.4);"><svg viewBox="0 0 24 24"><rect x="2" y="3" width="20" height="14" rx="2"/></svg><div class="nav-lbl">Vault</div></div>
+              <div class="nav-item" style="color:rgba(255,255,255,0.4);"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/></svg><div class="nav-lbl">Review</div></div>
+              <div class="nav-item on" style="color:white;"><svg viewBox="0 0 24 24"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg><div class="nav-lbl">Stories</div></div>
+              <div class="nav-item" style="color:rgba(255,255,255,0.4);"><svg viewBox="0 0 24 24"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/></svg><div class="nav-lbl">Progress</div></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════ WORD INTERACTIONS SCREENS ═══════════════ -->
+<div id="tab-interactions" class="main" style="display:none;">
+  <div class="section">
+    <div class="section-title">Tap-on-Word — Active Word Interactions</div>
+    <div class="section-sub">Tapping a word highlights it and transforms the cover to show word details, plural, conjugation, audio, and add-to-vault. LC-321, LC-322, LC-323, LC-324, LC-325.</div>
+
+    <div class="phones-row">
+
+      <!-- SCREEN AW-01: NOUN TAPPED -->
+      <div class="phone-wrap">
+        <div class="phone-label">AW-01 · Noun Tapped — "Menschen"</div>
+        <div class="phone">
+          <div class="phone-inner" style="position:relative;">
+            <!-- Active word cover -->
+            <div class="reader-cover-word">
+              <div class="reader-back"><svg viewBox="0 0 24 24"><polyline points="15,18 9,12 15,6"/></svg></div>
+              <div class="reader-mark"><svg viewBox="0 0 24 24"><polyline points="20,6 9,17 4,12"/></svg> Mark as learned</div>
+
+              <div class="word-main">der Mensch</div>
+              <div class="word-plural">die Menschen <span class="word-plural-badge">Plural</span></div>
+              <div class="word-translation">person, human</div>
+
+              <div class="word-actions">
+                <div class="word-action-btn" title="Play pronunciation"><svg viewBox="0 0 24 24"><polygon points="6,4 20,12 6,20" fill="white" stroke="none"/></svg></div>
+                <div class="word-action-btn" title="Add to collection"><svg viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg></div>
+              </div>
+            </div>
+
+            <div class="reader-tabs">
+              <button class="reader-tab active">Story</button>
+              <button class="reader-tab">Quiz</button>
+              <button class="reader-tab">Keywords</button>
+              <button class="reader-tab">Grammar</button>
+            </div>
+
+            <div class="story-text">
+              <div class="story-sentence">
+                <div class="story-de">
+                  <span class="story-word">Nachtzüge</span>
+                  <span class="story-word">helfen</span>
+                  <span class="story-word active">Menschen,</span>
+                  <span class="story-word">in</span>
+                  <span class="story-word">der</span>
+                  <span class="story-word">Nacht</span>
+                  <span class="story-word">zu</span>
+                  <span class="story-word">reisen.</span>
+                </div>
+                <div class="story-en">Night trains help people to travel at night.</div>
+              </div>
+              <div class="story-sentence">
+                <div class="story-de">
+                  <span class="story-word">Man</span>
+                  <span class="story-word">schläft</span>
+                  <span class="story-word">im</span>
+                  <span class="story-word">Zug</span>
+                  <span class="story-word">und</span>
+                  <span class="story-word">wacht</span>
+                  <span class="story-word">am</span>
+                  <span class="story-word">neuen</span>
+                  <span class="story-word">Ort</span>
+                  <span class="story-word">auf.</span>
+                </div>
+                <div class="story-en">You sleep on the train and wake up in a new place.</div>
+              </div>
+            </div>
+
+            <div class="annotation annotation-green" style="margin-top:auto;margin-bottom:50px;">
+              <strong>Active word state:</strong> "Menschen" is tapped → highlighted in green in the text. Cover transforms to show: article + word, plural form with badge, translation. Audio play + Add to collection buttons on the right.
+            </div>
+
+            <div class="float-pill">
+              <div class="pill-play"><svg viewBox="0 0 24 24"><polygon points="6,4 20,12 6,20"/></svg></div>
+              <span class="pill-label">story</span>
+              <span class="pill-speed">1.05x</span>
+              <div class="pill-repeat"><svg viewBox="0 0 24 24"><polyline points="17,1 21,5 17,9"/><path d="M3 11V9a4 4 0 0 1 4-4h14"/></svg></div>
+            </div>
+
+            <div class="bottom-nav">
+              <div class="nav-item"><svg viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg><div class="nav-lbl">Home</div></div>
+              <div class="nav-item"><svg viewBox="0 0 24 24"><rect x="2" y="3" width="20" height="14" rx="2"/></svg><div class="nav-lbl">Vault</div></div>
+              <div class="nav-item"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/></svg><div class="nav-lbl">Review</div></div>
+              <div class="nav-item on"><svg viewBox="0 0 24 24"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg><div class="nav-lbl">Stories</div></div>
+              <div class="nav-item"><svg viewBox="0 0 24 24"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/></svg><div class="nav-lbl">Progress</div></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- SCREEN AW-02: VERB TAPPED WITH CONJUGATE -->
+      <div class="phone-wrap">
+        <div class="phone-label">AW-02 · Verb Tapped — "beraten"</div>
+        <div class="phone">
+          <div class="phone-inner" style="position:relative;">
+            <div class="reader-cover-word">
+              <div class="reader-back"><svg viewBox="0 0 24 24"><polyline points="15,18 9,12 15,6"/></svg></div>
+              <div class="reader-mark"><svg viewBox="0 0 24 24"><polyline points="20,6 9,17 4,12"/></svg> Mark as learned</div>
+
+              <div class="word-main">beraten</div>
+              <div class="word-translation">to advise, to counsel</div>
+              <div class="word-type-badge">Verb</div>
+              <button class="word-conj-btn">Conjugate ▸</button>
+
+              <div class="word-actions">
+                <div class="word-action-btn" title="Play pronunciation"><svg viewBox="0 0 24 24"><polygon points="6,4 20,12 6,20" fill="white" stroke="none"/></svg></div>
+                <div class="word-action-btn" title="Add to collection"><svg viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg></div>
+              </div>
+            </div>
+
+            <div class="reader-tabs">
+              <button class="reader-tab active">Story</button>
+              <button class="reader-tab">Quiz</button>
+              <button class="reader-tab">Keywords</button>
+              <button class="reader-tab">Grammar</button>
+            </div>
+
+            <div class="story-text">
+              <div class="story-sentence">
+                <div class="story-de">
+                  <span class="story-word">Der</span>
+                  <span class="story-word">Trainer</span>
+                  <span class="story-word active">berät</span>
+                  <span class="story-word">Anna</span>
+                  <span class="story-word">am</span>
+                  <span class="story-word">ersten</span>
+                  <span class="story-word">Tag.</span>
+                </div>
+                <div class="story-en">The trainer advises Anna on the first day.</div>
+              </div>
+            </div>
+
+            <div class="annotation annotation-green" style="margin-top:auto;margin-bottom:50px;">
+              <strong>Verb state:</strong> No plural line shown. Instead: "Verb" type badge and "Conjugate ▸" button. Tapping opens the conjugation bottom sheet (see AW-03).
+            </div>
+
+            <div class="float-pill">
+              <div class="pill-play"><svg viewBox="0 0 24 24"><polygon points="6,4 20,12 6,20"/></svg></div>
+              <span class="pill-label">story</span>
+              <span class="pill-speed">1.05x</span>
+            </div>
+
+            <div class="bottom-nav">
+              <div class="nav-item"><svg viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg><div class="nav-lbl">Home</div></div>
+              <div class="nav-item"><svg viewBox="0 0 24 24"><rect x="2" y="3" width="20" height="14" rx="2"/></svg><div class="nav-lbl">Vault</div></div>
+              <div class="nav-item"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/></svg><div class="nav-lbl">Review</div></div>
+              <div class="nav-item on"><svg viewBox="0 0 24 24"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg><div class="nav-lbl">Stories</div></div>
+              <div class="nav-item"><svg viewBox="0 0 24 24"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/></svg><div class="nav-lbl">Progress</div></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- SCREEN AW-03: CONJUGATION SHEET -->
+      <div class="phone-wrap">
+        <div class="phone-label">AW-03 · Conjugation Sheet</div>
+        <div class="phone">
+          <div class="phone-inner" style="position:relative;">
+            <!-- Dimmed background -->
+            <div style="opacity:0.3;pointer-events:none;">
+              <div class="reader-cover-word" style="min-height:100px;">
+                <div class="word-main">beraten</div>
+              </div>
+              <div class="reader-tabs">
+                <button class="reader-tab active">Story</button>
+                <button class="reader-tab">Quiz</button>
+              </div>
+            </div>
+
+            <!-- Bottom sheet -->
+            <div class="conj-sheet" style="position:absolute;bottom:0;left:0;right:0;z-index:30;">
+              <div class="conj-handle"><div></div></div>
+              <div class="conj-title">beraten</div>
+              <div class="conj-sub">to advise, to counsel</div>
+
+              <table class="conj-table">
+                <thead>
+                  <tr><th></th><th>Präsens</th><th>Präteritum</th></tr>
+                </thead>
+                <tbody>
+                  <tr><td>ich</td><td>berate</td><td>beriet</td></tr>
+                  <tr><td>du</td><td>berätst</td><td>berietest</td></tr>
+                  <tr><td>er/sie</td><td>berät</td><td>beriet</td></tr>
+                  <tr><td>wir</td><td>beraten</td><td>berieten</td></tr>
+                  <tr><td>ihr</td><td>beratet</td><td>berietet</td></tr>
+                  <tr><td>sie/Sie</td><td>beraten</td><td>berieten</td></tr>
+                </tbody>
+              </table>
+
+              <div class="conj-extra">
+                <strong>Perfekt:</strong> hat beraten<br>
+                <strong>Imperativ:</strong> berate! beratet!
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- SCREEN AW-04: WORD ALREADY IN VAULT -->
+      <div class="phone-wrap">
+        <div class="phone-label">AW-04 · Word in Vault (✓)</div>
+        <div class="phone">
+          <div class="phone-inner" style="position:relative;">
+            <div class="reader-cover-word">
+              <div class="reader-back"><svg viewBox="0 0 24 24"><polyline points="15,18 9,12 15,6"/></svg></div>
+
+              <div class="word-main">die Arbeit</div>
+              <div class="word-plural">die Arbeiten <span class="word-plural-badge">Plural</span></div>
+              <div class="word-translation">work, labour</div>
+
+              <div class="word-actions">
+                <div class="word-action-btn" title="Play pronunciation"><svg viewBox="0 0 24 24"><polygon points="6,4 20,12 6,20" fill="white" stroke="none"/></svg></div>
+                <!-- In vault — filled check icon instead of plus -->
+                <div class="word-action-btn" style="background:var(--lc-mastery-4);" title="Already in vault"><svg viewBox="0 0 24 24"><polyline points="20,6 9,17 4,12" stroke="white" stroke-width="2.5"/></svg></div>
+              </div>
+            </div>
+
+            <div class="reader-tabs">
+              <button class="reader-tab active">Story</button>
+              <button class="reader-tab">Quiz</button>
+              <button class="reader-tab">Keywords</button>
+              <button class="reader-tab">Grammar</button>
+            </div>
+
+            <div class="story-text">
+              <div class="story-sentence">
+                <div class="story-de">
+                  <span class="story-word">Viele</span>
+                  <span class="story-word">Dinge</span>
+                  <span class="story-word">sind</span>
+                  <span class="story-word">bei</span>
+                  <span class="story-word">der</span>
+                  <span class="story-word">Suche</span>
+                  <span class="story-word">nach</span>
+                  <span class="story-word active">Arbeit</span>
+                  <span class="story-word">wichtig.</span>
+                </div>
+                <div class="story-en">Many things are important when looking for work.</div>
+              </div>
+            </div>
+
+            <div class="annotation annotation-green" style="margin-top:auto;margin-bottom:50px;">
+              <strong>"In vault" state:</strong> The add-to-collection button shows a green ✓ when the word is already in the user's vocabulary. Tapping shows a toast: "Already in your vault". Uses CardDedupService for O(1) lookup.
+            </div>
+
+            <div class="float-pill">
+              <div class="pill-play"><svg viewBox="0 0 24 24"><polygon points="6,4 20,12 6,20"/></svg></div>
+              <span class="pill-label">story</span>
+              <span class="pill-speed">1.05x</span>
+            </div>
+
+            <div class="bottom-nav">
+              <div class="nav-item"><svg viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg><div class="nav-lbl">Home</div></div>
+              <div class="nav-item"><svg viewBox="0 0 24 24"><rect x="2" y="3" width="20" height="14" rx="2"/></svg><div class="nav-lbl">Vault</div></div>
+              <div class="nav-item"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/></svg><div class="nav-lbl">Review</div></div>
+              <div class="nav-item on"><svg viewBox="0 0 24 24"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg><div class="nav-lbl">Stories</div></div>
+              <div class="nav-item"><svg viewBox="0 0 24 24"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/></svg><div class="nav-lbl">Progress</div></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<script>
+function showTab(id) {
+  ['studio','reader','quiz','interactions'].forEach(t => {
+    document.getElementById('tab-' + t).style.display = t === id ? 'block' : 'none';
+  });
+  document.querySelectorAll('.header-tab').forEach((btn, i) => {
+    const tabs = ['studio','reader','quiz','interactions'];
+    btn.classList.toggle('active', tabs[i] === id);
+  });
+}
+</script>
+
+</body>
+</html>

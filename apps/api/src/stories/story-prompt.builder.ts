@@ -1,5 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import type { GenerateStoryDto, StoryDifficulty, StoryLength, StorySentence } from '@lingua-card/shared/domain';
+import { calculateQuizCount } from '@lingua-card/shared/domain';
 import type { CardEntity } from '../cards/card.entity';
 import type { StoryEntity } from './story.entity';
 
@@ -28,6 +29,7 @@ export class StoryPromptBuilder {
   }
 
   buildQuizPrompt(sentences: StorySentence[], difficulty: StoryDifficulty): string {
+    const targetCount = calculateQuizCount(sentences.length);
     const sentenceList = sentences
       .map((s, i) => `${i + 1}. DE: "${s.german}" | EN: "${s.english}"`)
       .join('\n');
@@ -38,7 +40,7 @@ STORY SENTENCES:
 ${sentenceList}
 
 RULES:
-1. Generate exactly 4 fill-in-the-blank questions from the sentences above.
+1. Generate exactly ${targetCount} fill-in-the-blank questions from the sentences above.
 2. The blank must replace a single word that demonstrates a grammar rule (German article case: der/die/das/dem/den, modal verb form, preposition, adjective ending, verb conjugation).
 3. The correct answer must come from the actual story sentence.
 4. Generate exactly 2 distractors that are plausible but grammatically wrong. For article blanks, use other German articles/cases. For verbs, use wrong conjugations.
