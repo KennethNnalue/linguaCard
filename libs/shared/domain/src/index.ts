@@ -4,8 +4,8 @@ export type LanguageCode = 'en' | 'de' | 'fr' | 'es' | 'it' | 'pt' | 'ja' | 'zh'
 export type GenderType = 'masculine' | 'feminine' | 'neuter' | null;
 export type ArticleType = 'der' | 'die' | 'das' | 'le' | 'la' | 'el' | 'un' | 'une' | null;
 export type MasteryLevel = 0 | 1 | 2 | 3 | 4 | 5;
-export type SRSState = 'new' | 'learning' | 'review' | 'mastered';
-export type ConfidenceRating = 0 | 1 | 2 | 3 | 4 | 5;
+export type SRSState = 'new' | 'learning' | 'review' | 'relearning' | 'mastered';
+export type ConfidenceRating = 1 | 2 | 3 | 4;
 export type ThemeMode = 'light' | 'dark' | 'system';
 export type PlaylistType = 'word-meaning' | 'examples-only' | 'deep-dive';
 export type ReviewMode = 'flashcard' | 'listen' | 'cloze' | 'write';
@@ -87,15 +87,33 @@ export interface SRSStateData {
   id: string;
   cardId: string;
   userId: string;
-  algorithm: string;
+
+  /** 'fsrs' after migration; 'sm2' for un-migrated rows. */
+  algorithm: 'sm2' | 'fsrs';
+
+  // ─── Scheduling fields (used by both algorithms) ──────────────────────────
   intervalDays: number;
-  easeFactor: number;
-  repetitions: number;
-  lastRating: ConfidenceRating | null;
-  lastReviewedAt: string | null;
   nextDueAt: string;
+  lastReviewedAt: string | null;
+  lastRating: ConfidenceRating | null;
   masteryLevel: MasteryLevel;
+
+  /** 'relearning' replaces SM-2's reset-to-zero on failure. */
   state: SRSState;
+
+  // ─── FSRS-specific fields (null for SM-2 rows until migration runs) ────────
+  /** Days until recall probability drops to target retention. Null before first FSRS review. */
+  stability: number | null;
+  /** Intrinsic hardness 1–10, updated each review. Null before first FSRS review. */
+  difficulty: number | null;
+  /** Current recall probability 0–1. Null before first FSRS review. */
+  retrievability: number | null;
+
+  // ─── SM-2 legacy fields (kept during migration, removed in cleanup) ────────
+  /** @deprecated Use stability instead. Kept for SM-2 rows. */
+  easeFactor: number;
+  /** @deprecated Not used by FSRS. Kept for SM-2 rows. */
+  repetitions: number;
 }
 
 // ─── MEDIA ────────────────────────────────────────────────────────────────────

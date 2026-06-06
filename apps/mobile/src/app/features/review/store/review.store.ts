@@ -4,11 +4,12 @@ import { patchState, signalStore, withMethods, withState } from '@ngrx/signals';
 import { Card, ConfidenceRating } from '@lingua-card/shared/domain';
 import { CardApiService } from '../../vault/services/card-api.service';
 import { CardStore } from '../../vault/store/card.store';
-import { Sm2Service } from '../../../shared/srs/sm2.service';
+import { FsrsService } from '../../../shared/srs/fsrs.service';
 import { LocalDataService, PendingSrsRating } from '../../../core/services/local-data.service';
 import { AuthService } from '../../../core/services/auth.service';
 import { SyncService } from '../../../core/services/sync.service';
 import { LocalReviewSession, MAX_SESSION_HISTORY, SyncOperationType } from '../models/review.model';
+import { ReviewSessionApiService, UpsertSessionDto } from '../services/review-session-api.service';
 
 export type ReviewSession = LocalReviewSession;
 
@@ -38,10 +39,11 @@ export const ReviewStore = signalStore(
   withMethods(store => {
     const cardApi = inject(CardApiService);
     const cardStore = inject(CardStore);
-    const sm2 = inject(Sm2Service);
+    const fsrs = inject(FsrsService);
     const localData = inject(LocalDataService);
     const authService = inject(AuthService);
     const syncService = inject(SyncService);
+    const sessionApi = inject(ReviewSessionApiService);
 
     // Serialises all IndexedDB rating writes to prevent read-modify-write races
     // when multiple rateCard() calls fire before any write resolves.
@@ -55,6 +57,41 @@ export const ReviewStore = signalStore(
         reviewedCardIds: reviewedCards.map(c => c.id),
       }));
       await localData.setSessionHistory(userId, slim);
+    }
+
+    function toUpsertDto(session: ReviewSession): UpsertSessionDto {
+      return {
+        id: session.id,
+        collectionId: session.collectionId,
+        collectionName: session.collectionName,
+        startedAt: session.startedAt,
+        completedAt: session.completedAt,
+        totalCards: session.totalCards,
+        reviewedCards: Object.keys(session.ratings).length,
+        newCards: session.reviewedCards.filter(c => !c.srsState?.lastReviewedAt).length,
+        ratings: session.ratings,
+      };
+    }
+
+    async function bufferSession(session: ReviewSession): Promise<void> {
+      const userId = authService.currentUser()?.id;
+      if (!userId) return;
+      const existing = await localData.getPendingSessions(userId);
+      // Replace any prior record for the same session id (idempotent)
+      const filtered = existing.filter(s => s.id !== session.id);
+      await localData.setPendingSessions(userId, [...filtered, toUpsertDto(session)]);
+    }
+
+    async function flushSession(session: ReviewSession): Promise<void> {
+      const userId = authService.currentUser()?.id;
+      if (!userId) return;
+      try {
+        await firstValueFrom(sessionApi.upsert(toUpsertDto(session)));
+        const pending = await localData.getPendingSessions(userId);
+        await localData.setPendingSessions(userId, pending.filter(s => s.id !== session.id));
+      } catch {
+        // Will be retried by SessionSyncHandler on reconnect
+      }
     }
 
     async function bufferRating(rating: PendingSrsRating): Promise<void> {
@@ -146,8 +183,8 @@ export const ReviewStore = signalStore(
         }
 
         // 1. Compute new SRS state and apply optimistically to the store immediately
-        const existingSrs = card.srsState ?? sm2.freshState(card.id, card.userId);
-        const newSrs = sm2.compute(existingSrs, rating);
+        const existingSrs = card.srsState ?? fsrs.freshState(card.id, card.userId);
+        const newSrs = fsrs.compute(existingSrs, rating);
         cardStore.updateCard({ ...card, srsState: newSrs });
 
         // 2. Buffer locally — serialise writes to avoid read-modify-write race
@@ -186,14 +223,25 @@ export const ReviewStore = signalStore(
         });
         void persistHistory(updated);
 
+        // Buffer session locally first (survives crashes / network loss)
+        bufferChain = bufferChain.then(() => bufferSession(completed));
+
         // Wait for any in-flight per-card buffer/flush, then flush the rest
-        bufferChain = bufferChain.then(() => {
-          if (navigator.onLine) return flushAllPending();
-          void syncService.enqueue({
-            type: SyncOperationType.FLUSH_SRS_RATINGS,
-            payload: { userId: authService.currentUser()?.id },
-          });
-          return Promise.resolve();
+        bufferChain = bufferChain.then(async () => {
+          const userId = authService.currentUser()?.id;
+          if (navigator.onLine) {
+            await flushAllPending();
+            await flushSession(completed);
+          } else {
+            void syncService.enqueue({
+              type: SyncOperationType.FLUSH_SRS_RATINGS,
+              payload: { userId },
+            });
+            void syncService.enqueue({
+              type: SyncOperationType.FLUSH_REVIEW_SESSIONS,
+              payload: { userId },
+            });
+          }
         });
       },
 

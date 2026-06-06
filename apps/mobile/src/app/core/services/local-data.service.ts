@@ -1,6 +1,7 @@
 import { inject, Injectable } from '@angular/core';
 import { Storage } from '@ionic/storage-angular';
-import { Card, Collection, Story } from '@lingua-card/shared/domain';
+import { Card, Category, Collection, Story } from '@lingua-card/shared/domain';
+import type { UpsertSessionDto } from '../../features/review/services/review-session-api.service';
 
 export interface PendingSrsRating {
   cardId: string;
@@ -9,7 +10,7 @@ export interface PendingSrsRating {
   sessionId: string;
 }
 
-type SyncFeature = 'stories' | 'cards' | 'collections';
+type SyncFeature = 'stories' | 'cards' | 'collections' | 'categories';
 
 @Injectable({ providedIn: 'root' })
 export class LocalDataService {
@@ -84,6 +85,28 @@ export class LocalDataService {
     await this.storage.set(`session_history:${userId}`, sessions);
   }
 
+  // ── Categories ───────────────────────────────────────────────
+  async getCategories(userId: string): Promise<Category[]> {
+    await this.init();
+    return (await this.storage.get(`categories:${userId}`)) ?? [];
+  }
+
+  async setCategories(userId: string, categories: Category[]): Promise<void> {
+    await this.init();
+    await this.storage.set(`categories:${userId}`, categories);
+  }
+
+  // ── Pending sessions (buffered offline, flushed on reconnect) ────
+  async getPendingSessions(userId: string): Promise<UpsertSessionDto[]> {
+    await this.init();
+    return (await this.storage.get(`pending_sessions:${userId}`)) ?? [];
+  }
+
+  async setPendingSessions(userId: string, sessions: UpsertSessionDto[]): Promise<void> {
+    await this.init();
+    await this.storage.set(`pending_sessions:${userId}`, sessions);
+  }
+
   // ── SRS pending ratings ───────────────────────────────────────
   async getPendingSrsRatings(userId: string): Promise<PendingSrsRating[]> {
     await this.init();
@@ -112,11 +135,14 @@ export class LocalDataService {
     await Promise.all([
       this.storage.remove(`cards:${userId}`),
       this.storage.remove(`collections:${userId}`),
+      this.storage.remove(`categories:${userId}`),
       this.storage.remove(`stories:${userId}`),
       this.storage.remove(`srs_ratings:${userId}`),
       this.storage.remove(`session_history:${userId}`),
+      this.storage.remove(`pending_sessions:${userId}`),
       this.storage.remove('last_synced_at:cards'),
       this.storage.remove('last_synced_at:collections'),
+      this.storage.remove('last_synced_at:categories'),
       this.storage.remove('last_synced_at:stories'),
     ]);
   }

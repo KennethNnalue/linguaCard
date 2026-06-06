@@ -175,16 +175,19 @@ export class CollectionDetailPage implements OnInit {
   ngOnInit(): void {
     const id = this.route.snapshot.paramMap.get('id')!;
     this.collectionId.set(id);
-    this.collectionApi.getById(id).subscribe({
-      next: col => this.collection.set(col),
-      error: () => this.goBack(),
-    });
-    this.loadCards();
-  }
 
-  loadCards(): void {
-    this.cardStore.loadCards();
-    this.loading.set(false);
+    // Prefer the store (already cached) to avoid an extra API call on every open.
+    // Fall back to the API only when the collection is absent (deep-link / fresh device).
+    const fromStore = this.collectionStore.collections().find(c => c.id === id) ?? null;
+    if (fromStore) {
+      this.collection.set(fromStore);
+      this.loading.set(false);
+    } else {
+      this.collectionApi.getById(id).subscribe({
+        next: col => { this.collection.set(col); this.loading.set(false); },
+        error: () => this.goBack(),
+      });
+    }
   }
 
   async completeImport(): Promise<void> {
@@ -203,7 +206,8 @@ export class CollectionDetailPage implements OnInit {
         cardCount: c.cardCount + result.newCards,
       } : c);
 
-      this.loadCards();
+      // Reload cards + collections once after import — new cards arrived from the server
+      this.cardStore.loadCards();
       this.collectionStore.loadCollections();
 
       if (result.isComplete) {
@@ -278,8 +282,8 @@ export class CollectionDetailPage implements OnInit {
     });
     await modal.present();
     const {data} = await modal.onWillDismiss();
-    if (data?.created) {
-      this.cardStore.loadCards();
+    if (data?.collectionId) {
+      // Collection assignment changed on the new card — refresh collection counts
       this.collectionStore.loadCollections();
     }
   }
@@ -328,8 +332,17 @@ export class CollectionDetailPage implements OnInit {
     const col = this.collection();
     if (!col) return;
     this.collectionApi.clearCards(col.id).subscribe(() => {
-      this.cardStore.loadCards();
-      this.collectionStore.loadCollections();
+      // Remove all cards for this collection from the store optimistically
+      this.cardStore.setCardsFromSync(
+        this.cardStore.cards().filter(c => c.collectionId !== col.id),
+      );
+      // Update the collection's card count in-store
+      this.collectionStore.setCollectionsFromSync(
+        this.collectionStore.collections().map(c =>
+          c.id === col.id ? { ...c, cardCount: 0, masteredCount: 0, dueCount: 0 } : c,
+        ),
+      );
+      this.collection.update(c => c ? { ...c, cardCount: 0, masteredCount: 0, dueCount: 0 } : c);
     });
   }
 

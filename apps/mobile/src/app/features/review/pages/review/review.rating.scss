@@ -1,7 +1,10 @@
 // ─── RATING AREA ──────────────────────────────────────────────────────────────
 
+@use '../../../../../theme/tokens' as t;
+@use '../../../../../theme/utils' as u;
+
 .rv-rating-area {
-  padding: 4px 0 24px;
+  padding: t.$lc-space-1 0 t.$lc-space-6;
   opacity: 0.45;
   pointer-events: none;
   transition: opacity var(--lc-transition-base);
@@ -13,16 +16,17 @@
 }
 
 .rv-rating-prompt {
-  font-size: 11px;
-  color: var(--lc-text-secondary);
+  @include u.lc-font('xs');
+  color: t.$lc-text-secondary;
   text-align: center;
-  margin: 0 0 10px;
+  margin: 0 0 t.$lc-space-2;
   font-weight: 500;
 }
 
 .rv-rating-row {
   display: flex;
-  gap: 5px;
+  gap: t.$lc-space-2;
+  padding: 0 t.$lc-space-3;
 }
 
 .rv-rating-btn {
@@ -30,193 +34,61 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 4px;
-  padding: 9px 3px 7px;
-  border-radius: 10px;
-  border: 1.5px solid var(--lc-border);
-  background: var(--lc-card);
+  padding: t.$lc-space-2 t.$lc-space-1;
+  border-radius: t.$lc-radius-md;
+  border: 1.5px solid transparent;
   cursor: pointer;
-  font-family: var(--lc-font-body);
+  font-family: t.$lc-font-body;
   transition: var(--lc-transition-fast);
+  background: transparent;
 
   &:disabled { cursor: default; }
-  &:not(:disabled):active { transform: scale(0.91); }
-}
-
-.rv-r-num {
-  font-family: var(--lc-font-display);
-  font-size: 18px;
-  font-weight: 700;
-  line-height: 1;
+  &:not(:disabled):active { transform: scale(0.94); }
 }
 
 .rv-r-lbl {
-  font-size: 7px;
-  font-weight: 700;
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
-}
-
-// ── Rating 0 — Blank (neutral grey) ──────────────────────────────────────────
-.rv-rating-btn--0 {
-  border-color: var(--lc-rating-0-border);
-  background: var(--lc-rating-0-bg);
-
-  .rv-r-num { color: var(--lc-rating-0-text); }
-  .rv-r-lbl { color: var(--lc-rating-0-text); opacity: 0.7; }
-}
-
-// ── Rating 1 — Hard (red) ─────────────────────────────────────────────────────
-.rv-rating-btn--1 {
-  border-color: var(--lc-rating-1-border);
-  background: var(--lc-rating-1-bg);
-
-  .rv-r-num { color: var(--lc-rating-1-text); }
-  .rv-r-lbl { color: var(--lc-rating-1-text); opacity: 0.8; }
-}
-
-// ── Rating 2 — Hmm (amber) ────────────────────────────────────────────────────
-.rv-rating-btn--2 {
-  border-color: var(--lc-rating-2-border);
-  background: var(--lc-rating-2-bg);
-
-  .rv-r-num { color: var(--lc-rating-2-text); }
-  .rv-r-lbl { color: var(--lc-rating-2-text); opacity: 0.8; }
-}
-
-// ── Rating 3 — Good (light green) ────────────────────────────────────────────
-.rv-rating-btn--3 {
-  border-color: var(--lc-rating-3-border);
-  background: var(--lc-rating-3-bg);
-
-  .rv-r-num { color: var(--lc-rating-3-text); }
-  .rv-r-lbl { color: var(--lc-rating-3-text); opacity: 0.8; }
-}
-
-// ── Rating 4 — Easy (medium green) ───────────────────────────────────────────
-.rv-rating-btn--4 {
-  border-color: var(--lc-rating-4-border);
-  background: var(--lc-rating-4-bg);
-
-  .rv-r-num { color: var(--lc-rating-4-text); }
-  .rv-r-lbl { color: var(--lc-rating-4-text); opacity: 0.8; }
-}
-
-// ── Rating 5 — Nailed (deep green) ───────────────────────────────────────────
-.rv-rating-btn--5 {
-  border-color: var(--lc-rating-5-border);
-  background: var(--lc-rating-5-bg);
-
-  .rv-r-num { color: var(--lc-rating-5-text); }
-  .rv-r-lbl { color: var(--lc-rating-5-text); opacity: 0.8; }
-}
-
-// ─── SESSION COMPLETE ─────────────────────────────────────────────────────────
-
-.rv-complete {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  padding: 48px 24px 32px;
-  text-align: center;
-  min-height: 70vh;
-}
-
-.rv-complete-badge {
-  width: 76px;
-  height: 76px;
-  border-radius: 50%;
-  background: var(--lc-brand-light);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  margin-bottom: 22px;
-
-  ion-icon {
-    font-size: 42px;
-    color: var(--lc-brand);
-  }
-}
-
-.rv-complete-title {
-  font-size: 28px;
-  font-weight: 600;
-  color: var(--lc-text-primary);
-  margin: 0 0 8px;
-}
-
-.rv-complete-sub {
-  font-size: 14px;
-  color: var(--lc-text-secondary);
-  margin: 0 0 28px;
-}
-
-.rv-complete-stats {
-  display: flex;
-  gap: 0;
-  margin-bottom: 32px;
-  background: var(--lc-card);
-  border: 1px solid var(--lc-border);
-  border-radius: var(--lc-radius-lg);
-  width: 100%;
-  box-shadow: var(--lc-shadow-card);
-  overflow: hidden;
-}
-
-.rv-c-stat {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 4px;
-  padding: 18px 12px;
-
-  & + & {
-    border-left: 1px solid var(--lc-border);
-  }
-}
-
-.rv-c-val {
-  font-size: 30px;
-  font-weight: 600;
-  color: var(--lc-text-primary);
+  @include u.lc-font('sm', t.$lc-font-weight-semibold);
   line-height: 1;
+  margin-bottom: 4px;
 }
 
-.rv-c-lbl {
-  font-size: 11px;
-  color: var(--lc-text-hint);
-  font-weight: 500;
+.rv-r-interval {
+  @include u.lc-font('xxs');
+  opacity: 0.75;
 }
 
-.rv-exit-btn {
-  max-width: 280px;
-  margin: 0 auto;
+// ── Again (1) — red ──────────────────────────────────────────────────────────
+.rv-rating-btn--1 {
+  background: rgba(192, 57, 43, 0.07);
+  border-color: rgba(192, 57, 43, 0.2);
+
+  .rv-r-lbl      { color: var(--lc-rating-1-text, #c0392b); }
+  .rv-r-interval { color: var(--lc-rating-1-text, #c0392b); }
 }
 
-// ─── EMPTY STATE ──────────────────────────────────────────────────────────────
+// ── Hard (2) — amber ─────────────────────────────────────────────────────────
+.rv-rating-btn--2 {
+  background: rgba(186, 105, 20, 0.07);
+  border-color: rgba(186, 105, 20, 0.2);
 
-.lc-empty-state {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  padding: 60px 32px;
-  text-align: center;
-  min-height: 60vh;
+  .rv-r-lbl      { color: var(--lc-rating-2-text, #ba6914); }
+  .rv-r-interval { color: var(--lc-rating-2-text, #ba6914); }
 }
 
-.lc-empty-icon { font-size: 48px; margin-bottom: 16px; }
-.lc-empty-title {
-  font-family: var(--lc-font-display);
-  font-size: 20px;
-  font-weight: 600;
-  color: var(--lc-text-primary);
-  margin: 0 0 6px;
+// ── Good (3) — soft green ────────────────────────────────────────────────────
+.rv-rating-btn--3 {
+  background: rgba(45, 90, 78, 0.07);
+  border-color: rgba(45, 90, 78, 0.2);
+
+  .rv-r-lbl      { color: t.$lc-brand; }
+  .rv-r-interval { color: t.$lc-brand; }
 }
-.lc-empty-sub {
-  font-size: 14px;
-  color: var(--lc-text-hint);
-  margin: 0;
+
+// ── Easy (4) — brand filled ──────────────────────────────────────────────────
+.rv-rating-btn--4 {
+  background: t.$lc-brand;
+  border-color: t.$lc-brand;
+
+  .rv-r-lbl      { color: t.$lc-text-inverse; }
+  .rv-r-interval { color: rgba(255, 255, 255, 0.75); opacity: 1; }
 }

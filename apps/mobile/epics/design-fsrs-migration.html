@@ -1,0 +1,715 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>LinguaCard — FSRS Migration Design Reference</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,500;0,600;1,400&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600&family=Fira+Code:wght@400;500&display=swap" rel="stylesheet">
+<style>
+/* ─── DESIGN TOKENS ─────────────────────────────────────────── */
+:root {
+  --lc-brand:#2D5A4E;--lc-brand-light:#E8F2EE;--lc-brand-mid:#4A8C7A;--lc-brand-dark:#1A3830;
+  --lc-accent:#E07B3F;--lc-accent-light:#FDF0E6;
+  --lc-masc-bg:#EAF2FC;--lc-masc-text:#1A56A3;--lc-masc-border:#85B7EB;
+  --lc-fem-bg:#FEF2F2;--lc-fem-text:#B91C1C;--lc-fem-border:#FCA5A5;
+  --lc-neut-bg:#F1EFE8;--lc-neut-text:#5F5E5A;--lc-neut-border:#B4B2A9;
+  --lc-mastery-0:#D1D5DB;--lc-mastery-1:#FCA5A5;--lc-mastery-2:#FCD34D;
+  --lc-mastery-3:#6EE7B7;--lc-mastery-4:#34D399;--lc-mastery-5:#059669;
+  --lc-surface:#FAFAF8;--lc-card:#FFFFFF;--lc-border:rgba(45,90,78,0.12);
+  --lc-text-primary:#1A2B26;--lc-text-secondary:#6B7C78;--lc-text-hint:#9BAAA6;
+  --lc-shadow-card:0 2px 12px rgba(45,90,78,0.08),0 1px 3px rgba(0,0,0,0.04);
+  --lc-shadow-float:0 8px 32px rgba(45,90,78,0.14),0 2px 8px rgba(0,0,0,0.06);
+  --lc-font-display:'Lora',Georgia,serif;
+  --lc-font-body:'DM Sans',system-ui,sans-serif;
+  --lc-font-mono:'Fira Code','Courier New',monospace;
+  --lc-radius-sm:8px;--lc-radius-md:12px;--lc-radius-lg:20px;--lc-radius-xl:28px;
+  /* FSRS rating colors */
+  --lc-again-bg:rgba(192,57,43,0.07);--lc-again-border:rgba(192,57,43,0.2);--lc-again-text:#c0392b;
+  --lc-hard-bg:rgba(186,105,20,0.07);--lc-hard-border:rgba(186,105,20,0.2);--lc-hard-text:#ba6914;
+  --lc-good-bg:rgba(45,90,78,0.07);--lc-good-border:rgba(45,90,78,0.2);--lc-good-text:#2D5A4E;
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:var(--lc-font-body);background:#F0EDEA;color:var(--lc-text-primary);min-height:100vh;}
+
+/* ─── PAGE LAYOUT ─────────────────────────────────────────── */
+.page-header{background:var(--lc-brand);padding:28px 40px 24px;position:sticky;top:0;z-index:100;box-shadow:0 4px 20px rgba(0,0,0,0.2);}
+.page-header-inner{max-width:1400px;margin:0 auto;display:flex;align-items:center;justify-content:space-between;gap:20px;flex-wrap:wrap;}
+.logo{font-family:var(--lc-font-display);font-size:22px;font-weight:600;color:white;}
+.logo-sub{font-size:11px;color:rgba(255,255,255,0.55);margin-top:2px;}
+.main{max-width:1400px;margin:0 auto;padding:40px;}
+.section{margin-bottom:56px;}
+.section-title{font-family:var(--lc-font-display);font-size:20px;font-weight:600;color:var(--lc-text-primary);margin-bottom:4px;}
+.section-sub{font-size:13px;color:var(--lc-text-secondary);margin-bottom:24px;}
+
+/* ─── CHIP BADGE ─────────────────────────────────────────── */
+.chip{display:inline-block;font-size:11px;font-weight:600;letter-spacing:.04em;padding:3px 10px;border-radius:20px;border:1px solid transparent;}
+.chip-new{background:#F1EFE8;color:#9BAAA6;border-color:#D3D1C7;}
+.chip-learning{background:#FEF2F2;color:#B91C1C;border-color:#FCA5A5;}
+.chip-familiar{background:#FFFBEB;color:#ba6914;border-color:#FCD34D;}
+.chip-review{background:#E8F2EE;color:#2D5A4E;border-color:rgba(45,90,78,0.3);}
+.chip-good{background:#D1FAE5;color:#065F46;border-color:#34D399;}
+.chip-mastered{background:#D1FAE5;color:#065F46;border-color:#059669;}
+
+/* ─── PHONE SHELL ─────────────────────────────────────────── */
+.phones-row{display:flex;gap:24px;align-items:flex-start;overflow-x:auto;padding-bottom:8px;}
+.phone-wrap{display:flex;flex-direction:column;align-items:center;gap:10px;flex:0 0 auto;}
+.phone-label{font-size:11px;font-weight:600;letter-spacing:0.07em;text-transform:uppercase;color:var(--lc-text-hint);}
+.phone{width:280px;background:var(--lc-surface);border-radius:40px;border:8px solid #1A1A1A;box-shadow:0 0 0 1px #333,var(--lc-shadow-float),0 24px 48px rgba(0,0,0,0.2);overflow:hidden;position:relative;}
+.phone::before{content:'';position:absolute;top:0;left:50%;transform:translateX(-50%);width:80px;height:6px;background:#1A1A1A;border-radius:0 0 8px 8px;z-index:10;}
+.phone-inner{background:var(--lc-surface);min-height:580px;display:flex;flex-direction:column;padding-top:8px;}
+.status-bar{display:flex;justify-content:space-between;align-items:center;padding:10px 20px 6px;font-size:11px;font-weight:600;color:var(--lc-text-secondary);}
+
+/* ─── PHONE NAV ───────────────────────────────────────────── */
+.p-nav{display:flex;justify-content:space-between;align-items:center;padding:6px 16px 8px;}
+.p-nav-title{font-family:var(--lc-font-display);font-size:14px;font-weight:600;color:var(--lc-text-primary);}
+.p-back{width:28px;height:28px;border-radius:50%;background:var(--lc-brand-light);display:flex;align-items:center;justify-content:center;border:none;}
+.p-back svg{width:12px;height:12px;stroke:var(--lc-brand);fill:none;stroke-width:2.2;stroke-linecap:round;}
+.p-icon-btn{width:28px;height:28px;border-radius:50%;background:var(--lc-card);border:1px solid var(--lc-border);display:flex;align-items:center;justify-content:center;}
+.p-icon-btn svg{width:12px;height:12px;stroke:var(--lc-text-secondary);fill:none;stroke-width:2;stroke-linecap:round;}
+
+/* ─── PROGRESS BAR ────────────────────────────────────────── */
+.progress-bar{height:3px;background:var(--lc-border);margin:0 16px 0;}
+.progress-bar-fill{height:100%;background:var(--lc-brand);border-radius:2px;transition:width 0.3s ease;}
+
+/* ─── FLASHCARD ───────────────────────────────────────────── */
+.flashcard-area{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:16px 16px 8px;}
+.flashcard{width:100%;background:var(--lc-card);border-radius:var(--lc-radius-lg);box-shadow:var(--lc-shadow-card);padding:24px 18px;min-height:200px;display:flex;flex-direction:column;align-items:center;justify-content:center;position:relative;}
+.flashcard-badge{position:absolute;top:12px;left:12px;font-size:10px;font-weight:700;padding:2px 7px;border-radius:4px;letter-spacing:.04em;}
+.flashcard-badge-fem{background:var(--lc-fem-bg);color:var(--lc-fem-text);}
+.flashcard-word{font-family:var(--lc-font-display);font-size:34px;font-weight:600;color:var(--lc-text-primary);text-align:center;margin-bottom:4px;}
+.flashcard-pos{font-size:12px;color:var(--lc-text-hint);margin-bottom:16px;}
+.flashcard-audio{display:flex;align-items:center;gap:5px;font-size:11px;font-weight:600;color:var(--lc-brand);background:var(--lc-brand-light);border:none;border-radius:20px;padding:5px 12px;cursor:pointer;}
+.flashcard-audio svg{width:13px;height:13px;stroke:var(--lc-brand);fill:none;stroke-width:2;stroke-linecap:round;}
+.flashcard-divider{width:100%;height:1px;background:var(--lc-border);margin:16px 0;}
+.flashcard-translation{font-size:22px;font-weight:500;color:var(--lc-text-primary);text-align:center;margin-bottom:6px;}
+.flashcard-example{font-size:12px;color:var(--lc-text-secondary);text-align:center;font-style:italic;}
+.flashcard-example strong{color:var(--lc-brand);font-style:normal;}
+.flashcard-tap-hint{font-size:11px;color:var(--lc-text-hint);margin-top:12px;}
+
+/* ─── RATING BAR (NEW 4-BUTTON FSRS) ─────────────────────── */
+.rating-bar{display:flex;gap:7px;padding:10px 14px 14px;}
+
+.rating-btn{
+  flex:1;display:flex;flex-direction:column;align-items:center;
+  padding:9px 4px 8px;border-radius:10px;border:1.5px solid transparent;
+  cursor:pointer;transition:transform 0.1s ease;background:transparent;
+}
+.rating-btn:active{transform:scale(0.95);}
+.rating-btn__label{font-family:var(--lc-font-body);font-size:12px;font-weight:700;line-height:1;margin-bottom:4px;}
+.rating-btn__interval{font-family:var(--lc-font-body);font-size:10px;font-weight:400;opacity:0.75;}
+
+.rating-btn--1{background:var(--lc-again-bg);border-color:var(--lc-again-border);}
+.rating-btn--1 .rating-btn__label{color:var(--lc-again-text);}
+.rating-btn--1 .rating-btn__interval{color:var(--lc-again-text);}
+
+.rating-btn--2{background:var(--lc-hard-bg);border-color:var(--lc-hard-border);}
+.rating-btn--2 .rating-btn__label{color:var(--lc-hard-text);}
+.rating-btn--2 .rating-btn__interval{color:var(--lc-hard-text);}
+
+.rating-btn--3{background:var(--lc-good-bg);border-color:var(--lc-good-border);}
+.rating-btn--3 .rating-btn__label{color:var(--lc-good-text);}
+.rating-btn--3 .rating-btn__interval{color:var(--lc-good-text);}
+
+.rating-btn--4{background:var(--lc-brand);border-color:var(--lc-brand);}
+.rating-btn--4 .rating-btn__label{color:white;}
+.rating-btn--4 .rating-btn__interval{color:rgba(255,255,255,0.75);opacity:1;}
+
+/* ─── BOTTOM TAB BAR ──────────────────────────────────────── */
+.tab-bar{display:flex;border-top:1px solid var(--lc-border);background:var(--lc-card);padding:6px 0 10px;}
+.tab{flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;border:none;background:none;cursor:pointer;padding:4px 0;}
+.tab svg{width:20px;height:20px;stroke:var(--lc-text-hint);fill:none;stroke-width:1.7;stroke-linecap:round;}
+.tab.active svg{stroke:var(--lc-brand);}
+.tab-label{font-size:9px;font-weight:600;color:var(--lc-text-hint);}
+.tab.active .tab-label{color:var(--lc-brand);}
+
+/* ─── WORD DETAIL ─────────────────────────────────────────── */
+.wd-scroll{overflow-y:auto;flex:1;padding-bottom:80px;}
+.wd-card{margin:8px 12px;background:var(--lc-card);border-radius:var(--lc-radius-lg);box-shadow:var(--lc-shadow-card);padding:14px;}
+.wd-word-row{display:flex;align-items:center;gap:8px;margin-bottom:4px;}
+.wd-article-badge{font-size:10px;font-weight:700;padding:2px 7px;border-radius:5px;letter-spacing:.04em;}
+.wd-article-badge.fem{background:var(--lc-fem-bg);color:var(--lc-fem-text);}
+.wd-word{font-family:var(--lc-font-display);font-size:26px;font-weight:600;color:var(--lc-text-primary);}
+.wd-pos{font-size:12px;color:var(--lc-text-hint);margin-bottom:10px;}
+.wd-listen-btn{width:100%;display:flex;align-items:center;justify-content:center;gap:6px;background:rgba(45,90,78,0.06);border:1px solid rgba(45,90,78,0.15);border-radius:var(--lc-radius-md);padding:9px;font-size:12px;font-weight:600;color:var(--lc-brand);cursor:pointer;}
+.wd-listen-btn svg{width:14px;height:14px;stroke:var(--lc-brand);fill:none;stroke-width:2;stroke-linecap:round;}
+
+/* Mastery progress card */
+.wd-mastery-card{margin:6px 12px;background:var(--lc-card);border-radius:var(--lc-radius-lg);box-shadow:var(--lc-shadow-card);padding:14px;}
+.wd-section-label{font-size:9px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--lc-text-hint);margin-bottom:10px;}
+.wd-mastery-row{display:flex;align-items:center;gap:12px;margin-bottom:12px;}
+
+/* Mastery arc */
+.mastery-arc-wrap{flex-shrink:0;}
+.mastery-arc{width:52px;height:52px;position:relative;}
+.mastery-arc svg{width:52px;height:52px;transform:rotate(-90deg);}
+.mastery-arc-num{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);font-family:var(--lc-font-display);font-size:16px;font-weight:600;color:var(--lc-text-primary);}
+
+.wd-mastery-info{flex:1;}
+.wd-mastery-level{font-size:14px;font-weight:600;color:var(--lc-text-primary);line-height:1.2;}
+.wd-next-review{font-size:11px;color:var(--lc-text-hint);margin-top:2px;}
+
+/* NEW: 4-stat grid for FSRS */
+.wd-stat-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;}
+.wd-stat{background:#F7F6F2;border-radius:var(--lc-radius-sm);padding:8px 6px;text-align:center;}
+.wd-stat-val{font-family:var(--lc-font-display);font-size:14px;font-weight:600;color:var(--lc-text-primary);line-height:1;}
+.wd-stat-lbl{font-size:9px;font-weight:600;color:var(--lc-text-hint);margin-top:3px;letter-spacing:.03em;}
+
+/* Recall chance pill */
+.recall-pill{display:inline-flex;align-items:center;gap:4px;background:#E8F2EE;border-radius:20px;padding:3px 8px;font-size:11px;font-weight:600;color:var(--lc-brand);margin-top:8px;}
+.recall-dot{width:6px;height:6px;border-radius:50%;background:var(--lc-brand);}
+
+/* Example sentences */
+.wd-example-card{margin:6px 12px;background:var(--lc-card);border-radius:var(--lc-radius-lg);box-shadow:var(--lc-shadow-card);padding:14px;}
+.wd-example-sentence{font-size:13px;color:var(--lc-text-primary);margin-bottom:4px;line-height:1.5;}
+.wd-example-sentence strong{color:var(--lc-brand);}
+.wd-example-translation{font-size:11px;color:var(--lc-text-secondary);font-style:italic;}
+
+/* Bottom action bar */
+.wd-action-bar{position:absolute;bottom:0;left:0;right:0;padding:10px 12px 16px;background:var(--lc-surface);border-top:1px solid var(--lc-border);display:flex;gap:8px;}
+.wd-rate-btn{flex:1;background:var(--lc-brand);color:white;border:none;border-radius:var(--lc-radius-md);padding:12px;font-size:13px;font-weight:600;font-family:var(--lc-font-body);display:flex;align-items:center;justify-content:center;gap:6px;}
+.wd-rate-btn svg{width:14px;height:14px;stroke:white;fill:none;stroke-width:2;stroke-linecap:round;}
+.wd-icon-btn{width:44px;height:44px;border-radius:var(--lc-radius-md);background:var(--lc-card);border:1px solid var(--lc-border);display:flex;align-items:center;justify-content:center;}
+.wd-icon-btn svg{width:16px;height:16px;stroke:var(--lc-text-secondary);fill:none;stroke-width:2;stroke-linecap:round;}
+.wd-icon-btn.danger{border-color:rgba(192,57,43,0.2);background:rgba(192,57,43,0.05);}
+.wd-icon-btn.danger svg{stroke:#c0392b;}
+
+/* ─── COMPARISON TABLE ────────────────────────────────────── */
+.compare-section{background:var(--lc-card);border-radius:var(--lc-radius-lg);box-shadow:var(--lc-shadow-card);padding:24px;margin-bottom:32px;overflow-x:auto;}
+.compare-section h3{font-family:var(--lc-font-display);font-size:16px;font-weight:600;color:var(--lc-text-primary);margin-bottom:6px;}
+.compare-section .sub{font-size:12px;color:var(--lc-text-secondary);margin-bottom:20px;}
+table{width:100%;border-collapse:collapse;font-size:12px;}
+th{text-align:left;font-size:11px;font-weight:600;letter-spacing:.04em;color:var(--lc-text-hint);padding:8px 10px;border-bottom:1px solid var(--lc-border);}
+td{padding:9px 10px;border-bottom:1px solid rgba(45,90,78,0.06);vertical-align:top;}
+tr:last-child td{border-bottom:none;}
+.ok{color:#065F46;font-weight:600;}
+.bad{color:#c0392b;font-weight:600;}
+.warn{color:#ba6914;font-weight:600;}
+.new-col{background:rgba(45,90,78,0.03);}
+
+/* ─── MASTERY BAND TABLE ──────────────────────────────────── */
+.band-row{display:flex;align-items:center;gap:10px;padding:9px 12px;border-radius:var(--lc-radius-sm);margin-bottom:4px;}
+.band-dot{width:10px;height:10px;border-radius:50%;flex-shrink:0;}
+.band-level{font-size:11px;font-weight:700;color:var(--lc-text-hint);width:20px;}
+.band-label{font-size:13px;font-weight:600;color:var(--lc-text-primary);width:70px;}
+.band-bar-wrap{flex:1;height:6px;background:var(--lc-border);border-radius:3px;overflow:hidden;}
+.band-bar{height:100%;border-radius:3px;}
+.band-threshold{font-size:11px;color:var(--lc-text-secondary);width:90px;text-align:right;}
+</style>
+</head>
+<body>
+
+<div class="page-header">
+  <div class="page-header-inner">
+    <div>
+      <div class="logo">LinguaCard</div>
+      <div class="logo-sub">FSRS Migration — Design Reference (LC-140 → LC-150)</div>
+    </div>
+  </div>
+</div>
+
+<div class="main">
+
+  <!-- ─── SECTION 1: Rating bar comparison ─────────────────────────────── -->
+  <div class="section">
+    <div class="section-title">1. Rating bar — before &amp; after (LC-148)</div>
+    <div class="section-sub">
+      6-button SM-2 scale replaced with 4-button FSRS scale. Each button shows the predicted next interval.
+      Intervals are hidden until the card is flipped.
+    </div>
+
+    <div class="phones-row">
+
+      <!-- Before: 6-button SM-2 -->
+      <div class="phone-wrap">
+        <div class="phone-label">Before — SM-2 (6 buttons, no preview)</div>
+        <div class="phone">
+          <div class="phone-inner">
+            <div class="status-bar"><span>12:06</span><span>●●● 54%</span></div>
+            <div class="p-nav">
+              <div class="p-back"><svg viewBox="0 0 14 14"><polyline points="9,2 4,7 9,12"/></svg></div>
+              <div class="p-nav-title">Review</div>
+              <div style="width:28px"></div>
+            </div>
+            <div class="progress-bar" style="margin-bottom:8px"><div class="progress-bar-fill" style="width:40%"></div></div>
+            <div class="flashcard-area">
+              <div class="flashcard">
+                <span class="flashcard-badge flashcard-badge-fem">die</span>
+                <div class="flashcard-word">Fabrik</div>
+                <div class="flashcard-pos">factory · noun, feminine</div>
+                <button class="flashcard-audio">
+                  <svg viewBox="0 0 16 16"><path d="M3 5.5h2l4-3v11l-4-3H3z"/><path d="M12 5a4 4 0 010 6"/></svg>
+                  Listen
+                </button>
+                <div class="flashcard-divider"></div>
+                <div class="flashcard-translation">factory</div>
+                <div class="flashcard-example">Meine Mutter arbeitet in einer <strong>Fabrik</strong></div>
+              </div>
+            </div>
+            <!-- Old 6-button bar -->
+            <div style="display:flex;gap:5px;padding:8px 12px 12px;flex-wrap:wrap;">
+              <button style="flex:1;min-width:40px;padding:8px 4px;border-radius:8px;background:#FEF2F2;border:1px solid #FCA5A5;font-size:10px;font-weight:600;color:#B91C1C;cursor:pointer;">Blank</button>
+              <button style="flex:1;min-width:40px;padding:8px 4px;border-radius:8px;background:#FEF2F2;border:1px solid #FCA5A5;font-size:10px;font-weight:600;color:#B91C1C;cursor:pointer;">Hard</button>
+              <button style="flex:1;min-width:40px;padding:8px 4px;border-radius:8px;background:#FFFBEB;border:1px solid #FCD34D;font-size:10px;font-weight:600;color:#92400E;cursor:pointer;">Hmm</button>
+              <button style="flex:1;min-width:40px;padding:8px 4px;border-radius:8px;background:#E8F2EE;border:1px solid rgba(45,90,78,0.3);font-size:10px;font-weight:600;color:#2D5A4E;cursor:pointer;">Good</button>
+              <button style="flex:1;min-width:40px;padding:8px 4px;border-radius:8px;background:#E8F2EE;border:1px solid rgba(45,90,78,0.3);font-size:10px;font-weight:600;color:#2D5A4E;cursor:pointer;">Easy</button>
+              <button style="flex:1;min-width:40px;padding:8px 4px;border-radius:8px;background:#2D5A4E;border:1px solid #2D5A4E;font-size:10px;font-weight:600;color:white;cursor:pointer;">Nailed</button>
+            </div>
+            <div class="tab-bar">
+              <div class="tab"><svg viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9,22 9,12 15,12 15,22"/></svg><div class="tab-label">Home</div></div>
+              <div class="tab"><svg viewBox="0 0 24 24"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8M12 17v4"/></svg><div class="tab-label">Vault</div></div>
+              <div class="tab active"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polygon points="10,8 16,12 10,16 10,8"/></svg><div class="tab-label">Review</div></div>
+              <div class="tab"><svg viewBox="0 0 24 24"><path d="M4 19.5A2.5 2.5 0 016.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 014 19.5v-15A2.5 2.5 0 016.5 2z"/></svg><div class="tab-label">Stories</div></div>
+              <div class="tab"><svg viewBox="0 0 24 24"><polygon points="11,5 6,9 2,9 2,15 6,15 11,19 11,5"/><path d="M19.07 4.93a10 10 0 010 14.14M15.54 8.46a5 5 0 010 7.07"/></svg><div class="tab-label">Listen</div></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- After: 4-button FSRS, unflipped state -->
+      <div class="phone-wrap">
+        <div class="phone-label">After — FSRS, card face-down (no intervals shown)</div>
+        <div class="phone">
+          <div class="phone-inner">
+            <div class="status-bar"><span>12:06</span><span>●●● 54%</span></div>
+            <div class="p-nav">
+              <div class="p-back"><svg viewBox="0 0 14 14"><polyline points="9,2 4,7 9,12"/></svg></div>
+              <div class="p-nav-title">Review</div>
+              <div style="width:28px"></div>
+            </div>
+            <div class="progress-bar" style="margin-bottom:8px"><div class="progress-bar-fill" style="width:40%"></div></div>
+            <div class="flashcard-area">
+              <div class="flashcard">
+                <span class="flashcard-badge flashcard-badge-fem">die</span>
+                <div class="flashcard-word">Fabrik</div>
+                <div class="flashcard-pos">factory · noun, feminine</div>
+                <button class="flashcard-audio">
+                  <svg viewBox="0 0 16 16"><path d="M3 5.5h2l4-3v11l-4-3H3z"/><path d="M12 5a4 4 0 010 6"/></svg>
+                  Listen
+                </button>
+                <div class="flashcard-tap-hint">Tap card to reveal</div>
+              </div>
+            </div>
+            <!-- Rating bar hidden (card not flipped) -->
+            <div style="padding:12px 14px 14px;display:flex;gap:7px;opacity:0.3;pointer-events:none;">
+              <div class="rating-btn rating-btn--1" style="flex:1"><div class="rating-btn__label">Again</div><div class="rating-btn__interval">—</div></div>
+              <div class="rating-btn rating-btn--2" style="flex:1"><div class="rating-btn__label">Hard</div><div class="rating-btn__interval">—</div></div>
+              <div class="rating-btn rating-btn--3" style="flex:1"><div class="rating-btn__label">Good</div><div class="rating-btn__interval">—</div></div>
+              <div class="rating-btn rating-btn--4" style="flex:1"><div class="rating-btn__label">Easy</div><div class="rating-btn__interval">—</div></div>
+            </div>
+            <div class="tab-bar">
+              <div class="tab"><svg viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9,22 9,12 15,12 15,22"/></svg><div class="tab-label">Home</div></div>
+              <div class="tab"><svg viewBox="0 0 24 24"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8M12 17v4"/></svg><div class="tab-label">Vault</div></div>
+              <div class="tab active"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polygon points="10,8 16,12 10,16 10,8"/></svg><div class="tab-label">Review</div></div>
+              <div class="tab"><svg viewBox="0 0 24 24"><path d="M4 19.5A2.5 2.5 0 016.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 014 19.5v-15A2.5 2.5 0 016.5 2z"/></svg><div class="tab-label">Stories</div></div>
+              <div class="tab"><svg viewBox="0 0 24 24"><polygon points="11,5 6,9 2,9 2,15 6,15 11,19 11,5"/><path d="M19.07 4.93a10 10 0 010 14.14M15.54 8.46a5 5 0 010 7.07"/></svg><div class="tab-label">Listen</div></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- After: 4-button FSRS, flipped — intervals visible -->
+      <div class="phone-wrap">
+        <div class="phone-label">After — FSRS, card revealed (intervals shown)</div>
+        <div class="phone">
+          <div class="phone-inner">
+            <div class="status-bar"><span>12:06</span><span>●●● 54%</span></div>
+            <div class="p-nav">
+              <div class="p-back"><svg viewBox="0 0 14 14"><polyline points="9,2 4,7 9,12"/></svg></div>
+              <div class="p-nav-title">Review</div>
+              <div style="width:28px"></div>
+            </div>
+            <div class="progress-bar" style="margin-bottom:8px"><div class="progress-bar-fill" style="width:40%"></div></div>
+            <div class="flashcard-area">
+              <div class="flashcard">
+                <span class="flashcard-badge flashcard-badge-fem">die</span>
+                <div class="flashcard-word">Fabrik</div>
+                <div class="flashcard-pos">factory · noun, feminine</div>
+                <button class="flashcard-audio">
+                  <svg viewBox="0 0 16 16"><path d="M3 5.5h2l4-3v11l-4-3H3z"/><path d="M12 5a4 4 0 010 6"/></svg>
+                  Listen
+                </button>
+                <div class="flashcard-divider"></div>
+                <div class="flashcard-translation">factory</div>
+                <div class="flashcard-example">Meine Mutter arbeitet in einer <strong>Fabrik</strong></div>
+              </div>
+            </div>
+            <!-- NEW 4-button rating bar with intervals -->
+            <div class="rating-bar">
+              <div class="rating-btn rating-btn--1">
+                <div class="rating-btn__label">Again</div>
+                <div class="rating-btn__interval">1 day</div>
+              </div>
+              <div class="rating-btn rating-btn--2">
+                <div class="rating-btn__label">Hard</div>
+                <div class="rating-btn__interval">4d</div>
+              </div>
+              <div class="rating-btn rating-btn--3">
+                <div class="rating-btn__label">Good</div>
+                <div class="rating-btn__interval">12d</div>
+              </div>
+              <div class="rating-btn rating-btn--4">
+                <div class="rating-btn__label">Easy</div>
+                <div class="rating-btn__interval">45d</div>
+              </div>
+            </div>
+            <div class="tab-bar">
+              <div class="tab"><svg viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9,22 9,12 15,12 15,22"/></svg><div class="tab-label">Home</div></div>
+              <div class="tab"><svg viewBox="0 0 24 24"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8M12 17v4"/></svg><div class="tab-label">Vault</div></div>
+              <div class="tab active"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polygon points="10,8 16,12 10,16 10,8"/></svg><div class="tab-label">Review</div></div>
+              <div class="tab"><svg viewBox="0 0 24 24"><path d="M4 19.5A2.5 2.5 0 016.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 014 19.5v-15A2.5 2.5 0 016.5 2z"/></svg><div class="tab-label">Stories</div></div>
+              <div class="tab"><svg viewBox="0 0 24 24"><polygon points="11,5 6,9 2,9 2,15 6,15 11,19 11,5"/><path d="M19.07 4.93a10 14.14M15.54 8.46a5 5 0 010 7.07"/></svg><div class="tab-label">Listen</div></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div><!-- phones-row -->
+  </div><!-- section -->
+
+  <!-- ─── SECTION 2: Word detail mastery ─────────────────────────────── -->
+  <div class="section">
+    <div class="section-title">2. Word detail — mastery progress section (LC-149)</div>
+    <div class="section-sub">
+      Stat grid changes: "Avg rating" → "Recall chance" and "Interval" → "Stability".
+      Mastery level badge now derives from stability bands, not repetition count.
+    </div>
+
+    <div class="phones-row">
+
+      <!-- Before: SM-2 word detail -->
+      <div class="phone-wrap">
+        <div class="phone-label">Before — SM-2 (interval=20172d, mastery by reps)</div>
+        <div class="phone">
+          <div class="phone-inner">
+            <div class="status-bar"><span>12:06</span><span>●●● 54%</span></div>
+            <div class="p-nav">
+              <div class="p-back"><svg viewBox="0 0 14 14"><polyline points="9,2 4,7 9,12"/></svg></div>
+              <div class="p-nav-title">Word Detail</div>
+              <div class="p-icon-btn"><svg viewBox="0 0 14 14"><circle cx="2" cy="7" r="1"/><circle cx="7" cy="7" r="1"/><circle cx="12" cy="7" r="1"/></svg></div>
+            </div>
+            <div class="wd-scroll">
+              <!-- word card -->
+              <div class="wd-card">
+                <div class="wd-word-row">
+                  <span class="wd-article-badge fem">die</span>
+                  <span class="wd-word">Fabrik</span>
+                </div>
+                <div class="wd-pos">factory · noun, feminine</div>
+                <span class="chip chip-mastered">● Mastered</span>
+                <div style="margin-top:10px">
+                  <button class="wd-listen-btn">
+                    <svg viewBox="0 0 16 16"><path d="M3 5.5h2l4-3v11l-4-3H3z"/><path d="M12 5a4 4 0 010 6"/></svg>
+                    Listen to pronunciation
+                  </button>
+                </div>
+              </div>
+              <!-- mastery progress -->
+              <div class="wd-mastery-card">
+                <div class="wd-section-label">Mastery Progress</div>
+                <div class="wd-mastery-row">
+                  <!-- arc -->
+                  <div class="mastery-arc-wrap">
+                    <div class="mastery-arc">
+                      <svg viewBox="0 0 52 52">
+                        <circle cx="26" cy="26" r="21" fill="none" stroke="#E8F2EE" stroke-width="5"/>
+                        <circle cx="26" cy="26" r="21" fill="none" stroke="#059669" stroke-width="5"
+                          stroke-dasharray="131.9" stroke-dashoffset="0" stroke-linecap="round"/>
+                      </svg>
+                      <div class="mastery-arc-num">5</div>
+                    </div>
+                  </div>
+                  <div class="wd-mastery-info">
+                    <div class="wd-mastery-level">Level 5 — Mastered</div>
+                    <div class="wd-next-review" style="color:#c0392b">Next review in 20172 days ⚠</div>
+                  </div>
+                </div>
+                <!-- OLD stat grid (4 cols) -->
+                <div class="wd-stat-grid">
+                  <div class="wd-stat"><div class="wd-stat-val">10</div><div class="wd-stat-lbl">Reviews</div></div>
+                  <div class="wd-stat"><div class="wd-stat-val">5.0</div><div class="wd-stat-lbl">Avg rating</div></div>
+                  <div class="wd-stat" style="background:#FEF2F2"><div class="wd-stat-val" style="color:#c0392b;font-size:11px">20172d</div><div class="wd-stat-lbl">Interval</div></div>
+                  <div class="wd-stat"><div class="wd-stat-val" style="font-size:11px">Today</div><div class="wd-stat-lbl">Last seen</div></div>
+                </div>
+              </div>
+              <!-- example sentence -->
+              <div class="wd-example-card">
+                <div class="wd-section-label">Example Sentences</div>
+                <div class="wd-example-sentence">Mein Vater arbeitet in einer großen <strong>Fabrik</strong>.</div>
+                <div class="wd-example-translation">"My father works in a large factory."</div>
+              </div>
+            </div>
+            <!-- bottom bar -->
+            <div class="wd-action-bar">
+              <button class="wd-rate-btn"><svg viewBox="0 0 16 16"><polygon points="4,3 14,8 4,13 4,3"/></svg> Rate this word</button>
+              <div class="wd-icon-btn"><svg viewBox="0 0 16 16"><path d="M12 1H4a1 1 0 00-1 1v13l5-3 5 3V2a1 1 0 00-1-1z"/></svg></div>
+              <div class="wd-icon-btn danger"><svg viewBox="0 0 16 16"><polyline points="2,4 14,4"/><path d="M12 4l-1 10H5L4 4"/><path d="M6 4V2h4v2"/></svg></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- After: FSRS word detail — Level 3 Review (stability 45d) -->
+      <div class="phone-wrap">
+        <div class="phone-label">After — FSRS, Review (stability=45d, interval capped at 365d)</div>
+        <div class="phone">
+          <div class="phone-inner">
+            <div class="status-bar"><span>12:06</span><span>●●● 54%</span></div>
+            <div class="p-nav">
+              <div class="p-back"><svg viewBox="0 0 14 14"><polyline points="9,2 4,7 9,12"/></svg></div>
+              <div class="p-nav-title">Word Detail</div>
+              <div class="p-icon-btn"><svg viewBox="0 0 14 14"><circle cx="2" cy="7" r="1"/><circle cx="7" cy="7" r="1"/><circle cx="12" cy="7" r="1"/></svg></div>
+            </div>
+            <div class="wd-scroll">
+              <div class="wd-card">
+                <div class="wd-word-row">
+                  <span class="wd-article-badge fem">die</span>
+                  <span class="wd-word">Fabrik</span>
+                </div>
+                <div class="wd-pos">factory · noun, feminine</div>
+                <span class="chip chip-review">● Review</span>
+                <div style="margin-top:10px">
+                  <button class="wd-listen-btn">
+                    <svg viewBox="0 0 16 16"><path d="M3 5.5h2l4-3v11l-4-3H3z"/><path d="M12 5a4 4 0 010 6"/></svg>
+                    Listen to pronunciation
+                  </button>
+                </div>
+              </div>
+              <div class="wd-mastery-card">
+                <div class="wd-section-label">Mastery Progress</div>
+                <div class="wd-mastery-row">
+                  <div class="mastery-arc-wrap">
+                    <div class="mastery-arc">
+                      <svg viewBox="0 0 52 52">
+                        <circle cx="26" cy="26" r="21" fill="none" stroke="#E8F2EE" stroke-width="5"/>
+                        <circle cx="26" cy="26" r="21" fill="none" stroke="#6EE7B7" stroke-width="5"
+                          stroke-dasharray="131.9" stroke-dashoffset="33" stroke-linecap="round"/>
+                      </svg>
+                      <div class="mastery-arc-num">3</div>
+                    </div>
+                  </div>
+                  <div class="wd-mastery-info">
+                    <div class="wd-mastery-level">Level 3 — Review</div>
+                    <div class="wd-next-review">Next review in 38 days</div>
+                    <div style="margin-top:5px">
+                      <span class="recall-pill"><span class="recall-dot"></span>87% recall chance</span>
+                    </div>
+                  </div>
+                </div>
+                <!-- NEW stat grid: Reviews / Recall / Stability / Last seen -->
+                <div class="wd-stat-grid">
+                  <div class="wd-stat"><div class="wd-stat-val">10</div><div class="wd-stat-lbl">Reviews</div></div>
+                  <div class="wd-stat new-col"><div class="wd-stat-val">87%</div><div class="wd-stat-lbl">Recall now</div></div>
+                  <div class="wd-stat new-col"><div class="wd-stat-val" style="font-size:11px">45 days</div><div class="wd-stat-lbl">Stability</div></div>
+                  <div class="wd-stat"><div class="wd-stat-val" style="font-size:11px">Today</div><div class="wd-stat-lbl">Last seen</div></div>
+                </div>
+              </div>
+              <div class="wd-example-card">
+                <div class="wd-section-label">Example Sentences</div>
+                <div class="wd-example-sentence">Mein Vater arbeitet in einer großen <strong>Fabrik</strong>.</div>
+                <div class="wd-example-translation">"My father works in a large factory."</div>
+              </div>
+            </div>
+            <div class="wd-action-bar">
+              <button class="wd-rate-btn"><svg viewBox="0 0 16 16"><polygon points="4,3 14,8 4,13 4,3"/></svg> Rate this word</button>
+              <div class="wd-icon-btn"><svg viewBox="0 0 16 16"><path d="M12 1H4a1 1 0 00-1 1v13l5-3 5 3V2a1 1 0 00-1-1z"/></svg></div>
+              <div class="wd-icon-btn danger"><svg viewBox="0 0 16 16"><polyline points="2,4 14,4"/><path d="M12 4l-1 10H5L4 4"/><path d="M6 4V2h4v2"/></svg></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- After: FSRS word detail — Level 5 Mastered (stability ≥ 180d) -->
+      <div class="phone-wrap">
+        <div class="phone-label">After — FSRS, genuinely Mastered (stability=210d)</div>
+        <div class="phone">
+          <div class="phone-inner">
+            <div class="status-bar"><span>12:06</span><span>●●● 54%</span></div>
+            <div class="p-nav">
+              <div class="p-back"><svg viewBox="0 0 14 14"><polyline points="9,2 4,7 9,12"/></svg></div>
+              <div class="p-nav-title">Word Detail</div>
+              <div class="p-icon-btn"><svg viewBox="0 0 14 14"><circle cx="2" cy="7" r="1"/><circle cx="7" cy="7" r="1"/><circle cx="12" cy="7" r="1"/></svg></div>
+            </div>
+            <div class="wd-scroll">
+              <div class="wd-card">
+                <div class="wd-word-row">
+                  <span class="wd-article-badge fem">die</span>
+                  <span class="wd-word">Fabrik</span>
+                </div>
+                <div class="wd-pos">factory · noun, feminine</div>
+                <span class="chip chip-mastered">● Mastered</span>
+                <div style="margin-top:10px">
+                  <button class="wd-listen-btn">
+                    <svg viewBox="0 0 16 16"><path d="M3 5.5h2l4-3v11l-4-3H3z"/><path d="M12 5a4 4 0 010 6"/></svg>
+                    Listen to pronunciation
+                  </button>
+                </div>
+              </div>
+              <div class="wd-mastery-card">
+                <div class="wd-section-label">Mastery Progress</div>
+                <div class="wd-mastery-row">
+                  <div class="mastery-arc-wrap">
+                    <div class="mastery-arc">
+                      <svg viewBox="0 0 52 52">
+                        <circle cx="26" cy="26" r="21" fill="none" stroke="#E8F2EE" stroke-width="5"/>
+                        <circle cx="26" cy="26" r="21" fill="none" stroke="#059669" stroke-width="5"
+                          stroke-dasharray="131.9" stroke-dashoffset="0" stroke-linecap="round"/>
+                      </svg>
+                      <div class="mastery-arc-num">5</div>
+                    </div>
+                  </div>
+                  <div class="wd-mastery-info">
+                    <div class="wd-mastery-level">Level 5 — Mastered</div>
+                    <div class="wd-next-review">Next review in 194 days</div>
+                    <div style="margin-top:5px">
+                      <span class="recall-pill"><span class="recall-dot"></span>91% recall chance</span>
+                    </div>
+                  </div>
+                </div>
+                <div class="wd-stat-grid">
+                  <div class="wd-stat"><div class="wd-stat-val">14</div><div class="wd-stat-lbl">Reviews</div></div>
+                  <div class="wd-stat new-col"><div class="wd-stat-val">91%</div><div class="wd-stat-lbl">Recall now</div></div>
+                  <div class="wd-stat new-col"><div class="wd-stat-val" style="font-size:10px">7 months</div><div class="wd-stat-lbl">Stability</div></div>
+                  <div class="wd-stat"><div class="wd-stat-val" style="font-size:11px">Today</div><div class="wd-stat-lbl">Last seen</div></div>
+                </div>
+              </div>
+              <div class="wd-example-card">
+                <div class="wd-section-label">Example Sentences</div>
+                <div class="wd-example-sentence">Mein Vater arbeitet in einer großen <strong>Fabrik</strong>.</div>
+                <div class="wd-example-translation">"My father works in a large factory."</div>
+              </div>
+            </div>
+            <div class="wd-action-bar">
+              <button class="wd-rate-btn"><svg viewBox="0 0 16 16"><polygon points="4,3 14,8 4,13 4,3"/></svg> Rate this word</button>
+              <div class="wd-icon-btn"><svg viewBox="0 0 16 16"><path d="M12 1H4a1 1 0 00-1 1v13l5-3 5 3V2a1 1 0 00-1-1z"/></svg></div>
+              <div class="wd-icon-btn danger"><svg viewBox="0 0 16 16"><polyline points="2,4 14,4"/><path d="M12 4l-1 10H5L4 4"/><path d="M6 4V2h4v2"/></svg></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div><!-- phones-row -->
+  </div><!-- section -->
+
+  <!-- ─── SECTION 3: Mastery bands ───────────────────────────────────── -->
+  <div class="section">
+    <div class="section-title">3. Mastery band definitions (LC-149 / ADR-4)</div>
+    <div class="section-sub">
+      Each level maps to a stability threshold. "Mastered" requires 180+ days of demonstrated stability —
+      not just 8 button taps.
+    </div>
+
+    <div class="compare-section" style="max-width:600px">
+      <h3>Stability-based mastery scale</h3>
+      <div class="sub">Stability = days until FSRS predicts recall drops below 90%</div>
+      <div style="padding:4px 0">
+        <div class="band-row">
+          <div class="band-dot" style="background:#D1D5DB"></div>
+          <div class="band-level">0</div>
+          <div class="band-label">New</div>
+          <div class="band-bar-wrap"><div class="band-bar" style="background:#D1D5DB;width:0%"></div></div>
+          <div class="band-threshold">No reviews</div>
+        </div>
+        <div class="band-row">
+          <div class="band-dot" style="background:#FCA5A5"></div>
+          <div class="band-level">1</div>
+          <div class="band-label">Learning</div>
+          <div class="band-bar-wrap"><div class="band-bar" style="background:#FCA5A5;width:4%"></div></div>
+          <div class="band-threshold">&lt; 7 days</div>
+        </div>
+        <div class="band-row">
+          <div class="band-dot" style="background:#FCD34D"></div>
+          <div class="band-level">2</div>
+          <div class="band-label">Familiar</div>
+          <div class="band-bar-wrap"><div class="band-bar" style="background:#FCD34D;width:17%"></div></div>
+          <div class="band-threshold">7 – 30 days</div>
+        </div>
+        <div class="band-row">
+          <div class="band-dot" style="background:#6EE7B7"></div>
+          <div class="band-level">3</div>
+          <div class="band-label">Review</div>
+          <div class="band-bar-wrap"><div class="band-bar" style="background:#6EE7B7;width:50%"></div></div>
+          <div class="band-threshold">30 – 90 days</div>
+        </div>
+        <div class="band-row">
+          <div class="band-dot" style="background:#34D399"></div>
+          <div class="band-level">4</div>
+          <div class="band-label">Good</div>
+          <div class="band-bar-wrap"><div class="band-bar" style="background:#34D399;width:82%"></div></div>
+          <div class="band-threshold">90 – 180 days</div>
+        </div>
+        <div class="band-row" style="background:rgba(5,150,105,0.05);border-radius:8px;">
+          <div class="band-dot" style="background:#059669"></div>
+          <div class="band-level">5</div>
+          <div class="band-label" style="color:#065F46;font-weight:700">Mastered</div>
+          <div class="band-bar-wrap"><div class="band-bar" style="background:#059669;width:100%"></div></div>
+          <div class="band-threshold" style="color:#065F46;font-weight:600">≥ 180 days</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ─── SECTION 4: SM-2 vs FSRS stat comparison ──────────────────── -->
+  <div class="section">
+    <div class="section-title">4. Key behaviour changes</div>
+    <div class="section-sub">Side-by-side of what changes in the product as a result of the migration.</div>
+
+    <div class="compare-section">
+      <table>
+        <thead>
+          <tr>
+            <th>Behaviour</th>
+            <th>SM-2 (current)</th>
+            <th class="new-col">FSRS (after migration)</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Max interval after 10 "Easy" reviews</td>
+            <td class="bad">20,172 days (55 years)</td>
+            <td class="ok new-col">365 days (hard cap)</td>
+          </tr>
+          <tr>
+            <td>Rating buttons</td>
+            <td class="warn">6 buttons: Blank / Hard / Hmm / Good / Easy / Nailed</td>
+            <td class="ok new-col">4 buttons: Again / Hard / Good / Easy</td>
+          </tr>
+          <tr>
+            <td>Interval preview</td>
+            <td class="bad">Not shown</td>
+            <td class="ok new-col">Shown per button after card flip</td>
+          </tr>
+          <tr>
+            <td>"Mastered" meaning</td>
+            <td class="bad">Reviewed ≥ 8 times (any rating)</td>
+            <td class="ok new-col">Stability ≥ 180 days (proven retention)</td>
+          </tr>
+          <tr>
+            <td>Word detail stats</td>
+            <td class="warn">Reviews / Avg rating / Interval / Last seen</td>
+            <td class="ok new-col">Reviews / Recall chance / Stability / Last seen</td>
+          </tr>
+          <tr>
+            <td>Ease hell risk</td>
+            <td class="bad">High — easeFactor can lock at 1.3 permanently</td>
+            <td class="ok new-col">None — difficulty is bounded and self-correcting</td>
+          </tr>
+          <tr>
+            <td>Algorithm adapts to learner</td>
+            <td class="bad">No — same formula for everyone</td>
+            <td class="ok new-col">Yes — per-card difficulty (D) updates each review</td>
+          </tr>
+          <tr>
+            <td>Review efficiency</td>
+            <td class="warn">Baseline (SM-2)</td>
+            <td class="ok new-col">~25% fewer reviews for same retention</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+</div><!-- main -->
+</body>
+</html>

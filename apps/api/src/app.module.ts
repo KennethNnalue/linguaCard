@@ -16,6 +16,7 @@ import { ImportModule } from './import/import.module';
 import { WordAudioModule } from './word-audio/word-audio.module';
 import { SubscriptionsModule } from './subscriptions/subscriptions.module';
 import { ContactModule } from './contact/contact.module';
+import { ReviewModule } from './review/review.module';
 import databaseConfig from './config/database.config';
 import { aiConfig } from './config/ai.config';
 
@@ -46,6 +47,7 @@ import { aiConfig } from './config/ai.config';
     WordAudioModule,
     SubscriptionsModule,
     ContactModule,
+    ReviewModule,
     SeedModule,
   ],
   providers: [

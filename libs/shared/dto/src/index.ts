@@ -57,7 +57,7 @@ export class UpdateCardDto {
 }
 
 export class RateCardDto {
-  @IsNumber() @IsIn([0, 1, 2, 3, 4, 5]) rating!: number;
+  @IsNumber() @IsIn([1, 2, 3, 4]) rating!: number;
 }
 
 // ─── COLLECTION DTOs ──────────────────────────────────────────────────────────

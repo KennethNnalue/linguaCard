@@ -112,7 +112,7 @@ export function makeSrsState(cardId: string, overrides: Partial<SRSStateData> = 
     id: `srs-${cardId}`,
     cardId,
     userId: 'user-001',
-    algorithm: 'sm2',
+    algorithm: 'fsrs',
     intervalDays: 1,
     easeFactor: 2.5,
     repetitions: 0,
@@ -121,26 +121,27 @@ export function makeSrsState(cardId: string, overrides: Partial<SRSStateData> = 
     nextDueAt: now,
     masteryLevel: 0,
     state: 'new',
+    stability: null,
+    difficulty: null,
+    retrievability: null,
     ...overrides,
   };
 }
 
 // ─── RATING / MASTERY CONFIG ──────────────────────────────────────────────────
 
-export const SM2_RATING_CONFIG: Record<ConfidenceRating, { label: string; description: string; colour: string }> = {
-  0: { label: 'Blank',  description: 'No memory at all',            colour: '#D1D5DB' },
-  1: { label: 'Hard',   description: 'Barely recalled',             colour: '#FCA5A5' },
-  2: { label: 'Hmm',    description: 'Recalled with effort',        colour: '#FCD34D' },
-  3: { label: 'Good',   description: 'Recalled correctly',          colour: '#6EE7B7' },
-  4: { label: 'Easy',   description: 'Recalled without hesitation', colour: '#34D399' },
-  5: { label: 'Nailed', description: 'Instant, effortless recall',  colour: '#059669' },
+export const FSRS_RATING_CONFIG: Record<ConfidenceRating, { label: string; description: string; colour: string }> = {
+  1: { label: 'Again', description: 'Completely forgot',      colour: '#FCA5A5' },
+  2: { label: 'Hard',  description: 'Recalled with effort',   colour: '#FCD34D' },
+  3: { label: 'Good',  description: 'Recalled correctly',     colour: '#6EE7B7' },
+  4: { label: 'Easy',  description: 'Recalled instantly',     colour: '#059669' },
 };
 
 export const MASTERY_CONFIG: Record<MasteryLevel, { label: string; colour: string; cssClass: string }> = {
   0: { label: 'New',      colour: '#D1D5DB', cssClass: 'mastery--0' },
-  1: { label: 'Beginner', colour: '#FCA5A5', cssClass: 'mastery--1' },
-  2: { label: 'Learning', colour: '#FCD34D', cssClass: 'mastery--2' },
-  3: { label: 'Familiar', colour: '#6EE7B7', cssClass: 'mastery--3' },
+  1: { label: 'Learning', colour: '#FCA5A5', cssClass: 'mastery--1' },
+  2: { label: 'Familiar', colour: '#FCD34D', cssClass: 'mastery--2' },
+  3: { label: 'Review',   colour: '#6EE7B7', cssClass: 'mastery--3' },
   4: { label: 'Good',     colour: '#34D399', cssClass: 'mastery--4' },
   5: { label: 'Mastered', colour: '#059669', cssClass: 'mastery--5' },
 };
@@ -163,7 +164,7 @@ export const MOCK_CARDS: Card[] = [
       { id: 'ex-001a', target: 'Die Katze sitzt auf dem Sofa.', native: 'The cat is sitting on the sofa.' },
       { id: 'ex-001b', target: 'Meine Katze heißt Luna.', native: 'My cat is called Luna.' },
     ], notes: 'Always feminine. Plural: die Katzen.', audioAssetId: 'audio-001', imageUrl: null, plural: null, synonyms: [], },
-    srsState: makeSrsState('card-001', { masteryLevel: 5, state: 'mastered', intervalDays: 30, repetitions: 8, lastRating: 5, lastReviewedAt: daysAgo(2), nextDueAt: daysFromNow(28) }),
+    srsState: makeSrsState('card-001', { masteryLevel: 5, state: 'mastered', intervalDays: 30, repetitions: 8, lastRating: 4, lastReviewedAt: daysAgo(2), nextDueAt: daysFromNow(28) }),
   },
   {
     id: 'card-002', deckId: 'deck-001', collectionId: 'col-002', userId: 'user-001', contextId: 'german-vocab',
@@ -208,7 +209,7 @@ export const MOCK_CARDS: Card[] = [
     content: { front: 'the bread', back: 'Brot', article: 'das', gender: 'neuter', phonetic: '/bʁoːt/', examples: [
       { id: 'ex-006a', target: 'Das Brot ist frisch gebacken.', native: 'The bread is freshly baked.' },
     ], notes: 'Neuter. Plural: die Brote.', audioAssetId: 'audio-006', imageUrl: null, plural: null, synonyms: [], },
-    srsState: makeSrsState('card-006', { masteryLevel: 5, state: 'mastered', intervalDays: 21, repetitions: 7, lastRating: 5, lastReviewedAt: daysAgo(5), nextDueAt: daysFromNow(16) }),
+    srsState: makeSrsState('card-006', { masteryLevel: 5, state: 'mastered', intervalDays: 21, repetitions: 7, lastRating: 4, lastReviewedAt: daysAgo(5), nextDueAt: daysFromNow(16) }),
   },
   {
     id: 'card-007', deckId: 'deck-001', collectionId: 'col-001', userId: 'user-001', contextId: 'german-vocab',
@@ -271,7 +272,7 @@ export const MOCK_CARDS: Card[] = [
     content: { front: 'to go', back: 'gehen', article: null, gender: null, phonetic: '/ˈɡeː.ən/', examples: [
       { id: 'ex-015a', target: 'Ich gehe jeden Morgen spazieren.', native: 'I go for a walk every morning.' },
     ], notes: 'Irregular. ich gehe, du gehst, er geht.', audioAssetId: null, imageUrl: null, plural: null, synonyms: [], },
-    srsState: makeSrsState('card-015', { masteryLevel: 5, state: 'mastered', intervalDays: 28, repetitions: 9, lastRating: 5, lastReviewedAt: daysAgo(3), nextDueAt: daysFromNow(25) }),
+    srsState: makeSrsState('card-015', { masteryLevel: 5, state: 'mastered', intervalDays: 28, repetitions: 9, lastRating: 4, lastReviewedAt: daysAgo(3), nextDueAt: daysFromNow(25) }),
   },
   {
     id: 'card-018', deckId: 'deck-001', collectionId: 'col-001', userId: 'user-001', contextId: 'german-vocab',
@@ -280,7 +281,7 @@ export const MOCK_CARDS: Card[] = [
     content: { front: 'the child', back: 'Kind', article: 'das', gender: 'neuter', phonetic: '/kɪnt/', examples: [
       { id: 'ex-018a', target: 'Das Kind spielt im Garten.', native: 'The child plays in the garden.' },
     ], notes: 'Neuter. Plural: die Kinder.', audioAssetId: null, imageUrl: null, plural: null, synonyms: [], },
-    srsState: makeSrsState('card-018', { masteryLevel: 5, state: 'mastered', intervalDays: 25, repetitions: 7, lastRating: 5, lastReviewedAt: daysAgo(4), nextDueAt: daysFromNow(21) }),
+    srsState: makeSrsState('card-018', { masteryLevel: 5, state: 'mastered', intervalDays: 25, repetitions: 7, lastRating: 4, lastReviewedAt: daysAgo(4), nextDueAt: daysFromNow(21) }),
   },
   {
     id: 'card-021', deckId: 'deck-001', collectionId: 'col-001', userId: 'user-001', contextId: 'german-vocab',

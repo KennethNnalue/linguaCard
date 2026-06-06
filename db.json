@@ -30,7 +30,7 @@
         "back": "Katze",
         "article": "die",
         "gender": "feminine",
-        "phonetic": "/ˈkat.sə/",
+        "phonetic": "/\u02c8kat.s\u0259/",
         "examples": [
           {
             "id": "ex-001a",
@@ -39,7 +39,7 @@
           },
           {
             "id": "ex-001b",
-            "target": "Meine Katze heißt Luna.",
+            "target": "Meine Katze hei\u00dft Luna.",
             "native": "My cat is called Luna."
           }
         ],
@@ -83,7 +83,7 @@
         "back": "Hund",
         "article": "der",
         "gender": "masculine",
-        "phonetic": "/hʊnt/",
+        "phonetic": "/h\u028ant/",
         "examples": [
           {
             "id": "ex-002a",
@@ -136,7 +136,7 @@
         "back": "Vogel",
         "article": "der",
         "gender": "masculine",
-        "phonetic": "/ˈfoː.ɡəl/",
+        "phonetic": "/\u02c8fo\u02d0.\u0261\u0259l/",
         "examples": [
           {
             "id": "ex-003a",
@@ -144,7 +144,7 @@
             "native": "The bird is singing in the tree."
           }
         ],
-        "notes": "Masculine. Plural: die Vögel (umlaut changes!).",
+        "notes": "Masculine. Plural: die V\u00f6gel (umlaut changes!).",
         "audioAssetId": null,
         "imageUrl": null
       },
@@ -184,11 +184,11 @@
         "back": "Pferd",
         "article": "das",
         "gender": "neuter",
-        "phonetic": "/p͡feːɐ̯t/",
+        "phonetic": "/p\u0361fe\u02d0\u0250\u032ft/",
         "examples": [
           {
             "id": "ex-004a",
-            "target": "Das Pferd läuft schnell.",
+            "target": "Das Pferd l\u00e4uft schnell.",
             "native": "The horse runs fast."
           },
           {
@@ -237,7 +237,7 @@
         "back": "Fisch",
         "article": "der",
         "gender": "masculine",
-        "phonetic": "/fɪʃ/",
+        "phonetic": "/f\u026a\u0283/",
         "examples": [
           {
             "id": "ex-005a",
@@ -285,7 +285,7 @@
         "back": "Brot",
         "article": "das",
         "gender": "neuter",
-        "phonetic": "/bʁoːt/",
+        "phonetic": "/b\u0281o\u02d0t/",
         "examples": [
           {
             "id": "ex-006a",
@@ -294,7 +294,7 @@
           },
           {
             "id": "ex-006b",
-            "target": "Ich esse Brot zum Frühstück.",
+            "target": "Ich esse Brot zum Fr\u00fchst\u00fcck.",
             "native": "I eat bread for breakfast."
           }
         ],
@@ -339,7 +339,7 @@
         "back": "Wasser",
         "article": "das",
         "gender": "neuter",
-        "phonetic": "/ˈvas.ɐ/",
+        "phonetic": "/\u02c8vas.\u0250/",
         "examples": [
           {
             "id": "ex-007a",
@@ -392,11 +392,11 @@
         "back": "Apfel",
         "article": "der",
         "gender": "masculine",
-        "phonetic": "/ˈap.fəl/",
+        "phonetic": "/\u02c8ap.f\u0259l/",
         "examples": [
           {
             "id": "ex-008a",
-            "target": "Der Apfel ist rot und süß.",
+            "target": "Der Apfel ist rot und s\u00fc\u00df.",
             "native": "The apple is red and sweet."
           },
           {
@@ -405,7 +405,7 @@
             "native": "I eat an apple every day."
           }
         ],
-        "notes": "Masculine. Plural: die Äpfel (umlaut!).",
+        "notes": "Masculine. Plural: die \u00c4pfel (umlaut!).",
         "audioAssetId": null,
         "imageUrl": null
       },
@@ -446,7 +446,7 @@
         "back": "Kaffee",
         "article": "der",
         "gender": "masculine",
-        "phonetic": "/ˈka.feː/",
+        "phonetic": "/\u02c8ka.fe\u02d0/",
         "examples": [
           {
             "id": "ex-009a",
@@ -499,7 +499,7 @@
         "back": "Kuchen",
         "article": "der",
         "gender": "masculine",
-        "phonetic": "/ˈkuː.xən/",
+        "phonetic": "/\u02c8ku\u02d0.x\u0259n/",
         "examples": [
           {
             "id": "ex-010a",
@@ -553,11 +553,11 @@
         "back": "Zug",
         "article": "der",
         "gender": "masculine",
-        "phonetic": "/t͡suːk/",
+        "phonetic": "/t\u0361su\u02d0k/",
         "examples": [
           {
             "id": "ex-011a",
-            "target": "Der Zug fährt um 8 Uhr ab.",
+            "target": "Der Zug f\u00e4hrt um 8 Uhr ab.",
             "native": "The train departs at 8 o'clock."
           },
           {
@@ -606,7 +606,7 @@
         "back": "Flughafen",
         "article": "der",
         "gender": "masculine",
-        "phonetic": "/ˈfluːkˌhaː.fən/",
+        "phonetic": "/\u02c8flu\u02d0k\u02ccha\u02d0.f\u0259n/",
         "examples": [
           {
             "id": "ex-012a",
@@ -615,7 +615,7 @@
           },
           {
             "id": "ex-012b",
-            "target": "Der Flughafen ist sehr groß.",
+            "target": "Der Flughafen ist sehr gro\u00df.",
             "native": "The airport is very large."
           }
         ],
@@ -659,7 +659,7 @@
         "back": "Fahrkarte",
         "article": "die",
         "gender": "feminine",
-        "phonetic": "/ˈfaːɐ̯ˌkaʁ.tə/",
+        "phonetic": "/\u02c8fa\u02d0\u0250\u032f\u02ccka\u0281.t\u0259/",
         "examples": [
           {
             "id": "ex-013a",
@@ -712,7 +712,7 @@
         "back": "essen",
         "article": null,
         "gender": null,
-        "phonetic": "/ˈɛs.ən/",
+        "phonetic": "/\u02c8\u025bs.\u0259n/",
         "examples": [
           {
             "id": "ex-014a",
@@ -725,7 +725,7 @@
             "native": "We eat together."
           }
         ],
-        "notes": "Strong verb: ich esse, du isst, er/sie isst. Past: aß. Participle: gegessen.",
+        "notes": "Strong verb: ich esse, du isst, er/sie isst. Past: a\u00df. Participle: gegessen.",
         "audioAssetId": null,
         "imageUrl": null
       },
@@ -765,7 +765,7 @@
         "back": "gehen",
         "article": null,
         "gender": null,
-        "phonetic": "/ˈɡeː.ən/",
+        "phonetic": "/\u02c8\u0261e\u02d0.\u0259n/",
         "examples": [
           {
             "id": "ex-015a",
@@ -818,7 +818,7 @@
         "back": "sprechen",
         "article": null,
         "gender": null,
-        "phonetic": "/ˈʃpʁɛ.çən/",
+        "phonetic": "/\u02c8\u0283p\u0281\u025b.\u00e7\u0259n/",
         "examples": [
           {
             "id": "ex-016a",
@@ -868,23 +868,23 @@
       "updatedAt": "2025-01-23T08:00:00Z",
       "content": {
         "front": "big / large",
-        "back": "groß",
+        "back": "gro\u00df",
         "article": null,
         "gender": null,
-        "phonetic": "/ɡʁoːs/",
+        "phonetic": "/\u0261\u0281o\u02d0s/",
         "examples": [
           {
             "id": "ex-017a",
-            "target": "Das ist ein großes Haus.",
+            "target": "Das ist ein gro\u00dfes Haus.",
             "native": "That is a big house."
           },
           {
             "id": "ex-017b",
-            "target": "Er ist sehr groß.",
+            "target": "Er ist sehr gro\u00df.",
             "native": "He is very tall/big."
           }
         ],
-        "notes": "Adjective. Comparative: größer. Superlative: am größten.",
+        "notes": "Adjective. Comparative: gr\u00f6\u00dfer. Superlative: am gr\u00f6\u00dften.",
         "audioAssetId": null,
         "imageUrl": null
       },
@@ -924,7 +924,7 @@
         "back": "Kind",
         "article": "das",
         "gender": "neuter",
-        "phonetic": "/kɪnt/",
+        "phonetic": "/k\u026ant/",
         "examples": [
           {
             "id": "ex-018a",
@@ -977,7 +977,7 @@
         "back": "Mutter",
         "article": "die",
         "gender": "feminine",
-        "phonetic": "/ˈmʊ.tɐ/",
+        "phonetic": "/\u02c8m\u028a.t\u0250/",
         "examples": [
           {
             "id": "ex-019a",
@@ -990,7 +990,7 @@
             "native": "The mother reads to the child."
           }
         ],
-        "notes": "Feminine. Plural: die Mütter (umlaut!).",
+        "notes": "Feminine. Plural: die M\u00fctter (umlaut!).",
         "audioAssetId": null,
         "imageUrl": null
       },
@@ -1030,20 +1030,20 @@
         "back": "Bruder",
         "article": "der",
         "gender": "masculine",
-        "phonetic": "/ˈbʁuː.dɐ/",
+        "phonetic": "/\u02c8b\u0281u\u02d0.d\u0250/",
         "examples": [
           {
             "id": "ex-020a",
-            "target": "Mein Bruder wohnt in München.",
+            "target": "Mein Bruder wohnt in M\u00fcnchen.",
             "native": "My brother lives in Munich."
           },
           {
             "id": "ex-020b",
-            "target": "Er ist mein jüngerer Bruder.",
+            "target": "Er ist mein j\u00fcngerer Bruder.",
             "native": "He is my younger brother."
           }
         ],
-        "notes": "Masculine. Plural: die Brüder (umlaut!).",
+        "notes": "Masculine. Plural: die Br\u00fcder (umlaut!).",
         "audioAssetId": null,
         "imageUrl": null
       },
@@ -1080,23 +1080,23 @@
       "updatedAt": "2025-01-25T08:00:00Z",
       "content": {
         "front": "the door",
-        "back": "Tür",
+        "back": "T\u00fcr",
         "article": "die",
         "gender": "feminine",
-        "phonetic": "/tyːɐ̯/",
+        "phonetic": "/ty\u02d0\u0250\u032f/",
         "examples": [
           {
             "id": "ex-021a",
-            "target": "Bitte schließ die Tür!",
+            "target": "Bitte schlie\u00df die T\u00fcr!",
             "native": "Please close the door!"
           },
           {
             "id": "ex-021b",
-            "target": "Die Tür ist offen.",
+            "target": "Die T\u00fcr ist offen.",
             "native": "The door is open."
           }
         ],
-        "notes": "Feminine. Plural: die Türen.",
+        "notes": "Feminine. Plural: die T\u00fcren.",
         "audioAssetId": null,
         "imageUrl": null
       },
@@ -1136,7 +1136,7 @@
         "back": "Fenster",
         "article": "das",
         "gender": "neuter",
-        "phonetic": "/ˈfɛns.tɐ/",
+        "phonetic": "/\u02c8f\u025bns.t\u0250/",
         "examples": [
           {
             "id": "ex-022a",
@@ -1145,7 +1145,7 @@
           },
           {
             "id": "ex-022b",
-            "target": "Ich öffne das Fenster.",
+            "target": "Ich \u00f6ffne das Fenster.",
             "native": "I open the window."
           }
         ],
@@ -1189,7 +1189,7 @@
         "back": "Besprechung",
         "article": "die",
         "gender": "feminine",
-        "phonetic": "/bəˈʃpʁɛ.çʊŋ/",
+        "phonetic": "/b\u0259\u02c8\u0283p\u0281\u025b.\u00e7\u028a\u014b/",
         "examples": [
           {
             "id": "ex-023a",
@@ -1242,7 +1242,7 @@
         "back": "Computer",
         "article": "der",
         "gender": "masculine",
-        "phonetic": "/kɔmˈpjuː.tɐ/",
+        "phonetic": "/k\u0254m\u02c8pju\u02d0.t\u0250/",
         "examples": [
           {
             "id": "ex-024a",
@@ -1289,7 +1289,7 @@
           {
             "id": "b8786e6e-6fd7-4e7b-ac1f-e716077c9d3b",
             "target": "ich stehe mich um 7 Uhr auf",
-            "native": "I get up at 7 oçlock"
+            "native": "I get up at 7 o\u00e7lock"
           }
         ],
         "notes": "",
@@ -1378,7 +1378,7 @@
         "examples": [
           {
             "id": "f9eddf55-6938-43d6-8910-49d5cf97761d",
-            "target": "Die Fahrradtour durch den Park hat Spaß gemacht.",
+            "target": "Die Fahrradtour durch den Park hat Spa\u00df gemacht.",
             "native": "The cycling tour through the park was fun."
           }
         ],
@@ -1513,7 +1513,7 @@
         "examples": [
           {
             "id": "53bb1fc3-3b8d-4746-80b3-d1ce8434f57d",
-            "target": "Das Fest war wunderschön und sehr lustig.",
+            "target": "Das Fest war wundersch\u00f6n und sehr lustig.",
             "native": "The celebration was beautiful and very funny."
           }
         ],
@@ -1693,7 +1693,7 @@
         "examples": [
           {
             "id": "4b67e1c7-fe1e-4c7c-9416-c2e2f401e072",
-            "target": "Er wird nächste Woche dreißig Jahre alt.",
+            "target": "Er wird n\u00e4chste Woche drei\u00dfig Jahre alt.",
             "native": "He turns thirty next week."
           }
         ],
@@ -1783,7 +1783,7 @@
         "examples": [
           {
             "id": "64e3c70f-ef3a-46f4-885a-cbffa0afe19e",
-            "target": "Das Geschenk ist sehr schön verpackt.",
+            "target": "Das Geschenk ist sehr sch\u00f6n verpackt.",
             "native": "The gift is very nicely wrapped."
           }
         ],
@@ -1912,13 +1912,13 @@
       "contextId": "german-vocab",
       "content": {
         "front": "the surprise",
-        "back": "Überraschung",
+        "back": "\u00dcberraschung",
         "article": "die",
         "gender": "feminine",
         "examples": [
           {
             "id": "d207f0fd-414f-48b4-826e-9903c0046584",
-            "target": "Die Überraschung hat ihr sehr gefallen.",
+            "target": "Die \u00dcberraschung hat ihr sehr gefallen.",
             "native": "She really liked the surprise."
           }
         ],
@@ -2053,8 +2053,8 @@
         "examples": [
           {
             "id": "1a2dc2de-6afa-4483-9628-1c0075b09554",
-            "target": "Achtung – das ist sehr heiß!",
-            "native": "Attention – that is very hot!"
+            "target": "Achtung \u2013 das ist sehr hei\u00df!",
+            "native": "Attention \u2013 that is very hot!"
           }
         ],
         "notes": "",
@@ -2098,7 +2098,7 @@
         "examples": [
           {
             "id": "833c1c47-1725-444c-877d-3f2ae6ebb4d3",
-            "target": "Weißt du wo er wohnt?",
+            "target": "Wei\u00dft du wo er wohnt?",
             "native": "Do you know where he lives?"
           }
         ],
@@ -2188,7 +2188,7 @@
         "examples": [
           {
             "id": "8041b8a3-48d9-4bd3-8ea5-e506306f21cb",
-            "target": "Der Ausflug war sehr schön.",
+            "target": "Der Ausflug war sehr sch\u00f6n.",
             "native": "The trip was really lovely."
           }
         ],
@@ -2227,13 +2227,13 @@
       "contextId": "german-vocab",
       "content": {
         "front": "to have fun",
-        "back": "Spaß haben",
+        "back": "Spa\u00df haben",
         "article": null,
         "gender": null,
         "examples": [
           {
             "id": "6cd18725-b4a7-4992-8a2f-ea93b770141e",
-            "target": "Wir haben viel Spaß zusammen.",
+            "target": "Wir haben viel Spa\u00df zusammen.",
             "native": "We have a lot of fun together."
           }
         ],
@@ -2278,7 +2278,7 @@
         "examples": [
           {
             "id": "6e560f8b-477c-4401-ba48-94a1670963e9",
-            "target": "Hoffentlich kommt ihr pünktlich.",
+            "target": "Hoffentlich kommt ihr p\u00fcnktlich.",
             "native": "Hopefully you will come on time."
           }
         ],
@@ -2497,14 +2497,14 @@
       "contextId": "german-vocab",
       "content": {
         "front": "warm regards",
-        "back": "herzliche Grüße",
+        "back": "herzliche Gr\u00fc\u00dfe",
         "article": null,
         "gender": null,
         "examples": [
           {
             "id": "9dcd4a63-55b1-49a9-bfb2-910eb227eb4d",
-            "target": "Mit herzlichen Grüßen – dein Thomas.",
-            "native": "With warm regards – yours Thomas."
+            "target": "Mit herzlichen Gr\u00fc\u00dfen \u2013 dein Thomas.",
+            "native": "With warm regards \u2013 yours Thomas."
           }
         ],
         "notes": "",
@@ -2728,7 +2728,7 @@
         "examples": [
           {
             "id": "c029c3f9-f911-4895-b3fb-bcf9726754ee",
-            "target": "Die Tomatensuppe ist heute sehr heiß.",
+            "target": "Die Tomatensuppe ist heute sehr hei\u00df.",
             "native": "The tomato soup is very hot today."
           }
         ],
@@ -2818,7 +2818,7 @@
         "examples": [
           {
             "id": "f210fd63-e420-4b48-b12b-ab6a0195594c",
-            "target": "Nach dem Sport habe ich großen Durst.",
+            "target": "Nach dem Sport habe ich gro\u00dfen Durst.",
             "native": "After sport I am very thirsty."
           }
         ],
@@ -2863,8 +2863,8 @@
         "examples": [
           {
             "id": "11134aca-5270-463c-bc97-4c85f2fea933",
-            "target": "Ich habe Hunger – wann essen wir?",
-            "native": "I am hungry – when do we eat?"
+            "target": "Ich habe Hunger \u2013 wann essen wir?",
+            "native": "I am hungry \u2013 when do we eat?"
           }
         ],
         "notes": "",
@@ -2998,7 +2998,7 @@
         "examples": [
           {
             "id": "e73436d8-c0b2-400e-bd5d-153674cb7329",
-            "target": "Ich möchte bitte einen Kaffee bestellen.",
+            "target": "Ich m\u00f6chte bitte einen Kaffee bestellen.",
             "native": "I would like to order a coffee please."
           }
         ],
@@ -3043,7 +3043,7 @@
         "examples": [
           {
             "id": "a22ddb96-b071-4af5-95d7-c71f91de150f",
-            "target": "Können Sie mir bitte die Rechnung bringen?",
+            "target": "K\u00f6nnen Sie mir bitte die Rechnung bringen?",
             "native": "Can you please bring me the bill?"
           }
         ],
@@ -3082,13 +3082,13 @@
       "contextId": "german-vocab",
       "content": {
         "front": "For whom is ...?",
-        "back": "Für wen ist ...?",
+        "back": "F\u00fcr wen ist ...?",
         "article": null,
         "gender": null,
         "examples": [
           {
             "id": "374633a5-565c-44a6-9908-6b77e0b533d9",
-            "target": "Für wen ist die Tomatensuppe?",
+            "target": "F\u00fcr wen ist die Tomatensuppe?",
             "native": "Who is the tomato soup for?"
           }
         ],
@@ -3133,7 +3133,7 @@
         "examples": [
           {
             "id": "c919b198-bdbf-4a45-afca-1e19caddf694",
-            "target": "Ich möchte jetzt bezahlen bitte.",
+            "target": "Ich m\u00f6chte jetzt bezahlen bitte.",
             "native": "I would like to pay now please."
           }
         ],
@@ -3178,8 +3178,8 @@
         "examples": [
           {
             "id": "4ff72fd3-70f5-494b-842b-8c9ba19c5ffa",
-            "target": "Zahlen bitte! – Ja natürlich.",
-            "native": "The bill please! – Yes of course."
+            "target": "Zahlen bitte! \u2013 Ja nat\u00fcrlich.",
+            "native": "The bill please! \u2013 Yes of course."
           }
         ],
         "notes": "",
@@ -3223,7 +3223,7 @@
         "examples": [
           {
             "id": "15b746c2-e16a-4b77-89e1-1036b29d9793",
-            "target": "Die Rechnung war höher als erwartet.",
+            "target": "Die Rechnung war h\u00f6her als erwartet.",
             "native": "The bill was higher than expected."
           }
         ],
@@ -3313,7 +3313,7 @@
         "examples": [
           {
             "id": "4f3f6df0-322c-4dec-8800-6893e319b39c",
-            "target": "Das Trinkgeld war sehr großzügig.",
+            "target": "Das Trinkgeld war sehr gro\u00dfz\u00fcgig.",
             "native": "The tip was very generous."
           }
         ],
@@ -3403,8 +3403,8 @@
         "examples": [
           {
             "id": "7c5a4cee-1845-4ac0-9f68-7cdb8c2a5036",
-            "target": "Das stimmt so – behalten Sie den Rest!",
-            "native": "That is correct – keep the change!"
+            "target": "Das stimmt so \u2013 behalten Sie den Rest!",
+            "native": "That is correct \u2013 keep the change!"
           }
         ],
         "notes": "",
@@ -3532,13 +3532,13 @@
       "contextId": "german-vocab",
       "content": {
         "front": "the spoon",
-        "back": "Löffel",
+        "back": "L\u00f6ffel",
         "article": "der",
         "gender": "masculine",
         "examples": [
           {
             "id": "6e2be418-aaf5-4ca7-8001-413994ab6035",
-            "target": "Kann ich bitte einen Löffel haben?",
+            "target": "Kann ich bitte einen L\u00f6ffel haben?",
             "native": "Can I please have a spoon?"
           }
         ],
@@ -3673,7 +3673,7 @@
         "examples": [
           {
             "id": "2fdbe564-767d-44ed-bf63-1f9fe1590c98",
-            "target": "Der Teller ist schön dekoriert.",
+            "target": "Der Teller ist sch\u00f6n dekoriert.",
             "native": "The plate is nicely decorated."
           }
         ],
@@ -3718,7 +3718,7 @@
         "examples": [
           {
             "id": "c7e35053-8bf2-45dd-bdd0-31fc7471271d",
-            "target": "Können Sie mir bitte eine Serviette geben?",
+            "target": "K\u00f6nnen Sie mir bitte eine Serviette geben?",
             "native": "Can you please give me a napkin?"
           }
         ],
@@ -3801,7 +3801,7 @@
       "userId": "user-001",
       "contextId": "german-vocab",
       "content": {
-        "front": "the café",
+        "front": "the caf\u00e9",
         "back": "Kaffeehaus",
         "article": "das",
         "gender": "neuter",
@@ -3809,7 +3809,7 @@
           {
             "id": "23be0b42-da6a-44c8-8a38-a8588b9e679f",
             "target": "Das Kaffeehaus ist am Wochenende sehr voll.",
-            "native": "The café is very full at the weekend."
+            "native": "The caf\u00e9 is very full at the weekend."
           }
         ],
         "notes": "",
@@ -4027,13 +4027,13 @@
       "contextId": "german-vocab",
       "content": {
         "front": "open",
-        "back": "geöffnet",
+        "back": "ge\u00f6ffnet",
         "article": null,
         "gender": null,
         "examples": [
           {
             "id": "9d00ed05-8e05-45f7-9abd-099536b65321",
-            "target": "Das Restaurant ist heute bis 22 Uhr geöffnet.",
+            "target": "Das Restaurant ist heute bis 22 Uhr ge\u00f6ffnet.",
             "native": "The restaurant is open today until 10 pm."
           }
         ],
@@ -4072,13 +4072,13 @@
       "contextId": "german-vocab",
       "content": {
         "front": "outside",
-        "back": "draußen",
+        "back": "drau\u00dfen",
         "article": null,
         "gender": null,
         "examples": [
           {
             "id": "1d3cf952-43d9-434f-a568-14d5a7e05531",
-            "target": "Man kann draußen sitzen wenn das Wetter gut ist.",
+            "target": "Man kann drau\u00dfen sitzen wenn das Wetter gut ist.",
             "native": "You can sit outside when the weather is good."
           }
         ],
@@ -4393,7 +4393,7 @@
         "examples": [
           {
             "id": "66068569-6e73-4cfe-93a5-09ae4ecb50d6",
-            "target": "Die Anmeldung für den Kurs ist online.",
+            "target": "Die Anmeldung f\u00fcr den Kurs ist online.",
             "native": "Registration for the course is online."
           }
         ],
@@ -4528,7 +4528,7 @@
         "examples": [
           {
             "id": "1bf449c2-eccf-4f81-a799-abda5d801a30",
-            "target": "Ich habe zwei Karten für das Konzert.",
+            "target": "Ich habe zwei Karten f\u00fcr das Konzert.",
             "native": "I have two tickets for the concert."
           }
         ],
@@ -4618,7 +4618,7 @@
         "examples": [
           {
             "id": "9edf467e-b1bd-496c-8a67-5c48ad3e296c",
-            "target": "Er läuft jeden Morgen fünf Kilometer.",
+            "target": "Er l\u00e4uft jeden Morgen f\u00fcnf Kilometer.",
             "native": "He runs five kilometres every morning."
           }
         ],
@@ -4657,13 +4657,13 @@
       "contextId": "german-vocab",
       "content": {
         "front": "to enjoy",
-        "back": "genießen",
+        "back": "genie\u00dfen",
         "article": null,
         "gender": null,
         "examples": [
           {
             "id": "8aba4b7c-c82a-400e-8e9b-4ebed1df52c7",
-            "target": "Wir genießen den schönen Abend.",
+            "target": "Wir genie\u00dfen den sch\u00f6nen Abend.",
             "native": "We are enjoying the lovely evening."
           }
         ],
@@ -4888,7 +4888,7 @@
         "examples": [
           {
             "id": "447133c2-a943-493f-b380-a8ab77e2958e",
-            "target": "Wir sehen uns wieder nächste Woche.",
+            "target": "Wir sehen uns wieder n\u00e4chste Woche.",
             "native": "We will see each other again next week."
           }
         ],
@@ -5017,13 +5017,13 @@
       "contextId": "german-vocab",
       "content": {
         "front": "everywhere",
-        "back": "überall",
+        "back": "\u00fcberall",
         "article": null,
         "gender": null,
         "examples": [
           {
             "id": "64947595-8a46-4b40-831b-b8f4190f0eb8",
-            "target": "Die Touristen sind überall in der Stadt.",
+            "target": "Die Touristen sind \u00fcberall in der Stadt.",
             "native": "The tourists are everywhere in the city."
           }
         ],
@@ -5152,13 +5152,13 @@
       "contextId": "german-vocab",
       "content": {
         "front": "early",
-        "back": "früh",
+        "back": "fr\u00fch",
         "article": null,
         "gender": null,
         "examples": [
           {
             "id": "8ca5e229-fc43-4f79-8397-d82478c2f978",
-            "target": "Ich stehe morgen früh um sechs Uhr auf.",
+            "target": "Ich stehe morgen fr\u00fch um sechs Uhr auf.",
             "native": "I get up early tomorrow at six o'clock."
           }
         ],
@@ -5203,8 +5203,8 @@
         "examples": [
           {
             "id": "f50ef435-5c6e-4d68-82d4-ddc3d6787518",
-            "target": "Warum nicht – das klingt gut!",
-            "native": "Why not – that sounds good!"
+            "target": "Warum nicht \u2013 das klingt gut!",
+            "native": "Why not \u2013 that sounds good!"
           }
         ],
         "notes": "",
@@ -5248,8 +5248,8 @@
         "examples": [
           {
             "id": "cd91d493-8385-4984-91e0-2f3f73881933",
-            "target": "Alles klar – wir sehen uns um acht!",
-            "native": "All clear – we will see each other at eight!"
+            "target": "Alles klar \u2013 wir sehen uns um acht!",
+            "native": "All clear \u2013 we will see each other at eight!"
           }
         ],
         "notes": "",
@@ -5293,8 +5293,8 @@
         "examples": [
           {
             "id": "0f0633a5-30bd-42ec-92cd-3527243f88a8",
-            "target": "Wann denn – heute oder morgen?",
-            "native": "When then – today or tomorrow?"
+            "target": "Wann denn \u2013 heute oder morgen?",
+            "native": "When then \u2013 today or tomorrow?"
           }
         ],
         "notes": "",
@@ -5338,8 +5338,8 @@
         "examples": [
           {
             "id": "3bae58f7-3de8-4e86-a961-b39375a5e16a",
-            "target": "Klingt gut – ich komme gerne mit!",
-            "native": "Sounds good – I would love to come along!"
+            "target": "Klingt gut \u2013 ich komme gerne mit!",
+            "native": "Sounds good \u2013 I would love to come along!"
           }
         ],
         "notes": "",
@@ -5428,7 +5428,7 @@
         "examples": [
           {
             "id": "98ee8920-59d3-45f7-aef4-907ff5a67144",
-            "target": "Wann fängt die Party an?",
+            "target": "Wann f\u00e4ngt die Party an?",
             "native": "When does the party start?"
           }
         ],
@@ -5512,13 +5512,13 @@
       "contextId": "german-vocab",
       "content": {
         "front": "to stop / listen",
-        "back": "aufhören",
+        "back": "aufh\u00f6ren",
         "article": null,
         "gender": null,
         "examples": [
           {
             "id": "0887a174-0a1e-45b6-a493-a8c2d2662e18",
-            "target": "Hör bitte auf mit dem Lärm!",
+            "target": "H\u00f6r bitte auf mit dem L\u00e4rm!",
             "native": "Please stop making that noise!"
           }
         ],
@@ -5653,7 +5653,7 @@
         "examples": [
           {
             "id": "fb96e589-82f2-42b2-bf22-565b5b6797a5",
-            "target": "Die Fahrradtour durch den Park hat Spaß gemacht.",
+            "target": "Die Fahrradtour durch den Park hat Spa\u00df gemacht.",
             "native": "The cycling tour through the park was fun."
           }
         ],
@@ -5788,7 +5788,7 @@
         "examples": [
           {
             "id": "60b4d29a-7822-49b0-844f-d65b1a3d436a",
-            "target": "Das Fest war wunderschön und sehr lustig.",
+            "target": "Das Fest war wundersch\u00f6n und sehr lustig.",
             "native": "The celebration was beautiful and very funny."
           }
         ],
@@ -5923,7 +5923,7 @@
         "examples": [
           {
             "id": "99277878-9b1e-4fae-9c71-5fb66786df0c",
-            "target": "Er wird nächste Woche dreißig Jahre alt.",
+            "target": "Er wird n\u00e4chste Woche drei\u00dfig Jahre alt.",
             "native": "He turns thirty next week."
           }
         ],
@@ -6013,7 +6013,7 @@
         "examples": [
           {
             "id": "bbdc0606-e457-411c-9c48-977c67e389fc",
-            "target": "Das Geschenk ist sehr schön verpackt.",
+            "target": "Das Geschenk ist sehr sch\u00f6n verpackt.",
             "native": "The gift is very nicely wrapped."
           }
         ],
@@ -6142,13 +6142,13 @@
       "contextId": "german-vocab",
       "content": {
         "front": "the surprise",
-        "back": "Überraschung",
+        "back": "\u00dcberraschung",
         "article": "die",
         "gender": "feminine",
         "examples": [
           {
             "id": "edea2035-aa7b-45f8-b99d-d21f588407b5",
-            "target": "Die Überraschung hat ihr sehr gefallen.",
+            "target": "Die \u00dcberraschung hat ihr sehr gefallen.",
             "native": "She really liked the surprise."
           }
         ],
@@ -6193,8 +6193,8 @@
         "examples": [
           {
             "id": "56c131ed-87d9-4089-b0fd-73ba13e49595",
-            "target": "Achtung – das ist sehr heiß!",
-            "native": "Attention – that is very hot!"
+            "target": "Achtung \u2013 das ist sehr hei\u00df!",
+            "native": "Attention \u2013 that is very hot!"
           }
         ],
         "notes": "",
@@ -6238,7 +6238,7 @@
         "examples": [
           {
             "id": "7c9488a1-f9b2-4103-98a4-11ea5e4fc3a0",
-            "target": "Weißt du wo er wohnt?",
+            "target": "Wei\u00dft du wo er wohnt?",
             "native": "Do you know where he lives?"
           }
         ],
@@ -6322,13 +6322,13 @@
       "contextId": "german-vocab",
       "content": {
         "front": "to have fun",
-        "back": "Spaß haben",
+        "back": "Spa\u00df haben",
         "article": null,
         "gender": null,
         "examples": [
           {
             "id": "17ee4d18-655a-4037-aee8-053ecb3eed83",
-            "target": "Wir haben viel Spaß zusammen.",
+            "target": "Wir haben viel Spa\u00df zusammen.",
             "native": "We have a lot of fun together."
           }
         ],
@@ -6373,7 +6373,7 @@
         "examples": [
           {
             "id": "e95be946-317a-4ae9-8c0b-aa656a7100ab",
-            "target": "Hoffentlich kommt ihr pünktlich.",
+            "target": "Hoffentlich kommt ihr p\u00fcnktlich.",
             "native": "Hopefully you will come on time."
           }
         ],
@@ -6592,14 +6592,14 @@
       "contextId": "german-vocab",
       "content": {
         "front": "warm regards",
-        "back": "herzliche Grüße",
+        "back": "herzliche Gr\u00fc\u00dfe",
         "article": null,
         "gender": null,
         "examples": [
           {
             "id": "c7443a3d-4399-4217-8b63-c1a891f2740c",
-            "target": "Mit herzlichen Grüßen – dein Thomas.",
-            "native": "With warm regards – yours Thomas."
+            "target": "Mit herzlichen Gr\u00fc\u00dfen \u2013 dein Thomas.",
+            "native": "With warm regards \u2013 yours Thomas."
           }
         ],
         "notes": "",
@@ -6868,7 +6868,7 @@
         "examples": [
           {
             "id": "6527f3ac-e5b7-41d9-bea1-b4856ed5ef4a",
-            "target": "Die Tomatensuppe ist heute sehr heiß.",
+            "target": "Die Tomatensuppe ist heute sehr hei\u00df.",
             "native": "The tomato soup is very hot today."
           }
         ],
@@ -7003,7 +7003,7 @@
         "examples": [
           {
             "id": "a5d2b871-9ba1-45bb-9f5c-706372d96664",
-            "target": "Nach dem Sport habe ich großen Durst.",
+            "target": "Nach dem Sport habe ich gro\u00dfen Durst.",
             "native": "After sport I am very thirsty."
           }
         ],
@@ -7048,8 +7048,8 @@
         "examples": [
           {
             "id": "a1699fa3-8cc6-448f-9e48-c260ae5a28a3",
-            "target": "Ich habe Hunger – wann essen wir?",
-            "native": "I am hungry – when do we eat?"
+            "target": "Ich habe Hunger \u2013 wann essen wir?",
+            "native": "I am hungry \u2013 when do we eat?"
           }
         ],
         "notes": "",
@@ -7138,7 +7138,7 @@
         "examples": [
           {
             "id": "d40e8ac6-bf1d-45b3-b883-8a5d9d703594",
-            "target": "Der Ausflug war sehr schön.",
+            "target": "Der Ausflug war sehr sch\u00f6n.",
             "native": "The trip was really lovely."
           }
         ],
@@ -7228,7 +7228,7 @@
         "examples": [
           {
             "id": "619d26ee-d276-4694-8759-da55dfb50ed8",
-            "target": "Ich möchte bitte einen Kaffee bestellen.",
+            "target": "Ich m\u00f6chte bitte einen Kaffee bestellen.",
             "native": "I would like to order a coffee please."
           }
         ],
@@ -7273,7 +7273,7 @@
         "examples": [
           {
             "id": "6e089c2b-4657-44b7-9eea-60e2a5679977",
-            "target": "Können Sie mir bitte die Rechnung bringen?",
+            "target": "K\u00f6nnen Sie mir bitte die Rechnung bringen?",
             "native": "Can you please bring me the bill?"
           }
         ],
@@ -7357,13 +7357,13 @@
       "contextId": "german-vocab",
       "content": {
         "front": "For whom is ...?",
-        "back": "Für wen ist ...?",
+        "back": "F\u00fcr wen ist ...?",
         "article": null,
         "gender": null,
         "examples": [
           {
             "id": "48aab99a-578c-4100-843e-ad984ecb279b",
-            "target": "Für wen ist die Tomatensuppe?",
+            "target": "F\u00fcr wen ist die Tomatensuppe?",
             "native": "Who is the tomato soup for?"
           }
         ],
@@ -7408,7 +7408,7 @@
         "examples": [
           {
             "id": "bd972726-71b5-4a1f-8d0b-0c0b171015a6",
-            "target": "Ich möchte jetzt bezahlen bitte.",
+            "target": "Ich m\u00f6chte jetzt bezahlen bitte.",
             "native": "I would like to pay now please."
           }
         ],
@@ -7453,8 +7453,8 @@
         "examples": [
           {
             "id": "f6a3afcb-dd15-4f42-af5f-602d8a3772e9",
-            "target": "Zahlen bitte! – Ja natürlich.",
-            "native": "The bill please! – Yes of course."
+            "target": "Zahlen bitte! \u2013 Ja nat\u00fcrlich.",
+            "native": "The bill please! \u2013 Yes of course."
           }
         ],
         "notes": "",
@@ -7498,7 +7498,7 @@
         "examples": [
           {
             "id": "71cd16bf-b8fc-4b1b-9f26-6f40a1fc3c1d",
-            "target": "Die Rechnung war höher als erwartet.",
+            "target": "Die Rechnung war h\u00f6her als erwartet.",
             "native": "The bill was higher than expected."
           }
         ],
@@ -7588,7 +7588,7 @@
         "examples": [
           {
             "id": "b0bcc9fd-aba4-4c46-be44-525c3dde0752",
-            "target": "Das Trinkgeld war sehr großzügig.",
+            "target": "Das Trinkgeld war sehr gro\u00dfz\u00fcgig.",
             "native": "The tip was very generous."
           }
         ],
@@ -7678,8 +7678,8 @@
         "examples": [
           {
             "id": "b5004eb1-19b8-4030-a90d-77d278c1ebcb",
-            "target": "Das stimmt so – behalten Sie den Rest!",
-            "native": "That is correct – keep the change!"
+            "target": "Das stimmt so \u2013 behalten Sie den Rest!",
+            "native": "That is correct \u2013 keep the change!"
           }
         ],
         "notes": "",
@@ -7807,13 +7807,13 @@
       "contextId": "german-vocab",
       "content": {
         "front": "the spoon",
-        "back": "Löffel",
+        "back": "L\u00f6ffel",
         "article": "der",
         "gender": "masculine",
         "examples": [
           {
             "id": "abe8e89c-48a7-4c99-a8d1-f553609f3997",
-            "target": "Kann ich bitte einen Löffel haben?",
+            "target": "Kann ich bitte einen L\u00f6ffel haben?",
             "native": "Can I please have a spoon?"
           }
         ],
@@ -7948,7 +7948,7 @@
         "examples": [
           {
             "id": "7504566b-6419-4f2a-912f-e402fbd6224c",
-            "target": "Der Teller ist schön dekoriert.",
+            "target": "Der Teller ist sch\u00f6n dekoriert.",
             "native": "The plate is nicely decorated."
           }
         ],
@@ -7993,7 +7993,7 @@
         "examples": [
           {
             "id": "52e75fb3-1fc1-487a-abd9-a61d961a30d0",
-            "target": "Können Sie mir bitte eine Serviette geben?",
+            "target": "K\u00f6nnen Sie mir bitte eine Serviette geben?",
             "native": "Can you please give me a napkin?"
           }
         ],
@@ -8076,7 +8076,7 @@
       "userId": "user-001",
       "contextId": "german-vocab",
       "content": {
-        "front": "the café",
+        "front": "the caf\u00e9",
         "back": "Kaffeehaus",
         "article": "das",
         "gender": "neuter",
@@ -8084,7 +8084,7 @@
           {
             "id": "5687dcb3-5179-4a06-9ee2-92a02be2554d",
             "target": "Das Kaffeehaus ist am Wochenende sehr voll.",
-            "native": "The café is very full at the weekend."
+            "native": "The caf\u00e9 is very full at the weekend."
           }
         ],
         "notes": "",
@@ -8302,13 +8302,13 @@
       "contextId": "german-vocab",
       "content": {
         "front": "open",
-        "back": "geöffnet",
+        "back": "ge\u00f6ffnet",
         "article": null,
         "gender": null,
         "examples": [
           {
             "id": "f4ed0151-a17b-45a3-a51c-183354dc2a42",
-            "target": "Das Restaurant ist heute bis 22 Uhr geöffnet.",
+            "target": "Das Restaurant ist heute bis 22 Uhr ge\u00f6ffnet.",
             "native": "The restaurant is open today until 10 pm."
           }
         ],
@@ -8347,13 +8347,13 @@
       "contextId": "german-vocab",
       "content": {
         "front": "outside",
-        "back": "draußen",
+        "back": "drau\u00dfen",
         "article": null,
         "gender": null,
         "examples": [
           {
             "id": "33e18b98-ca0d-467f-b77e-296cc4faec72",
-            "target": "Man kann draußen sitzen wenn das Wetter gut ist.",
+            "target": "Man kann drau\u00dfen sitzen wenn das Wetter gut ist.",
             "native": "You can sit outside when the weather is good."
           }
         ],
@@ -8668,7 +8668,7 @@
         "examples": [
           {
             "id": "895249a1-eb08-4c0e-bcf3-3b6fd7faadbc",
-            "target": "Die Anmeldung für den Kurs ist online.",
+            "target": "Die Anmeldung f\u00fcr den Kurs ist online.",
             "native": "Registration for the course is online."
           }
         ],
@@ -8803,7 +8803,7 @@
         "examples": [
           {
             "id": "1c0e2c09-907b-4533-8e34-879d106e4e3e",
-            "target": "Ich habe zwei Karten für das Konzert.",
+            "target": "Ich habe zwei Karten f\u00fcr das Konzert.",
             "native": "I have two tickets for the concert."
           }
         ],
@@ -8893,7 +8893,7 @@
         "examples": [
           {
             "id": "79cee56a-e7a9-420c-b5e8-027edb52bc7d",
-            "target": "Er läuft jeden Morgen fünf Kilometer.",
+            "target": "Er l\u00e4uft jeden Morgen f\u00fcnf Kilometer.",
             "native": "He runs five kilometres every morning."
           }
         ],
@@ -8932,13 +8932,13 @@
       "contextId": "german-vocab",
       "content": {
         "front": "to enjoy",
-        "back": "genießen",
+        "back": "genie\u00dfen",
         "article": null,
         "gender": null,
         "examples": [
           {
             "id": "3b6190c5-ec56-4bfd-b23e-fc64913941c7",
-            "target": "Wir genießen den schönen Abend.",
+            "target": "Wir genie\u00dfen den sch\u00f6nen Abend.",
             "native": "We are enjoying the lovely evening."
           }
         ],
@@ -9163,7 +9163,7 @@
         "examples": [
           {
             "id": "43c17ffd-5c0d-46a8-8714-d3e88cc7f2af",
-            "target": "Wir sehen uns wieder nächste Woche.",
+            "target": "Wir sehen uns wieder n\u00e4chste Woche.",
             "native": "We will see each other again next week."
           }
         ],
@@ -9292,13 +9292,13 @@
       "contextId": "german-vocab",
       "content": {
         "front": "everywhere",
-        "back": "überall",
+        "back": "\u00fcberall",
         "article": null,
         "gender": null,
         "examples": [
           {
             "id": "b8955f88-685b-4982-8b82-8f327c1de7fe",
-            "target": "Die Touristen sind überall in der Stadt.",
+            "target": "Die Touristen sind \u00fcberall in der Stadt.",
             "native": "The tourists are everywhere in the city."
           }
         ],
@@ -9427,13 +9427,13 @@
       "contextId": "german-vocab",
       "content": {
         "front": "early",
-        "back": "früh",
+        "back": "fr\u00fch",
         "article": null,
         "gender": null,
         "examples": [
           {
             "id": "5882ad03-f892-4052-8ce6-2c9d781f5ae4",
-            "target": "Ich stehe morgen früh um sechs Uhr auf.",
+            "target": "Ich stehe morgen fr\u00fch um sechs Uhr auf.",
             "native": "I get up early tomorrow at six o'clock."
           }
         ],
@@ -9478,8 +9478,8 @@
         "examples": [
           {
             "id": "008083fe-ebe4-41b9-8f4d-8f99301ff54f",
-            "target": "Warum nicht – das klingt gut!",
-            "native": "Why not – that sounds good!"
+            "target": "Warum nicht \u2013 das klingt gut!",
+            "native": "Why not \u2013 that sounds good!"
           }
         ],
         "notes": "",
@@ -9523,8 +9523,8 @@
         "examples": [
           {
             "id": "80d17b84-05c6-4138-b1c3-7482d8e80239",
-            "target": "Alles klar – wir sehen uns um acht!",
-            "native": "All clear – we will see each other at eight!"
+            "target": "Alles klar \u2013 wir sehen uns um acht!",
+            "native": "All clear \u2013 we will see each other at eight!"
           }
         ],
         "notes": "",
@@ -9568,8 +9568,8 @@
         "examples": [
           {
             "id": "50ab52d0-db6f-4852-b4af-2c5ebaef090f",
-            "target": "Wann denn – heute oder morgen?",
-            "native": "When then – today or tomorrow?"
+            "target": "Wann denn \u2013 heute oder morgen?",
+            "native": "When then \u2013 today or tomorrow?"
           }
         ],
         "notes": "",
@@ -9613,8 +9613,8 @@
         "examples": [
           {
             "id": "3f66f94a-21bb-4307-884e-6e56be44fd36",
-            "target": "Klingt gut – ich komme gerne mit!",
-            "native": "Sounds good – I would love to come along!"
+            "target": "Klingt gut \u2013 ich komme gerne mit!",
+            "native": "Sounds good \u2013 I would love to come along!"
           }
         ],
         "notes": "",
@@ -9703,7 +9703,7 @@
         "examples": [
           {
             "id": "873d5e47-09ff-4200-b35f-e5b168380865",
-            "target": "Wann fängt die Party an?",
+            "target": "Wann f\u00e4ngt die Party an?",
             "native": "When does the party start?"
           }
         ],
@@ -9787,13 +9787,13 @@
       "contextId": "german-vocab",
       "content": {
         "front": "to stop / listen",
-        "back": "aufhören",
+        "back": "aufh\u00f6ren",
         "article": null,
         "gender": null,
         "examples": [
           {
             "id": "fc14bb59-d0da-4486-95d7-a2d0e8013852",
-            "target": "Hör bitte auf mit dem Lärm!",
+            "target": "H\u00f6r bitte auf mit dem L\u00e4rm!",
             "native": "Please stop making that noise!"
           }
         ],
@@ -10018,7 +10018,7 @@
         "examples": [
           {
             "id": "0271e607-9604-4b71-b70e-55b22fe6b7cd",
-            "target": "Die Fahrradtour durch den Park hat Spaß gemacht.",
+            "target": "Die Fahrradtour durch den Park hat Spa\u00df gemacht.",
             "native": "The cycling tour through the park was fun."
           }
         ],
@@ -10153,7 +10153,7 @@
         "examples": [
           {
             "id": "cc5c25f5-f65d-4541-aa23-99a7417fea4c",
-            "target": "Er wird nächste Woche dreißig Jahre alt.",
+            "target": "Er wird n\u00e4chste Woche drei\u00dfig Jahre alt.",
             "native": "He turns thirty next week."
           }
         ],
@@ -10333,7 +10333,7 @@
         "examples": [
           {
             "id": "34de5a33-f4d1-48e7-8d98-edff383e2f5d",
-            "target": "Das Fest war wunderschön und sehr lustig.",
+            "target": "Das Fest war wundersch\u00f6n und sehr lustig.",
             "native": "The celebration was beautiful and very funny."
           }
         ],
@@ -10378,7 +10378,7 @@
         "examples": [
           {
             "id": "0d5a3cbd-f74b-4e73-85f2-3a6ccc0a8abb",
-            "target": "Der Ausflug war sehr schön.",
+            "target": "Der Ausflug war sehr sch\u00f6n.",
             "native": "The trip was really lovely."
           }
         ],
@@ -10423,7 +10423,7 @@
         "examples": [
           {
             "id": "789387fa-82e3-4120-91fe-8a4ce3c4228c",
-            "target": "Das Geschenk ist sehr schön verpackt.",
+            "target": "Das Geschenk ist sehr sch\u00f6n verpackt.",
             "native": "The gift is very nicely wrapped."
           }
         ],
@@ -10552,13 +10552,13 @@
       "contextId": "german-vocab",
       "content": {
         "front": "the surprise",
-        "back": "Überraschung",
+        "back": "\u00dcberraschung",
         "article": "die",
         "gender": "feminine",
         "examples": [
           {
             "id": "29fe8126-25dc-407b-92b5-f882bc81f90d",
-            "target": "Die Überraschung hat ihr sehr gefallen.",
+            "target": "Die \u00dcberraschung hat ihr sehr gefallen.",
             "native": "She really liked the surprise."
           }
         ],
@@ -10603,8 +10603,8 @@
         "examples": [
           {
             "id": "a527ff55-8f1a-4cb8-8326-3f50cef47b38",
-            "target": "Achtung – das ist sehr heiß!",
-            "native": "Attention – that is very hot!"
+            "target": "Achtung \u2013 das ist sehr hei\u00df!",
+            "native": "Attention \u2013 that is very hot!"
           }
         ],
         "notes": "",
@@ -10648,7 +10648,7 @@
         "examples": [
           {
             "id": "52ddd5e3-c30b-48e2-b176-a21e853c4b27",
-            "target": "Weißt du wo er wohnt?",
+            "target": "Wei\u00dft du wo er wohnt?",
             "native": "Do you know where he lives?"
           }
         ],
@@ -10732,13 +10732,13 @@
       "contextId": "german-vocab",
       "content": {
         "front": "to have fun",
-        "back": "Spaß haben",
+        "back": "Spa\u00df haben",
         "article": null,
         "gender": null,
         "examples": [
           {
             "id": "b248f591-6d13-485a-a2f5-ea1d522882bf",
-            "target": "Wir haben viel Spaß zusammen.",
+            "target": "Wir haben viel Spa\u00df zusammen.",
             "native": "We have a lot of fun together."
           }
         ],
@@ -10783,7 +10783,7 @@
         "examples": [
           {
             "id": "d3cc9cb4-6d41-4a9a-9ddc-b6c65a66f958",
-            "target": "Hoffentlich kommt ihr pünktlich.",
+            "target": "Hoffentlich kommt ihr p\u00fcnktlich.",
             "native": "Hopefully you will come on time."
           }
         ],
@@ -11002,14 +11002,14 @@
       "contextId": "german-vocab",
       "content": {
         "front": "warm regards",
-        "back": "herzliche Grüße",
+        "back": "herzliche Gr\u00fc\u00dfe",
         "article": null,
         "gender": null,
         "examples": [
           {
             "id": "eca39660-0a3d-40b3-b329-f2c8733e4e79",
-            "target": "Mit herzlichen Grüßen – dein Thomas.",
-            "native": "With warm regards – yours Thomas."
+            "target": "Mit herzlichen Gr\u00fc\u00dfen \u2013 dein Thomas.",
+            "native": "With warm regards \u2013 yours Thomas."
           }
         ],
         "notes": "",
@@ -11233,7 +11233,7 @@
         "examples": [
           {
             "id": "a425c6de-694c-428e-9bb3-6aae04e751f6",
-            "target": "Die Tomatensuppe ist heute sehr heiß.",
+            "target": "Die Tomatensuppe ist heute sehr hei\u00df.",
             "native": "The tomato soup is very hot today."
           }
         ],
@@ -11323,7 +11323,7 @@
         "examples": [
           {
             "id": "d8246eb9-6541-4c99-a3d1-16b1227686f6",
-            "target": "Nach dem Sport habe ich großen Durst.",
+            "target": "Nach dem Sport habe ich gro\u00dfen Durst.",
             "native": "After sport I am very thirsty."
           }
         ],
@@ -11368,8 +11368,8 @@
         "examples": [
           {
             "id": "d9866c2a-2063-4a74-b965-44bf3a05a7c7",
-            "target": "Ich habe Hunger – wann essen wir?",
-            "native": "I am hungry – when do we eat?"
+            "target": "Ich habe Hunger \u2013 wann essen wir?",
+            "native": "I am hungry \u2013 when do we eat?"
           }
         ],
         "notes": "",
@@ -11503,7 +11503,7 @@
         "examples": [
           {
             "id": "5350e25d-3a70-42b6-8628-71278c47c92c",
-            "target": "Ich möchte bitte einen Kaffee bestellen.",
+            "target": "Ich m\u00f6chte bitte einen Kaffee bestellen.",
             "native": "I would like to order a coffee please."
           }
         ],
@@ -11548,7 +11548,7 @@
         "examples": [
           {
             "id": "165a870a-be4d-494b-a43d-ce351c448259",
-            "target": "Können Sie mir bitte die Rechnung bringen?",
+            "target": "K\u00f6nnen Sie mir bitte die Rechnung bringen?",
             "native": "Can you please bring me the bill?"
           }
         ],
@@ -11587,13 +11587,13 @@
       "contextId": "german-vocab",
       "content": {
         "front": "For whom is ...?",
-        "back": "Für wen ist ...?",
+        "back": "F\u00fcr wen ist ...?",
         "article": null,
         "gender": null,
         "examples": [
           {
             "id": "7edfbbba-a180-4cba-8001-4d64e212c7ef",
-            "target": "Für wen ist die Tomatensuppe?",
+            "target": "F\u00fcr wen ist die Tomatensuppe?",
             "native": "Who is the tomato soup for?"
           }
         ],
@@ -11638,7 +11638,7 @@
         "examples": [
           {
             "id": "3569c24b-d8a8-4c43-991c-7c1b6841eafa",
-            "target": "Ich möchte jetzt bezahlen bitte.",
+            "target": "Ich m\u00f6chte jetzt bezahlen bitte.",
             "native": "I would like to pay now please."
           }
         ],
@@ -11683,8 +11683,8 @@
         "examples": [
           {
             "id": "d7aa97ae-d98f-4d3f-a84d-6b968cb8781a",
-            "target": "Zahlen bitte! – Ja natürlich.",
-            "native": "The bill please! – Yes of course."
+            "target": "Zahlen bitte! \u2013 Ja nat\u00fcrlich.",
+            "native": "The bill please! \u2013 Yes of course."
           }
         ],
         "notes": "",
@@ -11728,7 +11728,7 @@
         "examples": [
           {
             "id": "c931ea74-7c96-410c-ba56-435d6b0bcf6d",
-            "target": "Die Rechnung war höher als erwartet.",
+            "target": "Die Rechnung war h\u00f6her als erwartet.",
             "native": "The bill was higher than expected."
           }
         ],
@@ -11818,7 +11818,7 @@
         "examples": [
           {
             "id": "4ef71374-6cd8-4ced-bac2-83bf70ec424b",
-            "target": "Das Trinkgeld war sehr großzügig.",
+            "target": "Das Trinkgeld war sehr gro\u00dfz\u00fcgig.",
             "native": "The tip was very generous."
           }
         ],
@@ -11908,8 +11908,8 @@
         "examples": [
           {
             "id": "5ef73da4-f847-4bd3-9c07-555698b86334",
-            "target": "Das stimmt so – behalten Sie den Rest!",
-            "native": "That is correct – keep the change!"
+            "target": "Das stimmt so \u2013 behalten Sie den Rest!",
+            "native": "That is correct \u2013 keep the change!"
           }
         ],
         "notes": "",
@@ -12037,13 +12037,13 @@
       "contextId": "german-vocab",
       "content": {
         "front": "the spoon",
-        "back": "Löffel",
+        "back": "L\u00f6ffel",
         "article": "der",
         "gender": "masculine",
         "examples": [
           {
             "id": "ad9dfac7-5b57-463a-95ce-3144863346c7",
-            "target": "Kann ich bitte einen Löffel haben?",
+            "target": "Kann ich bitte einen L\u00f6ffel haben?",
             "native": "Can I please have a spoon?"
           }
         ],
@@ -12178,7 +12178,7 @@
         "examples": [
           {
             "id": "3aae3eb4-9419-40d2-a036-ac08a69df92d",
-            "target": "Der Teller ist schön dekoriert.",
+            "target": "Der Teller ist sch\u00f6n dekoriert.",
             "native": "The plate is nicely decorated."
           }
         ],
@@ -12223,7 +12223,7 @@
         "examples": [
           {
             "id": "47095c3a-cfe8-47e6-a3ce-4621743f3842",
-            "target": "Können Sie mir bitte eine Serviette geben?",
+            "target": "K\u00f6nnen Sie mir bitte eine Serviette geben?",
             "native": "Can you please give me a napkin?"
           }
         ],
@@ -12306,7 +12306,7 @@
       "userId": "user-001",
       "contextId": "german-vocab",
       "content": {
-        "front": "the café",
+        "front": "the caf\u00e9",
         "back": "Kaffeehaus",
         "article": "das",
         "gender": "neuter",
@@ -12314,7 +12314,7 @@
           {
             "id": "706064b6-46b8-4692-beae-18bc5b1792b1",
             "target": "Das Kaffeehaus ist am Wochenende sehr voll.",
-            "native": "The café is very full at the weekend."
+            "native": "The caf\u00e9 is very full at the weekend."
           }
         ],
         "notes": "",
@@ -12532,13 +12532,13 @@
       "contextId": "german-vocab",
       "content": {
         "front": "open",
-        "back": "geöffnet",
+        "back": "ge\u00f6ffnet",
         "article": null,
         "gender": null,
         "examples": [
           {
             "id": "aee9cc31-7137-4ef4-ae39-06f61997fbb6",
-            "target": "Das Restaurant ist heute bis 22 Uhr geöffnet.",
+            "target": "Das Restaurant ist heute bis 22 Uhr ge\u00f6ffnet.",
             "native": "The restaurant is open today until 10 pm."
           }
         ],
@@ -12577,13 +12577,13 @@
       "contextId": "german-vocab",
       "content": {
         "front": "outside",
-        "back": "draußen",
+        "back": "drau\u00dfen",
         "article": null,
         "gender": null,
         "examples": [
           {
             "id": "c788d887-391a-472d-b82b-543cd963fff0",
-            "target": "Man kann draußen sitzen wenn das Wetter gut ist.",
+            "target": "Man kann drau\u00dfen sitzen wenn das Wetter gut ist.",
             "native": "You can sit outside when the weather is good."
           }
         ],
@@ -12943,7 +12943,7 @@
         "examples": [
           {
             "id": "d3c721ca-eef8-43ae-9128-c9dd6cadc610",
-            "target": "Die Anmeldung für den Kurs ist online.",
+            "target": "Die Anmeldung f\u00fcr den Kurs ist online.",
             "native": "Registration for the course is online."
           }
         ],
@@ -13078,7 +13078,7 @@
         "examples": [
           {
             "id": "a345814e-bea6-402c-8c56-9daaa999c77e",
-            "target": "Ich habe zwei Karten für das Konzert.",
+            "target": "Ich habe zwei Karten f\u00fcr das Konzert.",
             "native": "I have two tickets for the concert."
           }
         ],
@@ -13168,7 +13168,7 @@
         "examples": [
           {
             "id": "373f9cb5-c01c-4d61-85d8-726b03f72742",
-            "target": "Er läuft jeden Morgen fünf Kilometer.",
+            "target": "Er l\u00e4uft jeden Morgen f\u00fcnf Kilometer.",
             "native": "He runs five kilometres every morning."
           }
         ],
@@ -13207,13 +13207,13 @@
       "contextId": "german-vocab",
       "content": {
         "front": "to enjoy",
-        "back": "genießen",
+        "back": "genie\u00dfen",
         "article": null,
         "gender": null,
         "examples": [
           {
             "id": "52b1c4d2-1a75-4806-9bf3-46881622fdee",
-            "target": "Wir genießen den schönen Abend.",
+            "target": "Wir genie\u00dfen den sch\u00f6nen Abend.",
             "native": "We are enjoying the lovely evening."
           }
         ],
@@ -13438,7 +13438,7 @@
         "examples": [
           {
             "id": "4fc06a61-ff4a-4b18-9142-bbb823314d6b",
-            "target": "Wir sehen uns wieder nächste Woche.",
+            "target": "Wir sehen uns wieder n\u00e4chste Woche.",
             "native": "We will see each other again next week."
           }
         ],
@@ -13567,13 +13567,13 @@
       "contextId": "german-vocab",
       "content": {
         "front": "everywhere",
-        "back": "überall",
+        "back": "\u00fcberall",
         "article": null,
         "gender": null,
         "examples": [
           {
             "id": "279be26c-b3c8-437a-93e3-f73e8c280b4e",
-            "target": "Die Touristen sind überall in der Stadt.",
+            "target": "Die Touristen sind \u00fcberall in der Stadt.",
             "native": "The tourists are everywhere in the city."
           }
         ],
@@ -13702,13 +13702,13 @@
       "contextId": "german-vocab",
       "content": {
         "front": "early",
-        "back": "früh",
+        "back": "fr\u00fch",
         "article": null,
         "gender": null,
         "examples": [
           {
             "id": "3fc70c4a-4a43-433a-af3e-0f4afa013cb1",
-            "target": "Ich stehe morgen früh um sechs Uhr auf.",
+            "target": "Ich stehe morgen fr\u00fch um sechs Uhr auf.",
             "native": "I get up early tomorrow at six o'clock."
           }
         ],
@@ -13753,8 +13753,8 @@
         "examples": [
           {
             "id": "7117a634-dee0-45e7-8463-58f45aac8b98",
-            "target": "Warum nicht – das klingt gut!",
-            "native": "Why not – that sounds good!"
+            "target": "Warum nicht \u2013 das klingt gut!",
+            "native": "Why not \u2013 that sounds good!"
           }
         ],
         "notes": "",
@@ -13798,8 +13798,8 @@
         "examples": [
           {
             "id": "7137ee54-dc94-486e-972f-c85adc07dfda",
-            "target": "Alles klar – wir sehen uns um acht!",
-            "native": "All clear – we will see each other at eight!"
+            "target": "Alles klar \u2013 wir sehen uns um acht!",
+            "native": "All clear \u2013 we will see each other at eight!"
           }
         ],
         "notes": "",
@@ -13843,8 +13843,8 @@
         "examples": [
           {
             "id": "2a5a33ab-1226-40b2-95a1-b29512f8a70b",
-            "target": "Wann denn – heute oder morgen?",
-            "native": "When then – today or tomorrow?"
+            "target": "Wann denn \u2013 heute oder morgen?",
+            "native": "When then \u2013 today or tomorrow?"
           }
         ],
         "notes": "",
@@ -13888,8 +13888,8 @@
         "examples": [
           {
             "id": "a2720aaf-cd34-49ba-a583-88574d2c2e07",
-            "target": "Klingt gut – ich komme gerne mit!",
-            "native": "Sounds good – I would love to come along!"
+            "target": "Klingt gut \u2013 ich komme gerne mit!",
+            "native": "Sounds good \u2013 I would love to come along!"
           }
         ],
         "notes": "",
@@ -13978,7 +13978,7 @@
         "examples": [
           {
             "id": "4ce1c5fe-125d-4e51-a193-6f9c49cb918d",
-            "target": "Wann fängt die Party an?",
+            "target": "Wann f\u00e4ngt die Party an?",
             "native": "When does the party start?"
           }
         ],
@@ -14062,13 +14062,13 @@
       "contextId": "german-vocab",
       "content": {
         "front": "to stop / listen",
-        "back": "aufhören",
+        "back": "aufh\u00f6ren",
         "article": null,
         "gender": null,
         "examples": [
           {
             "id": "889385b4-6384-4c6b-9c2e-402e8c10f99b",
-            "target": "Hör bitte auf mit dem Lärm!",
+            "target": "H\u00f6r bitte auf mit dem L\u00e4rm!",
             "native": "Please stop making that noise!"
           }
         ],
@@ -14248,7 +14248,7 @@
         "examples": [
           {
             "id": "f95a44c5-3785-4e03-a916-a27b1fdd43e0",
-            "target": "Das Fest war wunderschön und sehr lustig.",
+            "target": "Das Fest war wundersch\u00f6n und sehr lustig.",
             "native": "The celebration was beautiful and very funny."
           }
         ],
@@ -14428,7 +14428,7 @@
         "examples": [
           {
             "id": "8039ed2f-a997-438f-9987-8c9c67e914c3",
-            "target": "Er wird nächste Woche dreißig Jahre alt.",
+            "target": "Er wird n\u00e4chste Woche drei\u00dfig Jahre alt.",
             "native": "He turns thirty next week."
           }
         ],
@@ -14518,7 +14518,7 @@
         "examples": [
           {
             "id": "0f5b515e-567f-4b9a-be2a-07baa9603f0c",
-            "target": "Das Geschenk ist sehr schön verpackt.",
+            "target": "Das Geschenk ist sehr sch\u00f6n verpackt.",
             "native": "The gift is very nicely wrapped."
           }
         ],
@@ -14647,13 +14647,13 @@
       "contextId": "german-vocab",
       "content": {
         "front": "the surprise",
-        "back": "Überraschung",
+        "back": "\u00dcberraschung",
         "article": "die",
         "gender": "feminine",
         "examples": [
           {
             "id": "e9b287a9-93c7-41b6-9098-f659d84316a7",
-            "target": "Die Überraschung hat ihr sehr gefallen.",
+            "target": "Die \u00dcberraschung hat ihr sehr gefallen.",
             "native": "She really liked the surprise."
           }
         ],
@@ -14698,8 +14698,8 @@
         "examples": [
           {
             "id": "cedc6159-2096-4eed-a7bf-debc5266d96c",
-            "target": "Achtung – das ist sehr heiß!",
-            "native": "Attention – that is very hot!"
+            "target": "Achtung \u2013 das ist sehr hei\u00df!",
+            "native": "Attention \u2013 that is very hot!"
           }
         ],
         "notes": "",
@@ -14743,7 +14743,7 @@
         "examples": [
           {
             "id": "d5c2fd80-e60b-4d2f-affa-cc4f316faba4",
-            "target": "Weißt du wo er wohnt?",
+            "target": "Wei\u00dft du wo er wohnt?",
             "native": "Do you know where he lives?"
           }
         ],
@@ -14827,13 +14827,13 @@
       "contextId": "german-vocab",
       "content": {
         "front": "to have fun",
-        "back": "Spaß haben",
+        "back": "Spa\u00df haben",
         "article": null,
         "gender": null,
         "examples": [
           {
             "id": "a1995afd-f2ca-4014-bd33-c9c4e33787ae",
-            "target": "Wir haben viel Spaß zusammen.",
+            "target": "Wir haben viel Spa\u00df zusammen.",
             "native": "We have a lot of fun together."
           }
         ],
@@ -14878,7 +14878,7 @@
         "examples": [
           {
             "id": "219c1b75-cb0c-49fd-8246-cf22f3fc8510",
-            "target": "Hoffentlich kommt ihr pünktlich.",
+            "target": "Hoffentlich kommt ihr p\u00fcnktlich.",
             "native": "Hopefully you will come on time."
           }
         ],
@@ -14923,7 +14923,7 @@
         "examples": [
           {
             "id": "bdcc55c9-35b8-4fb4-8962-51dc8862a0d1",
-            "target": "Die Fahrradtour durch den Park hat Spaß gemacht.",
+            "target": "Die Fahrradtour durch den Park hat Spa\u00df gemacht.",
             "native": "The cycling tour through the park was fun."
           }
         ],
@@ -15187,14 +15187,14 @@
       "contextId": "german-vocab",
       "content": {
         "front": "warm regards",
-        "back": "herzliche Grüße",
+        "back": "herzliche Gr\u00fc\u00dfe",
         "article": null,
         "gender": null,
         "examples": [
           {
             "id": "3c5fa548-e374-49c7-ad40-4c3a2b48b7e8",
-            "target": "Mit herzlichen Grüßen – dein Thomas.",
-            "native": "With warm regards – yours Thomas."
+            "target": "Mit herzlichen Gr\u00fc\u00dfen \u2013 dein Thomas.",
+            "native": "With warm regards \u2013 yours Thomas."
           }
         ],
         "notes": "",
@@ -15463,7 +15463,7 @@
         "examples": [
           {
             "id": "c0ade8f5-38fe-4d3e-97c9-5faed6bf58ea",
-            "target": "Die Tomatensuppe ist heute sehr heiß.",
+            "target": "Die Tomatensuppe ist heute sehr hei\u00df.",
             "native": "The tomato soup is very hot today."
           }
         ],
@@ -15553,7 +15553,7 @@
         "examples": [
           {
             "id": "cca98795-471b-4c45-8561-caf3f1636068",
-            "target": "Der Ausflug war sehr schön.",
+            "target": "Der Ausflug war sehr sch\u00f6n.",
             "native": "The trip was really lovely."
           }
         ],
@@ -15598,7 +15598,7 @@
         "examples": [
           {
             "id": "a6b84a10-5584-404d-9ef0-1f15d4c225c9",
-            "target": "Nach dem Sport habe ich großen Durst.",
+            "target": "Nach dem Sport habe ich gro\u00dfen Durst.",
             "native": "After sport I am very thirsty."
           }
         ],
@@ -15643,8 +15643,8 @@
         "examples": [
           {
             "id": "7812d5a7-8abd-46f2-bf1e-82b47adad77f",
-            "target": "Ich habe Hunger – wann essen wir?",
-            "native": "I am hungry – when do we eat?"
+            "target": "Ich habe Hunger \u2013 wann essen wir?",
+            "native": "I am hungry \u2013 when do we eat?"
           }
         ],
         "notes": "",
@@ -15823,7 +15823,7 @@
         "examples": [
           {
             "id": "41695158-6dda-4275-ab51-73aea15b6a65",
-            "target": "Ich möchte bitte einen Kaffee bestellen.",
+            "target": "Ich m\u00f6chte bitte einen Kaffee bestellen.",
             "native": "I would like to order a coffee please."
           }
         ],
@@ -15868,7 +15868,7 @@
         "examples": [
           {
             "id": "04e48d27-a79e-423e-a97e-0d019e3aa330",
-            "target": "Können Sie mir bitte die Rechnung bringen?",
+            "target": "K\u00f6nnen Sie mir bitte die Rechnung bringen?",
             "native": "Can you please bring me the bill?"
           }
         ],
@@ -15907,13 +15907,13 @@
       "contextId": "german-vocab",
       "content": {
         "front": "For whom is ...?",
-        "back": "Für wen ist ...?",
+        "back": "F\u00fcr wen ist ...?",
         "article": null,
         "gender": null,
         "examples": [
           {
             "id": "3f5547c7-c083-47f8-bc0e-e7c982d8440b",
-            "target": "Für wen ist die Tomatensuppe?",
+            "target": "F\u00fcr wen ist die Tomatensuppe?",
             "native": "Who is the tomato soup for?"
           }
         ],
@@ -15958,7 +15958,7 @@
         "examples": [
           {
             "id": "047c6ec5-c32e-4f1d-8b82-4fffe8c09158",
-            "target": "Ich möchte jetzt bezahlen bitte.",
+            "target": "Ich m\u00f6chte jetzt bezahlen bitte.",
             "native": "I would like to pay now please."
           }
         ],
@@ -16003,8 +16003,8 @@
         "examples": [
           {
             "id": "f094fecd-f94d-4cd0-9601-5f9576208580",
-            "target": "Zahlen bitte! – Ja natürlich.",
-            "native": "The bill please! – Yes of course."
+            "target": "Zahlen bitte! \u2013 Ja nat\u00fcrlich.",
+            "native": "The bill please! \u2013 Yes of course."
           }
         ],
         "notes": "",
@@ -16048,7 +16048,7 @@
         "examples": [
           {
             "id": "6126179e-3b9f-409b-9cb7-3c81b5697783",
-            "target": "Die Rechnung war höher als erwartet.",
+            "target": "Die Rechnung war h\u00f6her als erwartet.",
             "native": "The bill was higher than expected."
           }
         ],
@@ -16138,7 +16138,7 @@
         "examples": [
           {
             "id": "185b49a7-8e0c-448c-b2a0-2ce80aa12f5f",
-            "target": "Das Trinkgeld war sehr großzügig.",
+            "target": "Das Trinkgeld war sehr gro\u00dfz\u00fcgig.",
             "native": "The tip was very generous."
           }
         ],
@@ -16228,8 +16228,8 @@
         "examples": [
           {
             "id": "718807d6-5d08-4fc4-ba44-6da136c52a61",
-            "target": "Das stimmt so – behalten Sie den Rest!",
-            "native": "That is correct – keep the change!"
+            "target": "Das stimmt so \u2013 behalten Sie den Rest!",
+            "native": "That is correct \u2013 keep the change!"
           }
         ],
         "notes": "",
@@ -16357,13 +16357,13 @@
       "contextId": "german-vocab",
       "content": {
         "front": "the spoon",
-        "back": "Löffel",
+        "back": "L\u00f6ffel",
         "article": "der",
         "gender": "masculine",
         "examples": [
           {
             "id": "ac91a3ff-fade-4e33-91db-104c638f3e01",
-            "target": "Kann ich bitte einen Löffel haben?",
+            "target": "Kann ich bitte einen L\u00f6ffel haben?",
             "native": "Can I please have a spoon?"
           }
         ],
@@ -16498,7 +16498,7 @@
         "examples": [
           {
             "id": "182e0625-bcff-4795-bc67-ccfd57f25c3e",
-            "target": "Der Teller ist schön dekoriert.",
+            "target": "Der Teller ist sch\u00f6n dekoriert.",
             "native": "The plate is nicely decorated."
           }
         ],
@@ -16543,7 +16543,7 @@
         "examples": [
           {
             "id": "ebe79533-d6f5-4fed-8a47-3ed57a99c68e",
-            "target": "Können Sie mir bitte eine Serviette geben?",
+            "target": "K\u00f6nnen Sie mir bitte eine Serviette geben?",
             "native": "Can you please give me a napkin?"
           }
         ],
@@ -16626,7 +16626,7 @@
       "userId": "user-001",
       "contextId": "german-vocab",
       "content": {
-        "front": "the café",
+        "front": "the caf\u00e9",
         "back": "Kaffeehaus",
         "article": "das",
         "gender": "neuter",
@@ -16634,7 +16634,7 @@
           {
             "id": "31db0e05-e4d7-4632-8fa1-d238bb9086c0",
             "target": "Das Kaffeehaus ist am Wochenende sehr voll.",
-            "native": "The café is very full at the weekend."
+            "native": "The caf\u00e9 is very full at the weekend."
           }
         ],
         "notes": "",
@@ -16852,13 +16852,13 @@
       "contextId": "german-vocab",
       "content": {
         "front": "open",
-        "back": "geöffnet",
+        "back": "ge\u00f6ffnet",
         "article": null,
         "gender": null,
         "examples": [
           {
             "id": "53f90c71-f06b-42b7-9b9b-60cca70ee31a",
-            "target": "Das Restaurant ist heute bis 22 Uhr geöffnet.",
+            "target": "Das Restaurant ist heute bis 22 Uhr ge\u00f6ffnet.",
             "native": "The restaurant is open today until 10 pm."
           }
         ],
@@ -16897,13 +16897,13 @@
       "contextId": "german-vocab",
       "content": {
         "front": "outside",
-        "back": "draußen",
+        "back": "drau\u00dfen",
         "article": null,
         "gender": null,
         "examples": [
           {
             "id": "1a791bbd-3fd3-41e6-978d-9b69b4770d1b",
-            "target": "Man kann draußen sitzen wenn das Wetter gut ist.",
+            "target": "Man kann drau\u00dfen sitzen wenn das Wetter gut ist.",
             "native": "You can sit outside when the weather is good."
           }
         ],
@@ -17218,7 +17218,7 @@
         "examples": [
           {
             "id": "da18258c-93ed-439c-8e1c-e85f1f02b691",
-            "target": "Die Anmeldung für den Kurs ist online.",
+            "target": "Die Anmeldung f\u00fcr den Kurs ist online.",
             "native": "Registration for the course is online."
           }
         ],
@@ -17353,7 +17353,7 @@
         "examples": [
           {
             "id": "65bc41e8-343c-492e-9e98-da931ea4ea33",
-            "target": "Ich habe zwei Karten für das Konzert.",
+            "target": "Ich habe zwei Karten f\u00fcr das Konzert.",
             "native": "I have two tickets for the concert."
           }
         ],
@@ -17443,7 +17443,7 @@
         "examples": [
           {
             "id": "262345cc-fe93-4595-8a9c-8eae635542d0",
-            "target": "Er läuft jeden Morgen fünf Kilometer.",
+            "target": "Er l\u00e4uft jeden Morgen f\u00fcnf Kilometer.",
             "native": "He runs five kilometres every morning."
           }
         ],
@@ -17482,13 +17482,13 @@
       "contextId": "german-vocab",
       "content": {
         "front": "to enjoy",
-        "back": "genießen",
+        "back": "genie\u00dfen",
         "article": null,
         "gender": null,
         "examples": [
           {
             "id": "89aa08a5-4623-47db-a7a0-20f78be9dce2",
-            "target": "Wir genießen den schönen Abend.",
+            "target": "Wir genie\u00dfen den sch\u00f6nen Abend.",
             "native": "We are enjoying the lovely evening."
           }
         ],
@@ -17713,7 +17713,7 @@
         "examples": [
           {
             "id": "4ac238a8-6564-4e5c-98e5-6df9d090bebd",
-            "target": "Wir sehen uns wieder nächste Woche.",
+            "target": "Wir sehen uns wieder n\u00e4chste Woche.",
             "native": "We will see each other again next week."
           }
         ],
@@ -17842,13 +17842,13 @@
       "contextId": "german-vocab",
       "content": {
         "front": "everywhere",
-        "back": "überall",
+        "back": "\u00fcberall",
         "article": null,
         "gender": null,
         "examples": [
           {
             "id": "c4694b42-a421-48ee-a33a-e4d346da1e51",
-            "target": "Die Touristen sind überall in der Stadt.",
+            "target": "Die Touristen sind \u00fcberall in der Stadt.",
             "native": "The tourists are everywhere in the city."
           }
         ],
@@ -17977,13 +17977,13 @@
       "contextId": "german-vocab",
       "content": {
         "front": "early",
-        "back": "früh",
+        "back": "fr\u00fch",
         "article": null,
         "gender": null,
         "examples": [
           {
             "id": "1131b206-d858-4023-8996-cfe670c541c7",
-            "target": "Ich stehe morgen früh um sechs Uhr auf.",
+            "target": "Ich stehe morgen fr\u00fch um sechs Uhr auf.",
             "native": "I get up early tomorrow at six o'clock."
           }
         ],
@@ -18028,8 +18028,8 @@
         "examples": [
           {
             "id": "ff230320-4b9a-4dbb-8fe2-97b04584b73e",
-            "target": "Warum nicht – das klingt gut!",
-            "native": "Why not – that sounds good!"
+            "target": "Warum nicht \u2013 das klingt gut!",
+            "native": "Why not \u2013 that sounds good!"
           }
         ],
         "notes": "",
@@ -18073,8 +18073,8 @@
         "examples": [
           {
             "id": "a59f1abd-d393-4d3a-a168-aa072edc8aed",
-            "target": "Alles klar – wir sehen uns um acht!",
-            "native": "All clear – we will see each other at eight!"
+            "target": "Alles klar \u2013 wir sehen uns um acht!",
+            "native": "All clear \u2013 we will see each other at eight!"
           }
         ],
         "notes": "",
@@ -18118,8 +18118,8 @@
         "examples": [
           {
             "id": "12099ff3-e78d-4f14-9fb2-449dcc23fb2b",
-            "target": "Wann denn – heute oder morgen?",
-            "native": "When then – today or tomorrow?"
+            "target": "Wann denn \u2013 heute oder morgen?",
+            "native": "When then \u2013 today or tomorrow?"
           }
         ],
         "notes": "",
@@ -18163,8 +18163,8 @@
         "examples": [
           {
             "id": "f75adba3-91da-4278-a80b-0346e7c399cf",
-            "target": "Klingt gut – ich komme gerne mit!",
-            "native": "Sounds good – I would love to come along!"
+            "target": "Klingt gut \u2013 ich komme gerne mit!",
+            "native": "Sounds good \u2013 I would love to come along!"
           }
         ],
         "notes": "",
@@ -18253,7 +18253,7 @@
         "examples": [
           {
             "id": "7afea0a3-8d8b-4b73-8d54-5548814eeac0",
-            "target": "Wann fängt die Party an?",
+            "target": "Wann f\u00e4ngt die Party an?",
             "native": "When does the party start?"
           }
         ],
@@ -18337,13 +18337,13 @@
       "contextId": "german-vocab",
       "content": {
         "front": "to stop / listen",
-        "back": "aufhören",
+        "back": "aufh\u00f6ren",
         "article": null,
         "gender": null,
         "examples": [
           {
             "id": "1549fa1e-0dbd-4ba7-99c3-3620e79ad29b",
-            "target": "Hör bitte auf mit dem Lärm!",
+            "target": "H\u00f6r bitte auf mit dem L\u00e4rm!",
             "native": "Please stop making that noise!"
           }
         ],
@@ -18568,7 +18568,7 @@
         "examples": [
           {
             "id": "43404893-b7df-4e49-b91b-f8545615bcfa",
-            "target": "Er wird nächste Woche dreißig Jahre alt.",
+            "target": "Er wird n\u00e4chste Woche drei\u00dfig Jahre alt.",
             "native": "He turns thirty next week."
           }
         ],
@@ -18613,7 +18613,7 @@
         "examples": [
           {
             "id": "b7fa3ad1-265e-4e84-aaec-66b0da296864",
-            "target": "Die Fahrradtour durch den Park hat Spaß gemacht.",
+            "target": "Die Fahrradtour durch den Park hat Spa\u00df gemacht.",
             "native": "The cycling tour through the park was fun."
           }
         ],
@@ -18748,7 +18748,7 @@
         "examples": [
           {
             "id": "96e58bfc-7a04-4226-ba9e-2786ba004c77",
-            "target": "Das Geschenk ist sehr schön verpackt.",
+            "target": "Das Geschenk ist sehr sch\u00f6n verpackt.",
             "native": "The gift is very nicely wrapped."
           }
         ],
@@ -18793,7 +18793,7 @@
         "examples": [
           {
             "id": "869df112-bab7-4ba9-b226-6423ad91f6da",
-            "target": "Das Fest war wunderschön und sehr lustig.",
+            "target": "Das Fest war wundersch\u00f6n und sehr lustig.",
             "native": "The celebration was beautiful and very funny."
           }
         ],
@@ -18922,13 +18922,13 @@
       "contextId": "german-vocab",
       "content": {
         "front": "the surprise",
-        "back": "Überraschung",
+        "back": "\u00dcberraschung",
         "article": "die",
         "gender": "feminine",
         "examples": [
           {
             "id": "9d40be6e-509f-40f4-9864-257c7f169445",
-            "target": "Die Überraschung hat ihr sehr gefallen.",
+            "target": "Die \u00dcberraschung hat ihr sehr gefallen.",
             "native": "She really liked the surprise."
           }
         ],
@@ -18973,8 +18973,8 @@
         "examples": [
           {
             "id": "24788303-342f-4107-8a07-aa0d949a07e3",
-            "target": "Achtung – das ist sehr heiß!",
-            "native": "Attention – that is very hot!"
+            "target": "Achtung \u2013 das ist sehr hei\u00df!",
+            "native": "Attention \u2013 that is very hot!"
           }
         ],
         "notes": "",
@@ -19018,7 +19018,7 @@
         "examples": [
           {
             "id": "4bc6e26d-1168-42f1-a55d-2dfab3aef631",
-            "target": "Weißt du wo er wohnt?",
+            "target": "Wei\u00dft du wo er wohnt?",
             "native": "Do you know where he lives?"
           }
         ],
@@ -19147,13 +19147,13 @@
       "contextId": "german-vocab",
       "content": {
         "front": "to have fun",
-        "back": "Spaß haben",
+        "back": "Spa\u00df haben",
         "article": null,
         "gender": null,
         "examples": [
           {
             "id": "3725439f-2613-41a8-8c32-b89b923682c5",
-            "target": "Wir haben viel Spaß zusammen.",
+            "target": "Wir haben viel Spa\u00df zusammen.",
             "native": "We have a lot of fun together."
           }
         ],
@@ -19198,7 +19198,7 @@
         "examples": [
           {
             "id": "bfd3eca7-1e33-419d-bf30-eb4b0065fb46",
-            "target": "Hoffentlich kommt ihr pünktlich.",
+            "target": "Hoffentlich kommt ihr p\u00fcnktlich.",
             "native": "Hopefully you will come on time."
           }
         ],
@@ -19462,14 +19462,14 @@
       "contextId": "german-vocab",
       "content": {
         "front": "warm regards",
-        "back": "herzliche Grüße",
+        "back": "herzliche Gr\u00fc\u00dfe",
         "article": null,
         "gender": null,
         "examples": [
           {
             "id": "84e8010a-adef-40e4-84be-e1432c5ad010",
-            "target": "Mit herzlichen Grüßen – dein Thomas.",
-            "native": "With warm regards – yours Thomas."
+            "target": "Mit herzlichen Gr\u00fc\u00dfen \u2013 dein Thomas.",
+            "native": "With warm regards \u2013 yours Thomas."
           }
         ],
         "notes": "",
@@ -19693,7 +19693,7 @@
         "examples": [
           {
             "id": "12638675-2b25-4241-81bc-b0c947ad6600",
-            "target": "Die Tomatensuppe ist heute sehr heiß.",
+            "target": "Die Tomatensuppe ist heute sehr hei\u00df.",
             "native": "The tomato soup is very hot today."
           }
         ],
@@ -19783,7 +19783,7 @@
         "examples": [
           {
             "id": "a746c8de-06d6-4426-9a1a-06a827e4686b",
-            "target": "Nach dem Sport habe ich großen Durst.",
+            "target": "Nach dem Sport habe ich gro\u00dfen Durst.",
             "native": "After sport I am very thirsty."
           }
         ],
@@ -19828,8 +19828,8 @@
         "examples": [
           {
             "id": "de54e008-95dd-47fe-a0d0-cd0455fd14e9",
-            "target": "Ich habe Hunger – wann essen wir?",
-            "native": "I am hungry – when do we eat?"
+            "target": "Ich habe Hunger \u2013 wann essen wir?",
+            "native": "I am hungry \u2013 when do we eat?"
           }
         ],
         "notes": "",
@@ -19963,7 +19963,7 @@
         "examples": [
           {
             "id": "1effc373-917a-4ce5-8a01-9bf709dbb42d",
-            "target": "Ich möchte bitte einen Kaffee bestellen.",
+            "target": "Ich m\u00f6chte bitte einen Kaffee bestellen.",
             "native": "I would like to order a coffee please."
           }
         ],
@@ -20008,7 +20008,7 @@
         "examples": [
           {
             "id": "02f2849e-730d-4655-84f2-d2f3258180da",
-            "target": "Können Sie mir bitte die Rechnung bringen?",
+            "target": "K\u00f6nnen Sie mir bitte die Rechnung bringen?",
             "native": "Can you please bring me the bill?"
           }
         ],
@@ -20047,13 +20047,13 @@
       "contextId": "german-vocab",
       "content": {
         "front": "For whom is ...?",
-        "back": "Für wen ist ...?",
+        "back": "F\u00fcr wen ist ...?",
         "article": null,
         "gender": null,
         "examples": [
           {
             "id": "3f751324-b9ae-4fc3-a5f2-cb7c04f70ae0",
-            "target": "Für wen ist die Tomatensuppe?",
+            "target": "F\u00fcr wen ist die Tomatensuppe?",
             "native": "Who is the tomato soup for?"
           }
         ],
@@ -20098,7 +20098,7 @@
         "examples": [
           {
             "id": "301bc576-640a-4c3e-b537-7e560cd807e9",
-            "target": "Ich möchte jetzt bezahlen bitte.",
+            "target": "Ich m\u00f6chte jetzt bezahlen bitte.",
             "native": "I would like to pay now please."
           }
         ],
@@ -20143,8 +20143,8 @@
         "examples": [
           {
             "id": "71f97335-4c82-4932-98b4-a086e072d543",
-            "target": "Zahlen bitte! – Ja natürlich.",
-            "native": "The bill please! – Yes of course."
+            "target": "Zahlen bitte! \u2013 Ja nat\u00fcrlich.",
+            "native": "The bill please! \u2013 Yes of course."
           }
         ],
         "notes": "",
@@ -20188,7 +20188,7 @@
         "examples": [
           {
             "id": "eb176b4a-849f-4fdf-a4f8-9ed3ad2149e6",
-            "target": "Die Rechnung war höher als erwartet.",
+            "target": "Die Rechnung war h\u00f6her als erwartet.",
             "native": "The bill was higher than expected."
           }
         ],
@@ -20278,7 +20278,7 @@
         "examples": [
           {
             "id": "a9c4a1af-7550-430c-802d-32987bd2a98f",
-            "target": "Das Trinkgeld war sehr großzügig.",
+            "target": "Das Trinkgeld war sehr gro\u00dfz\u00fcgig.",
             "native": "The tip was very generous."
           }
         ],
@@ -20368,8 +20368,8 @@
         "examples": [
           {
             "id": "5917959d-0a40-4680-88b5-f6becbb32281",
-            "target": "Das stimmt so – behalten Sie den Rest!",
-            "native": "That is correct – keep the change!"
+            "target": "Das stimmt so \u2013 behalten Sie den Rest!",
+            "native": "That is correct \u2013 keep the change!"
           }
         ],
         "notes": "",
@@ -20497,13 +20497,13 @@
       "contextId": "german-vocab",
       "content": {
         "front": "the spoon",
-        "back": "Löffel",
+        "back": "L\u00f6ffel",
         "article": "der",
         "gender": "masculine",
         "examples": [
           {
             "id": "a97ef7bf-f35d-49ae-a35c-6186917a4758",
-            "target": "Kann ich bitte einen Löffel haben?",
+            "target": "Kann ich bitte einen L\u00f6ffel haben?",
             "native": "Can I please have a spoon?"
           }
         ],
@@ -20638,7 +20638,7 @@
         "examples": [
           {
             "id": "9b14e7ca-9455-4b3f-bfc3-46d0a428e893",
-            "target": "Der Teller ist schön dekoriert.",
+            "target": "Der Teller ist sch\u00f6n dekoriert.",
             "native": "The plate is nicely decorated."
           }
         ],
@@ -20683,7 +20683,7 @@
         "examples": [
           {
             "id": "67f9ea95-c1de-4dee-99ae-c705ec3e009e",
-            "target": "Können Sie mir bitte eine Serviette geben?",
+            "target": "K\u00f6nnen Sie mir bitte eine Serviette geben?",
             "native": "Can you please give me a napkin?"
           }
         ],
@@ -20766,7 +20766,7 @@
       "userId": "user-001",
       "contextId": "german-vocab",
       "content": {
-        "front": "the café",
+        "front": "the caf\u00e9",
         "back": "Kaffeehaus",
         "article": "das",
         "gender": "neuter",
@@ -20774,7 +20774,7 @@
           {
             "id": "e2619d12-bc4b-4c56-ab63-b772c899e0f4",
             "target": "Das Kaffeehaus ist am Wochenende sehr voll.",
-            "native": "The café is very full at the weekend."
+            "native": "The caf\u00e9 is very full at the weekend."
           }
         ],
         "notes": "",
@@ -21043,7 +21043,7 @@
         "examples": [
           {
             "id": "b7188f9b-b781-406a-ae2c-4145abba6788",
-            "target": "Der Ausflug war sehr schön.",
+            "target": "Der Ausflug war sehr sch\u00f6n.",
             "native": "The trip was really lovely."
           }
         ],
@@ -21082,13 +21082,13 @@
       "contextId": "german-vocab",
       "content": {
         "front": "open",
-        "back": "geöffnet",
+        "back": "ge\u00f6ffnet",
         "article": null,
         "gender": null,
         "examples": [
           {
             "id": "300e6d5a-9e47-4076-b076-ff7385e2d150",
-            "target": "Das Restaurant ist heute bis 22 Uhr geöffnet.",
+            "target": "Das Restaurant ist heute bis 22 Uhr ge\u00f6ffnet.",
             "native": "The restaurant is open today until 10 pm."
           }
         ],
@@ -21127,13 +21127,13 @@
       "contextId": "german-vocab",
       "content": {
         "front": "outside",
-        "back": "draußen",
+        "back": "drau\u00dfen",
         "article": null,
         "gender": null,
         "examples": [
           {
             "id": "2325bb81-044c-4e82-be6f-e2c3210c294b",
-            "target": "Man kann draußen sitzen wenn das Wetter gut ist.",
+            "target": "Man kann drau\u00dfen sitzen wenn das Wetter gut ist.",
             "native": "You can sit outside when the weather is good."
           }
         ],
@@ -21493,7 +21493,7 @@
         "examples": [
           {
             "id": "d96812f3-26b3-4cea-b568-29ede6476247",
-            "target": "Die Anmeldung für den Kurs ist online.",
+            "target": "Die Anmeldung f\u00fcr den Kurs ist online.",
             "native": "Registration for the course is online."
           }
         ],
@@ -21628,7 +21628,7 @@
         "examples": [
           {
             "id": "145af3e9-efb3-46c5-82d3-28d64ff676b3",
-            "target": "Ich habe zwei Karten für das Konzert.",
+            "target": "Ich habe zwei Karten f\u00fcr das Konzert.",
             "native": "I have two tickets for the concert."
           }
         ],
@@ -21718,7 +21718,7 @@
         "examples": [
           {
             "id": "527931b1-f32b-45b8-90b6-0810ae39abe8",
-            "target": "Er läuft jeden Morgen fünf Kilometer.",
+            "target": "Er l\u00e4uft jeden Morgen f\u00fcnf Kilometer.",
             "native": "He runs five kilometres every morning."
           }
         ],
@@ -21757,13 +21757,13 @@
       "contextId": "german-vocab",
       "content": {
         "front": "to enjoy",
-        "back": "genießen",
+        "back": "genie\u00dfen",
         "article": null,
         "gender": null,
         "examples": [
           {
             "id": "b33556d6-7882-4fa7-9e95-334f9b509cec",
-            "target": "Wir genießen den schönen Abend.",
+            "target": "Wir genie\u00dfen den sch\u00f6nen Abend.",
             "native": "We are enjoying the lovely evening."
           }
         ],
@@ -21988,7 +21988,7 @@
         "examples": [
           {
             "id": "00781a25-a227-4b7e-a078-167f92ff32da",
-            "target": "Wir sehen uns wieder nächste Woche.",
+            "target": "Wir sehen uns wieder n\u00e4chste Woche.",
             "native": "We will see each other again next week."
           }
         ],
@@ -22117,13 +22117,13 @@
       "contextId": "german-vocab",
       "content": {
         "front": "everywhere",
-        "back": "überall",
+        "back": "\u00fcberall",
         "article": null,
         "gender": null,
         "examples": [
           {
             "id": "1ec1b27b-1fcf-443b-a800-9dffa5045855",
-            "target": "Die Touristen sind überall in der Stadt.",
+            "target": "Die Touristen sind \u00fcberall in der Stadt.",
             "native": "The tourists are everywhere in the city."
           }
         ],
@@ -22252,13 +22252,13 @@
       "contextId": "german-vocab",
       "content": {
         "front": "early",
-        "back": "früh",
+        "back": "fr\u00fch",
         "article": null,
         "gender": null,
         "examples": [
           {
             "id": "5f045ab9-9e3d-4482-a271-3659f836b614",
-            "target": "Ich stehe morgen früh um sechs Uhr auf.",
+            "target": "Ich stehe morgen fr\u00fch um sechs Uhr auf.",
             "native": "I get up early tomorrow at six o'clock."
           }
         ],
@@ -22303,8 +22303,8 @@
         "examples": [
           {
             "id": "c666e4a3-5d74-4b53-9f79-6dd302b10c69",
-            "target": "Warum nicht – das klingt gut!",
-            "native": "Why not – that sounds good!"
+            "target": "Warum nicht \u2013 das klingt gut!",
+            "native": "Why not \u2013 that sounds good!"
           }
         ],
         "notes": "",
@@ -22348,8 +22348,8 @@
         "examples": [
           {
             "id": "cf1b6d15-4101-4f9e-a3f2-2bb61384f5ef",
-            "target": "Alles klar – wir sehen uns um acht!",
-            "native": "All clear – we will see each other at eight!"
+            "target": "Alles klar \u2013 wir sehen uns um acht!",
+            "native": "All clear \u2013 we will see each other at eight!"
           }
         ],
         "notes": "",
@@ -22393,8 +22393,8 @@
         "examples": [
           {
             "id": "d764d70d-2546-4394-9058-8c697174bfbc",
-            "target": "Wann denn – heute oder morgen?",
-            "native": "When then – today or tomorrow?"
+            "target": "Wann denn \u2013 heute oder morgen?",
+            "native": "When then \u2013 today or tomorrow?"
           }
         ],
         "notes": "",
@@ -22438,8 +22438,8 @@
         "examples": [
           {
             "id": "6aa92a42-e213-4cec-a204-9b1a8dd6a247",
-            "target": "Klingt gut – ich komme gerne mit!",
-            "native": "Sounds good – I would love to come along!"
+            "target": "Klingt gut \u2013 ich komme gerne mit!",
+            "native": "Sounds good \u2013 I would love to come along!"
           }
         ],
         "notes": "",
@@ -22528,7 +22528,7 @@
         "examples": [
           {
             "id": "ab743054-6898-43ac-aea1-cac27b36ae86",
-            "target": "Wann fängt die Party an?",
+            "target": "Wann f\u00e4ngt die Party an?",
             "native": "When does the party start?"
           }
         ],
@@ -22612,13 +22612,13 @@
       "contextId": "german-vocab",
       "content": {
         "front": "to stop / listen",
-        "back": "aufhören",
+        "back": "aufh\u00f6ren",
         "article": null,
         "gender": null,
         "examples": [
           {
             "id": "652dcd32-4637-413c-81ae-779b3ca939d0",
-            "target": "Hör bitte auf mit dem Lärm!",
+            "target": "H\u00f6r bitte auf mit dem L\u00e4rm!",
             "native": "Please stop making that noise!"
           }
         ],
@@ -22743,9 +22743,9 @@
     {
       "id": "col-001",
       "userId": "user-001",
-      "name": "Chapter 6 — Restaurant",
+      "name": "Chapter 6 \u2014 Restaurant",
       "description": "Vocabulary from Netzwerk chapter 6, covering food, ordering and events.",
-      "emoji": "🇩🇪",
+      "emoji": "\ud83c\udde9\ud83c\uddea",
       "colour": "#2D5A4E",
       "contextId": "german-vocab",
       "cardCount": 19,
@@ -22758,9 +22758,9 @@
     {
       "id": "col-002",
       "userId": "user-001",
-      "name": "Chapter 3 — Family",
+      "name": "Chapter 3 \u2014 Family",
       "description": "Family and animals vocabulary from chapter 3.",
-      "emoji": "🇩🇪",
+      "emoji": "\ud83c\udde9\ud83c\uddea",
       "colour": "#2D5A4E",
       "contextId": "german-vocab",
       "cardCount": 5,
@@ -22775,7 +22775,7 @@
       "userId": "user-001",
       "name": "My custom words",
       "description": "",
-      "emoji": "📚",
+      "emoji": "\ud83d\udcda",
       "colour": "#2D5A4E",
       "contextId": "german-vocab",
       "cardCount": 0,
@@ -22788,13 +22788,13 @@
     {
       "name": "verbs",
       "contextId": "german-vocab",
-      "emoji": "📚",
+      "emoji": "\ud83d\udcda",
       "id": "TURBPqsrBbc"
     },
     {
       "name": "Zeit mit Feunden",
       "contextId": "german-vocab",
-      "emoji": "📚",
+      "emoji": "\ud83d\udcda",
       "id": "n81GiEEauUc"
     }
   ],
@@ -22870,30 +22870,37 @@
       "userId": "user-001",
       "title": "Ein Abend im Biergarten",
       "titleTranslation": "An Evening at the Beer Garden",
-      "bodyDe": "Es war ein warmer Sommerabend als Thomas und Maria beschlossen, in den Biergarten zu gehen. Ich habe großen Hunger und Durst, sagte Thomas lachend. Der Kellner brachte ihnen sofort die Speisekarte. Maria betrachtete sie sorgfältig. Ich bestelle das Schnitzel, sagte sie. Thomas wählte die Tomatensuppe und eine Schorle. Am Ende des Abends bezahlten sie die Rechnung und gaben dem Kellner ein großzügiges Trinkgeld. Es war ein wunderschöner Abend.",
+      "bodyDe": "Es war ein warmer Sommerabend als Thomas und Maria beschlossen, in den Biergarten zu gehen. Ich habe gro\u00dfen Hunger und Durst, sagte Thomas lachend. Der Kellner brachte ihnen sofort die Speisekarte. Maria betrachtete sie sorgf\u00e4ltig. Ich bestelle das Schnitzel, sagte sie. Thomas w\u00e4hlte die Tomatensuppe und eine Schorle. Am Ende des Abends bezahlten sie die Rechnung und gaben dem Kellner ein gro\u00dfz\u00fcgiges Trinkgeld. Es war ein wundersch\u00f6ner Abend.",
       "bodyEn": "It was a warm summer evening when Thomas and Maria decided to go to the beer garden. I am very hungry and thirsty, said Thomas, laughing. The waiter immediately brought them the menu. Maria looked at it carefully. I will order the schnitzel, she said. Thomas chose the tomato soup and a sparkling water. At the end of the evening they paid the bill and gave the waiter a generous tip. It was a beautiful evening.",
       "sentences": [
         {
           "index": 0,
           "german": "Es war ein warmer Sommerabend als Thomas und Maria beschlossen, in den Biergarten zu gehen.",
           "english": "It was a warm summer evening when Thomas and Maria decided to go to the beer garden.",
-          "vocabWordIds": ["card-biergarten"]
+          "vocabWordIds": [
+            "card-biergarten"
+          ]
         },
         {
           "index": 1,
-          "german": "Ich habe großen Hunger und Durst, sagte Thomas lachend.",
+          "german": "Ich habe gro\u00dfen Hunger und Durst, sagte Thomas lachend.",
           "english": "I am very hungry and thirsty, said Thomas, laughing.",
-          "vocabWordIds": ["card-hunger", "card-durst"]
+          "vocabWordIds": [
+            "card-hunger",
+            "card-durst"
+          ]
         },
         {
           "index": 2,
           "german": "Der Kellner brachte ihnen sofort die Speisekarte.",
           "english": "The waiter immediately brought them the menu.",
-          "vocabWordIds": ["card-speisekarte"]
+          "vocabWordIds": [
+            "card-speisekarte"
+          ]
         },
         {
           "index": 3,
-          "german": "Maria betrachtete sie sorgfältig.",
+          "german": "Maria betrachtete sie sorgf\u00e4ltig.",
           "english": "Maria looked at it carefully.",
           "vocabWordIds": []
         },
@@ -22901,96 +22908,473 @@
           "index": 4,
           "german": "Ich bestelle das Schnitzel, sagte sie.",
           "english": "I will order the schnitzel, she said.",
-          "vocabWordIds": ["card-schnitzel", "card-bestellen"]
+          "vocabWordIds": [
+            "card-schnitzel",
+            "card-bestellen"
+          ]
         },
         {
           "index": 5,
-          "german": "Thomas wählte die Tomatensuppe und eine Schorle.",
+          "german": "Thomas w\u00e4hlte die Tomatensuppe und eine Schorle.",
           "english": "Thomas chose the tomato soup and a sparkling water.",
-          "vocabWordIds": ["card-tomatensuppe", "card-schorle"]
+          "vocabWordIds": [
+            "card-tomatensuppe",
+            "card-schorle"
+          ]
         },
         {
           "index": 6,
-          "german": "Am Ende des Abends bezahlten sie die Rechnung und gaben dem Kellner ein großzügiges Trinkgeld.",
+          "german": "Am Ende des Abends bezahlten sie die Rechnung und gaben dem Kellner ein gro\u00dfz\u00fcgiges Trinkgeld.",
           "english": "At the end of the evening they paid the bill and gave the waiter a generous tip.",
-          "vocabWordIds": ["card-rechnung", "card-trinkgeld", "card-bezahlen"]
+          "vocabWordIds": [
+            "card-rechnung",
+            "card-trinkgeld",
+            "card-bezahlen"
+          ]
         },
         {
           "index": 7,
-          "german": "Es war ein wunderschöner Abend.",
+          "german": "Es war ein wundersch\u00f6ner Abend.",
           "english": "It was a beautiful evening.",
           "vocabWordIds": []
         }
       ],
       "wordTimestamps": [
-        { "word": "Es", "startMs": 0, "endMs": 220, "isVocab": false },
-        { "word": "war", "startMs": 240, "endMs": 450, "isVocab": false },
-        { "word": "ein", "startMs": 470, "endMs": 580, "isVocab": false },
-        { "word": "warmer", "startMs": 600, "endMs": 780, "isVocab": false },
-        { "word": "Sommerabend", "startMs": 800, "endMs": 1100, "isVocab": false },
-        { "word": "als", "startMs": 1120, "endMs": 1280, "isVocab": false },
-        { "word": "Thomas", "startMs": 1300, "endMs": 1550, "isVocab": false },
-        { "word": "und", "startMs": 1570, "endMs": 1680, "isVocab": false },
-        { "word": "Maria", "startMs": 1700, "endMs": 1950, "isVocab": false },
-        { "word": "beschlossen,", "startMs": 1970, "endMs": 2350, "isVocab": false },
-        { "word": "in", "startMs": 2370, "endMs": 2450, "isVocab": false },
-        { "word": "den", "startMs": 2470, "endMs": 2600, "isVocab": false },
-        { "word": "Biergarten", "startMs": 2620, "endMs": 3100, "isVocab": true, "cardId": "card-biergarten" },
-        { "word": "zu", "startMs": 3120, "endMs": 3220, "isVocab": false },
-        { "word": "gehen.", "startMs": 3240, "endMs": 3600, "isVocab": false },
-        { "word": "Ich", "startMs": 3800, "endMs": 3950, "isVocab": false },
-        { "word": "habe", "startMs": 3970, "endMs": 4150, "isVocab": false },
-        { "word": "großen", "startMs": 4170, "endMs": 4400, "isVocab": false },
-        { "word": "Hunger", "startMs": 4420, "endMs": 4750, "isVocab": true, "cardId": "card-hunger" },
-        { "word": "und", "startMs": 4770, "endMs": 4880, "isVocab": false },
-        { "word": "Durst,", "startMs": 4900, "endMs": 5180, "isVocab": true, "cardId": "card-durst" },
-        { "word": "sagte", "startMs": 5200, "endMs": 5420, "isVocab": false },
-        { "word": "Thomas", "startMs": 5440, "endMs": 5700, "isVocab": false },
-        { "word": "lachend.", "startMs": 5720, "endMs": 6100, "isVocab": false },
-        { "word": "Der", "startMs": 6300, "endMs": 6430, "isVocab": false },
-        { "word": "Kellner", "startMs": 6450, "endMs": 6750, "isVocab": false },
-        { "word": "brachte", "startMs": 6770, "endMs": 7050, "isVocab": false },
-        { "word": "ihnen", "startMs": 7070, "endMs": 7270, "isVocab": false },
-        { "word": "sofort", "startMs": 7290, "endMs": 7570, "isVocab": false },
-        { "word": "die", "startMs": 7590, "endMs": 7700, "isVocab": false },
-        { "word": "Speisekarte.", "startMs": 7720, "endMs": 8300, "isVocab": true, "cardId": "card-speisekarte" },
-        { "word": "Ich", "startMs": 8700, "endMs": 8840, "isVocab": false },
-        { "word": "bestelle", "startMs": 8860, "endMs": 9200, "isVocab": true, "cardId": "card-bestellen" },
-        { "word": "das", "startMs": 9220, "endMs": 9340, "isVocab": false },
-        { "word": "Schnitzel,", "startMs": 9360, "endMs": 9750, "isVocab": true, "cardId": "card-schnitzel" },
-        { "word": "sagte", "startMs": 9770, "endMs": 9990, "isVocab": false },
-        { "word": "sie.", "startMs": 10010, "endMs": 10300, "isVocab": false },
-        { "word": "Thomas", "startMs": 10500, "endMs": 10760, "isVocab": false },
-        { "word": "wählte", "startMs": 10780, "endMs": 11060, "isVocab": false },
-        { "word": "die", "startMs": 11080, "endMs": 11180, "isVocab": false },
-        { "word": "Tomatensuppe", "startMs": 11200, "endMs": 11780, "isVocab": true, "cardId": "card-tomatensuppe" },
-        { "word": "und", "startMs": 11800, "endMs": 11910, "isVocab": false },
-        { "word": "eine", "startMs": 11930, "endMs": 12050, "isVocab": false },
-        { "word": "Schorle.", "startMs": 12070, "endMs": 12500, "isVocab": true, "cardId": "card-schorle" },
-        { "word": "Am", "startMs": 12700, "endMs": 12820, "isVocab": false },
-        { "word": "Ende", "startMs": 12840, "endMs": 13060, "isVocab": false },
-        { "word": "bezahlten", "startMs": 13080, "endMs": 13480, "isVocab": true, "cardId": "card-bezahlen" },
-        { "word": "die", "startMs": 13500, "endMs": 13600, "isVocab": false },
-        { "word": "Rechnung", "startMs": 13620, "endMs": 14050, "isVocab": true, "cardId": "card-rechnung" },
-        { "word": "und", "startMs": 14070, "endMs": 14180, "isVocab": false },
-        { "word": "Trinkgeld.", "startMs": 14200, "endMs": 14800, "isVocab": true, "cardId": "card-trinkgeld" }
+        {
+          "word": "Es",
+          "startMs": 0,
+          "endMs": 220,
+          "isVocab": false
+        },
+        {
+          "word": "war",
+          "startMs": 240,
+          "endMs": 450,
+          "isVocab": false
+        },
+        {
+          "word": "ein",
+          "startMs": 470,
+          "endMs": 580,
+          "isVocab": false
+        },
+        {
+          "word": "warmer",
+          "startMs": 600,
+          "endMs": 780,
+          "isVocab": false
+        },
+        {
+          "word": "Sommerabend",
+          "startMs": 800,
+          "endMs": 1100,
+          "isVocab": false
+        },
+        {
+          "word": "als",
+          "startMs": 1120,
+          "endMs": 1280,
+          "isVocab": false
+        },
+        {
+          "word": "Thomas",
+          "startMs": 1300,
+          "endMs": 1550,
+          "isVocab": false
+        },
+        {
+          "word": "und",
+          "startMs": 1570,
+          "endMs": 1680,
+          "isVocab": false
+        },
+        {
+          "word": "Maria",
+          "startMs": 1700,
+          "endMs": 1950,
+          "isVocab": false
+        },
+        {
+          "word": "beschlossen,",
+          "startMs": 1970,
+          "endMs": 2350,
+          "isVocab": false
+        },
+        {
+          "word": "in",
+          "startMs": 2370,
+          "endMs": 2450,
+          "isVocab": false
+        },
+        {
+          "word": "den",
+          "startMs": 2470,
+          "endMs": 2600,
+          "isVocab": false
+        },
+        {
+          "word": "Biergarten",
+          "startMs": 2620,
+          "endMs": 3100,
+          "isVocab": true,
+          "cardId": "card-biergarten"
+        },
+        {
+          "word": "zu",
+          "startMs": 3120,
+          "endMs": 3220,
+          "isVocab": false
+        },
+        {
+          "word": "gehen.",
+          "startMs": 3240,
+          "endMs": 3600,
+          "isVocab": false
+        },
+        {
+          "word": "Ich",
+          "startMs": 3800,
+          "endMs": 3950,
+          "isVocab": false
+        },
+        {
+          "word": "habe",
+          "startMs": 3970,
+          "endMs": 4150,
+          "isVocab": false
+        },
+        {
+          "word": "gro\u00dfen",
+          "startMs": 4170,
+          "endMs": 4400,
+          "isVocab": false
+        },
+        {
+          "word": "Hunger",
+          "startMs": 4420,
+          "endMs": 4750,
+          "isVocab": true,
+          "cardId": "card-hunger"
+        },
+        {
+          "word": "und",
+          "startMs": 4770,
+          "endMs": 4880,
+          "isVocab": false
+        },
+        {
+          "word": "Durst,",
+          "startMs": 4900,
+          "endMs": 5180,
+          "isVocab": true,
+          "cardId": "card-durst"
+        },
+        {
+          "word": "sagte",
+          "startMs": 5200,
+          "endMs": 5420,
+          "isVocab": false
+        },
+        {
+          "word": "Thomas",
+          "startMs": 5440,
+          "endMs": 5700,
+          "isVocab": false
+        },
+        {
+          "word": "lachend.",
+          "startMs": 5720,
+          "endMs": 6100,
+          "isVocab": false
+        },
+        {
+          "word": "Der",
+          "startMs": 6300,
+          "endMs": 6430,
+          "isVocab": false
+        },
+        {
+          "word": "Kellner",
+          "startMs": 6450,
+          "endMs": 6750,
+          "isVocab": false
+        },
+        {
+          "word": "brachte",
+          "startMs": 6770,
+          "endMs": 7050,
+          "isVocab": false
+        },
+        {
+          "word": "ihnen",
+          "startMs": 7070,
+          "endMs": 7270,
+          "isVocab": false
+        },
+        {
+          "word": "sofort",
+          "startMs": 7290,
+          "endMs": 7570,
+          "isVocab": false
+        },
+        {
+          "word": "die",
+          "startMs": 7590,
+          "endMs": 7700,
+          "isVocab": false
+        },
+        {
+          "word": "Speisekarte.",
+          "startMs": 7720,
+          "endMs": 8300,
+          "isVocab": true,
+          "cardId": "card-speisekarte"
+        },
+        {
+          "word": "Ich",
+          "startMs": 8700,
+          "endMs": 8840,
+          "isVocab": false
+        },
+        {
+          "word": "bestelle",
+          "startMs": 8860,
+          "endMs": 9200,
+          "isVocab": true,
+          "cardId": "card-bestellen"
+        },
+        {
+          "word": "das",
+          "startMs": 9220,
+          "endMs": 9340,
+          "isVocab": false
+        },
+        {
+          "word": "Schnitzel,",
+          "startMs": 9360,
+          "endMs": 9750,
+          "isVocab": true,
+          "cardId": "card-schnitzel"
+        },
+        {
+          "word": "sagte",
+          "startMs": 9770,
+          "endMs": 9990,
+          "isVocab": false
+        },
+        {
+          "word": "sie.",
+          "startMs": 10010,
+          "endMs": 10300,
+          "isVocab": false
+        },
+        {
+          "word": "Thomas",
+          "startMs": 10500,
+          "endMs": 10760,
+          "isVocab": false
+        },
+        {
+          "word": "w\u00e4hlte",
+          "startMs": 10780,
+          "endMs": 11060,
+          "isVocab": false
+        },
+        {
+          "word": "die",
+          "startMs": 11080,
+          "endMs": 11180,
+          "isVocab": false
+        },
+        {
+          "word": "Tomatensuppe",
+          "startMs": 11200,
+          "endMs": 11780,
+          "isVocab": true,
+          "cardId": "card-tomatensuppe"
+        },
+        {
+          "word": "und",
+          "startMs": 11800,
+          "endMs": 11910,
+          "isVocab": false
+        },
+        {
+          "word": "eine",
+          "startMs": 11930,
+          "endMs": 12050,
+          "isVocab": false
+        },
+        {
+          "word": "Schorle.",
+          "startMs": 12070,
+          "endMs": 12500,
+          "isVocab": true,
+          "cardId": "card-schorle"
+        },
+        {
+          "word": "Am",
+          "startMs": 12700,
+          "endMs": 12820,
+          "isVocab": false
+        },
+        {
+          "word": "Ende",
+          "startMs": 12840,
+          "endMs": 13060,
+          "isVocab": false
+        },
+        {
+          "word": "bezahlten",
+          "startMs": 13080,
+          "endMs": 13480,
+          "isVocab": true,
+          "cardId": "card-bezahlen"
+        },
+        {
+          "word": "die",
+          "startMs": 13500,
+          "endMs": 13600,
+          "isVocab": false
+        },
+        {
+          "word": "Rechnung",
+          "startMs": 13620,
+          "endMs": 14050,
+          "isVocab": true,
+          "cardId": "card-rechnung"
+        },
+        {
+          "word": "und",
+          "startMs": 14070,
+          "endMs": 14180,
+          "isVocab": false
+        },
+        {
+          "word": "Trinkgeld.",
+          "startMs": 14200,
+          "endMs": 14800,
+          "isVocab": true,
+          "cardId": "card-trinkgeld"
+        }
       ],
       "vocabWords": [
-        { "cardId": "card-biergarten", "german": "der Biergarten", "germanBase": "Biergarten", "english": "the beer garden", "article": "der", "sentenceIndices": [0] },
-        { "cardId": "card-hunger", "german": "der Hunger", "germanBase": "Hunger", "english": "the hunger", "article": "der", "sentenceIndices": [1] },
-        { "cardId": "card-durst", "german": "der Durst", "germanBase": "Durst", "english": "the thirst", "article": "der", "sentenceIndices": [1] },
-        { "cardId": "card-speisekarte", "german": "die Speisekarte", "germanBase": "Speisekarte", "english": "the menu", "article": "die", "sentenceIndices": [2] },
-        { "cardId": "card-bestellen", "german": "bestellen", "germanBase": "bestellen", "english": "to order", "article": null, "sentenceIndices": [4] },
-        { "cardId": "card-schnitzel", "german": "das Schnitzel", "germanBase": "Schnitzel", "english": "the schnitzel", "article": "das", "sentenceIndices": [4] },
-        { "cardId": "card-tomatensuppe", "german": "die Tomatensuppe", "germanBase": "Tomatensuppe", "english": "the tomato soup", "article": "die", "sentenceIndices": [5] },
-        { "cardId": "card-schorle", "german": "die Schorle", "germanBase": "Schorle", "english": "the sparkling water", "article": "die", "sentenceIndices": [5] },
-        { "cardId": "card-bezahlen", "german": "bezahlen", "germanBase": "bezahlen", "english": "to pay", "article": null, "sentenceIndices": [6] },
-        { "cardId": "card-rechnung", "german": "die Rechnung", "germanBase": "Rechnung", "english": "the bill", "article": "die", "sentenceIndices": [6] },
-        { "cardId": "card-trinkgeld", "german": "das Trinkgeld", "germanBase": "Trinkgeld", "english": "the tip", "article": "das", "sentenceIndices": [6] }
+        {
+          "cardId": "card-biergarten",
+          "german": "der Biergarten",
+          "germanBase": "Biergarten",
+          "english": "the beer garden",
+          "article": "der",
+          "sentenceIndices": [
+            0
+          ]
+        },
+        {
+          "cardId": "card-hunger",
+          "german": "der Hunger",
+          "germanBase": "Hunger",
+          "english": "the hunger",
+          "article": "der",
+          "sentenceIndices": [
+            1
+          ]
+        },
+        {
+          "cardId": "card-durst",
+          "german": "der Durst",
+          "germanBase": "Durst",
+          "english": "the thirst",
+          "article": "der",
+          "sentenceIndices": [
+            1
+          ]
+        },
+        {
+          "cardId": "card-speisekarte",
+          "german": "die Speisekarte",
+          "germanBase": "Speisekarte",
+          "english": "the menu",
+          "article": "die",
+          "sentenceIndices": [
+            2
+          ]
+        },
+        {
+          "cardId": "card-bestellen",
+          "german": "bestellen",
+          "germanBase": "bestellen",
+          "english": "to order",
+          "article": null,
+          "sentenceIndices": [
+            4
+          ]
+        },
+        {
+          "cardId": "card-schnitzel",
+          "german": "das Schnitzel",
+          "germanBase": "Schnitzel",
+          "english": "the schnitzel",
+          "article": "das",
+          "sentenceIndices": [
+            4
+          ]
+        },
+        {
+          "cardId": "card-tomatensuppe",
+          "german": "die Tomatensuppe",
+          "germanBase": "Tomatensuppe",
+          "english": "the tomato soup",
+          "article": "die",
+          "sentenceIndices": [
+            5
+          ]
+        },
+        {
+          "cardId": "card-schorle",
+          "german": "die Schorle",
+          "germanBase": "Schorle",
+          "english": "the sparkling water",
+          "article": "die",
+          "sentenceIndices": [
+            5
+          ]
+        },
+        {
+          "cardId": "card-bezahlen",
+          "german": "bezahlen",
+          "germanBase": "bezahlen",
+          "english": "to pay",
+          "article": null,
+          "sentenceIndices": [
+            6
+          ]
+        },
+        {
+          "cardId": "card-rechnung",
+          "german": "die Rechnung",
+          "germanBase": "Rechnung",
+          "english": "the bill",
+          "article": "die",
+          "sentenceIndices": [
+            6
+          ]
+        },
+        {
+          "cardId": "card-trinkgeld",
+          "german": "das Trinkgeld",
+          "germanBase": "Trinkgeld",
+          "english": "the tip",
+          "article": "das",
+          "sentenceIndices": [
+            6
+          ]
+        }
       ],
       "audioUrl": null,
       "audioDurationMs": 15000,
-      "sourceCollectionIds": ["col-001"],
+      "sourceCollectionIds": [
+        "col-001"
+      ],
       "difficultyLevel": "A2",
       "lengthType": "medium",
       "listenCount": 2,
@@ -23002,90 +23386,308 @@
       "userId": "user-001",
       "title": "Der Geburtstag",
       "titleTranslation": "The Birthday",
-      "bodyDe": "Heute ist der Geburtstag von Anna. Ihre Freunde haben eine große Überraschung geplant. Sie haben ein Fest organisiert und viele Geschenke gekauft. Anna freut sich sehr. Wir feiern heute Abend, sagte ihr Freund Peter. Das Programm beginnt um acht Uhr. Alles klar, antwortete Anna lachend. Hoffentlich wird es ein schöner Abend.",
+      "bodyDe": "Heute ist der Geburtstag von Anna. Ihre Freunde haben eine gro\u00dfe \u00dcberraschung geplant. Sie haben ein Fest organisiert und viele Geschenke gekauft. Anna freut sich sehr. Wir feiern heute Abend, sagte ihr Freund Peter. Das Programm beginnt um acht Uhr. Alles klar, antwortete Anna lachend. Hoffentlich wird es ein sch\u00f6ner Abend.",
       "bodyEn": "Today is Anna's birthday. Her friends have planned a big surprise. They have organised a party and bought many gifts. Anna is very happy. We are celebrating this evening, said her friend Peter. The programme begins at eight o'clock. All clear, answered Anna, laughing. Hopefully it will be a lovely evening.",
       "sentences": [
         {
           "index": 0,
           "german": "Heute ist der Geburtstag von Anna.",
           "english": "Today is Anna's birthday.",
-          "vocabWordIds": ["card-geburtstag"]
+          "vocabWordIds": [
+            "card-geburtstag"
+          ]
         },
         {
           "index": 1,
-          "german": "Ihre Freunde haben eine große Überraschung geplant.",
+          "german": "Ihre Freunde haben eine gro\u00dfe \u00dcberraschung geplant.",
           "english": "Her friends have planned a big surprise.",
-          "vocabWordIds": ["card-ueberraschung"]
+          "vocabWordIds": [
+            "card-ueberraschung"
+          ]
         },
         {
           "index": 2,
           "german": "Sie haben ein Fest organisiert und viele Geschenke gekauft.",
           "english": "They have organised a party and bought many gifts.",
-          "vocabWordIds": ["card-fest", "card-geschenk"]
+          "vocabWordIds": [
+            "card-fest",
+            "card-geschenk"
+          ]
         },
         {
           "index": 3,
           "german": "Wir feiern heute Abend, sagte ihr Freund Peter.",
           "english": "We are celebrating this evening, said her friend Peter.",
-          "vocabWordIds": ["card-feiern"]
+          "vocabWordIds": [
+            "card-feiern"
+          ]
         },
         {
           "index": 4,
           "german": "Das Programm beginnt um acht Uhr.",
           "english": "The programme begins at eight o'clock.",
-          "vocabWordIds": ["card-programm", "card-beginnen"]
+          "vocabWordIds": [
+            "card-programm",
+            "card-beginnen"
+          ]
         },
         {
           "index": 5,
           "german": "Alles klar, antwortete Anna lachend.",
           "english": "All clear, answered Anna, laughing.",
-          "vocabWordIds": ["card-alles-klar"]
+          "vocabWordIds": [
+            "card-alles-klar"
+          ]
         },
         {
           "index": 6,
-          "german": "Hoffentlich wird es ein schöner Abend.",
+          "german": "Hoffentlich wird es ein sch\u00f6ner Abend.",
           "english": "Hopefully it will be a lovely evening.",
-          "vocabWordIds": ["card-hoffentlich"]
+          "vocabWordIds": [
+            "card-hoffentlich"
+          ]
         }
       ],
       "wordTimestamps": [
-        { "word": "Heute", "startMs": 0, "endMs": 320, "isVocab": false },
-        { "word": "ist", "startMs": 340, "endMs": 460, "isVocab": false },
-        { "word": "der", "startMs": 480, "endMs": 580, "isVocab": false },
-        { "word": "Geburtstag", "startMs": 600, "endMs": 1050, "isVocab": true, "cardId": "card-geburtstag" },
-        { "word": "von", "startMs": 1070, "endMs": 1200, "isVocab": false },
-        { "word": "Anna.", "startMs": 1220, "endMs": 1580, "isVocab": false },
-        { "word": "Ihre", "startMs": 1780, "endMs": 1950, "isVocab": false },
-        { "word": "Freunde", "startMs": 1970, "endMs": 2280, "isVocab": false },
-        { "word": "eine", "startMs": 2300, "endMs": 2430, "isVocab": false },
-        { "word": "große", "startMs": 2450, "endMs": 2700, "isVocab": false },
-        { "word": "Überraschung", "startMs": 2720, "endMs": 3250, "isVocab": true, "cardId": "card-ueberraschung" },
-        { "word": "geplant.", "startMs": 3270, "endMs": 3650, "isVocab": false },
-        { "word": "Sie", "startMs": 3850, "endMs": 3970, "isVocab": false },
-        { "word": "Fest", "startMs": 4200, "endMs": 4520, "isVocab": true, "cardId": "card-fest" },
-        { "word": "Geschenke", "startMs": 4950, "endMs": 5380, "isVocab": true, "cardId": "card-geschenk" },
-        { "word": "Wir", "startMs": 6000, "endMs": 6150, "isVocab": false },
-        { "word": "feiern", "startMs": 6170, "endMs": 6490, "isVocab": true, "cardId": "card-feiern" },
-        { "word": "Programm", "startMs": 7500, "endMs": 7920, "isVocab": true, "cardId": "card-programm" },
-        { "word": "beginnt", "startMs": 7940, "endMs": 8260, "isVocab": true, "cardId": "card-beginnen" },
-        { "word": "Alles", "startMs": 9000, "endMs": 9220, "isVocab": false },
-        { "word": "klar,", "startMs": 9240, "endMs": 9480, "isVocab": true, "cardId": "card-alles-klar" },
-        { "word": "Hoffentlich", "startMs": 10200, "endMs": 10680, "isVocab": true, "cardId": "card-hoffentlich" }
+        {
+          "word": "Heute",
+          "startMs": 0,
+          "endMs": 320,
+          "isVocab": false
+        },
+        {
+          "word": "ist",
+          "startMs": 340,
+          "endMs": 460,
+          "isVocab": false
+        },
+        {
+          "word": "der",
+          "startMs": 480,
+          "endMs": 580,
+          "isVocab": false
+        },
+        {
+          "word": "Geburtstag",
+          "startMs": 600,
+          "endMs": 1050,
+          "isVocab": true,
+          "cardId": "card-geburtstag"
+        },
+        {
+          "word": "von",
+          "startMs": 1070,
+          "endMs": 1200,
+          "isVocab": false
+        },
+        {
+          "word": "Anna.",
+          "startMs": 1220,
+          "endMs": 1580,
+          "isVocab": false
+        },
+        {
+          "word": "Ihre",
+          "startMs": 1780,
+          "endMs": 1950,
+          "isVocab": false
+        },
+        {
+          "word": "Freunde",
+          "startMs": 1970,
+          "endMs": 2280,
+          "isVocab": false
+        },
+        {
+          "word": "eine",
+          "startMs": 2300,
+          "endMs": 2430,
+          "isVocab": false
+        },
+        {
+          "word": "gro\u00dfe",
+          "startMs": 2450,
+          "endMs": 2700,
+          "isVocab": false
+        },
+        {
+          "word": "\u00dcberraschung",
+          "startMs": 2720,
+          "endMs": 3250,
+          "isVocab": true,
+          "cardId": "card-ueberraschung"
+        },
+        {
+          "word": "geplant.",
+          "startMs": 3270,
+          "endMs": 3650,
+          "isVocab": false
+        },
+        {
+          "word": "Sie",
+          "startMs": 3850,
+          "endMs": 3970,
+          "isVocab": false
+        },
+        {
+          "word": "Fest",
+          "startMs": 4200,
+          "endMs": 4520,
+          "isVocab": true,
+          "cardId": "card-fest"
+        },
+        {
+          "word": "Geschenke",
+          "startMs": 4950,
+          "endMs": 5380,
+          "isVocab": true,
+          "cardId": "card-geschenk"
+        },
+        {
+          "word": "Wir",
+          "startMs": 6000,
+          "endMs": 6150,
+          "isVocab": false
+        },
+        {
+          "word": "feiern",
+          "startMs": 6170,
+          "endMs": 6490,
+          "isVocab": true,
+          "cardId": "card-feiern"
+        },
+        {
+          "word": "Programm",
+          "startMs": 7500,
+          "endMs": 7920,
+          "isVocab": true,
+          "cardId": "card-programm"
+        },
+        {
+          "word": "beginnt",
+          "startMs": 7940,
+          "endMs": 8260,
+          "isVocab": true,
+          "cardId": "card-beginnen"
+        },
+        {
+          "word": "Alles",
+          "startMs": 9000,
+          "endMs": 9220,
+          "isVocab": false
+        },
+        {
+          "word": "klar,",
+          "startMs": 9240,
+          "endMs": 9480,
+          "isVocab": true,
+          "cardId": "card-alles-klar"
+        },
+        {
+          "word": "Hoffentlich",
+          "startMs": 10200,
+          "endMs": 10680,
+          "isVocab": true,
+          "cardId": "card-hoffentlich"
+        }
       ],
       "vocabWords": [
-        { "cardId": "card-geburtstag", "german": "der Geburtstag", "germanBase": "Geburtstag", "english": "the birthday", "article": "der", "sentenceIndices": [0] },
-        { "cardId": "card-ueberraschung", "german": "die Überraschung", "germanBase": "Überraschung", "english": "the surprise", "article": "die", "sentenceIndices": [1] },
-        { "cardId": "card-fest", "german": "das Fest", "germanBase": "Fest", "english": "the party / celebration", "article": "das", "sentenceIndices": [2] },
-        { "cardId": "card-geschenk", "german": "das Geschenk", "germanBase": "Geschenk", "english": "the gift", "article": "das", "sentenceIndices": [2] },
-        { "cardId": "card-feiern", "german": "feiern", "germanBase": "feiern", "english": "to celebrate", "article": null, "sentenceIndices": [3] },
-        { "cardId": "card-programm", "german": "das Programm", "germanBase": "Programm", "english": "the programme", "article": "das", "sentenceIndices": [4] },
-        { "cardId": "card-beginnen", "german": "beginnen", "germanBase": "beginnen", "english": "to begin", "article": null, "sentenceIndices": [4] },
-        { "cardId": "card-alles-klar", "german": "Alles klar!", "germanBase": "Alles klar", "english": "All clear! / Got it!", "article": null, "sentenceIndices": [5] },
-        { "cardId": "card-hoffentlich", "german": "hoffentlich", "germanBase": "hoffentlich", "english": "hopefully", "article": null, "sentenceIndices": [6] }
+        {
+          "cardId": "card-geburtstag",
+          "german": "der Geburtstag",
+          "germanBase": "Geburtstag",
+          "english": "the birthday",
+          "article": "der",
+          "sentenceIndices": [
+            0
+          ]
+        },
+        {
+          "cardId": "card-ueberraschung",
+          "german": "die \u00dcberraschung",
+          "germanBase": "\u00dcberraschung",
+          "english": "the surprise",
+          "article": "die",
+          "sentenceIndices": [
+            1
+          ]
+        },
+        {
+          "cardId": "card-fest",
+          "german": "das Fest",
+          "germanBase": "Fest",
+          "english": "the party / celebration",
+          "article": "das",
+          "sentenceIndices": [
+            2
+          ]
+        },
+        {
+          "cardId": "card-geschenk",
+          "german": "das Geschenk",
+          "germanBase": "Geschenk",
+          "english": "the gift",
+          "article": "das",
+          "sentenceIndices": [
+            2
+          ]
+        },
+        {
+          "cardId": "card-feiern",
+          "german": "feiern",
+          "germanBase": "feiern",
+          "english": "to celebrate",
+          "article": null,
+          "sentenceIndices": [
+            3
+          ]
+        },
+        {
+          "cardId": "card-programm",
+          "german": "das Programm",
+          "germanBase": "Programm",
+          "english": "the programme",
+          "article": "das",
+          "sentenceIndices": [
+            4
+          ]
+        },
+        {
+          "cardId": "card-beginnen",
+          "german": "beginnen",
+          "germanBase": "beginnen",
+          "english": "to begin",
+          "article": null,
+          "sentenceIndices": [
+            4
+          ]
+        },
+        {
+          "cardId": "card-alles-klar",
+          "german": "Alles klar!",
+          "germanBase": "Alles klar",
+          "english": "All clear! / Got it!",
+          "article": null,
+          "sentenceIndices": [
+            5
+          ]
+        },
+        {
+          "cardId": "card-hoffentlich",
+          "german": "hoffentlich",
+          "germanBase": "hoffentlich",
+          "english": "hopefully",
+          "article": null,
+          "sentenceIndices": [
+            6
+          ]
+        }
       ],
       "audioUrl": null,
       "audioDurationMs": 11000,
-      "sourceCollectionIds": ["col-001"],
+      "sourceCollectionIds": [
+        "col-001"
+      ],
       "difficultyLevel": "B1",
       "lengthType": "short",
       "listenCount": 0,
@@ -23093,5 +23695,6 @@
       "generatedAt": "2025-05-28T08:00:00Z"
     }
   ],
-  "$schema": "./node_modules/json-server/schema.json"
+  "$schema": "./node_modules/json-server/schema.json",
+  "reviewSessions": []
 }

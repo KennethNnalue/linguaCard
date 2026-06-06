@@ -108,7 +108,11 @@ export const CardStore = signalStore(
     }
 
     return {
-      /** Cache-first: show cached data immediately, then refresh from API silently. */
+      /**
+       * Cache-first: serve cached data immediately, then silently refresh from
+       * the API — but only when online. If offline and cache exists, skip the
+       * network entirely so the page renders without errors or spinners.
+       */
       loadCards(): void {
         void (async () => {
           const userId = uid();
@@ -121,7 +125,12 @@ export const CardStore = signalStore(
             }
           }
 
-          // 2. Block with skeleton only if truly nothing to show
+          // 2. Offline with cached data — nothing more to do
+          if (!navigator.onLine && store.hasEverLoaded()) {
+            return;
+          }
+
+          // 3. Block with skeleton only if truly nothing to show
           if (!store.hasEverLoaded()) {
             patchState(store, { isLoading: true, error: null });
           } else {

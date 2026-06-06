@@ -156,8 +156,8 @@ export class VaultPage {
     });
     await modal.present();
     const {data} = await modal.onWillDismiss();
-    if (data?.created) {
-      this.cardStore.loadCards();
+    if (data?.collectionId) {
+      // Collection assignment changed — refresh collection counts from server
       this.collectionStore.loadCollections();
     }
   }
@@ -172,7 +172,6 @@ export class VaultPage {
     });
     await modal.present();
     const {data} = await modal.onDidDismiss();
-    this.collectionStore.loadCollections();
     if (data?.collectionId) {
       await this._promptImportAfterCreate(data.collectionId);
     }

@@ -5,6 +5,8 @@ import { CardApiService } from './card-api.service';
 import { LocalDataService } from '../../../core/services/local-data.service';
 import { CardStore } from '../store/card.store';
 
+const REFRESH_TTL_MS = 5 * 60 * 1000; // 5 minutes
+
 @Injectable({ providedIn: 'root' })
 export class CardDataRefresher implements DataRefresher {
   readonly name = 'cards';
@@ -13,6 +15,11 @@ export class CardDataRefresher implements DataRefresher {
   private readonly cardStore = inject(CardStore);
 
   async refresh(userId: string): Promise<void> {
+    if (!navigator.onLine) return;
+
+    const lastSynced = await this.localData.getLastSyncedAt('cards');
+    if (lastSynced && Date.now() - new Date(lastSynced).getTime() < REFRESH_TTL_MS) return;
+
     const serverCards = await firstValueFrom(this.api.getAll());
 
     // If there are pending SRS ratings that haven't been flushed to the server yet,

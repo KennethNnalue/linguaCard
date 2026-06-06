@@ -119,7 +119,7 @@ apps/mobile/src/app/
 │   │   ├── csv-parser.service.ts      ← Pure parsing: string → ParsedRow[]
 │   │   └── csv-import-ui/             ← Reusable import sheet (no vault knowledge)
 │   ├── srs/
-│   │   └── sm2.service.ts             ← Pure SM-2 algorithm — features call it, never re-implement
+│   │   └── fsrs.service.ts            ← FSRS-5 algorithm wrapper — features call it, never re-implement
 │   ├── components/                    ← Other shared components
 │   │   ├── sync-status/               ← Synced / pending / error indicator
 │   │   ├── fab-button/
@@ -173,7 +173,7 @@ apps/mobile/src/app/
 Is this infrastructure any app needs (auth, HTTP, storage, network)?  → core/
 Is this a UI component or algorithm used by 2+ features?              → shared/
 Is this TTS / audio as a platform capability?                         → shared/audio/
-Is this the SM-2 / SRS algorithm?                                     → shared/srs/
+Is this the FSRS / SRS algorithm?                                     → shared/srs/
 Is this owned by exactly one feature?                                 → features/<name>/
 Is this a store?                                                      → features/<name>/store/  (use signalStore)
 Is this an HTTP service for one resource?                             → features/<name>/services/
@@ -430,15 +430,18 @@ Never write mastery colour CSS. Never use `.lc-mastery-dot--*` global classes.
 
 ---
 
-## SRS algorithm (SM-2)
+## SRS algorithm (FSRS-5)
 
-Rating 0–5 maps to: Blank / Hard / Hmm / Good / Easy / Nailed.
+Rating 1–4 maps to: Again / Hard / Good / Easy.
 
-- Rating < 3 → reset interval (1–2 days), lower ease factor
-- Rating ≥ 3 → interval × easeFactor; ease factor adjusts up
-- SRS state stored per card per user in `srsStates` collection
+- Implemented via `ts-fsrs` npm package (v5.4.1)
+- `computeFSRS(state, rating)` and `previewFsrsIntervals(state)` live in `libs/shared/utils/src/index.ts`
+- **`FsrsService`** in `shared/srs/fsrs.service.ts` wraps those pure functions — features inject this service, they never call `ts-fsrs` directly
+- SRS state stored per card in `srsState` field of the `Card` entity
 - `nextDueAt` is indexed for due-card queries
-- **SM-2 logic lives in `shared/srs/sm2.service.ts`** — features call it, they never re-implement it
+- `stability` (days), `difficulty`, `retrievability` (0–1 float) are stored and displayed in word detail
+- Mastery level derived from stability thresholds: 0=New, 1=Learning (<7d), 2=Familiar (7–30d), 3=Review (30–90d), 4=Good (90–180d), 5=Mastered (≥180d)
+- `MAX_INTERVAL_DAYS = 365`, `TARGET_RETENTION = 0.9`
 
 ---
 
@@ -459,6 +462,7 @@ Rating 0–5 maps to: Blank / Hard / Hmm / Good / Easy / Nailed.
 | 11 | Community Decks | 📋 Planned | — |
 | 12 | Subscription & Paywall | ✅ Implemented | `features/subscription/`, `apps/api/src/subscriptions/`, `apps/mobile/epic-subscription-paywall.md` |
 | 13 | Tiered AI Routing | ✅ Implemented | `apps/api/src/stories/`, `apps/api/src/import/word-enrich.service.ts`, `apps/mobile/epic-tiered-ai-routing.md` |
+| 14 | FSRS Migration | ✅ Implemented | `shared/srs/fsrs.service.ts`, `libs/shared/utils/`, `apps/mobile/epics/epic-fsrs-migration.md` |
 
 ### Implemented page inventory
 
@@ -504,6 +508,7 @@ These are **known deviations** from the architecture. Do not "fix" them without 
 | Article badge global CSS | `.lc-article-badge--*` classes still in `variables.scss` | `<lc-article-badge>` component only (DS-04) | LDS epic |
 | `variables.scss` | Mix of raw values and CSS custom properties | Fully driven by `_tokens.scss` (DS-01) | LDS epic |
 | `UserMenuComponent` | Uses `@Output()` and `@Input()` decorators | Migrate to `input()` / `output()` signals | Architecture refactor epic |
+| `SRSStateData.easeFactor` / `.repetitions` | Legacy SM-2 fields kept for DB schema compat, no longer computed | Remove columns once DB migration is confirmed clean | FSRS migration epic |
 
 ---
 

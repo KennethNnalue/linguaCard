@@ -98,12 +98,12 @@
             <div class="wd2-stat-lbl">Reviews</div>
           </div>
           <div class="wd2-stat-cell">
-            <div class="wd2-stat-val">{{ word.srsState?.lastRating != null ? word.srsState!.lastRating + '.0' : '—' }}</div>
-            <div class="wd2-stat-lbl">Avg rating</div>
+            <div class="wd2-stat-val">{{ retrievabilityLabel() }}</div>
+            <div class="wd2-stat-lbl">Recall chance</div>
           </div>
           <div class="wd2-stat-cell">
-            <div class="wd2-stat-val">{{ intervalText() }}</div>
-            <div class="wd2-stat-lbl">Interval</div>
+            <div class="wd2-stat-val">{{ stabilityLabel() }}</div>
+            <div class="wd2-stat-lbl">Stability</div>
           </div>
           <div class="wd2-stat-cell">
             <div class="wd2-stat-val">{{ lastReviewedText() }}</div>

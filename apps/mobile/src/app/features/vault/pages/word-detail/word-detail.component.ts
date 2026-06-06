@@ -6,6 +6,7 @@ import {AlertController, IonContent, IonHeader, IonIcon, IonToolbar, ModalContro
 import {addIcons} from 'ionicons';
 import {
   chevronBackOutline,
+  chevronDownOutline,
   createOutline,
   ellipsisHorizontalOutline,
   playOutline,
@@ -45,6 +46,7 @@ export class WordDetailComponent {
   constructor() {
     addIcons({
       chevronBackOutline,
+      chevronDownOutline,
       ellipsisHorizontalOutline,
       volumeHighOutline,
       playOutline,
@@ -76,7 +78,7 @@ export class WordDetailComponent {
   readonly masteryLabel = computed(() => {
     const state = this.card()?.srsState?.state;
     if (!state || state === 'new') return 'New';
-    return {learning: 'Learning', review: 'Review', mastered: 'Mastered'}[state] ?? 'New';
+    return {learning: 'Learning', review: 'Review', relearning: 'Review', mastered: 'Mastered'}[state] ?? 'New';
   });
 
   readonly masteryRingOffset = computed(() => {
@@ -104,7 +106,20 @@ export class WordDetailComponent {
     return `${days}d ago`;
   });
 
-  readonly intervalText = computed(() => `${this.card()?.srsState?.intervalDays ?? 0}d`);
+  readonly stabilityLabel = computed(() => {
+    const s = this.card()?.srsState?.stability;
+    if (s === null || s === undefined) return '—';
+    if (s < 1)   return '<1d';
+    if (s < 30)  return `${Math.round(s)}d`;
+    if (s < 365) return `${Math.round(s / 30 * 10) / 10}mo`;
+    return `${Math.round(s / 365 * 10) / 10}yr`;
+  });
+
+  readonly retrievabilityLabel = computed(() => {
+    const r = this.card()?.srsState?.retrievability;
+    if (r === null || r === undefined) return '—';
+    return `${Math.round(r * 100)}%`;
+  });
 
   readonly categoryName = computed(() => {
     const id = this.card()?.categoryIds?.[0];

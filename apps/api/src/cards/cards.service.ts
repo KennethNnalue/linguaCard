@@ -4,7 +4,7 @@ import { Repository } from 'typeorm';
 import { randomUUID } from 'crypto';
 import type { Card, CardContent, ConfidenceRating, GenderType, SRSStateData } from '@lingua-card/shared/domain';
 import type { CreateCardDto, UpdateCardDto, CardQueryParams } from '@lingua-card/shared/dto';
-import { computeSM2, freshSrsState } from '@lingua-card/shared/utils';
+import { computeFSRS, freshFsrsState } from '@lingua-card/shared/utils';
 import { CardEntity } from './card.entity';
 import { WordAudioService } from '../word-audio/word-audio.service';
 
@@ -74,7 +74,7 @@ export class CardsService {
         id: randomUUID(),
         cardId: '',
         userId,
-        algorithm: 'sm2',
+        algorithm: 'fsrs',
         intervalDays: 1,
         easeFactor: 2.5,
         repetitions: 0,
@@ -83,6 +83,9 @@ export class CardsService {
         nextDueAt: now,
         masteryLevel: 0,
         state: 'new',
+        stability: null,
+        difficulty: null,
+        retrievability: null,
       } satisfies SRSStateData,
     });
     const saved = await this.repo.save(entity);
@@ -133,8 +136,12 @@ export class CardsService {
     for (const rating of ratings) {
       const entity = entityMap.get(rating.cardId);
       if (!entity) continue;
-      const existing = entity.srsState ?? freshSrsState(entity.id, userId, randomUUID);
-      entity.srsState = computeSM2(existing, rating.rating as ConfidenceRating);
+      if (rating.rating < 1 || rating.rating > 4) {
+        this.logger.warn(`batchRateSrs: skipping card ${rating.cardId} — invalid rating ${rating.rating}`);
+        continue;
+      }
+      const existing = entity.srsState ?? freshFsrsState(entity.id, userId, randomUUID);
+      entity.srsState = computeFSRS(existing, rating.rating as ConfidenceRating);
     }
 
     await this.repo.save([...entityMap.values()]);

@@ -14,6 +14,7 @@ import {
 import type { Card, ConfidenceRating } from '@lingua-card/shared/domain';
 import { ArticleBadgeComponent } from '../../../../shared/components/article-badge/article-badge.component';
 import { WordAudioService } from '../../../../shared/audio/word-audio.service';
+import { FsrsService } from '../../../../shared/srs/fsrs.service';
 import { CardStore } from '../../../vault/store/card.store';
 import { CategoryStore } from '../../../vault/store/category.store';
 import { CollectionStore } from '../../../vault/store/collection.store';
@@ -21,7 +22,9 @@ import { ReviewStore } from '../../store/review.store';
 import { HighlightWordPipe } from '../../shared/pipes/highlight-word.pipe';
 import {
   ARTICLE_GENDER_MAP,
-  RATING_OPTIONS,
+  buildRatingOptionsWithPreviews,
+  RATING_OPTIONS_NO_PREVIEW,
+  RatingOption,
   ReviewMode,
   ReviewQueryParam,
   ReviewRoute,
@@ -38,6 +41,7 @@ export class ReviewPage implements OnInit {
   private readonly cardStore = inject(CardStore);
   private readonly reviewStore = inject(ReviewStore);
   private readonly wordAudio = inject(WordAudioService);
+  private readonly fsrs = inject(FsrsService);
   private readonly categoryStore = inject(CategoryStore);
   private readonly collectionStore = inject(CollectionStore);
   private readonly router = inject(Router);
@@ -55,15 +59,19 @@ export class ReviewPage implements OnInit {
     });
   }
 
-  readonly ratings = RATING_OPTIONS;
   readonly queue = signal<Card[]>([]);
   readonly currentIndex = signal(0);
   readonly isFlipped = signal(false);
   readonly isPronunciationLoading = this.wordAudio.isLoading;
-  // Track the furthest index reached so going back and re-rating doesn't end the session early
   private highestIndexReached = 0;
 
   readonly currentCard = computed<Card>(() => this.queue()[this.currentIndex()]);
+
+  readonly ratingOptionsWithPreviews = computed<RatingOption[]>(() => {
+    const card = this.currentCard();
+    if (!card?.srsState || !this.isFlipped()) return RATING_OPTIONS_NO_PREVIEW;
+    return buildRatingOptionsWithPreviews(this.fsrs.previewIntervals(card.srsState));
+  });
 
   readonly progressPercent = computed(() => {
     const q = this.queue();

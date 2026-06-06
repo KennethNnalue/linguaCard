@@ -36,7 +36,7 @@ export class WordCardComponent {
   readonly masteryLabel = computed(() => {
     const state = this.card().srsState?.state;
     if (!state || state === 'new') return 'New';
-    return {learning: 'Learning', review: 'Review', mastered: 'Mastered'}[state] ?? 'New';
+    return {learning: 'Learning', review: 'Review', relearning: 'Review', mastered: 'Mastered'}[state] ?? 'New';
   });
 
   readonly isDue = computed(() => {

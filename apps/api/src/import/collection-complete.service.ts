@@ -173,7 +173,7 @@ export class CollectionCompleteService {
       id: randomUUID(),
       cardId: '',
       userId,
-      algorithm: 'sm2',
+      algorithm: 'fsrs',
       intervalDays: 1,
       easeFactor: 2.5,
       repetitions: 0,
@@ -182,6 +182,9 @@ export class CollectionCompleteService {
       nextDueAt: now,
       masteryLevel: 0,
       state: 'new',
+      stability: null,
+      difficulty: null,
+      retrievability: null,
     };
 
     const entity = this.cardRepo.create({

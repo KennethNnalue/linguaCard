@@ -417,7 +417,7 @@ export class AddWordSheetComponent implements OnInit {
         id: crypto.randomUUID(),
         cardId: '',
         userId,
-        algorithm: 'sm2',
+        algorithm: 'fsrs',
         intervalDays: 1,
         easeFactor: 2.5,
         repetitions: 0,
@@ -426,6 +426,9 @@ export class AddWordSheetComponent implements OnInit {
         nextDueAt: now,
         masteryLevel: 0,
         state: 'new',
+        stability: null,
+        difficulty: null,
+        retrievability: null,
       },
     }).subscribe({
       next: () => { this.saving.set(false); this.modalCtrl.dismiss({ created: true }); },

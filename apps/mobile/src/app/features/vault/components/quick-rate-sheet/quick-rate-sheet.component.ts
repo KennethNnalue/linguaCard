@@ -1,12 +1,13 @@
-import { ChangeDetectionStrategy, Component, inject, Input, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, inject, Input, signal } from '@angular/core';
 import { IonContent, IonHeader, IonIcon, IonToolbar, ModalController } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
 import { checkmarkOutline, closeOutline, volumeHighOutline } from 'ionicons/icons';
 import { Card, ConfidenceRating } from '@lingua-card/shared/domain';
+import { FsrsService } from '../../../../shared/srs/fsrs.service';
 import { ReviewStore } from '../../../review/store/review.store';
 import { WordAudioService } from '../../../../shared/audio/word-audio.service';
 import { ArticleBadgeComponent } from '../../../../shared/components/article-badge/article-badge.component';
-import { RATING_OPTIONS } from '../../../review/models/review.model';
+import { buildRatingOptionsWithPreviews, RATING_OPTIONS_NO_PREVIEW, RatingOption } from '../../../review/models/review.model';
 
 @Component({
   selector: 'lc-quick-rate-sheet',
@@ -19,12 +20,17 @@ export class QuickRateSheetComponent {
   private readonly modalCtrl = inject(ModalController);
   private readonly reviewStore = inject(ReviewStore);
   private readonly wordAudio = inject(WordAudioService);
+  private readonly fsrs = inject(FsrsService);
 
   @Input() card!: Card;
 
   readonly revealed = signal(false);
   readonly rated = signal(false);
-  readonly ratings = RATING_OPTIONS;
+
+  readonly ratingOptions = computed<RatingOption[]>(() => {
+    if (!this.revealed() || !this.card?.srsState) return RATING_OPTIONS_NO_PREVIEW;
+    return buildRatingOptionsWithPreviews(this.fsrs.previewIntervals(this.card.srsState));
+  });
 
   constructor() {
     addIcons({ closeOutline, volumeHighOutline, checkmarkOutline });

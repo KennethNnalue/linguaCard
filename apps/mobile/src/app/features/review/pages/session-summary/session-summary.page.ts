@@ -60,12 +60,12 @@ export class SessionSummaryPage implements OnInit {
 
   readonly ratingBreakdown = computed(() => {
     const s = this.session();
-    const counts: Record<number, number> = { 0: 0, 1: 0, 2: 0, 3: 0, 4: 0, 5: 0 };
+    const counts: Record<number, number> = { 1: 0, 2: 0, 3: 0, 4: 0 };
     if (s) {
       Object.values(s.ratings).forEach(r => { counts[r as number]++; });
     }
     const maxCount = Math.max(...Object.values(counts), 1);
-    return ([5, 4, 3, 2, 1, 0] as ConfidenceRating[]).map(v => ({
+    return ([4, 3, 2, 1] as ConfidenceRating[]).map(v => ({
       value: v,
       label: RATING_LABELS[v],
       count: counts[v],

@@ -118,13 +118,13 @@
       <div class="rv-rating-area" [class.rv-rating-area--active]="isFlipped()">
         <p class="rv-rating-prompt">How well did you know this?</p>
         <div class="rv-rating-row">
-          @for (r of ratings; track r.value) {
+          @for (r of ratingOptionsWithPreviews(); track r.value) {
             <button
               class="rv-rating-btn rv-rating-btn--{{ r.value }}"
               [disabled]="!isFlipped()"
               (click)="submitRating(r.value)">
-              <span class="rv-r-num">{{ r.value }}</span>
               <span class="rv-r-lbl">{{ r.label }}</span>
+              <span class="rv-r-interval">{{ r.previewLabel ?? '—' }}</span>
             </button>
           }
         </div>

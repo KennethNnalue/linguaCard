@@ -48,14 +48,14 @@
     <div class="qr-rating-area" [class.qr-rating-area--active]="revealed()">
       <p class="qr-rating-prompt">How well did you know this?</p>
       <div class="qr-rating-row">
-        @for (r of ratings; track r.value) {
+        @for (r of ratingOptions(); track r.value) {
           <button
             class="qr-rating-btn qr-rating-btn--{{ r.value }}"
             [disabled]="!revealed() || rated()"
             [class.qr-rating-btn--done]="rated()"
             (click)="rate(r.value)">
-            <span class="qr-r-num">{{ r.value }}</span>
             <span class="qr-r-lbl">{{ r.label }}</span>
+            <span class="qr-r-interval">{{ r.previewLabel ?? '—' }}</span>
           </button>
         }
       </div>

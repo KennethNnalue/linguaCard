@@ -62,7 +62,11 @@ export const CollectionStore = signalStore(
     }
 
     return {
-      /** Cache-first: show cached data immediately, then refresh from API silently. */
+      /**
+       * Cache-first: serve cached data immediately, then silently refresh from
+       * the API — but only when online. If offline and cache exists, skip the
+       * network entirely.
+       */
       loadCollections(): void {
         void (async () => {
           const userId = uid();
@@ -75,7 +79,12 @@ export const CollectionStore = signalStore(
             }
           }
 
-          // 2. Block with skeleton only if nothing to show
+          // 2. Offline with cached data — nothing more to do
+          if (!navigator.onLine && store.hasEverLoaded()) {
+            return;
+          }
+
+          // 3. Block with skeleton only if nothing to show
           if (!store.hasEverLoaded()) {
             patchState(store, { isLoading: true, error: null });
           } else {

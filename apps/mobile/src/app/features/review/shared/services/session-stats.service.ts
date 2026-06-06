@@ -19,11 +19,14 @@ import type { LocalReviewSession } from '../../models/review.model';
 
 @Injectable({ providedIn: 'root' })
 export class SessionStatsService {
+  private avgRatingNum(session: LocalReviewSession): number | null {
+    const vals = Object.values(session.ratings) as number[];
+    return vals.length ? vals.reduce((a, b) => a + b, 0) / vals.length : null;
+  }
+
   computeStats(session: LocalReviewSession): SessionStats {
     const ratings = Object.values(session.ratings) as number[];
-    const avg = ratings.length
-      ? (ratings.reduce((a, b) => a + b, 0) / ratings.length).toFixed(1)
-      : '–';
+    const avg = this.avgRatingNum(session);
 
     const ms = session.completedAt
       ? new Date(session.completedAt).getTime() - new Date(session.startedAt).getTime()
@@ -37,9 +40,9 @@ export class SessionStatsService {
       // Use actual ratings count — cards in queue but not yet rated don't count
       totalCards: ratings.length || session.totalCards,
       duration,
-      avgRating: avg,
+      avgRating: avg != null ? avg.toFixed(1) : '–',
       struggled: ratings.filter(r => r <= 2).length,
-      nailed: ratings.filter(r => r === 5).length,
+      nailed: ratings.filter(r => r === 4).length,
     };
   }
 
@@ -54,24 +57,21 @@ export class SessionStatsService {
   }
 
   avgRating(session: LocalReviewSession): string {
-    const vals = Object.values(session.ratings) as number[];
-    if (!vals.length) return '—';
-    return (vals.reduce((a, b) => a + b, 0) / vals.length).toFixed(1);
+    const avg = this.avgRatingNum(session);
+    return avg != null ? avg.toFixed(1) : '—';
   }
 
   ratingColour(session: LocalReviewSession): string {
-    const ratings = Object.values(session.ratings) as number[];
-    if (!ratings.length) return SESSION_COLOUR_NEUTRAL;
-    const avg = ratings.reduce((a, b) => a + b, 0) / ratings.length;
+    const avg = this.avgRatingNum(session);
+    if (avg == null) return SESSION_COLOUR_NEUTRAL;
     if (avg >= RATING_GOOD_THRESHOLD) return SESSION_COLOUR_GOOD;
     if (avg >= RATING_OK_THRESHOLD) return SESSION_COLOUR_OK;
     return SESSION_COLOUR_BAD;
   }
 
   dotColour(session: LocalReviewSession): string {
-    const ratings = Object.values(session.ratings) as number[];
-    if (!ratings.length) return SESSION_DOT_EMPTY;
-    const avg = ratings.reduce((a, b) => a + b, 0) / ratings.length;
+    const avg = this.avgRatingNum(session);
+    if (avg == null) return SESSION_DOT_EMPTY;
     if (avg >= RATING_GOOD_THRESHOLD) return SESSION_DOT_GOOD;
     if (avg >= RATING_OK_THRESHOLD) return SESSION_DOT_OK;
     if (avg >= 2) return SESSION_DOT_WARN;

@@ -7,6 +7,7 @@ import { UserEntity } from '../auth/user.entity';
 import { StoryEntity } from '../stories/story.entity';
 import { WordAudioEntity } from '../word-audio/word-audio.entity';
 import { SubscriptionEntity } from '../subscriptions/subscription.entity';
+import { ReviewSessionEntity } from '../review/review-session.entity';
 
 export default registerAs('database', (): TypeOrmModuleOptions => ({
   type: 'postgres',
@@ -14,7 +15,7 @@ export default registerAs('database', (): TypeOrmModuleOptions => ({
   ssl: process.env['NODE_ENV'] === 'production'
     ? { rejectUnauthorized: false }
     : false,
-  entities: [UserEntity, CardEntity, CollectionEntity, CategoryEntity, StoryEntity, WordAudioEntity, SubscriptionEntity],
+  entities: [UserEntity, CardEntity, CollectionEntity, CategoryEntity, StoryEntity, WordAudioEntity, SubscriptionEntity, ReviewSessionEntity],
   synchronize: true,
   logging: process.env['NODE_ENV'] !== 'production',
 }));

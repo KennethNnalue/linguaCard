@@ -4,6 +4,7 @@ import type { Card, ConfidenceRating, MasteryLevel } from '@lingua-card/shared/d
 
 export const SyncOperationType = {
   FLUSH_SRS_RATINGS: 'FLUSH_SRS_RATINGS',
+  FLUSH_REVIEW_SESSIONS: 'FLUSH_REVIEW_SESSIONS',
 } as const;
 
 export type SyncOperationType = (typeof SyncOperationType)[keyof typeof SyncOperationType];
@@ -12,9 +13,9 @@ export type SyncOperationType = (typeof SyncOperationType)[keyof typeof SyncOper
 
 export const MASTERY_LABELS: Record<MasteryLevel, string> = {
   0: 'New',
-  1: 'Beginner',
-  2: 'Learning',
-  3: 'Familiar',
+  1: 'Learning',
+  2: 'Familiar',
+  3: 'Review',
   4: 'Good',
   5: 'Mastered',
 };
@@ -45,32 +46,69 @@ export const MASTERY_INFO: MasteryInfo[] = [
 
 export const MASTERY_INFO_DESC: MasteryInfo[] = [...MASTERY_INFO].reverse();
 
-// ─── CONFIDENCE RATINGS ───────────────────────────────────────────────────────
+// ─── CONFIDENCE RATINGS (4-button FSRS scale) ────────────────────────────────
 
 export const RATING_LABELS: Record<ConfidenceRating, string> = {
-  0: 'Blank',
-  1: 'Hard',
-  2: 'Hmm',
+  1: 'Again',
+  2: 'Hard',
   3: 'Good',
   4: 'Easy',
-  5: 'Nailed',
+};
+
+export const RATING_DESCRIPTIONS: Record<ConfidenceRating, string> = {
+  1: 'Completely forgot',
+  2: 'Recalled with effort',
+  3: 'Recalled correctly',
+  4: 'Recalled instantly',
 };
 
 export interface RatingOption {
   value: ConfidenceRating;
   label: string;
+  description: string;
+  /** Next interval in days — populated by FsrsService.previewIntervals() */
+  previewDays?: number | null;
+  /** Formatted label, e.g. "8d", "10min", "2hr" */
+  previewLabel?: string | null;
+}
+
+export function formatPreviewInterval(days: number | null | undefined): string {
+  if (days === null || days === undefined) return '—';
+  if (days < 1 / 24) {
+    // less than 1 hour — show minutes
+    return `${Math.max(1, Math.round(days * 24 * 60))}min`;
+  }
+  if (days < 1) {
+    // less than 1 day — show hours
+    return `${Math.round(days * 24)}hr`;
+  }
+  return `${Math.round(days)}d`;
 }
 
 export const RATING_OPTIONS: RatingOption[] = [
-  { value: 0, label: RATING_LABELS[0] },
-  { value: 1, label: RATING_LABELS[1] },
-  { value: 2, label: RATING_LABELS[2] },
-  { value: 3, label: RATING_LABELS[3] },
-  { value: 4, label: RATING_LABELS[4] },
-  { value: 5, label: RATING_LABELS[5] },
+  { value: 1, label: 'Again', description: 'Completely forgot' },
+  { value: 2, label: 'Hard',  description: 'Recalled with effort' },
+  { value: 3, label: 'Good',  description: 'Recalled correctly' },
+  { value: 4, label: 'Easy',  description: 'Recalled instantly' },
 ];
 
-// Threshold below which a card is considered "not mastered" in a session
+export function buildRatingOptionsWithPreviews(
+  previews: Record<ConfidenceRating, number>,
+): RatingOption[] {
+  return RATING_OPTIONS.map(opt => ({
+    ...opt,
+    previewDays: previews[opt.value],
+    previewLabel: formatPreviewInterval(previews[opt.value]),
+  }));
+}
+
+export const RATING_OPTIONS_NO_PREVIEW: RatingOption[] = RATING_OPTIONS.map(opt => ({
+  ...opt,
+  previewDays: null,
+  previewLabel: null,
+}));
+
+// Threshold: ratings below this reset progress (Again=1, Hard=2 both fail)
 export const MASTERY_THRESHOLD: ConfidenceRating = 3;
 
 // ─── SESSION HISTORY LIMITS ───────────────────────────────────────────────────
@@ -184,8 +222,9 @@ export const RatingPillClass = {
 
 export type RatingPillClass = (typeof RatingPillClass)[keyof typeof RatingPillClass];
 
-export const RATING_GOOD_THRESHOLD = 4.0;
-export const RATING_OK_THRESHOLD = 3.0;
+// Calibrated for 1–4 FSRS scale: ≥3.0 = mostly Good/Easy, ≥2.0 = mixed, <2.0 = mostly failing
+export const RATING_GOOD_THRESHOLD = 3.0;
+export const RATING_OK_THRESHOLD = 2.0;
 
 // ─── SESSION COLOUR THRESHOLDS ────────────────────────────────────────────────
 
