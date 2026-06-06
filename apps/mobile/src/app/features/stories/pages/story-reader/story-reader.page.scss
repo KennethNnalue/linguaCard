@@ -251,6 +251,32 @@
   white-space: normal;
 }
 
+// ── Tappable word tokens ──────────────────────────────────────────
+.sr-word-token {
+  display: inline;
+  cursor: pointer;
+  border-radius: 3px;
+  padding: 0 2px;
+  transition: background t.$lc-duration-fast, color t.$lc-duration-fast;
+
+  &.vocab {
+    color: var(--lc-brand);
+    font-weight: 600;
+  }
+
+  &.active {
+    background: var(--lc-brand);
+    color: white;
+    border-radius: 4px;
+    padding: 1px 4px;
+
+    // vocab-active overrides vocab colour
+    &.vocab {
+      color: white;
+    }
+  }
+}
+
 // ── Karaoke fallback (stories without sentences array) ────────────
 .sr2-karaoke {
   display: block;
@@ -404,4 +430,192 @@
   transition: opacity t.$lc-duration-fast;
   &:active { opacity: 1; }
   &:disabled { opacity: 0.35; cursor: not-allowed; }
+}
+
+// ── Active word cover panel ───────────────────────────────────────
+.sr-word-cover {
+  width: 100%; height: 160px; position: relative; overflow: hidden; flex-shrink: 0;
+  background: linear-gradient(160deg, t.$lc-brand-dark 0%, t.$lc-brand 50%, t.$lc-brand-mid 100%); cursor: pointer;
+
+  &--fixed {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 30;
+  }
+}
+
+// Holds the vertical space occupied by the fixed cover so content doesn't jump
+.sr-word-cover-spacer {
+  height: 160px;
+  flex-shrink: 0;
+}
+.sr-word-content {
+  position: absolute; left: 16px; bottom: 16px; right: 90px;
+  display: flex; flex-direction: column; gap: t.$lc-space-1; z-index: 2;
+}
+.sr-word-main {
+  font-family: var(--lc-font-display); font-size: 22px; font-weight: 700;
+  color: white; line-height: 1.2; text-shadow: 0 1px 4px rgba(0,0,0,0.4);
+}
+.sr-word-plural {
+  display: flex; align-items: center; gap: t.$lc-space-2;
+  font-size: 13px; color: rgba(255,255,255,0.85); font-family: var(--lc-font-body);
+}
+.sr-word-plural-badge {
+  font-size: 9px; font-weight: 700; background: rgba(255,255,255,0.25);
+  color: white; padding: 1px 6px; border-radius: 8px;
+  letter-spacing: 0.03em; text-transform: uppercase;
+}
+.sr-word-translation {
+  font-size: 13px; color: rgba(255,255,255,0.75); font-family: var(--lc-font-body); font-style: italic;
+}
+.sr-word-type-badge {
+  display: inline-block; font-size: 9px; font-weight: 700;
+  background: rgba(255,255,255,0.2); color: rgba(255,255,255,0.9);
+  padding: 2px 8px; border-radius: 8px; text-transform: uppercase;
+  letter-spacing: 0.04em; align-self: flex-start; margin-top: 2px;
+}
+.sr-word-actions {
+  position: absolute; right: 14px; bottom: 16px;
+  display: flex; flex-direction: column; gap: t.$lc-space-2; z-index: 2;
+}
+
+.sr-word-action-btn {
+  @include u.circle(36px);
+  @include u.flex-center;
+  background: rgba(255, 255, 255, 0.2);
+  border: none;
+  cursor: pointer;
+  backdrop-filter: blur(4px);
+  transition: background t.$lc-duration-fast;
+  &:active { background: rgba(255, 255, 255, 0.35); }
+  &--loading { cursor: not-allowed; opacity: 0.7; }
+  &--in-vault { background: var(--lc-mastery-4); }
+}
+
+.sr-word-audio-spinner {
+  width: 14px;
+  height: 14px;
+  border: 2px solid rgba(255, 255, 255, 0.4);
+  border-top-color: white;
+  border-radius: 50%;
+  animation: sr-pill-spin 0.7s linear infinite;
+}
+
+.sr-word-conj-btn {
+  font-size: 10px;
+  font-weight: 600;
+  background: rgba(255, 255, 255, 0.15);
+  color: white;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  padding: 5px 12px;
+  border-radius: 16px;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-family: var(--lc-font-body);
+  margin-top: 4px;
+  transition: background t.$lc-duration-fast;
+  &:active { background: rgba(255, 255, 255, 0.28); }
+}
+
+// ── Conjugation bottom sheet ──────────────────────────────────────
+.sr-conj-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.35);
+  z-index: 40;
+}
+
+.sr-conj-sheet {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: var(--lc-card);
+  border-radius: t.$lc-radius-lg t.$lc-radius-lg 0 0;
+  padding: 0 16px 32px;
+  box-shadow: 0 -8px 32px rgba(0, 0, 0, 0.14);
+  z-index: 50;
+  max-height: 70vh;
+  overflow-y: auto;
+}
+
+.sr-conj-handle {
+  display: flex;
+  justify-content: center;
+  padding: 10px 0 8px;
+
+  div {
+    width: 36px;
+    height: 4px;
+    border-radius: 2px;
+    background: var(--lc-border);
+  }
+}
+
+.sr-conj-title {
+  font-family: var(--lc-font-display);
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--lc-text-primary);
+  margin-bottom: 4px;
+}
+
+.sr-conj-sub {
+  font-size: 12px;
+  color: var(--lc-text-hint);
+  margin-bottom: 14px;
+}
+
+.sr-conj-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-bottom: 12px;
+
+  th {
+    font-size: 10px;
+    font-weight: 600;
+    color: var(--lc-brand);
+    text-align: left;
+    padding: 6px 8px;
+    border-bottom: 1px solid var(--lc-border);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+
+  td {
+    font-size: 12px;
+    padding: 5px 8px;
+    color: var(--lc-text-primary);
+    border-bottom: 1px solid rgba(45, 90, 78, 0.06);
+
+    &:first-child {
+      font-weight: 500;
+      color: var(--lc-text-secondary);
+      font-size: 11px;
+    }
+  }
+}
+
+.sr-conj-extra {
+  font-size: 11px;
+  color: var(--lc-text-secondary);
+  padding: 6px 0;
+  border-top: 1px solid var(--lc-border);
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+
+  strong { color: var(--lc-text-primary); }
+}
+
+.sr-conj-empty {
+  font-size: 13px;
+  color: var(--lc-text-hint);
+  padding: 16px 0;
+  text-align: center;
 }

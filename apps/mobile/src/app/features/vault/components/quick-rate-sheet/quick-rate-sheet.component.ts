@@ -1,7 +1,7 @@
 import { ChangeDetectionStrategy, Component, computed, inject, Input, signal } from '@angular/core';
 import { IonContent, IonHeader, IonIcon, IonToolbar, ModalController } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
-import { checkmarkOutline, closeOutline, volumeHighOutline } from 'ionicons/icons';
+import { checkmarkOutline, chevronDownOutline, closeOutline, volumeHighOutline } from 'ionicons/icons';
 import { Card, ConfidenceRating } from '@lingua-card/shared/domain';
 import { FsrsService } from '../../../../shared/srs/fsrs.service';
 import { ReviewStore } from '../../../review/store/review.store';
@@ -22,7 +22,18 @@ export class QuickRateSheetComponent {
   private readonly wordAudio = inject(WordAudioService);
   private readonly fsrs = inject(FsrsService);
 
-  @Input() card!: Card;
+  @Input() set card(value: Card) {
+    this._card = {
+      ...value,
+      content: {
+        ...value.content,
+        synonyms: value.content.synonyms ?? [],
+        examples: value.content.examples ?? [],
+      },
+    };
+  }
+  get card(): Card { return this._card; }
+  private _card!: Card;
 
   readonly revealed = signal(false);
   readonly rated = signal(false);
@@ -32,8 +43,10 @@ export class QuickRateSheetComponent {
     return buildRatingOptionsWithPreviews(this.fsrs.previewIntervals(this.card.srsState));
   });
 
+  private readonly expandedSynonym = signal<number | null>(null);
+
   constructor() {
-    addIcons({ closeOutline, volumeHighOutline, checkmarkOutline });
+    addIcons({ closeOutline, volumeHighOutline, checkmarkOutline, chevronDownOutline });
   }
 
   reveal(): void {
@@ -49,6 +62,29 @@ export class QuickRateSheetComponent {
 
   playAudio(): void {
     void this.wordAudio.playCard(this.card);
+  }
+
+  playExample(sentence: string): void {
+    void this.wordAudio.play(sentence, 'de-DE');
+  }
+
+  playPlural(): void {
+    const plural = this.card?.content.plural;
+    if (plural) void this.wordAudio.play(plural, 'de-DE');
+  }
+
+  toggleSynonym(i: number): void {
+    this.expandedSynonym.set(this.expandedSynonym() === i ? null : i);
+  }
+
+  isSynonymExpanded(i: number): boolean {
+    return this.expandedSynonym() === i;
+  }
+
+  highlightWord(sentence: string, word: string): string {
+    if (!sentence || !word) return sentence;
+    const escaped = word.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+    return sentence.replace(new RegExp(`(${escaped})`, 'gi'), '<strong>$1</strong>');
   }
 
   dismiss(): void {

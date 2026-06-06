@@ -1,7 +1,7 @@
 @use 'theme/tokens' as t;
 @use 'theme/utils' as u;
 
-.rv-nav { @include u.flex-between; padding: t.$lc-space-2 14px t.$lc-space-2; }
+.rv-nav { @include u.flex-between; padding: t.$lc-space-2 t.$lc-space-4 t.$lc-space-2; }
 .rv-title { @include u.lc-font('xl', t.$lc-font-weight-semibold); color: var(--lc-text-primary); }
 .rv-nav-spacer { width: 34px; }
 
@@ -17,6 +17,26 @@
 .rv-prog-fill { height: 100%; background: var(--lc-brand); border-radius: t.$lc-space-1; transition: width 0.4s ease; }
 .rv-prog-labels { @include u.flex-between; @include u.lc-font('xs', t.$lc-font-weight-medium); color: var(--lc-text-hint); }
 
-ion-content::part(scroll) { display: flex; flex-direction: column; }
+// Height of the sticky bottom bar content (excluding safe-area padding).
+// Shared by .rv-bottom-bar and .rv-session so the scroll clearance is always in sync.
+$rv-bottom-bar-content-height: 130px;
 
-.rv-session { flex: 1; display: flex; flex-direction: column; padding: t.$lc-space-2 14px t.$lc-space-4; }
+.rv-session {
+  padding: t.$lc-space-2 t.$lc-space-4 calc(#{$rv-bottom-bar-content-height} + env(safe-area-inset-bottom, 0px) + t.$lc-space-4);
+}
+
+.rv-card-scene {
+  // Natural height — card grows with content
+}
+
+// ── Sticky bottom bar ─────────────────────────────────────────────────────────
+.rv-bottom-bar {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: var(--lc-background);
+  border-top: 1px solid var(--lc-border);
+  padding-bottom: calc(env(safe-area-inset-bottom, 0px) + t.$lc-space-2);
+  z-index: 100;
+}

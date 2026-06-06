@@ -64,8 +64,20 @@ export class ReviewPage implements OnInit {
   readonly isFlipped = signal(false);
   readonly isPronunciationLoading = this.wordAudio.isLoading;
   private highestIndexReached = 0;
+  private readonly expandedSynonym = signal<number | null>(null);
 
-  readonly currentCard = computed<Card>(() => this.queue()[this.currentIndex()]);
+  readonly currentCard = computed<Card | null>(() => {
+    const card = this.queue()[this.currentIndex()];
+    if (!card) return null;
+    return {
+      ...card,
+      content: {
+        ...card.content,
+        synonyms: card.content.synonyms ?? [],
+        examples: card.content.examples ?? [],
+      },
+    };
+  });
 
   readonly ratingOptionsWithPreviews = computed<RatingOption[]>(() => {
     const card = this.currentCard();
@@ -151,8 +163,17 @@ export class ReviewPage implements OnInit {
     }
   }
 
+  toggleSynonym(i: number): void {
+    this.expandedSynonym.set(this.expandedSynonym() === i ? null : i);
+  }
+
+  isSynonymExpanded(i: number): boolean {
+    return this.expandedSynonym() === i;
+  }
+
   flipCard(): void {
     this.isFlipped.set(true);
+    this.expandedSynonym.set(null);
   }
 
   submitRating(rating: ConfidenceRating): void {
@@ -171,12 +192,17 @@ export class ReviewPage implements OnInit {
     this.reviewStore.rateCard(card, rating);
 
     if (isLast) {
-      this.reviewStore.completeSession(this.queue());
+      // Resolve latest card objects from CardStore so completedSession.reviewedCards
+      // reflects the updated SRS state after all ratings in this session.
+      const liveMap = new Map(this.cardStore.cards().map(c => [c.id, c]));
+      const freshQueue = this.queue().map(c => liveMap.get(c.id) ?? c);
+      this.reviewStore.completeSession(freshQueue);
       void this.router.navigate([ReviewRoute.SUMMARY], { replaceUrl: true });
     }
 
     // Advance immediately for responsive UX
     this.isFlipped.set(false);
+    this.expandedSynonym.set(null);
     if (!isLast) {
       this.currentIndex.set(idx + 1);
     }

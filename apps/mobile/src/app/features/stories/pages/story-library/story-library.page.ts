@@ -31,6 +31,8 @@ import {
   sparklesOutline,
   trashOutline,
   chevronDownCircleOutline,
+  chevronBackOutline,
+  chevronForwardOutline,
   warningOutline,
   addCircleOutline,
   gridOutline,
@@ -85,6 +87,7 @@ export class StoryLibraryPage implements OnInit {
   // ── Explore (platform stories) ───────────────────────────────────────────
   readonly platformStories     = signal<PlatformStoryCard[]>([]);
   readonly isLoadingExplore    = signal(false);
+  readonly exploreError        = signal(false);
   readonly selectedLevel       = signal<StoryDifficulty | null>(null);
   readonly selectedCategory    = signal<StoryCategory | null>(null);
 
@@ -104,8 +107,8 @@ export class StoryLibraryPage implements OnInit {
   constructor() {
     addIcons({
       bookOutline, addOutline, playOutline, timeOutline, sparklesOutline,
-      trashOutline, chevronDownCircleOutline, warningOutline, addCircleOutline,
-      gridOutline, ellipsisHorizontalOutline,
+      trashOutline, chevronDownCircleOutline, chevronBackOutline, chevronForwardOutline,
+      warningOutline, addCircleOutline, gridOutline, ellipsisHorizontalOutline,
     });
 
     effect(async () => {
@@ -271,12 +274,16 @@ export class StoryLibraryPage implements OnInit {
 
   private loadPlatformStories(): void {
     this.isLoadingExplore.set(true);
+    this.exploreError.set(false);
     this.platformApi.getAll({ limit: 20 }).subscribe({
       next: res => {
         this.platformStories.set(res.stories);
         this.isLoadingExplore.set(false);
       },
-      error: () => this.isLoadingExplore.set(false),
+      error: () => {
+        this.isLoadingExplore.set(false);
+        this.exploreError.set(true);
+      },
     });
   }
 }

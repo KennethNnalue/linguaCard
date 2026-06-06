@@ -13,11 +13,10 @@ import {
   IonIcon,
   IonInfiniteScroll,
   IonInfiniteScrollContent,
-  IonSpinner,
   IonToolbar,
 } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
-import { arrowBackOutline, bookOutline } from 'ionicons/icons';
+import { arrowBackOutline, bookOutline, chevronBackOutline, chevronForwardOutline } from 'ionicons/icons';
 import type { PlatformStoryCard, StoryCategory, StoryDifficulty } from '@lingua-card/shared/domain';
 import { STORY_CATEGORIES } from '@lingua-card/shared/domain';
 import { PlatformStoryApiService } from '../../services/platform-story-api.service';
@@ -72,7 +71,7 @@ export class StoryExplorePage implements OnInit {
   });
 
   constructor() {
-    addIcons({ arrowBackOutline, bookOutline });
+    addIcons({ arrowBackOutline, bookOutline, chevronBackOutline, chevronForwardOutline });
   }
 
   ngOnInit(): void {

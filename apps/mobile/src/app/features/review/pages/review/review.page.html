@@ -27,107 +27,113 @@
       <!-- ── Flashcard ── -->
       <div class="rv-card-scene">
 
-        @if (!isFlipped()) {
-          <!-- Front face -->
-          <div class="rv-card rv-card--front" (click)="flipCard()">
-            <div class="rv-card-hdr">
-              <span class="rv-side-lbl">Your language</span>
-              <span class="rv-lang-chip">🇬🇧 English</span>
-            </div>
-            <div class="rv-body-front">
-              <p class="rv-front-word lc-display">{{ currentCard().content.front }}</p>
-              @if (currentCard().tags.length) {
-                <p class="rv-hint">{{ currentCard().tags[0] }}</p>
-              }
-            </div>
-            <button class="rv-tap-pill" tabindex="-1">
-              <ion-icon name="chevron-down-outline"></ion-icon>
-              Tap to reveal German
-            </button>
-          </div>
-
-        } @else {
-          <!-- Back face (revealed) -->
-          <div class="rv-card rv-card--back">
-            <div class="rv-card-hdr">
-              <span class="rv-side-lbl">{{ currentCard().content.front }}</span>
-              <span class="rv-lang-chip">🇩🇪 German</span>
-            </div>
-            <div class="rv-body-back">
-              @if (currentCard().content.article) {
-                <div class="rv-art-row">
-                  <lc-article-badge [article]="currentCard().content.article" />
-                  <span class="rv-art-gender">{{ currentArticleLabel() }}</span>
-                </div>
-              }
-              <p class="rv-back-word lc-display">{{ currentCard().content.back }}</p>
-              @if (currentCard().content.phonetic) {
-                <p class="rv-phonetic">{{ currentCard().content.phonetic }}</p>
-              }
-              @if (currentCard().content.plural) {
-                <div class="rv-plural">
-                  <span class="rv-plural-lbl">Plural</span>
-                  <span class="rv-plural-val">{{ currentCard().content.plural }}</span>
-                </div>
-              }
-              @for (ex of currentCard().content.examples; track ex.id) {
-                <div class="rv-ex-block">
-                  <div class="rv-ex-row">
-                    <p class="rv-ex-de" [innerHTML]="ex.target | highlightWord: currentCard().content.back"></p>
-                    <button class="rv-ex-play-btn" (click)="playExample($event, ex.target)" aria-label="Play example">
-                      <ion-icon name="volume-high-outline"></ion-icon>
-                    </button>
-                  </div>
-                  <p class="rv-ex-en">"{{ ex.native }}"</p>
-                </div>
-              }
-              <button class="rv-audio-btn" (click)="playAudio($event)" [disabled]="isPronunciationLoading()">
-                @if (isPronunciationLoading()) {
-                  <div class="rv-audio-spinner"></div>
-                  Generating…
-                } @else {
-                  <ion-icon name="volume-high-outline"></ion-icon>
-                  Play pronunciation
+        @if (currentCard(); as card) {
+          @if (!isFlipped()) {
+            <!-- Front face -->
+            <div class="rv-card rv-card--front" (click)="flipCard()">
+              <div class="rv-card-hdr">
+                <span class="rv-side-lbl">Your language</span>
+                <span class="rv-lang-chip">🇬🇧 English</span>
+              </div>
+              <div class="rv-body-front">
+                <p class="rv-front-word lc-display">{{ card.content.front }}</p>
+                @if (card.tags.length) {
+                  <p class="rv-hint">{{ card.tags[0] }}</p>
                 }
+              </div>
+              <button class="rv-tap-pill" tabindex="-1">
+                <ion-icon name="chevron-down-outline"></ion-icon>
+                Tap to reveal German
               </button>
-              @if (currentCard().content.notes) {
-                <div class="rv-note-pill">
-                  <span class="rv-note-icon">💡</span>
-                  <p class="rv-note-text">{{ currentCard().content.notes }}</p>
-                </div>
-              }
             </div>
-          </div>
+
+          } @else {
+            <!-- Back face (revealed) -->
+            <div class="rv-card rv-card--back">
+              <div class="rv-card-hdr">
+                <span class="rv-side-lbl">{{ card.content.front }}</span>
+                <span class="rv-lang-chip">🇩🇪 German</span>
+              </div>
+              <div class="rv-body-back">
+                @if (card.content.article) {
+                  <div class="rv-art-row">
+                    <lc-article-badge [article]="card.content.article" />
+                    <span class="rv-art-gender">{{ currentArticleLabel() }}</span>
+                  </div>
+                }
+                <p class="rv-back-word lc-display">{{ card.content.back }}</p>
+                @if (card.content.phonetic) {
+                  <p class="rv-phonetic">{{ card.content.phonetic }}</p>
+                }
+                @if (card.content.plural) {
+                  <div class="rv-plural">
+                    <span class="rv-plural-lbl">Plural</span>
+                    <span class="rv-plural-val">{{ card.content.plural }}</span>
+                  </div>
+                }
+                @for (ex of card.content.examples; track ex.id) {
+                  <div class="rv-ex-block">
+                    <div class="rv-ex-row">
+                      <p class="rv-ex-de" [innerHTML]="ex.target | highlightWord: card.content.back"></p>
+                      <button class="rv-ex-play-btn" (click)="playExample($event, ex.target)" aria-label="Play example">
+                        <ion-icon name="volume-high-outline"></ion-icon>
+                      </button>
+                    </div>
+                    <p class="rv-ex-en">"{{ ex.native }}"</p>
+                  </div>
+                }
+                <button class="rv-audio-btn" (click)="playAudio($event)" [disabled]="isPronunciationLoading()">
+                  @if (isPronunciationLoading()) {
+                    <div class="rv-audio-spinner"></div>
+                    Generating…
+                  } @else {
+                    <ion-icon name="volume-high-outline"></ion-icon>
+                    Play pronunciation
+                  }
+                </button>
+                @if (card.content.notes) {
+                  <div class="rv-note-pill">
+                    <span class="rv-note-icon">💡</span>
+                    <p class="rv-note-text">{{ card.content.notes }}</p>
+                  </div>
+                }
+                @if (card.content.synonyms.length) {
+                  <div class="rv-synonyms">
+                    <div class="rv-syn-lbl">Synonyms</div>
+                    @for (syn of card.content.synonyms; track $index; let i = $index; let last = $last) {
+                      <div class="rv-syn-item" [class.rv-syn-item--open]="isSynonymExpanded(i)" [class.rv-syn-item--last]="last">
+                        <div class="rv-syn-head" (click)="toggleSynonym(i)">
+                          <lc-article-badge [article]="syn.article" />
+                          <span class="rv-syn-word">{{ syn.word }}</span>
+                          <span class="rv-syn-trans">{{ syn.translation }}</span>
+                          <span class="rv-syn-chev">
+                            <ion-icon name="chevron-down-outline"></ion-icon>
+                          </span>
+                        </div>
+                        @if (isSynonymExpanded(i) && syn.example) {
+                          <div class="rv-syn-body">
+                            <div class="rv-syn-example">
+                              <div class="rv-ex-row">
+                                <p class="rv-ex-de" [innerHTML]="syn.example | highlightWord: syn.word"></p>
+                                <button class="rv-ex-play-btn" (click)="playExample($event, syn.example)" aria-label="Play synonym example">
+                                  <ion-icon name="volume-high-outline"></ion-icon>
+                                </button>
+                              </div>
+                              @if (syn.exampleNative) {
+                                <p class="rv-ex-en">"{{ syn.exampleNative }}"</p>
+                              }
+                            </div>
+                          </div>
+                        }
+                      </div>
+                    }
+                  </div>
+                }
+              </div>
+            </div>
+          }
         }
 
-      </div>
-
-      <!-- ── Secondary actions ── -->
-      <div class="rv-secondary">
-        <button class="rv-sec-btn" (click)="goToPrevious()" [disabled]="currentIndex() === 0">
-          <ion-icon name="chevron-back-outline"></ion-icon>
-          Previous
-        </button>
-        <button class="rv-sec-btn" (click)="skipCard()">
-          <ion-icon name="chevron-forward-outline"></ion-icon>
-          Skip
-        </button>
-      </div>
-
-      <!-- ── Rating row ── -->
-      <div class="rv-rating-area" [class.rv-rating-area--active]="isFlipped()">
-        <p class="rv-rating-prompt">How well did you know this?</p>
-        <div class="rv-rating-row">
-          @for (r of ratingOptionsWithPreviews(); track r.value) {
-            <button
-              class="rv-rating-btn rv-rating-btn--{{ r.value }}"
-              [disabled]="!isFlipped()"
-              (click)="submitRating(r.value)">
-              <span class="rv-r-lbl">{{ r.label }}</span>
-              <span class="rv-r-interval">{{ r.previewLabel ?? '—' }}</span>
-            </button>
-          }
-        </div>
       </div>
 
     </div>
@@ -142,3 +148,34 @@
     </div>
   }
 </ion-content>
+
+<!-- ── Sticky bottom bar: secondary actions + rating ── -->
+@if (queue().length) {
+  <div class="rv-bottom-bar">
+    <div class="rv-secondary">
+      <button class="rv-sec-btn" (click)="goToPrevious()" [disabled]="currentIndex() === 0">
+        <ion-icon name="chevron-back-outline"></ion-icon>
+        Previous
+      </button>
+      <button class="rv-sec-btn" (click)="skipCard()">
+        <ion-icon name="chevron-forward-outline"></ion-icon>
+        Skip
+      </button>
+    </div>
+
+    <div class="rv-rating-area" [class.rv-rating-area--active]="isFlipped()">
+      <p class="rv-rating-prompt">How well did you know this?</p>
+      <div class="rv-rating-row">
+        @for (r of ratingOptionsWithPreviews(); track r.value) {
+          <button
+            class="rv-rating-btn rv-rating-btn--{{ r.value }}"
+            [disabled]="!isFlipped()"
+            (click)="submitRating(r.value)">
+            <span class="rv-r-lbl">{{ r.label }}</span>
+            <span class="rv-r-interval">{{ r.previewLabel ?? '—' }}</span>
+          </button>
+        }
+      </div>
+    </div>
+  </div>
+}

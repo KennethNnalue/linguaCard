@@ -117,12 +117,12 @@
     <div class="quiz-settings">
       <div class="quiz-settings-row">
         <div class="quiz-settings-label">
-          <span class="quiz-settings-title">Manual advance on wrong</span>
-          <span class="quiz-settings-sub">Read the hint before moving on</span>
+          <span class="quiz-settings-title">Pause on mistakes</span>
+          <span class="quiz-settings-sub">Review the correct answer before continuing</span>
         </div>
         <ion-toggle
-          [checked]="manualAdvance()"
-          (ionChange)="manualAdvance.set($any($event).detail.checked)"
+          [checked]="pauseOnMistakes()"
+          (ionChange)="pauseOnMistakes.set($any($event).detail.checked)"
           mode="ios"
           color="success"
         />

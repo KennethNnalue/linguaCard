@@ -35,10 +35,72 @@
             <p class="qr-phonetic">{{ card.content.phonetic }}</p>
           }
           <p class="qr-trans">{{ card.content.front }}</p>
+
+          @if (card.content.plural) {
+            <div class="qr-plural-row">
+              <span class="qr-plural-lbl">Plural</span>
+              <span class="qr-plural-val">{{ card.content.plural }}</span>
+              <button class="qr-plural-play" (click)="playPlural()" aria-label="Play plural">
+                <ion-icon name="volume-high-outline"></ion-icon>
+              </button>
+            </div>
+          }
+
           <button class="qr-audio-btn" (click)="playAudio()" aria-label="Play pronunciation">
             <ion-icon name="volume-high-outline"></ion-icon>
             Listen
           </button>
+
+          @if (card.content.examples.length) {
+            <div class="qr-section">
+              <div class="qr-sec-lbl">Example Sentences</div>
+              @for (ex of card.content.examples; track ex.id; let last = $last) {
+                <div class="qr-example-block" [class.qr-example-block--last]="last">
+                  <div class="qr-ex-row">
+                    <p class="qr-ex-de" [innerHTML]="highlightWord(ex.target, card.content.back)"></p>
+                    <button class="qr-ex-play-btn" (click)="playExample(ex.target)" aria-label="Play example">
+                      <ion-icon name="volume-high-outline"></ion-icon>
+                    </button>
+                  </div>
+                  <p class="qr-ex-en">"{{ ex.native }}"</p>
+                </div>
+              }
+            </div>
+          }
+
+          @if (card.content.synonyms.length) {
+            <div class="qr-section">
+              <div class="qr-sec-lbl">Synonyms</div>
+              @for (syn of card.content.synonyms; track $index; let i = $index; let last = $last) {
+                <div class="qr-syn-item" [class.qr-syn-item--open]="isSynonymExpanded(i)" [class.qr-syn-item--last]="last">
+                  <div class="qr-syn-head" (click)="toggleSynonym(i)">
+                    <lc-article-badge [article]="syn.article" />
+                    <span class="qr-syn-word">{{ syn.word }}</span>
+                    <span class="qr-syn-trans">{{ syn.translation }}</span>
+                    <span class="qr-syn-chev">
+                      <ion-icon name="chevron-down-outline"></ion-icon>
+                    </span>
+                  </div>
+                  @if (isSynonymExpanded(i) && syn.example) {
+                    <div class="qr-syn-body">
+                      <div class="qr-syn-example">
+                        <div class="qr-ex-row">
+                          <p class="qr-ex-de" [innerHTML]="highlightWord(syn.example, syn.word)"></p>
+                          <button class="qr-ex-play-btn" (click)="playExample(syn.example)" aria-label="Play synonym example">
+                            <ion-icon name="volume-high-outline"></ion-icon>
+                          </button>
+                        </div>
+                        @if (syn.exampleNative) {
+                          <p class="qr-ex-en">"{{ syn.exampleNative }}"</p>
+                        }
+                      </div>
+                    </div>
+                  }
+                </div>
+              }
+            </div>
+          }
+
         </div>
       }
 

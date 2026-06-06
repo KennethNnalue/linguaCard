@@ -446,6 +446,13 @@ export interface StoryGrammarNote {
   additionalExamples: Array<{ de: string; en: string }>;
 }
 
+export interface VerbConjugations {
+  praesens: Array<{ pronoun: string; form: string }>;
+  praeteritum: Array<{ pronoun: string; form: string }>;
+  perfekt?: string;    // e.g. "hat beraten"
+  imperativ?: string;  // e.g. "berate! beratet!"
+}
+
 export interface StoryKeyword {
   cardId: string | null;       // null if not in user's vault
   german: string;              // "der Sternenhimmel" (with article)
@@ -454,6 +461,7 @@ export interface StoryKeyword {
   article: 'der' | 'die' | 'das' | null;
   wordType: 'noun' | 'verb' | 'adjective' | 'adverb' | 'other';
   level: 'A1' | 'A2' | 'B1' | 'B2' | 'C1' | 'C2';
+  conjugations?: VerbConjugations;
 }
 
 export interface StorySentence {

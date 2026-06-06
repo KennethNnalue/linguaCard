@@ -4,7 +4,7 @@
 @use '../../../../../theme/utils' as u;
 
 .rv-rating-area {
-  padding: t.$lc-space-1 0 t.$lc-space-6;
+  padding: t.$lc-space-1 0 t.$lc-space-2;
   opacity: 0.45;
   pointer-events: none;
   transition: opacity var(--lc-transition-base);

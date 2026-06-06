@@ -12,11 +12,11 @@
 
 <ion-content>
 
-  <!-- Level filter chips -->
-  <div class="filter-row">
+  <!-- Level tab bar -->
+  <div class="filter-tabs">
     @for (f of levelFilters; track f.label) {
       <button
-        class="filter-chip"
+        class="filter-tab"
         [class.active]="selectedLevel() === f.value"
         (click)="selectLevel(f.value)"
       >{{ f.label }}</button>
@@ -24,17 +24,25 @@
   </div>
 
   <!-- Category chips -->
-  <div class="cat-row">
-    @for (cat of categoryFilters; track cat.value) {
-      <button
-        class="cat-chip"
-        [class.active]="selectedCategory() === cat.value"
-        (click)="selectCategory(cat.value)"
-      >
-        <span class="cat-emoji">{{ cat.icon }}</span>
-        {{ cat.label }}
-      </button>
-    }
+  <div class="cat-scroll-wrap">
+    <button class="cat-arrow cat-arrow--left" (click)="catRow.scrollBy({ left: -120, behavior: 'smooth' })" aria-label="Scroll left" tabindex="-1">
+      <ion-icon name="chevron-back-outline"></ion-icon>
+    </button>
+    <div class="cat-row" #catRow>
+      @for (cat of categoryFilters; track cat.value) {
+        <button
+          class="cat-chip"
+          [class.active]="selectedCategory() === cat.value"
+          (click)="selectCategory(cat.value)"
+        >
+          <span class="cat-emoji">{{ cat.icon }}</span>
+          {{ cat.label }}
+        </button>
+      }
+    </div>
+    <button class="cat-arrow cat-arrow--right" (click)="catRow.scrollBy({ left: 120, behavior: 'smooth' })" aria-label="Scroll right" tabindex="-1">
+      <ion-icon name="chevron-forward-outline"></ion-icon>
+    </button>
   </div>
 
   <!-- Story count header -->
@@ -62,6 +70,9 @@
       @for (story of stories(); track story.id) {
         <div class="browse-card" (click)="openStory(story.id)" role="button" [attr.aria-label]="'Open: ' + story.title">
           <div class="browse-img">
+            @if (story.coverImageUrl) {
+              <img [src]="story.coverImageUrl" class="browse-cover-img" [alt]="story.title" />
+            }
             <span class="browse-lvl">{{ story.level }}</span>
             @if (story.isPremium) {
               <span class="browse-premium">⭐</span>

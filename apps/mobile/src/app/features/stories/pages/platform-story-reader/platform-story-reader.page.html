@@ -5,26 +5,31 @@
     </div>
   } @else if (story(); as s) {
 
-    <!-- ── Cover ─────────────────────────────────────────────────── -->
-    <div class="sr2-cover">
-      @if (s.coverImageUrl) {
-        <img [src]="s.coverImageUrl" class="sr2-cover-img" alt="" />
-      }
-      <div class="sr2-cover-overlay"></div>
-
-      <div class="sr2-top-bar">
-        <button class="sr2-back-btn" (click)="goBack()" aria-label="Back">
-          <ion-icon name="arrow-back-outline"></ion-icon>
-        </button>
-        <div class="sr2-top-actions">
-          <!-- Level + category pill -->
-          <span class="psr-meta-pill">{{ s.level }} · {{ categoryLabel() }}</span>
-          @if (s.isPremium) {
-            <span class="psr-premium-pill">⭐ Pro</span>
-          }
+    <!-- ── Cover: default state ───────────────────────────────────── -->
+    @if (!tappedWord()) {
+      <div class="sr2-cover">
+        @if (s.coverImageUrl) {
+          <img [src]="s.coverImageUrl" class="sr2-cover-img" alt="" />
+        }
+        <div class="sr2-cover-overlay"></div>
+        <div class="sr2-top-bar">
+          <button class="sr2-back-btn" (click)="goBack()" aria-label="Back">
+            <ion-icon name="arrow-back-outline"></ion-icon>
+          </button>
+          <div class="sr2-top-actions">
+            <span class="psr-meta-pill">{{ s.level }} · {{ categoryLabel() }}</span>
+            @if (s.isPremium) {
+              <span class="psr-premium-pill">⭐ Pro</span>
+            }
+          </div>
         </div>
       </div>
-    </div>
+    }
+
+    <!-- Spacer holds vertical space when fixed word panel is shown -->
+    @if (tappedWord()) {
+      <div class="sr-word-cover-spacer"></div>
+    }
 
     <!-- ── Tab bar ────────────────────────────────────────────────── -->
     <div class="sr2-section-tabs">
@@ -58,10 +63,19 @@
         </div>
       </div>
 
-      <div class="sr2-text-block">
-        @for (sent of s.sentences; track sent.index) {
+      <div class="sr2-text-block" (click)="dismissTappedWord()">
+        @for (sent of s.sentences; track sent.index; let si = $index) {
           <div class="sr2-sent-block">
-            <p class="sr2-sent-de">{{ sent.german }}</p>
+            <p class="sr2-sent-de">
+              @for (token of sentenceTokens()[si]; track token.wordIdx) {
+                <span
+                  class="sr-word-token"
+                  [class.vocab]="token.isVocab"
+                  [class.active]="isWordActive(si, token.wordIdx)"
+                  (click)="$event.stopPropagation(); tapWord(si, token)"
+                >{{ token.text }}</span>&#8203;
+              }
+            </p>
             @if (showTranslation()) {
               <p class="sr2-sent-en">{{ sent.english }}</p>
             }
@@ -112,6 +126,136 @@
     </div>
   }
 </ion-content>
+
+<!-- ── Active word cover panel (fixed — stays at top when scrolled) -->
+@if (story(); as s) {
+  @if (tappedWord(); as tw) {
+    @if (tappedWordDetail(); as wd) {
+      <div class="sr-word-cover sr-word-cover--fixed" (click)="dismissTappedWord()">
+        @if (s.coverImageUrl) {
+          <img [src]="s.coverImageUrl" class="sr2-cover-img" alt="" />
+        }
+        <div class="sr2-cover-overlay"></div>
+
+        <div class="sr2-top-bar">
+          <button class="sr2-back-btn" (click)="$event.stopPropagation(); dismissTappedWord()" aria-label="Close word panel">
+            <svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" width="14" height="14">
+              <polyline points="15,18 9,12 15,6"/>
+            </svg>
+          </button>
+          <div class="sr2-top-actions">
+            <span class="psr-meta-pill">{{ s.level }} · {{ categoryLabel() }}</span>
+          </div>
+        </div>
+
+        <div class="sr-word-content" (click)="$event.stopPropagation()">
+          <div class="sr-word-main">{{ wd.display }}</div>
+
+          @if (wd.wordType === 'noun' && wd.plural) {
+            <div class="sr-word-plural">
+              {{ wd.plural }}
+              <span class="sr-word-plural-badge">Plural</span>
+            </div>
+          }
+
+          @if (wd.english) {
+            <div class="sr-word-translation">{{ wd.english }}</div>
+          }
+
+          @if (wd.wordType && wd.wordType !== 'noun') {
+            <span class="sr-word-type-badge">{{ wd.wordType | titlecase }}</span>
+          }
+
+          @if (wd.wordType === 'verb') {
+            <button
+              class="sr-word-conj-btn"
+              (click)="$event.stopPropagation(); showConjugations.update(v => !v)"
+            >Conjugate ▸</button>
+          }
+        </div>
+
+        <div class="sr-word-actions" (click)="$event.stopPropagation()">
+          <button
+            class="sr-word-action-btn"
+            [class.sr-word-action-btn--loading]="pronunciationLoading()"
+            (click)="playTappedWord()"
+            aria-label="Play pronunciation"
+          >
+            @if (pronunciationLoading()) {
+              <div class="sr-word-audio-spinner"></div>
+            } @else {
+              <svg viewBox="0 0 24 24" width="16" height="16" fill="white" stroke="none">
+                <polygon points="6,4 20,12 6,20"/>
+              </svg>
+            }
+          </button>
+          <button
+            class="sr-word-action-btn"
+            [class.sr-word-action-btn--in-vault]="tappedWordInVault()"
+            (click)="addToVault()"
+            [attr.aria-label]="tappedWordInVault() ? 'Already in vault' : 'Add to vault'"
+          >
+            @if (tappedWordInVault()) {
+              <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                <polyline points="20,6 9,17 4,12"/>
+              </svg>
+            } @else {
+              <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="white" stroke-width="2" stroke-linecap="round">
+                <line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/>
+              </svg>
+            }
+          </button>
+        </div>
+      </div>
+    }
+  }
+}
+
+<!-- ── Conjugation bottom sheet ────────────────────────────────── -->
+@if (showConjugations() && tappedWordDetail(); as wd) {
+  <div class="sr-conj-backdrop" (click)="showConjugations.set(false)"></div>
+  <div class="sr-conj-sheet" (click)="$event.stopPropagation()">
+    <div class="sr-conj-handle"><div></div></div>
+    <div class="sr-conj-title">{{ wd.display }}</div>
+    @if (wd.english) {
+      <div class="sr-conj-sub">{{ wd.english }}</div>
+    }
+
+    @if (wd.conjugations; as conj) {
+      <table class="sr-conj-table">
+        <thead>
+          <tr>
+            <th></th>
+            <th>Präsens</th>
+            <th>Präteritum</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (row of conj.praesens; track row.pronoun; let i = $index) {
+            <tr>
+              <td>{{ row.pronoun }}</td>
+              <td>{{ row.form }}</td>
+              <td>{{ conj.praeteritum[i]?.form ?? '—' }}</td>
+            </tr>
+          }
+        </tbody>
+      </table>
+
+      @if (conj.perfekt || conj.imperativ) {
+        <div class="sr-conj-extra">
+          @if (conj.perfekt) {
+            <span><strong>Perfekt:</strong> {{ conj.perfekt }}</span>
+          }
+          @if (conj.imperativ) {
+            <span><strong>Imperativ:</strong> {{ conj.imperativ }}</span>
+          }
+        </div>
+      }
+    } @else {
+      <div class="sr-conj-empty">No conjugation data available.</div>
+    }
+  </div>
+}
 
 <!-- ── Floating audio pill — only on Story tab when audio exists ── -->
 @if (story(); as s) {

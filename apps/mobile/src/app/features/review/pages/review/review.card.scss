@@ -1,7 +1,7 @@
 // ─── CARD ─────────────────────────────────────────────────────────────────────
 
 .rv-card-scene {
-  flex: 1;
+  // Natural height — grows with card content
 }
 
 .rv-card {
@@ -116,7 +116,7 @@
 .rv-body-back {
   display: flex;
   flex-direction: column;
-  align-items: center;
+  align-items: flex-start;
   gap: 0;
 }
 
@@ -129,7 +129,8 @@
   display: flex;
   align-items: center;
   gap: 7px;
-  margin-bottom: 12px;
+  margin-bottom: 8px;
+  width: 100%;
 }
 
 .rv-art-gender {
@@ -142,18 +143,20 @@
   font-size: 34px;
   font-weight: 600;
   color: var(--lc-text-primary);
-  text-align: center;
   line-height: 1.1;
   margin: 0 0 4px;
+  width: 100%;
+  word-break: break-word;
+  overflow-wrap: break-word;
 }
 
 .rv-phonetic {
   font-size: 13px;
   color: var(--lc-text-hint);
   font-style: italic;
-  text-align: center;
   margin: 0 0 10px;
   font-family: var(--lc-font-display);
+  width: 100%;
 }
 
 .rv-plural {
@@ -300,6 +303,75 @@
   color: var(--lc-accent);
   line-height: 1.5;
   margin: 0;
+}
+
+// ─── SYNONYMS ────────────────────────────────────────────────────────────────
+
+.rv-synonyms {
+  width: 100%;
+  margin-top: 8px;
+  background: var(--lc-surface);
+  border-radius: var(--lc-radius-md);
+  padding: 10px 14px;
+}
+
+.rv-syn-lbl {
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+  color: var(--lc-text-hint);
+  margin-bottom: 4px;
+}
+
+.rv-syn-item {
+  border-bottom: 1px solid var(--lc-border);
+
+  &--last { border-bottom: none; }
+}
+
+.rv-syn-head {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  padding: 9px 0;
+  cursor: pointer;
+  transition: var(--lc-transition-fast);
+
+  &:active { opacity: 0.7; }
+}
+
+.rv-syn-word {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--lc-text-primary);
+}
+
+.rv-syn-trans {
+  font-size: 12px;
+  color: var(--lc-text-secondary);
+  flex: 1;
+}
+
+.rv-syn-chev {
+  display: flex;
+  align-items: center;
+  flex-shrink: 0;
+  transition: transform var(--lc-transition-fast);
+
+  ion-icon { font-size: 13px; color: var(--lc-text-hint); }
+}
+
+.rv-syn-item--open .rv-syn-chev { transform: rotate(180deg); }
+
+.rv-syn-body {
+  padding-bottom: 10px;
+}
+
+.rv-syn-example {
+  background: var(--lc-card);
+  border-radius: var(--lc-radius-sm);
+  padding: 8px 10px;
 }
 
 // ─── SECONDARY ACTIONS ────────────────────────────────────────────────────────

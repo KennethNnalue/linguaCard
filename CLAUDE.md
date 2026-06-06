@@ -162,7 +162,8 @@ apps/mobile/src/app/
     │   ├── store/
     │   │   └── story.store.ts         ← StoryStore (signalStore)
     │   └── services/
-    │       └── story-api.service.ts
+    │       ├── story-api.service.ts
+    │       └── platform-story-api.service.ts     ← platform story API (LC-310)
     ├── ai/                            ← AI integrations (pronunciation, image parsing)
     └── progress/
 ```
@@ -463,6 +464,7 @@ Rating 1–4 maps to: Again / Hard / Good / Easy.
 | 12 | Subscription & Paywall | ✅ Implemented | `features/subscription/`, `apps/api/src/subscriptions/`, `apps/mobile/epic-subscription-paywall.md` |
 | 13 | Tiered AI Routing | ✅ Implemented | `apps/api/src/stories/`, `apps/api/src/import/word-enrich.service.ts`, `apps/mobile/epic-tiered-ai-routing.md` |
 | 14 | FSRS Migration | ✅ Implemented | `shared/srs/fsrs.service.ts`, `libs/shared/utils/`, `apps/mobile/epics/epic-fsrs-migration.md` |
+| 15 | Story Studio 2.0 | 🔄 In progress | `features/stories/`, `apps/mobile/epics/epic-story-studio-redesign.md`, `apps/mobile/epics/epic-story-studio-redesign-design.html` |
 
 ### Implemented page inventory
 
@@ -528,5 +530,7 @@ These are **known deviations** from the architecture. Do not "fix" them without 
 | `apps/mobile/epic-design-system.md` | LDS epic — DS-01 to DS-17 |
 | `apps/mobile/story-ready-update-epic.md` | Story Reader Redesign epic |
 | `apps/mobile/epic-subscription-paywall.md` | Subscription & Paywall epic — LC-103 to LC-118 |
+| `apps/mobile/epics/epic-story-studio-redesign.md` | Story Studio 2.0 — Explore, read, interact (LC-300–LC-345) |
+| `apps/mobile/epics/epic-story-studio-redesign-design.html` | Design reference for Story Studio 2.0 |
 | `design-reference.html` | Visual design spec — open in browser before building any screen |
 | `apps/api/src/` | NestJS backend source |

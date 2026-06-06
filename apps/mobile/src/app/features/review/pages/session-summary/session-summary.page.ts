@@ -5,6 +5,7 @@ import { addIcons } from 'ionicons';
 import { arrowBackOutline, checkmarkCircleOutline, repeatOutline, refreshOutline } from 'ionicons/icons';
 import { Card, ConfidenceRating } from '@lingua-card/shared/domain';
 import { ReviewStore } from '../../store/review.store';
+import { CardStore } from '../../../vault/store/card.store';
 import { CategoryStore } from '../../../vault/store/category.store';
 import { WordCardComponent } from '../../../../shared/ui/word-card/word-card.component';
 import { getCategoryName } from '../../../../shared/helpers/helpers';
@@ -26,6 +27,7 @@ import {
 })
 export class SessionSummaryPage implements OnInit {
   private readonly reviewStore = inject(ReviewStore);
+  private readonly cardStore = inject(CardStore);
   private readonly categoryStore = inject(CategoryStore);
   private readonly router = inject(Router);
   private readonly wordAudio = inject(WordAudioService);
@@ -98,17 +100,29 @@ export class SessionSummaryPage implements OnInit {
   readonly hasNonMasteredCards = computed(() => this.nonMasteredCards().length > 0);
 
   reviewAllAgain(): void {
-    const cards = this.allReviewedCards();
-    if (!cards.length) return;
+    const staleCards = this.allReviewedCards();
+    if (!staleCards.length) return;
+    const cards = this.resolveLatestCards(staleCards);
     this.reviewStore.startSession(cards, this.session()?.collectionId ?? null, this.session()?.collectionName ?? null);
     void this.router.navigate([ReviewRoute.PLAYER]);
   }
 
   reviewNonMastered(): void {
-    const cards = this.nonMasteredCards();
-    if (!cards.length) return;
+    const staleCards = this.nonMasteredCards();
+    if (!staleCards.length) return;
+    const cards = this.resolveLatestCards(staleCards);
     this.reviewStore.startSession(cards, this.session()?.collectionId ?? null, 'Struggled cards retry');
     void this.router.navigate([ReviewRoute.PLAYER]);
+  }
+
+  // Resolves the freshest Card objects from the live store.
+  // Falls back to the session snapshot cards when the store hasn't loaded yet
+  // (deep-link / page refresh before CardStore HTTP response returns).
+  private resolveLatestCards(fallback: Card[]): Card[] {
+    const liveCards = this.cardStore.cards();
+    if (!liveCards.length) return fallback;
+    const liveMap = new Map(liveCards.map(c => [c.id, c]));
+    return fallback.map(c => liveMap.get(c.id) ?? c);
   }
 
   navigateToCard(card: Card): void {

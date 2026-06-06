@@ -44,6 +44,7 @@
   align-items: center;
   gap: t.$lc-space-2;
   margin-bottom: t.$lc-space-1;
+  min-width: 0;
 }
 
 .wd2-word {
@@ -53,6 +54,9 @@
   color: var(--lc-text-primary);
   line-height: 1.1;
   margin: 0;
+  min-width: 0;
+  word-break: break-word;
+  overflow-wrap: break-word;
 }
 
 .wd2-phonetic {
@@ -66,6 +70,8 @@
   @include u.lc-font('md');
   color: var(--lc-text-secondary);
   margin-bottom: t.$lc-space-3;
+  word-break: break-word;
+  overflow-wrap: break-word;
 }
 
 .wd2-pills {

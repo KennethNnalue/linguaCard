@@ -22,57 +22,119 @@
   flex-shrink: 0;
 }
 
-// ── Level filter chips ─────────────────────────────────────────────────────
-.filter-row {
-  display: flex; gap: t.$lc-space-2; padding: 0 t.$lc-space-4 t.$lc-space-3;
-  overflow-x: auto; -webkit-overflow-scrolling: touch;
+// ── Level tab bar ──────────────────────────────────────────────────────────
+.filter-tabs {
+  display: flex;
+  border-bottom: 1px solid var(--lc-border);
+  padding: 0 t.$lc-space-4;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
   &::-webkit-scrollbar { display: none; }
 }
-.filter-chip {
-  padding: 5px 14px;
-  border-radius: 20px;
-  @include u.lc-font('xxs', t.$lc-font-weight-semibold);
-  border: 1px solid var(--lc-border);
-  background: var(--lc-card);
-  color: var(--lc-text-secondary);
+.filter-tab {
+  flex-shrink: 0;
+  padding: t.$lc-space-2 t.$lc-space-3 calc(t.$lc-space-2 - 2px);
+  border: none;
+  border-bottom: 2px solid transparent;
+  background: none;
+  @include u.lc-font('xs', t.$lc-font-weight-medium);
+  color: var(--lc-text-hint);
   cursor: pointer;
   white-space: nowrap;
   font-family: t.$lc-font-body;
-  transition: background t.$lc-duration-fast, color t.$lc-duration-fast, border-color t.$lc-duration-fast;
+  transition: color t.$lc-duration-fast, border-color t.$lc-duration-fast;
 
   &.active {
-    background: var(--lc-brand);
-    color: white;
-    border-color: var(--lc-brand);
+    color: var(--lc-brand);
+    border-bottom-color: var(--lc-brand);
+    font-weight: t.$lc-font-weight-semibold;
   }
+
+  &:active { opacity: 0.7; }
 }
 
 // ── Category chips ─────────────────────────────────────────────────────────
+.cat-scroll-wrap {
+  position: relative;
+  display: flex;
+  align-items: center;
+  padding: t.$lc-space-3 0 t.$lc-space-2;
+
+  // Edge fade masks — always visible to signal overflow
+  &::before,
+  &::after {
+    content: '';
+    position: absolute;
+    top: 0; bottom: 0;
+    width: 32px;
+    pointer-events: none;
+    z-index: 1;
+  }
+  &::before {
+    left: 0;
+    background: linear-gradient(to right, var(--lc-background) 40%, transparent);
+  }
+  &::after {
+    right: 0;
+    background: linear-gradient(to left, var(--lc-background) 40%, transparent);
+  }
+}
+
+.cat-arrow {
+  flex-shrink: 0;
+  width: 28px;
+  height: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  background: none;
+  cursor: pointer;
+  color: var(--lc-text-hint);
+  z-index: 2;
+  padding: 0;
+  transition: color t.$lc-duration-fast;
+
+  ion-icon { font-size: 16px; }
+
+  &:active { color: var(--lc-brand); }
+
+  &--left  { padding-left:  t.$lc-space-4; }
+  &--right { padding-right: t.$lc-space-4; }
+}
+
 .cat-row {
-  display: flex; gap: t.$lc-space-2; padding: 0 t.$lc-space-4 t.$lc-space-3;
-  overflow-x: auto; -webkit-overflow-scrolling: touch;
+  display: flex;
+  flex: 1;
+  gap: t.$lc-space-1;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  scroll-behavior: smooth;
   &::-webkit-scrollbar { display: none; }
 }
+
 .cat-chip {
   display: flex; align-items: center; gap: 4px;
-  padding: 5px 12px;
-  border-radius: 20px;
-  @include u.lc-font('xxs', t.$lc-font-weight-semibold);
-  border: 1px solid var(--lc-border);
-  background: var(--lc-card);
-  color: var(--lc-text-secondary);
+  padding: 4px 10px;
+  border-radius: t.$lc-radius-sm;
+  @include u.lc-font('xxs', t.$lc-font-weight-medium);
+  border: none;
+  background: transparent;
+  color: var(--lc-text-hint);
   cursor: pointer;
   white-space: nowrap;
   font-family: t.$lc-font-body;
-  transition: background t.$lc-duration-fast, color t.$lc-duration-fast, border-color t.$lc-duration-fast;
+  transition: background t.$lc-duration-fast, color t.$lc-duration-fast;
 
   &.active {
     background: var(--lc-brand-light);
     color: var(--lc-brand);
-    border-color: var(--lc-brand-mid);
+    font-weight: t.$lc-font-weight-semibold;
   }
+
+  &:active { opacity: 0.7; }
 }
-.cat-emoji { font-size: 12px; }
+.cat-emoji { font-size: 13px; }
 
 // ── Results header ─────────────────────────────────────────────────────────
 .results-header {
@@ -102,9 +164,14 @@
 }
 .browse-img {
   width: 100%; height: 96px;
+  position: relative;
   background: linear-gradient(135deg, var(--lc-brand-light), var(--lc-brand-mid));
   display: flex; align-items: flex-start; padding: t.$lc-space-2;
   gap: t.$lc-space-1;
+}
+.browse-cover-img {
+  position: absolute; inset: 0; width: 100%; height: 100%;
+  object-fit: cover; display: block;
 }
 .browse-lvl {
   font-size: 9px;

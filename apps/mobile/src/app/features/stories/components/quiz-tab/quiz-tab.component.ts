@@ -1,6 +1,8 @@
 import {
+  ChangeDetectionStrategy,
   Component,
   computed,
+  effect,
   inject,
   input,
   model,
@@ -24,6 +26,7 @@ function shuffle<T>(arr: T[]): T[] {
   selector: 'lc-quiz-tab',
   templateUrl: './quiz-tab.component.html',
   styleUrls: ['./quiz-tab.component.scss'],
+  changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [NgClass, IonToggle],
 })
 export class QuizTabComponent {
@@ -44,12 +47,26 @@ export class QuizTabComponent {
 
   // When true: wrong answers require a manual "Next" tap before advancing.
   // When false: auto-advances after audio (or 1500ms) even on wrong answers.
-  readonly manualAdvance = signal(false);
+  readonly pauseOnMistakes = signal(true);
 
   // Set to true while waiting for the user to tap "Next" after a wrong answer
   readonly waitingForNext = signal(false);
 
+  // Track which question IDs have already been auto-played so revisiting doesn't replay
+  private readonly playedQuestionIds = new Set<string>();
+
   readonly currentQuestion = computed(() => this.questions()[this.currentIdx()] ?? null);
+
+  constructor() {
+    // LC-332: auto-play sentence audio on question load (first visit only)
+    effect(() => {
+      const q = this.currentQuestion();
+      if (q && !this.playedQuestionIds.has(q.id)) {
+        this.playedQuestionIds.add(q.id);
+        void this.wordAudio.play(q.sentenceTemplate, 'de-DE');
+      }
+    });
+  }
 
   readonly progressLabel = computed(
     () => `${this.currentIdx() + 1}/${this.questions().length}`,
@@ -66,10 +83,16 @@ export class QuizTabComponent {
     return circumference - filled;
   });
 
+  // Memoised per question ID so shuffle runs once per question, not on every CD cycle.
+  private readonly shuffledChoicesCache = new Map<string, string[]>();
+
   readonly choices = computed(() => {
     const q = this.currentQuestion();
     if (!q) return [];
-    return shuffle([q.correctAnswer, ...q.distractors]);
+    if (!this.shuffledChoicesCache.has(q.id)) {
+      this.shuffledChoicesCache.set(q.id, shuffle([q.correctAnswer, ...q.distractors]));
+    }
+    return this.shuffledChoicesCache.get(q.id)!;
   });
 
   readonly isComplete = computed(
@@ -115,7 +138,7 @@ export class QuizTabComponent {
 
     const wrong = choice !== q.correctAnswer;
 
-    if (wrong && this.manualAdvance()) {
+    if (wrong && this.pauseOnMistakes()) {
       // Stay on feedback — user must tap "Next" to continue.
       // Still play audio so they hear the correct pronunciation.
       this.waitingForNext.set(true);
@@ -144,9 +167,14 @@ export class QuizTabComponent {
   }
 
   retake(): void {
-    this.currentIdx.set(0);
+    this.playedQuestionIds.clear();
+    this.shuffledChoicesCache.clear();
     this.answered.set({});
     this.waitingForNext.set(false);
     this.showFeedback.set(false);
+    // Bounce through -1 so the effect re-fires even when already at index 0,
+    // ensuring auto-play triggers for question 0 after a retake.
+    this.currentIdx.set(-1);
+    this.currentIdx.set(0);
   }
 }
