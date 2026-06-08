@@ -66,7 +66,7 @@
       </div>
 
       <div class="hero-actions">
-        <button class="hero-btn-start" [routerLink]="['/review']">
+        <button class="hero-btn-start" (click)="startSession()">
           <ion-icon name="play-outline"></ion-icon>
           Start session
         </button>

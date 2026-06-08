@@ -15,7 +15,15 @@ import {AuthService} from '../../../../core/services/auth.service';
 import {CardStore} from '../../../vault/store/card.store';
 import {CategoryStore} from '../../../vault/store/category.store';
 import {CollectionStore} from '../../../vault/store/collection.store';
-import {RING_CIRCUMFERENCE_OUTER} from '../../../review/models/review.model';
+import {
+  RING_CIRCUMFERENCE_OUTER,
+  ReviewLimit,
+  ReviewRoute,
+  ReviewSortOrder,
+  ReviewSource,
+} from '../../../review/models/review.model';
+import {ReviewFilterService} from '../../../review/services/review-filter.service';
+import {ReviewStore} from '../../../review/store/review.store';
 import {getCategoryName} from '../../../../shared/helpers/helpers';
 import {UserMenuComponent} from '../../../../shared/components/user-menu/user-menu.component';
 import {AddWordSheetComponent} from '../../../vault/components/add-word-sheet/add-word-sheet.component';
@@ -53,6 +61,8 @@ export class HomePage {
   private readonly bottomSheet = inject(BottomSheetService);
   private readonly authService = inject(AuthService);
   private readonly router = inject(Router);
+  private readonly reviewStore = inject(ReviewStore);
+  private readonly filterService = inject(ReviewFilterService);
 
   constructor() {
     addIcons({playOutline, libraryOutline});
@@ -196,6 +206,22 @@ export class HomePage {
 
   playAudio(card: Card): void {
     void this.wordAudio.playCard(card);
+  }
+
+  startSession(): void {
+    const collectionId = this.selectedCollectionId();
+    const queue = this.filterService.buildQueue({
+      source: collectionId ?? ReviewSource.ALL,
+      masteryLevels: [0, 1, 2, 3, 4, 5],
+      sortOrder: ReviewSortOrder.DUE_DATE,
+      limit: ReviewLimit.DUE_TODAY,
+    });
+    if (!queue.length) {
+      void this.router.navigate([ReviewRoute.HUB]);
+      return;
+    }
+    this.reviewStore.startSession(queue, null, null);
+    void this.router.navigate([ReviewRoute.PLAYER]);
   }
 
   navigateToCard(card: Card): void {
