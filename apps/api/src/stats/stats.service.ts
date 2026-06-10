@@ -59,9 +59,16 @@ export class StatsService {
     settings: { dailyGoal: number; timezone: string },
   ): Promise<{ streak: StreakStatus; progress: GoalProgress }> {
     const counts = await this.dailyCardCounts(userId, settings.timezone);
+    const today = this.todayKey(settings.timezone);
+    const reviewed = counts.get(today) ?? 0;
     return {
       streak: this.streakFromCounts(counts, settings.dailyGoal, settings.timezone),
-      progress: this.goalProgressFromCounts(counts, 'daily', settings),
+      progress: {
+        period: 'daily',
+        reviewed,
+        goal: settings.dailyGoal,
+        metGoal: reviewed >= settings.dailyGoal,
+      },
     };
   }
 
