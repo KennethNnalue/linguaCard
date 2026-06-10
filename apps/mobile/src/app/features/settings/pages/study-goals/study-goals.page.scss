@@ -9,8 +9,8 @@
 .sg-back {
   @include u.circle(28px);
   border: none;
-  background: t.$lc-brand-light;
-  color: t.$lc-brand;
+  background: var(--lc-brand-light);
+  color: var(--lc-brand);
   @include u.flex-center;
   cursor: pointer;
   @include u.touch-state;
@@ -18,14 +18,14 @@
   svg {
     width: 12px;
     height: 12px;
-    stroke: t.$lc-brand;
+    stroke: var(--lc-brand);
   }
 }
 
 .sg-nav-title {
   font-family: t.$lc-font-display;
   @include u.lc-font('2xl', t.$lc-font-weight-semibold);
-  color: t.$lc-text-primary;
+  color: var(--lc-text-primary);
 }
 
 .sg-content {
@@ -36,7 +36,7 @@
   @include u.lc-font('xxs', t.$lc-font-weight-bold);
   letter-spacing: 0.1em;
   text-transform: uppercase;
-  color: t.$lc-text-hint;
+  color: var(--lc-text-hint);
   padding: t.$lc-space-1 t.$lc-space-4 t.$lc-space-2;
 }
 
@@ -54,12 +54,12 @@
 
 .sg-goal-name {
   @include u.lc-font('md', t.$lc-font-weight-semibold);
-  color: t.$lc-text-primary;
+  color: var(--lc-text-primary);
 }
 
 .sg-goal-desc {
   @include u.lc-font('xs', t.$lc-font-weight-regular);
-  color: t.$lc-text-secondary;
+  color: var(--lc-text-secondary);
   margin-top: t.$lc-space-1;
   line-height: 1.4;
 }
@@ -67,7 +67,7 @@
 .sg-stepper {
   display: flex;
   align-items: center;
-  border: 1px solid t.$lc-border;
+  border: 1px solid var(--lc-border);
   border-radius: t.$lc-radius-md;
   overflow: hidden;
   flex-shrink: 0;
@@ -77,8 +77,8 @@
   width: 34px;
   height: 34px;
   border: none;
-  background: t.$lc-surface;
-  color: t.$lc-brand;
+  background: var(--lc-surface);
+  color: var(--lc-brand);
   font-size: 18px;
   font-weight: t.$lc-font-weight-semibold;
   font-family: t.$lc-font-body;
@@ -87,11 +87,11 @@
 }
 
 .sg-stepper-val {
-  width: 46px;
+  min-width: 52px;
   text-align: center;
   font-family: t.$lc-font-display;
   @include u.lc-font('2xl', t.$lc-font-weight-semibold);
-  color: t.$lc-text-primary;
+  color: var(--lc-text-primary);
 }
 
 .sg-chips {
@@ -104,26 +104,26 @@
   @include u.lc-font('xs', t.$lc-font-weight-semibold);
   padding: 5px t.$lc-space-3;
   border-radius: 14px;
-  border: 1px solid t.$lc-border;
-  background: t.$lc-surface;
-  color: t.$lc-text-secondary;
+  border: 1px solid var(--lc-border);
+  background: var(--lc-surface);
+  color: var(--lc-text-secondary);
   cursor: pointer;
   @include u.touch-state;
   font-family: t.$lc-font-body;
 
   &--active {
-    background: t.$lc-brand;
+    background: var(--lc-brand);
     color: t.$lc-text-inverse;
-    border-color: t.$lc-brand;
+    border-color: var(--lc-brand);
   }
 }
 
 .sg-note {
   margin: 0 t.$lc-space-4 t.$lc-space-4;
   @include u.lc-font('xs', t.$lc-font-weight-regular);
-  color: t.$lc-brand-mid;
+  color: var(--lc-brand-mid);
   padding: t.$lc-space-2 t.$lc-space-3;
-  background: t.$lc-brand-light;
+  background: var(--lc-brand-light);
   border-radius: t.$lc-radius-sm;
   line-height: 1.4;
 }

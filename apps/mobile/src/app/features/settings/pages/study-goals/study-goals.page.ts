@@ -30,15 +30,15 @@ export class StudyGoalsPage {
   }
 
   setDailyGoal(value: number): void {
-    this.debouncedUpdate({dailyGoal: Math.max(1, Math.min(1000, value))});
+    this.debouncedUpdate({dailyGoal: Math.max(1, Math.min(500, value))});
   }
 
   setWeeklyGoal(value: number): void {
-    this.debouncedUpdate({weeklyGoal: Math.max(1, Math.min(1000, value))});
+    this.debouncedUpdate({weeklyGoal: Math.max(1, Math.min(2000, value))});
   }
 
   setMonthlyGoal(value: number): void {
-    this.debouncedUpdate({monthlyGoal: Math.max(1, Math.min(1000, value))});
+    this.debouncedUpdate({monthlyGoal: Math.max(1, Math.min(5000, value))});
   }
 
   private debouncedUpdate(patch: Parameters<typeof this.settingsStore.update>[0]): void {

@@ -224,6 +224,14 @@
   display: flex;
   align-items: center;
   gap: t.$lc-space-3;
+
+  &--broken {
+    background: var(--lc-brand-light);
+    border-color: var(--lc-border);
+
+    .at-risk-txt { color: var(--lc-brand-mid); }
+    .at-risk-cta { background: var(--lc-brand); }
+  }
 }
 
 .at-risk-flame {

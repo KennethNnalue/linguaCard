@@ -82,11 +82,17 @@
       </div>
     </div>
 
-    <!-- ── At-risk banner ── -->
-    @if (streakReady() && streak().state === 'at_risk') {
-      <div class="at-risk-banner">
+    <!-- ── At-risk / goal banner ── -->
+    @if (streakReady() && dailyGoalPct() < 1) {
+      <div class="at-risk-banner" [class.at-risk-banner--broken]="streak().state === 'broken'">
         <span class="at-risk-flame">🔥</span>
-        <div class="at-risk-txt">Review now to keep your {{ streak().current }}-day streak alive</div>
+        @if (streak().state === 'at_risk') {
+          <div class="at-risk-txt">Review now to keep your {{ streak().current }}-day streak alive</div>
+        } @else if (streak().state === 'broken') {
+          <div class="at-risk-txt">Review {{ dailyGoal() }} cards today to start a streak</div>
+        } @else {
+          <div class="at-risk-txt">{{ dailyGoal() - completedToday() }} more cards to hit your daily goal</div>
+        }
         <button class="at-risk-cta" (click)="startSession()">Start</button>
       </div>
     }

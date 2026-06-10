@@ -36,9 +36,9 @@ export class UserSettingsService {
     await this.getForUser(userId);
     const patch: Partial<UserSettingsEntity> = {};
     const goalTouched = dto.dailyGoal !== undefined || dto.weeklyGoal !== undefined || dto.monthlyGoal !== undefined;
-    if (dto.dailyGoal !== undefined)        patch.dailyGoal = clampGoal(dto.dailyGoal);
-    if (dto.weeklyGoal !== undefined)       patch.weeklyGoal = clampGoal(dto.weeklyGoal);
-    if (dto.monthlyGoal !== undefined)      patch.monthlyGoal = clampGoal(dto.monthlyGoal);
+    if (dto.dailyGoal !== undefined)        patch.dailyGoal = clampGoal(dto.dailyGoal, 500);
+    if (dto.weeklyGoal !== undefined)       patch.weeklyGoal = clampGoal(dto.weeklyGoal, 2000);
+    if (dto.monthlyGoal !== undefined)      patch.monthlyGoal = clampGoal(dto.monthlyGoal, 5000);
     if (goalTouched)                        patch.goalsSetAt = new Date();
     if (dto.remindersEnabled !== undefined) patch.remindersEnabled = dto.remindersEnabled;
     if (dto.reminderTime !== undefined)     patch.reminderTime = dto.reminderTime;
@@ -69,6 +69,6 @@ export class UserSettingsService {
   }
 }
 
-function clampGoal(v: number): number {
-  return Math.max(1, Math.min(1000, Math.round(v)));
+function clampGoal(v: number, max = 5000): number {
+  return Math.max(1, Math.min(max, Math.round(v)));
 }
