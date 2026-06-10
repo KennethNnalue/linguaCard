@@ -1,0 +1,7 @@
+<div class="milestone-modal" role="dialog" aria-modal="true" [attr.aria-label]="milestone() + '-day streak milestone'">
+  <div class="milestone-flame" aria-hidden="true">🔥</div>
+  <div class="milestone-num">{{ milestone() }}</div>
+  <div class="milestone-title">{{ milestone() }}-day streak!</div>
+  <p class="milestone-body">{{ motivationText }}</p>
+  <button class="milestone-btn" (click)="dismiss()" autofocus>Keep going</button>
+</div>

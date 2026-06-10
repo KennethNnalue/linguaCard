@@ -228,6 +228,8 @@ export const CardStore = signalStore(
 | `ReviewStore` | `review/store/` | review only |
 | `ListenStore` | `listen/store/` | listen only |
 | `StoryStore` | `stories/store/` | stories only |
+| `SettingsStore` | `settings/store/` | home, settings, `ReviewStatsStore` (for `dailyGoal`) |
+| `ReviewStatsStore` | `shared/srs/` | home (streak/progress display); depends on `SettingsStore` for goal threshold |
 
 Cross-feature data sharing is via Angular DI injection, **never** via file imports across feature folder boundaries.
 
@@ -465,6 +467,7 @@ Rating 1–4 maps to: Again / Hard / Good / Easy.
 | 13 | Tiered AI Routing | ✅ Implemented | `apps/api/src/stories/`, `apps/api/src/import/word-enrich.service.ts`, `apps/mobile/epic-tiered-ai-routing.md` |
 | 14 | FSRS Migration | ✅ Implemented | `shared/srs/fsrs.service.ts`, `libs/shared/utils/`, `apps/mobile/epics/epic-fsrs-migration.md` |
 | 15 | Story Studio 2.0 | 🔄 In progress | `features/stories/`, `apps/mobile/epics/epic-story-studio-redesign.md`, `apps/mobile/epics/epic-story-studio-redesign-design.html` |
+| 16 | Streak, Goals & Web Reminders | ✅ Implemented | `apps/api/src/{settings,stats,push}/`, `features/settings/`, `shared/srs/review-stats.store.ts`, `apps/mobile/epics/epic-streak-goals-reminders.md` |
 
 ### Implemented page inventory
 
@@ -479,6 +482,33 @@ Rating 1–4 maps to: Again / Hard / Good / Easy.
 **Auth:** login, register, forgot password, reset-data sheet
 
 **Shared:** home/dashboard, onboarding, user menu, sync-status indicator, fab button
+
+**Settings:** study goals (daily/weekly/monthly), reminders (push toggle + time picker)
+
+---
+
+## Streak & goals
+
+- **Streak rule (ADR-1):** a calendar day counts toward the streak only when `distinctCardsReviewed >= dailyGoal`. Uses local timezone bucketing via `Intl.DateTimeFormat('en-CA', { timeZone })`.
+- **States:** `safe` (goal met today) · `at_risk` (goal met yesterday, not yet today) · `broken` (current = 0).
+- **Server-authoritative (ADR-2):** `GET /api/v1/stats/streak` computes from `reviewSessions` table (up to 500 sessions back). Client `ReviewStatsStore` keeps an optimistic local computation for instant UI; reconciles with server on load and after each session via `refreshStreak()`.
+- **Defaults:** `dailyGoal = 20`, `weeklyGoal = 120`, `monthlyGoal = 500` — stored in `user_settings` (one row per user, created on registration).
+- **Goals API:** `GET /api/v1/settings/me` · `PATCH /api/v1/settings/me` (fields: `dailyGoal`, `weeklyGoal`, `monthlyGoal`, `remindersEnabled`, `reminderTime`, `timezone`).
+- **`goalsSetAt`:** stamped whenever any goal field is explicitly updated — used by `SettingsStore.needsGoalSetup()` to prompt the user to set goals on first use or after 30 days.
+- **Milestone celebrations:** `StreakMilestoneComponent` fires on 3/7/14/30/50/100/365-day milestones; persists `lc_last_celebrated_milestone` in localStorage to avoid re-showing.
+
+---
+
+## Web push reminders
+
+- **Protocol:** VAPID Web Push via `web-push` npm package on the server + Angular `SwPush` (`@angular/service-worker`) on the client.
+- **VAPID env vars:** `VAPID_PUBLIC_KEY`, `VAPID_PRIVATE_KEY`, `VAPID_SUBJECT` — public key is safe to send to clients; private key is secret (never expose).
+- **`push_subscriptions` table:** `endpoint` (PK), `user_id` (FK CASCADE), `p256dh`, `auth`. One user may have multiple device rows.
+- **Scheduler (ADR-5):** `ReminderSchedulerService` runs `@Cron('0 * * * *')` (hourly). Sends one push per user whose local hour matches `reminderTime`, has `remindersEnabled = true`, and has **not yet hit today's daily goal**. `lastRemindedOn` (local day key) prevents duplicate reminders.
+- **Payload shape:** `{ notification: { title, body, data: { url } } }` — `ngsw-worker.js` handles the `push` event and shows the notification natively; clicking routes to `data.url`.
+- **Stale subscription pruning:** `410`/`404` responses from the push service auto-delete the row.
+- **iOS caveat:** Web Push works only for **installed** (Add to Home Screen) PWAs on iOS 16.4+.
+- **`provideServiceWorker`** is registered in `main.ts` with `enabled: !isDevMode()`; `ngsw-config.json` is at the repo root.
 
 ---
 
@@ -532,5 +562,7 @@ These are **known deviations** from the architecture. Do not "fix" them without 
 | `apps/mobile/epic-subscription-paywall.md` | Subscription & Paywall epic — LC-103 to LC-118 |
 | `apps/mobile/epics/epic-story-studio-redesign.md` | Story Studio 2.0 — Explore, read, interact (LC-300–LC-345) |
 | `apps/mobile/epics/epic-story-studio-redesign-design.html` | Design reference for Story Studio 2.0 |
+| `apps/mobile/epics/epic-streak-goals-reminders.md` | Streak, Goals & Web Reminders epic — LC-350 to LC-368 |
+| `apps/mobile/epics/design-streak-goals-reminders.html` | Design reference for Streak/Goals/Reminders screens |
 | `design-reference.html` | Visual design spec — open in browser before building any screen |
 | `apps/api/src/` | NestJS backend source |

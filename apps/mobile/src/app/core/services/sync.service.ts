@@ -16,7 +16,8 @@ export type SyncOperationType =
   | 'GENERATE_STORY'
   | 'DELETE_STORY'
   | 'FLUSH_SRS_RATINGS'
-  | 'FLUSH_REVIEW_SESSIONS';
+  | 'FLUSH_REVIEW_SESSIONS'
+  | 'PATCH_SETTINGS';
 
 export interface SyncOperation {
   id: string;

@@ -19,6 +19,7 @@ import { provideAi } from './app/features/ai/ai.providers';
 import { provideVault } from './app/features/vault/vault.providers';
 import { provideStories } from './app/features/stories/stories.providers';
 import { provideReview } from './app/features/review/review.providers';
+import { provideSettings } from './app/features/settings/settings.providers';
 
 bootstrapApplication(AppComponent, {
   providers: [
@@ -42,5 +43,6 @@ bootstrapApplication(AppComponent, {
     provideVault(),
     provideStories(),
     provideReview(),
+    provideSettings(),
   ],
 });

@@ -5,6 +5,7 @@ import type { Card, ConfidenceRating, MasteryLevel } from '@lingua-card/shared/d
 export const SyncOperationType = {
   FLUSH_SRS_RATINGS: 'FLUSH_SRS_RATINGS',
   FLUSH_REVIEW_SESSIONS: 'FLUSH_REVIEW_SESSIONS',
+  PATCH_SETTINGS: 'PATCH_SETTINGS',
 } as const;
 
 export type SyncOperationType = (typeof SyncOperationType)[keyof typeof SyncOperationType];

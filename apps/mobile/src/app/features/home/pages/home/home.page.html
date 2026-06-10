@@ -29,9 +29,14 @@
   <div class="home-content">
 
     <!-- ── Hero card ── -->
-    <div class="hero-card">
-      <div class="hero-greeting">{{ greeting() }}</div>
-      <div class="hero-title">Ready to learn today?</div>
+    <div class="hero-card" [class.hero-card--complete]="dailyGoalPct() >= 1">
+      @if (dailyGoalPct() >= 1) {
+        <div class="hero-greeting hero-greeting--complete">Nice work</div>
+        <div class="hero-title">Goal complete today ✓</div>
+      } @else {
+        <div class="hero-greeting">{{ greeting() }}</div>
+        <div class="hero-title">Ready to learn today?</div>
+      }
 
       <div class="hero-ring-row">
         <div class="hero-ring">
@@ -77,27 +82,82 @@
       </div>
     </div>
 
-    <!-- ── Stats row ── -->
-    <div class="stats-row">
-      <div class="stat-card">
-        <span class="stat-icon">🔥</span>
-        <div class="stat-val">{{ dayStreak() }}</div>
-        <div class="stat-lbl">Day streak</div>
-        <div class="streak-dots">
-          @for (active of last7DaysActivity(); track $index) {
-            <div class="streak-dot" [class.streak-dot--active]="active"></div>
-          }
+    <!-- ── At-risk banner ── -->
+    @if (streak().state === 'at_risk') {
+      <div class="at-risk-banner">
+        <span class="at-risk-flame">🔥</span>
+        <div class="at-risk-txt">Review now to keep your {{ streak().current }}-day streak alive</div>
+        <button class="at-risk-cta" (click)="startSession()">Start</button>
+      </div>
+    }
+
+    <!-- ── Streak + Goal row ── -->
+    <div class="streak-goal-row">
+      <!-- Streak card -->
+      <div class="streak-card">
+        <span class="streak-flame">🔥</span>
+        <div class="streak-num">{{ streak().current }}</div>
+        <div class="streak-unit">Day streak</div>
+        @if (streak().state === 'safe') {
+          <div class="streak-state streak-state--safe">On track today ✓</div>
+        } @else if (streak().state === 'at_risk') {
+          <div class="streak-state streak-state--risk">At risk!</div>
+        } @else {
+          <div class="streak-state streak-state--broken">Start a new streak</div>
+        }
+      </div>
+
+      <!-- Daily goal ring card -->
+      <div class="streak-card">
+        <div class="goal-ring-wrap">
+          <svg viewBox="0 0 64 64" aria-hidden="true">
+            <circle
+              cx="32" cy="32" r="27"
+              fill="none"
+              [attr.stroke]="streak().state === 'at_risk' ? 'var(--lc-amber-bg)' : 'var(--lc-brand-light)'"
+              stroke-width="6"
+            />
+            @if (dailyGoalPct() < 1) {
+              <circle
+                cx="32" cy="32" r="27"
+                fill="none"
+                [attr.stroke]="streak().state === 'at_risk' ? 'var(--lc-amber)' : 'var(--lc-brand)'"
+                stroke-width="6"
+                [attr.stroke-dasharray]="GOAL_RING_CIRCUMFERENCE"
+                [attr.stroke-dashoffset]="goalRingOffset()"
+                stroke-linecap="round"
+                transform="rotate(-90 32 32)"
+              />
+            } @else {
+              <circle
+                cx="32" cy="32" r="27"
+                fill="none"
+                stroke="var(--lc-brand)"
+                stroke-width="6"
+                [attr.stroke-dasharray]="GOAL_RING_CIRCUMFERENCE"
+                stroke-dashoffset="0"
+                stroke-linecap="round"
+                transform="rotate(-90 32 32)"
+              />
+            }
+          </svg>
+          <div class="goal-ring-inner">
+            @if (dailyGoalPct() >= 1) {
+              <span class="goal-check">✓</span>
+            } @else {
+              <div class="goal-ring-num">{{ completedToday() }}/{{ dailyGoal() }}</div>
+              <div class="goal-ring-sub">today</div>
+            }
+          </div>
         </div>
-      </div>
-      <div class="stat-card">
-        <span class="stat-icon">📚</span>
-        <div class="stat-val">{{ totalCards() }}</div>
-        <div class="stat-lbl">Words</div>
-      </div>
-      <div class="stat-card">
-        <span class="stat-icon">⭐</span>
-        <div class="stat-val">{{ masteredCount() }}</div>
-        <div class="stat-lbl">Mastered</div>
+        <div class="streak-unit">Daily goal</div>
+        @if (dailyGoalPct() >= 1) {
+          <div class="streak-state streak-state--safe">{{ completedToday() }}/{{ dailyGoal() }} done</div>
+        } @else if (streak().state === 'at_risk') {
+          <div class="streak-state streak-state--risk">Not started</div>
+        } @else {
+          <div class="streak-state streak-state--safe">{{ dailyGoal() - completedToday() }} to go</div>
+        }
       </div>
     </div>
 
@@ -141,7 +201,7 @@
       </div>
       <div class="weekly-legend">
         <span class="weekly-total"><strong>{{ weeklyTotal() }}</strong> cards reviewed</span>
-        <span class="weekly-goal">Goal: <strong>150</strong></span>
+        <span class="weekly-goal">Goal: <strong>{{ weeklyGoal() }}</strong></span>
       </div>
     </div>
 

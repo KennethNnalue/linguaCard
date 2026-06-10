@@ -10,6 +10,8 @@ import { SubscriptionEntity } from '../subscriptions/subscription.entity';
 import { ReviewSessionEntity } from '../review/review-session.entity';
 import { PlatformStoryEntity } from '../platform-stories/platform-story.entity';
 import { UserStoryProgressEntity } from '../platform-stories/user-story-progress.entity';
+import { UserSettingsEntity } from '../settings/user-settings.entity';
+import { PushSubscriptionEntity } from '../push/push-subscription.entity';
 
 export default registerAs('database', (): TypeOrmModuleOptions => ({
   type: 'postgres',
@@ -17,7 +19,7 @@ export default registerAs('database', (): TypeOrmModuleOptions => ({
   ssl: process.env['NODE_ENV'] === 'production'
     ? { rejectUnauthorized: false }
     : false,
-  entities: [UserEntity, CardEntity, CollectionEntity, CategoryEntity, StoryEntity, WordAudioEntity, SubscriptionEntity, ReviewSessionEntity, PlatformStoryEntity, UserStoryProgressEntity],
+  entities: [UserEntity, CardEntity, CollectionEntity, CategoryEntity, StoryEntity, WordAudioEntity, SubscriptionEntity, ReviewSessionEntity, PlatformStoryEntity, UserStoryProgressEntity, UserSettingsEntity, PushSubscriptionEntity],
   synchronize: true,
   logging: process.env['NODE_ENV'] !== 'production',
 }));

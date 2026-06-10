@@ -1,0 +1,582 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>LinguaCard — Streak, Goals &amp; Reminders Design Reference</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,500;0,600;1,400&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600&family=Fira+Code:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root {
+  --lc-brand:#2D5A4E;--lc-brand-light:#E8F2EE;--lc-brand-mid:#4A8C7A;--lc-brand-dark:#1A3830;
+  --lc-accent:#E07B3F;--lc-accent-light:#FDF0E6;
+  --lc-fem-bg:#FEF2F2;--lc-fem-text:#B91C1C;--lc-fem-border:#FCA5A5;
+  --lc-amber:#D97706;--lc-amber-bg:#FFFBEB;--lc-amber-border:#FCD34D;
+  --lc-flame:#F97316;
+  --lc-surface:#FAFAF8;--lc-card:#FFFFFF;--lc-border:rgba(45,90,78,0.12);
+  --lc-text-primary:#1A2B26;--lc-text-secondary:#6B7C78;--lc-text-hint:#9BAAA6;
+  --lc-shadow-card:0 2px 12px rgba(45,90,78,0.08),0 1px 3px rgba(0,0,0,0.04);
+  --lc-shadow-float:0 8px 32px rgba(45,90,78,0.14),0 2px 8px rgba(0,0,0,0.06);
+  --lc-font-display:'Lora',Georgia,serif;
+  --lc-font-body:'DM Sans',system-ui,sans-serif;
+  --lc-font-mono:'Fira Code','Courier New',monospace;
+  --lc-radius-sm:8px;--lc-radius-md:12px;--lc-radius-lg:20px;--lc-radius-xl:28px;
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:var(--lc-font-body);background:#F0EDEA;color:var(--lc-text-primary);min-height:100vh;}
+
+.page-header{background:var(--lc-brand);padding:28px 40px 24px;position:sticky;top:0;z-index:100;box-shadow:0 4px 20px rgba(0,0,0,0.2);}
+.page-header-inner{max-width:1400px;margin:0 auto;}
+.logo{font-family:var(--lc-font-display);font-size:22px;font-weight:600;color:white;}
+.logo-sub{font-size:11px;color:rgba(255,255,255,0.55);margin-top:2px;}
+.main{max-width:1400px;margin:0 auto;padding:40px;}
+.section{margin-bottom:56px;}
+.section-title{font-family:var(--lc-font-display);font-size:20px;font-weight:600;color:var(--lc-text-primary);margin-bottom:4px;}
+.section-sub{font-size:13px;color:var(--lc-text-secondary);margin-bottom:24px;max-width:760px;line-height:1.5;}
+
+.phones-row{display:flex;gap:24px;align-items:flex-start;overflow-x:auto;padding-bottom:8px;}
+.phone-wrap{display:flex;flex-direction:column;align-items:center;gap:10px;flex:0 0 auto;}
+.phone-label{font-size:11px;font-weight:600;letter-spacing:0.06em;text-transform:uppercase;color:var(--lc-text-hint);max-width:280px;text-align:center;}
+.phone{width:300px;background:var(--lc-surface);border-radius:40px;border:8px solid #1A1A1A;box-shadow:0 0 0 1px #333,var(--lc-shadow-float),0 24px 48px rgba(0,0,0,0.2);overflow:hidden;position:relative;}
+.phone::before{content:'';position:absolute;top:0;left:50%;transform:translateX(-50%);width:80px;height:6px;background:#1A1A1A;border-radius:0 0 8px 8px;z-index:10;}
+.phone-inner{background:var(--lc-surface);min-height:600px;display:flex;flex-direction:column;padding-top:8px;position:relative;}
+.status-bar{display:flex;justify-content:space-between;align-items:center;padding:10px 20px 6px;font-size:11px;font-weight:600;color:var(--lc-text-secondary);}
+
+.app-top{display:flex;align-items:center;justify-content:space-between;padding:8px 16px 12px;}
+.app-logo{font-family:var(--lc-font-display);font-size:18px;font-weight:600;color:var(--lc-text-primary);}
+.app-avatar{width:32px;height:32px;border-radius:50%;background:var(--lc-brand);color:white;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;}
+
+/* hero */
+.hero{margin:0 14px 14px;background:var(--lc-brand);border-radius:18px;padding:16px 18px;position:relative;overflow:hidden;}
+.hero::after{content:'';position:absolute;bottom:-30px;right:-10px;width:90px;height:90px;border-radius:50%;background:rgba(255,255,255,0.05);}
+.hero-greet{font-size:9px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:rgba(255,255,255,0.45);margin-bottom:3px;}
+.hero-title{font-family:var(--lc-font-display);font-size:20px;font-weight:600;color:white;line-height:1.1;margin-bottom:12px;}
+.hero-row{display:flex;align-items:center;gap:14px;}
+.hero-due{display:flex;align-items:center;gap:10px;}
+.hero-due-num{font-family:var(--lc-font-display);font-size:30px;font-weight:600;color:white;line-height:1;}
+.hero-due-lbl{font-size:10px;color:rgba(255,255,255,0.55);text-transform:uppercase;letter-spacing:.05em;}
+.hero-cta{margin-top:12px;display:inline-flex;align-items:center;gap:6px;background:white;color:var(--lc-brand);font-size:12px;font-weight:700;padding:9px 18px;border-radius:20px;border:none;}
+
+/* ── STREAK + GOAL RING ROW ── */
+.streak-row{display:flex;gap:10px;margin:0 14px 14px;}
+.streak-card{flex:1;background:var(--lc-card);border-radius:16px;box-shadow:var(--lc-shadow-card);padding:14px 12px;display:flex;flex-direction:column;align-items:center;text-align:center;}
+.flame{font-size:24px;line-height:1;margin-bottom:2px;}
+.streak-num{font-family:var(--lc-font-display);font-size:30px;font-weight:600;color:var(--lc-text-primary);line-height:1;}
+.streak-lbl{font-size:10px;font-weight:600;color:var(--lc-text-hint);text-transform:uppercase;letter-spacing:.04em;margin-top:2px;}
+.streak-state{font-size:10px;font-weight:600;margin-top:7px;padding:3px 9px;border-radius:12px;}
+.streak-state--safe{background:var(--lc-brand-light);color:var(--lc-brand);}
+.streak-state--risk{background:var(--lc-amber-bg);color:var(--lc-amber);}
+.streak-state--broken{background:#F1EFE8;color:var(--lc-text-secondary);}
+
+/* goal ring */
+.goal-ring-wrap{position:relative;width:64px;height:64px;margin-bottom:4px;}
+.goal-ring-wrap svg{width:64px;height:64px;transform:rotate(-90deg);}
+.goal-ring-txt{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);text-align:center;}
+.goal-ring-num{font-family:var(--lc-font-display);font-size:15px;font-weight:600;color:var(--lc-text-primary);line-height:1;}
+.goal-ring-sub{font-size:8px;color:var(--lc-text-hint);}
+.goal-check{font-size:20px;color:var(--lc-brand);}
+
+/* at-risk banner */
+.risk-banner{margin:0 14px 14px;background:var(--lc-amber-bg);border:1px solid var(--lc-amber-border);border-radius:14px;padding:11px 14px;display:flex;align-items:center;gap:10px;}
+.risk-banner .rb-flame{font-size:20px;}
+.risk-banner .rb-txt{flex:1;font-size:12px;font-weight:600;color:var(--lc-amber);line-height:1.3;}
+.risk-banner .rb-cta{background:var(--lc-amber);color:white;border:none;border-radius:14px;padding:7px 13px;font-size:11px;font-weight:700;font-family:var(--lc-font-body);white-space:nowrap;}
+
+/* weekly */
+.week-card{margin:0 14px 14px;background:var(--lc-card);border-radius:16px;box-shadow:var(--lc-shadow-card);padding:14px;}
+.week-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;}
+.week-title{font-size:12px;font-weight:700;color:var(--lc-text-primary);}
+.week-goal{font-size:11px;color:var(--lc-text-secondary);}
+.week-goal b{color:var(--lc-brand);}
+.week-bars{display:flex;align-items:flex-end;justify-content:space-between;gap:6px;height:60px;margin-bottom:6px;}
+.week-bar-col{flex:1;display:flex;flex-direction:column;align-items:center;gap:4px;height:100%;justify-content:flex-end;}
+.week-bar{width:100%;border-radius:5px 5px 0 0;background:var(--lc-brand);}
+.week-bar--today{background:var(--lc-accent);}
+.week-bar--empty{background:var(--lc-border);}
+.week-day{font-size:9px;font-weight:600;color:var(--lc-text-hint);}
+.week-day--today{color:var(--lc-accent);}
+
+/* tab bar */
+.tab-bar{display:flex;border-top:1px solid var(--lc-border);background:var(--lc-card);padding:6px 0 10px;margin-top:auto;}
+.tab{flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;}
+.tab svg{width:20px;height:20px;stroke:var(--lc-text-hint);fill:none;stroke-width:1.7;stroke-linecap:round;}
+.tab.active svg{stroke:var(--lc-brand);}
+.tab-label{font-size:9px;font-weight:600;color:var(--lc-text-hint);}
+.tab.active .tab-label{color:var(--lc-brand);}
+
+/* nav header for settings */
+.p-nav{display:flex;align-items:center;gap:10px;padding:8px 16px 12px;}
+.p-back{width:28px;height:28px;border-radius:50%;background:var(--lc-brand-light);display:flex;align-items:center;justify-content:center;border:none;}
+.p-back svg{width:12px;height:12px;stroke:var(--lc-brand);fill:none;stroke-width:2.2;stroke-linecap:round;}
+.p-nav-title{font-family:var(--lc-font-display);font-size:16px;font-weight:600;color:var(--lc-text-primary);}
+
+/* settings goal rows */
+.set-section-label{font-size:9px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--lc-text-hint);padding:4px 16px 8px;}
+.goal-card{margin:0 14px 10px;background:var(--lc-card);border-radius:16px;box-shadow:var(--lc-shadow-card);padding:14px;}
+.goal-card-head{display:flex;align-items:flex-start;justify-content:space-between;gap:10px;margin-bottom:10px;}
+.goal-name{font-size:14px;font-weight:600;color:var(--lc-text-primary);}
+.goal-desc{font-size:11px;color:var(--lc-text-secondary);margin-top:2px;line-height:1.4;}
+.stepper{display:flex;align-items:center;gap:0;border:1px solid var(--lc-border);border-radius:12px;overflow:hidden;flex-shrink:0;}
+.stepper button{width:34px;height:34px;border:none;background:var(--lc-surface);color:var(--lc-brand);font-size:18px;font-weight:600;font-family:var(--lc-font-body);}
+.stepper .stepper-val{width:46px;text-align:center;font-family:var(--lc-font-display);font-size:17px;font-weight:600;color:var(--lc-text-primary);}
+.chips{display:flex;gap:6px;flex-wrap:wrap;}
+.chip{font-size:11px;font-weight:600;padding:5px 12px;border-radius:14px;border:1px solid var(--lc-border);background:var(--lc-surface);color:var(--lc-text-secondary);}
+.chip--active{background:var(--lc-brand);color:white;border-color:var(--lc-brand);}
+.goal-note{margin:2px 14px 14px;font-size:11px;color:var(--lc-brand-mid);padding:8px 12px;background:var(--lc-brand-light);border-radius:var(--lc-radius-sm);line-height:1.4;}
+
+/* settings reminders */
+.toggle-row{margin:0 14px 10px;background:var(--lc-card);border-radius:16px;box-shadow:var(--lc-shadow-card);padding:14px;display:flex;align-items:center;justify-content:space-between;gap:12px;}
+.toggle-info{flex:1;}
+.toggle-name{font-size:14px;font-weight:600;color:var(--lc-text-primary);}
+.toggle-desc{font-size:11px;color:var(--lc-text-secondary);margin-top:2px;line-height:1.4;}
+.toggle{width:46px;height:27px;border-radius:14px;position:relative;flex-shrink:0;transition:background .2s;}
+.toggle--on{background:var(--lc-brand);}
+.toggle--off{background:#D3D1C7;}
+.toggle-knob{position:absolute;top:3px;width:21px;height:21px;border-radius:50%;background:white;box-shadow:0 1px 3px rgba(0,0,0,0.2);transition:left .2s;}
+.toggle--on .toggle-knob{left:22px;}
+.toggle--off .toggle-knob{left:3px;}
+.time-row{margin:0 14px 10px;background:var(--lc-card);border-radius:16px;box-shadow:var(--lc-shadow-card);padding:14px;display:flex;align-items:center;justify-content:space-between;}
+.time-pill{font-family:var(--lc-font-display);font-size:18px;font-weight:600;color:var(--lc-brand);background:var(--lc-brand-light);padding:7px 16px;border-radius:12px;}
+.set-hint{margin:2px 14px 14px;font-size:11px;color:var(--lc-text-hint);padding:0 4px;line-height:1.4;}
+
+/* milestone modal */
+.modal-scrim{position:absolute;inset:0;background:rgba(26,43,38,0.55);display:flex;align-items:center;justify-content:center;padding:24px;z-index:50;}
+.modal{background:var(--lc-card);border-radius:24px;padding:28px 22px;text-align:center;width:100%;box-shadow:var(--lc-shadow-float);}
+.modal-flame{font-size:56px;line-height:1;margin-bottom:6px;}
+.modal-num{font-family:var(--lc-font-display);font-size:40px;font-weight:600;color:var(--lc-flame);line-height:1;}
+.modal-title{font-family:var(--lc-font-display);font-size:18px;font-weight:600;color:var(--lc-text-primary);margin:4px 0 6px;}
+.modal-sub{font-size:13px;color:var(--lc-text-secondary);line-height:1.5;margin-bottom:18px;}
+.modal-btn{width:100%;background:var(--lc-brand);color:white;border:none;border-radius:14px;padding:13px;font-size:14px;font-weight:600;font-family:var(--lc-font-body);}
+
+/* push notification mock */
+.notif-stage{background:linear-gradient(160deg,#3a4a6b 0%,#2d3a52 100%);border-radius:24px;padding:60px 18px 24px;display:flex;flex-direction:column;gap:12px;min-height:560px;}
+.notif-time{text-align:center;color:rgba(255,255,255,0.9);font-family:var(--lc-font-display);}
+.notif-time .nt-clock{font-size:52px;font-weight:600;line-height:1;}
+.notif-time .nt-date{font-size:13px;color:rgba(255,255,255,0.6);margin-top:4px;}
+.notif{background:rgba(255,255,255,0.92);border-radius:16px;padding:12px 14px;display:flex;gap:11px;align-items:flex-start;box-shadow:0 4px 16px rgba(0,0,0,0.2);margin-top:16px;}
+.notif-icon{width:38px;height:38px;border-radius:9px;background:var(--lc-brand);color:white;display:flex;align-items:center;justify-content:center;font-family:var(--lc-font-display);font-size:13px;font-weight:600;flex-shrink:0;}
+.notif-body{flex:1;}
+.notif-app{font-size:10px;font-weight:700;color:var(--lc-text-hint);text-transform:uppercase;letter-spacing:.04em;display:flex;justify-content:space-between;}
+.notif-title{font-size:13px;font-weight:700;color:#1A2B26;margin:2px 0 1px;}
+.notif-text{font-size:12px;color:#444;line-height:1.35;}
+
+/* explainer table */
+.explain{background:var(--lc-card);border-radius:var(--lc-radius-lg);box-shadow:var(--lc-shadow-card);padding:24px;overflow-x:auto;}
+table{width:100%;border-collapse:collapse;font-size:12px;}
+th{text-align:left;font-size:11px;font-weight:600;letter-spacing:.04em;color:var(--lc-text-hint);padding:8px 10px;border-bottom:1px solid var(--lc-border);}
+td{padding:9px 10px;border-bottom:1px solid rgba(45,90,78,0.06);vertical-align:top;}
+tr:last-child td{border-bottom:none;}
+.ok{color:#065F46;font-weight:600;}
+.bad{color:#c0392b;font-weight:600;}
+.new-col{background:rgba(45,90,78,0.03);}
+.adr-note{font-size:12px;color:var(--lc-text-secondary);margin-top:14px;padding:10px 14px;background:var(--lc-brand-light);border-radius:var(--lc-radius-sm);line-height:1.5;}
+</style>
+</head>
+<body>
+
+<div class="page-header">
+  <div class="page-header-inner">
+    <div class="logo">LinguaCard</div>
+    <div class="logo-sub">Daily Streak, Study Goals &amp; Web Reminders — Design Reference (LC-350 → LC-368)</div>
+  </div>
+</div>
+
+<div class="main">
+
+  <!-- ── SECTION 1: HOME STREAK STATES ── -->
+  <div class="section">
+    <div class="section-title">1. Home — daily streak &amp; goal progress (LC-363)</div>
+    <div class="section-sub">
+      The streak is reframed from a 7-dot weekly hint into a first-class daily streak with a goal-progress ring.
+      A day only counts toward the streak when the daily goal is met (LC-354 / ADR-1). Three states shown: on track,
+      at risk, and a met-goal state with the ring completed.
+    </div>
+
+    <div class="phones-row">
+
+      <!-- State: safe / in progress -->
+      <div class="phone-wrap">
+        <div class="phone-label">On track — goal in progress (12 / 20)</div>
+        <div class="phone">
+          <div class="phone-inner">
+            <div class="status-bar"><span>9:41</span><span>●●● 82%</span></div>
+            <div class="app-top"><div class="app-logo">LinguaCard</div><div class="app-avatar">KN</div></div>
+            <div class="hero">
+              <div class="hero-greet">Good morning</div>
+              <div class="hero-title">Ready to learn today?</div>
+              <div class="hero-row">
+                <div class="hero-due"><div class="hero-due-num">489</div><div class="hero-due-lbl">Due</div></div>
+              </div>
+              <button class="hero-cta">▶ Start session</button>
+            </div>
+            <!-- streak + goal -->
+            <div class="streak-row">
+              <div class="streak-card">
+                <span class="flame">🔥</span>
+                <div class="streak-num">12</div>
+                <div class="streak-lbl">Day streak</div>
+                <div class="streak-state streak-state--safe">On track today ✓</div>
+              </div>
+              <div class="streak-card">
+                <div class="goal-ring-wrap">
+                  <svg viewBox="0 0 64 64">
+                    <circle cx="32" cy="32" r="27" fill="none" stroke="var(--lc-brand-light)" stroke-width="6"/>
+                    <circle cx="32" cy="32" r="27" fill="none" stroke="var(--lc-brand)" stroke-width="6"
+                      stroke-dasharray="169.6" stroke-dashoffset="67.8" stroke-linecap="round"/>
+                  </svg>
+                  <div class="goal-ring-txt"><div class="goal-ring-num">12/20</div><div class="goal-ring-sub">today</div></div>
+                </div>
+                <div class="streak-lbl">Daily goal</div>
+                <div class="streak-state streak-state--safe">8 to go</div>
+              </div>
+            </div>
+            <!-- weekly -->
+            <div class="week-card">
+              <div class="week-head"><div class="week-title">This week</div><div class="week-goal">Goal: <b>120</b></div></div>
+              <div class="week-bars">
+                <div class="week-bar-col"><div class="week-bar" style="height:40%"></div><div class="week-day">Mo</div></div>
+                <div class="week-bar-col"><div class="week-bar" style="height:75%"></div><div class="week-day">Tu</div></div>
+                <div class="week-bar-col"><div class="week-bar week-bar--today" style="height:55%"></div><div class="week-day week-day--today">We</div></div>
+                <div class="week-bar-col"><div class="week-bar week-bar--empty" style="height:6%"></div><div class="week-day">Th</div></div>
+                <div class="week-bar-col"><div class="week-bar week-bar--empty" style="height:6%"></div><div class="week-day">Fr</div></div>
+                <div class="week-bar-col"><div class="week-bar week-bar--empty" style="height:6%"></div><div class="week-day">Sa</div></div>
+                <div class="week-bar-col"><div class="week-bar week-bar--empty" style="height:6%"></div><div class="week-day">Su</div></div>
+              </div>
+            </div>
+            <div class="tab-bar">
+              <div class="tab active"><svg viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9,22 9,12 15,12 15,22"/></svg><div class="tab-label">Home</div></div>
+              <div class="tab"><svg viewBox="0 0 24 24"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8M12 17v4"/></svg><div class="tab-label">Vault</div></div>
+              <div class="tab"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polygon points="10,8 16,12 10,16 10,8"/></svg><div class="tab-label">Review</div></div>
+              <div class="tab"><svg viewBox="0 0 24 24"><path d="M4 19.5A2.5 2.5 0 016.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 014 19.5v-15A2.5 2.5 0 016.5 2z"/></svg><div class="tab-label">Stories</div></div>
+              <div class="tab"><svg viewBox="0 0 24 24"><polygon points="11,5 6,9 2,9 2,15 6,15 11,19 11,5"/><path d="M19 5a10 10 0 010 14"/></svg><div class="tab-label">Listen</div></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- State: at risk -->
+      <div class="phone-wrap">
+        <div class="phone-label">At risk — no reviews yet today (LC-363 / ADR-6)</div>
+        <div class="phone">
+          <div class="phone-inner">
+            <div class="status-bar"><span>20:15</span><span>●●● 41%</span></div>
+            <div class="app-top"><div class="app-logo">LinguaCard</div><div class="app-avatar">KN</div></div>
+            <!-- at risk banner -->
+            <div class="risk-banner">
+              <span class="rb-flame">🔥</span>
+              <div class="rb-txt">Review now to keep your 12-day streak alive</div>
+              <button class="rb-cta">Start</button>
+            </div>
+            <div class="hero">
+              <div class="hero-greet">Good evening</div>
+              <div class="hero-title">Don't lose your streak</div>
+              <div class="hero-row"><div class="hero-due"><div class="hero-due-num">489</div><div class="hero-due-lbl">Due</div></div></div>
+              <button class="hero-cta">▶ Start session</button>
+            </div>
+            <div class="streak-row">
+              <div class="streak-card">
+                <span class="flame">🔥</span>
+                <div class="streak-num">12</div>
+                <div class="streak-lbl">Day streak</div>
+                <div class="streak-state streak-state--risk">At risk!</div>
+              </div>
+              <div class="streak-card">
+                <div class="goal-ring-wrap">
+                  <svg viewBox="0 0 64 64">
+                    <circle cx="32" cy="32" r="27" fill="none" stroke="var(--lc-amber-bg)" stroke-width="6"/>
+                    <circle cx="32" cy="32" r="27" fill="none" stroke="var(--lc-amber)" stroke-width="6"
+                      stroke-dasharray="169.6" stroke-dashoffset="169.6" stroke-linecap="round"/>
+                  </svg>
+                  <div class="goal-ring-txt"><div class="goal-ring-num">0/20</div><div class="goal-ring-sub">today</div></div>
+                </div>
+                <div class="streak-lbl">Daily goal</div>
+                <div class="streak-state streak-state--risk">Not started</div>
+              </div>
+            </div>
+            <div class="week-card">
+              <div class="week-head"><div class="week-title">This week</div><div class="week-goal">Goal: <b>120</b></div></div>
+              <div class="week-bars">
+                <div class="week-bar-col"><div class="week-bar" style="height:40%"></div><div class="week-day">Mo</div></div>
+                <div class="week-bar-col"><div class="week-bar" style="height:75%"></div><div class="week-day">Tu</div></div>
+                <div class="week-bar-col"><div class="week-bar" style="height:60%"></div><div class="week-day">We</div></div>
+                <div class="week-bar-col"><div class="week-bar" style="height:50%"></div><div class="week-day">Th</div></div>
+                <div class="week-bar-col"><div class="week-bar week-bar--today week-bar--empty" style="height:6%;background:var(--lc-accent);opacity:0.4"></div><div class="week-day week-day--today">Fr</div></div>
+                <div class="week-bar-col"><div class="week-bar week-bar--empty" style="height:6%"></div><div class="week-day">Sa</div></div>
+                <div class="week-bar-col"><div class="week-bar week-bar--empty" style="height:6%"></div><div class="week-day">Su</div></div>
+              </div>
+            </div>
+            <div class="tab-bar">
+              <div class="tab active"><svg viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9,22 9,12 15,12 15,22"/></svg><div class="tab-label">Home</div></div>
+              <div class="tab"><svg viewBox="0 0 24 24"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8M12 17v4"/></svg><div class="tab-label">Vault</div></div>
+              <div class="tab"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polygon points="10,8 16,12 10,16 10,8"/></svg><div class="tab-label">Review</div></div>
+              <div class="tab"><svg viewBox="0 0 24 24"><path d="M4 19.5A2.5 2.5 0 016.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 014 19.5v-15A2.5 2.5 0 016.5 2z"/></svg><div class="tab-label">Stories</div></div>
+              <div class="tab"><svg viewBox="0 0 24 24"><polygon points="11,5 6,9 2,9 2,15 6,15 11,19 11,5"/><path d="M19 5a10 10 0 010 14"/></svg><div class="tab-label">Listen</div></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- State: goal met -->
+      <div class="phone-wrap">
+        <div class="phone-label">Goal met — streak extended, ring complete</div>
+        <div class="phone">
+          <div class="phone-inner">
+            <div class="status-bar"><span>21:02</span><span>●●● 38%</span></div>
+            <div class="app-top"><div class="app-logo">LinguaCard</div><div class="app-avatar">KN</div></div>
+            <div class="hero">
+              <div class="hero-greet">Nice work</div>
+              <div class="hero-title">Goal complete today ✓</div>
+              <div class="hero-row"><div class="hero-due"><div class="hero-due-num">469</div><div class="hero-due-lbl">Due</div></div></div>
+              <button class="hero-cta">▶ Keep going</button>
+            </div>
+            <div class="streak-row">
+              <div class="streak-card">
+                <span class="flame">🔥</span>
+                <div class="streak-num">13</div>
+                <div class="streak-lbl">Day streak</div>
+                <div class="streak-state streak-state--safe">Extended!</div>
+              </div>
+              <div class="streak-card">
+                <div class="goal-ring-wrap">
+                  <svg viewBox="0 0 64 64">
+                    <circle cx="32" cy="32" r="27" fill="none" stroke="var(--lc-brand-light)" stroke-width="6"/>
+                    <circle cx="32" cy="32" r="27" fill="none" stroke="var(--lc-brand)" stroke-width="6"
+                      stroke-dasharray="169.6" stroke-dashoffset="0" stroke-linecap="round"/>
+                  </svg>
+                  <div class="goal-ring-txt"><div class="goal-check">✓</div></div>
+                </div>
+                <div class="streak-lbl">Daily goal</div>
+                <div class="streak-state streak-state--safe">22/20 done</div>
+              </div>
+            </div>
+            <div class="week-card">
+              <div class="week-head"><div class="week-title">This week</div><div class="week-goal">Goal: <b>120</b></div></div>
+              <div class="week-bars">
+                <div class="week-bar-col"><div class="week-bar" style="height:40%"></div><div class="week-day">Mo</div></div>
+                <div class="week-bar-col"><div class="week-bar" style="height:75%"></div><div class="week-day">Tu</div></div>
+                <div class="week-bar-col"><div class="week-bar" style="height:60%"></div><div class="week-day">We</div></div>
+                <div class="week-bar-col"><div class="week-bar" style="height:50%"></div><div class="week-day">Th</div></div>
+                <div class="week-bar-col"><div class="week-bar week-bar--today" style="height:90%"></div><div class="week-day week-day--today">Fr</div></div>
+                <div class="week-bar-col"><div class="week-bar week-bar--empty" style="height:6%"></div><div class="week-day">Sa</div></div>
+                <div class="week-bar-col"><div class="week-bar week-bar--empty" style="height:6%"></div><div class="week-day">Su</div></div>
+              </div>
+            </div>
+            <div class="tab-bar">
+              <div class="tab active"><svg viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9,22 9,12 15,12 15,22"/></svg><div class="tab-label">Home</div></div>
+              <div class="tab"><svg viewBox="0 0 24 24"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8M12 17v4"/></svg><div class="tab-label">Vault</div></div>
+              <div class="tab"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polygon points="10,8 16,12 10,16 10,8"/></svg><div class="tab-label">Review</div></div>
+              <div class="tab"><svg viewBox="0 0 24 24"><path d="M4 19.5A2.5 2.5 0 016.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 014 19.5v-15A2.5 2.5 0 016.5 2z"/></svg><div class="tab-label">Stories</div></div>
+              <div class="tab"><svg viewBox="0 0 24 24"><polygon points="11,5 6,9 2,9 2,15 6,15 11,19 11,5"/><path d="M19 5a10 10 0 010 14"/></svg><div class="tab-label">Listen</div></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ── SECTION 2: SETTINGS ── -->
+  <div class="section">
+    <div class="section-title">2. Settings — study goals &amp; reminders (LC-361, LC-367)</div>
+    <div class="section-sub">
+      Daily / weekly / monthly targets with defaults pre-filled and quick-pick chips. The daily goal is the one
+      that drives the streak. Reminders section appears only on browsers that support web push.
+    </div>
+
+    <div class="phones-row">
+
+      <!-- Study goals -->
+      <div class="phone-wrap">
+        <div class="phone-label">Study goals (LC-361)</div>
+        <div class="phone">
+          <div class="phone-inner">
+            <div class="status-bar"><span>9:41</span><span>●●● 82%</span></div>
+            <div class="p-nav">
+              <button class="p-back"><svg viewBox="0 0 14 14"><polyline points="9,2 4,7 9,12"/></svg></button>
+              <div class="p-nav-title">Study goals</div>
+            </div>
+            <div class="set-section-label">Targets</div>
+            <div class="goal-card">
+              <div class="goal-card-head">
+                <div><div class="goal-name">Daily</div><div class="goal-desc">Cards per day to keep your streak</div></div>
+                <div class="stepper"><button>−</button><div class="stepper-val">20</div><button>+</button></div>
+              </div>
+              <div class="chips">
+                <span class="chip">10</span><span class="chip chip--active">20</span><span class="chip">30</span><span class="chip">50</span>
+              </div>
+            </div>
+            <div class="goal-note">🔥 Hitting your daily goal extends your streak. Miss a day and the streak resets.</div>
+            <div class="goal-card">
+              <div class="goal-card-head">
+                <div><div class="goal-name">Weekly</div><div class="goal-desc">Total cards reviewed per week</div></div>
+                <div class="stepper"><button>−</button><div class="stepper-val">120</div><button>+</button></div>
+              </div>
+              <div class="chips">
+                <span class="chip">70</span><span class="chip chip--active">120</span><span class="chip">200</span>
+              </div>
+            </div>
+            <div class="goal-card">
+              <div class="goal-card-head">
+                <div><div class="goal-name">Monthly</div><div class="goal-desc">Total cards reviewed per month</div></div>
+                <div class="stepper"><button>−</button><div class="stepper-val">500</div><button>+</button></div>
+              </div>
+              <div class="chips">
+                <span class="chip">300</span><span class="chip chip--active">500</span><span class="chip">800</span>
+              </div>
+            </div>
+            <div style="height:14px"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Reminders -->
+      <div class="phone-wrap">
+        <div class="phone-label">Reminders (LC-367) — web push</div>
+        <div class="phone">
+          <div class="phone-inner">
+            <div class="status-bar"><span>9:41</span><span>●●● 82%</span></div>
+            <div class="p-nav">
+              <button class="p-back"><svg viewBox="0 0 14 14"><polyline points="9,2 4,7 9,12"/></svg></button>
+              <div class="p-nav-title">Reminders</div>
+            </div>
+            <div class="set-section-label">Daily reminder</div>
+            <div class="toggle-row">
+              <div class="toggle-info">
+                <div class="toggle-name">Enable reminders</div>
+                <div class="toggle-desc">Get a browser notification if you haven't hit your goal</div>
+              </div>
+              <div class="toggle toggle--on"><div class="toggle-knob"></div></div>
+            </div>
+            <div class="time-row">
+              <div class="toggle-info">
+                <div class="toggle-name">Reminder time</div>
+                <div class="toggle-desc">We'll only nudge you if your goal isn't met yet</div>
+              </div>
+              <div class="time-pill">19:00</div>
+            </div>
+            <div class="set-hint">
+              Reminders use your browser's notification system and work even when LinguaCard is closed.
+              Mobile app notifications (iOS / Android) are coming later.
+            </div>
+            <div class="set-section-label">Permission</div>
+            <div class="toggle-row">
+              <div class="toggle-info">
+                <div class="toggle-name">Notifications allowed</div>
+                <div class="toggle-desc">Granted for this browser ✓</div>
+              </div>
+              <span style="font-size:20px;color:var(--lc-brand)">✓</span>
+            </div>
+            <div style="height:14px"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Milestone modal -->
+      <div class="phone-wrap">
+        <div class="phone-label">Milestone celebration (LC-364)</div>
+        <div class="phone">
+          <div class="phone-inner">
+            <div class="status-bar"><span>21:02</span><span>●●● 38%</span></div>
+            <div class="app-top"><div class="app-logo">LinguaCard</div><div class="app-avatar">KN</div></div>
+            <div class="hero" style="opacity:0.4">
+              <div class="hero-greet">Nice work</div>
+              <div class="hero-title">Goal complete today ✓</div>
+              <button class="hero-cta">▶ Keep going</button>
+            </div>
+            <div class="streak-row" style="opacity:0.4">
+              <div class="streak-card"><span class="flame">🔥</span><div class="streak-num">14</div><div class="streak-lbl">Day streak</div></div>
+              <div class="streak-card"><span class="flame">⭐</span><div class="streak-num">22</div><div class="streak-lbl">Today</div></div>
+            </div>
+            <!-- modal overlay -->
+            <div class="modal-scrim">
+              <div class="modal">
+                <div class="modal-flame">🔥</div>
+                <div class="modal-num">14</div>
+                <div class="modal-title">14-day streak!</div>
+                <div class="modal-sub">Two weeks of hitting your goal. Your future self is already thanking you.</div>
+                <button class="modal-btn">Keep going</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ── SECTION 3: WEB PUSH ── -->
+  <div class="section">
+    <div class="section-title">3. Web push reminder (LC-359, LC-365)</div>
+    <div class="section-sub">
+      Sent by the backend hourly cron only when the daily goal is unmet, at the user's chosen local time, at most once
+      per day. Fires even when the tab is closed (Web Push, not the in-page Notifications API — ADR-4). The copy
+      references the live streak count and remaining cards.
+    </div>
+
+    <div class="phones-row">
+      <div class="phone-wrap">
+        <div class="phone-label">Lock screen / system notification</div>
+        <div class="phone">
+          <div class="phone-inner">
+            <div class="status-bar"><span>19:00</span><span>●●● 36%</span></div>
+            <div class="notif-stage">
+              <div class="notif-time">
+                <div class="nt-clock">19:00</div>
+                <div class="nt-date">Friday, June 12</div>
+              </div>
+              <div class="notif">
+                <div class="notif-icon">LC</div>
+                <div class="notif-body">
+                  <div class="notif-app"><span>LinguaCard</span><span>now</span></div>
+                  <div class="notif-title">Time to review 📚</div>
+                  <div class="notif-text">Keep your 12-day streak alive — 20 cards to go!</div>
+                </div>
+              </div>
+              <div class="notif" style="opacity:0.55;transform:scale(0.97)">
+                <div class="notif-icon" style="background:#888">··</div>
+                <div class="notif-body">
+                  <div class="notif-app"><span>Other app</span><span>17m</span></div>
+                  <div class="notif-title" style="font-weight:600">···············</div>
+                  <div class="notif-text">··················</div>
+                </div>
+              </div>
+            </div>
+            <div style="padding:10px 14px;font-size:11px;color:var(--lc-text-hint);text-align:center;">
+              Tapping the notification opens the app at <code style="font-family:var(--lc-font-mono)">/review</code>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Behaviour explainer -->
+      <div style="flex:1;min-width:420px;">
+        <div class="explain">
+          <h3 style="font-family:var(--lc-font-display);font-size:16px;font-weight:600;margin-bottom:6px;">What changes vs today</h3>
+          <table>
+            <thead><tr><th>Behaviour</th><th>Today</th><th class="new-col">After this epic</th></tr></thead>
+            <tbody>
+              <tr><td>Streak rule</td><td class="bad">Any session counts the day</td><td class="ok new-col">Day counts only if daily goal met</td></tr>
+              <tr><td>Streak source</td><td class="bad">Local history (capped 50)</td><td class="ok new-col">Server-authoritative from reviewSessions</td></tr>
+              <tr><td>Survives reinstall / multi-device</td><td class="bad">No</td><td class="ok new-col">Yes</td></tr>
+              <tr><td>Goal</td><td class="bad">Hardcoded "Goal: 150"</td><td class="ok new-col">Editable daily/weekly/monthly</td></tr>
+              <tr><td>Timezone correctness</td><td class="bad">Mixed UTC/local</td><td class="ok new-col">User timezone end-to-end</td></tr>
+              <tr><td>Reminders</td><td class="bad">None</td><td class="ok new-col">Web push, goal-gated, 1/day</td></tr>
+              <tr><td>"At risk" warning</td><td class="bad">None</td><td class="ok new-col">Explicit amber state + CTA</td></tr>
+              <tr><td>Milestones</td><td class="bad">None</td><td class="ok new-col">3 / 7 / 14 / 30 / 50 / 100 / 365</td></tr>
+            </tbody>
+          </table>
+          <div class="adr-note">
+            <strong>ADR-4 — why Web Push, not the Notifications API:</strong> the reminder must reach a user whose tab is
+            closed. <code style="font-family:var(--lc-font-mono)">setTimeout</code>-based notifications die with the tab;
+            only Web Push (VAPID → push service → service worker) delivers to a closed PWA. iOS delivers web push only to
+            installed (Add to Home Screen) PWAs on 16.4+ — native iOS/Android is a later epic.
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
+</body>
+</html>

@@ -1,0 +1,94 @@
+<ion-header class="ion-no-border">
+  <ion-toolbar>
+    <div class="sg-nav">
+      <button class="sg-back" (click)="goBack()" aria-label="Back">
+        <svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round">
+          <polyline points="9,2 4,7 9,12"/>
+        </svg>
+      </button>
+      <span class="sg-nav-title">Study goals</span>
+    </div>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+  <div class="sg-content">
+
+    <div class="sg-section-label">Targets</div>
+
+    <!-- Daily goal -->
+    <div class="sg-goal-card">
+      <div class="sg-goal-head">
+        <div>
+          <div class="sg-goal-name">Daily</div>
+          <div class="sg-goal-desc">Cards per day to keep your streak</div>
+        </div>
+        <div class="sg-stepper">
+          <button class="sg-stepper-btn" (click)="setDailyGoal(dailyGoal() - 1)" aria-label="Decrease daily goal">−</button>
+          <span class="sg-stepper-val">{{ dailyGoal() }}</span>
+          <button class="sg-stepper-btn" (click)="setDailyGoal(dailyGoal() + 1)" aria-label="Increase daily goal">+</button>
+        </div>
+      </div>
+      <div class="sg-chips">
+        @for (v of dailyChips; track v) {
+          <button
+            class="sg-chip"
+            [class.sg-chip--active]="dailyGoal() === v"
+            (click)="setDailyGoal(v)"
+          >{{ v }}</button>
+        }
+      </div>
+    </div>
+    <div class="sg-note">🔥 Hitting your daily goal extends your streak. Miss a day and the streak resets.</div>
+
+    <!-- Weekly goal -->
+    <div class="sg-goal-card">
+      <div class="sg-goal-head">
+        <div>
+          <div class="sg-goal-name">Weekly</div>
+          <div class="sg-goal-desc">Total cards reviewed per week</div>
+        </div>
+        <div class="sg-stepper">
+          <button class="sg-stepper-btn" (click)="setWeeklyGoal(weeklyGoal() - 10)" aria-label="Decrease weekly goal">−</button>
+          <span class="sg-stepper-val">{{ weeklyGoal() }}</span>
+          <button class="sg-stepper-btn" (click)="setWeeklyGoal(weeklyGoal() + 10)" aria-label="Increase weekly goal">+</button>
+        </div>
+      </div>
+      <div class="sg-chips">
+        @for (v of weeklyChips; track v) {
+          <button
+            class="sg-chip"
+            [class.sg-chip--active]="weeklyGoal() === v"
+            (click)="setWeeklyGoal(v)"
+          >{{ v }}</button>
+        }
+      </div>
+    </div>
+
+    <!-- Monthly goal -->
+    <div class="sg-goal-card">
+      <div class="sg-goal-head">
+        <div>
+          <div class="sg-goal-name">Monthly</div>
+          <div class="sg-goal-desc">Total cards reviewed per month</div>
+        </div>
+        <div class="sg-stepper">
+          <button class="sg-stepper-btn" (click)="setMonthlyGoal(monthlyGoal() - 50)" aria-label="Decrease monthly goal">−</button>
+          <span class="sg-stepper-val">{{ monthlyGoal() }}</span>
+          <button class="sg-stepper-btn" (click)="setMonthlyGoal(monthlyGoal() + 50)" aria-label="Increase monthly goal">+</button>
+        </div>
+      </div>
+      <div class="sg-chips">
+        @for (v of monthlyChips; track v) {
+          <button
+            class="sg-chip"
+            [class.sg-chip--active]="monthlyGoal() === v"
+            (click)="setMonthlyGoal(v)"
+          >{{ v }}</button>
+        }
+      </div>
+    </div>
+
+    <div class="sg-spacer"></div>
+  </div>
+</ion-content>

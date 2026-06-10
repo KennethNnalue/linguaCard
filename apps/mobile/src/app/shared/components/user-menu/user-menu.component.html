@@ -12,6 +12,24 @@
     <div class="ctx-user-email">{{ auth.currentUser()?.email }}</div>
   </div>
 
+  <!-- Study goals -->
+  <a class="ctx-item" role="menuitem" [routerLink]="['/settings/goals']" (click)="closed.emit()">
+    <div class="ctx-item-left">
+      <ion-icon name="trophy-outline"></ion-icon>
+      Study goals
+    </div>
+    <ion-icon name="chevron-forward-outline" class="ctx-chevron"></ion-icon>
+  </a>
+
+  <!-- Reminders -->
+  <a class="ctx-item" role="menuitem" [routerLink]="['/settings/reminders']" (click)="closed.emit()">
+    <div class="ctx-item-left">
+      <ion-icon name="notifications-outline"></ion-icon>
+      Reminders
+    </div>
+    <ion-icon name="chevron-forward-outline" class="ctx-chevron"></ion-icon>
+  </a>
+
   <!-- Dark mode -->
   <button class="ctx-item" role="menuitem" (click)="theme.toggle()">
     <div class="ctx-item-left">

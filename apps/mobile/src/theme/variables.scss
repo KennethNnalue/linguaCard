@@ -5,6 +5,12 @@
 
 // ─── DESIGN TOKENS → CSS CUSTOM PROPERTIES ──────────────────────────────────
 :root {
+  // Streak / status colours
+  --lc-amber:           #{t.$lc-amber};
+  --lc-amber-bg:        #{t.$lc-amber-bg};
+  --lc-amber-border:    #{t.$lc-amber-border};
+  --lc-flame:           #{t.$lc-flame};
+
   // Brand palette
   --lc-brand:           #{t.$lc-brand};
   --lc-brand-light:     #{t.$lc-brand-light};

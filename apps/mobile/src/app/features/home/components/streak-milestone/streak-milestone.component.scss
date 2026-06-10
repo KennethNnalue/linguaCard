@@ -1,0 +1,61 @@
+@use '../../../../../theme/tokens' as t;
+@use '../../../../../theme/utils' as u;
+
+.milestone-modal {
+  background: t.$lc-card;
+  border-radius: 24px;
+  padding: t.$lc-space-8 t.$lc-space-6;
+  text-align: center;
+  box-shadow: t.$lc-shadow-modal;
+}
+
+.milestone-flame {
+  font-size: 56px;
+  line-height: 1;
+  margin-bottom: t.$lc-space-2;
+
+  @media (prefers-reduced-motion: no-preference) {
+    animation: pop 0.4s t.$lc-easing-spring forwards;
+  }
+}
+
+.milestone-num {
+  font-family: t.$lc-font-display;
+  font-size: 40px;
+  font-weight: t.$lc-font-weight-semibold;
+  color: t.$lc-flame;
+  line-height: 1;
+}
+
+.milestone-title {
+  font-family: t.$lc-font-display;
+  @include u.lc-font('2xl', t.$lc-font-weight-semibold);
+  color: t.$lc-text-primary;
+  margin: t.$lc-space-1 0 t.$lc-space-2;
+}
+
+.milestone-body {
+  @include u.lc-font('sm');
+  color: t.$lc-text-secondary;
+  line-height: 1.5;
+  margin-bottom: t.$lc-space-5;
+}
+
+.milestone-btn {
+  width: 100%;
+  background: t.$lc-brand;
+  color: t.$lc-text-inverse;
+  border: none;
+  border-radius: t.$lc-radius-md;
+  padding: t.$lc-space-4;
+  @include u.lc-font('md', t.$lc-font-weight-semibold);
+  font-family: t.$lc-font-body;
+  cursor: pointer;
+  @include u.touch-state;
+}
+
+@keyframes pop {
+  0%   { transform: scale(0.5); opacity: 0; }
+  70%  { transform: scale(1.15); }
+  100% { transform: scale(1); opacity: 1; }
+}

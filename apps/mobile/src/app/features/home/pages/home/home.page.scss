@@ -59,12 +59,20 @@
   }
 }
 
+.hero-card--complete {
+  background: linear-gradient(135deg, #1A3830 0%, #2D5A4E 55%, #6EE7B7 180%);
+}
+
 .hero-greeting {
   @include u.lc-font('xxs', t.$lc-font-weight-semibold);
   letter-spacing: 0.08em;
   text-transform: uppercase;
   color: rgba(255, 255, 255, 0.45);
   margin-bottom: 3px;
+
+  &--complete {
+    color: #6EE7B7;
+  }
 }
 
 .hero-title {
@@ -206,55 +214,140 @@
   @include u.touch-state;
 }
 
-// ─── STATS ROW ───────────────────────────────────────────────────────────────
-.stats-row {
+// ─── AT-RISK BANNER ──────────────────────────────────────────────────────────
+.at-risk-banner {
+  margin: 0 t.$lc-space-4 t.$lc-space-3;
+  background: t.$lc-amber-bg;
+  border: 1px solid t.$lc-amber-border;
+  border-radius: t.$lc-radius-md;
+  padding: t.$lc-space-3 t.$lc-space-4;
   display: flex;
-  gap: t.$lc-space-2;
-  padding: 0 t.$lc-space-4 t.$lc-space-3;
+  align-items: center;
+  gap: t.$lc-space-3;
 }
 
-.stat-card {
+.at-risk-flame {
+  font-size: t.$lc-text-xl;
+  flex-shrink: 0;
+}
+
+.at-risk-txt {
+  flex: 1;
+  @include u.lc-font('xs', t.$lc-font-weight-semibold);
+  color: t.$lc-amber;
+  line-height: 1.3;
+}
+
+.at-risk-cta {
+  background: t.$lc-amber;
+  color: t.$lc-text-inverse;
+  border: none;
+  border-radius: t.$lc-radius-md;
+  padding: 7px t.$lc-space-3;
+  @include u.lc-font('xs', t.$lc-font-weight-bold);
+  font-family: t.$lc-font-body;
+  cursor: pointer;
+  white-space: nowrap;
+  @include u.touch-state;
+}
+
+// ─── STREAK + GOAL ROW ───────────────────────────────────────────────────────
+.streak-goal-row {
+  display: flex;
+  gap: t.$lc-space-3;
+  margin: 0 t.$lc-space-4 t.$lc-space-3;
+}
+
+.streak-card {
   flex: 1;
   @include u.lc-card;
-  padding: t.$lc-space-3;
+  padding: t.$lc-space-4 t.$lc-space-3;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
   text-align: center;
 }
 
-.stat-icon {
-  font-size: t.$lc-text-xl;
-  margin-bottom: 3px;
-  display: block;
+.streak-flame {
+  font-size: 24px;
+  line-height: 1;
+  margin-bottom: 2px;
 }
 
-.stat-val {
+.streak-num {
   font-family: t.$lc-font-display;
-  @include u.lc-font('3xl', t.$lc-font-weight-semibold);
-  color: var(--lc-text-primary);
+  font-size: 30px;
+  font-weight: t.$lc-font-weight-semibold;
+  color: t.$lc-text-primary;
   line-height: 1;
 }
 
-.stat-lbl {
-  @include u.lc-font('xxs', t.$lc-font-weight-medium);
-  color: var(--lc-text-hint);
-  margin-top: 3px;
+.streak-unit {
+  @include u.lc-font('xxs', t.$lc-font-weight-semibold);
+  color: t.$lc-text-hint;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  margin-top: 2px;
 }
 
-.streak-dots {
-  display: flex;
-  justify-content: center;
-  gap: 3px;
-  margin-top: t.$lc-space-1;
-}
+.streak-state {
+  @include u.lc-font('xxs', t.$lc-font-weight-semibold);
+  margin-top: 7px;
+  padding: 3px 9px;
+  border-radius: t.$lc-radius-full;
 
-.streak-dot {
-  width: 6px;
-  height: 6px;
-  border-radius: 50%;
-  background: var(--lc-border);
-
-  &--active {
-    background: t.$lc-accent;
+  &--safe {
+    background: t.$lc-brand-light;
+    color: t.$lc-brand;
   }
+
+  &--risk {
+    background: t.$lc-amber-bg;
+    color: t.$lc-amber;
+  }
+
+  &--broken {
+    background: t.$lc-neut-bg;
+    color: t.$lc-text-secondary;
+  }
+}
+
+// Goal ring
+.goal-ring-wrap {
+  position: relative;
+  width: 64px;
+  height: 64px;
+  margin-bottom: t.$lc-space-1;
+
+  svg {
+    width: 64px;
+    height: 64px;
+  }
+}
+
+.goal-ring-inner {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  text-align: center;
+}
+
+.goal-ring-num {
+  font-family: t.$lc-font-display;
+  @include u.lc-font('lg', t.$lc-font-weight-semibold);
+  color: t.$lc-text-primary;
+  line-height: 1;
+}
+
+.goal-ring-sub {
+  @include u.lc-font('xxs');
+  color: t.$lc-text-hint;
+}
+
+.goal-check {
+  font-size: 20px;
+  color: t.$lc-brand;
 }
 
 // ─── WORD OF THE DAY ─────────────────────────────────────────────────────────

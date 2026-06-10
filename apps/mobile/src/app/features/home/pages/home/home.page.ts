@@ -1,4 +1,4 @@
-import {Component, computed, inject, signal} from '@angular/core';
+import {ChangeDetectionStrategy, Component, computed, effect, inject, signal} from '@angular/core';
 import {Router, RouterLink} from '@angular/router';
 import {
   IonContent,
@@ -31,6 +31,9 @@ import {ResetDataSheetComponent} from '../../../auth/components/reset-data-sheet
 import {WordCardComponent} from '../../../../shared/ui/word-card/word-card.component';
 import {WordAudioService} from '../../../../shared/audio/word-audio.service';
 import {ReviewStatsStore} from '../../../../shared/srs/review-stats.store';
+import {SettingsStore} from '../../../settings/store/settings.store';
+import {StreakMilestoneComponent} from '../../components/streak-milestone/streak-milestone.component';
+import {StudyGoalsPromptComponent} from '../../../settings/components/study-goals-prompt/study-goals-prompt.component';
 import {BottomSheetService} from '../../../../shared/components/bottom-sheet/bottom-sheet.service';
 import {isDue, isNew} from '../../../../shared/srs/srs-status';
 import {Card} from '@lingua-card/shared/domain';
@@ -39,6 +42,7 @@ import {Card} from '@lingua-card/shared/domain';
   selector: 'lc-home',
   templateUrl: './home.page.html',
   styleUrls: ['./home.page.scss'],
+  changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [
     RouterLink,
     UserMenuComponent,
@@ -56,6 +60,7 @@ export class HomePage {
   private readonly categoryStore = inject(CategoryStore);
   private readonly collectionStore = inject(CollectionStore);
   private readonly reviewStats = inject(ReviewStatsStore);
+  private readonly settingsStore = inject(SettingsStore);
   private readonly wordAudio = inject(WordAudioService);
   private readonly modalCtrl = inject(ModalController);
   private readonly bottomSheet = inject(BottomSheetService);
@@ -64,8 +69,46 @@ export class HomePage {
   private readonly reviewStore = inject(ReviewStore);
   private readonly filterService = inject(ReviewFilterService);
 
+  private readonly goalPromptShown = signal(false);
+
   constructor() {
     addIcons({playOutline, libraryOutline});
+    effect(() => {
+      const current = this.streak().current;
+      if (StreakMilestoneComponent.shouldShow(current)) {
+        const reached = [3, 7, 14, 30, 50, 100, 365].filter(m => m <= current);
+        StreakMilestoneComponent.markShown(reached[reached.length - 1]);
+        void this.showMilestoneModal();
+      }
+    });
+    effect(() => {
+      if (!this.goalPromptShown() && this.settingsStore.needsGoalSetup()) {
+        this.goalPromptShown.set(true);
+        void this.showGoalsPrompt();
+      }
+    });
+  }
+
+  private async showMilestoneModal(): Promise<void> {
+    const modal = await this.modalCtrl.create({
+      component: StreakMilestoneComponent,
+      cssClass: 'milestone-modal-wrapper',
+      breakpoints: [0, 0.55, 0.7],
+      initialBreakpoint: 0.55,
+      handleBehavior: 'cycle',
+    });
+    await modal.present();
+  }
+
+  private async showGoalsPrompt(): Promise<void> {
+    const modal = await this.modalCtrl.create({
+      component: StudyGoalsPromptComponent,
+      cssClass: 'goals-prompt-modal-wrapper',
+      breakpoints: [0, 0.6, 0.75],
+      initialBreakpoint: 0.6,
+      handleBehavior: 'cycle',
+    });
+    await modal.present();
   }
 
   readonly user = this.authService.currentUser;
@@ -103,13 +146,12 @@ export class HomePage {
   // Total study workload = new (never studied) + reviews (studied & due)
   readonly totalDue = computed(() => this.newCardsCount() + this.reviewsCount());
 
-  // Facade — session-derived stats use local-time bucketing
-  readonly completedToday = this.reviewStats.completedToday;
-
+  // Hero ring (due cards progress)
   readonly ringProgress = computed(() => {
-    const total = this.totalDue() + this.completedToday();
+    const done = this.reviewStats.completedToday();
+    const total = this.totalDue() + done;
     if (total === 0) return 0;
-    return Math.min(1, this.completedToday() / total);
+    return Math.min(1, done / total);
   });
 
   readonly ringOffset = computed(() =>
@@ -123,11 +165,28 @@ export class HomePage {
     return col ? `${col.emoji} ${col.name}` : 'All collections';
   });
 
-  // ─── Stat cards — all from facade or CardStore, no bespoke re-derivation ────
+  // ─── Stat cards + goal progress ─────────────────────────────────────────────
+  readonly completedToday = this.reviewStats.completedToday;
   readonly dayStreak = this.reviewStats.dayStreak;
+  readonly streak = this.reviewStats.streak;
   readonly last7DaysActivity = this.reviewStats.last7DaysActivity;
   readonly totalCards = this.cardStore.totalCount;
   readonly masteredCount = this.cardStore.masteredCount;
+  readonly dailyGoal = this.reviewStats.dailyGoal;
+  readonly weeklyGoal = this.reviewStats.weeklyGoal;
+
+  readonly dailyGoalPct = computed(() => {
+    const goal = this.dailyGoal();
+    if (goal === 0) return 0;
+    return Math.min(1, this.completedToday() / goal);
+  });
+
+  // SVG ring: circumference for r=27 = 2*PI*27 ≈ 169.6
+  readonly GOAL_RING_CIRCUMFERENCE = 2 * Math.PI * 27;
+
+  readonly goalRingOffset = computed(() =>
+    this.GOAL_RING_CIRCUMFERENCE * (1 - this.dailyGoalPct())
+  );
 
   // ─── Word of the Day ─────────────────────────────────────────────────────────
   readonly wordOfTheDay = computed(() => {
@@ -193,9 +252,9 @@ export class HomePage {
     ]);
   }
 
-  handleRefresh(event: any): void {
+  handleRefresh(event: Event): void {
     this.cardStore.loadCards();
-    setTimeout(() => event.target.complete(), 800);
+    setTimeout(() => (event.target as HTMLIonRefresherElement).complete(), 800);
   }
 
   playWotd(): void {

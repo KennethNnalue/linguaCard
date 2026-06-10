@@ -1,0 +1,105 @@
+@use '../../../../../theme/tokens' as t;
+@use '../../../../../theme/utils' as u;
+
+.sgp-modal {
+  background: t.$lc-card;
+  border-radius: 24px;
+  padding: t.$lc-space-8 t.$lc-space-6 t.$lc-space-6;
+  text-align: center;
+}
+
+.sgp-icon {
+  font-size: 52px;
+  line-height: 1;
+  margin-bottom: t.$lc-space-4;
+
+  @media (prefers-reduced-motion: no-preference) {
+    animation: sgp-pop 0.4s t.$lc-easing-spring forwards;
+  }
+}
+
+.sgp-title {
+  font-family: t.$lc-font-display;
+  @include u.lc-font('2xl', t.$lc-font-weight-semibold);
+  color: t.$lc-text-primary;
+  margin: 0 0 t.$lc-space-3;
+}
+
+.sgp-body {
+  @include u.lc-font('sm');
+  color: t.$lc-text-secondary;
+  line-height: 1.55;
+  margin: 0 0 t.$lc-space-5;
+}
+
+.sgp-goals-preview {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0;
+  background: t.$lc-surface;
+  border: 1px solid t.$lc-border;
+  border-radius: t.$lc-radius-md;
+  padding: t.$lc-space-4 t.$lc-space-3;
+  margin-bottom: t.$lc-space-6;
+}
+
+.sgp-goal-item {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: t.$lc-space-1;
+}
+
+.sgp-goal-label {
+  @include u.lc-font('xxs', t.$lc-font-weight-semibold);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: t.$lc-text-hint;
+}
+
+.sgp-goal-value {
+  font-family: t.$lc-font-display;
+  @include u.lc-font('lg', t.$lc-font-weight-semibold);
+  color: t.$lc-brand;
+}
+
+.sgp-divider {
+  width: 1px;
+  height: 36px;
+  background: t.$lc-border;
+  flex-shrink: 0;
+}
+
+.sgp-btn-primary {
+  width: 100%;
+  background: t.$lc-brand;
+  color: t.$lc-text-inverse;
+  border: none;
+  border-radius: t.$lc-radius-md;
+  padding: t.$lc-space-4;
+  @include u.lc-font('md', t.$lc-font-weight-semibold);
+  font-family: t.$lc-font-body;
+  cursor: pointer;
+  @include u.touch-state;
+  margin-bottom: t.$lc-space-2;
+}
+
+.sgp-btn-skip {
+  width: 100%;
+  background: none;
+  border: none;
+  padding: t.$lc-space-3;
+  @include u.lc-font('sm', t.$lc-font-weight-medium);
+  color: t.$lc-text-secondary;
+  font-family: t.$lc-font-body;
+  cursor: pointer;
+  @include u.touch-state;
+}
+
+@keyframes sgp-pop {
+  0%   { transform: scale(0.5); opacity: 0; }
+  70%  { transform: scale(1.15); }
+  100% { transform: scale(1); opacity: 1; }
+}

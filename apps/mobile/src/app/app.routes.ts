@@ -149,6 +149,16 @@ export const routes: Routes = [
         loadComponent: () =>
           import('./features/progress/pages/progress/progress.component').then(m => m.ProgressComponent),
       },
+      {
+        path: 'settings/goals',
+        loadComponent: () =>
+          import('./features/settings/pages/study-goals/study-goals.page').then(m => m.StudyGoalsPage),
+      },
+      {
+        path: 'settings/reminders',
+        loadComponent: () =>
+          import('./features/settings/pages/reminders/reminders.page').then(m => m.RemindersPage),
+      },
     ],
   },
   {

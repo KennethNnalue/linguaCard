@@ -1,12 +1,15 @@
 import { Component, EventEmitter, inject, Output } from '@angular/core';
+import { RouterLink } from '@angular/router';
 import { IonIcon, IonToggle } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
 import {
   chevronForwardOutline,
   logOutOutline,
   moonOutline,
+  notificationsOutline,
   syncOutline,
   trashOutline,
+  trophyOutline,
 } from 'ionicons/icons';
 import { AuthService } from '../../../core/services/auth.service';
 import { SyncService } from '../../../core/services/sync.service';
@@ -18,7 +21,7 @@ import { SubscriptionStore } from '../../../features/subscription/store/subscrip
   standalone: true,
   templateUrl: './user-menu.component.html',
   styleUrls: ['./user-menu.component.scss'],
-  imports: [IonIcon, IonToggle],
+  imports: [IonIcon, IonToggle, RouterLink],
 })
 export class UserMenuComponent {
   readonly auth = inject(AuthService);
@@ -30,7 +33,7 @@ export class UserMenuComponent {
   @Output() resetRequested = new EventEmitter<void>();
 
   constructor() {
-    addIcons({ moonOutline, syncOutline, trashOutline, logOutOutline, chevronForwardOutline });
+    addIcons({ moonOutline, syncOutline, trashOutline, logOutOutline, chevronForwardOutline, trophyOutline, notificationsOutline });
   }
 
   get syncLabel(): string {

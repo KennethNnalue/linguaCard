@@ -739,3 +739,61 @@ export interface UserStoryProgress {
 export function calculateQuizCount(sentenceCount: number): number {
   return Math.max(5, Math.ceil(sentenceCount / 3));
 }
+
+// ─── STUDY GOALS & REMINDERS ─────────────────────────────────────────────────
+
+export interface StudyGoals {
+  dailyGoal: number;
+  weeklyGoal: number;
+  monthlyGoal: number;
+}
+
+export interface ReminderSettings {
+  remindersEnabled: boolean;
+  reminderTime: string;
+  timezone: string;
+}
+
+export interface UserSettings extends StudyGoals, ReminderSettings {
+  userId: string;
+  goalsSetAt: string | null;
+}
+
+export type UpdateUserSettingsDto = Partial<StudyGoals & ReminderSettings>;
+
+export const DEFAULT_STUDY_GOALS: StudyGoals = {
+  dailyGoal: 20,
+  weeklyGoal: 120,
+  monthlyGoal: 500,
+};
+
+export const DEFAULT_REMINDER_SETTINGS: Omit<ReminderSettings, 'timezone'> = {
+  remindersEnabled: false,
+  reminderTime: '19:00',
+};
+
+// ─── STREAK & GOAL PROGRESS ───────────────────────────────────────────────────
+
+export type StreakState = 'safe' | 'at_risk' | 'broken';
+
+export interface StreakStatus {
+  current: number;
+  longest: number;
+  state: StreakState;
+  lastGoalMetDate: string | null;
+}
+
+export interface GoalProgress {
+  period: 'daily' | 'weekly' | 'monthly';
+  reviewed: number;
+  goal: number;
+  metGoal: boolean;
+}
+
+// ─── WEB PUSH ────────────────────────────────────────────────────────────────
+
+export interface PushSubscriptionDto {
+  endpoint: string;
+  expirationTime: number | null;
+  keys: { p256dh: string; auth: string };
+}

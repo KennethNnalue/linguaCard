@@ -1,0 +1,98 @@
+<ion-header class="ion-no-border">
+  <ion-toolbar>
+    <div class="rm-nav">
+      <button class="rm-back" (click)="goBack()" aria-label="Back">
+        <svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round">
+          <polyline points="9,2 4,7 9,12"/>
+        </svg>
+      </button>
+      <span class="rm-nav-title">Reminders</span>
+    </div>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+  <div class="rm-content">
+
+    <div class="rm-section-label">Daily reminder</div>
+
+    <!-- Enable toggle -->
+    <div class="rm-row">
+      <div class="rm-row-info">
+        <div class="rm-row-name">Enable reminders</div>
+        <div class="rm-row-desc">Get a browser notification if you haven't hit your goal</div>
+      </div>
+      <button
+        class="rm-toggle"
+        [class.rm-toggle--on]="remindersEnabled()"
+        [class.rm-toggle--off]="!remindersEnabled()"
+        [attr.aria-checked]="remindersEnabled()"
+        role="switch"
+        [disabled]="toggling() || !isSupported"
+        (click)="toggleReminders(!remindersEnabled())"
+        aria-label="Toggle reminders"
+      >
+        <span class="rm-toggle-knob"></span>
+      </button>
+    </div>
+
+    @if (permissionState() === 'denied') {
+      <div class="rm-hint rm-hint--warn">
+        Notification permission was denied. To enable reminders, open your browser settings and allow notifications for this site.
+      </div>
+    }
+
+    <!-- Time picker — only when enabled -->
+    @if (remindersEnabled()) {
+      <div class="rm-row">
+        <div class="rm-row-info">
+          <div class="rm-row-name">Reminder time</div>
+          <div class="rm-row-desc">We'll only nudge you if your goal isn't met yet</div>
+        </div>
+        <input
+          class="rm-time-input"
+          type="time"
+          [value]="reminderTime()"
+          (change)="setReminderTime(timeInput.value)"
+          #timeInput
+          aria-label="Reminder time"
+        />
+      </div>
+    }
+
+    <!-- How reminders work -->
+    <div class="rm-info-text">
+      Reminders use your browser's notification system and work even when LinguaCard is
+      closed. Mobile app notifications (iOS / Android) are coming later.
+    </div>
+
+    <!-- Not supported note -->
+    @if (!isSupported) {
+      <div class="rm-hint rm-hint--warn">
+        Your current browser or context doesn't support web push notifications. Try opening LinguaCard in Chrome or Edge, or install it as a PWA.
+      </div>
+    }
+
+    <div class="rm-section-label">Permission</div>
+
+    <div class="rm-row">
+      <div class="rm-row-info">
+        <div class="rm-row-name">
+          @if (permissionState() === 'granted') { Notifications allowed }
+          @else if (permissionState() === 'denied') { Notifications blocked }
+          @else { Notifications }
+        </div>
+        <div class="rm-row-desc">
+          @if (permissionState() === 'granted') { Granted for this browser ✓ }
+          @else if (permissionState() === 'denied') { Blocked — change in browser settings }
+          @else { Not yet requested }
+        </div>
+      </div>
+      @if (permissionState() === 'granted') {
+        <span class="rm-granted" aria-hidden="true">✓</span>
+      }
+    </div>
+
+    <div class="rm-spacer"></div>
+  </div>
+</ion-content>

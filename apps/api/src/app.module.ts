@@ -1,6 +1,7 @@
 import { Module } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
+import { ScheduleModule } from '@nestjs/schedule';
 import { TypeOrmModuleOptions } from '@nestjs/typeorm';
 import { APP_GUARD } from '@nestjs/core';
 import { CardsModule } from './cards/cards.module';
@@ -18,6 +19,9 @@ import { SubscriptionsModule } from './subscriptions/subscriptions.module';
 import { ContactModule } from './contact/contact.module';
 import { ReviewModule } from './review/review.module';
 import { PlatformStoriesModule } from './platform-stories/platform-stories.module';
+import { SettingsModule } from './settings/settings.module';
+import { StatsModule } from './stats/stats.module';
+import { PushModule } from './push/push.module';
 import databaseConfig from './config/database.config';
 import { aiConfig } from './config/ai.config';
 
@@ -50,6 +54,10 @@ import { aiConfig } from './config/ai.config';
     ContactModule,
     ReviewModule,
     PlatformStoriesModule,
+    ScheduleModule.forRoot(),
+    SettingsModule,
+    StatsModule,
+    PushModule,
     SeedModule,
   ],
   providers: [

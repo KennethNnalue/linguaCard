@@ -6,6 +6,7 @@ import { randomUUID } from 'crypto';
 import * as bcrypt from 'bcrypt';
 import { UserEntity } from './user.entity';
 import { SubscriptionService } from '../subscriptions/subscription.service';
+import { UserSettingsService } from '../settings/user-settings.service';
 import type { LoginDto, RegisterDto } from '@lingua-card/shared/dto';
 
 export interface AuthUser {
@@ -27,6 +28,7 @@ export class AuthService {
     private readonly userRepo: Repository<UserEntity>,
     private readonly jwtService: JwtService,
     private readonly subscriptions: SubscriptionService,
+    private readonly settings: UserSettingsService,
   ) {}
 
   async register(dto: RegisterDto): Promise<AuthResponse> {
@@ -48,6 +50,7 @@ export class AuthService {
     });
     const saved = await this.userRepo.save(entity);
     await this.subscriptions.createFree(saved.id);
+    await this.settings.createDefault(saved.id);
     return this.buildResponse(saved);
   }
 

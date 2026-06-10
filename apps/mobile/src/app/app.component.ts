@@ -9,6 +9,8 @@ import {SyncService} from './core/services/sync.service';
 import {SyncNotificationService} from './core/services/sync-notification.service';
 import {NetworkService} from './core/services/network.service';
 import {ReviewStore} from './features/review/store/review.store';
+import {ReviewStatsStore} from './shared/srs/review-stats.store';
+import {SettingsStore} from './features/settings/store/settings.store';
 import {SubscriptionStore} from './features/subscription/store/subscription.store';
 import {AuthService} from './core/services/auth.service';
 import {PwaInstallBannerComponent} from './shared/components/pwa-install-banner/pwa-install-banner.component';
@@ -26,6 +28,8 @@ export class AppComponent implements OnInit {
   private readonly syncNotification = inject(SyncNotificationService);
   private readonly networkService = inject(NetworkService);
   private readonly reviewStore = inject(ReviewStore);
+  private readonly reviewStats = inject(ReviewStatsStore);
+  private readonly settingsStore = inject(SettingsStore);
   private readonly subscriptionStore = inject(SubscriptionStore);
   private readonly authService = inject(AuthService);
 
@@ -41,6 +45,9 @@ export class AppComponent implements OnInit {
 
     if (this.authService.isAuthenticated()) {
       this.subscriptionStore.loadStatus();
+      void this.settingsStore.load();
+      void this.reviewStats.refreshStreak();
+      void this.reviewStats.refreshGoalProgress();
     }
 
     await this.syncService.init();

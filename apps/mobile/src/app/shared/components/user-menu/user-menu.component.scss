@@ -44,6 +44,7 @@
   border-bottom: 1px solid var(--lc-border); background: none;
   @include u.lc-font('xs', t.$lc-font-weight-medium); font-family: t.$lc-font-body;
   color: var(--lc-text-primary); cursor: pointer; text-align: left;
+  text-decoration: none; display: flex;
   &:last-child { border-bottom: none; }
   &:active { background: var(--lc-surface); }
   &--danger { color: var(--lc-fem-text); .ctx-item-left ion-icon { color: var(--lc-fem-text); } .ctx-chevron { color: var(--lc-text-hint); } }
