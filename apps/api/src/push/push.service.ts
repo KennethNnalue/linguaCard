@@ -11,13 +11,19 @@ export interface PushPayload { title: string; body: string; url?: string; }
 @Injectable()
 export class PushService {
   private readonly logger = new Logger(PushService.name);
+  private readonly vapidReady: boolean;
 
   constructor(
     @InjectRepository(PushSubscriptionEntity)
     private readonly repo: Repository<PushSubscriptionEntity>,
     private readonly config: PushConfig,
   ) {
-    webpush.setVapidDetails(config.subject, config.publicKey, config.privateKey);
+    this.vapidReady = !!(config.publicKey && config.privateKey);
+    if (this.vapidReady) {
+      webpush.setVapidDetails(config.subject, config.publicKey, config.privateKey);
+    } else {
+      this.logger.warn('VAPID keys not configured — web push notifications disabled');
+    }
   }
 
   async subscribe(userId: string, sub: PushSubscriptionDto): Promise<void> {
@@ -34,6 +40,7 @@ export class PushService {
   }
 
   async sendToUser(userId: string, payload: PushPayload): Promise<void> {
+    if (!this.vapidReady) return;
     const subs = await this.repo.find({ where: { userId } });
     await Promise.all(subs.map(s => this.sendOne(s, payload)));
   }
