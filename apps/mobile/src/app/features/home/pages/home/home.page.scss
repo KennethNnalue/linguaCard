@@ -217,8 +217,8 @@
 // ─── AT-RISK BANNER ──────────────────────────────────────────────────────────
 .at-risk-banner {
   margin: 0 t.$lc-space-4 t.$lc-space-3;
-  background: t.$lc-amber-bg;
-  border: 1px solid t.$lc-amber-border;
+  background: var(--lc-amber-bg);
+  border: 1px solid var(--lc-amber-border);
   border-radius: t.$lc-radius-md;
   padding: t.$lc-space-3 t.$lc-space-4;
   display: flex;
@@ -234,12 +234,12 @@
 .at-risk-txt {
   flex: 1;
   @include u.lc-font('xs', t.$lc-font-weight-semibold);
-  color: t.$lc-amber;
+  color: var(--lc-amber);
   line-height: 1.3;
 }
 
 .at-risk-cta {
-  background: t.$lc-amber;
+  background: var(--lc-amber);
   color: t.$lc-text-inverse;
   border: none;
   border-radius: t.$lc-radius-md;
@@ -278,13 +278,13 @@
   font-family: t.$lc-font-display;
   font-size: 30px;
   font-weight: t.$lc-font-weight-semibold;
-  color: t.$lc-text-primary;
+  color: var(--lc-text-primary);
   line-height: 1;
 }
 
 .streak-unit {
   @include u.lc-font('xxs', t.$lc-font-weight-semibold);
-  color: t.$lc-text-hint;
+  color: var(--lc-text-hint);
   text-transform: uppercase;
   letter-spacing: 0.04em;
   margin-top: 2px;
@@ -297,31 +297,31 @@
   border-radius: t.$lc-radius-full;
 
   &--safe {
-    background: t.$lc-brand-light;
-    color: t.$lc-brand;
+    background: var(--lc-brand-light);
+    color: var(--lc-brand);
   }
 
   &--risk {
-    background: t.$lc-amber-bg;
-    color: t.$lc-amber;
+    background: var(--lc-amber-bg);
+    color: var(--lc-amber);
   }
 
   &--broken {
-    background: t.$lc-neut-bg;
-    color: t.$lc-text-secondary;
+    background: var(--lc-neut-bg);
+    color: var(--lc-text-secondary);
   }
 }
 
 // Goal ring
 .goal-ring-wrap {
   position: relative;
-  width: 64px;
-  height: 64px;
+  width: 80px;
+  height: 80px;
   margin-bottom: t.$lc-space-1;
 
   svg {
-    width: 64px;
-    height: 64px;
+    width: 80px;
+    height: 80px;
   }
 }
 
@@ -335,19 +335,19 @@
 
 .goal-ring-num {
   font-family: t.$lc-font-display;
-  @include u.lc-font('lg', t.$lc-font-weight-semibold);
-  color: t.$lc-text-primary;
+  @include u.lc-font('sm', t.$lc-font-weight-semibold);
+  color: var(--lc-text-primary);
   line-height: 1;
 }
 
 .goal-ring-sub {
   @include u.lc-font('xxs');
-  color: t.$lc-text-hint;
+  color: var(--lc-text-hint);
 }
 
 .goal-check {
   font-size: 20px;
-  color: t.$lc-brand;
+  color: var(--lc-brand);
 }
 
 // ─── WORD OF THE DAY ─────────────────────────────────────────────────────────
@@ -363,7 +363,7 @@
     position: absolute;
     top: 0; left: 0;
     width: 4px; height: 100%;
-    background: t.$lc-accent;
+    background: var(--lc-accent);
     border-radius: 2px 0 0 2px;
   }
 }
@@ -377,13 +377,13 @@
   @include u.lc-font('xxs', t.$lc-font-weight-semibold);
   letter-spacing: 0.07em;
   text-transform: uppercase;
-  color: t.$lc-accent;
+  color: var(--lc-accent);
 }
 
 .wotd-play {
   @include u.square(28px);
   border-radius: 50%;
-  background: t.$lc-accent-light;
+  background: var(--lc-accent-light);
   border: 1px solid rgba(224, 123, 63, 0.2);
   @include u.flex-center;
   cursor: pointer;
@@ -391,7 +391,7 @@
 
   ion-icon {
     font-size: 12px;
-    color: t.$lc-accent;
+    color: var(--lc-accent);
   }
 }
 
@@ -435,7 +435,7 @@
 
 .sec-link {
   @include u.lc-font('xxs', t.$lc-font-weight-semibold);
-  color: t.$lc-brand-mid;
+  color: var(--lc-brand-mid);
   cursor: pointer;
 }
 
@@ -465,11 +465,11 @@
 .weekly-bar {
   width: 100%;
   border-radius: 4px 4px 2px 2px;
-  background: t.$lc-brand-light;
+  background: var(--lc-brand-light);
   min-height: 4px;
 
   &--filled {
-    background: t.$lc-brand;
+    background: var(--lc-brand);
   }
 
   &--today {

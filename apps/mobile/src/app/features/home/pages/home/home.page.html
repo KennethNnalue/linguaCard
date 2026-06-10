@@ -83,7 +83,7 @@
     </div>
 
     <!-- ── At-risk banner ── -->
-    @if (streak().state === 'at_risk') {
+    @if (streakReady() && streak().state === 'at_risk') {
       <div class="at-risk-banner">
         <span class="at-risk-flame">🔥</span>
         <div class="at-risk-txt">Review now to keep your {{ streak().current }}-day streak alive</div>

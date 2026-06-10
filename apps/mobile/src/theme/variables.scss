@@ -201,6 +201,11 @@ body.ion-palette-dark {
   --lc-neut-text:       #A8B8B4;
   --lc-neut-border:     #4A4E48;
 
+  // Amber / streak colours — muted for dark surfaces
+  --lc-amber:           #F59E0B;   // brighter amber readable on dark
+  --lc-amber-bg:        #2A2000;   // near-black amber tint
+  --lc-amber-border:    #7A5C00;   // dark amber border
+
   // Ionic surfaces follow LDS tokens automatically
   --ion-background-color:    var(--lc-surface);
   --ion-text-color:          var(--lc-text-primary);

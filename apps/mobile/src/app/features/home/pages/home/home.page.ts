@@ -169,6 +169,7 @@ export class HomePage {
   readonly completedToday = this.reviewStats.completedToday;
   readonly dayStreak = this.reviewStats.dayStreak;
   readonly streak = this.reviewStats.streak;
+  readonly streakReady = computed(() => this.reviewStats.serverStreak() !== null);
   readonly last7DaysActivity = this.reviewStats.last7DaysActivity;
   readonly totalCards = this.cardStore.totalCount;
   readonly masteredCount = this.cardStore.masteredCount;
