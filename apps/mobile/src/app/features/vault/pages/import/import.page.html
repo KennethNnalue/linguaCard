@@ -17,54 +17,24 @@
 <ion-content>
   <div class="imp-content">
 
-    <!-- Drop zone -->
-    <div
-      class="imp-drop"
-      [class.imp-drop--active]="dragActive()"
-      (dragover)="onDragOver($event)"
-      (dragleave)="onDragLeave()"
-      (drop)="onDrop($event)">
-      <div class="imp-drop-icon-wrap">
-        <ion-icon name="cloud-upload-outline"></ion-icon>
-      </div>
-      <p class="imp-drop-title">Drop your CSV file here</p>
-      <p class="imp-drop-sub">Drag and drop a .csv file<br>or tap to browse your files</p>
+    <!-- Method cards -->
+    <div class="imp-methods">
+      <button class="imp-method-card" (click)="navigateToImageImport()">
+        <div class="imp-method-icon imp-method-icon--camera">
+          <ion-icon name="camera-outline"></ion-icon>
+        </div>
+        <span class="imp-method-title">Scan Image</span>
+        <span class="imp-method-sub">Photos, menus, flashcards</span>
+      </button>
+
+      <button class="imp-method-card" (click)="openFilePicker()">
+        <div class="imp-method-icon imp-method-icon--csv">
+          <ion-icon name="cloud-upload-outline"></ion-icon>
+        </div>
+        <span class="imp-method-title">Upload CSV</span>
+        <span class="imp-method-sub">Bulk import from file</span>
+      </button>
     </div>
-
-    <!-- Or divider -->
-    <div class="imp-or">
-      <span class="imp-or-line"></span>
-      <span class="imp-or-txt">or scan an image</span>
-      <span class="imp-or-line"></span>
-    </div>
-
-    <!-- Image import button (NEW) -->
-    <button class="imp-image-btn" (click)="navigateToImageImport()">
-      <ion-icon name="camera-outline"></ion-icon>
-      <div class="imp-image-btn-text">
-        <span class="imp-image-btn-title">Import from Image</span>
-        <span class="imp-image-btn-sub">Menus, pages, flashcards…</span>
-      </div>
-    </button>
-
-    <!-- Or divider -->
-    <div class="imp-or">
-      <span class="imp-or-line"></span>
-      <span class="imp-or-txt">or start with our template</span>
-      <span class="imp-or-line"></span>
-    </div>
-
-    <!-- Download template button -->
-    <button class="imp-dl-btn" (click)="downloadTemplate()">
-      <ion-icon name="download-outline"></ion-icon>
-      Download CSV template (95 words)
-    </button>
-
-    <!-- Browse files button -->
-    <button class="imp-browse-btn" (click)="openFilePicker()">
-      <ion-icon name="document-outline"></ion-icon>
-      Browse files
-    </button>
 
     <!-- Hidden file input -->
     <input
@@ -72,24 +42,84 @@
       type="file"
       accept=".csv"
       style="display:none"
-      (change)="onFileSelected($event)" />
+      (change)="onFileSelected($event)"/>
 
-    <!-- Format spec -->
-    <div class="imp-format-box">
-      <p class="imp-format-title">CSV columns</p>
-      <p class="imp-format-row"><strong>Required:</strong> front, back</p>
-      <p class="imp-format-row"><strong>Optional:</strong> article, plural, category,</p>
-      <p class="imp-format-row">exampleTarget, exampleNative</p>
-      <p class="imp-format-row"><strong>Synonyms (×3):</strong> synWord, synArticle,</p>
-      <p class="imp-format-row">synTranslation, synExample, synExampleNative</p>
-      <p class="imp-format-note">
-        <strong>front:</strong> English translation (e.g. dog)<br>
-        <strong>back:</strong> German word without article (e.g. Hund)<br>
-        <strong>article:</strong> der / die / das — omit for verbs &amp; phrases<br>
-        <strong>plural:</strong> full form incl. article (e.g. die Hunde)<br>
-        <strong>category:</strong> Animals, Food, Travel … (name, not ID)
-      </p>
+    <!-- AI Prompt Helper -->
+    <div class="imp-ai-section">
+      <div class="imp-ai-header">
+        <div class="imp-ai-icon">
+          <ion-icon name="sparkles-outline"></ion-icon>
+        </div>
+        <div class="imp-ai-header-text">
+          <span class="imp-ai-title">Generate a CSV with AI</span>
+          <span class="imp-ai-subtitle">Copy this prompt into ChatGPT, Claude, or any AI</span>
+        </div>
+      </div>
+
+      <!-- 3-step guide -->
+      <div class="imp-steps">
+        <div class="imp-step" [class.imp-step--done]="promptCopied()">
+          @if (promptCopied()) {
+            <div class="imp-step-num imp-step-num--done">
+              <ion-icon name="checkmark-outline"></ion-icon>
+            </div>
+            <span class="imp-step-lbl imp-step-lbl--done">Copied!</span>
+          } @else {
+            <div class="imp-step-num">1</div>
+            <span class="imp-step-lbl">Copy prompt below</span>
+          }
+        </div>
+        <ion-icon name="chevron-forward-outline" class="imp-step-arrow"></ion-icon>
+        <div class="imp-step">
+          <div class="imp-step-num">2</div>
+          <span class="imp-step-lbl">Paste into AI with your words</span>
+        </div>
+        <ion-icon name="chevron-forward-outline" class="imp-step-arrow"></ion-icon>
+        <div class="imp-step">
+          <div class="imp-step-num">3</div>
+          <span class="imp-step-lbl">Upload the CSV here</span>
+        </div>
+      </div>
+
+      <!-- Prompt card -->
+      <div class="imp-prompt-card" [class.imp-prompt-card--copied]="promptCopied()">
+        <div class="imp-prompt-top">
+          @if (promptCopied()) {
+            <span class="imp-prompt-label imp-prompt-label--copied">✓ Copied to clipboard</span>
+          } @else {
+            <span class="imp-prompt-label">AI prompt</span>
+          }
+          <button class="imp-copy-btn" [class.imp-copy-btn--copied]="promptCopied()" (click)="copyPrompt()">
+            @if (promptCopied()) {
+              <ion-icon name="checkmark-outline"></ion-icon>
+              Copied!
+            } @else {
+              <ion-icon name="copy-outline"></ion-icon>
+              Copy
+            }
+          </button>
+        </div>
+        <div class="imp-prompt-body">
+          <pre class="imp-prompt-text">{{ DISPLAY_PROMPT }}</pre>
+        </div>
+        <div class="imp-prompt-footer">
+          <ion-icon name="information-circle-outline"></ion-icon>
+          <span class="imp-prompt-footer-text">
+            @if (promptCopied()) {
+              Now open your favourite AI tool, paste the prompt, add your words, and download the CSV
+            } @else {
+              Works with ChatGPT, Claude, Gemini, Copilot — any AI that generates text
+            }
+          </span>
+        </div>
+      </div>
     </div>
+
+    <!-- Template download -->
+    <button class="imp-dl-btn" (click)="downloadTemplate()">
+      <ion-icon name="download-outline"></ion-icon>
+      Download CSV template (95 pre-made words)
+    </button>
 
   </div>
 </ion-content>

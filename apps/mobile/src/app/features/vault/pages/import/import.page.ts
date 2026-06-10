@@ -12,14 +12,20 @@ import {addIcons} from 'ionicons';
 import {
   arrowBackOutline,
   cameraOutline,
-  cloudUploadOutline,
+  checkmarkOutline,
+  chevronForwardOutline,
   closeOutline,
+  cloudUploadOutline,
+  copyOutline,
   documentOutline,
   downloadOutline,
+  informationCircleOutline,
+  sparklesOutline,
 } from 'ionicons/icons';
 import {CsvParserService} from '../../../../shared/csv/csv-parser.service';
 import {CategoryStore} from '../../store/category.store';
 import {ImportStateService} from '../../services/import-state.service';
+import {CLIPBOARD_PROMPT, DISPLAY_PROMPT} from './import-prompt.constants';
 
 @Component({
   selector: 'lc-import',
@@ -38,30 +44,27 @@ export class ImportPage {
   private readonly toastCtrl = inject(ToastController);
   private readonly modalCtrl = inject(ModalController);
 
-  /** Set via componentProps when opened as a modal. */
   set isModal(v: boolean) { this._isModal.set(v ?? false); }
   readonly _isModal = signal(false);
 
-  readonly dragActive = signal(false);
+  readonly promptCopied = signal(false);
+
+  readonly DISPLAY_PROMPT = DISPLAY_PROMPT;
 
   constructor() {
-    addIcons({arrowBackOutline, cameraOutline, cloudUploadOutline, closeOutline, documentOutline, downloadOutline});
-  }
-
-  onDragOver(event: DragEvent): void {
-    event.preventDefault();
-    this.dragActive.set(true);
-  }
-
-  onDragLeave(): void {
-    this.dragActive.set(false);
-  }
-
-  onDrop(event: DragEvent): void {
-    event.preventDefault();
-    this.dragActive.set(false);
-    const file = event.dataTransfer?.files[0];
-    if (file) this.processFile(file);
+    addIcons({
+      arrowBackOutline,
+      cameraOutline,
+      checkmarkOutline,
+      chevronForwardOutline,
+      closeOutline,
+      cloudUploadOutline,
+      copyOutline,
+      documentOutline,
+      downloadOutline,
+      informationCircleOutline,
+      sparklesOutline,
+    });
   }
 
   openFilePicker(): void {
@@ -101,6 +104,33 @@ export class ImportPage {
     } else {
       this.router.navigate(['/vault']);
     }
+  }
+
+  async copyPrompt(): Promise<void> {
+    try {
+      await navigator.clipboard.writeText(CLIPBOARD_PROMPT);
+      this.onPromptCopied();
+    } catch {
+      this.fallbackCopy(CLIPBOARD_PROMPT);
+    }
+  }
+
+  private onPromptCopied(): void {
+    this.promptCopied.set(true);
+    this.showToast('Prompt copied to clipboard');
+    setTimeout(() => this.promptCopied.set(false), 8_000);
+  }
+
+  private fallbackCopy(text: string): void {
+    const textarea = document.createElement('textarea');
+    textarea.value = text;
+    textarea.style.position = 'fixed';
+    textarea.style.opacity = '0';
+    document.body.appendChild(textarea);
+    textarea.select();
+    document.execCommand('copy');
+    document.body.removeChild(textarea);
+    this.onPromptCopied();
   }
 
   private processFile(file: File): void {

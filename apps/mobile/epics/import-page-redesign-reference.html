@@ -1,0 +1,1051 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>LinguaCard — Import Page Redesign Reference</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,500;0,600;1,400&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600&family=Fira+Code:wght@400;500&display=swap" rel="stylesheet">
+<style>
+/* ─── DESIGN TOKENS ─────────────────────────────────────────── */
+:root {
+  --lc-brand:#2D5A4E;--lc-brand-light:#E8F2EE;--lc-brand-mid:#4A8C7A;--lc-brand-dark:#1A3830;
+  --lc-accent:#E07B3F;--lc-accent-light:#FDF0E6;
+  --lc-masc-bg:#EAF2FC;--lc-masc-text:#1A56A3;--lc-masc-border:#85B7EB;
+  --lc-fem-bg:#FEF2F2;--lc-fem-text:#B91C1C;--lc-fem-border:#FCA5A5;
+  --lc-neut-bg:#F1EFE8;--lc-neut-text:#5F5E5A;--lc-neut-border:#B4B2A9;
+  --lc-mastery-0:#D1D5DB;--lc-mastery-1:#FCA5A5;--lc-mastery-2:#FCD34D;
+  --lc-mastery-3:#6EE7B7;--lc-mastery-4:#34D399;--lc-mastery-5:#059669;
+  --lc-surface:#FAFAF8;--lc-card:#FFFFFF;--lc-border:rgba(45,90,78,0.12);
+  --lc-text-primary:#1A2B26;--lc-text-secondary:#6B7C78;--lc-text-hint:#9BAAA6;
+  --lc-shadow-card:0 2px 12px rgba(45,90,78,0.08),0 1px 3px rgba(0,0,0,0.04);
+  --lc-shadow-float:0 8px 32px rgba(45,90,78,0.14),0 2px 8px rgba(0,0,0,0.06);
+  --lc-font-display:'Lora',Georgia,serif;
+  --lc-font-body:'DM Sans',system-ui,sans-serif;
+  --lc-font-mono:'Fira Code','Courier New',monospace;
+  --lc-radius-sm:8px;--lc-radius-md:12px;--lc-radius-lg:20px;--lc-radius-xl:28px;
+  --lc-transition-fast:0.15s ease;
+  --lc-transition-base:0.25s ease;
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:var(--lc-font-body);background:#F0EDEA;color:var(--lc-text-primary);min-height:100vh;}
+
+/* ─── PAGE LAYOUT ───────────────────────────────────────────── */
+.page-header{background:var(--lc-brand);padding:32px 40px 28px;position:sticky;top:0;z-index:100;box-shadow:0 4px 20px rgba(0,0,0,0.2);}
+.page-header-inner{max-width:1400px;margin:0 auto;display:flex;align-items:center;justify-content:space-between;gap:20px;flex-wrap:wrap;}
+.logo{font-family:var(--lc-font-display);font-size:24px;font-weight:600;color:white;}
+.logo-sub{font-size:12px;color:rgba(255,255,255,0.6);margin-top:2px;}
+.header-tabs{display:flex;gap:4px;}
+.header-tab{padding:7px 16px;border-radius:20px;font-size:12px;font-weight:600;cursor:pointer;border:none;color:rgba(255,255,255,0.7);background:transparent;transition:all 0.2s;font-family:var(--lc-font-body);}
+.header-tab.active,.header-tab:hover{background:rgba(255,255,255,0.15);color:white;}
+.main{max-width:1600px;margin:0 auto;padding:40px;}
+.section{margin-bottom:56px;}
+.section-title{font-family:var(--lc-font-display);font-size:22px;font-weight:600;color:var(--lc-text-primary);margin-bottom:6px;}
+.section-sub{font-size:13px;color:var(--lc-text-secondary);margin-bottom:24px;line-height:1.6;}
+
+/* ─── PHONE SHELL ────────────────────────────────────────────── */
+.phones-row{display:flex;gap:28px;align-items:flex-start;overflow-x:auto;padding-bottom:12px;}
+.phone-wrap{display:flex;flex-direction:column;align-items:center;gap:12px;flex:0 0 auto;}
+.phone-label{font-size:11px;font-weight:600;letter-spacing:0.07em;text-transform:uppercase;color:var(--lc-text-hint);}
+.phone-badge{display:inline-flex;align-items:center;gap:5px;font-size:9px;font-weight:700;letter-spacing:0.05em;text-transform:uppercase;padding:3px 10px;border-radius:20px;}
+.phone-badge--before{background:#FEF2F2;color:#B91C1C;border:1px solid #FCA5A5;}
+.phone-badge--after{background:#D1FAE5;color:#059669;border:1px solid #6EE7B7;}
+.phone-badge--future{background:var(--lc-accent-light);color:var(--lc-accent);border:1px solid #E07B3F40;}
+.phone{width:300px;background:var(--lc-surface);border-radius:40px;border:8px solid #1A1A1A;box-shadow:0 0 0 1px #333,var(--lc-shadow-float),0 24px 48px rgba(0,0,0,0.2);overflow:hidden;position:relative;}
+.phone::before{content:'';position:absolute;top:0;left:50%;transform:translateX(-50%);width:80px;height:6px;background:#1A1A1A;border-radius:0 0 8px 8px;z-index:10;}
+.phone-inner{background:var(--lc-surface);min-height:600px;display:flex;flex-direction:column;padding-top:8px;}
+.status-bar{display:flex;justify-content:space-between;align-items:center;padding:10px 20px 6px;font-size:11px;font-weight:600;color:var(--lc-text-secondary);}
+.sig{display:flex;gap:3px;align-items:flex-end;}
+.sig span{width:3px;background:var(--lc-text-secondary);border-radius:1px;}
+.sig span:nth-child(1){height:4px;}.sig span:nth-child(2){height:7px;}.sig span:nth-child(3){height:10px;}
+
+/* ─── BOTTOM NAV ─────────────────────────────────────────────── */
+.bottom-nav{display:flex;background:var(--lc-card);border-top:1px solid var(--lc-border);padding:9px 0 6px;margin-top:auto;}
+.nav-item{flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;cursor:pointer;}
+.nav-item svg{width:18px;height:18px;stroke:var(--lc-text-hint);fill:none;stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round;}
+.nav-item.on svg{stroke:var(--lc-brand);}
+.nav-lbl{font-size:9px;font-weight:600;color:var(--lc-text-hint);}
+.nav-item.on .nav-lbl{color:var(--lc-brand);}
+.nav-dot{width:4px;height:4px;border-radius:50%;background:var(--lc-brand);margin:1px auto 0;}
+
+/* ─── PAGE NAV ──────────────────────────────────────────────── */
+.p-nav{display:flex;justify-content:space-between;align-items:center;padding:6px 16px 10px;}
+.p-nav-title{font-family:var(--lc-font-display);font-size:16px;font-weight:600;color:var(--lc-text-primary);}
+.p-back{width:32px;height:32px;border-radius:50%;background:var(--lc-brand-light);display:flex;align-items:center;justify-content:center;border:none;cursor:pointer;}
+.p-back svg{width:13px;height:13px;stroke:var(--lc-brand);fill:none;stroke-width:2;stroke-linecap:round;}
+
+/* ─── IMPORT PAGE — CURRENT (BEFORE) ───────────────────────── */
+.imp-drop{margin:0 14px 12px;border:2px dashed var(--lc-border);border-radius:18px;background:var(--lc-card);padding:24px 14px;display:flex;flex-direction:column;align-items:center;gap:9px;cursor:pointer;}
+.imp-drop-icon{width:42px;height:42px;border-radius:50%;background:var(--lc-brand-light);display:flex;align-items:center;justify-content:center;}
+.imp-drop-icon svg{width:20px;height:20px;stroke:var(--lc-brand);fill:none;stroke-width:1.8;stroke-linecap:round;}
+.imp-drop-title{font-size:13px;font-weight:600;color:var(--lc-text-primary);text-align:center;}
+.imp-drop-sub{font-size:11px;color:var(--lc-text-hint);text-align:center;line-height:1.5;}
+.imp-or{display:flex;align-items:center;gap:8px;padding:0 14px 10px;}
+.imp-or-line{flex:1;height:1px;background:var(--lc-border);}
+.imp-or-txt{font-size:10px;color:var(--lc-text-hint);font-weight:500;}
+.imp-image-btn-old{margin:0 14px 10px;display:flex;align-items:center;justify-content:center;gap:8px;border:1.5px solid var(--lc-brand);border-radius:12px;padding:12px;background:var(--lc-brand-light);cursor:pointer;}
+.imp-image-btn-old svg{width:20px;height:20px;stroke:var(--lc-brand);fill:none;stroke-width:1.5;}
+.imp-image-btn-old-text{text-align:center;}
+.imp-image-btn-old-title{font-size:12px;font-weight:600;color:var(--lc-brand);}
+.imp-image-btn-old-sub{font-size:10px;color:var(--lc-brand-mid);opacity:0.7;}
+.imp-dl-link{display:flex;align-items:center;justify-content:center;gap:7px;margin:0 14px 10px;background:var(--lc-brand);color:white;border:none;border-radius:12px;padding:10px;font-size:12px;font-weight:600;cursor:pointer;font-family:var(--lc-font-body);}
+.imp-dl-link svg{width:13px;height:13px;stroke:white;fill:none;stroke-width:1.8;stroke-linecap:round;}
+.imp-browse-btn-old{margin:0 14px 12px;display:flex;align-items:center;justify-content:center;gap:7px;border:1px solid var(--lc-brand);border-radius:12px;padding:10px;font-size:12px;font-weight:600;color:var(--lc-brand);background:var(--lc-card);cursor:pointer;font-family:var(--lc-font-body);}
+.imp-browse-btn-old svg{width:13px;height:13px;stroke:var(--lc-brand);fill:none;stroke-width:1.8;stroke-linecap:round;}
+.imp-format-box{margin:0 14px 12px;background:var(--lc-surface);border:1px solid var(--lc-border);border-radius:12px;padding:11px 13px;}
+.imp-format-title{font-size:9px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--lc-text-hint);margin-bottom:7px;}
+.imp-format-row{font-family:var(--lc-font-mono);font-size:9px;color:var(--lc-brand);line-height:1.9;}
+.imp-format-note{font-size:10px;color:var(--lc-text-hint);margin-top:7px;line-height:1.5;}
+.imp-format-note strong{color:var(--lc-text-secondary);font-weight:600;}
+
+/* ─── IMPORT PAGE — REDESIGNED ──────────────────────────────── */
+
+/* Method cards row */
+.imp-methods{display:flex;gap:10px;padding:0 14px 14px;}
+.imp-method-card{
+  flex:1;display:flex;flex-direction:column;align-items:center;gap:7px;
+  background:var(--lc-card);border:1.5px solid var(--lc-border);border-radius:16px;
+  padding:18px 10px 14px;cursor:pointer;transition:all 0.15s;
+  box-shadow:var(--lc-shadow-card);
+}
+.imp-method-card:hover{border-color:var(--lc-brand);background:var(--lc-brand-light);}
+.imp-method-icon{
+  width:44px;height:44px;border-radius:12px;
+  display:flex;align-items:center;justify-content:center;
+}
+.imp-method-icon svg{width:22px;height:22px;fill:none;stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round;}
+.imp-method-icon--camera{background:var(--lc-accent-light);}
+.imp-method-icon--camera svg{stroke:var(--lc-accent);}
+.imp-method-icon--csv{background:var(--lc-brand-light);}
+.imp-method-icon--csv svg{stroke:var(--lc-brand);}
+.imp-method-icon--paste{background:#EDE9FE;}
+.imp-method-icon--paste svg{stroke:#7C3AED;}
+.imp-method-title{font-size:12px;font-weight:600;color:var(--lc-text-primary);text-align:center;}
+.imp-method-sub{font-size:9px;color:var(--lc-text-hint);text-align:center;line-height:1.4;}
+
+/* Compact drop zone */
+.imp-drop-compact{
+  margin:0 14px 10px;border:2px dashed var(--lc-border);border-radius:14px;
+  background:var(--lc-card);padding:14px;
+  display:flex;align-items:center;gap:12px;cursor:pointer;
+  transition:border-color 0.15s,background 0.15s;
+}
+.imp-drop-compact:hover{border-color:var(--lc-brand);background:var(--lc-brand-light);}
+.imp-drop-compact-icon{
+  width:36px;height:36px;border-radius:10px;background:var(--lc-brand-light);
+  display:flex;align-items:center;justify-content:center;flex-shrink:0;
+}
+.imp-drop-compact-icon svg{width:18px;height:18px;stroke:var(--lc-brand);fill:none;stroke-width:1.8;stroke-linecap:round;}
+.imp-drop-compact-text{flex:1;}
+.imp-drop-compact-title{font-size:12px;font-weight:600;color:var(--lc-text-primary);}
+.imp-drop-compact-sub{font-size:10px;color:var(--lc-text-hint);margin-top:1px;}
+.imp-browse-link{font-size:10px;font-weight:600;color:var(--lc-brand);text-decoration:underline;cursor:pointer;flex-shrink:0;}
+
+/* AI Prompt Helper section */
+.imp-ai-section{margin:0 14px 14px;}
+.imp-ai-header{display:flex;align-items:center;gap:8px;margin-bottom:10px;}
+.imp-ai-icon{
+  width:32px;height:32px;border-radius:8px;background:linear-gradient(135deg,#E8F2EE 0%,#C6E0D8 100%);
+  display:flex;align-items:center;justify-content:center;flex-shrink:0;
+}
+.imp-ai-icon svg{width:16px;height:16px;stroke:var(--lc-brand);fill:none;stroke-width:1.8;}
+.imp-ai-header-text{flex:1;}
+.imp-ai-title{font-size:13px;font-weight:600;color:var(--lc-text-primary);}
+.imp-ai-subtitle{font-size:10px;color:var(--lc-text-hint);margin-top:1px;line-height:1.4;}
+
+/* Steps */
+.imp-steps{display:flex;gap:6px;margin-bottom:12px;}
+.imp-step{
+  flex:1;display:flex;flex-direction:column;align-items:center;gap:4px;
+  padding:8px 4px;background:var(--lc-card);border:1px solid var(--lc-border);
+  border-radius:10px;text-align:center;
+}
+.imp-step-num{
+  width:20px;height:20px;border-radius:50%;background:var(--lc-brand);
+  color:white;font-size:9px;font-weight:700;
+  display:flex;align-items:center;justify-content:center;
+}
+.imp-step-lbl{font-size:8px;font-weight:600;color:var(--lc-text-secondary);line-height:1.3;}
+.imp-step-arrow{
+  width:12px;display:flex;align-items:center;justify-content:center;
+  flex-shrink:0;align-self:center;
+}
+.imp-step-arrow svg{width:10px;height:10px;stroke:var(--lc-text-hint);fill:none;stroke-width:2;stroke-linecap:round;}
+
+/* Prompt card */
+.imp-prompt-card{
+  background:var(--lc-card);border:1px solid var(--lc-border);border-radius:14px;
+  overflow:hidden;box-shadow:var(--lc-shadow-card);
+}
+.imp-prompt-top{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:9px 12px;background:var(--lc-brand-light);border-bottom:1px solid var(--lc-border);
+}
+.imp-prompt-label{font-size:10px;font-weight:600;color:var(--lc-brand);letter-spacing:0.04em;}
+.imp-copy-btn{
+  display:flex;align-items:center;gap:5px;
+  background:var(--lc-brand);color:white;border:none;border-radius:8px;
+  padding:5px 10px;font-size:10px;font-weight:600;cursor:pointer;
+  font-family:var(--lc-font-body);transition:opacity 0.15s;
+}
+.imp-copy-btn:hover{opacity:0.85;}
+.imp-copy-btn svg{width:11px;height:11px;stroke:white;fill:none;stroke-width:2;stroke-linecap:round;}
+.imp-prompt-body{padding:10px 12px;max-height:120px;overflow-y:auto;}
+.imp-prompt-text{
+  font-family:var(--lc-font-mono);font-size:9px;
+  color:var(--lc-text-secondary);line-height:1.7;white-space:pre-wrap;
+}
+.imp-prompt-text .highlight{
+  color:var(--lc-accent);font-weight:600;background:var(--lc-accent-light);
+  padding:0 3px;border-radius:3px;
+}
+.imp-prompt-footer{
+  padding:8px 12px;border-top:1px solid var(--lc-border);
+  display:flex;align-items:center;gap:6px;
+}
+.imp-prompt-footer svg{width:12px;height:12px;stroke:var(--lc-text-hint);fill:none;stroke-width:1.5;}
+.imp-prompt-footer-text{font-size:9px;color:var(--lc-text-hint);line-height:1.4;}
+
+/* Template link (secondary) */
+.imp-template-link{
+  margin:0 14px 12px;display:flex;align-items:center;gap:8px;
+  padding:10px 12px;background:var(--lc-surface);border:1px solid var(--lc-border);
+  border-radius:10px;cursor:pointer;transition:background 0.15s;
+}
+.imp-template-link:hover{background:var(--lc-brand-light);}
+.imp-template-link svg{width:14px;height:14px;stroke:var(--lc-brand-mid);fill:none;stroke-width:1.6;stroke-linecap:round;flex-shrink:0;}
+.imp-template-text{flex:1;}
+.imp-template-title{font-size:11px;font-weight:600;color:var(--lc-text-primary);}
+.imp-template-sub{font-size:9px;color:var(--lc-text-hint);margin-top:1px;}
+
+/* ─── PASTE WORDS (FUTURE) ──────────────────────────────────── */
+.imp-paste-area{
+  margin:0 14px 12px;
+  background:var(--lc-card);border:1.5px solid var(--lc-border);border-radius:14px;
+  overflow:hidden;box-shadow:var(--lc-shadow-card);
+}
+.imp-paste-header{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:10px 12px;background:var(--lc-brand-light);border-bottom:1px solid var(--lc-border);
+}
+.imp-paste-label{font-size:10px;font-weight:600;color:var(--lc-brand);}
+.imp-paste-count{font-size:10px;font-weight:600;color:var(--lc-brand-mid);}
+.imp-paste-body{padding:10px 12px;min-height:100px;}
+.imp-paste-line{
+  display:flex;align-items:center;gap:8px;
+  padding:5px 0;border-bottom:1px solid rgba(45,90,78,0.06);
+}
+.imp-paste-line:last-child{border-bottom:none;}
+.imp-paste-num{font-size:9px;font-weight:600;color:var(--lc-text-hint);min-width:16px;text-align:right;}
+.imp-paste-word{font-size:12px;font-weight:500;color:var(--lc-text-primary);}
+.imp-paste-placeholder{
+  font-size:11px;color:var(--lc-text-hint);font-style:italic;line-height:1.6;
+}
+.imp-paste-actions{padding:10px 12px;border-top:1px solid var(--lc-border);display:flex;gap:8px;}
+.imp-enrich-btn{
+  flex:1;display:flex;align-items:center;justify-content:center;gap:6px;
+  background:var(--lc-brand);color:white;border:none;border-radius:10px;
+  padding:11px;font-size:12px;font-weight:600;cursor:pointer;
+  font-family:var(--lc-font-body);
+}
+.imp-enrich-btn svg{width:14px;height:14px;stroke:white;fill:none;stroke-width:1.6;}
+
+/* ─── ANNOTATION STYLES ─────────────────────────────────────── */
+.annotation{
+  position:relative;margin:0 14px 10px;
+  background:#FEF9E7;border:1px solid #FCD34D;border-radius:10px;
+  padding:8px 12px;font-size:10px;color:#92400E;line-height:1.5;
+}
+.annotation--green{background:#D1FAE5;border-color:#6EE7B7;color:#065F46;}
+.annotation--blue{background:#DBEAFE;border-color:#93C5FD;color:#1E40AF;}
+.annotation--removed{background:#FEE2E2;border-color:#FCA5A5;color:#991B1B;}
+.annotation strong{font-weight:700;}
+
+/* ─── DETAIL PANEL ──────────────────────────────────────────── */
+.detail-section{margin-bottom:48px;}
+.detail-title{font-family:var(--lc-font-display);font-size:18px;font-weight:600;color:var(--lc-text-primary);margin-bottom:6px;}
+.detail-sub{font-size:13px;color:var(--lc-text-secondary);margin-bottom:20px;line-height:1.6;}
+.detail-card{
+  background:var(--lc-card);border:1px solid var(--lc-border);border-radius:16px;
+  padding:20px 24px;margin-bottom:16px;box-shadow:var(--lc-shadow-card);
+}
+.detail-card-title{font-size:14px;font-weight:600;color:var(--lc-text-primary);margin-bottom:12px;}
+.detail-prompt{
+  font-family:var(--lc-font-mono);font-size:11px;color:var(--lc-text-secondary);
+  line-height:1.8;white-space:pre-wrap;background:var(--lc-surface);
+  border:1px solid var(--lc-border);border-radius:10px;padding:16px;
+}
+.detail-prompt .hl{color:var(--lc-accent);font-weight:600;}
+.detail-prompt .cmt{color:var(--lc-text-hint);font-style:italic;}
+.detail-note{
+  display:flex;align-items:flex-start;gap:10px;
+  background:var(--lc-brand-light);border-radius:10px;padding:12px 14px;
+  margin-top:12px;
+}
+.detail-note svg{width:16px;height:16px;stroke:var(--lc-brand);fill:none;stroke-width:1.8;flex-shrink:0;margin-top:1px;}
+.detail-note-text{font-size:12px;color:var(--lc-text-secondary);line-height:1.5;}
+
+/* ─── COMPARISON TABLE ──────────────────────────────────────── */
+.compare-table{width:100%;border-collapse:collapse;margin-top:12px;border-radius:12px;overflow:hidden;border:1px solid var(--lc-border);}
+.compare-table th{background:var(--lc-brand-light);font-size:11px;font-weight:600;color:var(--lc-brand);padding:10px 14px;text-align:left;}
+.compare-table td{font-size:12px;color:var(--lc-text-secondary);padding:10px 14px;border-top:1px solid var(--lc-border);line-height:1.5;vertical-align:top;}
+.compare-table tr:nth-child(even) td{background:var(--lc-surface);}
+.compare-check{color:var(--lc-mastery-5);font-weight:700;}
+.compare-cross{color:var(--lc-text-hint);font-weight:600;}
+
+/* ─── RESPONSIVE ────────────────────────────────────────────── */
+@media (max-width:1200px){.phones-row{flex-wrap:wrap;justify-content:center;}}
+</style>
+</head>
+<body>
+
+<!-- ═══════════════════════════════════════════════════════════════
+     HEADER
+     ═══════════════════════════════════════════════════════════════ -->
+<div class="page-header">
+  <div class="page-header-inner">
+    <div>
+      <div class="logo">LinguaCard</div>
+      <div class="logo-sub">Import Page Redesign — Design Reference</div>
+    </div>
+    <div class="header-tabs">
+      <button class="header-tab active" onclick="showSection('mockups')">Mockups</button>
+      <button class="header-tab" onclick="showSection('prompt')">Prompt Detail</button>
+      <button class="header-tab" onclick="showSection('comparison')">Format Comparison</button>
+      <button class="header-tab" onclick="showSection('future')">Future: Paste Words</button>
+    </div>
+  </div>
+</div>
+
+<div class="main">
+
+<!-- ═══════════════════════════════════════════════════════════════
+     SECTION 1: PHONE MOCKUPS
+     ═══════════════════════════════════════════════════════════════ -->
+<div class="section" id="mockups">
+  <div class="section-title">Import Page — Before & After</div>
+  <div class="section-sub">
+    Replace the developer-facing CSV format spec with a user-friendly AI prompt helper that
+    guides users to generate import-ready CSVs. Reorganize the page to reduce visual noise
+    and create a clearer action hierarchy.
+  </div>
+
+  <div class="phones-row">
+
+    <!-- ─── PHONE 1: BEFORE (Current) ─────────────────────────── -->
+    <div class="phone-wrap">
+      <span class="phone-badge phone-badge--before">✕ Current</span>
+      <div class="phone-label">Import — Before</div>
+      <div class="phone">
+        <div class="phone-inner">
+          <div class="status-bar">
+            <span>9:41</span>
+            <div style="display:flex;align-items:center;gap:5px;">
+              <div class="sig"><span></span><span></span><span></span></div>
+            </div>
+          </div>
+          <div class="p-nav">
+            <div class="p-back"><svg viewBox="0 0 24 24"><path d="M15 18l-6-6 6-6"/></svg></div>
+            <div class="p-nav-title">Import Words</div>
+            <div style="width:32px;"></div>
+          </div>
+
+          <!-- Drop zone — large -->
+          <div class="imp-drop">
+            <div class="imp-drop-icon">
+              <svg viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+            </div>
+            <div class="imp-drop-title">Drop your CSV file here</div>
+            <div class="imp-drop-sub">Drag and drop a .csv file<br>or tap to browse your files</div>
+          </div>
+
+          <div class="imp-or">
+            <div class="imp-or-line"></div>
+            <span class="imp-or-txt">or scan an image</span>
+            <div class="imp-or-line"></div>
+          </div>
+
+          <div class="imp-image-btn-old">
+            <svg viewBox="0 0 24 24"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>
+            <div class="imp-image-btn-old-text">
+              <div class="imp-image-btn-old-title">Import from Image</div>
+              <div class="imp-image-btn-old-sub">Menus, pages, flashcards…</div>
+            </div>
+          </div>
+
+          <div class="imp-or">
+            <div class="imp-or-line"></div>
+            <span class="imp-or-txt">or start with our template</span>
+            <div class="imp-or-line"></div>
+          </div>
+
+          <button class="imp-dl-link">
+            <svg viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+            Download CSV template (95 words)
+          </button>
+
+          <button class="imp-browse-btn-old">
+            <svg viewBox="0 0 24 24"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>
+            Browse files
+          </button>
+
+          <!-- Annotation: PROBLEM -->
+          <div class="annotation annotation--removed">
+            <strong>Problem:</strong> Format spec below is developer-facing, intimidating, and doesn't help the user actually create a CSV.
+          </div>
+
+          <div class="imp-format-box">
+            <div class="imp-format-title">CSV columns</div>
+            <div class="imp-format-row"><strong>Required:</strong> front, back</div>
+            <div class="imp-format-row"><strong>Optional:</strong> article, plural, category,</div>
+            <div class="imp-format-row">exampleTarget, exampleNative</div>
+            <div class="imp-format-row"><strong>Synonyms (×3):</strong> synWord, synArticle,</div>
+            <div class="imp-format-row">synTranslation, synExample…</div>
+            <div class="imp-format-note"><strong>front:</strong> English translation<br><strong>back:</strong> German word<br><strong>article:</strong> der / die / das</div>
+          </div>
+
+          <div class="bottom-nav">
+            <div class="nav-item"><svg viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9,22 9,12 15,12 15,22"/></svg><div class="nav-lbl">Home</div></div>
+            <div class="nav-item on"><svg viewBox="0 0 24 24"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg><div class="nav-lbl">Vault</div><div class="nav-dot"></div></div>
+            <div class="nav-item"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polygon points="10,8 16,12 10,16 10,8"/></svg><div class="nav-lbl">Review</div></div>
+            <div class="nav-item"><svg viewBox="0 0 24 24"><path d="M2 3h6a4 4 0 014 4v14a3 3 0 00-3-3H2z"/><path d="M22 3h-6a4 4 0 00-4 4v14a3 3 0 013-3h7z"/></svg><div class="nav-lbl">Stories</div></div>
+            <div class="nav-item"><svg viewBox="0 0 24 24"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M19.07 4.93a10 10 0 010 14.14M15.54 8.46a5 5 0 010 7.07"/></svg><div class="nav-lbl">Listen</div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ─── PHONE 2: AFTER — Top Section ──────────────────────── -->
+    <div class="phone-wrap">
+      <span class="phone-badge phone-badge--after">✓ Redesigned</span>
+      <div class="phone-label">Import — After (top)</div>
+      <div class="phone">
+        <div class="phone-inner">
+          <div class="status-bar">
+            <span>9:41</span>
+            <div style="display:flex;align-items:center;gap:5px;">
+              <div class="sig"><span></span><span></span><span></span></div>
+            </div>
+          </div>
+          <div class="p-nav">
+            <div class="p-back"><svg viewBox="0 0 24 24"><path d="M15 18l-6-6 6-6"/></svg></div>
+            <div class="p-nav-title">Import Words</div>
+            <div style="width:32px;"></div>
+          </div>
+
+          <!-- Annotation: METHOD CARDS -->
+          <div class="annotation annotation--green">
+            <strong>New:</strong> Two clear entry points as tappable cards — scan vs upload.
+          </div>
+
+          <!-- Method cards -->
+          <div class="imp-methods">
+            <div class="imp-method-card">
+              <div class="imp-method-icon imp-method-icon--camera">
+                <svg viewBox="0 0 24 24"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>
+              </div>
+              <div class="imp-method-title">Scan Image</div>
+              <div class="imp-method-sub">Photos, menus,<br>flashcards</div>
+            </div>
+            <div class="imp-method-card" style="border-color:var(--lc-brand);background:var(--lc-brand-light);">
+              <div class="imp-method-icon imp-method-icon--csv">
+                <svg viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+              </div>
+              <div class="imp-method-title">Upload CSV</div>
+              <div class="imp-method-sub">Bulk import<br>from file</div>
+            </div>
+          </div>
+
+          <!-- Compact drop zone -->
+          <div class="imp-drop-compact">
+            <div class="imp-drop-compact-icon">
+              <svg viewBox="0 0 24 24"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>
+            </div>
+            <div class="imp-drop-compact-text">
+              <div class="imp-drop-compact-title">Drop a .csv file here</div>
+              <div class="imp-drop-compact-sub">or tap to browse your files</div>
+            </div>
+            <span class="imp-browse-link">Browse</span>
+          </div>
+
+          <!-- Annotation: AI SECTION -->
+          <div class="annotation annotation--green">
+            <strong>New:</strong> AI prompt helper replaces the old format spec. Guides users through creating a CSV with any AI tool.
+          </div>
+
+          <!-- AI Prompt Helper -->
+          <div class="imp-ai-section">
+            <div class="imp-ai-header">
+              <div class="imp-ai-icon">
+                <svg viewBox="0 0 24 24"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
+              </div>
+              <div class="imp-ai-header-text">
+                <div class="imp-ai-title">Generate a CSV with AI</div>
+                <div class="imp-ai-subtitle">Copy this prompt into ChatGPT, Claude, or any AI</div>
+              </div>
+            </div>
+
+            <!-- Steps -->
+            <div class="imp-steps">
+              <div class="imp-step">
+                <div class="imp-step-num">1</div>
+                <div class="imp-step-lbl">Copy prompt below</div>
+              </div>
+              <div class="imp-step-arrow"><svg viewBox="0 0 24 24"><polyline points="9 6 15 12 9 18"/></svg></div>
+              <div class="imp-step">
+                <div class="imp-step-num">2</div>
+                <div class="imp-step-lbl">Paste into AI with your words</div>
+              </div>
+              <div class="imp-step-arrow"><svg viewBox="0 0 24 24"><polyline points="9 6 15 12 9 18"/></svg></div>
+              <div class="imp-step">
+                <div class="imp-step-num">3</div>
+                <div class="imp-step-lbl">Upload the CSV here</div>
+              </div>
+            </div>
+
+            <!-- Prompt card -->
+            <div class="imp-prompt-card">
+              <div class="imp-prompt-top">
+                <span class="imp-prompt-label">AI PROMPT</span>
+                <button class="imp-copy-btn">
+                  <svg viewBox="0 0 24 24"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+                  Copy
+                </button>
+              </div>
+              <div class="imp-prompt-body">
+                <div class="imp-prompt-text">Create German vocabulary flashcards as a CSV.
+
+Columns: front,back,article,plural,
+category,exampleTarget,exampleNative
+
+• front = English translation
+• back = German word (no article)
+• article = der/die/das or empty
+• plural = full form (e.g. die Hunde)
+• category = Food, Travel, Home…
+
+<span class="highlight">[PASTE YOUR WORDS HERE]</span>
+
+Output ONLY the CSV. No explanations.</div>
+              </div>
+              <div class="imp-prompt-footer">
+                <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4M12 8h.01"/></svg>
+                <span class="imp-prompt-footer-text">Works with ChatGPT, Claude, Gemini, Copilot — any AI that generates text</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Template link (secondary) -->
+          <div class="imp-template-link">
+            <svg viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+            <div class="imp-template-text">
+              <div class="imp-template-title">Download CSV template</div>
+              <div class="imp-template-sub">95 pre-made words — try it out</div>
+            </div>
+          </div>
+
+          <div class="bottom-nav">
+            <div class="nav-item"><svg viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9,22 9,12 15,12 15,22"/></svg><div class="nav-lbl">Home</div></div>
+            <div class="nav-item on"><svg viewBox="0 0 24 24"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg><div class="nav-lbl">Vault</div><div class="nav-dot"></div></div>
+            <div class="nav-item"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polygon points="10,8 16,12 10,16 10,8"/></svg><div class="nav-lbl">Review</div></div>
+            <div class="nav-item"><svg viewBox="0 0 24 24"><path d="M2 3h6a4 4 0 014 4v14a3 3 0 00-3-3H2z"/><path d="M22 3h-6a4 4 0 00-4 4v14a3 3 0 013-3h7z"/></svg><div class="nav-lbl">Stories</div></div>
+            <div class="nav-item"><svg viewBox="0 0 24 24"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M19.07 4.93a10 10 0 010 14.14M15.54 8.46a5 5 0 010 7.07"/></svg><div class="nav-lbl">Listen</div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ─── PHONE 3: AFTER — Copied State ─────────────────────── -->
+    <div class="phone-wrap">
+      <span class="phone-badge phone-badge--after">✓ Copied state</span>
+      <div class="phone-label">After copy tap</div>
+      <div class="phone">
+        <div class="phone-inner">
+          <div class="status-bar">
+            <span>9:41</span>
+            <div style="display:flex;align-items:center;gap:5px;">
+              <div class="sig"><span></span><span></span><span></span></div>
+            </div>
+          </div>
+          <div class="p-nav">
+            <div class="p-back"><svg viewBox="0 0 24 24"><path d="M15 18l-6-6 6-6"/></svg></div>
+            <div class="p-nav-title">Import Words</div>
+            <div style="width:32px;"></div>
+          </div>
+
+          <!-- Method cards -->
+          <div class="imp-methods">
+            <div class="imp-method-card">
+              <div class="imp-method-icon imp-method-icon--camera">
+                <svg viewBox="0 0 24 24"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>
+              </div>
+              <div class="imp-method-title">Scan Image</div>
+              <div class="imp-method-sub">Photos, menus,<br>flashcards</div>
+            </div>
+            <div class="imp-method-card">
+              <div class="imp-method-icon imp-method-icon--csv">
+                <svg viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+              </div>
+              <div class="imp-method-title">Upload CSV</div>
+              <div class="imp-method-sub">Bulk import<br>from file</div>
+            </div>
+          </div>
+
+          <!-- Drop zone -->
+          <div class="imp-drop-compact">
+            <div class="imp-drop-compact-icon">
+              <svg viewBox="0 0 24 24"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>
+            </div>
+            <div class="imp-drop-compact-text">
+              <div class="imp-drop-compact-title">Drop a .csv file here</div>
+              <div class="imp-drop-compact-sub">or tap to browse your files</div>
+            </div>
+            <span class="imp-browse-link">Browse</span>
+          </div>
+
+          <!-- AI Prompt — Copied State -->
+          <div class="imp-ai-section">
+            <div class="imp-ai-header">
+              <div class="imp-ai-icon">
+                <svg viewBox="0 0 24 24"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
+              </div>
+              <div class="imp-ai-header-text">
+                <div class="imp-ai-title">Generate a CSV with AI</div>
+                <div class="imp-ai-subtitle">Copy this prompt into ChatGPT, Claude, or any AI</div>
+              </div>
+            </div>
+
+            <div class="imp-steps">
+              <div class="imp-step" style="background:var(--lc-brand-light);border-color:var(--lc-brand);">
+                <div class="imp-step-num">✓</div>
+                <div class="imp-step-lbl" style="color:var(--lc-brand);font-weight:700;">Copied!</div>
+              </div>
+              <div class="imp-step-arrow"><svg viewBox="0 0 24 24"><polyline points="9 6 15 12 9 18"/></svg></div>
+              <div class="imp-step">
+                <div class="imp-step-num">2</div>
+                <div class="imp-step-lbl">Paste into AI with your words</div>
+              </div>
+              <div class="imp-step-arrow"><svg viewBox="0 0 24 24"><polyline points="9 6 15 12 9 18"/></svg></div>
+              <div class="imp-step">
+                <div class="imp-step-num">3</div>
+                <div class="imp-step-lbl">Upload the CSV here</div>
+              </div>
+            </div>
+
+            <!-- Prompt card — copied state -->
+            <div class="imp-prompt-card" style="border-color:var(--lc-mastery-5);">
+              <div class="imp-prompt-top" style="background:#D1FAE5;border-color:var(--lc-mastery-5);">
+                <span class="imp-prompt-label" style="color:#059669;">✓ COPIED TO CLIPBOARD</span>
+                <button class="imp-copy-btn" style="background:#059669;">
+                  <svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>
+                  Copied!
+                </button>
+              </div>
+              <div class="imp-prompt-body">
+                <div class="imp-prompt-text">Create German vocabulary flashcards as a CSV.
+
+Columns: front,back,article,plural,
+category,exampleTarget,exampleNative
+
+• front = English translation
+• back = German word (no article)
+• article = der/die/das or empty
+• plural = full form (e.g. die Hunde)
+• category = Food, Travel, Home…
+
+<span class="highlight">[PASTE YOUR WORDS HERE]</span>
+
+Output ONLY the CSV. No explanations.</div>
+              </div>
+              <div class="imp-prompt-footer">
+                <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4M12 8h.01"/></svg>
+                <span class="imp-prompt-footer-text">Now open your favourite AI tool, paste the prompt, add your words, and download the CSV</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Toast overlay -->
+          <div style="position:absolute;bottom:60px;left:50%;transform:translateX(-50%);background:var(--lc-brand-dark);color:white;padding:8px 16px;border-radius:20px;font-size:11px;font-weight:600;box-shadow:var(--lc-shadow-float);white-space:nowrap;z-index:20;">
+            ✓ Prompt copied to clipboard
+          </div>
+
+          <div class="bottom-nav">
+            <div class="nav-item"><svg viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9,22 9,12 15,12 15,22"/></svg><div class="nav-lbl">Home</div></div>
+            <div class="nav-item on"><svg viewBox="0 0 24 24"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg><div class="nav-lbl">Vault</div><div class="nav-dot"></div></div>
+            <div class="nav-item"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polygon points="10,8 16,12 10,16 10,8"/></svg><div class="nav-lbl">Review</div></div>
+            <div class="nav-item"><svg viewBox="0 0 24 24"><path d="M2 3h6a4 4 0 014 4v14a3 3 0 00-3-3H2z"/><path d="M22 3h-6a4 4 0 00-4 4v14a3 3 0 013-3h7z"/></svg><div class="nav-lbl">Stories</div></div>
+            <div class="nav-item"><svg viewBox="0 0 24 24"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M19.07 4.93a10 10 0 010 14.14M15.54 8.46a5 5 0 010 7.07"/></svg><div class="nav-lbl">Listen</div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ─── PHONE 4: FUTURE — Paste Words ─────────────────────── -->
+    <div class="phone-wrap">
+      <span class="phone-badge phone-badge--future">◆ Future concept</span>
+      <div class="phone-label">Paste Words (v2)</div>
+      <div class="phone">
+        <div class="phone-inner">
+          <div class="status-bar">
+            <span>9:41</span>
+            <div style="display:flex;align-items:center;gap:5px;">
+              <div class="sig"><span></span><span></span><span></span></div>
+            </div>
+          </div>
+          <div class="p-nav">
+            <div class="p-back"><svg viewBox="0 0 24 24"><path d="M15 18l-6-6 6-6"/></svg></div>
+            <div class="p-nav-title">Import Words</div>
+            <div style="width:32px;"></div>
+          </div>
+
+          <!-- Three method cards -->
+          <div class="imp-methods">
+            <div class="imp-method-card">
+              <div class="imp-method-icon imp-method-icon--camera">
+                <svg viewBox="0 0 24 24"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>
+              </div>
+              <div class="imp-method-title">Scan</div>
+              <div class="imp-method-sub">Camera<br>or photo</div>
+            </div>
+            <div class="imp-method-card" style="border-color:#7C3AED;background:#F5F3FF;">
+              <div class="imp-method-icon imp-method-icon--paste">
+                <svg viewBox="0 0 24 24"><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><rect x="8" y="2" width="8" height="4" rx="1"/></svg>
+              </div>
+              <div class="imp-method-title">Paste</div>
+              <div class="imp-method-sub">Type or<br>paste words</div>
+            </div>
+            <div class="imp-method-card">
+              <div class="imp-method-icon imp-method-icon--csv">
+                <svg viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+              </div>
+              <div class="imp-method-title">CSV</div>
+              <div class="imp-method-sub">Upload<br>a file</div>
+            </div>
+          </div>
+
+          <!-- Annotation -->
+          <div class="annotation annotation--blue">
+            <strong>Future:</strong> Paste words directly — our AI enriches them server-side. Reuses the existing enrichment pipeline. No CSV needed!
+          </div>
+
+          <!-- Paste area -->
+          <div class="imp-paste-area">
+            <div class="imp-paste-header">
+              <span class="imp-paste-label">YOUR GERMAN WORDS</span>
+              <span class="imp-paste-count">5 words</span>
+            </div>
+            <div class="imp-paste-body">
+              <div class="imp-paste-line"><span class="imp-paste-num">1</span><span class="imp-paste-word">Flugzeug</span></div>
+              <div class="imp-paste-line"><span class="imp-paste-num">2</span><span class="imp-paste-word">Schmetterling</span></div>
+              <div class="imp-paste-line"><span class="imp-paste-num">3</span><span class="imp-paste-word">Krankenhaus</span></div>
+              <div class="imp-paste-line"><span class="imp-paste-num">4</span><span class="imp-paste-word">Sehenswürdigkeit</span></div>
+              <div class="imp-paste-line"><span class="imp-paste-num">5</span><span class="imp-paste-word">Gemütlichkeit</span></div>
+            </div>
+            <div class="imp-paste-actions">
+              <button class="imp-enrich-btn">
+                <svg viewBox="0 0 24 24"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
+                Generate 5 flashcards
+              </button>
+            </div>
+          </div>
+
+          <div style="margin:0 14px;display:flex;align-items:flex-start;gap:8px;padding:10px 12px;background:var(--lc-brand-light);border-radius:10px;">
+            <svg viewBox="0 0 24 24" style="width:14px;height:14px;stroke:var(--lc-brand);fill:none;stroke-width:1.8;flex-shrink:0;margin-top:1px;"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4M12 8h.01"/></svg>
+            <span style="font-size:10px;color:var(--lc-text-secondary);line-height:1.5;">Our AI adds translations, articles, plurals, examples, and synonyms — one word per line is all you need.</span>
+          </div>
+
+          <div class="bottom-nav" style="margin-top:auto;">
+            <div class="nav-item"><svg viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9,22 9,12 15,12 15,22"/></svg><div class="nav-lbl">Home</div></div>
+            <div class="nav-item on"><svg viewBox="0 0 24 24"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg><div class="nav-lbl">Vault</div><div class="nav-dot"></div></div>
+            <div class="nav-item"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polygon points="10,8 16,12 10,16 10,8"/></svg><div class="nav-lbl">Review</div></div>
+            <div class="nav-item"><svg viewBox="0 0 24 24"><path d="M2 3h6a4 4 0 014 4v14a3 3 0 00-3-3H2z"/><path d="M22 3h-6a4 4 0 00-4 4v14a3 3 0 013-3h7z"/></svg><div class="nav-lbl">Stories</div></div>
+            <div class="nav-item"><svg viewBox="0 0 24 24"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M19.07 4.93a10 10 0 010 14.14M15.54 8.46a5 5 0 010 7.07"/></svg><div class="nav-lbl">Listen</div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════════
+     SECTION 2: PROMPT DETAIL
+     ═══════════════════════════════════════════════════════════════ -->
+<div class="section" id="prompt" style="display:none;">
+  <div class="section-title">AI Prompt — Full Text</div>
+  <div class="section-sub">
+    This is the complete prompt that gets copied to the user's clipboard. It's derived from
+    our <code>WordEnrichPromptBuilder</code> but simplified for human consumption. The prompt
+    outputs CSV that matches our parser's expected column layout exactly.
+  </div>
+
+  <div class="detail-section">
+    <div class="detail-card">
+      <div class="detail-card-title">Complete Prompt (copied to clipboard)</div>
+      <div class="detail-prompt">I have a list of German words I want to study. Create a CSV file with these exact column headers:
+
+<span class="hl">front,back,article,plural,category,exampleTarget,exampleNative</span>
+
+Column definitions:
+- <span class="hl">front</span>: English translation (e.g. "dog")
+- <span class="hl">back</span>: German word WITHOUT article (e.g. "Hund")
+- <span class="hl">article</span>: der, die, or das — leave empty for verbs, adjectives, phrases
+- <span class="hl">plural</span>: Full plural with article (e.g. "die Hunde") — leave empty for verbs
+- <span class="hl">category</span>: One of: Food, Travel, Home, Work, People, Nature, Transport, Shopping, Health, Other
+- <span class="hl">exampleTarget</span>: A natural German sentence using the word
+- <span class="hl">exampleNative</span>: English translation of that sentence
+
+Rules:
+- The "back" column must NEVER include the article — that goes in the "article" column only
+- Wrap any field that contains commas in double quotes
+- Include the header row as the first line
+- Use correct German grammar in all sentences
+
+Here are my German words:
+<span class="hl">[PASTE YOUR WORDS HERE — one per line]</span>
+
+Output ONLY the CSV with headers. No markdown fences. No explanations.</div>
+
+      <div class="detail-note">
+        <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4M12 8h.01"/></svg>
+        <div class="detail-note-text">
+          <strong>Why not include synonyms in the prompt?</strong> The synonym columns (synWord, synArticle, etc.) add significant complexity to the prompt
+          and most AI tools struggle with the 3×5 repeating column structure. For the best user experience, we keep
+          the prompt focused on the 7 core columns. Synonyms can be backfilled via our enrichment pipeline later.
+        </div>
+      </div>
+    </div>
+
+    <div class="detail-card">
+      <div class="detail-card-title">Prompt shown in the UI (abbreviated)</div>
+      <div class="detail-prompt"><span class="cmt">// This shorter version is shown in the phone UI card.
+// The full version above is what actually gets copied to clipboard.</span>
+
+Create German vocabulary flashcards as a CSV.
+
+Columns: front,back,article,plural,category,exampleTarget,exampleNative
+
+• front = English translation
+• back = German word (no article)
+• article = der/die/das or empty
+• plural = full form (e.g. die Hunde)
+• category = Food, Travel, Home, Work, People, Nature, Transport, Shopping, Health, Other
+• exampleTarget = German sentence with the word
+• exampleNative = English translation of the sentence
+
+<span class="hl">[PASTE YOUR WORDS HERE]</span>
+
+Output ONLY the CSV. No explanations.</div>
+
+      <div class="detail-note">
+        <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4M12 8h.01"/></svg>
+        <div class="detail-note-text">
+          <strong>Two versions of the prompt:</strong> The UI card shows a shorter preview for scannability.
+          The clipboard copy contains the full, detailed version with rules and examples to maximize AI output quality.
+        </div>
+      </div>
+    </div>
+
+    <div class="detail-card">
+      <div class="detail-card-title">CSV output mapping to parser</div>
+      <div class="detail-prompt"><span class="cmt">// CsvParserService column indices (0-indexed):</span>
+Column 0: <span class="hl">front</span>          → ParsedImportRow.front
+Column 1: <span class="hl">back</span>           → ParsedImportRow.back
+Column 2: <span class="hl">article</span>        → ParsedImportRow.article (der/die/das/null)
+Column 3: <span class="hl">plural</span>         → ParsedImportRow.plural
+Column 4: <span class="hl">category</span>       → ParsedImportRow.categoryId (matched by name)
+Column 5: <span class="hl">exampleTarget</span>  → ParsedImportRow.exampleTarget
+Column 6: <span class="hl">exampleNative</span>  → ParsedImportRow.exampleNative
+
+<span class="cmt">// Synonym columns (7+) are intentionally omitted from the AI prompt.
+// These columns still work if the user provides them manually.</span></div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════════
+     SECTION 3: FORMAT COMPARISON
+     ═══════════════════════════════════════════════════════════════ -->
+<div class="section" id="comparison" style="display:none;">
+  <div class="section-title">Import Format Comparison</div>
+  <div class="section-sub">
+    Evaluating whether CSV is the best format, or if there's a simpler alternative for user-generated imports.
+  </div>
+
+  <div class="detail-card">
+    <div class="detail-card-title">Format Options</div>
+    <table class="compare-table">
+      <thead>
+        <tr>
+          <th style="width:20%;">Format</th>
+          <th style="width:18%;">User Effort</th>
+          <th style="width:22%;">Data Richness</th>
+          <th style="width:18%;">AI-friendly</th>
+          <th style="width:22%;">Implementation</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><strong>Plain text list</strong><br><span style="font-size:10px;color:var(--lc-text-hint);">One word per line</span></td>
+          <td><span class="compare-check">★★★</span> Easiest</td>
+          <td><span class="compare-cross">★</span> Words only — needs server enrichment</td>
+          <td>N/A — no AI needed</td>
+          <td>New endpoint + "Paste Words" UI. Reuses enrichment pipeline.</td>
+        </tr>
+        <tr>
+          <td><strong>CSV (7 columns)</strong><br><span style="font-size:10px;color:var(--lc-text-hint);">Current format</span></td>
+          <td><span class="compare-cross">★★</span> Needs AI help or template</td>
+          <td><span class="compare-check">★★★</span> Full card data</td>
+          <td><span class="compare-check">★★★</span> AI generates well</td>
+          <td>Already implemented. Parser exists.</td>
+        </tr>
+        <tr>
+          <td><strong>CSV (22 columns)</strong><br><span style="font-size:10px;color:var(--lc-text-hint);">With 3× synonyms</span></td>
+          <td><span class="compare-cross">★</span> Too complex</td>
+          <td><span class="compare-check">★★★</span> Everything including synonyms</td>
+          <td><span class="compare-cross">★</span> AI struggles with structure</td>
+          <td>Already implemented. Parser handles it.</td>
+        </tr>
+        <tr>
+          <td><strong>JSON</strong><br><span style="font-size:10px;color:var(--lc-text-hint);">Structured objects</span></td>
+          <td><span class="compare-cross">★</span> Not user-friendly</td>
+          <td><span class="compare-check">★★★</span> Unlimited structure</td>
+          <td><span class="compare-check">★★★</span> AI generates easily</td>
+          <td>Would need new parser + file picker support.</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <div class="detail-note" style="margin-top:16px;">
+      <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4M12 8h.01"/></svg>
+      <div class="detail-note-text">
+        <strong>Recommendation:</strong> Keep CSV (7 columns) as the import format — it's already implemented,
+        AI tools generate it well, and the prompt helper makes it accessible. For v2, add a "Paste Words" flow
+        that sends plain text to the server enrichment pipeline (eliminating CSV friction entirely for casual users).
+        The synonym columns are best handled by server-side backfill, not user-generated CSV.
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════════
+     SECTION 4: FUTURE — PASTE WORDS
+     ═══════════════════════════════════════════════════════════════ -->
+<div class="section" id="future" style="display:none;">
+  <div class="section-title">Future Concept: Paste Words</div>
+  <div class="section-sub">
+    The ultimate simplification — users type or paste German words directly, and our existing
+    enrichment pipeline generates full flashcards server-side. No CSV, no AI prompt, no file downloads.
+  </div>
+
+  <div class="detail-card">
+    <div class="detail-card-title">Architecture: How Paste Words would work</div>
+    <div class="detail-prompt"><span class="cmt">// User pastes a list of German words (one per line)</span>
+Input: "Flugzeug\nSchmetterling\nKrankenhaus"
+
+<span class="cmt">// Client converts to RawExtractedWord[] (same type image-import uses)</span>
+const rawWords: RawExtractedWord[] = lines.map(line => ({
+  back: line.trim(),
+}));
+
+<span class="cmt">// Call the EXISTING enrichment endpoint</span>
+POST /import/enrich
+Body: {
+  rawWords,
+  targetLanguage: 'German',
+  nativeLanguage: 'English',
+}
+
+<span class="cmt">// Returns ImageExtractedWord[] → same review page as image import</span>
+<span class="hl">→ Navigate to /vault/import/image/review</span>
+<span class="cmt">// Reuses the entire image-import review + card creation flow</span></div>
+
+    <div class="detail-note" style="margin-top:16px;">
+      <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4M12 8h.01"/></svg>
+      <div class="detail-note-text">
+        <strong>Effort estimate:</strong> ~8 story points. One new page (text input + word list preview),
+        one new endpoint call (reusing <code>WordEnrichService</code>), and navigation to the existing
+        image-import review page. The enrichment pipeline, review page, and card creation logic are all reused.
+      </div>
+    </div>
+  </div>
+
+  <div class="detail-card">
+    <div class="detail-card-title">User flow comparison</div>
+    <table class="compare-table">
+      <thead>
+        <tr>
+          <th>Step</th>
+          <th>CSV + AI Prompt</th>
+          <th>Paste Words (v2)</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><strong>1</strong></td>
+          <td>Copy AI prompt from app</td>
+          <td>Open Import page</td>
+        </tr>
+        <tr>
+          <td><strong>2</strong></td>
+          <td>Open ChatGPT/Claude/etc.</td>
+          <td>Type or paste German words</td>
+        </tr>
+        <tr>
+          <td><strong>3</strong></td>
+          <td>Paste prompt + add words</td>
+          <td>Tap "Generate flashcards"</td>
+        </tr>
+        <tr>
+          <td><strong>4</strong></td>
+          <td>Wait for AI to generate CSV</td>
+          <td>Wait for enrichment (~3s/batch)</td>
+        </tr>
+        <tr>
+          <td><strong>5</strong></td>
+          <td>Download CSV file</td>
+          <td>Review + select words</td>
+        </tr>
+        <tr>
+          <td><strong>6</strong></td>
+          <td>Return to LinguaCard</td>
+          <td>Import to collection</td>
+        </tr>
+        <tr>
+          <td><strong>7</strong></td>
+          <td>Upload the CSV file</td>
+          <td><span style="color:var(--lc-mastery-5);font-weight:700;">Done ✓</span></td>
+        </tr>
+        <tr>
+          <td><strong>8</strong></td>
+          <td>Review + select words</td>
+          <td></td>
+        </tr>
+        <tr>
+          <td><strong>9</strong></td>
+          <td>Import to collection</td>
+          <td></td>
+        </tr>
+        <tr>
+          <td colspan="3" style="text-align:center;font-weight:600;color:var(--lc-brand);">
+            Paste Words saves 3 steps and keeps the user in-app the entire time
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+</div><!-- /main -->
+
+<script>
+function showSection(id) {
+  document.querySelectorAll('.section').forEach(s => s.style.display = 'none');
+  document.getElementById(id).style.display = 'block';
+  document.querySelectorAll('.header-tab').forEach(t => t.classList.remove('active'));
+  event.target.classList.add('active');
+}
+</script>
+</body>
+</html>
