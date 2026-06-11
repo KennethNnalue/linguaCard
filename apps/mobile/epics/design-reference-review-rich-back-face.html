@@ -1,0 +1,842 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>LinguaCard — Review Rich Back Face Design Reference</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,500;0,600;1,400&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600&family=Fira+Code:wght@400;500&display=swap" rel="stylesheet">
+<style>
+/* ─── DESIGN TOKENS ─────────────────────────────────────────── */
+:root {
+  --lc-brand:#2D5A4E;--lc-brand-light:#E8F2EE;--lc-brand-mid:#4A8C7A;--lc-brand-dark:#1A3830;
+  --lc-accent:#E07B3F;--lc-accent-light:#FDF0E6;
+  --lc-masc-bg:#EAF2FC;--lc-masc-text:#1A56A3;--lc-masc-border:#85B7EB;
+  --lc-fem-bg:#FEF2F2;--lc-fem-text:#B91C1C;--lc-fem-border:#FCA5A5;
+  --lc-neut-bg:#F1EFE8;--lc-neut-text:#5F5E5A;--lc-neut-border:#B4B2A9;
+  --lc-mastery-0:#D1D5DB;--lc-mastery-1:#FCA5A5;--lc-mastery-2:#FCD34D;
+  --lc-mastery-3:#6EE7B7;--lc-mastery-4:#34D399;--lc-mastery-5:#059669;
+  --lc-surface:#FAFAF8;--lc-card:#FFFFFF;--lc-border:rgba(45,90,78,0.12);
+  --lc-text-primary:#1A2B26;--lc-text-secondary:#6B7C78;--lc-text-hint:#9BAAA6;
+  --lc-shadow-card:0 2px 12px rgba(45,90,78,0.08),0 1px 3px rgba(0,0,0,0.04);
+  --lc-shadow-float:0 8px 32px rgba(45,90,78,0.14),0 2px 8px rgba(0,0,0,0.06);
+  --lc-font-display:'Lora',Georgia,serif;
+  --lc-font-body:'DM Sans',system-ui,sans-serif;
+  --lc-font-mono:'Fira Code','Courier New',monospace;
+  --lc-radius-sm:8px;--lc-radius-md:12px;--lc-radius-lg:20px;--lc-radius-xl:28px;
+  --lc-radius-full:999px;
+  --lc-transition-fast:0.15s ease;
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:var(--lc-font-body);background:#F0EDEA;color:var(--lc-text-primary);min-height:100vh;}
+
+/* ─── PAGE LAYOUT ───────────────────────────────────────────── */
+.page-header{background:var(--lc-brand);padding:28px 40px 24px;position:sticky;top:0;z-index:100;box-shadow:0 4px 20px rgba(0,0,0,0.2);}
+.page-header-inner{max-width:1300px;margin:0 auto;display:flex;align-items:center;justify-content:space-between;gap:20px;flex-wrap:wrap;}
+.logo{font-family:var(--lc-font-display);font-size:22px;font-weight:600;color:white;}
+.logo-sub{font-size:11px;color:rgba(255,255,255,0.55);margin-top:2px;}
+.badge-epic{background:rgba(255,255,255,0.15);border:1px solid rgba(255,255,255,0.25);color:white;font-size:11px;font-weight:600;padding:5px 14px;border-radius:20px;}
+.main{max-width:1300px;margin:0 auto;padding:40px;}
+.section{margin-bottom:56px;}
+.section-title{font-family:var(--lc-font-display);font-size:20px;font-weight:600;color:var(--lc-text-primary);margin-bottom:5px;}
+.section-sub{font-size:12px;color:var(--lc-text-secondary);margin-bottom:22px;line-height:1.6;}
+.phones-row{display:flex;gap:24px;align-items:flex-start;overflow-x:auto;padding-bottom:8px;}
+
+/* ─── PHONE SHELL ────────────────────────────────────────────── */
+.phone-wrap{display:flex;flex-direction:column;align-items:center;gap:10px;flex:0 0 auto;}
+.phone-label{font-size:10px;font-weight:600;letter-spacing:0.07em;text-transform:uppercase;color:var(--lc-text-hint);}
+.phone{width:280px;background:var(--lc-surface);border-radius:40px;border:8px solid #1A1A1A;box-shadow:0 0 0 1px #333,var(--lc-shadow-float),0 24px 48px rgba(0,0,0,0.2);overflow:hidden;position:relative;}
+.phone::before{content:'';position:absolute;top:0;left:50%;transform:translateX(-50%);width:80px;height:6px;background:#1A1A1A;border-radius:0 0 8px 8px;z-index:10;}
+.phone-inner{background:var(--lc-surface);min-height:580px;display:flex;flex-direction:column;padding-top:8px;}
+.status-bar{display:flex;justify-content:space-between;align-items:center;padding:10px 20px 6px;font-size:11px;font-weight:600;color:var(--lc-text-secondary);}
+.sig{display:flex;gap:3px;align-items:flex-end;}
+.sig span{width:3px;background:var(--lc-text-secondary);border-radius:1px;}
+.sig span:nth-child(1){height:4px;}
+.sig span:nth-child(2){height:7px;}
+.sig span:nth-child(3){height:10px;}
+.batt{width:20px;height:10px;border:1.5px solid var(--lc-text-secondary);border-radius:3px;position:relative;margin-left:4px;}
+.batt::after{content:'';position:absolute;top:1.5px;left:1.5px;width:65%;height:5px;background:var(--lc-text-secondary);border-radius:1px;}
+
+/* ─── PHONE NAV ─────────────────────────────────────────────── */
+.p-nav{display:flex;justify-content:space-between;align-items:center;padding:6px 16px 10px;}
+.p-nav-title{font-family:var(--lc-font-display);font-size:15px;font-weight:600;color:var(--lc-text-primary);}
+.p-back{width:30px;height:30px;border-radius:50%;background:var(--lc-brand-light);display:flex;align-items:center;justify-content:center;border:none;cursor:pointer;}
+.p-back svg{width:13px;height:13px;stroke:var(--lc-brand);fill:none;stroke-width:2;stroke-linecap:round;}
+
+/* ─── ARTICLE BADGE ─────────────────────────────────────────── */
+.art-badge{font-size:9px;font-weight:700;padding:2px 7px;border-radius:20px;border:1px solid;flex-shrink:0;letter-spacing:.04em;}
+.art-der{background:var(--lc-masc-bg);color:var(--lc-masc-text);border-color:var(--lc-masc-border);}
+.art-die{background:var(--lc-fem-bg);color:var(--lc-fem-text);border-color:var(--lc-fem-border);}
+.art-das{background:var(--lc-neut-bg);color:var(--lc-neut-text);border-color:var(--lc-neut-border);}
+
+/* ─── REVIEW SESSION PROGRESS ───────────────────────────────── */
+.rv-prog-wrap{padding:0 16px 10px;}
+.rv-prog-track{height:4px;background:var(--lc-border);border-radius:4px;overflow:hidden;margin-bottom:5px;}
+.rv-prog-fill{height:100%;background:var(--lc-brand);border-radius:4px;}
+.rv-prog-labels{display:flex;justify-content:space-between;font-size:10px;color:var(--lc-text-hint);}
+
+/* ─── REVIEW SESSION LAYOUT ─────────────────────────────────── */
+.rv-session{display:flex;flex-direction:column;flex:1;padding:0 14px;gap:10px;overflow:hidden;}
+.rv-card-scene{flex:1;overflow:hidden;display:flex;flex-direction:column;}
+.rv-footer{padding:0 0 12px;display:flex;flex-direction:column;gap:8px;}
+
+/* ─── REVIEW CARD ───────────────────────────────────────────── */
+.rv-card{background:var(--lc-card);border:1px solid var(--lc-border);border-radius:24px;padding:16px 18px;box-shadow:var(--lc-shadow-float);display:flex;flex-direction:column;flex:1;overflow:hidden;}
+/* Scrollable variant for back face */
+.rv-card--back-scrollable{overflow-y:auto;-webkit-overflow-scrolling:touch;}
+.rv-card-hdr{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;flex-shrink:0;}
+.rv-side-lbl{font-size:10px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--lc-text-hint);max-width:55%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.rv-lang-chip{font-size:11px;font-weight:600;color:var(--lc-brand-mid);background:var(--lc-brand-light);padding:3px 10px;border-radius:var(--lc-radius-full);}
+
+/* ─── FRONT FACE ────────────────────────────────────────────── */
+.rv-body-front{display:flex;flex-direction:column;align-items:center;justify-content:center;padding:16px 0 20px;gap:8px;flex:1;}
+.rv-front-word{font-family:var(--lc-font-display);font-size:34px;font-weight:600;color:var(--lc-text-primary);text-align:center;line-height:1.2;}
+.rv-hint{font-size:13px;color:var(--lc-text-hint);font-style:italic;text-align:center;}
+.rv-tap-pill{display:flex;align-items:center;justify-content:center;gap:7px;background:var(--lc-brand-light);color:var(--lc-brand);font-size:13px;font-weight:600;padding:10px 20px;border-radius:var(--lc-radius-full);border:none;width:100%;font-family:var(--lc-font-body);cursor:pointer;margin-top:auto;}
+.rv-tap-pill svg{width:14px;height:14px;stroke:var(--lc-brand);fill:none;stroke-width:2;stroke-linecap:round;}
+
+/* ─── BACK FACE BODY ─────────────────────────────────────────── */
+.rv-body-back{display:flex;flex-direction:column;align-items:center;gap:0;}
+.rv-art-row{display:flex;align-items:center;gap:7px;margin-bottom:10px;}
+.rv-art-gender{font-size:12px;color:var(--lc-text-secondary);font-weight:500;}
+.rv-back-word{font-family:var(--lc-font-display);font-size:32px;font-weight:600;color:var(--lc-text-primary);text-align:center;line-height:1.1;margin:0 0 4px;}
+.rv-phonetic{font-size:13px;color:var(--lc-text-hint);font-style:italic;text-align:center;margin:0 0 10px;}
+
+/* Plural pill */
+.rv-plural{display:inline-flex;align-items:center;gap:6px;margin-bottom:12px;background:var(--lc-surface);border:1px solid var(--lc-border);border-radius:var(--lc-radius-md);padding:5px 11px;}
+.rv-plural-lbl{font-size:9px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--lc-brand-mid);}
+.rv-plural-val{font-size:13px;font-weight:500;color:var(--lc-text-primary);}
+
+/* Play pronunciation */
+.rv-audio-btn{display:flex;align-items:center;justify-content:center;gap:7px;background:var(--lc-brand-light);color:var(--lc-brand);border:none;border-radius:var(--lc-radius-md);padding:9px 16px;font-size:12px;font-weight:600;cursor:pointer;font-family:var(--lc-font-body);width:100%;margin-bottom:2px;}
+.rv-audio-btn svg{width:13px;height:13px;stroke:var(--lc-brand);fill:none;stroke-width:1.8;stroke-linecap:round;}
+
+/* Section divider + header */
+.rv-sec-divider{width:100%;height:1px;background:var(--lc-border);margin:12px 0 10px;flex-shrink:0;}
+.rv-sec-hdr{font-size:10px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;color:var(--lc-text-hint);margin-bottom:8px;align-self:flex-start;}
+
+/* Example blocks */
+.rv-ex-block{background:var(--lc-surface);border-radius:var(--lc-radius-md);padding:10px 12px;width:100%;margin-bottom:7px;}
+.rv-ex-row{display:flex;align-items:flex-start;gap:8px;}
+.rv-ex-de{font-size:13px;color:var(--lc-text-primary);line-height:1.5;margin:0 0 3px;flex:1;}
+.rv-ex-de strong{color:var(--lc-brand);font-weight:600;}
+.rv-ex-en{font-size:11px;color:var(--lc-text-hint);font-style:italic;}
+.rv-ex-play-btn{flex-shrink:0;display:flex;align-items:center;justify-content:center;width:26px;height:26px;border:none;border-radius:50%;background:transparent;color:var(--lc-text-hint);cursor:pointer;padding:0;margin-top:1px;}
+.rv-ex-play-btn svg{width:13px;height:13px;stroke:var(--lc-text-hint);fill:none;stroke-width:1.8;stroke-linecap:round;}
+
+/* ─── NEW: SYNONYM ROWS ─────────────────────────────────────── */
+.rv-syn-list{width:100%;}
+.rv-syn-row{display:flex;align-items:center;gap:8px;padding:9px 0;border-bottom:1px solid var(--lc-border);cursor:pointer;user-select:none;}
+.rv-syn-row:last-of-type{border-bottom:none;}
+.rv-syn-word{font-size:14px;font-weight:600;color:var(--lc-text-primary);flex:1;}
+.rv-syn-trans{font-size:11px;color:var(--lc-text-secondary);}
+.rv-syn-chevron{flex-shrink:0;width:14px;height:14px;stroke:var(--lc-text-hint);fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;transition:transform var(--lc-transition-fast);}
+.rv-syn-chevron.open{transform:rotate(180deg);}
+.rv-syn-ex-block{background:var(--lc-surface);border-radius:var(--lc-radius-md);padding:10px 12px;margin-bottom:6px;width:100%;}
+
+/* ─── RATING FOOTER ─────────────────────────────────────────── */
+.rv-nav-row{display:flex;justify-content:center;gap:24px;font-size:12px;color:var(--lc-text-hint);font-weight:500;}
+.rv-nav-row span{display:flex;align-items:center;gap:4px;cursor:pointer;}
+.rv-nav-row svg{width:12px;height:12px;stroke:var(--lc-text-hint);fill:none;stroke-width:2;stroke-linecap:round;}
+.rv-prompt{font-size:10px;color:var(--lc-text-hint);text-align:center;font-weight:500;}
+.rv-rating-row{display:flex;gap:5px;}
+.rv-r-btn{flex:1;display:flex;flex-direction:column;align-items:center;gap:2px;padding:8px 3px;border-radius:10px;border:1.5px solid;cursor:pointer;font-family:var(--lc-font-body);}
+.rv-r-again{border-color:#FCA5A5;background:#FFF5F5;}
+.rv-r-hard{border-color:#FCD34D;background:#FFFBEA;}
+.rv-r-good{border-color:#6EE7B7;background:#F0FDF9;}
+.rv-r-easy{border-color:var(--lc-brand);background:var(--lc-brand);}
+.rv-r-label{font-size:11px;font-weight:700;font-family:var(--lc-font-body);}
+.rv-r-again .rv-r-label{color:#B91C1C;}
+.rv-r-hard .rv-r-label{color:#92400E;}
+.rv-r-good .rv-r-label{color:#065F46;}
+.rv-r-easy .rv-r-label{color:#ffffff;}
+.rv-r-interval{font-size:9px;color:var(--lc-text-hint);}
+.rv-r-easy .rv-r-interval{color:rgba(255,255,255,0.7);}
+
+/* ─── ANNOTATION CALLOUTS ───────────────────────────────────── */
+.callout-wrap{position:relative;}
+.callout{position:absolute;background:var(--lc-brand);color:white;font-size:10px;font-weight:600;padding:4px 10px;border-radius:20px;white-space:nowrap;z-index:20;line-height:1.4;}
+.callout::after{content:'';position:absolute;width:6px;height:6px;background:var(--lc-brand);}
+.callout.right{right:-8px;transform:translateX(100%);}
+.callout.right::after{left:-3px;top:50%;transform:translateY(-50%) rotate(45deg);}
+.callout.left{left:-8px;transform:translateX(-100%);}
+.callout.left::after{right:-3px;top:50%;transform:translateY(-50%) rotate(45deg);}
+.callout-line{position:absolute;background:var(--lc-brand);height:1px;opacity:0.4;z-index:19;}
+
+/* ─── COMPARISON LAYOUT ─────────────────────────────────────── */
+.compare-grid{display:grid;grid-template-columns:1fr 1fr;gap:32px;align-items:start;}
+.compare-label{font-size:11px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;text-align:center;margin-bottom:12px;}
+.compare-label.before{color:#B91C1C;}
+.compare-label.after{color:var(--lc-brand);}
+.delta-card{background:var(--lc-card);border:1px solid var(--lc-border);border-radius:var(--lc-radius-lg);padding:20px;box-shadow:var(--lc-shadow-card);}
+.delta-card h4{font-family:var(--lc-font-display);font-size:14px;font-weight:600;color:var(--lc-text-primary);margin-bottom:8px;}
+.delta-list{display:flex;flex-direction:column;gap:6px;}
+.delta-item{display:flex;align-items:flex-start;gap:8px;font-size:12px;color:var(--lc-text-secondary);line-height:1.4;}
+.delta-icon{width:16px;height:16px;flex-shrink:0;margin-top:1px;}
+.delta-icon.add{stroke:var(--lc-brand);fill:none;stroke-width:2;stroke-linecap:round;}
+.delta-icon.keep{stroke:var(--lc-text-hint);fill:none;stroke-width:2;stroke-linecap:round;}
+</style>
+</head>
+<body>
+
+<!-- ═══════════════════════════════════════════════════════════════════ -->
+<!-- PAGE HEADER -->
+<!-- ═══════════════════════════════════════════════════════════════════ -->
+<div class="page-header">
+  <div class="page-header-inner">
+    <div>
+      <div class="logo">LinguaCard</div>
+      <div class="logo-sub">Design Reference — LC-350 · Review Rich Back Face</div>
+    </div>
+    <div class="badge-epic">Epic LC-350–355 · 9 points</div>
+  </div>
+</div>
+
+<div class="main">
+
+<!-- ═══════════════════════════════════════════════════════════════════ -->
+<!-- SECTION 1: BEFORE vs AFTER -->
+<!-- ═══════════════════════════════════════════════════════════════════ -->
+<div class="section">
+  <div class="section-title">1 · Before vs After</div>
+  <div class="section-sub">The back face gains a scrollable synonym section with collapsible example rows. The front face, rating bar, and session flow are unchanged.</div>
+
+  <div class="compare-grid" style="margin-bottom:32px;">
+    <!-- BEFORE -->
+    <div>
+      <div class="compare-label before">Before — empty lower half</div>
+      <div class="phone-wrap" style="margin:0 auto;">
+        <div class="phone">
+          <div class="phone-inner">
+            <div class="status-bar"><span>9:41</span><div style="display:flex;align-items:center;gap:3px;"><div class="sig"><span></span><span></span><span></span></div><div class="batt"></div></div></div>
+            <div class="p-nav">
+              <button class="p-back"><svg viewBox="0 0 24 24"><polyline points="15,18 9,12 15,6"/></svg></button>
+              <span class="p-nav-title">Review Session</span>
+              <div style="width:30px;"></div>
+            </div>
+            <div class="rv-prog-wrap">
+              <div class="rv-prog-track"><div class="rv-prog-fill" style="width:24%;"></div></div>
+              <div class="rv-prog-labels"><span>1 of 50</span><span></span></div>
+            </div>
+            <div class="rv-session">
+              <div class="rv-card-scene">
+                <div class="rv-card">
+                  <div class="rv-card-hdr">
+                    <span class="rv-side-lbl">to bring along</span>
+                    <span class="rv-lang-chip">🇩🇪 German</span>
+                  </div>
+                  <div class="rv-body-back">
+                    <p class="rv-back-word">mitbringen</p>
+                    <div class="rv-audio-btn" style="margin-bottom:10px;">
+                      <svg viewBox="0 0 24 24"><polygon points="11,5 6,9 2,9 2,15 6,15 11,19 11,5"/><path d="M15.54,8.46a5,5,0,0,1,0,7.07"/></svg>
+                      Play pronunciation
+                    </div>
+                    <div class="rv-ex-block">
+                      <div class="rv-ex-row">
+                        <p class="rv-ex-de">Kannst du etwas zu essen <strong>mitbringen</strong>?</p>
+                        <button class="rv-ex-play-btn"><svg viewBox="0 0 24 24"><polygon points="11,5 6,9 2,9 2,15 6,15 11,19 11,5"/></svg></button>
+                      </div>
+                      <p class="rv-ex-en">"Can you bring something to eat?"</p>
+                    </div>
+                    <!-- Dead space — the problem -->
+                    <div style="flex:1;min-height:100px;display:flex;align-items:center;justify-content:center;border:2px dashed rgba(185,28,28,0.2);border-radius:12px;width:100%;margin-top:4px;">
+                      <span style="font-size:10px;color:#B91C1C;font-weight:600;opacity:0.5;">WASTED SPACE</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div class="rv-footer">
+                <div class="rv-nav-row">
+                  <span><svg viewBox="0 0 24 24"><polyline points="15,18 9,12 15,6"/></svg>Previous</span>
+                  <span>Skip<svg viewBox="0 0 24 24"><polyline points="9,18 15,12 9,6"/></svg></span>
+                </div>
+                <div class="rv-prompt">How well did you know this?</div>
+                <div class="rv-rating-row">
+                  <div class="rv-r-btn rv-r-again"><span class="rv-r-label">Again</span><span class="rv-r-interval">1min</span></div>
+                  <div class="rv-r-btn rv-r-hard"><span class="rv-r-label">Hard</span><span class="rv-r-interval">6min</span></div>
+                  <div class="rv-r-btn rv-r-good"><span class="rv-r-label">Good</span><span class="rv-r-interval">10min</span></div>
+                  <div class="rv-r-btn rv-r-easy"><span class="rv-r-label">Easy</span><span class="rv-r-interval">8d</span></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- AFTER -->
+    <div>
+      <div class="compare-label after">After — synonyms with examples</div>
+      <div class="phone-wrap" style="margin:0 auto;">
+        <div class="phone">
+          <div class="phone-inner">
+            <div class="status-bar"><span>9:41</span><div style="display:flex;align-items:center;gap:3px;"><div class="sig"><span></span><span></span><span></span></div><div class="batt"></div></div></div>
+            <div class="p-nav">
+              <button class="p-back"><svg viewBox="0 0 24 24"><polyline points="15,18 9,12 15,6"/></svg></button>
+              <span class="p-nav-title">Review Session</span>
+              <div style="width:30px;"></div>
+            </div>
+            <div class="rv-prog-wrap">
+              <div class="rv-prog-track"><div class="rv-prog-fill" style="width:24%;"></div></div>
+              <div class="rv-prog-labels"><span>1 of 50</span><span></span></div>
+            </div>
+            <div class="rv-session">
+              <div class="rv-card-scene">
+                <div class="rv-card rv-card--back-scrollable">
+                  <div class="rv-card-hdr">
+                    <span class="rv-side-lbl">to bring along</span>
+                    <span class="rv-lang-chip">🇩🇪 German</span>
+                  </div>
+                  <div class="rv-body-back">
+                    <p class="rv-back-word">mitbringen</p>
+                    <div class="rv-audio-btn" style="margin-bottom:10px;">
+                      <svg viewBox="0 0 24 24"><polygon points="11,5 6,9 2,9 2,15 6,15 11,19 11,5"/><path d="M15.54,8.46a5,5,0,0,1,0,7.07"/></svg>
+                      Play pronunciation
+                    </div>
+                    <div class="rv-ex-block">
+                      <div class="rv-ex-row">
+                        <p class="rv-ex-de">Kannst du etwas zu essen <strong>mitbringen</strong>?</p>
+                        <button class="rv-ex-play-btn"><svg viewBox="0 0 24 24"><polygon points="11,5 6,9 2,9 2,15 6,15 11,19 11,5"/></svg></button>
+                      </div>
+                      <p class="rv-ex-en">"Can you bring something to eat?"</p>
+                    </div>
+
+                    <!-- NEW: Synonyms section -->
+                    <div class="rv-sec-divider"></div>
+                    <p class="rv-sec-hdr">Synonyms</p>
+                    <div class="rv-syn-list">
+                      <!-- Row 1 — collapsed -->
+                      <div class="rv-syn-row">
+                        <span class="rv-syn-word">herbringen</span>
+                        <span class="rv-syn-trans">to bring here</span>
+                        <svg class="rv-syn-chevron" viewBox="0 0 24 24"><polyline points="6,9 12,15 18,9"/></svg>
+                      </div>
+                      <!-- Row 2 — expanded -->
+                      <div class="rv-syn-row" style="border-bottom:1px solid var(--lc-border);">
+                        <span class="rv-syn-word">vorbeibringen</span>
+                        <span class="rv-syn-trans">to drop off</span>
+                        <svg class="rv-syn-chevron open" viewBox="0 0 24 24"><polyline points="6,9 12,15 18,9"/></svg>
+                      </div>
+                      <div class="rv-syn-ex-block">
+                        <div class="rv-ex-row">
+                          <p class="rv-ex-de">Kannst du die Unterlagen <strong>vorbeibringen</strong>?</p>
+                          <button class="rv-ex-play-btn"><svg viewBox="0 0 24 24"><polygon points="11,5 6,9 2,9 2,15 6,15 11,19 11,5"/></svg></button>
+                        </div>
+                        <p class="rv-ex-en">"Can you drop off the documents?"</p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div class="rv-footer">
+                <div class="rv-nav-row">
+                  <span><svg viewBox="0 0 24 24"><polyline points="15,18 9,12 15,6"/></svg>Previous</span>
+                  <span>Skip<svg viewBox="0 0 24 24"><polyline points="9,18 15,12 9,6"/></svg></span>
+                </div>
+                <div class="rv-prompt">How well did you know this?</div>
+                <div class="rv-rating-row">
+                  <div class="rv-r-btn rv-r-again"><span class="rv-r-label">Again</span><span class="rv-r-interval">1min</span></div>
+                  <div class="rv-r-btn rv-r-hard"><span class="rv-r-label">Hard</span><span class="rv-r-interval">6min</span></div>
+                  <div class="rv-r-btn rv-r-good"><span class="rv-r-label">Good</span><span class="rv-r-interval">10min</span></div>
+                  <div class="rv-r-btn rv-r-easy"><span class="rv-r-label">Easy</span><span class="rv-r-interval">8d</span></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- What changed -->
+  <div class="delta-card" style="max-width:640px;margin:0 auto;">
+    <h4>What changes</h4>
+    <div class="delta-list" style="margin-top:12px;">
+      <div class="delta-item">
+        <svg class="delta-icon add" viewBox="0 0 24 24"><polyline points="20,6 9,17 4,12"/></svg>
+        <span><strong>Scrollable back face card</strong> — overflow-y:auto so tall content doesn't overflow into the rating bar</span>
+      </div>
+      <div class="delta-item">
+        <svg class="delta-icon add" viewBox="0 0 24 24"><polyline points="20,6 9,17 4,12"/></svg>
+        <span><strong>Synonyms section</strong> with article badge, word, translation, and chevron — only rendered when synonyms exist</span>
+      </div>
+      <div class="delta-item">
+        <svg class="delta-icon add" viewBox="0 0 24 24"><polyline points="20,6 9,17 4,12"/></svg>
+        <span><strong>Collapsible synonym examples</strong> — tap a row to expand and see the German usage sentence with audio and English translation</span>
+      </div>
+      <div class="delta-item">
+        <svg class="delta-icon add" viewBox="0 0 24 24"><polyline points="20,6 9,17 4,12"/></svg>
+        <span><strong>Word highlighting</strong> — synonym headword highlighted in brand-green within its example sentence (matches existing example behaviour)</span>
+      </div>
+      <div class="delta-item">
+        <svg class="delta-icon add" viewBox="0 0 24 24"><polyline points="20,6 9,17 4,12"/></svg>
+        <span><strong>Auto-collapse on advance</strong> — expanded synonym rows reset when moving to the next card</span>
+      </div>
+      <div class="delta-item">
+        <svg class="delta-icon keep" viewBox="0 0 24 24"><line x1="5" y1="12" x2="19" y2="12"/></svg>
+        <span>Front face, rating bar, session flow, progress bar — <em>unchanged</em></span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════════════ -->
+<!-- SECTION 2: VARIANT STATES -->
+<!-- ═══════════════════════════════════════════════════════════════════ -->
+<div class="section">
+  <div class="section-title">2 · Variant States</div>
+  <div class="section-sub">Four representative card types showing how the back face adapts to different data shapes.</div>
+
+  <div class="phones-row">
+
+    <!-- A: Noun with plural + synonyms (noun, expanded) -->
+    <div class="phone-wrap">
+      <div class="phone-label">A · Noun — plural + synonyms</div>
+      <div class="phone">
+        <div class="phone-inner">
+          <div class="status-bar"><span>9:41</span><div style="display:flex;align-items:center;gap:3px;"><div class="sig"><span></span><span></span><span></span></div><div class="batt"></div></div></div>
+          <div class="p-nav">
+            <button class="p-back"><svg viewBox="0 0 24 24"><polyline points="15,18 9,12 15,6"/></svg></button>
+            <span class="p-nav-title">Review Session</span>
+            <div style="width:30px;"></div>
+          </div>
+          <div class="rv-prog-wrap">
+            <div class="rv-prog-track"><div class="rv-prog-fill" style="width:40%;"></div></div>
+            <div class="rv-prog-labels"><span>3 of 8</span><span>Travel</span></div>
+          </div>
+          <div class="rv-session">
+            <div class="rv-card-scene">
+              <div class="rv-card rv-card--back-scrollable">
+                <div class="rv-card-hdr">
+                  <span class="rv-side-lbl">backpack</span>
+                  <span class="rv-lang-chip">🇩🇪 German</span>
+                </div>
+                <div class="rv-body-back">
+                  <div class="rv-art-row">
+                    <span class="art-badge art-der">der</span>
+                    <span class="rv-art-gender">der — masculine</span>
+                  </div>
+                  <p class="rv-back-word">Rucksack</p>
+                  <div class="rv-plural">
+                    <span class="rv-plural-lbl">Plural</span>
+                    <span class="rv-plural-val">die Rucksäcke</span>
+                  </div>
+                  <div class="rv-audio-btn" style="margin-bottom:6px;">
+                    <svg viewBox="0 0 24 24"><polygon points="11,5 6,9 2,9 2,15 6,15 11,19 11,5"/><path d="M15.54,8.46a5,5,0,0,1,0,7.07"/></svg>
+                    Play pronunciation
+                  </div>
+                  <div class="rv-ex-block">
+                    <div class="rv-ex-row">
+                      <p class="rv-ex-de">Ich packe meinen <strong>Rucksack</strong> für die Wanderung.</p>
+                      <button class="rv-ex-play-btn"><svg viewBox="0 0 24 24"><polygon points="11,5 6,9 2,9 2,15 6,15 11,19 11,5"/></svg></button>
+                    </div>
+                    <p class="rv-ex-en">"I'm packing my backpack for the hike."</p>
+                  </div>
+                  <div class="rv-sec-divider"></div>
+                  <p class="rv-sec-hdr">Synonyms</p>
+                  <div class="rv-syn-list">
+                    <div class="rv-syn-row">
+                      <span class="art-badge art-die">die</span>
+                      <span class="rv-syn-word">Tasche</span>
+                      <span class="rv-syn-trans">bag</span>
+                      <svg class="rv-syn-chevron" viewBox="0 0 24 24"><polyline points="6,9 12,15 18,9"/></svg>
+                    </div>
+                    <div class="rv-syn-row" style="border-bottom:none;">
+                      <span class="art-badge art-die">die</span>
+                      <span class="rv-syn-word">Reisetasche</span>
+                      <span class="rv-syn-trans">travel bag</span>
+                      <svg class="rv-syn-chevron" viewBox="0 0 24 24"><polyline points="6,9 12,15 18,9"/></svg>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="rv-footer">
+              <div class="rv-nav-row">
+                <span><svg viewBox="0 0 24 24"><polyline points="15,18 9,12 15,6"/></svg>Previous</span>
+                <span>Skip<svg viewBox="0 0 24 24"><polyline points="9,18 15,12 9,6"/></svg></span>
+              </div>
+              <div class="rv-prompt">How well did you know this?</div>
+              <div class="rv-rating-row">
+                <div class="rv-r-btn rv-r-again"><span class="rv-r-label">Again</span><span class="rv-r-interval">1min</span></div>
+                <div class="rv-r-btn rv-r-hard"><span class="rv-r-label">Hard</span><span class="rv-r-interval">10min</span></div>
+                <div class="rv-r-btn rv-r-good"><span class="rv-r-label">Good</span><span class="rv-r-interval">1d</span></div>
+                <div class="rv-r-btn rv-r-easy"><span class="rv-r-label">Easy</span><span class="rv-r-interval">4d</span></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- B: Synonym expanded -->
+    <div class="phone-wrap">
+      <div class="phone-label">B · Synonym row expanded</div>
+      <div class="phone">
+        <div class="phone-inner">
+          <div class="status-bar"><span>9:41</span><div style="display:flex;align-items:center;gap:3px;"><div class="sig"><span></span><span></span><span></span></div><div class="batt"></div></div></div>
+          <div class="p-nav">
+            <button class="p-back"><svg viewBox="0 0 24 24"><polyline points="15,18 9,12 15,6"/></svg></button>
+            <span class="p-nav-title">Review Session</span>
+            <div style="width:30px;"></div>
+          </div>
+          <div class="rv-prog-wrap">
+            <div class="rv-prog-track"><div class="rv-prog-fill" style="width:40%;"></div></div>
+            <div class="rv-prog-labels"><span>3 of 8</span><span>Travel</span></div>
+          </div>
+          <div class="rv-session">
+            <div class="rv-card-scene">
+              <div class="rv-card rv-card--back-scrollable">
+                <div class="rv-card-hdr">
+                  <span class="rv-side-lbl">backpack</span>
+                  <span class="rv-lang-chip">🇩🇪 German</span>
+                </div>
+                <div class="rv-body-back">
+                  <div class="rv-art-row">
+                    <span class="art-badge art-der">der</span>
+                    <span class="rv-art-gender">der — masculine</span>
+                  </div>
+                  <p class="rv-back-word">Rucksack</p>
+                  <div class="rv-plural">
+                    <span class="rv-plural-lbl">Plural</span>
+                    <span class="rv-plural-val">die Rucksäcke</span>
+                  </div>
+                  <div class="rv-audio-btn" style="margin-bottom:6px;">
+                    <svg viewBox="0 0 24 24"><polygon points="11,5 6,9 2,9 2,15 6,15 11,19 11,5"/><path d="M15.54,8.46a5,5,0,0,1,0,7.07"/></svg>
+                    Play pronunciation
+                  </div>
+                  <div class="rv-ex-block">
+                    <div class="rv-ex-row">
+                      <p class="rv-ex-de">Ich packe meinen <strong>Rucksack</strong> für die Wanderung.</p>
+                      <button class="rv-ex-play-btn"><svg viewBox="0 0 24 24"><polygon points="11,5 6,9 2,9 2,15 6,15 11,19 11,5"/></svg></button>
+                    </div>
+                    <p class="rv-ex-en">"I'm packing my backpack for the hike."</p>
+                  </div>
+                  <div class="rv-sec-divider"></div>
+                  <p class="rv-sec-hdr">Synonyms</p>
+                  <div class="rv-syn-list">
+                    <!-- Expanded row -->
+                    <div class="rv-syn-row" style="border-bottom:1px solid var(--lc-border);">
+                      <span class="art-badge art-die">die</span>
+                      <span class="rv-syn-word">Tasche</span>
+                      <span class="rv-syn-trans">bag</span>
+                      <svg class="rv-syn-chevron open" viewBox="0 0 24 24"><polyline points="6,9 12,15 18,9"/></svg>
+                    </div>
+                    <div class="rv-syn-ex-block">
+                      <div class="rv-ex-row">
+                        <p class="rv-ex-de">Ich trage eine <strong>Tasche</strong> zum Einkaufen.</p>
+                        <button class="rv-ex-play-btn"><svg viewBox="0 0 24 24"><polygon points="11,5 6,9 2,9 2,15 6,15 11,19 11,5"/></svg></button>
+                      </div>
+                      <p class="rv-ex-en">"I carry a bag for shopping."</p>
+                    </div>
+                    <div class="rv-syn-row" style="border-bottom:none;">
+                      <span class="art-badge art-die">die</span>
+                      <span class="rv-syn-word">Reisetasche</span>
+                      <span class="rv-syn-trans">travel bag</span>
+                      <svg class="rv-syn-chevron" viewBox="0 0 24 24"><polyline points="6,9 12,15 18,9"/></svg>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="rv-footer">
+              <div class="rv-nav-row">
+                <span><svg viewBox="0 0 24 24"><polyline points="15,18 9,12 15,6"/></svg>Previous</span>
+                <span>Skip<svg viewBox="0 0 24 24"><polyline points="9,18 15,12 9,6"/></svg></span>
+              </div>
+              <div class="rv-prompt">How well did you know this?</div>
+              <div class="rv-rating-row">
+                <div class="rv-r-btn rv-r-again"><span class="rv-r-label">Again</span><span class="rv-r-interval">1min</span></div>
+                <div class="rv-r-btn rv-r-hard"><span class="rv-r-label">Hard</span><span class="rv-r-interval">10min</span></div>
+                <div class="rv-r-btn rv-r-good"><span class="rv-r-label">Good</span><span class="rv-r-interval">1d</span></div>
+                <div class="rv-r-btn rv-r-easy"><span class="rv-r-label">Easy</span><span class="rv-r-interval">4d</span></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- C: Verb — no article, no plural, synonyms only -->
+    <div class="phone-wrap">
+      <div class="phone-label">C · Verb — no plural, synonyms only</div>
+      <div class="phone">
+        <div class="phone-inner">
+          <div class="status-bar"><span>9:41</span><div style="display:flex;align-items:center;gap:3px;"><div class="sig"><span></span><span></span><span></span></div><div class="batt"></div></div></div>
+          <div class="p-nav">
+            <button class="p-back"><svg viewBox="0 0 24 24"><polyline points="15,18 9,12 15,6"/></svg></button>
+            <span class="p-nav-title">Review Session</span>
+            <div style="width:30px;"></div>
+          </div>
+          <div class="rv-prog-wrap">
+            <div class="rv-prog-track"><div class="rv-prog-fill" style="width:60%;"></div></div>
+            <div class="rv-prog-labels"><span>5 of 8</span><span>Daily Life</span></div>
+          </div>
+          <div class="rv-session">
+            <div class="rv-card-scene">
+              <div class="rv-card rv-card--back-scrollable">
+                <div class="rv-card-hdr">
+                  <span class="rv-side-lbl">to bring along</span>
+                  <span class="rv-lang-chip">🇩🇪 German</span>
+                </div>
+                <div class="rv-body-back">
+                  <p class="rv-back-word">mitbringen</p>
+                  <div class="rv-audio-btn" style="margin-bottom:6px;">
+                    <svg viewBox="0 0 24 24"><polygon points="11,5 6,9 2,9 2,15 6,15 11,19 11,5"/><path d="M15.54,8.46a5,5,0,0,1,0,7.07"/></svg>
+                    Play pronunciation
+                  </div>
+                  <div class="rv-ex-block">
+                    <div class="rv-ex-row">
+                      <p class="rv-ex-de">Kannst du etwas zu essen <strong>mitbringen</strong>?</p>
+                      <button class="rv-ex-play-btn"><svg viewBox="0 0 24 24"><polygon points="11,5 6,9 2,9 2,15 6,15 11,19 11,5"/></svg></button>
+                    </div>
+                    <p class="rv-ex-en">"Can you bring something to eat?"</p>
+                  </div>
+                  <div class="rv-sec-divider"></div>
+                  <p class="rv-sec-hdr">Synonyms</p>
+                  <div class="rv-syn-list">
+                    <div class="rv-syn-row">
+                      <span class="rv-syn-word">herbringen</span>
+                      <span class="rv-syn-trans">to bring here</span>
+                      <svg class="rv-syn-chevron" viewBox="0 0 24 24"><polyline points="6,9 12,15 18,9"/></svg>
+                    </div>
+                    <div class="rv-syn-row" style="border-bottom:none;">
+                      <span class="rv-syn-word">vorbeibringen</span>
+                      <span class="rv-syn-trans">to drop off</span>
+                      <svg class="rv-syn-chevron" viewBox="0 0 24 24"><polyline points="6,9 12,15 18,9"/></svg>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="rv-footer">
+              <div class="rv-nav-row">
+                <span><svg viewBox="0 0 24 24"><polyline points="15,18 9,12 15,6"/></svg>Previous</span>
+                <span>Skip<svg viewBox="0 0 24 24"><polyline points="9,18 15,12 9,6"/></svg></span>
+              </div>
+              <div class="rv-prompt">How well did you know this?</div>
+              <div class="rv-rating-row">
+                <div class="rv-r-btn rv-r-again"><span class="rv-r-label">Again</span><span class="rv-r-interval">1min</span></div>
+                <div class="rv-r-btn rv-r-hard"><span class="rv-r-label">Hard</span><span class="rv-r-interval">6min</span></div>
+                <div class="rv-r-btn rv-r-good"><span class="rv-r-label">Good</span><span class="rv-r-interval">10min</span></div>
+                <div class="rv-r-btn rv-r-easy"><span class="rv-r-label">Easy</span><span class="rv-r-interval">8d</span></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- D: No synonyms — clean empty guard -->
+    <div class="phone-wrap">
+      <div class="phone-label">D · No synonyms — clean card</div>
+      <div class="phone">
+        <div class="phone-inner">
+          <div class="status-bar"><span>9:41</span><div style="display:flex;align-items:center;gap:3px;"><div class="sig"><span></span><span></span><span></span></div><div class="batt"></div></div></div>
+          <div class="p-nav">
+            <button class="p-back"><svg viewBox="0 0 24 24"><polyline points="15,18 9,12 15,6"/></svg></button>
+            <span class="p-nav-title">Review Session</span>
+            <div style="width:30px;"></div>
+          </div>
+          <div class="rv-prog-wrap">
+            <div class="rv-prog-track"><div class="rv-prog-fill" style="width:80%;"></div></div>
+            <div class="rv-prog-labels"><span>7 of 8</span><span>Food</span></div>
+          </div>
+          <div class="rv-session">
+            <div class="rv-card-scene">
+              <div class="rv-card">
+                <div class="rv-card-hdr">
+                  <span class="rv-side-lbl">the cat</span>
+                  <span class="rv-lang-chip">🇩🇪 German</span>
+                </div>
+                <div class="rv-body-back">
+                  <div class="rv-art-row">
+                    <span class="art-badge art-die">die</span>
+                    <span class="rv-art-gender">die — feminine</span>
+                  </div>
+                  <p class="rv-back-word">Katze</p>
+                  <div class="rv-plural">
+                    <span class="rv-plural-lbl">Plural</span>
+                    <span class="rv-plural-val">die Katzen</span>
+                  </div>
+                  <div class="rv-audio-btn" style="margin-bottom:6px;">
+                    <svg viewBox="0 0 24 24"><polygon points="11,5 6,9 2,9 2,15 6,15 11,19 11,5"/><path d="M15.54,8.46a5,5,0,0,1,0,7.07"/></svg>
+                    Play pronunciation
+                  </div>
+                  <div class="rv-ex-block">
+                    <div class="rv-ex-row">
+                      <p class="rv-ex-de">Die <strong>Katze</strong> sitzt auf dem Sofa.</p>
+                      <button class="rv-ex-play-btn"><svg viewBox="0 0 24 24"><polygon points="11,5 6,9 2,9 2,15 6,15 11,19 11,5"/></svg></button>
+                    </div>
+                    <p class="rv-ex-en">"The cat is sitting on the sofa."</p>
+                  </div>
+                  <!-- No synonyms section — intentionally absent, no divider, no header -->
+                  <div style="font-size:10px;color:var(--lc-text-hint);font-style:italic;text-align:center;margin-top:12px;padding:8px;background:var(--lc-surface);border-radius:8px;border:1px dashed var(--lc-border);">
+                    ↑ No synonyms field — section not rendered
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="rv-footer">
+              <div class="rv-nav-row">
+                <span><svg viewBox="0 0 24 24"><polyline points="15,18 9,12 15,6"/></svg>Previous</span>
+                <span>Skip<svg viewBox="0 0 24 24"><polyline points="9,18 15,12 9,6"/></svg></span>
+              </div>
+              <div class="rv-prompt">How well did you know this?</div>
+              <div class="rv-rating-row">
+                <div class="rv-r-btn rv-r-again"><span class="rv-r-label">Again</span><span class="rv-r-interval">1min</span></div>
+                <div class="rv-r-btn rv-r-hard"><span class="rv-r-label">Hard</span><span class="rv-r-interval">6min</span></div>
+                <div class="rv-r-btn rv-r-good"><span class="rv-r-label">Good</span><span class="rv-r-interval">2d</span></div>
+                <div class="rv-r-btn rv-r-easy"><span class="rv-r-label">Easy</span><span class="rv-r-interval">6d</span></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- /phones-row -->
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════════════ -->
+<!-- SECTION 3: COMPONENT SPEC -->
+<!-- ═══════════════════════════════════════════════════════════════════ -->
+<div class="section">
+  <div class="section-title">3 · Component & Style Spec</div>
+  <div class="section-sub">CSS classes added in <code>review.card.scss</code>. All values use existing LDS tokens — no new tokens needed.</div>
+
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;max-width:900px;">
+
+    <div class="delta-card">
+      <h4>New SCSS classes</h4>
+      <div style="margin-top:12px;font-size:11px;font-family:var(--lc-font-mono);color:var(--lc-text-secondary);line-height:1.8;">
+        <div><strong style="color:var(--lc-brand);">.rv-card--back-scrollable</strong></div>
+        <div style="padding-left:12px;color:var(--lc-text-hint);">overflow-y: auto; -webkit-overflow-scrolling: touch; max-height: 100%;</div>
+        <br>
+        <div><strong style="color:var(--lc-brand);">.rv-sec-divider</strong></div>
+        <div style="padding-left:12px;color:var(--lc-text-hint);">1px solid var(--lc-border); margin: 12px 0 10px;</div>
+        <br>
+        <div><strong style="color:var(--lc-brand);">.rv-sec-hdr</strong></div>
+        <div style="padding-left:12px;color:var(--lc-text-hint);">10px, 700w, uppercase, var(--lc-text-hint)</div>
+        <br>
+        <div><strong style="color:var(--lc-brand);">.rv-syn-row</strong></div>
+        <div style="padding-left:12px;color:var(--lc-text-hint);">flex row, border-bottom, 9px padding, cursor:pointer</div>
+        <br>
+        <div><strong style="color:var(--lc-brand);">.rv-syn-word</strong></div>
+        <div style="padding-left:12px;color:var(--lc-text-hint);">14px, 600w, var(--lc-text-primary), flex:1</div>
+        <br>
+        <div><strong style="color:var(--lc-brand);">.rv-syn-trans</strong></div>
+        <div style="padding-left:12px;color:var(--lc-text-hint);">11px, var(--lc-text-secondary)</div>
+        <br>
+        <div><strong style="color:var(--lc-brand);">.rv-syn-chevron</strong></div>
+        <div style="padding-left:12px;color:var(--lc-text-hint);">14×14, stroke var(--lc-text-hint); .open → rotate(180deg)</div>
+        <br>
+        <div><strong style="color:var(--lc-brand);">.rv-syn-ex-block</strong></div>
+        <div style="padding-left:12px;color:var(--lc-text-hint);">background var(--lc-surface), radius-md, 10px 12px padding</div>
+      </div>
+    </div>
+
+    <div class="delta-card">
+      <h4>New component signals &amp; methods</h4>
+      <div style="margin-top:12px;font-size:11px;font-family:var(--lc-font-mono);color:var(--lc-text-secondary);line-height:1.8;">
+        <div><strong style="color:var(--lc-brand);">expandedSynonyms</strong></div>
+        <div style="padding-left:12px;color:var(--lc-text-hint);">signal&lt;Set&lt;number&gt;&gt;(new Set())</div>
+        <br>
+        <div><strong style="color:var(--lc-brand);">toggleReviewSynonym(i)</strong></div>
+        <div style="padding-left:12px;color:var(--lc-text-hint);">copies Set, toggles index i, re-sets signal</div>
+        <br>
+        <div><strong style="color:var(--lc-brand);">isReviewSynonymExpanded(i)</strong></div>
+        <div style="padding-left:12px;color:var(--lc-text-hint);">returns expandedSynonyms().has(i)</div>
+        <br>
+        <div><strong style="color:var(--lc-brand);">effect() reset</strong></div>
+        <div style="padding-left:12px;color:var(--lc-text-hint);">reads currentIndex(); calls expandedSynonyms.set(new Set()) on advance</div>
+        <br>
+        <div><strong style="color:var(--lc-brand);">highlightWord(sentence, word)</strong></div>
+        <div style="padding-left:12px;color:var(--lc-text-hint);">regex replace → wraps in &lt;strong&gt;; safe escape; case-insensitive</div>
+        <br>
+        <div style="margin-top:8px;padding:8px;background:var(--lc-brand-light);border-radius:8px;color:var(--lc-brand);font-size:10px;">
+          ⚠️ highlightWord() already exists for main examples — check before adding a duplicate. Reuse if present.
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════════════ -->
+<!-- SECTION 4: TICKET SUMMARY -->
+<!-- ═══════════════════════════════════════════════════════════════════ -->
+<div class="section">
+  <div class="section-title">4 · Ticket Summary</div>
+  <div class="section-sub">9 points total across 4 phases. Phases 2–4 depend on LC-350 (scrollable card) but can otherwise be worked in one session.</div>
+
+  <div style="overflow-x:auto;">
+  <table style="width:100%;border-collapse:collapse;font-size:12px;background:var(--lc-card);border-radius:var(--lc-radius-lg);overflow:hidden;box-shadow:var(--lc-shadow-card);">
+    <thead>
+      <tr style="background:var(--lc-brand);color:white;">
+        <th style="padding:10px 14px;text-align:left;font-size:10px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;">Ticket</th>
+        <th style="padding:10px 14px;text-align:left;font-size:10px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;">Title</th>
+        <th style="padding:10px 14px;text-align:left;font-size:10px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;">Phase</th>
+        <th style="padding:10px 14px;text-align:center;font-size:10px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;">Pts</th>
+        <th style="padding:10px 14px;text-align:left;font-size:10px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;">Files</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr style="border-bottom:1px solid var(--lc-border);">
+        <td style="padding:10px 14px;font-family:var(--lc-font-mono);font-size:11px;color:var(--lc-brand);font-weight:600;">LC-350</td>
+        <td style="padding:10px 14px;color:var(--lc-text-primary);">Make back face card scrollable</td>
+        <td style="padding:10px 14px;color:var(--lc-text-secondary);">1 — Layout</td>
+        <td style="padding:10px 14px;text-align:center;"><span style="background:var(--lc-brand-light);color:var(--lc-brand);font-weight:700;font-size:11px;padding:2px 8px;border-radius:20px;">1</span></td>
+        <td style="padding:10px 14px;font-family:var(--lc-font-mono);font-size:10px;color:var(--lc-text-hint);">review.card.scss, review.page.html</td>
+      </tr>
+      <tr style="border-bottom:1px solid var(--lc-border);background:rgba(45,90,78,0.02);">
+        <td style="padding:10px 14px;font-family:var(--lc-font-mono);font-size:11px;color:var(--lc-brand);font-weight:600;">LC-351</td>
+        <td style="padding:10px 14px;color:var(--lc-text-primary);">Add synonym section to back face</td>
+        <td style="padding:10px 14px;color:var(--lc-text-secondary);">2 — Synonyms</td>
+        <td style="padding:10px 14px;text-align:center;"><span style="background:var(--lc-brand-light);color:var(--lc-brand);font-weight:700;font-size:11px;padding:2px 8px;border-radius:20px;">3</span></td>
+        <td style="padding:10px 14px;font-family:var(--lc-font-mono);font-size:10px;color:var(--lc-text-hint);">review.page.ts, review.page.html, review.card.scss</td>
+      </tr>
+      <tr style="border-bottom:1px solid var(--lc-border);">
+        <td style="padding:10px 14px;font-family:var(--lc-font-mono);font-size:11px;color:var(--lc-brand);font-weight:600;">LC-352</td>
+        <td style="padding:10px 14px;color:var(--lc-text-primary);">Reset expand state on card advance</td>
+        <td style="padding:10px 14px;color:var(--lc-text-secondary);">2 — Synonyms</td>
+        <td style="padding:10px 14px;text-align:center;"><span style="background:var(--lc-brand-light);color:var(--lc-brand);font-weight:700;font-size:11px;padding:2px 8px;border-radius:20px;">1</span></td>
+        <td style="padding:10px 14px;font-family:var(--lc-font-mono);font-size:10px;color:var(--lc-text-hint);">review.page.ts</td>
+      </tr>
+      <tr style="border-bottom:1px solid var(--lc-border);background:rgba(45,90,78,0.02);">
+        <td style="padding:10px 14px;font-family:var(--lc-font-mono);font-size:11px;color:var(--lc-brand);font-weight:600;">LC-353</td>
+        <td style="padding:10px 14px;color:var(--lc-text-primary);">Synonym example audio from review card</td>
+        <td style="padding:10px 14px;color:var(--lc-text-secondary);">3 — Polish</td>
+        <td style="padding:10px 14px;text-align:center;"><span style="background:var(--lc-brand-light);color:var(--lc-brand);font-weight:700;font-size:11px;padding:2px 8px;border-radius:20px;">1</span></td>
+        <td style="padding:10px 14px;font-family:var(--lc-font-mono);font-size:10px;color:var(--lc-text-hint);">review.page.html</td>
+      </tr>
+      <tr style="border-bottom:1px solid var(--lc-border);">
+        <td style="padding:10px 14px;font-family:var(--lc-font-mono);font-size:11px;color:var(--lc-brand);font-weight:600;">LC-354</td>
+        <td style="padding:10px 14px;color:var(--lc-text-primary);">Highlight word in synonym examples</td>
+        <td style="padding:10px 14px;color:var(--lc-text-secondary);">3 — Polish</td>
+        <td style="padding:10px 14px;text-align:center;"><span style="background:var(--lc-brand-light);color:var(--lc-brand);font-weight:700;font-size:11px;padding:2px 8px;border-radius:20px;">2</span></td>
+        <td style="padding:10px 14px;font-family:var(--lc-font-mono);font-size:10px;color:var(--lc-text-hint);">review.page.ts, review.page.html</td>
+      </tr>
+      <tr>
+        <td style="padding:10px 14px;font-family:var(--lc-font-mono);font-size:11px;color:var(--lc-brand);font-weight:600;">LC-355</td>
+        <td style="padding:10px 14px;color:var(--lc-text-primary);">Graceful empty-state guards</td>
+        <td style="padding:10px 14px;color:var(--lc-text-secondary);">4 — Guards</td>
+        <td style="padding:10px 14px;text-align:center;"><span style="background:var(--lc-brand-light);color:var(--lc-brand);font-weight:700;font-size:11px;padding:2px 8px;border-radius:20px;">1</span></td>
+        <td style="padding:10px 14px;font-family:var(--lc-font-mono);font-size:10px;color:var(--lc-text-hint);">review.page.html</td>
+      </tr>
+    </tbody>
+    <tfoot>
+      <tr style="background:var(--lc-brand-light);">
+        <td colspan="3" style="padding:10px 14px;font-weight:700;font-size:12px;color:var(--lc-brand);">Total</td>
+        <td style="padding:10px 14px;text-align:center;font-weight:700;font-size:13px;color:var(--lc-brand);">9</td>
+        <td style="padding:10px 14px;font-size:11px;color:var(--lc-text-hint);">Depends on: LC-133/134 (synonym data model must be live)</td>
+      </tr>
+    </tfoot>
+  </table>
+  </div>
+</div>
+
+</div><!-- /main -->
+</body>
+</html>

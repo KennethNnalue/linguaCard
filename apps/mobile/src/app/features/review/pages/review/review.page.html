@@ -49,7 +49,7 @@
 
           } @else {
             <!-- Back face (revealed) -->
-            <div class="rv-card rv-card--back">
+            <div class="rv-card rv-card--back rv-card--back-scrollable">
               <div class="rv-card-hdr">
                 <span class="rv-side-lbl">{{ card.content.front }}</span>
                 <span class="rv-lang-chip">🇩🇪 German</span>
@@ -98,34 +98,33 @@
                   </div>
                 }
                 @if (card.content.synonyms.length) {
-                  <div class="rv-synonyms">
-                    <div class="rv-syn-lbl">Synonyms</div>
-                    @for (syn of card.content.synonyms; track $index; let i = $index; let last = $last) {
-                      <div class="rv-syn-item" [class.rv-syn-item--open]="isSynonymExpanded(i)" [class.rv-syn-item--last]="last">
-                        <div class="rv-syn-head" (click)="toggleSynonym(i)">
+                  <div class="rv-sec-divider"></div>
+                  <p class="rv-sec-hdr">Synonyms</p>
+                  <div class="rv-syn-list">
+                    @for (syn of card.content.synonyms; track $index; let i = $index) {
+                      <div class="rv-syn-row" (click)="toggleSynonym(i)">
+                        @if (syn.article) {
                           <lc-article-badge [article]="syn.article" />
-                          <span class="rv-syn-word">{{ syn.word }}</span>
-                          <span class="rv-syn-trans">{{ syn.translation }}</span>
-                          <span class="rv-syn-chev">
-                            <ion-icon name="chevron-down-outline"></ion-icon>
-                          </span>
-                        </div>
-                        @if (isSynonymExpanded(i) && syn.example) {
-                          <div class="rv-syn-body">
-                            <div class="rv-syn-example">
-                              <div class="rv-ex-row">
-                                <p class="rv-ex-de" [innerHTML]="syn.example | highlightWord: syn.word"></p>
-                                <button class="rv-ex-play-btn" (click)="playExample($event, syn.example)" aria-label="Play synonym example">
-                                  <ion-icon name="volume-high-outline"></ion-icon>
-                                </button>
-                              </div>
-                              @if (syn.exampleNative) {
-                                <p class="rv-ex-en">"{{ syn.exampleNative }}"</p>
-                              }
-                            </div>
-                          </div>
                         }
+                        <span class="rv-syn-word">{{ syn.word }}</span>
+                        <span class="rv-syn-trans">{{ syn.translation }}</span>
+                        <span class="rv-syn-chev" [class.open]="isSynonymExpanded(i)">
+                          <ion-icon name="chevron-down-outline"></ion-icon>
+                        </span>
                       </div>
+                      @if (isSynonymExpanded(i) && syn.example) {
+                        <div class="rv-syn-ex-block">
+                          <div class="rv-ex-row">
+                            <p class="rv-ex-de" [innerHTML]="syn.example | highlightWord: syn.word"></p>
+                            <button class="rv-ex-play-btn" (click)="playExample($event, syn.example)" aria-label="Play synonym example">
+                              <ion-icon name="volume-high-outline"></ion-icon>
+                            </button>
+                          </div>
+                          @if (syn.exampleNative) {
+                            <p class="rv-ex-en">"{{ syn.exampleNative }}"</p>
+                          }
+                        </div>
+                      }
                     }
                   </div>
                 }

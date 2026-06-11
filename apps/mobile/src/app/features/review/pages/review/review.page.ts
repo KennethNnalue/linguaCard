@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, computed, DestroyRef, inject, Injector, OnInit, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, DestroyRef, effect, inject, Injector, OnInit, signal } from '@angular/core';
 import { takeUntilDestroyed, toObservable } from '@angular/core/rxjs-interop';
 import { filter, take } from 'rxjs';
 import { ActivatedRoute, Router } from '@angular/router';
@@ -56,6 +56,11 @@ export class ReviewPage implements OnInit {
       chevronForwardOutline,
       flagOutline,
       volumeHighOutline,
+    });
+
+    effect(() => {
+      this.currentIndex();
+      this.expandedSynonym.set(null);
     });
   }
 
