@@ -51,6 +51,14 @@
         </button>
       </div>
 
+      <!-- Library fill banner (LC-WD10) -->
+      @if (fromLibrary()) {
+        <div class="aw-library-banner">
+          <span class="aw-library-banner__icon">⚡</span>
+          <span class="aw-library-banner__text">Filled from the library — no AI call</span>
+        </div>
+      }
+
       <!-- Article segmented selector -->
       <div class="aw-article-group">
         <span class="aw-article-lbl">Article</span>

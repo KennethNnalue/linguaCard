@@ -9,6 +9,7 @@ export interface AuthUser {
   email: string;
   name: string;
   avatarInitials: string;
+  isAdmin?: boolean;
 }
 
 interface AuthResponse {
@@ -42,6 +43,7 @@ export class AuthService {
   readonly token = this._token.asReadonly();
   readonly currentUser = this._user.asReadonly();
   readonly isAuthenticated = computed(() => !!this._token());
+  readonly isAdmin = computed(() => this._user()?.isAdmin === true);
 
   login(payload: LoginPayload): Observable<AuthUser> {
     return this.http.post<AuthResponse>(`${this.authUrl}/login`, payload).pipe(

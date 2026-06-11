@@ -17,6 +17,9 @@ export class UserEntity {
   @Column()
   avatarInitials!: string;
 
+  @Column({ default: false })
+  isAdmin!: boolean;
+
   @CreateDateColumn()
   createdAt!: Date;
 

@@ -120,3 +120,22 @@
   color: var(--lc-neut-text);
   border-right-color: var(--lc-neut-border);
 }
+
+// ─── Library fill banner (LC-WD10) ───────────────────────────────────────────
+
+.aw-library-banner {
+  display: flex;
+  align-items: center;
+  gap: t.$lc-space-2;
+  background: t.$lc-accent-light;
+  border: 1px solid rgba(224, 123, 63, 0.3);
+  border-radius: t.$lc-radius-sm;
+  padding: t.$lc-space-2 t.$lc-space-3;
+  font-size: 12px;
+  color: #b65a22;
+  line-height: 1.4;
+
+  &__icon { flex-shrink: 0; }
+
+  &__text { flex: 1; }
+}

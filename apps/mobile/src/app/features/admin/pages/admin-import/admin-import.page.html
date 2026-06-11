@@ -1,0 +1,239 @@
+<ion-header class="ion-no-border">
+  <ion-toolbar>
+    <div class="adm-nav">
+      <button class="adm-back-btn" (click)="goBack()" aria-label="Back">
+        <ion-icon name="arrow-back-outline"></ion-icon>
+      </button>
+      <span class="adm-title lc-display">Admin Import</span>
+      <div class="adm-nav-spacer"></div>
+    </div>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+  <div class="adm-content">
+
+    <!-- Tabs -->
+    <div class="adm-tabs">
+      <button
+        class="adm-tab"
+        [class.adm-tab--active]="activeTab() === 'collection'"
+        (click)="activeTab.set('collection')">
+        Word List
+      </button>
+      <button
+        class="adm-tab"
+        [class.adm-tab--active]="activeTab() === 'json'"
+        (click)="activeTab.set('json')">
+        JSON Import
+      </button>
+      <button
+        class="adm-tab"
+        [class.adm-tab--active]="activeTab() === 'story'"
+        (click)="activeTab.set('story')">
+        Story
+      </button>
+    </div>
+
+    <!-- ─── COLLECTION IMPORT ──────────────────────────────────────────── -->
+    @if (activeTab() === 'collection') {
+      <form [formGroup]="collectionForm" (ngSubmit)="importCollection()">
+
+        <div class="adm-field">
+          <label class="adm-label">Title *</label>
+          <input class="adm-input" formControlName="title" placeholder="e.g. Food & Drink A1" />
+        </div>
+
+        <div class="adm-row">
+          <div class="adm-field adm-field--half">
+            <label class="adm-label">Level *</label>
+            <select class="adm-select" formControlName="level">
+              @for (lvl of levels; track lvl) {
+                <option [value]="lvl">{{ lvl }}</option>
+              }
+            </select>
+          </div>
+          <div class="adm-field adm-field--half">
+            <label class="adm-label">Emoji</label>
+            <input class="adm-input" formControlName="emoji" placeholder="🍎" maxlength="4" />
+          </div>
+        </div>
+
+        <div class="adm-field">
+          <label class="adm-label">Topic *</label>
+          <input class="adm-input" formControlName="topic" placeholder="e.g. Food & Drink" />
+        </div>
+
+        <div class="adm-field">
+          <label class="adm-label">Word list * <span class="adm-hint">(one per line, articles optional)</span></label>
+          <textarea
+            class="adm-textarea"
+            formControlName="wordListRaw"
+            rows="10"
+            placeholder="der Apfel&#10;die Banane&#10;bestellen&#10;trinken"></textarea>
+        </div>
+
+        <!-- Result banner -->
+        @if (lastCollectionResult(); as r) {
+          <div class="adm-result-bar">
+            <span class="adm-result-bar__icon">⚡</span>
+            <div class="adm-result-bar__body">
+              <strong>{{ r.title }}</strong>
+              <span>{{ r.created }} words · <strong>{{ r.reused }}</strong> reused · <strong>{{ r.enriched }}</strong> enriched</span>
+              <span class="adm-result-bar__id">ID: {{ r.collectionId }}</span>
+            </div>
+          </div>
+        }
+
+        <button
+          type="submit"
+          class="adm-submit-btn"
+          [disabled]="importing() || collectionForm.invalid">
+          @if (importing()) {
+            Importing…
+          } @else {
+            <ion-icon name="cloud-upload-outline"></ion-icon>
+            Import Collection
+          }
+        </button>
+
+      </form>
+    }
+
+    <!-- ─── JSON COLLECTION IMPORT ──────────────────────────────────────── -->
+    @if (activeTab() === 'json') {
+      <form [formGroup]="jsonForm" (ngSubmit)="importJson()">
+
+        <div class="adm-prompt-box">
+          <div class="adm-prompt-box__header">
+            <span class="adm-prompt-box__label">AI Enrichment Prompt</span>
+            <button type="button" class="adm-prompt-box__copy-btn" (click)="copyPrompt()">
+              @if (promptCopied()) { ✓ Copied } @else { Copy prompt }
+            </button>
+          </div>
+          <pre class="adm-prompt-box__body">{{ enrichmentPrompt }}</pre>
+        </div>
+
+        <div class="adm-field">
+          <label class="adm-label">Title *</label>
+          <input class="adm-input" formControlName="title" placeholder="e.g. Food & Drink A1" />
+        </div>
+
+        <div class="adm-row">
+          <div class="adm-field adm-field--half">
+            <label class="adm-label">Level *</label>
+            <select class="adm-select" formControlName="level">
+              @for (lvl of levels; track lvl) {
+                <option [value]="lvl">{{ lvl }}</option>
+              }
+            </select>
+          </div>
+          <div class="adm-field adm-field--half">
+            <label class="adm-label">Emoji</label>
+            <input class="adm-input" formControlName="emoji" placeholder="🍎" maxlength="4" />
+          </div>
+        </div>
+
+        <div class="adm-field">
+          <label class="adm-label">Topic *</label>
+          <input class="adm-input" formControlName="topic" placeholder="e.g. Food & Drink" />
+        </div>
+
+        <div class="adm-field">
+          <label class="adm-label">Words JSON *</label>
+          <textarea
+            class="adm-textarea"
+            formControlName="wordsJson"
+            rows="14"
+            placeholder='[{"back": "Apfel", "front": "apple", "article": "der", "plural": "die Äpfel"}]'></textarea>
+        </div>
+
+        @if (lastJsonResult(); as r) {
+          <div class="adm-result-bar">
+            <span class="adm-result-bar__icon">⚡</span>
+            <div class="adm-result-bar__body">
+              <strong>{{ r.title }}</strong>
+              <span><strong>{{ r.inserted }}</strong> inserted · <strong>{{ r.reused }}</strong> reused · <strong>{{ r.audioLinked }}</strong> audio linked</span>
+              <span class="adm-result-bar__id">ID: {{ r.collectionId }}</span>
+            </div>
+          </div>
+        }
+
+        <button
+          type="submit"
+          class="adm-submit-btn"
+          [disabled]="importingJson() || jsonForm.invalid">
+          @if (importingJson()) {
+            Importing…
+          } @else {
+            <ion-icon name="cloud-upload-outline"></ion-icon>
+            Import JSON Collection
+          }
+        </button>
+
+      </form>
+    }
+
+    <!-- ─── STORY IMPORT ───────────────────────────────────────────────── -->
+    @if (activeTab() === 'story') {
+      <form [formGroup]="storyForm" (ngSubmit)="importStory()">
+
+        <div class="adm-prompt-box">
+          <div class="adm-prompt-box__header">
+            <span class="adm-prompt-box__label">Story Generation Prompt</span>
+            <button type="button" class="adm-prompt-box__copy-btn" (click)="copyStoryPrompt()">
+              @if (storyPromptCopied()) { ✓ Copied } @else { Copy prompt }
+            </button>
+          </div>
+          <pre class="adm-prompt-box__body">{{ storyPrompt }}</pre>
+        </div>
+
+        <div class="adm-field">
+          <label class="adm-label">Platform Collection ID *</label>
+          <input class="adm-input" formControlName="platformCollectionId" placeholder="uuid" />
+        </div>
+
+        <div class="adm-field adm-field--inline">
+          <input type="checkbox" id="adm-is-fiction" class="adm-checkbox" formControlName="isFiction" />
+          <label class="adm-label adm-label--inline" for="adm-is-fiction">Fiction story</label>
+          <span class="adm-hint">(uncheck for non-fiction, vocab-focused content)</span>
+        </div>
+
+        <div class="adm-field">
+          <label class="adm-label">Story JSON *</label>
+          <textarea
+            class="adm-textarea"
+            formControlName="storyJson"
+            rows="14"
+            placeholder='{ "title": "...", "titleTranslation": "...", ... }'></textarea>
+        </div>
+
+        <!-- Result banner -->
+        @if (lastStoryResult(); as r) {
+          <div class="adm-result-bar">
+            <span class="adm-result-bar__icon">✓</span>
+            <div class="adm-result-bar__body">
+              <strong>{{ r.title }}</strong>
+              <span>{{ r.sentenceCount }} sentences · {{ r.keywordsResolved }} keywords resolved</span>
+              <span class="adm-result-bar__id">ID: {{ r.storyId }}</span>
+            </div>
+          </div>
+        }
+
+        <button
+          type="submit"
+          class="adm-submit-btn"
+          [disabled]="importingStory() || storyForm.invalid">
+          @if (importingStory()) {
+            Importing…
+          } @else {
+            <ion-icon name="sparkles-outline"></ion-icon>
+            Import Story
+          }
+        </button>
+
+      </form>
+    }
+
+  </div>
+</ion-content>

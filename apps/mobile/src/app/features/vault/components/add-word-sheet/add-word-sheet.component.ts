@@ -19,7 +19,7 @@ import {
   sparklesOutline,
   volumeHighOutline,
 } from 'ionicons/icons';
-import type { ArticleType, Card, CardContent, ExampleSentence, Synonym } from '@lingua-card/shared/domain';
+import type { ArticleType, Card, CardContent, ExampleSentence, Synonym, WordDictionaryEntry } from '@lingua-card/shared/domain';
 import { UpdateCardDto } from '@lingua-card/shared/dto';
 import { WordAudioService } from '../../../../shared/audio/word-audio.service';
 import { AuthService } from '../../../../core/services/auth.service';
@@ -30,6 +30,9 @@ import { CollectionStore } from '../../store/collection.store';
 import { AssignCollectionSheetComponent } from '../assign-collection-sheet/assign-collection-sheet.component';
 import { CardDedupService } from '../../../../shared/dedup/card-dedup.service';
 import { EnrichOneApiService } from '../../import/services/enrich-one-api.service';
+import { DictionaryApiService } from '../../services/dictionary-api.service';
+import { switchMap } from 'rxjs/operators';
+import { of } from 'rxjs';
 
 // ─── Synonym form group shape ────────────────────────────────────────────────
 
@@ -58,6 +61,7 @@ export class AddWordSheetComponent implements OnInit {
   private readonly cardStore = inject(CardStore);
   private readonly cardApi = inject(CardApiService);
   private readonly enrichOneApi = inject(EnrichOneApiService);
+  private readonly dictionaryApi = inject(DictionaryApiService);
   private readonly modalCtrl = inject(ModalController);
   private readonly toastCtrl = inject(ToastController);
   private readonly router = inject(Router);
@@ -139,6 +143,8 @@ export class AddWordSheetComponent implements OnInit {
   readonly showNewCategoryInput = signal(false);
   readonly newCategoryName = signal('');
   readonly expandedSynonymIdx = signal<number | null>(null);
+  /** Set when autoGenerate finds a dictionary hit — no AI call was made. */
+  readonly fromLibrary = signal<WordDictionaryEntry | null>(null);
 
   // ─── Lifecycle ─────────────────────────────────────────────────────────────
 
@@ -174,12 +180,12 @@ export class AddWordSheetComponent implements OnInit {
   constructor() {
     addIcons({ closeOutline, micOutline, volumeHighOutline, addOutline, sparklesOutline });
 
-    // Single back subscription handles both duplicate-check and article auto-detect.
-    // Merging avoids two separate subscriptions on the same control.
+    // Single back subscription handles duplicate-check, article auto-detect, and library banner reset.
     this.form.get('back')!.valueChanges.pipe(
       takeUntilDestroyed(),
       distinctUntilChanged(),
     ).subscribe(val => {
+      this.fromLibrary.set(null);
       const lower = (val ?? '').toLowerCase();
       const prefixes: Array<[string, ArticleType]> = [
         ['der ', 'der'], ['die ', 'die'], ['das ', 'das'],
@@ -244,33 +250,51 @@ export class AddWordSheetComponent implements OnInit {
     setTimeout(() => clearInterval(check), 5000);
   }
 
-  // ─── Auto-generate (LC-137) ────────────────────────────────────────────────
+  // ─── Auto-generate (LC-137 / LC-WD10) ────────────────────────────────────
 
   autoGenerate(): void {
     const back = this._back()?.trim();
     if (!back || this.generating()) return;
 
     this.generating.set(true);
+    this.fromLibrary.set(null);
 
-    this.enrichOneApi.enrich({
-      back,
-      targetLanguage: 'de',
-      nativeLanguage: 'en',
-    }).pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
+    const article = this.form.get('article')!.value ?? null;
+
+    this.dictionaryApi.lookup(back, article).pipe(
+      takeUntilDestroyed(this.destroyRef),
+      switchMap(({ entry }) => {
+        if (entry) {
+          return of({ fromDict: entry });
+        }
+        return this.enrichOneApi.enrich({
+          back,
+          article: article as 'der' | 'die' | 'das' | null,
+          targetLanguage: 'de',
+          nativeLanguage: 'en',
+        }).pipe(switchMap(result => of({ fromAI: result })));
+      }),
+    ).subscribe({
       next: result => {
-        const v = this.form.getRawValue();
-        this.form.patchValue({
-          front:         v.front?.trim() ? v.front : result.front,
-          article:       v.article ?? result.article ?? null,
-          plural:        result.plural ?? '',
-          exampleTarget: v.exampleTarget?.trim() ? v.exampleTarget : result.exampleTarget,
-          exampleNative: v.exampleNative?.trim() ? v.exampleNative : result.exampleNative,
-        });
-        this._article.set(this.form.get('article')!.value);
-
-        this.synonymsArray.clear({ emitEvent: false });
-        for (const syn of result.synonyms) {
-          this.synonymsArray.push(makeSynonymGroup(syn));
+        if ('fromDict' in result) {
+          const entry = result.fromDict;
+          this._fillFromEntry(entry);
+          this.fromLibrary.set(entry);
+        } else {
+          const aiResult = result.fromAI;
+          const v = this.form.getRawValue();
+          this.form.patchValue({
+            front:         v.front?.trim() ? v.front : aiResult.front,
+            article:       v.article ?? aiResult.article ?? null,
+            plural:        aiResult.plural ?? '',
+            exampleTarget: v.exampleTarget?.trim() ? v.exampleTarget : aiResult.exampleTarget,
+            exampleNative: v.exampleNative?.trim() ? v.exampleNative : aiResult.exampleNative,
+          });
+          this._article.set(this.form.get('article')!.value);
+          this.synonymsArray.clear({ emitEvent: false });
+          for (const syn of aiResult.synonyms) {
+            this.synonymsArray.push(makeSynonymGroup(syn));
+          }
         }
         this.generating.set(false);
       },
@@ -285,6 +309,22 @@ export class AddWordSheetComponent implements OnInit {
         await toast.present();
       },
     });
+  }
+
+  private _fillFromEntry(entry: WordDictionaryEntry): void {
+    const example = entry.examples[0] ?? null;
+    this.form.patchValue({
+      front:         entry.translation,
+      article:       entry.article ?? null,
+      plural:        entry.plurals[0] ?? '',
+      exampleTarget: example?.target ?? '',
+      exampleNative: example?.native ?? '',
+    });
+    this._article.set(entry.article ?? null);
+    this.synonymsArray.clear({ emitEvent: false });
+    for (const syn of entry.synonyms) {
+      this.synonymsArray.push(makeSynonymGroup(syn));
+    }
   }
 
   // ─── Synonym chip editor (LC-136) ─────────────────────────────────────────
@@ -372,18 +412,19 @@ export class AddWordSheetComponent implements OnInit {
       }));
 
     const card = this.cardToEdit;
+    const dictEntry = this.fromLibrary();
     const content: CardContent = {
-      front:        v.front!.trim(),
-      back:         v.back!.trim(),
-      article:      art,
-      gender:       art === 'der' ? 'masculine' : art === 'die' ? 'feminine' : art === 'das' ? 'neuter' : null,
-      plural:       (art && v.plural?.trim()) ? v.plural.trim() : null,
+      front:            v.front!.trim(),
+      back:             v.back!.trim(),
+      article:          art,
+      gender:           art === 'der' ? 'masculine' : art === 'die' ? 'feminine' : art === 'das' ? 'neuter' : null,
+      plural:           (art && v.plural?.trim()) ? v.plural.trim() : null,
       examples,
       synonyms,
-      notes:        card?.content.notes ?? '',
-      audioAssetId: card?.content.audioAssetId ?? null, // preserved until Word Audio Registry epic
-      imageUrl:     card?.content.imageUrl ?? null,
-      phonetic:     card?.content.phonetic ?? null,
+      notes:            card?.content.notes ?? '',
+      imageUrl:         card?.content.imageUrl ?? null,
+      phonetic:         dictEntry?.phonetic ?? card?.content.phonetic ?? null,
+      dictionaryWordId: dictEntry?.id ?? card?.content.dictionaryWordId ?? null,
     };
 
     const categoryIds = v.categoryId ? [v.categoryId] : [];

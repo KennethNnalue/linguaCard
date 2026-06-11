@@ -1,3 +1,5 @@
+@use 'theme/tokens' as t;
+
 // ─── NAV ─────────────────────────────────────────────────────────────────────
 
 .imp-nav {
@@ -490,4 +492,70 @@
   white-space: nowrap;
 
   &:active { opacity: 0.7; }
+}
+
+// ─── DICTIONARY REUSE ────────────────────────────────────────────────────────
+
+.imp-reuse-bar {
+  display: flex;
+  align-items: flex-start;
+  gap: t.$lc-space-2;
+  background: t.$lc-accent-light;
+  border: 1px solid rgba(224, 123, 63, 0.3);
+  border-radius: t.$lc-radius-sm;
+  padding: t.$lc-space-2 t.$lc-space-3;
+  margin: t.$lc-space-3 0 0;
+  font-size: 12px;
+  color: #b65a22;
+  line-height: 1.5;
+
+  &__icon { flex-shrink: 0; }
+  strong { font-weight: 700; }
+}
+
+.imp-sum-cell--reuse {
+  .imp-sum-val { color: t.$lc-accent; }
+}
+
+.imp-reuse-tog {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 3px;
+  flex-shrink: 0;
+  cursor: pointer;
+  padding: 4px;
+}
+
+.imp-reuse-lbl {
+  font-size: 9px;
+  font-weight: 600;
+  color: t.$lc-text-hint;
+  white-space: nowrap;
+}
+
+.imp-tog {
+  width: 30px;
+  height: 18px;
+  border-radius: 10px;
+  background: t.$lc-border;
+  position: relative;
+  transition: background 0.2s;
+
+  &::after {
+    content: '';
+    position: absolute;
+    top: 2px;
+    left: 2px;
+    width: 14px;
+    height: 14px;
+    border-radius: 50%;
+    background: #fff;
+    transition: transform 0.2s;
+  }
+
+  &--on {
+    background: t.$lc-accent;
+    &::after { transform: translateX(12px); }
+  }
 }

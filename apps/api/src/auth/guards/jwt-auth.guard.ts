@@ -28,8 +28,8 @@ export class JwtAuthGuard implements CanActivate {
     if (!token) throw new UnauthorizedException('Missing auth token');
 
     try {
-      const payload = this.jwtService.verify<{ sub: string; email: string }>(token);
-      request.user = { userId: payload.sub, email: payload.email };
+      const payload = this.jwtService.verify<{ sub: string; email: string; isAdmin?: boolean }>(token);
+      request.user = { userId: payload.sub, email: payload.email, isAdmin: payload.isAdmin ?? false };
     } catch {
       throw new UnauthorizedException('Invalid or expired token');
     }

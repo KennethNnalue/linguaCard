@@ -77,6 +77,10 @@ export class PlatformStoryEntity {
   @Column({ default: true })
   isPublished!: boolean;
 
+  @Index('idx_platform_stories_collection')
+  @Column({ nullable: true, type: 'varchar' })
+  platformCollectionId!: string | null;
+
   @CreateDateColumn()
   publishedAt!: Date;
 }

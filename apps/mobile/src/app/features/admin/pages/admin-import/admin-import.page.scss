@@ -1,0 +1,277 @@
+@use 'theme/tokens' as t;
+
+.adm-nav {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: t.$lc-space-2 t.$lc-space-4 t.$lc-space-3;
+}
+
+.adm-title {
+  font-size: 20px;
+  font-weight: 600;
+  color: var(--lc-text-primary);
+}
+
+.adm-nav-spacer { width: 38px; }
+
+.adm-back-btn {
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  background: var(--lc-brand-light);
+  border: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+
+  ion-icon {
+    font-size: 20px;
+    color: var(--lc-brand);
+  }
+}
+
+.adm-content {
+  padding: t.$lc-space-4;
+  display: flex;
+  flex-direction: column;
+  gap: t.$lc-space-4;
+}
+
+// ─── Tabs ─────────────────────────────────────────────────────────────────────
+
+.adm-tabs {
+  display: flex;
+  gap: t.$lc-space-2;
+  border-bottom: 1px solid var(--lc-border);
+  padding-bottom: t.$lc-space-2;
+}
+
+.adm-tab {
+  padding: t.$lc-space-2 t.$lc-space-3;
+  background: transparent;
+  border: none;
+  border-radius: t.$lc-radius-sm;
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--lc-text-secondary);
+  cursor: pointer;
+  font-family: var(--lc-font-body);
+
+  &--active {
+    background: var(--lc-brand-light);
+    color: var(--lc-brand);
+    font-weight: 600;
+  }
+}
+
+// ─── Form fields ──────────────────────────────────────────────────────────────
+
+.adm-field {
+  display: flex;
+  flex-direction: column;
+  gap: t.$lc-space-1;
+
+  &--half { flex: 1; }
+
+  &--inline {
+    flex-direction: row;
+    align-items: center;
+    gap: t.$lc-space-2;
+  }
+}
+
+.adm-row {
+  display: flex;
+  gap: t.$lc-space-3;
+}
+
+.adm-label {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--lc-text-secondary);
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+
+  &--inline {
+    text-transform: none;
+    letter-spacing: 0;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+  }
+}
+
+.adm-checkbox {
+  width: 16px;
+  height: 16px;
+  accent-color: var(--lc-brand);
+  cursor: pointer;
+  flex-shrink: 0;
+}
+
+.adm-hint {
+  font-weight: 400;
+  text-transform: none;
+  letter-spacing: 0;
+  color: var(--lc-text-hint);
+}
+
+.adm-input,
+.adm-select,
+.adm-textarea {
+  width: 100%;
+  padding: t.$lc-space-3;
+  background: var(--lc-card);
+  border: 1.5px solid var(--lc-border);
+  border-radius: t.$lc-radius-sm;
+  font-size: 14px;
+  font-family: var(--lc-font-body);
+  color: var(--lc-text-primary);
+  box-sizing: border-box;
+
+  &:focus {
+    outline: none;
+    border-color: var(--lc-brand);
+  }
+}
+
+.adm-textarea {
+  resize: vertical;
+  min-height: 120px;
+  font-size: 13px;
+  font-family: monospace;
+}
+
+// ─── Prompt copy box ──────────────────────────────────────────────────────────
+
+.adm-prompt-box {
+  border: 1px solid var(--lc-border);
+  border-radius: t.$lc-radius-sm;
+  overflow: hidden;
+
+  &__header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: t.$lc-space-2 t.$lc-space-3;
+    background: var(--lc-surface);
+    border-bottom: 1px solid var(--lc-border);
+  }
+
+  &__label {
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--lc-text-secondary);
+  }
+
+  &__copy-btn {
+    font-size: 12px;
+    font-weight: 600;
+    font-family: var(--lc-font-body);
+    color: var(--lc-brand);
+    background: transparent;
+    border: 1px solid var(--lc-brand);
+    border-radius: t.$lc-radius-sm;
+    padding: 3px t.$lc-space-2;
+    cursor: pointer;
+
+    &:active { opacity: 0.7; }
+  }
+
+  &__body {
+    margin: 0;
+    padding: t.$lc-space-3;
+    font-size: 11px;
+    font-family: monospace;
+    line-height: 1.6;
+    color: var(--lc-text-secondary);
+    background: var(--lc-card);
+    white-space: pre-wrap;
+    word-break: break-word;
+    max-height: 220px;
+    overflow-y: auto;
+  }
+}
+
+// ─── Info box ─────────────────────────────────────────────────────────────────
+
+.adm-info-box {
+  background: var(--lc-brand-light);
+  border: 1px solid var(--lc-brand);
+  border-radius: t.$lc-radius-sm;
+  padding: t.$lc-space-3;
+  font-size: 13px;
+  color: var(--lc-text-secondary);
+  line-height: 1.5;
+
+  code {
+    font-size: 12px;
+    background: rgba(0, 0, 0, 0.06);
+    padding: 1px 4px;
+    border-radius: 3px;
+  }
+}
+
+// ─── Result banner ────────────────────────────────────────────────────────────
+
+.adm-result-bar {
+  display: flex;
+  align-items: flex-start;
+  gap: t.$lc-space-2;
+  background: t.$lc-accent-light;
+  border: 1px solid rgba(224, 123, 63, 0.3);
+  border-radius: t.$lc-radius-sm;
+  padding: t.$lc-space-3;
+  font-size: 13px;
+  color: #b65a22;
+
+  &__icon { flex-shrink: 0; font-size: 16px; margin-top: 1px; }
+
+  &__body {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    flex: 1;
+
+    strong { font-weight: 700; color: var(--lc-text-primary); }
+    span { color: var(--lc-text-secondary); }
+  }
+
+  &__id {
+    font-size: 11px;
+    color: var(--lc-text-hint) !important;
+    font-family: monospace;
+  }
+}
+
+// ─── Submit button ────────────────────────────────────────────────────────────
+
+.adm-submit-btn {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: t.$lc-space-2;
+  padding: 16px;
+  background: var(--lc-brand);
+  color: white;
+  border: none;
+  border-radius: 14px;
+  font-size: 16px;
+  font-weight: 600;
+  font-family: var(--lc-font-body);
+  cursor: pointer;
+
+  &:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+
+  &:not(:disabled):active { opacity: 0.85; }
+
+  ion-icon { font-size: 18px; }
+}

@@ -25,6 +25,10 @@ export class CardEntity {
   @Column('jsonb')
   content!: CardContent;
 
+  @Index('idx_cards_dictionaryWordId')
+  @Column({ nullable: true, type: 'varchar' })
+  dictionaryWordId!: string | null;
+
   @Column('text', { array: true, default: [] })
   categoryIds!: string[];
 

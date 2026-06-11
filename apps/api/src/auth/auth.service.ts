@@ -14,6 +14,7 @@ export interface AuthUser {
   email: string;
   name: string;
   avatarInitials: string;
+  isAdmin: boolean;
 }
 
 export interface AuthResponse {
@@ -69,12 +70,13 @@ export class AuthService {
 
   private buildResponse(user: UserEntity): AuthResponse {
     return {
-      accessToken: this.jwtService.sign({ sub: user.id, email: user.email }),
+      accessToken: this.jwtService.sign({ sub: user.id, email: user.email, isAdmin: user.isAdmin }),
       user: {
         id: user.id,
         email: user.email,
         name: user.name,
         avatarInitials: user.avatarInitials,
+        isAdmin: user.isAdmin,
       },
     };
   }

@@ -1,5 +1,6 @@
 import {Routes} from '@angular/router';
 import {AuthGuard} from './core/guards/auth.guard';
+import {AdminGuard} from './core/guards/admin.guard';
 import {TabsPage} from './tabs/tabs.page';
 
 export const routes: Routes = [
@@ -158,6 +159,12 @@ export const routes: Routes = [
         path: 'settings/reminders',
         loadComponent: () =>
           import('./features/settings/pages/reminders/reminders.page').then(m => m.RemindersPage),
+      },
+      {
+        path: 'admin/import',
+        canActivate: [AdminGuard],
+        loadComponent: () =>
+          import('./features/admin/pages/admin-import/admin-import.page').then(m => m.AdminImportPage),
       },
     ],
   },

@@ -534,7 +534,6 @@ export class StoryReaderPage implements OnInit, OnDestroy, ViewWillLeave {
         examples: [],
         synonyms: [],
         notes: '',
-        audioAssetId: null,
         imageUrl: null,
         phonetic: null,
       },

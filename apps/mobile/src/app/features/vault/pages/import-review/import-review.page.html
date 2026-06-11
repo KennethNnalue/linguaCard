@@ -34,20 +34,37 @@
         </div>
       }
 
+      <!-- Dictionary reuse summary banner -->
+      @if (reuseCount() > 0) {
+        <div class="imp-reuse-bar">
+          <span class="imp-reuse-bar__icon">⚡</span>
+          <span class="imp-reuse-bar__text">
+            <strong>{{ reuseCount() }} known</strong> to the library — reused at no cost.
+            {{ newEnrichCount() }} will be enriched.
+          </span>
+        </div>
+      }
+
       <!-- Summary stats -->
       <div class="imp-summary-row">
         <div class="imp-sum-cell">
           <span class="imp-sum-val">{{ totalCount() }}</span>
           <span class="imp-sum-lbl">Total</span>
         </div>
+        @if (reuseCount() > 0) {
+          <div class="imp-sum-cell imp-sum-cell--reuse">
+            <span class="imp-sum-val">{{ reuseCount() }}</span>
+            <span class="imp-sum-lbl">Reuse</span>
+          </div>
+        }
         <div class="imp-sum-cell imp-sum-cell--ready">
-          <span class="imp-sum-val">{{ selectedCount() }}</span>
-          <span class="imp-sum-lbl">Selected</span>
+          <span class="imp-sum-val">{{ newEnrichCount() }}</span>
+          <span class="imp-sum-lbl">New</span>
         </div>
-        @if (duplicateCount() > 0) {
+        @if (vaultDuplicateCount() > 0) {
           <div class="imp-sum-cell imp-sum-cell--warn">
-            <span class="imp-sum-val">{{ duplicateCount() }}</span>
-            <span class="imp-sum-lbl">Duplicates</span>
+            <span class="imp-sum-val">{{ vaultDuplicateCount() }}</span>
+            <span class="imp-sum-lbl">In vault</span>
           </div>
         }
         @if (errorCount() > 0) {
@@ -100,7 +117,7 @@
               </div>
               @if (row.isDuplicate) {
                 <div class="imp-dup-row">
-                  <span class="imp-dup-badge">Duplicate</span>
+                  <span class="imp-dup-badge">In vault</span>
                   <span class="imp-dup-hint">{{ getDuplicateLabel(row) }}</span>
                   @if (row.duplicateCard) {
                     <button class="imp-dup-go" (click)="$event.stopPropagation(); suppressDuplicate(row.rowIndex)">
@@ -111,7 +128,14 @@
               }
             </div>
 
-            @if (row.status === 'warning' && !row.isDuplicate) {
+            @if (row.dictionaryEntry && !row.isDuplicate) {
+              <div class="imp-reuse-tog" (click)="$event.stopPropagation(); toggleReuse(row.rowIndex)">
+                <span class="imp-reuse-lbl">{{ row.reuseFromDictionary ? '★ library' : 'enrich' }}</span>
+                <span class="imp-tog" [class.imp-tog--on]="row.reuseFromDictionary"></span>
+              </div>
+            }
+
+            @if (row.status === 'warning' && !row.isDuplicate && !row.dictionaryEntry) {
               <ion-icon name="warning-outline" class="imp-word-warn-icon"></ion-icon>
             }
           </div>

@@ -46,6 +46,7 @@ export class CardsService {
       id: randomUUID(),
       deckId: dto.deckId,
       collectionId: dto.collectionId ?? null,
+      dictionaryWordId: dto.content.dictionaryWordId ?? null,
       userId,
       contextId: dto.contextId,
       content: {
@@ -63,7 +64,6 @@ export class CardsService {
           exampleNative: s.exampleNative ?? '',
         })),
         notes: dto.content.notes ?? '',
-        audioAssetId: dto.content.audioAssetId ?? null,
         imageUrl: dto.content.imageUrl ?? null,
         phonetic: dto.content.phonetic ?? null,
       } satisfies CardContent,

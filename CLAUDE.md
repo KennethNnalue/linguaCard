@@ -231,6 +231,13 @@ export const CardStore = signalStore(
 | `SettingsStore` | `settings/store/` | home, settings, `ReviewStatsStore` (for `dailyGoal`) |
 | `ReviewStatsStore` | `shared/srs/` | home (streak/progress display); depends on `SettingsStore` for goal threshold |
 
+**Dictionary service (not a store — stateless API wrapper):**
+
+| Service | Lives in | Who can inject it |
+|---|---|---|
+| `DictionaryApiService` | `vault/services/` | vault import-review, add-word sheet |
+| `AdminApiService` | `features/admin/services/` | admin import page only |
+
 Cross-feature data sharing is via Angular DI injection, **never** via file imports across feature folder boundaries.
 
 ---
@@ -318,6 +325,11 @@ json-server runs at `http://localhost:3000` with no prefix.
 | Review sessions | `GET /reviewSessions` | `GET /api/v1/review/sessions` |
 | Stories | `GET /stories` | `GET /api/v1/stories` |
 | Image import | — | `POST /api/v1/import/image` |
+| Dictionary lookup | — | `POST /api/v1/word-dictionary/lookup` |
+| Dictionary batch lookup | — | `POST /api/v1/word-dictionary/batch-lookup` |
+| Dictionary stats (admin) | — | `GET /api/v1/word-dictionary/stats` |
+| Admin: import collection | — | `POST /api/v1/admin/platform-collections/import` |
+| Admin: import story | — | `POST /api/v1/admin/platform-stories/import` |
 
 **json-server filtering:**
 ```
@@ -468,6 +480,7 @@ Rating 1–4 maps to: Again / Hard / Good / Easy.
 | 14 | FSRS Migration | ✅ Implemented | `shared/srs/fsrs.service.ts`, `libs/shared/utils/`, `apps/mobile/epics/epic-fsrs-migration.md` |
 | 15 | Story Studio 2.0 | 🔄 In progress | `features/stories/`, `apps/mobile/epics/epic-story-studio-redesign.md`, `apps/mobile/epics/epic-story-studio-redesign-design.html` |
 | 16 | Streak, Goals & Web Reminders | ✅ Implemented | `apps/api/src/{settings,stats,push}/`, `features/settings/`, `shared/srs/review-stats.store.ts`, `apps/mobile/epics/epic-streak-goals-reminders.md` |
+| 17 | Global Word Dictionary & Admin | ✅ Implemented | `apps/api/src/word-dictionary/`, `apps/api/src/admin/`, `features/admin/`, `vault/services/dictionary-api.service.ts`, `apps/mobile/epics/epic-global-word-dictionary.md` |
 
 ### Implemented page inventory
 
@@ -564,5 +577,9 @@ These are **known deviations** from the architecture. Do not "fix" them without 
 | `apps/mobile/epics/epic-story-studio-redesign-design.html` | Design reference for Story Studio 2.0 |
 | `apps/mobile/epics/epic-streak-goals-reminders.md` | Streak, Goals & Web Reminders epic — LC-350 to LC-368 |
 | `apps/mobile/epics/design-streak-goals-reminders.html` | Design reference for Streak/Goals/Reminders screens |
+| `apps/mobile/epics/epic-global-word-dictionary.md` | Global Word Dictionary & Admin epic — LC-WD01 to LC-WD17 |
+| `apps/api/src/word-dictionary/` | Global word dictionary module (entity, service, repository, controller) |
+| `apps/api/src/admin/` | Admin module — platform-collections import, platform-stories import, prompts |
+| `apps/api/src/admin/prompts/platform-story.prompt.md` | Canonical AI prompt for generating platform stories (paste into AI tool) |
 | `design-reference.html` | Visual design spec — open in browser before building any screen |
 | `apps/api/src/` | NestJS backend source |

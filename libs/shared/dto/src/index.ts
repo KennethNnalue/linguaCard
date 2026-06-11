@@ -33,9 +33,9 @@ export class CreateCardContentDto {
   @IsOptional() @IsArray() examples?: CreateExampleSentenceDto[];
   @IsOptional() @IsArray() @ValidateNested({ each: true }) @Type(() => SynonymDto) synonyms?: SynonymDto[];
   @IsOptional() @IsString() notes?: string;
-  @IsOptional() @IsString() audioAssetId?: string | null;
   @IsOptional() @IsString() imageUrl?: string | null;
   @IsOptional() @IsString() phonetic?: string | null;
+  @IsOptional() @IsString() dictionaryWordId?: string | null;
 }
 
 export class CreateCardDto {

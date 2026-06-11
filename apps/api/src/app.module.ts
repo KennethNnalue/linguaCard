@@ -22,6 +22,8 @@ import { PlatformStoriesModule } from './platform-stories/platform-stories.modul
 import { SettingsModule } from './settings/settings.module';
 import { StatsModule } from './stats/stats.module';
 import { PushModule } from './push/push.module';
+import { WordDictionaryModule } from './word-dictionary/word-dictionary.module';
+import { AdminModule } from './admin/admin.module';
 import databaseConfig from './config/database.config';
 import { aiConfig } from './config/ai.config';
 
@@ -58,6 +60,8 @@ import { aiConfig } from './config/ai.config';
     SettingsModule,
     StatsModule,
     PushModule,
+    WordDictionaryModule,
+    AdminModule,
     SeedModule,
   ],
   providers: [

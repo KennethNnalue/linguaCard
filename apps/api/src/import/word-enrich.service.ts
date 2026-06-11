@@ -1,4 +1,4 @@
-import { HttpException, Injectable, Logger } from '@nestjs/common';
+import { forwardRef, HttpException, Inject, Injectable, Logger } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import type { AiConfig } from '../config/ai.config';
 import type {
@@ -9,15 +9,20 @@ import type {
   EnrichWordsResult,
   ImageExtractedWord,
   RawExtractedWord,
+  RawWordInput,
   Synonym,
 } from '@lingua-card/shared/domain';
 import { OpenRouterAdapter } from '../ai/providers/openrouter.adapter';
 import { WordEnrichPromptBuilder } from './word-enrich-prompt.builder';
 import { recoverJsonArray } from './json-recovery.util';
+import { WordDictionaryService } from '../word-dictionary/word-dictionary.service';
 
 const DEFAULT_BATCH_SIZE = 10;
-// 20 RPM free tier = 1 req per 3s. 3 500ms gives headroom for the request itself taking ~0.5–1s.
 const INTER_BATCH_DELAY_MS = 3_500;
+
+export interface RawEnrichResult extends ImageExtractedWord {
+  model: string;
+}
 
 @Injectable()
 export class WordEnrichService {
@@ -28,50 +33,85 @@ export class WordEnrichService {
     private readonly openRouter:    OpenRouterAdapter,
     private readonly promptBuilder: WordEnrichPromptBuilder,
     private readonly config:        ConfigService,
+    @Inject(forwardRef(() => WordDictionaryService))
+    private readonly dictionary: WordDictionaryService,
   ) {
     this.enrichmentModel = this.config.get<AiConfig>('ai')!.enrichmentModel;
     this.logger.log(`Enrichment model: ${this.enrichmentModel}`);
   }
 
+  /**
+   * Public entry point for batch enrichment.
+   * Checks the dictionary first — only misses reach the AI.
+   */
   async enrichWords(dto: EnrichWordsRequest): Promise<EnrichWordsResult> {
-    const batchSize = dto.batchSize ?? DEFAULT_BATCH_SIZE;
-    const batches   = this.chunk(dto.rawWords, batchSize);
+    const raws: RawWordInput[] = dto.rawWords.map(w => ({
+      back: w.back,
+      article: w.article as 'der' | 'die' | 'das' | null ?? null,
+    }));
 
-    const enriched: ImageExtractedWord[] = [];
-    let processedCount = 0;
+    const { entries, reused, enriched: newCount } = await this.dictionary.batchResolve(
+      raws,
+      dto.targetLanguage,
+      dto.nativeLanguage,
+    );
 
-    for (let i = 0; i < batches.length; i++) {
-      if (i > 0) await this.sleep(INTER_BATCH_DELAY_MS);
-      const batch = batches[i];
-      try {
-        const batchResult = await this.enrichBatch(batch, dto.targetLanguage, dto.nativeLanguage);
-        enriched.push(...batchResult);
-        processedCount += batch.length;
-      } catch (err: unknown) {
-        const status = err instanceof HttpException
-          ? err.getStatus()
-          : (err as { status?: number })?.status;
+    this.logger.log(
+      `enrichWords: ${reused} reused from dictionary, ${newCount} newly enriched`,
+    );
 
-        if (status === 429 || status === 503) {
-          this.logger.warn(
-            `Enrichment rate-limited after batch ${i} — ${enriched.length} words enriched, ` +
-            `${dto.rawWords.length - processedCount} pending`,
-          );
-          break;
-        }
+    const enrichedWords: ImageExtractedWord[] = entries.map(e => ({
+      front:         e.translation,
+      back:          e.displayText,
+      article:       e.article,
+      plural:        e.plurals[0] ?? null,
+      categoryName:  e.categoryName,
+      exampleTarget: e.examples[0]?.target ?? '',
+      exampleNative: e.examples[0]?.native ?? '',
+      synonyms:      e.synonyms,
+      confidence:    1.0,
+    }));
 
-        // Non-rate-limit error — log and skip this batch, continue with the next
-        this.logger.error(`Batch ${i} enrichment failed (non-rate-limit)`, err);
-        processedCount += batch.length;
-      }
-    }
+    return { enriched: enrichedWords, pending: [], isComplete: true };
+  }
 
-    const pending = dto.rawWords.slice(processedCount);
+  /**
+   * Public entry point for single-word enrichment.
+   * Checks the dictionary first.
+   */
+  async enrichOne(dto: EnrichOneRequest): Promise<EnrichOneResult> {
+    const raw: RawWordInput = { back: dto.back, article: dto.article ?? null };
+    const { entry } = await this.dictionary.resolve(raw, dto.targetLanguage, dto.nativeLanguage);
 
     return {
-      enriched,
-      pending,
-      isComplete: pending.length === 0,
+      front:         entry.translation,
+      back:          entry.displayText,
+      article:       entry.article,
+      plural:        entry.plurals[0] ?? null,
+      categoryName:  entry.categoryName,
+      exampleTarget: entry.examples[0]?.target ?? '',
+      exampleNative: entry.examples[0]?.native ?? '',
+      synonyms:      entry.synonyms,
+      confidence:    1.0,
+    };
+  }
+
+  /**
+   * Raw AI enrichment — the ONLY place the model is called.
+   * Called exclusively by WordDictionaryService on cache misses.
+   */
+  async enrichRaw(raw: RawWordInput, targetLanguage: string, nativeLanguage: string): Promise<RawEnrichResult> {
+    const extracted: RawExtractedWord = { back: raw.back, article: raw.article, rawText: raw.back };
+    const results = await this.enrichBatch([extracted], targetLanguage, nativeLanguage);
+    const requestedLower = raw.back.toLowerCase();
+    const match = results.find(r => r.back.toLowerCase() === requestedLower) ?? results[0];
+    return {
+      ...(match ?? {
+        front: '', back: raw.back, article: null, plural: null,
+        categoryName: 'Other', exampleTarget: '', exampleNative: '',
+        synonyms: [], confidence: 1.0,
+      }),
+      model: this.enrichmentModel,
     };
   }
 
@@ -81,29 +121,12 @@ export class WordEnrichService {
     nativeLanguage: string,
   ): Promise<ImageExtractedWord[]> {
     const prompt = this.promptBuilder.build(words, targetLanguage, nativeLanguage);
-
     const result = await this.openRouter.generateText({
       messages:  [{ role: 'user', content: prompt }],
       maxTokens: 2048,
       model:     this.enrichmentModel,
     });
-    const rawText = result.text;
-
-    return this.parseEnrichmentResponse(rawText);
-  }
-
-  async enrichOne(dto: EnrichOneRequest): Promise<EnrichOneResult> {
-    const raw: RawExtractedWord = { back: dto.back, article: null, rawText: dto.back };
-    const results = await this.enrichBatch([raw], dto.targetLanguage, dto.nativeLanguage);
-    // Prefer the result whose back matches the requested word — the LLM
-    // occasionally returns extra items before the one we asked for.
-    const requestedLower = dto.back.toLowerCase();
-    const match = results.find(r => r.back.toLowerCase() === requestedLower) ?? results[0];
-    return match ?? {
-      front: '', back: dto.back, article: null, plural: null,
-      categoryName: 'Other', exampleTarget: '', exampleNative: '',
-      synonyms: [], confidence: 1.0,
-    };
+    return this.parseEnrichmentResponse(result.text);
   }
 
   private parseEnrichmentResponse(raw: string): ImageExtractedWord[] {
@@ -131,7 +154,6 @@ export class WordEnrichService {
     return null;
   }
 
-  /** plural is only meaningful for nouns (article present). Nullify for non-nouns. */
   private parsePlural(value: unknown, article: ArticleType | null): string | null {
     if (!article) return null;
     const s = typeof value === 'string' ? value.trim() : '';
@@ -161,13 +183,5 @@ export class WordEnrichService {
 
   private sleep(ms: number): Promise<void> {
     return new Promise(resolve => setTimeout(resolve, ms));
-  }
-
-  private chunk<T>(arr: T[], size: number): T[][] {
-    const chunks: T[][] = [];
-    for (let i = 0; i < arr.length; i += size) {
-      chunks.push(arr.slice(i, i + size));
-    }
-    return chunks;
   }
 }

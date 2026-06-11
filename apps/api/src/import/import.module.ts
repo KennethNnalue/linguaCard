@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+import { forwardRef, Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { ImportController } from './import.controller';
 import { ImageImportService } from './image-import.service';
@@ -14,6 +14,7 @@ import { WordAudioModule } from '../word-audio/word-audio.module';
 import { SubscriptionsModule } from '../subscriptions/subscriptions.module';
 import { CollectionEntity } from '../collections/collection.entity';
 import { CardEntity } from '../cards/card.entity';
+import { WordDictionaryModule } from '../word-dictionary/word-dictionary.module';
 
 @Module({
   imports: [
@@ -22,6 +23,7 @@ import { CardEntity } from '../cards/card.entity';
     WordAudioModule,
     SubscriptionsModule,
     TypeOrmModule.forFeature([CollectionEntity, CardEntity]),
+    forwardRef(() => WordDictionaryModule),
   ],
   controllers: [ImportController],
   providers: [
@@ -33,5 +35,6 @@ import { CardEntity } from '../cards/card.entity';
     WordEnrichPromptBuilder,
     CollectionCompleteService,
   ],
+  exports: [WordEnrichService],
 })
 export class ImportModule {}

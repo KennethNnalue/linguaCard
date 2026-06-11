@@ -12,6 +12,7 @@ import { ConfigModule } from '@nestjs/config';
 import { CardEntity } from '../cards/card.entity';
 import { StorageService } from '../storage/storage.service';
 import { SubscriptionsModule } from '../subscriptions/subscriptions.module';
+import { WordDictionaryModule } from '../word-dictionary/word-dictionary.module';
 
 @Module({
   imports: [
@@ -19,6 +20,7 @@ import { SubscriptionsModule } from '../subscriptions/subscriptions.module';
     AiModule,
     ConfigModule,
     SubscriptionsModule,
+    WordDictionaryModule,
   ],
   controllers: [StoriesController],
   providers: [

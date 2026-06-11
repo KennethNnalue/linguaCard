@@ -23,6 +23,7 @@ import { StoryPromptBuilder } from './story-prompt.builder';
 import { StoryAudioService } from './story-audio.service';
 import { StoryVocabMapper } from './story-vocab.mapper';
 import { SubscriptionService } from '../subscriptions/subscription.service';
+import { WordDictionaryService } from '../word-dictionary/word-dictionary.service';
 import type { AiConfig } from '../config/ai.config';
 
 const MIN_RECOVERABLE_SENTENCES = 5;
@@ -59,6 +60,7 @@ export class StoryGenerationService {
     private readonly audioService:  StoryAudioService,
     private readonly vocabMapper:   StoryVocabMapper,
     private readonly subscriptions: SubscriptionService,
+    private readonly dictionary: WordDictionaryService,
   ) {
     const ai = this.config.get<AiConfig>('ai')!;
     this.storyModelPro  = ai.storyModelPro;
@@ -130,8 +132,9 @@ export class StoryGenerationService {
       this.generateKeywords(sentences, dto.difficulty, model),
     ]);
 
-    // Merge AI keywords with vault words (vault words get their cardId set)
-    const keywords: StoryKeyword[] = this.mergeKeywords(aiKeywords, vocabWords);
+    // Merge AI keywords with vault words; enrich known words from dictionary
+    const merged = this.mergeKeywords(aiKeywords, vocabWords);
+    const keywords: StoryKeyword[] = await this.enrichKeywordsFromDictionary(merged);
 
     const entity = this.storyRepo.create({
       id: storyId,
@@ -264,7 +267,8 @@ export class StoryGenerationService {
         : Promise.resolve(entity.keywords!),
     ]);
 
-    const keywords: StoryKeyword[] = this.mergeKeywords(aiKeywords, entity.vocabWords ?? []);
+    const merged = this.mergeKeywords(aiKeywords, entity.vocabWords ?? []);
+    const keywords: StoryKeyword[] = await this.enrichKeywordsFromDictionary(merged);
 
     entity.quizQuestions = quizQuestions;
     entity.grammarNotes = grammarNotes;
@@ -302,6 +306,31 @@ export class StoryGenerationService {
     }
     const order = ['A1', 'A2', 'B1', 'B2', 'C1', 'C2'];
     return merged.sort((a, b) => order.indexOf(a.level) - order.indexOf(b.level));
+  }
+
+  private async enrichKeywordsFromDictionary(
+    keywords: StoryKeyword[],
+    targetLang = 'de-DE',
+    nativeLang = 'en',
+  ): Promise<StoryKeyword[]> {
+    const settled = await Promise.allSettled(
+      keywords.map(async kw => {
+        // Try DB lookup first (no AI cost). On a miss, resolve() enriches and caches.
+        const raw = { back: kw.germanBase, article: (kw.article as 'der' | 'die' | 'das' | null) ?? null };
+        let entry = await this.dictionary.lookup(kw.germanBase, kw.article ?? null, targetLang, nativeLang);
+        if (!entry) {
+          const resolved = await this.dictionary.resolve(raw, targetLang, nativeLang);
+          entry = resolved.entry;
+        }
+        return {
+          ...kw,
+          english: entry.translation,
+          article: entry.article ?? kw.article,
+          wordType: entry.wordType as StoryKeyword['wordType'],
+        };
+      }),
+    );
+    return settled.map((r, i) => r.status === 'fulfilled' ? r.value : keywords[i]);
   }
 
   private async generateTextWithModel(

@@ -6,23 +6,24 @@ import type {
   CardContent,
   ExampleSentence,
   GenderType,
-  ImageExtractedWord,
   RawExtractedWord,
+  RawWordInput,
   SRSStateData,
+  WordDictionaryEntry,
 } from '@lingua-card/shared/domain';
 import { CollectionEntity } from '../collections/collection.entity';
 import { CardEntity } from '../cards/card.entity';
-import { WordEnrichService } from './word-enrich.service';
 import { WordDedupService } from '../cards/word-dedup.service';
 import { WordAudioService } from '../word-audio/word-audio.service';
 import { SynonymAudioPrefetchService } from '../word-audio/synonym-audio-prefetch.service';
+import { WordDictionaryService } from '../word-dictionary/word-dictionary.service';
 
 @Injectable()
 export class CollectionCompleteService {
   private readonly logger = new Logger(CollectionCompleteService.name);
 
   constructor(
-    private readonly wordEnrich: WordEnrichService,
+    private readonly dictionary: WordDictionaryService,
     private readonly wordDedup: WordDedupService,
     private readonly wordAudio: WordAudioService,
     private readonly synonymAudioPrefetch: SynonymAudioPrefetchService,
@@ -52,46 +53,43 @@ export class CollectionCompleteService {
       return { newCards: 0, reusedCards: 0, pendingWords: [], isComplete: true };
     }
 
-    const result = await this.wordEnrich.enrichWords({
-      rawWords: pending,
-      targetLanguage: 'de',
-      nativeLanguage: 'en',
-      collectionId,
-    });
+    const raws: RawWordInput[] = pending.map(w => ({
+      back: w.back,
+      article: (w.article as 'der' | 'die' | 'das' | null) ?? null,
+    }));
 
-    // Dedup all enriched words against the user's existing cards in one query.
-    // Use back-only matching because:
-    // 1. Phase 1 extraction embeds the article in back ("der Hund" not "Hund")
-    // 2. The enrichment prompt echoes back the original back value unchanged
-    // So enriched.back may be "der Hund" while the vault card has back="Hund", article="der"
-    // A word-only match is sufficient and avoids false negatives from article mismatches.
+    const { entries, reused, enriched: newCount } = await this.dictionary.batchResolve(
+      raws,
+      'de-DE',
+      'en',
+    );
+
+    this.logger.log(
+      `resume(${collectionId}): ${reused} reused from dictionary, ${newCount} newly enriched`,
+    );
+
     const dupResults = await this.wordDedup.findDuplicatesByBackOnly(
       userId,
-      result.enriched.map(w => ({ back: w.back })),
+      entries.map(e => ({ back: e.displayText })),
     );
 
     let newCards = 0;
     let reusedCards = 0;
 
-    for (let i = 0; i < result.enriched.length; i++) {
-      const word = result.enriched[i];
+    for (let i = 0; i < entries.length; i++) {
+      const entry = entries[i];
       const existing = dupResults[i];
 
       if (existing) {
-        // Card already exists — reassign its collectionId rather than duplicating it.
-        // Preserves the original card's SRS state, audio, and all metadata.
         try {
-          await this.cardRepo.update(
-            { id: existing.id, userId },
-            { collectionId },
-          );
+          await this.cardRepo.update({ id: existing.id, userId }, { collectionId });
           reusedCards++;
         } catch (err) {
           this.logger.warn(`Failed to reassign duplicate card ${existing.id}`, err);
         }
       } else {
         try {
-          await this.createCard(userId, collectionId, word);
+          await this.createCard(userId, collectionId, entry);
           newCards++;
         } catch (err) {
           this.logger.error('Failed to create card during resume', err);
@@ -99,31 +97,26 @@ export class CollectionCompleteService {
       }
     }
 
-    collection.pendingWords = result.pending;
-    collection.importStatus = result.isComplete ? 'complete' : 'incomplete';
+    collection.pendingWords = [];
+    collection.importStatus = 'complete';
     await this.collectionRepo.save(collection);
 
-    // Fire-and-forget audio pre-generation — runs after the HTTP response is sent.
-    // Primary audio (word + main example): fired immediately via batchResolve so
-    // the user hears audio on first tap into the vault.
-    // Secondary audio (plural + synonym examples): queued in the throttled
-    // SynonymAudioPrefetchService to avoid spiking TTS quota on large imports.
-    if (result.enriched.length > 0) {
+    if (entries.length > 0) {
       const primaryAudio: { text: string; language: string }[] = [];
       const secondaryAudio: { text: string; language: string }[] = [];
 
-      for (const word of result.enriched) {
+      for (const entry of entries) {
         primaryAudio.push({
-          text: (word.article ? `${word.article} ` : '') + word.back,
+          text: (entry.article ? `${entry.article} ` : '') + entry.displayText,
           language: 'de-DE',
         });
-        if (word.exampleTarget) {
-          primaryAudio.push({ text: word.exampleTarget, language: 'de-DE' });
+        if (entry.examples[0]?.target) {
+          primaryAudio.push({ text: entry.examples[0].target, language: 'de-DE' });
         }
-        if (word.plural) {
-          secondaryAudio.push({ text: word.plural, language: 'de-DE' });
+        if (entry.plurals[0]) {
+          secondaryAudio.push({ text: entry.plurals[0], language: 'de-DE' });
         }
-        for (const syn of (word.synonyms ?? [])) {
+        for (const syn of (entry.synonyms ?? [])) {
           if (syn.example) secondaryAudio.push({ text: syn.example, language: 'de-DE' });
         }
       }
@@ -139,34 +132,34 @@ export class CollectionCompleteService {
     return {
       newCards,
       reusedCards,
-      pendingWords: result.pending,
-      isComplete: result.isComplete,
+      pendingWords: [],
+      isComplete: true,
     };
   }
 
-  private async createCard(userId: string, collectionId: string, word: ImageExtractedWord): Promise<void> {
+  private async createCard(userId: string, collectionId: string, entry: WordDictionaryEntry): Promise<void> {
     const now = new Date().toISOString();
     const gender: GenderType =
-      word.article === 'der' ? 'masculine' :
-      word.article === 'die' ? 'feminine' :
-      word.article === 'das' ? 'neuter' : null;
+      entry.article === 'der' ? 'masculine' :
+      entry.article === 'die' ? 'feminine' :
+      entry.article === 'das' ? 'neuter' : null;
 
-    const examples: ExampleSentence[] = word.exampleTarget
-      ? [{ id: randomUUID(), target: word.exampleTarget, native: word.exampleNative }]
+    const examples: ExampleSentence[] = entry.examples.length
+      ? entry.examples
       : [];
 
     const content: CardContent = {
-      front: word.front,
-      back: word.back,
-      article: word.article,
+      front: entry.translation,
+      back: entry.displayText,
+      article: entry.article,
       gender,
-      plural: word.plural ?? null,
+      plural: entry.plurals[0] ?? null,
       examples,
-      synonyms: word.synonyms ?? [],
+      synonyms: entry.synonyms ?? [],
       notes: '',
-      audioAssetId: null,
       imageUrl: null,
-      phonetic: null,
+      phonetic: entry.phonetic,
+      dictionaryWordId: entry.id,
     };
 
     const srsState: SRSStateData = {

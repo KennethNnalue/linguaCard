@@ -419,7 +419,6 @@ export class ImageImportReviewPage implements OnInit {
       examples,
       synonyms: row.synonyms ?? [],
       notes: '',
-      audioAssetId: null,
       imageUrl: null,
       phonetic: null,
     };
