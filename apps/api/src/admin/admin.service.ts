@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { randomUUID } from 'crypto';
@@ -13,6 +13,7 @@ import type {
   AdminImportCollectionJsonResult,
   AdminImportStoryDto,
   AdminImportStoryResult,
+  AdminPlatformCollectionListItem,
 } from '@lingua-card/shared/domain';
 
 @Injectable()
@@ -164,5 +165,50 @@ export class AdminService {
       sentenceCount: story.sentences.length,
       keywordsResolved: keywordEntries.filter(e => e !== null).length,
     };
+  }
+
+  async listCollections(): Promise<AdminPlatformCollectionListItem[]> {
+    const collections = await this.collectionRepo.find({ order: { createdAt: 'DESC' } });
+    const ids = collections.map(c => c.id);
+    if (!ids.length) return [];
+
+    const reuseCounts: Array<{ platformCollectionId: string; reused: number }> =
+      await this.wordRepo.manager.query(
+        `SELECT pcw."platformCollectionId",
+                COUNT(DISTINCT wd."id")::int AS reused
+         FROM platform_collection_words pcw
+         JOIN word_dictionary wd ON wd.id = pcw."dictionaryWordId"
+         WHERE pcw."platformCollectionId" = ANY($1::text[])
+         GROUP BY pcw."platformCollectionId"`,
+        [ids],
+      );
+    const reuseMap = new Map(reuseCounts.map(r => [r.platformCollectionId, r.reused]));
+
+    return collections.map(c => ({
+      id: c.id,
+      title: c.title,
+      emoji: c.emoji,
+      level: c.level,
+      topic: c.topic,
+      wordCount: c.wordCount,
+      dictionaryLinked: reuseMap.get(c.id) ?? 0,
+      isPublished: c.isPublished,
+      storyCategory: c.storyCategory ?? null,
+      createdAt: c.createdAt instanceof Date ? c.createdAt.toISOString() : String(c.createdAt),
+    }));
+  }
+
+  async setPublished(id: string, isPublished: boolean): Promise<void> {
+    const entity = await this.collectionRepo.findOneBy({ id });
+    if (!entity) throw new NotFoundException(`Platform collection ${id} not found`);
+    entity.isPublished = isPublished;
+    await this.collectionRepo.save(entity);
+  }
+
+  async setStoryCategory(id: string, storyCategory: string | null): Promise<void> {
+    const entity = await this.collectionRepo.findOneBy({ id });
+    if (!entity) throw new NotFoundException(`Platform collection ${id} not found`);
+    entity.storyCategory = storyCategory;
+    await this.collectionRepo.save(entity);
   }
 }

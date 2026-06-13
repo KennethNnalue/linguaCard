@@ -15,6 +15,6 @@ import { WordAudioModule } from '../word-audio/word-audio.module';
   ],
   controllers: [WordDictionaryController],
   providers: [WordDictionaryRepository, WordDictionaryService],
-  exports: [WordDictionaryService],
+  exports: [WordDictionaryService, WordDictionaryRepository],
 })
 export class WordDictionaryModule {}

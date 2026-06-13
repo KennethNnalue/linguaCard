@@ -31,6 +31,14 @@
   --lc-neut-text:       #{t.$lc-neut-text};
   --lc-neut-border:     #{t.$lc-neut-border};
 
+  // CEFR level pill colours (B1/B2/C1 — A1/A2 reuse brand tokens)
+  --lc-lvl-b1-bg:       #EAF2FC;
+  --lc-lvl-b1-tx:       #1A56A3;
+  --lc-lvl-b2-bg:       #FDF0E6;
+  --lc-lvl-b2-tx:       #B65A22;
+  --lc-lvl-c1-bg:       #F1EFE8;
+  --lc-lvl-c1-tx:       #5F5E5A;
+
   // Mastery colours
   --lc-mastery-0:       #{t.$lc-mastery-0};
   --lc-mastery-1:       #{t.$lc-mastery-1};
@@ -200,6 +208,14 @@ body.ion-palette-dark {
   --lc-neut-bg:         #272820;
   --lc-neut-text:       #A8B8B4;
   --lc-neut-border:     #4A4E48;
+
+  // CEFR level pill colours — dark-mode overrides
+  --lc-lvl-b1-bg:       #1A2B42;
+  --lc-lvl-b1-tx:       #7BB8F8;
+  --lc-lvl-b2-bg:       #2E1A0E;
+  --lc-lvl-b2-tx:       #FDBA74;
+  --lc-lvl-c1-bg:       #272820;
+  --lc-lvl-c1-tx:       #A8B8B4;
 
   // Amber / streak colours — muted for dark surfaces
   --lc-amber:           #F59E0B;   // brighter amber readable on dark

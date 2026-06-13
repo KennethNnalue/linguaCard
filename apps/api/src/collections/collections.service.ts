@@ -122,6 +122,9 @@ export class CollectionsService {
       importStatus: (e.importStatus as CollectionImportStatus) ?? 'complete',
       pendingWords: e.pendingWords ?? [],
       sourceImageDescription: e.sourceImageDescription ?? undefined,
+      sourcePlatformCollectionId: e.sourcePlatformCollectionId ?? null,
+      level: e.level ?? null,
+      topic: e.topic ?? null,
       createdAt: e.createdAt instanceof Date ? e.createdAt.toISOString() : e.createdAt,
       updatedAt: e.updatedAt instanceof Date ? e.updatedAt.toISOString() : e.updatedAt,
     };

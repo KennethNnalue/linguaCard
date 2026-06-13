@@ -217,6 +217,8 @@ export interface Card {
   collectionId: string | null;
   userId: string;
   contextId: string;
+  /** Top-level provenance link — mirrors the DB column used for dedup joins. */
+  dictionaryWordId?: string | null;
   content: CardContent;
   categoryIds: string[];
   tags: string[];
@@ -282,6 +284,12 @@ export interface Collection {
   importStatus: CollectionImportStatus;
   pendingWords: RawExtractedWord[];
   sourceImageDescription?: string;
+  /** Set when adopted from a platform collection (LC-405). */
+  sourcePlatformCollectionId?: string | null;
+  /** CEFR level from source platform collection (LC-405). */
+  level?: string | null;
+  /** Topic from source platform collection (LC-405). */
+  topic?: string | null;
   createdAt: string;
   updatedAt: string;
 }
@@ -921,4 +929,82 @@ export interface AdminImportCollectionJsonResult {
   inserted: number;
   reused: number;
   audioLinked: number;
+}
+
+export interface AdminPlatformCollectionListItem {
+  id: string;
+  title: string;
+  emoji: string | null;
+  level: string;
+  topic: string;
+  wordCount: number;
+  dictionaryLinked: number;
+  isPublished: boolean;
+  /** Admin-set story category for deterministic story pairing (LC-414). */
+  storyCategory: string | null;
+  createdAt: string;
+}
+
+export interface AdminPublishToggleDto {
+  isPublished: boolean;
+}
+
+export interface AdminSetStoryCategoryDto {
+  /** Enum value matching StoryCategory, or null to clear the pairing. */
+  storyCategory: string | null;
+}
+
+// ─── PLATFORM COLLECTIONS — PUBLIC (LC-403a) ─────────────────────────────────
+
+export type PlatformCollectionAdoptionStatus = 'not-adopted' | 'adopted';
+
+export interface PlatformCollectionSummary {
+  id: string;
+  title: string;
+  emoji: string | null;
+  level: CefrLevel;
+  topic: string;
+  wordCount: number;
+  /** Exact count of this set's words that already exist in the user's vault (dictionaryWordId join). */
+  knownCount: number;
+  adoptionStatus: PlatformCollectionAdoptionStatus;
+  /** ID of the user's Collection entity if already adopted, null otherwise. */
+  adoptedCollectionId: string | null;
+}
+
+export interface PlatformCollectionWordView {
+  dictionaryWordId: string;
+  displayText: string;
+  article: 'der' | 'die' | 'das' | null;
+  translation: string;
+  wordType: string;
+  cefrLevel: CefrLevel | null;
+  exampleTarget: string | null;
+  exampleNative: string | null;
+  /** True if the user already owns a card linked to this dictionary word. */
+  knownToUser: boolean;
+}
+
+export interface PlatformCollectionDetail extends PlatformCollectionSummary {
+  words: PlatformCollectionWordView[];
+  /** Related platform stories matched by level + storyCategory. Empty when storyCategory is unset. */
+  relatedStories: PlatformStoryCard[];
+}
+
+export interface PlatformCollectionListResponse {
+  collections: PlatformCollectionSummary[];
+  levelCounts: Record<CefrLevel, number>;
+  /** Mode of cefrLevel across user's dictionary-linked cards; 'A1' for empty vaults. */
+  suggestedLevel: CefrLevel;
+}
+
+export interface AdoptPlatformCollectionDto {
+  /** No request body required — user identity comes from JWT. */
+  _?: never;
+}
+
+export interface AdoptPlatformCollectionResult {
+  collection: Collection;
+  addedCount: number;
+  skippedCount: number;
 }

@@ -61,8 +61,10 @@ export class VaultPage {
 
   constructor() {
     addIcons({addOutline, cloudUploadOutline, funnelOutline, chevronDownOutline, cameraOutline, ellipsisVerticalOutline, documentTextOutline, timeOutline, textOutline, starOutline, calendarOutline, folderOpenOutline});
-    const tab = inject(ActivatedRoute).snapshot.queryParams['tab'];
-    if (tab === 'collections') this.activeTab.set('collections');
+  }
+
+  openCollectionsPage(): void {
+    this.router.navigate(['/vault/collections']);
   }
 
   readonly loading = computed(() => this.cardStore.isLoading() && this.cardStore.cards().length === 0);

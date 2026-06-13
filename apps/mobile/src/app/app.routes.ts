@@ -56,8 +56,19 @@ export const routes: Routes = [
       },
       {
         path: 'vault/collections',
-        redirectTo: '/vault?tab=collections',
-        pathMatch: 'full',
+        loadComponent: () =>
+          import('./features/vault/pages/collections/collections.page').then(m => m.CollectionsPage),
+      },
+      {
+        path: 'vault/collections/platform/:id',
+        loadComponent: () =>
+          import('./features/vault/pages/platform-collection-detail/platform-collection-detail.page')
+            .then(m => m.PlatformCollectionDetailPage),
+      },
+      {
+        path: 'vault/explore/topic/:topic',
+        loadComponent: () =>
+          import('./features/vault/pages/explore-topic/explore-topic.page').then(m => m.ExploreTopicPage),
       },
       {
         path: 'vault/collections/:id',

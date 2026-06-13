@@ -41,8 +41,7 @@
       </button>
       <button
         class="tab-item"
-        [class.tab-item--active]="activeTab() === 'collections'"
-        (click)="activeTab.set('collections')"
+        (click)="openCollectionsPage()"
         aria-label="Collections tab">
         Collections
       </button>

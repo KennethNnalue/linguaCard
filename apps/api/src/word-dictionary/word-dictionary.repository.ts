@@ -42,6 +42,11 @@ export class WordDictionaryRepository {
     return this.repo.findOneBy({ id });
   }
 
+  async findByIds(ids: string[]): Promise<WordDictionaryEntity[]> {
+    if (!ids.length) return [];
+    return this.repo.find({ where: { id: In(ids) } });
+  }
+
   async upsertOnConflict(entity: WordDictionaryEntity): Promise<WordDictionaryEntity> {
     // On unique-key conflict the existing row wins — return it.
     try {

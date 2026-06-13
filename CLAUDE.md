@@ -133,16 +133,18 @@ apps/mobile/src/app/
     ├── onboarding/
     ├── home/                          ← Dashboard
     ├── vault/                         ← Cards + collections
-    │   ├── pages/                     ← vault, word-detail, collections, collection-detail
+    │   ├── pages/                     ← vault, word-detail, collections, collection-detail, platform-collection-detail, explore-topic
     │   ├── components/                ← add-word-sheet, assign-collection-sheet, category-selector
     │   ├── store/
     │   │   ├── card.store.ts          ← CardStore (signalStore)
     │   │   ├── category.store.ts      ← CategoryStore (signalStore)
-    │   │   └── collection.store.ts    ← CollectionStore (signalStore)
+    │   │   ├── collection.store.ts    ← CollectionStore (signalStore)
+    │   │   └── platform-collection.store.ts  ← PlatformCollectionStore (signalStore)
     │   ├── services/
     │   │   ├── card-api.service.ts
     │   │   ├── category-api.service.ts
-    │   │   └── collection-api.service.ts
+    │   │   ├── collection-api.service.ts
+    │   │   └── platform-collection-api.service.ts
     │   └── import/                    ← CSV + image import sub-feature
     │       ├── pages/                 ← import, import-review, image-entry, image-processing, image-review
     │       └── services/
@@ -225,6 +227,7 @@ export const CardStore = signalStore(
 | `CardStore` | `vault/store/` | vault, review, listen, home |
 | `CategoryStore` | `vault/store/` | vault, home |
 | `CollectionStore` | `vault/store/` | vault, review |
+| `PlatformCollectionStore` | `vault/store/` | vault collections page, platform-collection-detail page, explore-topic page |
 | `ReviewStore` | `review/store/` | review only |
 | `ListenStore` | `listen/store/` | listen only |
 | `StoryStore` | `stories/store/` | stories only |
@@ -236,6 +239,7 @@ export const CardStore = signalStore(
 | Service | Lives in | Who can inject it |
 |---|---|---|
 | `DictionaryApiService` | `vault/services/` | vault import-review, add-word sheet |
+| `PlatformCollectionApiService` | `vault/services/` | `PlatformCollectionStore` only |
 | `AdminApiService` | `features/admin/services/` | admin import page only |
 
 Cross-feature data sharing is via Angular DI injection, **never** via file imports across feature folder boundaries.
@@ -330,6 +334,12 @@ json-server runs at `http://localhost:3000` with no prefix.
 | Dictionary stats (admin) | — | `GET /api/v1/word-dictionary/stats` |
 | Admin: import collection | — | `POST /api/v1/admin/platform-collections/import` |
 | Admin: import story | — | `POST /api/v1/admin/platform-stories/import` |
+| Admin: list platform collections | — | `GET /api/v1/admin/platform-collections` |
+| Admin: publish toggle | — | `PATCH /api/v1/admin/platform-collections/:id/publish` (body: `AdminPublishToggleDto`) |
+| Admin: set story category | — | `PATCH /api/v1/admin/platform-collections/:id/story-category` (body: `AdminSetStoryCategoryDto`) |
+| Platform collections list | — | `GET /api/v1/platform-collections` → `PlatformCollectionListResponse` (auth required) |
+| Platform collection detail | — | `GET /api/v1/platform-collections/:id` → `PlatformCollectionDetail` (auth required) |
+| Adopt platform collection | — | `POST /api/v1/platform-collections/:id/adopt` → `AdoptPlatformCollectionResult` (auth required; idempotent) |
 
 **json-server filtering:**
 ```
@@ -481,6 +491,7 @@ Rating 1–4 maps to: Again / Hard / Good / Easy.
 | 15 | Story Studio 2.0 | 🔄 In progress | `features/stories/`, `apps/mobile/epics/epic-story-studio-redesign.md`, `apps/mobile/epics/epic-story-studio-redesign-design.html` |
 | 16 | Streak, Goals & Web Reminders | ✅ Implemented | `apps/api/src/{settings,stats,push}/`, `features/settings/`, `shared/srs/review-stats.store.ts`, `apps/mobile/epics/epic-streak-goals-reminders.md` |
 | 17 | Global Word Dictionary & Admin | ✅ Implemented | `apps/api/src/word-dictionary/`, `apps/api/src/admin/`, `features/admin/`, `vault/services/dictionary-api.service.ts`, `apps/mobile/epics/epic-global-word-dictionary.md` |
+| 18 | Platform Vocabulary Collections | ✅ Implemented | `apps/api/src/platform-collections/`, `vault/store/platform-collection.store.ts`, `vault/services/platform-collection-api.service.ts`, `vault/pages/platform-collection-detail/`, `vault/pages/collections/` (Explore segment), `vault/pages/explore-topic/` (See All), `apps/mobile/epics/epic-platform-collections-refined.md` |
 
 ### Implemented page inventory
 

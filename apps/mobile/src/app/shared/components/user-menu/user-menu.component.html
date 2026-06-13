@@ -60,6 +60,17 @@
     </div>
   </button>
 
+  <!-- Admin import (admin users only) -->
+  @if (auth.isAdmin()) {
+    <a class="ctx-item ctx-item--admin" role="menuitem" [routerLink]="['/admin/import']" (click)="closed.emit()">
+      <div class="ctx-item-left">
+        <ion-icon name="cloud-upload-outline"></ion-icon>
+        Admin import
+      </div>
+      <ion-icon name="chevron-forward-outline" class="ctx-chevron"></ion-icon>
+    </a>
+  }
+
   <!-- Reset all data -->
   <button class="ctx-item ctx-item--danger" role="menuitem" (click)="onResetClick()">
     <div class="ctx-item-left">

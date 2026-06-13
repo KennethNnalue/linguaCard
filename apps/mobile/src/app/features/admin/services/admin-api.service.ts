@@ -8,6 +8,8 @@ import type {
   AdminImportCollectionJsonResult,
   AdminImportStoryDto,
   AdminImportStoryResult,
+  AdminPlatformCollectionListItem,
+  AdminSetStoryCategoryDto,
 } from '@lingua-card/shared/domain';
 import { environment } from '../../../../environments/environment';
 
@@ -15,6 +17,19 @@ import { environment } from '../../../../environments/environment';
 export class AdminApiService {
   private readonly http = inject(HttpClient);
   private readonly apiUrl = `${environment.apiUrl}/admin`;
+
+  listCollections(): Observable<AdminPlatformCollectionListItem[]> {
+    return this.http.get<AdminPlatformCollectionListItem[]>(`${this.apiUrl}/platform-collections`);
+  }
+
+  setPublished(id: string, isPublished: boolean): Observable<void> {
+    return this.http.patch<void>(`${this.apiUrl}/platform-collections/${id}/publish`, { isPublished });
+  }
+
+  setStoryCategory(id: string, storyCategory: string | null): Observable<void> {
+    const dto: AdminSetStoryCategoryDto = { storyCategory };
+    return this.http.patch<void>(`${this.apiUrl}/platform-collections/${id}/story-category`, dto);
+  }
 
   importCollection(dto: AdminImportCollectionDto): Observable<AdminImportCollectionResult> {
     return this.http.post<AdminImportCollectionResult>(`${this.apiUrl}/platform-collections/import`, dto);

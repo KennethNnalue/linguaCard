@@ -48,6 +48,7 @@
   &:last-child { border-bottom: none; }
   &:active { background: var(--lc-surface); }
   &--danger { color: var(--lc-fem-text); .ctx-item-left ion-icon { color: var(--lc-fem-text); } .ctx-chevron { color: var(--lc-text-hint); } }
+  &--admin  { color: var(--lc-brand); .ctx-item-left ion-icon { color: var(--lc-brand); } }
 }
 
 .ctx-item-left { display: flex; align-items: center; gap: 9px; ion-icon { @include u.lc-font('lg'); color: var(--lc-text-hint); flex-shrink: 0; } }

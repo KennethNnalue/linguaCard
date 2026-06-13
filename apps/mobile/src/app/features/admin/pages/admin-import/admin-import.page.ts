@@ -1,18 +1,22 @@
-import { ChangeDetectionStrategy, Component, inject, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, DestroyRef, inject, signal } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import { IonContent, IonHeader, IonIcon, IonToolbar, ToastController } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
-import { arrowBackOutline, cloudUploadOutline, sparklesOutline } from 'ionicons/icons';
+import { arrowBackOutline, cloudUploadOutline, eyeOutline, eyeOffOutline, sparklesOutline } from 'ionicons/icons';
 import type {
   AdminImportCollectionResult,
   AdminImportCollectionJsonDto,
   AdminImportCollectionJsonResult,
   AdminImportStoryResult,
+  AdminPlatformCollectionListItem,
   CefrLevel,
   GeneratedPlatformStory,
   RawWordInput,
+  StoryCategory,
 } from '@lingua-card/shared/domain';
+import { STORY_CATEGORIES } from '@lingua-card/shared/domain';
 import { AdminApiService } from '../../services/admin-api.service';
 
 @Component({
@@ -26,6 +30,7 @@ export class AdminImportPage {
   private readonly adminApi = inject(AdminApiService);
   private readonly toastCtrl = inject(ToastController);
   private readonly router = inject(Router);
+  private readonly _destroyRef = inject(DestroyRef);
 
   readonly collectionForm = new FormGroup({
     title: new FormControl('', [Validators.required]),
@@ -131,10 +136,63 @@ OUTPUT — valid JSON ONLY, no markdown fences, no commentary:
   readonly lastJsonResult = signal<AdminImportCollectionJsonResult | null>(null);
 
   readonly levels: CefrLevel[] = ['A1', 'A2', 'B1', 'B2', 'C1'];
-  readonly activeTab = signal<'collection' | 'json' | 'story'>('collection');
+  readonly activeTab = signal<'collection' | 'json' | 'story' | 'manage'>('collection');
+
+  readonly collections = signal<AdminPlatformCollectionListItem[]>([]);
+  readonly collectionsLoading = signal(false);
+  readonly togglingId = signal<string | null>(null);
+  readonly settingCategoryId = signal<string | null>(null);
+
+  readonly storyCategories = STORY_CATEGORIES;
 
   constructor() {
-    addIcons({ arrowBackOutline, cloudUploadOutline, sparklesOutline });
+    addIcons({ arrowBackOutline, cloudUploadOutline, sparklesOutline, eyeOutline, eyeOffOutline });
+  }
+
+  loadCollections(): void {
+    if (this.collectionsLoading()) return;
+    this.collectionsLoading.set(true);
+    this.adminApi.listCollections().pipe(takeUntilDestroyed(this._destroyRef)).subscribe({
+      next: items => { this.collections.set(items); this.collectionsLoading.set(false); },
+      error: () => { this.collectionsLoading.set(false); void this._toast('Failed to load collections', 'danger'); },
+    });
+  }
+
+  setStoryCategory(item: AdminPlatformCollectionListItem, value: string): void {
+    if (this.settingCategoryId()) return;
+    const storyCategory: StoryCategory | null = value === '' ? null : (value as StoryCategory);
+    this.settingCategoryId.set(item.id);
+    this.adminApi.setStoryCategory(item.id, storyCategory).pipe(takeUntilDestroyed(this._destroyRef)).subscribe({
+      next: () => {
+        this.settingCategoryId.set(null);
+        this.collections.update(list =>
+          list.map(c => c.id === item.id ? { ...c, storyCategory } : c),
+        );
+      },
+      error: () => {
+        this.settingCategoryId.set(null);
+        void this._toast('Failed to update story category', 'danger');
+      },
+    });
+  }
+
+  togglePublish(item: AdminPlatformCollectionListItem): void {
+    if (this.togglingId()) return;
+    this.togglingId.set(item.id);
+    const next = !item.isPublished;
+    this.adminApi.setPublished(item.id, next).pipe(takeUntilDestroyed(this._destroyRef)).subscribe({
+      next: () => {
+        this.togglingId.set(null);
+        this.collections.update(list => list.map(c => c.id === item.id ? { ...c, isPublished: next } : c));
+        void this._toast(`"${item.title}" ${next ? 'published' : 'unpublished'}`, 'success');
+      },
+      error: () => { this.togglingId.set(null); void this._toast('Toggle failed', 'danger'); },
+    });
+  }
+
+  switchTab(tab: 'collection' | 'json' | 'story' | 'manage'): void {
+    this.activeTab.set(tab);
+    if (tab === 'manage' && !this.collections().length) this.loadCollections();
   }
 
   importCollection(): void {
@@ -157,7 +215,7 @@ OUTPUT — valid JSON ONLY, no markdown fences, no commentary:
       topic: v.topic!.trim(),
       emoji: v.emoji?.trim() || undefined,
       words,
-    }).subscribe({
+    }).pipe(takeUntilDestroyed(this._destroyRef)).subscribe({
       next: result => {
         this.importing.set(false);
         this.lastCollectionResult.set(result);
@@ -186,7 +244,7 @@ OUTPUT — valid JSON ONLY, no markdown fences, no commentary:
     this.importingStory.set(true);
     this.lastStoryResult.set(null);
 
-    this.adminApi.importStory({ platformCollectionId: v.platformCollectionId!.trim(), story, isFiction: v.isFiction ?? true }).subscribe({
+    this.adminApi.importStory({ platformCollectionId: v.platformCollectionId!.trim(), story, isFiction: v.isFiction ?? true }).pipe(takeUntilDestroyed(this._destroyRef)).subscribe({
       next: result => {
         this.importingStory.set(false);
         this.lastStoryResult.set(result);
@@ -222,7 +280,7 @@ OUTPUT — valid JSON ONLY, no markdown fences, no commentary:
       topic: v.topic!.trim() as AdminImportCollectionJsonDto['topic'],
       emoji: v.emoji?.trim() || undefined,
       words,
-    }).subscribe({
+    }).pipe(takeUntilDestroyed(this._destroyRef)).subscribe({
       next: result => {
         this.importingJson.set(false);
         this.lastJsonResult.set(result);

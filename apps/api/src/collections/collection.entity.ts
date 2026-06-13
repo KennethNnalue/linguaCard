@@ -49,6 +49,19 @@ export class CollectionEntity {
   @Column({ type: 'varchar', nullable: true, default: null })
   sourceImageDescription!: string | null;
 
+  /** Set when this collection was adopted from a platform collection (LC-405). */
+  @Index('idx_collections_sourcePlatformCollectionId')
+  @Column({ type: 'varchar', nullable: true, default: null })
+  sourcePlatformCollectionId!: string | null;
+
+  /** CEFR level carried from the source platform collection; null for hand-authored sets (LC-405). */
+  @Column({ type: 'varchar', length: 4, nullable: true, default: null })
+  level!: string | null;
+
+  /** Topic carried from the source platform collection; null for hand-authored sets (LC-405). */
+  @Column({ type: 'varchar', length: 80, nullable: true, default: null })
+  topic!: string | null;
+
   @CreateDateColumn()
   createdAt!: Date;
 

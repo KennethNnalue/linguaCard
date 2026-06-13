@@ -248,6 +248,169 @@
   }
 }
 
+// ─── Manage collections tab ───────────────────────────────────────────────────
+
+.adm-manage {
+  display: flex;
+  flex-direction: column;
+  gap: t.$lc-space-2;
+}
+
+.adm-manage-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: t.$lc-space-1;
+}
+
+.adm-manage-count {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--lc-text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.adm-refresh-btn {
+  font-size: 12px;
+  font-weight: 600;
+  font-family: var(--lc-font-body);
+  color: var(--lc-brand);
+  background: var(--lc-brand-light);
+  border: none;
+  border-radius: t.$lc-radius-sm;
+  padding: 5px t.$lc-space-3;
+  cursor: pointer;
+
+  &:disabled { opacity: 0.5; cursor: not-allowed; }
+}
+
+.adm-manage-empty {
+  font-size: 13px;
+  color: var(--lc-text-hint);
+  text-align: center;
+  padding: t.$lc-space-6;
+}
+
+.adm-coll-row {
+  display: flex;
+  align-items: center;
+  gap: t.$lc-space-3;
+  background: var(--lc-card);
+  border: 1px solid var(--lc-border);
+  border-radius: t.$lc-radius-md;
+  padding: t.$lc-space-3;
+  position: relative;
+  overflow: hidden;
+
+  &::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    width: 3px;
+    background: var(--lc-text-hint);
+  }
+
+  &--published::before { background: var(--lc-brand); }
+}
+
+.adm-coll-emoji {
+  font-size: 22px;
+  flex-shrink: 0;
+  width: 36px;
+  text-align: center;
+}
+
+.adm-coll-body { flex: 1; min-width: 0; }
+
+.adm-coll-title {
+  font-size: 13px;
+  font-weight: 600;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.adm-coll-meta {
+  display: flex;
+  align-items: center;
+  gap: t.$lc-space-2;
+  margin-top: 3px;
+  font-size: 11px;
+  color: var(--lc-text-secondary);
+  flex-wrap: wrap;
+}
+
+.adm-lvl-badge {
+  font-size: 9px;
+  font-weight: 700;
+  background: var(--lc-brand-light);
+  color: var(--lc-brand);
+  padding: 1px 6px;
+  border-radius: 8px;
+}
+
+.adm-coll-id {
+  font-family: monospace;
+  font-size: 10px;
+  color: var(--lc-text-hint);
+}
+
+.adm-coll-cat-row {
+  display: flex;
+  align-items: center;
+  gap: t.$lc-space-2;
+  margin-top: t.$lc-space-2;
+}
+
+.adm-coll-cat-lbl {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--lc-text-secondary);
+  flex-shrink: 0;
+}
+
+.adm-cat-select {
+  font-family: var(--lc-font-body);
+  font-size: 11px;
+  color: var(--lc-text-primary);
+  background: var(--lc-surface-2, var(--lc-brand-light));
+  border: 1px solid var(--lc-border);
+  border-radius: 6px;
+  padding: 3px 6px;
+  flex: 1;
+  min-width: 0;
+
+  &:disabled { opacity: 0.5; }
+}
+
+.adm-publish-btn {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  flex-shrink: 0;
+  font-size: 11px;
+  font-weight: 700;
+  font-family: var(--lc-font-body);
+  border: none;
+  border-radius: t.$lc-radius-sm;
+  padding: 6px t.$lc-space-2;
+  cursor: pointer;
+  background: var(--lc-brand-light);
+  color: var(--lc-text-secondary);
+
+  &--live {
+    background: var(--lc-brand);
+    color: white;
+  }
+
+  &:disabled { opacity: 0.5; cursor: not-allowed; }
+
+  ion-icon { font-size: 14px; }
+}
+
 // ─── Submit button ────────────────────────────────────────────────────────────
 
 .adm-submit-btn {

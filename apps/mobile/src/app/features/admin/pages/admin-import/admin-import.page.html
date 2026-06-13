@@ -18,20 +18,26 @@
       <button
         class="adm-tab"
         [class.adm-tab--active]="activeTab() === 'collection'"
-        (click)="activeTab.set('collection')">
+        (click)="switchTab('collection')">
         Word List
       </button>
       <button
         class="adm-tab"
         [class.adm-tab--active]="activeTab() === 'json'"
-        (click)="activeTab.set('json')">
+        (click)="switchTab('json')">
         JSON Import
       </button>
       <button
         class="adm-tab"
         [class.adm-tab--active]="activeTab() === 'story'"
-        (click)="activeTab.set('story')">
+        (click)="switchTab('story')">
         Story
+      </button>
+      <button
+        class="adm-tab"
+        [class.adm-tab--active]="activeTab() === 'manage'"
+        (click)="switchTab('manage')">
+        Collections
       </button>
     </div>
 
@@ -233,6 +239,66 @@
         </button>
 
       </form>
+    }
+
+    <!-- ─── MANAGE COLLECTIONS ──────────────────────────────────────────── -->
+    @if (activeTab() === 'manage') {
+      <div class="adm-manage">
+
+        <div class="adm-manage-header">
+          <span class="adm-manage-count">{{ collections().length }} collections</span>
+          <button class="adm-refresh-btn" (click)="loadCollections()" [disabled]="collectionsLoading()">
+            @if (collectionsLoading()) { Loading… } @else { Refresh }
+          </button>
+        </div>
+
+        @if (collectionsLoading() && !collections().length) {
+          <div class="adm-manage-empty">Loading…</div>
+        }
+
+        @for (item of collections(); track item.id) {
+          <div class="adm-coll-row" [class.adm-coll-row--published]="item.isPublished">
+            <div class="adm-coll-emoji">{{ item.emoji ?? '📚' }}</div>
+            <div class="adm-coll-body">
+              <div class="adm-coll-title">{{ item.title }}</div>
+              <div class="adm-coll-meta">
+                <span class="adm-lvl-badge">{{ item.level }}</span>
+                <span>{{ item.wordCount }} words</span>
+                <span>{{ item.dictionaryLinked }} linked</span>
+                <span class="adm-coll-id">{{ item.id.slice(0, 8) }}</span>
+              </div>
+              <!-- Story category pairing (LC-414) -->
+              <div class="adm-coll-cat-row">
+                <span class="adm-coll-cat-lbl">Story:</span>
+                <select
+                  class="adm-cat-select"
+                  [value]="item.storyCategory ?? ''"
+                  [disabled]="settingCategoryId() === item.id"
+                  (change)="setStoryCategory(item, $any($event.target).value)">
+                  <option value="">None</option>
+                  @for (cat of storyCategories; track cat.value) {
+                    <option [value]="cat.value">{{ cat.icon }} {{ cat.label }}</option>
+                  }
+                </select>
+              </div>
+            </div>
+            <button
+              class="adm-publish-btn"
+              [class.adm-publish-btn--live]="item.isPublished"
+              [disabled]="togglingId() === item.id"
+              (click)="togglePublish(item)"
+              [attr.aria-label]="item.isPublished ? 'Unpublish' : 'Publish'">
+              <ion-icon [name]="item.isPublished ? 'eye-outline' : 'eye-off-outline'"></ion-icon>
+              {{ item.isPublished ? 'Live' : 'Draft' }}
+            </button>
+          </div>
+        }
+
+        @if (!collectionsLoading() && !collections().length) {
+          <div class="adm-manage-empty">No collections yet. Import one first.</div>
+        }
+
+      </div>
     }
 
   </div>

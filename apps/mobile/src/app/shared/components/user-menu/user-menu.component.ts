@@ -4,6 +4,7 @@ import { IonIcon, IonToggle } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
 import {
   chevronForwardOutline,
+  cloudUploadOutline,
   logOutOutline,
   moonOutline,
   notificationsOutline,
@@ -33,7 +34,7 @@ export class UserMenuComponent {
   @Output() resetRequested = new EventEmitter<void>();
 
   constructor() {
-    addIcons({ moonOutline, syncOutline, trashOutline, logOutOutline, chevronForwardOutline, trophyOutline, notificationsOutline });
+    addIcons({ moonOutline, syncOutline, trashOutline, logOutOutline, chevronForwardOutline, trophyOutline, notificationsOutline, cloudUploadOutline });
   }
 
   get syncLabel(): string {

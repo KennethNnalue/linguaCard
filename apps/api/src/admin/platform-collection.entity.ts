@@ -27,6 +27,10 @@ export class PlatformCollectionEntity {
   @Column({ default: 0 })
   wordCount!: number;
 
+  /** Admin-set story category used to deterministically match related platform stories (LC-414). */
+  @Column({ type: 'varchar', length: 40, nullable: true, default: null })
+  storyCategory!: string | null;
+
   @CreateDateColumn()
   createdAt!: Date;
 }
