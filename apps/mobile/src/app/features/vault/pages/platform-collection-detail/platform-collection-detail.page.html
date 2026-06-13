@@ -1,0 +1,172 @@
+<ion-header class="ion-no-border">
+  <ion-toolbar>
+    <div class="pcd-nav">
+      <button class="lc-back-btn" (click)="goBack()" aria-label="Back">
+        <ion-icon name="chevron-back-outline"></ion-icon>
+      </button>
+      <span class="pcd-nav-crumb">Explore</span>
+      <div style="width:30px;"></div>
+    </div>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+
+  @if (isLoading() && !detail()) {
+    <!-- Loading skeleton -->
+    <div class="pcd-skeleton">
+      <div class="pcd-skel-hero"></div>
+      <div class="pcd-skel-banner"></div>
+      @for (i of [1, 2, 3]; track i) {
+        <div class="pcd-skel-word"></div>
+      }
+    </div>
+  }
+
+  @if (detail(); as d) {
+
+    <!-- Hero -->
+    <div class="pcd-hero">
+      <div class="pcd-emoji">{{ d.emoji ?? '📚' }}</div>
+      <div>
+        <h1 class="pcd-title lc-display">{{ d.title }}</h1>
+        <div class="pcd-meta">
+          <span class="pcd-lvl-pill pcd-lvl-{{ d.level.toLowerCase() }}">{{ d.level }}</span>
+          <span>{{ d.wordCount }} words · with audio</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Progress banner -->
+    @if (d.adoptionStatus !== 'adopted') {
+      <div class="pcd-prog-banner">
+        <div class="pcd-bigring" [style]="ringStyle(d.knownCount, d.wordCount)">
+          <div class="pcd-bigring-inner">{{ d.knownCount }}/{{ d.wordCount }}</div>
+        </div>
+        <div class="pcd-prog-txt">
+          @if (d.knownCount > 0) {
+            You already know <b>{{ d.knownCount }} of {{ d.wordCount }}</b> words here.<br>
+            Getting this set adds <b>{{ newCount() }} new cards</b> — instantly.
+          } @else {
+            <b>{{ d.wordCount }} words</b> · all new for you.
+          }
+        </div>
+      </div>
+    } @else {
+      <div class="pcd-adopted-banner">
+        <span>✓</span>
+        <span>In your sets · {{ d.knownCount }} of {{ d.wordCount }} words known</span>
+      </div>
+    }
+
+    <!-- Words: New here -->
+    @if (newWords().length > 0) {
+      <div class="pcd-grp-hd">
+        New here <span class="pcd-grp-n">{{ newCount() }}</span>
+      </div>
+      @for (w of newWords(); track w.dictionaryWordId) {
+        <div class="pcd-word-row">
+          @if (w.article) {
+            <span class="pcd-art pcd-art-{{ w.article }}">{{ w.article }}</span>
+          } @else {
+            <span class="pcd-art-spacer"></span>
+          }
+          <div class="pcd-word-body">
+            <div class="pcd-word-de">{{ w.displayText }}</div>
+            <div class="pcd-word-en">{{ w.translation }}</div>
+            @if (w.exampleTarget) {
+              <div class="pcd-word-example">{{ w.exampleTarget }}</div>
+            }
+          </div>
+          <div class="pcd-spk">
+            <ion-icon name="volume-high-outline"></ion-icon>
+          </div>
+        </div>
+      }
+    }
+
+    <!-- Words: Already yours -->
+    @if (knownWords().length > 0) {
+      <div class="pcd-grp-hd pcd-grp-hd--known">
+        Already yours <span class="pcd-grp-n pcd-grp-n--known">{{ knownCount() }}</span>
+        <span class="pcd-grp-tap">&nbsp;· tap to {{ alreadyKnownExpanded() ? 'collapse' : 'expand' }}</span>
+        <button class="pcd-expand-btn" (click)="alreadyKnownExpanded.set(!alreadyKnownExpanded())">
+          {{ alreadyKnownExpanded() ? '▲' : '▼' }}
+        </button>
+      </div>
+      @if (alreadyKnownExpanded()) {
+        @for (w of knownWords(); track w.dictionaryWordId) {
+          <div class="pcd-word-row pcd-word-row--known">
+            @if (w.article) {
+              <span class="pcd-art pcd-art-{{ w.article }}">{{ w.article }}</span>
+            } @else {
+              <span class="pcd-art-spacer"></span>
+            }
+            <div class="pcd-word-body">
+              <div class="pcd-word-de">{{ w.displayText }}</div>
+              <div class="pcd-word-en">{{ w.translation }}</div>
+            </div>
+            <span class="pcd-known-chip">✓ YOURS</span>
+          </div>
+        }
+      }
+    }
+
+    <!-- Related stories shelf -->
+    @if (d.relatedStories.length > 0) {
+      <div class="pcd-shelf-hd">
+        <span class="pcd-shelf-icon">📖</span>
+        <span class="pcd-shelf-name">Stories with these words</span>
+      </div>
+      <div class="pcd-stories-shelf">
+        @for (story of d.relatedStories; track story.id) {
+          <div class="pcd-story-card" (click)="openStory(story.id)">
+            <div class="pcd-story-cover">
+              <span class="pcd-story-lvl">{{ story.level }}</span>
+              <span class="pcd-story-em">📖</span>
+            </div>
+            <div class="pcd-story-body">
+              <div class="pcd-story-title">{{ story.title }}</div>
+              <div class="pcd-story-meta">~{{ story.estimatedReadMinutes }} min</div>
+            </div>
+          </div>
+        }
+      </div>
+    }
+
+  }
+
+</ion-content>
+
+<ion-footer class="ion-no-border">
+  @if (detail(); as d) {
+    <div class="pcd-footer">
+      @if (d.adoptionStatus === 'adopted') {
+        <button
+          class="pcd-btn-primary"
+          (click)="openAdoptedCollection(d.adoptedCollectionId!)">
+          Open in My Sets
+        </button>
+      } @else {
+        <button
+          class="pcd-btn-primary"
+          [disabled]="adoptingId() === d.id"
+          (click)="adoptCollection()">
+          @if (adoptingId() === d.id) {
+            Adding…
+          } @else if (newCount() > 0) {
+            + Get {{ newCount() }} new words
+          } @else {
+            + Get words
+          }
+        </button>
+      }
+      <button class="pcd-btn-secondary" (click)="generateStory()">
+        Generate a story from this set
+      </button>
+      @if (d.adoptionStatus !== 'adopted') {
+        <p class="pcd-footer-note">Instant — no waiting, audio included</p>
+      }
+    </div>
+  }
+</ion-footer>
