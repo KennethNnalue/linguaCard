@@ -1,10 +1,11 @@
-import { ChangeDetectionStrategy, Component, computed, inject } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, effect, inject } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { IonContent, IonHeader, IonToolbar, ModalController, ViewWillEnter } from '@ionic/angular/standalone';
 import { Card, PlayMode } from '@lingua-card/shared/domain';
 import { CategoryStore } from '../../../vault/store/category.store';
 import { CollectionStore } from '../../../vault/store/collection.store';
 import { ListenStore } from '../../store/listen.store';
+import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { ArticleBadgeComponent } from '../../../../shared/components/article-badge/article-badge.component';
 import { WordAudioService } from '../../../../shared/audio/word-audio.service';
 import { PlaylistSourceSheetComponent } from '../../components/playlist-source-sheet/playlist-source-sheet.component';
@@ -14,13 +15,14 @@ import {
   PLAYLIST_SOURCE_SHEET_CSS_CLASS,
   PlaybackSpeed,
 } from '../../models/listen.models';
+import { patchState } from '@ngrx/signals';
 
 @Component({
   selector: 'lc-listen',
   templateUrl: './listen.component.html',
   styleUrl: './listen.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [IonContent, IonHeader, IonToolbar, ArticleBadgeComponent],
+  imports: [IonContent, IonHeader, IonToolbar, ArticleBadgeComponent, TranslatePipe],
 })
 export class ListenComponent implements ViewWillEnter {
   protected readonly listenStore = inject(ListenStore);
@@ -30,11 +32,27 @@ export class ListenComponent implements ViewWillEnter {
   private readonly router = inject(Router);
   private readonly route = inject(ActivatedRoute);
   private readonly wordAudio = inject(WordAudioService);
+  private readonly translate = inject(TranslateService);
 
   readonly MODES = PLAY_MODE_OPTIONS;
   readonly SPEEDS = LISTEN_SPEEDS_EXTENDED;
 
   readonly queueCount = computed(() => this.listenStore.queue().length);
+
+  constructor() {
+    // Fix any untranslated collection labels from restored sessions
+    effect(() => {
+      const sourceLabel = this.listenStore.sourceLabel();
+      if (sourceLabel?.startsWith('Collection:') && !sourceLabel.includes(this.translate.instant('listen.card.collectionPrefix'))) {
+        // This is an old-style untranslated label, update it
+        const collectionName = sourceLabel.substring('Collection:'.length).trim();
+        const prefix = this.translate.instant('listen.card.collectionPrefix');
+        const newLabel = `${prefix} ${collectionName}`;
+        // Directly patch the store state to update the label
+        patchState(this.listenStore, { sourceLabel: newLabel });
+      }
+    });
+  }
 
   getCategoryLabel(card: Card): string {
     return this.categoryStore.categories().find(c => card.categoryIds.includes(c.id))?.name ?? '';
@@ -47,7 +65,9 @@ export class ListenComponent implements ViewWillEnter {
       const colName = params.get('collectionName')
         ?? this.collectionStore.collections().find(c => c.id === collectionId)?.name
         ?? 'Collection';
-      this.listenStore.loadCollectionCards(collectionId, colName);
+      const prefix = this.translate.instant('listen.card.collectionPrefix');
+      const label = `${prefix} ${colName}`;
+      this.listenStore.loadCollectionCards(collectionId, label);
       this.router.navigate([], { replaceUrl: true, queryParams: {} });
     }
   }
