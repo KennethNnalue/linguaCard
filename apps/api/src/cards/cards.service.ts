@@ -133,15 +133,33 @@ export class CardsService {
 
     const entityMap = new Map(entities.map(e => [e.id, e]));
 
-    for (const rating of ratings) {
+    // Apply in chronological order so a batch carrying several reviews of the
+    // same card replays them as they happened.
+    const ordered = [...ratings].sort((a, b) => a.reviewedAt.localeCompare(b.reviewedAt));
+
+    for (const rating of ordered) {
       const entity = entityMap.get(rating.cardId);
       if (!entity) continue;
       if (rating.rating < 1 || rating.rating > 4) {
         this.logger.warn(`batchRateSrs: skipping card ${rating.cardId} — invalid rating ${rating.rating}`);
         continue;
       }
+
+      // Last-write-wins by review time: ignore a rating that is not newer than
+      // the card's last recorded review. This stops a stale offline rating
+      // (flushed late) from clobbering a newer review made on another device,
+      // and makes re-flushed ratings idempotent.
+      const lastReviewedAt = entity.srsState?.lastReviewedAt;
+      if (lastReviewedAt && rating.reviewedAt <= lastReviewedAt) {
+        this.logger.debug(
+          `batchRateSrs: skipping stale rating for card ${rating.cardId} ` +
+          `(reviewedAt ${rating.reviewedAt} <= last ${lastReviewedAt})`,
+        );
+        continue;
+      }
+
       const existing = entity.srsState ?? freshFsrsState(entity.id, userId, randomUUID);
-      entity.srsState = computeFSRS(existing, rating.rating as ConfidenceRating);
+      entity.srsState = computeFSRS(existing, rating.rating as ConfidenceRating, new Date(rating.reviewedAt));
     }
 
     await this.repo.save([...entityMap.values()]);

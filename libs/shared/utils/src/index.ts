@@ -72,11 +72,17 @@ function toFsrsCard(state: SRSStateData): FsrsCard {
 
 // ─── FSRS ALGORITHM ───────────────────────────────────────────────────────────
 
-export function computeFSRS(state: SRSStateData, rating: ConfidenceRating): SRSStateData {
+export function computeFSRS(
+  state: SRSStateData,
+  rating: ConfidenceRating,
+  // The moment the review actually happened. Defaults to now for online
+  // reviews; offline reviews flushed later pass their original `reviewedAt`
+  // so the schedule is anchored to when the card was actually rated.
+  reviewedAt: Date = new Date(),
+): SRSStateData {
   if (rating < 1 || rating > 4) throw new Error(`computeFSRS: invalid rating ${rating} — must be 1–4`);
   const fsrsCard = toFsrsCard(state);
-  const now = new Date();
-  const result = scheduler.next(fsrsCard, now, rating as Grade);
+  const result = scheduler.next(fsrsCard, reviewedAt, rating as Grade);
   const next = result.card;
 
   const intervalDays = Math.min(next.scheduled_days, MAX_INTERVAL_DAYS);
@@ -91,8 +97,8 @@ export function computeFSRS(state: SRSStateData, rating: ConfidenceRating): SRSS
     ...state,
     algorithm: 'fsrs',
     intervalDays,
-    nextDueAt: new Date(Date.now() + intervalDays * 86_400_000).toISOString(),
-    lastReviewedAt: now.toISOString(),
+    nextDueAt: new Date(reviewedAt.getTime() + intervalDays * 86_400_000).toISOString(),
+    lastReviewedAt: reviewedAt.toISOString(),
     lastRating: rating,
     stability,
     difficulty,
