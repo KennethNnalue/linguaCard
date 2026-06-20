@@ -1,6 +1,7 @@
 import { Component, computed, EnvironmentInjector, inject, signal } from '@angular/core';
 import { NavigationEnd, Router } from '@angular/router';
 import { IonIcon, IonLabel, IonTabBar, IonTabButton, IonTabs } from '@ionic/angular/standalone';
+import { TranslatePipe } from '@ngx-translate/core';
 import { addIcons } from 'ionicons';
 import {
   analyticsOutline,
@@ -23,7 +24,7 @@ const HIDE_TAB_BAR_ROUTES = [
   selector: 'lc-tabs',
   templateUrl: 'tabs.page.html',
   styleUrls: ['tabs.page.scss'],
-  imports: [IonTabs, IonTabBar, IonTabButton, IonIcon, IonLabel],
+  imports: [IonTabs, IonTabBar, IonTabButton, IonIcon, IonLabel, TranslatePipe],
 })
 export class TabsPage {
   public environmentInjector = inject(EnvironmentInjector);

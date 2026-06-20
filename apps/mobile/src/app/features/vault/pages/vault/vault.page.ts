@@ -11,9 +11,11 @@ import {
 } from '@ionic/angular/standalone';
 import {addIcons} from 'ionicons';
 import {addOutline, calendarOutline, cameraOutline, chevronDownOutline, cloudUploadOutline, documentTextOutline, ellipsisVerticalOutline, folderOpenOutline, funnelOutline, starOutline, textOutline, timeOutline} from 'ionicons/icons';
+import {TranslateService, TranslatePipe} from '@ngx-translate/core';
 import {Card, Collection} from '@lingua-card/shared/domain';
 import {CardStore} from '../../store/card.store';
 import {SyncService} from '../../../../core/services/sync.service';
+import {LanguageService} from '../../../../core/services/language.service';
 import {CategoryStore} from '../../store/category.store';
 import {getCategoryName} from '../../../../shared/helpers/helpers';
 import {AddWordSheetComponent} from '../../components/add-word-sheet/add-word-sheet.component';
@@ -42,6 +44,7 @@ type VaultSortMode = 'newest' | 'alphabetical' | 'mastery' | 'due-date';
     IonRefresherContent,
     WordCardComponent,
     SpeedDialFabComponent,
+    TranslatePipe,
   ],
 })
 export class VaultPage {
@@ -53,6 +56,8 @@ export class VaultPage {
   private readonly bottomSheet = inject(BottomSheetService);
   private readonly wordAudio = inject(WordAudioService);
   private readonly router = inject(Router);
+  private readonly translate = inject(TranslateService);
+  private readonly languageService = inject(LanguageService);
 
   readonly activeTab = signal<'words' | 'collections'>('words');
   readonly masteryFilter = signal<VaultMasteryFilter>('all');
@@ -72,13 +77,14 @@ export class VaultPage {
   readonly categories = this.categoryStore.categories;
 
   readonly sortLabel = computed(() => {
-    const labels: Record<VaultSortMode, string> = {
-      newest: 'Newest',
-      alphabetical: 'A–Z',
-      mastery: 'Mastery',
-      'due-date': 'Due date',
+    this.languageService.current(); // recompute on UI language change
+    const keys: Record<VaultSortMode, string> = {
+      newest: 'vault.sort.newestFirst',
+      alphabetical: 'vault.sort.alphabetical',
+      mastery: 'vault.sort.masteryLowest',
+      'due-date': 'vault.sort.dueDate',
     };
-    return labels[this.sortMode()];
+    return this.translate.instant(keys[this.sortMode()]);
   });
 
   private readonly sortedCards = computed(() => {
@@ -140,12 +146,12 @@ export class VaultPage {
   }
 
   async openSortSheet(): Promise<void> {
-    await this.bottomSheet.open('Sort by', [
-      {label: 'Newest first', icon: 'time-outline', handler: () => this.sortMode.set('newest')},
-      {label: 'A–Z (alphabetical)', icon: 'text-outline', handler: () => this.sortMode.set('alphabetical')},
-      {label: 'Mastery (lowest first)', icon: 'star-outline', handler: () => this.sortMode.set('mastery')},
-      {label: 'Due date', icon: 'calendar-outline', handler: () => this.sortMode.set('due-date')},
-      {label: 'Cancel', role: 'cancel'},
+    await this.bottomSheet.open(this.translate.instant('vault.sort.title'), [
+      {label: this.translate.instant('vault.sort.newestFirst'), icon: 'time-outline', handler: () => this.sortMode.set('newest')},
+      {label: this.translate.instant('vault.sort.alphabetical'), icon: 'text-outline', handler: () => this.sortMode.set('alphabetical')},
+      {label: this.translate.instant('vault.sort.masteryLowest'), icon: 'star-outline', handler: () => this.sortMode.set('mastery')},
+      {label: this.translate.instant('vault.sort.dueDate'), icon: 'calendar-outline', handler: () => this.sortMode.set('due-date')},
+      {label: this.translate.instant('common.cancel'), role: 'cancel'},
     ]);
   }
 
@@ -180,10 +186,10 @@ export class VaultPage {
   }
 
   private async _promptImportAfterCreate(collectionId: string): Promise<void> {
-    await this.bottomSheet.open('Add words to your collection?', [
-      {label: 'Import words', icon: 'cloud-upload-outline', handler: () => this.openImportSheet()},
-      {label: 'Go to collection', icon: 'folder-open-outline', handler: () => this.router.navigate(['/vault/collections', collectionId])},
-      {label: 'Maybe later', role: 'cancel'},
+    await this.bottomSheet.open(this.translate.instant('vault.afterCreate.title'), [
+      {label: this.translate.instant('vault.afterCreate.importOption'), icon: 'cloud-upload-outline', handler: () => this.openImportSheet()},
+      {label: this.translate.instant('vault.afterCreate.goToOption'), icon: 'folder-open-outline', handler: () => this.router.navigate(['/vault/collections', collectionId])},
+      {label: this.translate.instant('vault.afterCreate.laterOption'), role: 'cancel'},
     ]);
   }
 

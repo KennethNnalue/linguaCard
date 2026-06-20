@@ -105,7 +105,7 @@ export class PlatformStoryReaderPage implements OnInit, OnDestroy, ViewWillLeave
       return {
         display:      keyword.german,
         base:         keyword.germanBase,
-        english:      keyword.english,
+        english:      keyword.translation,
         article:      keyword.article,
         wordType:     keyword.wordType,
         plural:       card?.content?.plural ?? null,

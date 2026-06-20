@@ -43,6 +43,7 @@ export class UserSettingsService {
     if (dto.remindersEnabled !== undefined) patch.remindersEnabled = dto.remindersEnabled;
     if (dto.reminderTime !== undefined)     patch.reminderTime = dto.reminderTime;
     if (dto.timezone !== undefined)         patch.timezone = dto.timezone;
+    if (dto.uiLanguage !== undefined)      patch.uiLanguage = dto.uiLanguage;
     await this.repo.update({ userId }, patch);
     return this.getForUser(userId);
   }
@@ -65,6 +66,7 @@ export class UserSettingsService {
       reminderTime: e.reminderTime,
       timezone: e.timezone,
       goalsSetAt: e.goalsSetAt ? e.goalsSetAt.toISOString() : null,
+      uiLanguage: (e.uiLanguage ?? 'en') as UserSettings['uiLanguage'],
     };
   }
 }

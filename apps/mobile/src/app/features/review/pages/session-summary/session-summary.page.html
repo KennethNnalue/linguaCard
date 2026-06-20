@@ -1,7 +1,7 @@
 <ion-header class="ion-no-border">
   <ion-toolbar>
     <div class="ss-nav">
-      <button class="ss-back-btn" (click)="goToHub()" aria-label="Back to vault">
+      <button class="ss-back-btn" (click)="goToHub()" [attr.aria-label]="'review.summary.backAriaLabel' | translate">
         <ion-icon name="arrow-back-outline"></ion-icon>
       </button>
     </div>
@@ -16,32 +16,32 @@
       <div class="ss-hero-icon">
         <ion-icon name="checkmark-circle-outline"></ion-icon>
       </div>
-      <h1 class="ss-title lc-display">Session Complete!</h1>
+      <h1 class="ss-title lc-display">{{ 'review.summary.title' | translate }}</h1>
       @if (s.collectionName) {
         <p class="ss-collection-name">{{ s.collectionName }}</p>
       }
-      <p class="ss-subtitle">{{ reviewedCount() }} of {{ s.totalCards }} cards reviewed</p>
+      <p class="ss-subtitle">{{ reviewedCount() }} {{ 'common.of' | translate }} {{ s.totalCards }} {{ 'review.summary.cardsReviewedLabel' | translate }}</p>
     </div>
 
     <!-- ── Stats ── -->
     <div class="ss-stats lc-card">
       <div class="ss-stat">
         <span class="ss-stat-val lc-display">{{ reviewedCount() }}</span>
-        <span class="ss-stat-lbl">Reviewed</span>
+        <span class="ss-stat-lbl">{{ 'review.summary.reviewedStat' | translate }}</span>
       </div>
       <div class="ss-stat ss-stat--border">
         <span class="ss-stat-val lc-display">{{ duration() }}</span>
-        <span class="ss-stat-lbl">Duration</span>
+        <span class="ss-stat-lbl">{{ 'review.summary.durationStat' | translate }}</span>
       </div>
       <div class="ss-stat ss-stat--border">
         <span class="ss-stat-val lc-display">{{ averageRating() }}</span>
-        <span class="ss-stat-lbl">Avg Rating</span>
+        <span class="ss-stat-lbl">{{ 'review.summary.avgRatingStat' | translate }}</span>
       </div>
     </div>
 
     <!-- ── Rating breakdown ── -->
     <div class="ss-section">
-      <p class="ss-section-label">Rating breakdown</p>
+      <p class="ss-section-label">{{ 'review.summary.ratingBreakdownSection' | translate }}</p>
       <div class="ss-bars">
         @for (rb of ratingBreakdown(); track rb.value) {
           <div class="ss-bar-row">
@@ -61,7 +61,7 @@
     <!-- ── Reviewed cards ── -->
     @if (reviewedCardRows().length) {
       <div class="ss-section">
-        <p class="ss-section-label">Words reviewed</p>
+        <p class="ss-section-label">{{ 'review.summary.wordsReviewedSection' | translate }}</p>
         <div class="ss-word-list">
           @for (row of reviewedCardRows(); track row.card.id) {
             <lc-word-card
@@ -81,17 +81,17 @@
       @if (hasNonMasteredCards()) {
         <button class="ss-btn-retry" (click)="reviewNonMastered()">
           <ion-icon name="repeat-outline"></ion-icon>
-          Retry struggled cards ({{ nonMasteredCards().length }} {{ nonMasteredCards().length === 1 ? 'card' : 'cards' }})
+          {{ 'review.summary.retryStruggled' | translate }} ({{ nonMasteredCards().length }} {{ nonMasteredCards().length === 1 ? ('common.cards' | translate) : ('common.cards' | translate) }})
         </button>
       }
       @if (allReviewedCards().length) {
         <button class="ss-btn-retry ss-btn-retry--secondary" (click)="reviewAllAgain()">
           <ion-icon name="refresh-outline"></ion-icon>
-          Review all again ({{ allReviewedCards().length }} {{ allReviewedCards().length === 1 ? 'card' : 'cards' }})
+          {{ 'review.summary.reviewAllAgain' | translate }} ({{ allReviewedCards().length }} {{ allReviewedCards().length === 1 ? ('common.cards' | translate) : ('common.cards' | translate) }})
         </button>
       }
       <button class="lc-btn-primary ss-btn-vault" (click)="goToHub()">
-        Back to vault
+        {{ 'review.summary.backToVault' | translate }}
       </button>
     </div>
 

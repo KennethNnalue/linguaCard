@@ -102,12 +102,12 @@ ion-content {
 }
 
 .auth-input-wrap .auth-input {
-  padding-right: 44px;
+  padding-inline-end: 44px;
 }
 
 .auth-eye-btn {
   position: absolute;
-  right: 12px;
+  inset-inline-end: 12px;
   background: none;
   border: none;
   padding: 4px;

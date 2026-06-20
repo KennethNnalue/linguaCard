@@ -564,7 +564,8 @@
     },
     "collection": {
       "label": "إضافة إلى مجموعة",
-      "requiredHint": "*مطلوب"
+      "requiredHint": "*مطلوب",
+      "noSelectionLabel": "بدون مجموعة"
     },
     "words": {
       "label": "الكلمات (اضغط للتحديد / إلغاء التحديد)",

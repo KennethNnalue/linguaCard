@@ -2,6 +2,7 @@ import { Component, inject, signal } from '@angular/core';
 import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
 import { IonContent, IonIcon, IonSpinner, ToastController } from '@ionic/angular/standalone';
+import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { addIcons } from 'ionicons';
 import { alertCircleOutline, eyeOffOutline, eyeOutline, logoGoogle } from 'ionicons/icons';
 import { AuthService } from '../../../../core/services/auth.service';
@@ -11,12 +12,13 @@ import { AuthService } from '../../../../core/services/auth.service';
   templateUrl: './register.page.html',
   styleUrls: ['./register.page.scss'],
   standalone: true,
-  imports: [ReactiveFormsModule, RouterLink, IonContent, IonIcon, IonSpinner],
+  imports: [ReactiveFormsModule, RouterLink, IonContent, IonIcon, IonSpinner, TranslatePipe],
 })
 export class RegisterPage {
   private readonly authService = inject(AuthService);
   private readonly router = inject(Router);
   private readonly toastCtrl = inject(ToastController);
+  private readonly translate = inject(TranslateService);
 
   readonly loading = signal(false);
   readonly errorMessage = signal('');
@@ -47,14 +49,14 @@ export class RegisterPage {
         },
         error: (err: Error) => {
           this.loading.set(false);
-          this.errorMessage.set(err.message ?? 'Registration failed. Please try again.');
+          this.errorMessage.set(err.message ?? this.translate.instant('auth.register.error'));
         },
       });
   }
 
   async signInWithGoogle(): Promise<void> {
     const toast = await this.toastCtrl.create({
-      message: 'Google Sign-In coming soon',
+      message: this.translate.instant('auth.oauth.googleComingSoon'),
       duration: 2000,
       position: 'bottom',
       color: 'medium',

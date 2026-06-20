@@ -8,7 +8,7 @@ export interface PlatformStorySeedItem {
   title: string;
   titleTranslation: string;
   bodyDe: string;
-  bodyEn: string;
+  bodyNative: string;
   sentences: StorySentence[];
   keywords: StoryKeyword[];
   quizQuestions: StoryQuizQuestion[];
@@ -25,17 +25,17 @@ export interface PlatformStorySeedItem {
 
 // ─── HELPER ───────────────────────────────────────────────────────────────────
 
-function s(index: number, german: string, english: string): StorySentence {
-  return { index, german, english, vocabWordIds: [] };
+function s(index: number, german: string, native: string): StorySentence {
+  return { index, german, native, vocabWordIds: [] };
 }
 
 function kw(
-  german: string, germanBase: string, english: string,
+  german: string, germanBase: string, translation: string,
   article: 'der' | 'die' | 'das' | null,
   wordType: StoryKeyword['wordType'],
   level: StoryKeyword['level'],
 ): StoryKeyword {
-  return { cardId: null, german, germanBase, english, article, wordType, level };
+  return { cardId: null, german, germanBase, translation, article, wordType, level };
 }
 
 function qq(
@@ -46,10 +46,10 @@ function qq(
 }
 
 function gn(
-  id: string, title: string, exampleDe: string, exampleEn: string,
-  description: string, additionalExamples: Array<{ de: string; en: string }> = [],
+  id: string, title: string, exampleDe: string, exampleNative: string,
+  description: string, additionalExamples: Array<{ de: string; native: string }> = [],
 ): StoryGrammarNote {
-  return { id, title, exampleDe, exampleEn, description, additionalExamples };
+  return { id, title, exampleDe, exampleNative, description, additionalExamples };
 }
 
 // ─── SEED DATA (20 STORIES) ───────────────────────────────────────────────────
@@ -66,7 +66,7 @@ export const PLATFORM_STORIES_SEED: PlatformStorySeedItem[] = [
     topics: ['city', 'routine', 'sightseeing'],
     coverGradient: 'linear-gradient(135deg,#3B6F60,#8CB5A4)',
     bodyDe: 'Ich wohne in Berlin. Jeden Morgen stehe ich um sieben Uhr auf. Ich trinke Kaffee und esse Brot mit Butter. Dann fahre ich mit der U-Bahn zur Arbeit. Berlin ist eine große Stadt. Es gibt viele Parks und Museen. Am Nachmittag gehe ich oft im Tiergarten spazieren. Abends koche ich zu Hause. Ich mag Berlin sehr.',
-    bodyEn: 'I live in Berlin. Every morning I get up at seven. I drink coffee and eat bread with butter. Then I take the subway to work. Berlin is a big city. There are many parks and museums. In the afternoon I often go for a walk in the Tiergarten. In the evening I cook at home. I like Berlin very much.',
+    bodyNative: 'I live in Berlin. Every morning I get up at seven. I drink coffee and eat bread with butter. Then I take the subway to work. Berlin is a big city. There are many parks and museums. In the afternoon I often go for a walk in the Tiergarten. In the evening I cook at home. I like Berlin very much.',
     sentences: [
       s(0,'Ich wohne in Berlin.','I live in Berlin.'),
       s(1,'Jeden Morgen stehe ich um sieben Uhr auf.','Every morning I get up at seven.'),
@@ -99,12 +99,12 @@ export const PLATFORM_STORIES_SEED: PlatformStorySeedItem[] = [
         'Jeden Morgen stehe ich um sieben Uhr auf.',
         'Every morning I get up at seven.',
         'Separable verbs split in the present tense: the prefix goes to the end of the clause. "aufstehen" → "ich stehe … auf".',
-        [{ de: 'Er steht spät auf.', en: 'He gets up late.' }]),
+        [{ de: 'Er steht spät auf.', native: 'He gets up late.' }]),
       gn('ps-a1-d1-g2','Dative with "mit"',
         'Ich fahre mit der U-Bahn.',
         'I travel by subway.',
         '"mit" (with / by means of) always takes the dative case. "die U-Bahn" becomes "der U-Bahn" in dative.',
-        [{ de: 'Sie fährt mit dem Bus.', en: 'She travels by bus.' }]),
+        [{ de: 'Sie fährt mit dem Bus.', native: 'She travels by bus.' }]),
     ],
   },
 
@@ -118,7 +118,7 @@ export const PLATFORM_STORIES_SEED: PlatformStorySeedItem[] = [
     topics: ['café', 'ordering', 'food'],
     coverGradient: 'linear-gradient(135deg,#8B4513,#D4A96A)',
     bodyDe: 'Lena geht ins Café. Sie setzt sich an einen Tisch. Der Kellner kommt. "Was möchten Sie?" fragt er. "Einen Kaffee und ein Stück Kuchen, bitte," sagt Lena. "Welchen Kuchen möchten Sie? Wir haben Apfelkuchen und Schokoladenkuchen." "Apfelkuchen, bitte," antwortet Lena. Der Kellner bringt den Kaffee und den Kuchen. Lena trinkt den Kaffee und isst den Kuchen. Er schmeckt sehr gut. Sie bezahlt und geht.',
-    bodyEn: 'Lena goes to the café. She sits down at a table. The waiter comes. "What would you like?" he asks. "A coffee and a piece of cake, please," says Lena. "Which cake would you like? We have apple cake and chocolate cake." "Apple cake, please," Lena replies. The waiter brings the coffee and the cake. Lena drinks the coffee and eats the cake. It tastes very good. She pays and leaves.',
+    bodyNative: 'Lena goes to the café. She sits down at a table. The waiter comes. "What would you like?" he asks. "A coffee and a piece of cake, please," says Lena. "Which cake would you like? We have apple cake and chocolate cake." "Apple cake, please," Lena replies. The waiter brings the coffee and the cake. Lena drinks the coffee and eats the cake. It tastes very good. She pays and leaves.',
     sentences: [
       s(0,'Lena geht ins Café.','Lena goes to the café.'),
       s(1,'Sie setzt sich an einen Tisch.','She sits down at a table.'),
@@ -154,7 +154,7 @@ export const PLATFORM_STORIES_SEED: PlatformStorySeedItem[] = [
         'Einen Kaffee und ein Stück Kuchen, bitte.',
         'A coffee and a piece of cake, please.',
         'After modal verbs like "möchten", the direct object takes the accusative case. Masculine "der Kaffee" → "einen Kaffee".',
-        [{ de: 'Ich möchte einen Tee.', en: 'I would like a tea.' }]),
+        [{ de: 'Ich möchte einen Tee.', native: 'I would like a tea.' }]),
     ],
   },
 
@@ -168,7 +168,7 @@ export const PLATFORM_STORIES_SEED: PlatformStorySeedItem[] = [
     topics: ['animals', 'children', 'friendship'],
     coverGradient: 'linear-gradient(135deg,#5B7FA6,#A8C8E8)',
     bodyDe: 'Max ist ein kleiner Hund. Er ist weiß und braun. Max wohnt bei der Familie Müller. Er hat eine rote Leine. Jeden Tag geht Max mit Anna in den Park. Anna wirft einen Ball. Max läuft und holt den Ball. "Guter Hund!", sagt Anna. Max wedelt mit dem Schwanz. Er ist sehr glücklich.',
-    bodyEn: 'Max is a little dog. He is white and brown. Max lives with the Müller family. He has a red leash. Every day Max goes to the park with Anna. Anna throws a ball. Max runs and fetches the ball. "Good dog!" says Anna. Max wags his tail. He is very happy.',
+    bodyNative: 'Max is a little dog. He is white and brown. Max lives with the Müller family. He has a red leash. Every day Max goes to the park with Anna. Anna throws a ball. Max runs and fetches the ball. "Good dog!" says Anna. Max wags his tail. He is very happy.',
     sentences: [
       s(0,'Max ist ein kleiner Hund.','Max is a little dog.'),
       s(1,'Er ist weiß und braun.','He is white and brown.'),
@@ -202,7 +202,7 @@ export const PLATFORM_STORIES_SEED: PlatformStorySeedItem[] = [
         'Max ist ein kleiner Hund.',
         'Max is a little dog.',
         'Adjectives before nouns need an ending. After "ein" (indefinite article), masculine nominative takes "-er": "ein kleiner Hund".',
-        [{ de: 'Das ist ein großes Haus.', en: 'That is a big house.' }]),
+        [{ de: 'Das ist ein großes Haus.', native: 'That is a big house.' }]),
     ],
   },
 
@@ -216,7 +216,7 @@ export const PLATFORM_STORIES_SEED: PlatformStorySeedItem[] = [
     topics: ['train', 'station', 'tickets'],
     coverGradient: 'linear-gradient(135deg,#3B6F60,#8CB5A4)',
     bodyDe: 'Tom ist am Bahnhof. Er möchte nach München fahren. Er geht zum Schalter. "Einmal nach München, bitte," sagt er. "Einfach oder hin und zurück?" fragt die Frau. "Hin und zurück, bitte." Die Fahrkarte kostet zwanzig Euro. Tom bezahlt und nimmt die Fahrkarte. Sein Zug fährt in zehn Minuten ab. Er geht zu Gleis vier.',
-    bodyEn: 'Tom is at the train station. He wants to travel to Munich. He goes to the counter. "One ticket to Munich, please," he says. "Single or return?" asks the woman. "Return, please." The ticket costs twenty euros. Tom pays and takes the ticket. His train departs in ten minutes. He goes to platform four.',
+    bodyNative: 'Tom is at the train station. He wants to travel to Munich. He goes to the counter. "One ticket to Munich, please," he says. "Single or return?" asks the woman. "Return, please." The ticket costs twenty euros. Tom pays and takes the ticket. His train departs in ten minutes. He goes to platform four.',
     sentences: [
       s(0,'Tom ist am Bahnhof.','Tom is at the train station.'),
       s(1,'Er möchte nach München fahren.','He wants to travel to Munich.'),
@@ -250,7 +250,7 @@ export const PLATFORM_STORIES_SEED: PlatformStorySeedItem[] = [
         'Er möchte nach München fahren.',
         'He wants to travel to Munich.',
         '"möchten" is a modal verb meaning "would like to". The second verb (the action) is an infinitive at the end of the sentence.',
-        [{ de: 'Ich möchte Deutsch lernen.', en: 'I would like to learn German.' }]),
+        [{ de: 'Ich möchte Deutsch lernen.', native: 'I would like to learn German.' }]),
     ],
   },
 
@@ -264,7 +264,7 @@ export const PLATFORM_STORIES_SEED: PlatformStorySeedItem[] = [
     topics: ['office', 'first day', 'colleagues'],
     coverGradient: 'linear-gradient(135deg,#4A3728,#8B6D5A)',
     bodyDe: 'Heute ist mein erster Arbeitstag. Ich bin sehr aufgeregt. Das Büro ist modern und hell. Meine Kollegin Sandra zeigt mir alles. "Das ist die Küche. Dort kannst du Kaffee machen," sagt sie. Ich lerne viele neue Kollegen kennen. Wir haben eine kurze Besprechung um zehn Uhr. Der Chef heißt Herr Weber und ist sehr freundlich. Nach der Arbeit bin ich müde, aber glücklich.',
-    bodyEn: 'Today is my first day at work. I am very excited. The office is modern and bright. My colleague Sandra shows me everything. "That is the kitchen. You can make coffee there," she says. I meet many new colleagues. We have a short meeting at ten. The boss is called Mr Weber and is very friendly. After work I am tired but happy.',
+    bodyNative: 'Today is my first day at work. I am very excited. The office is modern and bright. My colleague Sandra shows me everything. "That is the kitchen. You can make coffee there," she says. I meet many new colleagues. We have a short meeting at ten. The boss is called Mr Weber and is very friendly. After work I am tired but happy.',
     sentences: [
       s(0,'Heute ist mein erster Arbeitstag.','Today is my first day at work.'),
       s(1,'Ich bin sehr aufgeregt.','I am very excited.'),
@@ -297,12 +297,12 @@ export const PLATFORM_STORIES_SEED: PlatformStorySeedItem[] = [
         'Dort kannst du Kaffee machen.',
         'You can make coffee there.',
         '"können" expresses ability or permission. The infinitive ("machen") goes to the end of the clause.',
-        [{ de: 'Er kann gut kochen.', en: 'He can cook well.' }]),
+        [{ de: 'Er kann gut kochen.', native: 'He can cook well.' }]),
       gn('ps-a2-w1-g2','Dative pronoun "mir"',
         'Meine Kollegin zeigt mir alles.',
         'My colleague shows me everything.',
         '"zeigen" takes two objects: a dative person and an accusative thing. "mir" = "me" in the dative case.',
-        [{ de: 'Er gibt mir das Buch.', en: 'He gives me the book.' }]),
+        [{ de: 'Er gibt mir das Buch.', native: 'He gives me the book.' }]),
     ],
   },
 
@@ -316,7 +316,7 @@ export const PLATFORM_STORIES_SEED: PlatformStorySeedItem[] = [
     topics: ['smartphone', 'shopping', 'apps'],
     coverGradient: 'linear-gradient(135deg,#2C3E50,#4CA1AF)',
     bodyDe: 'Julia hat sich ein neues Handy gekauft. Es ist ein Smartphone mit einem großen Bildschirm. Sie lädt zuerst ihre Lieblings-Apps herunter. Mit der Kamera macht sie tolle Fotos. Sie schreibt Nachrichten an ihre Freunde. "Schick mir doch ein Foto!", schreibt ihr Freund Leon. Julia schickt ihm ein Selfie. Der Akku hält fast zwei Tage. Das neue Handy gefällt ihr sehr.',
-    bodyEn: 'Julia has bought herself a new phone. It is a smartphone with a large screen. She first downloads her favourite apps. She takes great photos with the camera. She writes messages to her friends. "Send me a photo!" writes her friend Leon. Julia sends him a selfie. The battery lasts almost two days. She likes the new phone very much.',
+    bodyNative: 'Julia has bought herself a new phone. It is a smartphone with a large screen. She first downloads her favourite apps. She takes great photos with the camera. She writes messages to her friends. "Send me a photo!" writes her friend Leon. Julia sends him a selfie. The battery lasts almost two days. She likes the new phone very much.',
     sentences: [
       s(0,'Julia hat sich ein neues Handy gekauft.','Julia has bought herself a new phone.'),
       s(1,'Es ist ein Smartphone mit einem großen Bildschirm.','It is a smartphone with a large screen.'),
@@ -349,12 +349,12 @@ export const PLATFORM_STORIES_SEED: PlatformStorySeedItem[] = [
         'Julia hat sich ein neues Handy gekauft.',
         'Julia has bought herself a new phone.',
         'Perfekt = "haben/sein" + past participle. For most verbs use "haben". The participle goes to the end: "ge-" + stem + "-t".',
-        [{ de: 'Er hat ein Buch gelesen.', en: 'He has read a book.' }]),
+        [{ de: 'Er hat ein Buch gelesen.', native: 'He has read a book.' }]),
       gn('ps-a2-t1-g2','Dative verb "gefallen"',
         'Das Handy gefällt ihr sehr.',
         'She likes the phone very much.',
         '"gefallen" means "to be pleasing to". The person is in the dative case. Literally: "The phone is pleasing to her."',
-        [{ de: 'Gefällt dir die Stadt?', en: 'Do you like the city?' }]),
+        [{ de: 'Gefällt dir die Stadt?', native: 'Do you like the city?' }]),
     ],
   },
 
@@ -368,7 +368,7 @@ export const PLATFORM_STORIES_SEED: PlatformStorySeedItem[] = [
     topics: ['doctor', 'illness', 'appointment'],
     coverGradient: 'linear-gradient(135deg,#1A6B4A,#5DB485)',
     bodyDe: 'Klaus fühlt sich nicht gut. Er hat Halsschmerzen und Fieber. Er ruft beim Arzt an und macht einen Termin. Am nächsten Tag geht er in die Praxis. Die Sprechstundenhilfe nimmt seine Krankenkassenkarte. "Wie lange haben Sie schon Schmerzen?", fragt der Arzt. "Seit drei Tagen," antwortet Klaus. Der Arzt untersucht ihn und verschreibt ihm ein Antibiotikum. "Trinken Sie viel Wasser und schlafen Sie viel," sagt er.',
-    bodyEn: 'Klaus does not feel well. He has a sore throat and a fever. He calls the doctor and makes an appointment. The next day he goes to the practice. The receptionist takes his health insurance card. "How long have you had the pain?" asks the doctor. "For three days," Klaus replies. The doctor examines him and prescribes an antibiotic. "Drink plenty of water and sleep a lot," he says.',
+    bodyNative: 'Klaus does not feel well. He has a sore throat and a fever. He calls the doctor and makes an appointment. The next day he goes to the practice. The receptionist takes his health insurance card. "How long have you had the pain?" asks the doctor. "For three days," Klaus replies. The doctor examines him and prescribes an antibiotic. "Drink plenty of water and sleep a lot," he says.',
     sentences: [
       s(0,'Klaus fühlt sich nicht gut.','Klaus does not feel well.'),
       s(1,'Er hat Halsschmerzen und Fieber.','He has a sore throat and a fever.'),
@@ -402,13 +402,13 @@ export const PLATFORM_STORIES_SEED: PlatformStorySeedItem[] = [
         'Klaus fühlt sich nicht gut.',
         'Klaus does not feel well.',
         'Some German verbs require a reflexive pronoun. "sich fühlen" = to feel (oneself). The reflexive pronoun matches the subject.',
-        [{ de: 'Ich fühle mich müde.', en: 'I feel tired.' },
-         { de: 'Er fühlt sich krank.', en: 'He feels ill.' }]),
+        [{ de: 'Ich fühle mich müde.', native: 'I feel tired.' },
+         { de: 'Er fühlt sich krank.', native: 'He feels ill.' }]),
       gn('ps-a2-h1-g2','Temporal "seit" + present tense',
         '"Seit drei Tagen," antwortet Klaus.',
         '"For three days," Klaus replies.',
         'German uses "seit" + present tense for ongoing situations (unlike English past tense). "Seit drei Tagen habe ich Schmerzen."',
-        [{ de: 'Ich lerne seit einem Jahr Deutsch.', en: 'I have been learning German for a year.' }]),
+        [{ de: 'Ich lerne seit einem Jahr Deutsch.', native: 'I have been learning German for a year.' }]),
     ],
   },
 
@@ -422,7 +422,7 @@ export const PLATFORM_STORIES_SEED: PlatformStorySeedItem[] = [
     topics: ['mystery', 'discovery', 'adventure'],
     coverGradient: 'linear-gradient(135deg,#2D1B69,#6B3FA0)',
     bodyDe: 'Mia findet in ihrem alten Haus eine Tür, die sie noch nie gesehen hat. Die Tür ist aus dunklem Holz und hat ein goldenes Schloss. Sie sucht überall nach dem Schlüssel. Im Keller findet sie eine alte Holzkiste. Darin liegt ein kleiner goldener Schlüssel. Ihr Herz schlägt schneller. Sie geht zurück zur Tür und steckt den Schlüssel ins Schloss. Die Tür öffnet sich langsam. Dahinter liegt ein wunderschöner Garten.',
-    bodyEn: 'Mia finds a door in her old house that she has never seen before. The door is made of dark wood and has a golden lock. She searches everywhere for the key. In the cellar she finds an old wooden chest. Inside lies a small golden key. Her heart beats faster. She goes back to the door and puts the key in the lock. The door opens slowly. Behind it lies a beautiful garden.',
+    bodyNative: 'Mia finds a door in her old house that she has never seen before. The door is made of dark wood and has a golden lock. She searches everywhere for the key. In the cellar she finds an old wooden chest. Inside lies a small golden key. Her heart beats faster. She goes back to the door and puts the key in the lock. The door opens slowly. Behind it lies a beautiful garden.',
     sentences: [
       s(0,'Mia findet in ihrem alten Haus eine Tür, die sie noch nie gesehen hat.','Mia finds a door in her old house that she has never seen before.'),
       s(1,'Die Tür ist aus dunklem Holz und hat ein goldenes Schloss.','The door is made of dark wood and has a golden lock.'),
@@ -456,7 +456,7 @@ export const PLATFORM_STORIES_SEED: PlatformStorySeedItem[] = [
         'Eine Tür, die sie noch nie gesehen hat.',
         'A door that she has never seen before.',
         'Relative clauses describe nouns. The relative pronoun matches the gender of the noun: "die Tür" → "die". The verb goes to the end of the relative clause.',
-        [{ de: 'Das ist der Mann, der hier wohnt.', en: 'That is the man who lives here.' }]),
+        [{ de: 'Das ist der Mann, der hier wohnt.', native: 'That is the man who lives here.' }]),
     ],
   },
 
@@ -470,7 +470,7 @@ export const PLATFORM_STORIES_SEED: PlatformStorySeedItem[] = [
     topics: ['cinema', 'friends', 'weekend'],
     coverGradient: 'linear-gradient(135deg,#1A1A2E,#E94560)',
     bodyDe: 'Am Freitagabend gehen Tim und seine Freunde ins Kino. Sie wollen einen neuen Actionfilm sehen. Tim kauft die Karten online. Die Karten kosten zwölf Euro pro Person. Im Kino kaufen sie Popcorn und Cola. Der Film beginnt um acht Uhr. Er ist sehr spannend. Am Ende klatschen alle Zuschauer. "Das war der beste Film des Jahres!", sagt Tims Freundin Sara.',
-    bodyEn: 'On Friday evening Tim and his friends go to the cinema. They want to see a new action film. Tim buys the tickets online. The tickets cost twelve euros per person. At the cinema they buy popcorn and cola. The film starts at eight. It is very exciting. At the end all the audience applauds. "That was the best film of the year!" says Tim\'s friend Sara.',
+    bodyNative: 'On Friday evening Tim and his friends go to the cinema. They want to see a new action film. Tim buys the tickets online. The tickets cost twelve euros per person. At the cinema they buy popcorn and cola. The film starts at eight. It is very exciting. At the end all the audience applauds. "That was the best film of the year!" says Tim\'s friend Sara.',
     sentences: [
       s(0,'Am Freitagabend gehen Tim und seine Freunde ins Kino.','On Friday evening Tim and his friends go to the cinema.'),
       s(1,'Sie wollen einen neuen Actionfilm sehen.','They want to see a new action film.'),
@@ -503,7 +503,7 @@ export const PLATFORM_STORIES_SEED: PlatformStorySeedItem[] = [
         'Sie wollen einen neuen Actionfilm sehen.',
         'They want to see a new action film.',
         '"wollen" expresses a strong wish or intention. The infinitive goes to the end. "wollen" conjugates: ich will, du willst, er/sie/es will, wir wollen.',
-        [{ de: 'Ich will Deutsch lernen.', en: 'I want to learn German.' }]),
+        [{ de: 'Ich will Deutsch lernen.', native: 'I want to learn German.' }]),
     ],
   },
 
@@ -517,7 +517,7 @@ export const PLATFORM_STORIES_SEED: PlatformStorySeedItem[] = [
     topics: ['language learning', 'classroom', 'students'],
     coverGradient: 'linear-gradient(135deg,#1565C0,#42A5F5)',
     bodyDe: 'María kommt aus Spanien und lernt Deutsch. Sie besucht einen Kurs an der Volkshochschule. Die Lehrerin heißt Frau Braun. Im Kurs sind zwölf Teilnehmer aus verschiedenen Ländern. Heute üben sie Dialog. María spielt eine Szene im Supermarkt. Sie macht ein paar Fehler, aber die Lehrerin hilft ihr. "Dein Deutsch wird immer besser!", sagt Frau Braun. María freut sich sehr.',
-    bodyEn: 'María comes from Spain and is learning German. She attends a course at the adult education centre. The teacher is called Ms Braun. In the course there are twelve participants from different countries. Today they practise dialogue. María acts out a scene in the supermarket. She makes a few mistakes but the teacher helps her. "Your German is getting better and better!" says Ms Braun. María is very pleased.',
+    bodyNative: 'María comes from Spain and is learning German. She attends a course at the adult education centre. The teacher is called Ms Braun. In the course there are twelve participants from different countries. Today they practise dialogue. María acts out a scene in the supermarket. She makes a few mistakes but the teacher helps her. "Your German is getting better and better!" says Ms Braun. María is very pleased.',
     sentences: [
       s(0,'María kommt aus Spanien und lernt Deutsch.','María comes from Spain and is learning German.'),
       s(1,'Sie besucht einen Kurs an der Volkshochschule.','She attends a course at the adult education centre.'),
@@ -550,12 +550,12 @@ export const PLATFORM_STORIES_SEED: PlatformStorySeedItem[] = [
         'Die Lehrerin hilft ihr.',
         'The teacher helps her.',
         '"helfen" always takes the dative case for the person being helped. "sie" (she/her as nominative) → "ihr" (dative).',
-        [{ de: 'Kannst du mir helfen?', en: 'Can you help me?' }]),
+        [{ de: 'Kannst du mir helfen?', native: 'Can you help me?' }]),
       gn('ps-a2-ed1-g2','Comparative adjectives',
         'Dein Deutsch wird immer besser.',
         'Your German is getting better and better.',
         'Comparative = adjective + "-er": gut → besser (irregular), schnell → schneller. "Immer + comparative" = increasingly.',
-        [{ de: 'Er läuft immer schneller.', en: 'He runs faster and faster.' }]),
+        [{ de: 'Er läuft immer schneller.', native: 'He runs faster and faster.' }]),
     ],
   },
 
@@ -569,7 +569,7 @@ export const PLATFORM_STORIES_SEED: PlatformStorySeedItem[] = [
     topics: ['train', 'europe', 'overnight travel'],
     coverGradient: 'linear-gradient(135deg,#2D5A4E,#6BA08E)',
     bodyDe: 'Nachtzüge erleben in Europa eine Renaissance. Immer mehr Reisende entscheiden sich für den Zug statt des Flugzeugs, um lange Strecken zu überwinden. Der Vorteil ist offensichtlich: Man spart sich ein Hotelzimmer und wacht am Zielort ausgeruht auf. Die Österreichische Bundesbahn hat ihr Netz stark ausgebaut. Von Wien aus kann man heute direkt nach Paris, Amsterdam oder Hamburg fahren. Das Liegeabteil bietet sechs Betten und ein kleines Frühstück. Kritiker bemängeln jedoch die Preise: Ein Schlafwagen kostet oft mehr als ein Flug. Dennoch wächst die Nachfrage, besonders unter klimabewussten Reisenden.',
-    bodyEn: 'Night trains are experiencing a renaissance in Europe. More and more travellers are choosing the train over the plane for long distances. The advantage is obvious: you save on a hotel room and wake up refreshed at your destination. Austrian Federal Railways has greatly expanded its network. From Vienna you can now travel directly to Paris, Amsterdam or Hamburg. The couchette offers six berths and a small breakfast. Critics point out the prices however: a sleeping car often costs more than a flight. Nevertheless demand is growing, especially among climate-conscious travellers.',
+    bodyNative: 'Night trains are experiencing a renaissance in Europe. More and more travellers are choosing the train over the plane for long distances. The advantage is obvious: you save on a hotel room and wake up refreshed at your destination. Austrian Federal Railways has greatly expanded its network. From Vienna you can now travel directly to Paris, Amsterdam or Hamburg. The couchette offers six berths and a small breakfast. Critics point out the prices however: a sleeping car often costs more than a flight. Nevertheless demand is growing, especially among climate-conscious travellers.',
     sentences: [
       s(0,'Nachtzüge erleben in Europa eine Renaissance.','Night trains are experiencing a renaissance in Europe.'),
       s(1,'Immer mehr Reisende entscheiden sich für den Zug statt des Flugzeugs.','More and more travellers are choosing the train over the plane.'),
@@ -604,12 +604,12 @@ export const PLATFORM_STORIES_SEED: PlatformStorySeedItem[] = [
         'Statt des Flugzeugs nehmen sie den Zug.',
         'Instead of the plane they take the train.',
         '"statt" (instead of) governs the genitive case. Neuter "das Flugzeug" → genitive "des Flugzeugs". Masculine: "der Mann" → "des Mannes".',
-        [{ de: 'Statt des Kaffees trinkt er Tee.', en: 'Instead of coffee he drinks tea.' }]),
+        [{ de: 'Statt des Kaffees trinkt er Tee.', native: 'Instead of coffee he drinks tea.' }]),
       gn('ps-b1-t1-g2','Reflexive "sich entscheiden für"',
         'Reisende entscheiden sich für den Zug.',
         'Travellers choose the train.',
         '"sich entscheiden für" = to decide on / choose. The reflexive pronoun matches the subject. "für" takes the accusative.',
-        [{ de: 'Ich entscheide mich für den Bus.', en: 'I choose the bus.' }]),
+        [{ de: 'Ich entscheide mich für den Bus.', native: 'I choose the bus.' }]),
     ],
   },
 
@@ -623,7 +623,7 @@ export const PLATFORM_STORIES_SEED: PlatformStorySeedItem[] = [
     topics: ['christmas', 'traditions', 'markets'],
     coverGradient: 'linear-gradient(135deg,#7B2D00,#D4572A)',
     bodyDe: 'Jedes Jahr im Advent verwandeln sich die Innenstädte Deutschlands in festliche Weihnachtsmärkte. Der älteste und bekannteste ist der Christkindlesmarkt in Nürnberg, der seit dem 16. Jahrhundert stattfindet. Besucher schlendern zwischen Holzbuden und kaufen Lebkuchen, Glühwein und handgemachten Schmuck. Besonders beliebt sind die Holzfiguren aus dem Erzgebirge. Die Atmosphäre ist einzigartig: Lichterketten glänzen, Kinderchor singt Weihnachtslieder, und der Geruch von gebrannten Mandeln liegt in der Luft. Für viele Deutsche gehört ein Besuch auf dem Weihnachtsmarkt zur unverzichtbaren Vorweihnachtstradition.',
-    bodyEn: 'Every year in Advent the inner cities of Germany are transformed into festive Christmas markets. The oldest and most famous is the Christkindlesmarkt in Nuremberg, which has taken place since the 16th century. Visitors stroll between wooden stalls and buy gingerbread, mulled wine and handmade jewellery. Particularly popular are the wooden figures from the Ore Mountains. The atmosphere is unique: fairy lights glitter, a children\'s choir sings Christmas carols, and the smell of roasted almonds hangs in the air. For many Germans a visit to the Christmas market is an indispensable pre-Christmas tradition.',
+    bodyNative: 'Every year in Advent the inner cities of Germany are transformed into festive Christmas markets. The oldest and most famous is the Christkindlesmarkt in Nuremberg, which has taken place since the 16th century. Visitors stroll between wooden stalls and buy gingerbread, mulled wine and handmade jewellery. Particularly popular are the wooden figures from the Ore Mountains. The atmosphere is unique: fairy lights glitter, a children\'s choir sings Christmas carols, and the smell of roasted almonds hangs in the air. For many Germans a visit to the Christmas market is an indispensable pre-Christmas tradition.',
     sentences: [
       s(0,'Jedes Jahr im Advent verwandeln sich die Innenstädte Deutschlands in festliche Weihnachtsmärkte.','Every year in Advent the inner cities of Germany are transformed into festive Christmas markets.'),
       s(1,'Der älteste und bekannteste ist der Christkindlesmarkt in Nürnberg.','The oldest and most famous is the Christkindlesmarkt in Nuremberg.'),
@@ -656,12 +656,12 @@ export const PLATFORM_STORIES_SEED: PlatformStorySeedItem[] = [
         'Die Innenstädte verwandeln sich in festliche Weihnachtsmärkte.',
         'The inner cities transform into festive Christmas markets.',
         '"sich verwandeln in" = to turn into. The reflexive pronoun matches the subject. "in" with destination/result takes accusative.',
-        [{ de: 'Die Raupe verwandelt sich in einen Schmetterling.', en: 'The caterpillar transforms into a butterfly.' }]),
+        [{ de: 'Die Raupe verwandelt sich in einen Schmetterling.', native: 'The caterpillar transforms into a butterfly.' }]),
       gn('ps-b1-f1-g2','Superlatives',
         'Der älteste und bekannteste Markt ist in Nürnberg.',
         'The oldest and most famous market is in Nuremberg.',
         'German superlatives add "-ste" (after vowel: "-este"): alt → älteste, bekannt → bekannteste. Used attributively they take normal adjective endings.',
-        [{ de: 'Das ist das schönste Lied.', en: 'That is the most beautiful song.' }]),
+        [{ de: 'Das ist das schönste Lied.', native: 'That is the most beautiful song.' }]),
     ],
   },
 
@@ -675,7 +675,7 @@ export const PLATFORM_STORIES_SEED: PlatformStorySeedItem[] = [
     topics: ['interview', 'job application', 'preparation'],
     coverGradient: 'linear-gradient(135deg,#1C3A5E,#2E86AB)',
     bodyDe: 'Nadia bereitet sich intensiv auf ihr Vorstellungsgespräch vor. Sie recherchiert das Unternehmen und überlegt sich Antworten auf typische Fragen. Am Tag des Gesprächs zieht sie sich professionell an und fährt früh los, um pünktlich zu sein. Im Büro wird sie von der Personalreferentin begrüßt. Das Gespräch beginnt gut: Die Interviewerin ist freundlich und stellt interessante Fragen über Nadias Berufserfahrung. Als sie nach den Gehaltsvorstellungen gefragt wird, nennt Nadia selbstbewusst eine Zahl. Am Ende der Stunde bedankt sie sich herzlich. Zwei Tage später bekommt sie die Zusage.',
-    bodyEn: 'Nadia prepares intensively for her job interview. She researches the company and thinks of answers to typical questions. On the day of the interview she dresses professionally and sets off early to be on time. In the office she is greeted by the HR officer. The interview starts well: the interviewer is friendly and asks interesting questions about Nadia\'s professional experience. When asked about salary expectations she confidently names a figure. At the end of the hour she thanks them warmly. Two days later she receives the job offer.',
+    bodyNative: 'Nadia prepares intensively for her job interview. She researches the company and thinks of answers to typical questions. On the day of the interview she dresses professionally and sets off early to be on time. In the office she is greeted by the HR officer. The interview starts well: the interviewer is friendly and asks interesting questions about Nadia\'s professional experience. When asked about salary expectations she confidently names a figure. At the end of the hour she thanks them warmly. Two days later she receives the job offer.',
     sentences: [
       s(0,'Nadia bereitet sich intensiv auf ihr Vorstellungsgespräch vor.','Nadia prepares intensively for her job interview.'),
       s(1,'Sie recherchiert das Unternehmen und überlegt sich Antworten auf typische Fragen.','She researches the company and thinks of answers to typical questions.'),
@@ -709,12 +709,12 @@ export const PLATFORM_STORIES_SEED: PlatformStorySeedItem[] = [
         'Sie fährt früh los, um pünktlich zu sein.',
         'She sets off early to be on time.',
         '"um … zu" expresses purpose (in order to). The infinitive goes to the end after "zu". The subject of both clauses must be the same.',
-        [{ de: 'Er lernt Deutsch, um in Deutschland zu arbeiten.', en: 'He learns German in order to work in Germany.' }]),
+        [{ de: 'Er lernt Deutsch, um in Deutschland zu arbeiten.', native: 'He learns German in order to work in Germany.' }]),
       gn('ps-b1-w1-g2','Passive voice (Vorgangspassiv)',
         'Sie wird von der Personalreferentin begrüßt.',
         'She is greeted by the HR officer.',
         'Passive = "werden" (conjugated) + past participle at end. The agent (doer) is introduced by "von" + dative.',
-        [{ de: 'Das Buch wird von ihr gelesen.', en: 'The book is being read by her.' }]),
+        [{ de: 'Das Buch wird von ihr gelesen.', native: 'The book is being read by her.' }]),
     ],
   },
 
@@ -728,7 +728,7 @@ export const PLATFORM_STORIES_SEED: PlatformStorySeedItem[] = [
     topics: ['hiking', 'nature', 'forest'],
     coverGradient: 'linear-gradient(135deg,#1B4332,#40916C)',
     bodyDe: 'Der Schwarzwald im Südwesten Deutschlands ist ein Paradies für Wanderer. Auf über 23.000 Kilometern ausgeschilderten Wegen kann man durch dichte Wälder, an Seen vorbei und über sanfte Hügel wandern. Besonders beliebt ist der Westweg, der von Pforzheim bis Basel führt. Wer die Wanderung plant, sollte wetterfeste Kleidung und feste Schuhe mitnehmen. Im Wald begegnet man häufig Rehen und Wildschweinen. Die Schwarzwälder Küche bietet nach der Wanderung Stärkung: Schwarzwälder Kirschtorte und Vesper gehören dazu. Naturschutzgebiete machen fast dreißig Prozent des Waldes aus.',
-    bodyEn: 'The Black Forest in south-west Germany is a paradise for hikers. On over 23,000 kilometres of marked trails you can hike through dense forests, past lakes and over gentle hills. Particularly popular is the Westweg, which runs from Pforzheim to Basel. Anyone planning the hike should bring weatherproof clothing and sturdy shoes. In the forest you frequently encounter deer and wild boar. Black Forest cuisine offers refreshment after the hike: Black Forest gateau and Vesper are included. Nature reserves make up almost thirty percent of the forest.',
+    bodyNative: 'The Black Forest in south-west Germany is a paradise for hikers. On over 23,000 kilometres of marked trails you can hike through dense forests, past lakes and over gentle hills. Particularly popular is the Westweg, which runs from Pforzheim to Basel. Anyone planning the hike should bring weatherproof clothing and sturdy shoes. In the forest you frequently encounter deer and wild boar. Black Forest cuisine offers refreshment after the hike: Black Forest gateau and Vesper are included. Nature reserves make up almost thirty percent of the forest.',
     sentences: [
       s(0,'Der Schwarzwald im Südwesten Deutschlands ist ein Paradies für Wanderer.','The Black Forest in south-west Germany is a paradise for hikers.'),
       s(1,'Auf über 23.000 Kilometern ausgeschilderten Wegen kann man durch dichte Wälder wandern.','On over 23,000 kilometres of marked trails you can hike through dense forests.'),
@@ -761,12 +761,12 @@ export const PLATFORM_STORIES_SEED: PlatformStorySeedItem[] = [
         'Im Wald begegnet man häufig Rehen.',
         'In the forest you frequently encounter deer.',
         '"begegnen" (to encounter/meet) takes the dative case for the person/thing encountered. "das Reh" (deer) → dative plural "den Rehen".',
-        [{ de: 'Ich bin ihr auf der Straße begegnet.', en: 'I encountered her on the street.' }]),
+        [{ de: 'Ich bin ihr auf der Straße begegnet.', native: 'I encountered her on the street.' }]),
       gn('ps-b1-n1-g2','Relative clause with "der" (masculine)',
         'Der Westweg, der von Pforzheim bis Basel führt.',
         'The Westweg, which runs from Pforzheim to Basel.',
         'The relative pronoun for a masculine nominative antecedent is "der". It introduces a subordinate clause with verb at end.',
-        [{ de: 'Der Mann, der dort steht, ist mein Vater.', en: 'The man who is standing there is my father.' }]),
+        [{ de: 'Der Mann, der dort steht, ist mein Vater.', native: 'The man who is standing there is my father.' }]),
     ],
   },
 
@@ -780,7 +780,7 @@ export const PLATFORM_STORIES_SEED: PlatformStorySeedItem[] = [
     topics: ['science fiction', 'time travel', 'mystery'],
     coverGradient: 'linear-gradient(135deg,#0D0D2B,#1A237E)',
     bodyDe: 'Sophie findet auf dem Dachboden ihrer Großmutter eine alte Taschenuhr. Als sie sie aufzieht, beginnt die Uhr seltsam zu leuchten. Plötzlich findet sie sich in einer fremden Stadt wieder — aber es ist Berlin, so wie es 1923 ausgesehen haben muss. Die Straßen sind belebt, die Menschen tragen alte Kleidung. Eine ältere Frau blickt sie neugierig an. "Sind Sie fremd hier?", fragt sie. Sophie zittert, nickt aber tapfer. Sie muss herausfinden, wie sie zurückkommt, bevor es zu spät ist. In ihrer Tasche findet sie zum Glück noch die Uhr.',
-    bodyEn: 'Sophie finds an old pocket watch in her grandmother\'s attic. When she winds it up, the watch starts to glow strangely. Suddenly she finds herself in an unfamiliar city — but it is Berlin as it must have looked in 1923. The streets are busy, the people wear old clothes. An older woman looks at her curiously. "Are you a stranger here?" she asks. Sophie trembles but nods bravely. She has to find out how to get back before it is too late. Fortunately she still has the watch in her pocket.',
+    bodyNative: 'Sophie finds an old pocket watch in her grandmother\'s attic. When she winds it up, the watch starts to glow strangely. Suddenly she finds herself in an unfamiliar city — but it is Berlin as it must have looked in 1923. The streets are busy, the people wear old clothes. An older woman looks at her curiously. "Are you a stranger here?" she asks. Sophie trembles but nods bravely. She has to find out how to get back before it is too late. Fortunately she still has the watch in her pocket.',
     sentences: [
       s(0,'Sophie findet auf dem Dachboden ihrer Großmutter eine alte Taschenuhr.','Sophie finds an old pocket watch in her grandmother\'s attic.'),
       s(1,'Als sie sie aufzieht, beginnt die Uhr seltsam zu leuchten.','When she winds it up, the watch starts to glow strangely.'),
@@ -815,12 +815,12 @@ export const PLATFORM_STORIES_SEED: PlatformStorySeedItem[] = [
         'Als sie die Uhr aufzieht, beginnt sie zu leuchten.',
         'When she winds it up, the watch starts to glow.',
         '"Als" introduces a one-time event in the past or a single point in time. The verb goes to the end of the "als" clause.',
-        [{ de: 'Als er ankam, war sie schon weg.', en: 'When he arrived, she was already gone.' }]),
+        [{ de: 'Als er ankam, war sie schon weg.', native: 'When he arrived, she was already gone.' }]),
       gn('ps-b1-fi1-g2','Modal perfect: Konjunktiv II',
         'So wie es 1923 ausgesehen haben muss.',
         'As it must have looked in 1923.',
         'Modal + perfect infinitive: "müssen" + perfect infinitive expresses logical deduction about the past. Structure: modal verb + "haben/sein" + past participle.',
-        [{ de: 'Er muss das gewusst haben.', en: 'He must have known that.' }]),
+        [{ de: 'Er muss das gewusst haben.', native: 'He must have known that.' }]),
     ],
   },
 
@@ -834,7 +834,7 @@ export const PLATFORM_STORIES_SEED: PlatformStorySeedItem[] = [
     topics: ['AI', 'technology', 'society'],
     coverGradient: 'linear-gradient(135deg,#0A0A23,#1565C0)',
     bodyDe: 'Künstliche Intelligenz hat sich in den letzten Jahren rasant entwickelt und ist mittlerweile ein fester Bestandteil unseres Alltags geworden. Sprachassistenten helfen uns beim Planen des Tages, Algorithmen kuratieren unsere Nachrichten, und Empfehlungssysteme schlagen uns Musik und Filme vor. Doch diese Entwicklung wirft auch ernsthafte Fragen auf. Kritiker warnen vor der sogenannten Filterbubble: Wenn Algorithmen nur zeigen, was wir sehen wollen, verengt sich unser Weltbild. Datenschützer mahnen, dass persönliche Daten oft ohne ausreichende Transparenz gesammelt werden. Gleichzeitig birgt KI enormes Potenzial für Medizin, Klimaforschung und Bildung. Die Herausforderung besteht darin, den technologischen Fortschritt so zu gestalten, dass er der Gesellschaft als Ganzes nutzt.',
-    bodyEn: 'Artificial intelligence has developed rapidly in recent years and has become a permanent part of our everyday lives. Voice assistants help us plan our day, algorithms curate our news, and recommendation systems suggest music and films. But this development also raises serious questions. Critics warn of the so-called filter bubble: when algorithms only show what we want to see, our worldview narrows. Data protection advocates caution that personal data is often collected without sufficient transparency. At the same time AI holds enormous potential for medicine, climate research and education. The challenge is to shape technological progress in a way that benefits society as a whole.',
+    bodyNative: 'Artificial intelligence has developed rapidly in recent years and has become a permanent part of our everyday lives. Voice assistants help us plan our day, algorithms curate our news, and recommendation systems suggest music and films. But this development also raises serious questions. Critics warn of the so-called filter bubble: when algorithms only show what we want to see, our worldview narrows. Data protection advocates caution that personal data is often collected without sufficient transparency. At the same time AI holds enormous potential for medicine, climate research and education. The challenge is to shape technological progress in a way that benefits society as a whole.',
     sentences: [
       s(0,'Künstliche Intelligenz hat sich in den letzten Jahren rasant entwickelt.','Artificial intelligence has developed rapidly in recent years.'),
       s(1,'Sie ist mittlerweile ein fester Bestandteil unseres Alltags geworden.','It has become a permanent part of our everyday lives.'),
@@ -869,12 +869,12 @@ export const PLATFORM_STORIES_SEED: PlatformStorySeedItem[] = [
         'Ein fester Bestandteil unseres Alltags.',
         'A permanent part of our everyday lives.',
         'Genitive attributes chain in German: "unseres Alltags" = of our everyday life. "unser" (possessive) in genitive: masculine/neuter "-es", feminine/plural "-er".',
-        [{ de: 'Das Auto meines Vaters.', en: 'My father\'s car.' }]),
+        [{ de: 'Das Auto meines Vaters.', native: 'My father\'s car.' }]),
       gn('ps-b2-t1-g2','Consecutive clause: "so … dass"',
         'Den Fortschritt so gestalten, dass er der Gesellschaft nutzt.',
         'To shape progress so that it benefits society.',
         '"so … dass" introduces a result clause. The first clause contains "so" + adjective/adverb; "dass" introduces the consequence with verb at end.',
-        [{ de: 'Er spricht so leise, dass ich ihn nicht verstehe.', en: 'He speaks so quietly that I don\'t understand him.' }]),
+        [{ de: 'Er spricht so leise, dass ich ihn nicht verstehe.', native: 'He speaks so quietly that I don\'t understand him.' }]),
     ],
   },
 
@@ -888,7 +888,7 @@ export const PLATFORM_STORIES_SEED: PlatformStorySeedItem[] = [
     topics: ['negotiation', 'business', 'strategy'],
     coverGradient: 'linear-gradient(135deg,#1A1A2E,#16213E)',
     bodyDe: 'Erfolgreiche Verhandlungen erfordern gründliche Vorbereitung, emotionale Intelligenz und die Fähigkeit, die Perspektive des Gegenübers einzunehmen. Im Deutschen Unternehmensumfeld sind direkte, sachliche Kommunikation und Verlässlichkeit besonders geschätzt. Bevor man in eine Verhandlung geht, sollte man die eigene Verhandlungsposition klar definieren: Was ist das Ziel? Welche Zugeständnisse ist man bereit zu machen? Während der Verhandlung ist aktives Zuhören entscheidend. Wer paraphrasiert, was die andere Seite gesagt hat, signalisiert Respekt und gewinnt Zeit zum Nachdenken. Kompromisse sollten als Erfolg für beide Seiten kommuniziert werden, nicht als Niederlage. Nach Abschluss einer Einigung ist ein schriftliches Protokoll unbedingt empfehlenswert.',
-    bodyEn: 'Successful negotiations require thorough preparation, emotional intelligence and the ability to take the other party\'s perspective. In the German business environment direct, factual communication and reliability are particularly valued. Before entering a negotiation one should clearly define one\'s own negotiating position: What is the goal? What concessions is one prepared to make? During the negotiation active listening is crucial. Whoever paraphrases what the other side has said signals respect and gains time to think. Compromises should be communicated as a success for both sides, not as a defeat. After reaching an agreement a written minute is strongly recommended.',
+    bodyNative: 'Successful negotiations require thorough preparation, emotional intelligence and the ability to take the other party\'s perspective. In the German business environment direct, factual communication and reliability are particularly valued. Before entering a negotiation one should clearly define one\'s own negotiating position: What is the goal? What concessions is one prepared to make? During the negotiation active listening is crucial. Whoever paraphrases what the other side has said signals respect and gains time to think. Compromises should be communicated as a success for both sides, not as a defeat. After reaching an agreement a written minute is strongly recommended.',
     sentences: [
       s(0,'Erfolgreiche Verhandlungen erfordern gründliche Vorbereitung und emotionale Intelligenz.','Successful negotiations require thorough preparation and emotional intelligence.'),
       s(1,'Im deutschen Unternehmensumfeld sind direkte Kommunikation und Verlässlichkeit besonders geschätzt.','In the German business environment direct communication and reliability are particularly valued.'),
@@ -921,12 +921,12 @@ export const PLATFORM_STORIES_SEED: PlatformStorySeedItem[] = [
         'Welche Zugeständnisse ist man bereit zu machen?',
         'What concessions is one prepared to make?',
         '"bereit sein zu" + infinitive = to be prepared/willing to do something. The infinitive goes to the very end after "zu".',
-        [{ de: 'Ich bin bereit zu helfen.', en: 'I am prepared to help.' }]),
+        [{ de: 'Ich bin bereit zu helfen.', native: 'I am prepared to help.' }]),
       gn('ps-b2-w1-g2','Modal passive infinitive',
         'Kompromisse sollten als Erfolg kommuniziert werden.',
         'Compromises should be communicated as a success.',
         'Modal verb + passive infinitive: "sollten" + past participle + "werden". The agent is omitted when unimportant.',
-        [{ de: 'Das muss sofort erledigt werden.', en: 'That must be done immediately.' }]),
+        [{ de: 'Das muss sofort erledigt werden.', native: 'That must be done immediately.' }]),
     ],
   },
 
@@ -940,7 +940,7 @@ export const PLATFORM_STORIES_SEED: PlatformStorySeedItem[] = [
     topics: ['flatshare', 'city life', 'Munich'],
     coverGradient: 'linear-gradient(135deg,#4A1942,#9B2335)',
     bodyDe: 'Das Wohnen in einer Wohngemeinschaft ist für viele Studenten und Berufseinsteiger in München die einzige erschwingliche Möglichkeit, in der Stadt zu leben. Die Mietpreise für Einzelapartments haben in den letzten Jahren derart angezogen, dass selbst gut verdienende Berufseinsteiger kaum eine Chance haben, alleine zu wohnen. Eine WG bietet jedoch nicht nur finanzielle Vorteile: Man lernt Menschen aus anderen Kulturen kennen, teilt Verantwortung im Haushalt und hat immer Gesellschaft. Konflikte entstehen oft wegen unterschiedlicher Vorstellungen von Sauberkeit oder Nachtruhe. Wer klare Absprachen trifft und Rücksicht nimmt, macht die besten Erfahrungen. München hat eine lebhafte WG-Kultur mit einer eigenen Community auf Plattformen wie WG-Gesucht.',
-    bodyEn: 'Living in a shared flat is for many students and young professionals in Munich the only affordable option for living in the city. Rental prices for individual apartments have risen so sharply in recent years that even well-earning young professionals have little chance of living alone. A shared flat offers more than just financial advantages however: you get to know people from other cultures, share household responsibilities and always have company. Conflicts often arise because of differing ideas about cleanliness or quiet hours at night. Those who make clear agreements and show consideration have the best experience. Munich has a vibrant shared-flat culture with its own community on platforms like WG-Gesucht.',
+    bodyNative: 'Living in a shared flat is for many students and young professionals in Munich the only affordable option for living in the city. Rental prices for individual apartments have risen so sharply in recent years that even well-earning young professionals have little chance of living alone. A shared flat offers more than just financial advantages however: you get to know people from other cultures, share household responsibilities and always have company. Conflicts often arise because of differing ideas about cleanliness or quiet hours at night. Those who make clear agreements and show consideration have the best experience. Munich has a vibrant shared-flat culture with its own community on platforms like WG-Gesucht.',
     sentences: [
       s(0,'Das Wohnen in einer WG ist für viele die einzige erschwingliche Möglichkeit in München.','Living in a shared flat is for many the only affordable option in Munich.'),
       s(1,'Die Mietpreise haben in den letzten Jahren derart angezogen, dass Einzelapartments kaum erschwinglich sind.','Rental prices have risen so sharply that individual apartments are barely affordable.'),
@@ -972,12 +972,12 @@ export const PLATFORM_STORIES_SEED: PlatformStorySeedItem[] = [
         'Konflikte entstehen wegen unterschiedlicher Vorstellungen.',
         'Conflicts arise because of differing ideas.',
         '"wegen" (because of) governs the genitive. "unterschiedliche Vorstellungen" → genitive plural: "unterschiedlicher Vorstellungen".',
-        [{ de: 'Wegen des Wetters bleiben wir zu Hause.', en: 'Because of the weather we stay at home.' }]),
+        [{ de: 'Wegen des Wetters bleiben wir zu Hause.', native: 'Because of the weather we stay at home.' }]),
       gn('ps-b2-d1-g2','Consecutive "derart … dass"',
         'Die Mietpreise haben derart angezogen, dass Einzelapartments kaum erschwinglich sind.',
         'Rental prices have risen so sharply that individual apartments are barely affordable.',
         '"derart … dass" = so much that. It introduces a result clause. "derart" modifies the degree of the action.',
-        [{ de: 'Er hat derart laut geschrien, dass alle erschrocken sind.', en: 'He shouted so loudly that everyone was startled.' }]),
+        [{ de: 'Er hat derart laut geschrien, dass alle erschrocken sind.', native: 'He shouted so loudly that everyone was startled.' }]),
     ],
   },
 
@@ -991,7 +991,7 @@ export const PLATFORM_STORIES_SEED: PlatformStorySeedItem[] = [
     topics: ['thriller', 'train', 'mystery'],
     coverGradient: 'linear-gradient(135deg,#1A0A2E,#4A1942)',
     bodyDe: 'Der letzte Zug nach Wien verlässt München Hauptbahnhof um 23:47 Uhr. Kommissarin Haller betritt das leere Abteil mit einem unguten Gefühl. Ihr Kollege hatte sie kurz zuvor angerufen: Jemand habe einen verdächtigen Koffer im Zug zurückgelassen. Sie geht den Gang entlang, die Hand am Dienstausweis. Im vorletzten Wagen entdeckt sie einen älteren Herrn, der tief schläft — und neben ihm einen schwarzen Koffer. Als sie ihn ansprechen will, öffnet sich am anderen Ende des Waggons eine Tür. Eine junge Frau tritt ein, sieht Haller, und erstarrt. In diesem Moment fährt der Zug in einen Tunnel. Die Lichter erlöschen.',
-    bodyEn: 'The last train to Vienna leaves Munich Central Station at 23:47. Detective Haller enters the empty compartment with a bad feeling. Her colleague had called her shortly before: someone had left a suspicious suitcase on the train. She walks along the corridor, her hand on her badge. In the second-to-last carriage she discovers an older gentleman sleeping deeply — and next to him a black suitcase. Just as she is about to address him, a door opens at the other end of the carriage. A young woman enters, sees Haller, and freezes. At that moment the train enters a tunnel. The lights go out.',
+    bodyNative: 'The last train to Vienna leaves Munich Central Station at 23:47. Detective Haller enters the empty compartment with a bad feeling. Her colleague had called her shortly before: someone had left a suspicious suitcase on the train. She walks along the corridor, her hand on her badge. In the second-to-last carriage she discovers an older gentleman sleeping deeply — and next to him a black suitcase. Just as she is about to address him, a door opens at the other end of the carriage. A young woman enters, sees Haller, and freezes. At that moment the train enters a tunnel. The lights go out.',
     sentences: [
       s(0,'Der letzte Zug nach Wien verlässt München Hauptbahnhof um 23:47 Uhr.','The last train to Vienna leaves Munich Central Station at 23:47.'),
       s(1,'Kommissarin Haller betritt das leere Abteil mit einem unguten Gefühl.','Detective Haller enters the empty compartment with a bad feeling.'),
@@ -1027,12 +1027,12 @@ export const PLATFORM_STORIES_SEED: PlatformStorySeedItem[] = [
         'Ihr Kollege hatte sie kurz zuvor angerufen.',
         'Her colleague had called her shortly before.',
         'Pluperfect = "hatte/war" (past) + past participle. Used for events that happened before another past event. "hatte angerufen" = had called.',
-        [{ de: 'Nachdem er gegessen hatte, ging er schlafen.', en: 'After he had eaten, he went to sleep.' }]),
+        [{ de: 'Nachdem er gegessen hatte, ging er schlafen.', native: 'After he had eaten, he went to sleep.' }]),
       gn('ps-b2-fi1-g2','Konjunktiv I (indirect speech)',
         'Jemand habe einen Koffer zurückgelassen.',
         'Someone had left a suitcase (reportedly).',
         'Konjunktiv I is used in indirect/reported speech. "hat … gelassen" (direct) → "habe … gelassen" (indirect). Signals the speaker is not confirming the statement.',
-        [{ de: 'Er sagte, er sei krank.', en: 'He said he was ill.' }]),
+        [{ de: 'Er sagte, er sei krank.', native: 'He said he was ill.' }]),
     ],
   },
 
@@ -1046,7 +1046,7 @@ export const PLATFORM_STORIES_SEED: PlatformStorySeedItem[] = [
     topics: ['climate', 'environment', 'sustainability'],
     coverGradient: 'linear-gradient(135deg,#0D4F2E,#1B8A4E)',
     bodyDe: 'Der Klimawandel stellt eine der größten Herausforderungen unserer Zeit dar. Wissenschaftliche Studien belegen, dass die Durchschnittstemperatur der Erde seit der Industrialisierung um etwa 1,2 Grad Celsius gestiegen ist. Die Folgen sind bereits spürbar: häufigere Extremwetterereignisse, steigende Meeresspiegel und der Rückzug von Gletschern. Um die Erderwärmung zu begrenzen, haben 197 Länder das Pariser Abkommen unterzeichnet, das eine Begrenzung auf 1,5 Grad anstrebt. Deutschland hat sich verpflichtet, bis 2045 klimaneutral zu sein. Nachhaltigkeit bedeutet jedoch mehr als Energiepolitik: Es geht um veränderte Konsumgewohnheiten, nachhaltige Landwirtschaft und den Erhalt der Artenvielfalt. Jede Entscheidung im Alltag — was wir essen, wie wir reisen, was wir kaufen — hat einen ökologischen Fußabdruck.',
-    bodyEn: 'Climate change is one of the greatest challenges of our time. Scientific studies show that the average temperature of the earth has risen by about 1.2 degrees Celsius since industrialisation. The consequences are already noticeable: more frequent extreme weather events, rising sea levels and the retreat of glaciers. To limit global warming 197 countries have signed the Paris Agreement, which aims for a limit of 1.5 degrees. Germany has committed to being climate-neutral by 2045. Sustainability means more than energy policy however: it is about changed consumption habits, sustainable agriculture and the preservation of biodiversity. Every everyday decision — what we eat, how we travel, what we buy — has an ecological footprint.',
+    bodyNative: 'Climate change is one of the greatest challenges of our time. Scientific studies show that the average temperature of the earth has risen by about 1.2 degrees Celsius since industrialisation. The consequences are already noticeable: more frequent extreme weather events, rising sea levels and the retreat of glaciers. To limit global warming 197 countries have signed the Paris Agreement, which aims for a limit of 1.5 degrees. Germany has committed to being climate-neutral by 2045. Sustainability means more than energy policy however: it is about changed consumption habits, sustainable agriculture and the preservation of biodiversity. Every everyday decision — what we eat, how we travel, what we buy — has an ecological footprint.',
     sentences: [
       s(0,'Der Klimawandel stellt eine der größten Herausforderungen unserer Zeit dar.','Climate change is one of the greatest challenges of our time.'),
       s(1,'Die Durchschnittstemperatur ist seit der Industrialisierung um 1,2 Grad gestiegen.','The average temperature has risen by 1.2 degrees since industrialisation.'),
@@ -1080,12 +1080,12 @@ export const PLATFORM_STORIES_SEED: PlatformStorySeedItem[] = [
         'Der Klimawandel stellt eine große Herausforderung dar.',
         'Climate change is a great challenge.',
         '"darstellen" = to represent/constitute. Separable: "stellt … dar". In subordinate clauses the full verb moves to the end: "…, dass er eine Herausforderung darstellt."',
-        [{ de: 'Das stellt ein Problem dar.', en: 'That represents a problem.' }]),
+        [{ de: 'Das stellt ein Problem dar.', native: 'That represents a problem.' }]),
       gn('ps-b2-n1-g2','Verpflichten + zu + infinitive',
         'Deutschland hat sich verpflichtet, klimaneutral zu sein.',
         'Germany has committed to being climate-neutral.',
         '"sich verpflichten" + "zu" + infinitive. The infinitive clause is separated by a comma. "zu" comes directly before the infinitive.',
-        [{ de: 'Wir haben uns verpflichtet, das Projekt fertigzustellen.', en: 'We committed to completing the project.' }]),
+        [{ de: 'Wir haben uns verpflichtet, das Projekt fertigzustellen.', native: 'We committed to completing the project.' }]),
     ],
   },
 

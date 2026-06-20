@@ -1,10 +1,10 @@
 <ion-header class="ion-no-border">
   <ion-toolbar>
     <div class="rv-nav">
-      <button class="rv-icon-btn" (click)="exitSession()" aria-label="Go back">
+      <button class="rv-icon-btn" (click)="exitSession()" [attr.aria-label]="'review.session.goBackAriaLabel' | translate">
         <ion-icon name="chevron-back-outline"></ion-icon>
       </button>
-      <span class="rv-title lc-display">Review Session</span>
+      <span class="rv-title lc-display">{{ 'review.session.pageTitle' | translate }}</span>
       <div class="rv-nav-spacer"></div>
     </div>
 
@@ -32,8 +32,8 @@
             <!-- Front face -->
             <div class="rv-card rv-card--front" (click)="flipCard()">
               <div class="rv-card-hdr">
-                <span class="rv-side-lbl">Your language</span>
-                <span class="rv-lang-chip">🇬🇧 English</span>
+                <span class="rv-side-lbl">{{ 'review.session.yourLanguageLabel' | translate }}</span>
+                <span class="rv-lang-chip">{{ 'review.session.englishLangChip' | translate }}</span>
               </div>
               <div class="rv-body-front">
                 <p class="rv-front-word lc-display">{{ card.content.front }}</p>
@@ -43,7 +43,7 @@
               </div>
               <button class="rv-tap-pill" tabindex="-1">
                 <ion-icon name="chevron-down-outline"></ion-icon>
-                Tap to reveal German
+                {{ 'review.session.tapToRevealGerman' | translate }}
               </button>
             </div>
 
@@ -52,7 +52,7 @@
             <div class="rv-card rv-card--back rv-card--back-scrollable">
               <div class="rv-card-hdr">
                 <span class="rv-side-lbl">{{ card.content.front }}</span>
-                <span class="rv-lang-chip">🇩🇪 German</span>
+                <span class="rv-lang-chip">{{ 'review.session.germanLangChip' | translate }}</span>
               </div>
               <div class="rv-body-back">
                 @if (card.content.article) {
@@ -67,7 +67,7 @@
                 }
                 @if (card.content.plural) {
                   <div class="rv-plural">
-                    <span class="rv-plural-lbl">Plural</span>
+                    <span class="rv-plural-lbl">{{ 'review.session.pluralLabel' | translate }}</span>
                     <span class="rv-plural-val">{{ card.content.plural }}</span>
                   </div>
                 }
@@ -75,7 +75,7 @@
                   <div class="rv-ex-block">
                     <div class="rv-ex-row">
                       <p class="rv-ex-de" [innerHTML]="ex.target | highlightWord: card.content.back"></p>
-                      <button class="rv-ex-play-btn" (click)="playExample($event, ex.target)" aria-label="Play example">
+                      <button class="rv-ex-play-btn" (click)="playExample($event, ex.target)" [attr.aria-label]="'review.session.playExampleAriaLabel' | translate">
                         <ion-icon name="volume-high-outline"></ion-icon>
                       </button>
                     </div>
@@ -85,10 +85,10 @@
                 <button class="rv-audio-btn" (click)="playAudio($event)" [disabled]="isPronunciationLoading()">
                   @if (isPronunciationLoading()) {
                     <div class="rv-audio-spinner"></div>
-                    Generating…
+                    {{ 'review.session.generatingAudio' | translate }}
                   } @else {
                     <ion-icon name="volume-high-outline"></ion-icon>
-                    Play pronunciation
+                    {{ 'review.session.playPronunciationBtn' | translate }}
                   }
                 </button>
                 @if (card.content.notes) {
@@ -99,7 +99,7 @@
                 }
                 @if (card.content.synonyms.length) {
                   <div class="rv-sec-divider"></div>
-                  <p class="rv-sec-hdr">Synonyms</p>
+                  <p class="rv-sec-hdr">{{ 'review.session.synonymsHeader' | translate }}</p>
                   <div class="rv-syn-list">
                     @for (syn of card.content.synonyms; track $index; let i = $index) {
                       <div class="rv-syn-row" (click)="toggleSynonym(i)">
@@ -116,7 +116,7 @@
                         <div class="rv-syn-ex-block">
                           <div class="rv-ex-row">
                             <p class="rv-ex-de" [innerHTML]="syn.example | highlightWord: syn.word"></p>
-                            <button class="rv-ex-play-btn" (click)="playExample($event, syn.example)" aria-label="Play synonym example">
+                            <button class="rv-ex-play-btn" (click)="playExample($event, syn.example)" [attr.aria-label]="'review.session.playExampleAriaLabel' | translate">
                               <ion-icon name="volume-high-outline"></ion-icon>
                             </button>
                           </div>
@@ -141,9 +141,9 @@
     <!-- Empty queue -->
     <div class="lc-empty-state">
       <span class="lc-empty-icon">🎉</span>
-      <p class="lc-empty-title">All caught up!</p>
-      <p class="lc-empty-sub">No cards due for review right now.</p>
-      <button class="lc-btn-primary rv-exit-btn" (click)="exitSession()">Back to Home</button>
+      <p class="lc-empty-title">{{ 'review.session.allCaughtUpMsg' | translate }}</p>
+      <p class="lc-empty-sub">{{ 'review.session.noDueCardsMsg' | translate }}</p>
+      <button class="lc-btn-primary rv-exit-btn" (click)="exitSession()">{{ 'review.session.backToHomeBtn' | translate }}</button>
     </div>
   }
 </ion-content>
@@ -154,16 +154,16 @@
     <div class="rv-secondary">
       <button class="rv-sec-btn" (click)="goToPrevious()" [disabled]="currentIndex() === 0">
         <ion-icon name="chevron-back-outline"></ion-icon>
-        Previous
+        {{ 'review.session.previousBtn' | translate }}
       </button>
       <button class="rv-sec-btn" (click)="skipCard()">
         <ion-icon name="chevron-forward-outline"></ion-icon>
-        Skip
+        {{ 'review.session.skipBtn' | translate }}
       </button>
     </div>
 
     <div class="rv-rating-area" [class.rv-rating-area--active]="isFlipped()">
-      <p class="rv-rating-prompt">How well did you know this?</p>
+      <p class="rv-rating-prompt">{{ 'review.session.ratingPrompt' | translate }}</p>
       <div class="rv-rating-row">
         @for (r of ratingOptionsWithPreviews(); track r.value) {
           <button

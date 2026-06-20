@@ -1,10 +1,10 @@
 <ion-header class="ion-no-border">
   <ion-toolbar>
     <div class="adm-nav">
-      <button class="adm-back-btn" (click)="goBack()" aria-label="Back">
+      <button class="adm-back-btn" (click)="goBack()" [attr.aria-label]="'common.back' | translate">
         <ion-icon name="arrow-back-outline"></ion-icon>
       </button>
-      <span class="adm-title lc-display">Admin Import</span>
+      <span class="adm-title lc-display">{{ 'admin.import.pageTitle' | translate }}</span>
       <div class="adm-nav-spacer"></div>
     </div>
   </ion-toolbar>
@@ -19,25 +19,25 @@
         class="adm-tab"
         [class.adm-tab--active]="activeTab() === 'collection'"
         (click)="switchTab('collection')">
-        Word List
+        {{ 'admin.import.tabs.wordList' | translate }}
       </button>
       <button
         class="adm-tab"
         [class.adm-tab--active]="activeTab() === 'json'"
         (click)="switchTab('json')">
-        JSON Import
+        {{ 'admin.import.tabs.json' | translate }}
       </button>
       <button
         class="adm-tab"
         [class.adm-tab--active]="activeTab() === 'story'"
         (click)="switchTab('story')">
-        Story
+        {{ 'admin.import.tabs.story' | translate }}
       </button>
       <button
         class="adm-tab"
         [class.adm-tab--active]="activeTab() === 'manage'"
         (click)="switchTab('manage')">
-        Collections
+        {{ 'admin.import.tabs.collections' | translate }}
       </button>
     </div>
 
@@ -46,13 +46,13 @@
       <form [formGroup]="collectionForm" (ngSubmit)="importCollection()">
 
         <div class="adm-field">
-          <label class="adm-label">Title *</label>
+          <label class="adm-label">{{ 'admin.import.fields.title' | translate }}</label>
           <input class="adm-input" formControlName="title" placeholder="e.g. Food & Drink A1" />
         </div>
 
         <div class="adm-row">
           <div class="adm-field adm-field--half">
-            <label class="adm-label">Level *</label>
+            <label class="adm-label">{{ 'admin.import.fields.level' | translate }}</label>
             <select class="adm-select" formControlName="level">
               @for (lvl of levels; track lvl) {
                 <option [value]="lvl">{{ lvl }}</option>
@@ -60,18 +60,18 @@
             </select>
           </div>
           <div class="adm-field adm-field--half">
-            <label class="adm-label">Emoji</label>
+            <label class="adm-label">{{ 'admin.import.fields.emoji' | translate }}</label>
             <input class="adm-input" formControlName="emoji" placeholder="🍎" maxlength="4" />
           </div>
         </div>
 
         <div class="adm-field">
-          <label class="adm-label">Topic *</label>
+          <label class="adm-label">{{ 'admin.import.fields.topic' | translate }}</label>
           <input class="adm-input" formControlName="topic" placeholder="e.g. Food & Drink" />
         </div>
 
         <div class="adm-field">
-          <label class="adm-label">Word list * <span class="adm-hint">(one per line, articles optional)</span></label>
+          <label class="adm-label">{{ 'admin.import.fields.words' | translate }}</label>
           <textarea
             class="adm-textarea"
             formControlName="wordListRaw"
@@ -96,10 +96,10 @@
           class="adm-submit-btn"
           [disabled]="importing() || collectionForm.invalid">
           @if (importing()) {
-            Importing…
+            {{ 'admin.import.status.loading' | translate }}
           } @else {
             <ion-icon name="cloud-upload-outline"></ion-icon>
-            Import Collection
+            {{ 'admin.import.buttons.importCollection' | translate }}
           }
         </button>
 
@@ -121,13 +121,13 @@
         </div>
 
         <div class="adm-field">
-          <label class="adm-label">Title *</label>
+          <label class="adm-label">{{ 'admin.import.fields.title' | translate }}</label>
           <input class="adm-input" formControlName="title" placeholder="e.g. Food & Drink A1" />
         </div>
 
         <div class="adm-row">
           <div class="adm-field adm-field--half">
-            <label class="adm-label">Level *</label>
+            <label class="adm-label">{{ 'admin.import.fields.level' | translate }}</label>
             <select class="adm-select" formControlName="level">
               @for (lvl of levels; track lvl) {
                 <option [value]="lvl">{{ lvl }}</option>
@@ -135,18 +135,18 @@
             </select>
           </div>
           <div class="adm-field adm-field--half">
-            <label class="adm-label">Emoji</label>
+            <label class="adm-label">{{ 'admin.import.fields.emoji' | translate }}</label>
             <input class="adm-input" formControlName="emoji" placeholder="🍎" maxlength="4" />
           </div>
         </div>
 
         <div class="adm-field">
-          <label class="adm-label">Topic *</label>
+          <label class="adm-label">{{ 'admin.import.fields.topic' | translate }}</label>
           <input class="adm-input" formControlName="topic" placeholder="e.g. Food & Drink" />
         </div>
 
         <div class="adm-field">
-          <label class="adm-label">Words JSON *</label>
+          <label class="adm-label">{{ 'admin.import.fields.json' | translate }}</label>
           <textarea
             class="adm-textarea"
             formControlName="wordsJson"
@@ -170,10 +170,10 @@
           class="adm-submit-btn"
           [disabled]="importingJson() || jsonForm.invalid">
           @if (importingJson()) {
-            Importing…
+            {{ 'admin.import.status.loading' | translate }}
           } @else {
             <ion-icon name="cloud-upload-outline"></ion-icon>
-            Import JSON Collection
+            {{ 'admin.import.buttons.importJson' | translate }}
           }
         </button>
 
@@ -206,7 +206,7 @@
         </div>
 
         <div class="adm-field">
-          <label class="adm-label">Story JSON *</label>
+          <label class="adm-label">{{ 'admin.import.fields.storyJson' | translate }}</label>
           <textarea
             class="adm-textarea"
             formControlName="storyJson"
@@ -231,10 +231,10 @@
           class="adm-submit-btn"
           [disabled]="importingStory() || storyForm.invalid">
           @if (importingStory()) {
-            Importing…
+            {{ 'admin.import.status.loading' | translate }}
           } @else {
             <ion-icon name="sparkles-outline"></ion-icon>
-            Import Story
+            {{ 'admin.import.buttons.importStory' | translate }}
           }
         </button>
 
@@ -248,12 +248,12 @@
         <div class="adm-manage-header">
           <span class="adm-manage-count">{{ collections().length }} collections</span>
           <button class="adm-refresh-btn" (click)="loadCollections()" [disabled]="collectionsLoading()">
-            @if (collectionsLoading()) { Loading… } @else { Refresh }
+            @if (collectionsLoading()) { {{ 'admin.import.status.loading' | translate }} } @else { {{ 'common.refresh' | translate }} }
           </button>
         </div>
 
         @if (collectionsLoading() && !collections().length) {
-          <div class="adm-manage-empty">Loading…</div>
+          <div class="adm-manage-empty">{{ 'admin.import.status.loading' | translate }}</div>
         }
 
         @for (item of collections(); track item.id) {
@@ -282,20 +282,71 @@
                 </select>
               </div>
             </div>
-            <button
-              class="adm-publish-btn"
-              [class.adm-publish-btn--live]="item.isPublished"
-              [disabled]="togglingId() === item.id"
-              (click)="togglePublish(item)"
-              [attr.aria-label]="item.isPublished ? 'Unpublish' : 'Publish'">
-              <ion-icon [name]="item.isPublished ? 'eye-outline' : 'eye-off-outline'"></ion-icon>
-              {{ item.isPublished ? 'Live' : 'Draft' }}
-            </button>
+            <div class="adm-coll-actions">
+              <button
+                class="adm-publish-btn"
+                [class.adm-publish-btn--live]="item.isPublished"
+                [disabled]="togglingId() === item.id"
+                (click)="togglePublish(item)"
+                [attr.aria-label]="item.isPublished ? 'Unpublish' : 'Publish'">
+                <ion-icon [name]="item.isPublished ? 'eye-outline' : 'eye-off-outline'"></ion-icon>
+                {{ item.isPublished ? 'Live' : 'Draft' }}
+              </button>
+              <button
+                class="adm-delete-btn"
+                [disabled]="deletingCollectionId() === item.id"
+                (click)="deleteCollection(item)"
+                aria-label="Delete collection">
+                <ion-icon name="trash-outline"></ion-icon>
+              </button>
+            </div>
           </div>
         }
 
         @if (!collectionsLoading() && !collections().length) {
-          <div class="adm-manage-empty">No collections yet. Import one first.</div>
+          <div class="adm-manage-empty">{{ 'admin.import.status.noCollections' | translate }}</div>
+        }
+
+        <div class="adm-manage-header">
+          <span class="adm-manage-count">{{ stories().length }} stories</span>
+          <button class="adm-refresh-btn" (click)="loadStories()" [disabled]="storiesLoading()">
+            @if (storiesLoading()) { {{ 'admin.import.status.loading' | translate }} } @else { {{ 'common.refresh' | translate }} }
+          </button>
+        </div>
+
+        @if (storiesLoading() && !stories().length) {
+          <div class="adm-manage-empty">{{ 'admin.import.status.loading' | translate }}</div>
+        }
+
+        @for (story of stories(); track story.id) {
+          <div class="adm-coll-row" [class.adm-coll-row--published]="story.isPublished">
+            <div class="adm-coll-emoji">📖</div>
+            <div class="adm-coll-body">
+              <div class="adm-coll-title">{{ story.title }}</div>
+              <div class="adm-coll-meta">
+                <span class="adm-lvl-badge">{{ story.level }}</span>
+                <span>{{ story.category }}</span>
+                <span>{{ story.wordCount }} words</span>
+                <span class="adm-coll-id">{{ story.id.slice(0, 8) }}</span>
+              </div>
+            </div>
+            <div class="adm-coll-actions">
+              <span class="adm-publish-btn" [class.adm-publish-btn--live]="story.isPublished">
+                {{ story.isPublished ? 'Live' : 'Draft' }}
+              </span>
+              <button
+                class="adm-delete-btn"
+                [disabled]="deletingStoryId() === story.id"
+                (click)="deleteStory(story)"
+                aria-label="Delete story">
+                <ion-icon name="trash-outline"></ion-icon>
+              </button>
+            </div>
+          </div>
+        }
+
+        @if (!storiesLoading() && !stories().length) {
+          <div class="adm-manage-empty">No stories yet.</div>
         }
 
       </div>

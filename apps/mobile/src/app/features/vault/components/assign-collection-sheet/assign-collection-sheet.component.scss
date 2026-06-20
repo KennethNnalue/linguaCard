@@ -17,7 +17,7 @@
 .acs-row {
   width: 100%; background: var(--lc-card); border: 1px solid var(--lc-border);
   border-radius: t.$lc-radius-md; padding: 11px 13px;
-  display: flex; align-items: center; gap: t.$lc-space-3; cursor: pointer; text-align: left;
+  display: flex; align-items: center; gap: t.$lc-space-3; cursor: pointer; text-align: start;
   transition: border-color t.$lc-duration-fast, background t.$lc-duration-fast;
   &--selected { background: var(--lc-brand-light); border-color: var(--lc-brand); border-width: 1.5px; }
   &--create { background: var(--lc-surface); border-style: dashed; border-color: var(--lc-brand); }

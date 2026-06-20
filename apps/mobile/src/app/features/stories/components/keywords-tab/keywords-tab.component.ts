@@ -1,10 +1,13 @@
-import { Component, input, output, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, input, output, signal } from '@angular/core';
+import { TranslatePipe } from '@ngx-translate/core';
 import type { StoryKeyword } from '@lingua-card/shared/domain';
 
 @Component({
   selector: 'lc-keywords-tab',
   templateUrl: './keywords-tab.component.html',
   styleUrls: ['./keywords-tab.component.scss'],
+  changeDetection: ChangeDetectionStrategy.OnPush,
+  imports: [TranslatePipe],
 })
 export class KeywordsTabComponent {
   readonly keywords = input<StoryKeyword[]>([]);

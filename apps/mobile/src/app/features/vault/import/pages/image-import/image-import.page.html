@@ -1,10 +1,10 @@
 <ion-header class="ion-no-border">
   <ion-toolbar>
     <div class="imp-nav">
-      <button class="imp-back-btn" (click)="goBack()" aria-label="Back">
+      <button class="imp-back-btn" (click)="goBack()" [attr.aria-label]="'common.back' | translate">
         <ion-icon name="arrow-back-outline"></ion-icon>
       </button>
-      <span class="imp-title lc-display">Import from Image</span>
+      <span class="imp-title lc-display">{{ 'imageImport.title' | translate }}</span>
       <div class="imp-nav-spacer"></div>
     </div>
   </ion-toolbar>
@@ -22,21 +22,21 @@
             <p class="img-imp-error-title">{{ errorMessage(error()) }}</p>
             <p class="img-imp-error-sub">{{ errorSuggestion(error()) }}</p>
           </div>
-          <button class="img-imp-error-dismiss" (click)="dismissError()" aria-label="Dismiss">
+          <button class="img-imp-error-dismiss" (click)="dismissError()" [attr.aria-label]="'common.dismiss' | translate">
             <ion-icon name="close-circle-outline"></ion-icon>
           </button>
         </div>
         <div class="img-imp-error-actions">
-          <button class="img-imp-error-action-btn" (click)="retryPick()">Try again</button>
+          <button class="img-imp-error-action-btn" (click)="retryPick()">{{ 'common.retry' | translate }}</button>
           @if (error() === 'no_words' || error() === 'blurry') {
             <button class="img-imp-error-action-btn img-imp-error-action-btn--outline" (click)="goToCsvImport()">
               <ion-icon name="document-outline"></ion-icon>
-              Use CSV
+              CSV
             </button>
           }
         </div>
       </div>
-    }  
+    }
 
     <!-- Picker buttons (camera + gallery) -->
     <lc-image-picker
@@ -47,18 +47,18 @@
 
     <!-- Tips section -->
     <div class="img-imp-tips-card">
-      <div class="img-imp-tips-label">For best results</div>
+      <div class="img-imp-tips-label">{{ 'imageImport.bestResults.label' | translate }}</div>
       <div class="img-imp-tip-row">
         <div class="img-imp-tip-dot"></div>
-        <span>Good lighting — avoid shadows on the text</span>
+        <span>{{ 'imageImport.bestResults.tip1' | translate }}</span>
       </div>
       <div class="img-imp-tip-row">
         <div class="img-imp-tip-dot"></div>
-        <span>Hold the camera still — blurry images may miss words</span>
+        <span>{{ 'imageImport.bestResults.tip2' | translate }}</span>
       </div>
       <div class="img-imp-tip-row">
         <div class="img-imp-tip-dot"></div>
-        <span>Large images with many words work better in batches</span>
+        <span>{{ 'imageImport.bestResults.tip3' | translate }}</span>
       </div>
     </div>
 

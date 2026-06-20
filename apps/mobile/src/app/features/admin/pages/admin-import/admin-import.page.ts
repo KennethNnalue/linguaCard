@@ -2,21 +2,23 @@ import { ChangeDetectionStrategy, Component, DestroyRef, inject, signal } from '
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
-import { IonContent, IonHeader, IonIcon, IonToolbar, ToastController } from '@ionic/angular/standalone';
+import { AlertController, IonContent, IonHeader, IonIcon, IonToolbar, ToastController } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
-import { arrowBackOutline, cloudUploadOutline, eyeOutline, eyeOffOutline, sparklesOutline } from 'ionicons/icons';
+import { arrowBackOutline, cloudUploadOutline, eyeOutline, eyeOffOutline, sparklesOutline, trashOutline } from 'ionicons/icons';
 import type {
   AdminImportCollectionResult,
   AdminImportCollectionJsonDto,
   AdminImportCollectionJsonResult,
   AdminImportStoryResult,
   AdminPlatformCollectionListItem,
+  AdminPlatformStoryListItem,
   CefrLevel,
   GeneratedPlatformStory,
   RawWordInput,
   StoryCategory,
 } from '@lingua-card/shared/domain';
 import { STORY_CATEGORIES } from '@lingua-card/shared/domain';
+import { TranslatePipe } from '@ngx-translate/core';
 import { AdminApiService } from '../../services/admin-api.service';
 
 @Component({
@@ -24,11 +26,12 @@ import { AdminApiService } from '../../services/admin-api.service';
   templateUrl: './admin-import.page.html',
   styleUrls: ['./admin-import.page.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [IonHeader, IonToolbar, IonContent, IonIcon, ReactiveFormsModule],
+  imports: [IonHeader, IonToolbar, IonContent, IonIcon, ReactiveFormsModule, TranslatePipe],
 })
 export class AdminImportPage {
   private readonly adminApi = inject(AdminApiService);
   private readonly toastCtrl = inject(ToastController);
+  private readonly alertCtrl = inject(AlertController);
   private readonly router = inject(Router);
   private readonly _destroyRef = inject(DestroyRef);
 
@@ -111,7 +114,7 @@ HARD RULES
 2. Stay strictly at CEFR {{LEVEL}}. For A1/A2: short main clauses, present and simple past, no subjunctive, no passive. Higher levels may add subordinate clauses/tenses as the level allows.
 3. Words must appear in CORRECT grammatical form — right article, case, and conjugation.
 4. Write a COMPLETE arc (beginning → middle → end) of 8–16 sentences for short, 16–28 for medium. Include natural dialogue where it fits.
-5. Provide an English translation for every sentence and a title translation.
+5. Provide an English ("native") translation for every sentence and a title translation.
 6. Do NOT add words to hit a quota — only natural usage counts toward the 80%.
 
 OUTPUT — valid JSON ONLY, no markdown fences, no commentary:
@@ -121,10 +124,10 @@ OUTPUT — valid JSON ONLY, no markdown fences, no commentary:
   "level": "{{LEVEL}}",
   "topic": "{{TOPIC}}",
   "sentences": [
-    { "german": "...", "english": "...", "wordsUsed": ["Apfel", "bestellen"] }
+    { "german": "...", "native": "...", "wordsUsed": ["Apfel", "bestellen"] }
   ],
   "keywords": [
-    { "germanBase": "Apfel", "article": "der", "english": "apple", "wordType": "noun", "level": "A1" }
+    { "germanBase": "Apfel", "article": "der", "translation": "apple", "wordType": "noun", "level": "A1" }
   ]
 }`;
 
@@ -142,11 +145,16 @@ OUTPUT — valid JSON ONLY, no markdown fences, no commentary:
   readonly collectionsLoading = signal(false);
   readonly togglingId = signal<string | null>(null);
   readonly settingCategoryId = signal<string | null>(null);
+  readonly deletingCollectionId = signal<string | null>(null);
+
+  readonly stories = signal<AdminPlatformStoryListItem[]>([]);
+  readonly storiesLoading = signal(false);
+  readonly deletingStoryId = signal<string | null>(null);
 
   readonly storyCategories = STORY_CATEGORIES;
 
   constructor() {
-    addIcons({ arrowBackOutline, cloudUploadOutline, sparklesOutline, eyeOutline, eyeOffOutline });
+    addIcons({ arrowBackOutline, cloudUploadOutline, sparklesOutline, eyeOutline, eyeOffOutline, trashOutline });
   }
 
   loadCollections(): void {
@@ -190,9 +198,75 @@ OUTPUT — valid JSON ONLY, no markdown fences, no commentary:
     });
   }
 
+  loadStories(): void {
+    if (this.storiesLoading()) return;
+    this.storiesLoading.set(true);
+    this.adminApi.listStories().pipe(takeUntilDestroyed(this._destroyRef)).subscribe({
+      next: items => { this.stories.set(items); this.storiesLoading.set(false); },
+      error: () => { this.storiesLoading.set(false); void this._toast('Failed to load stories', 'danger'); },
+    });
+  }
+
+  async deleteCollection(item: AdminPlatformCollectionListItem): Promise<void> {
+    if (this.deletingCollectionId()) return;
+    const alert = await this.alertCtrl.create({
+      header: 'Delete collection?',
+      message: `Permanently delete "${item.title}" and its ${item.wordCount} word links? Paired stories are kept but detached. This cannot be undone.`,
+      buttons: [
+        { text: 'Cancel', role: 'cancel' },
+        {
+          text: 'Delete',
+          role: 'destructive',
+          handler: () => {
+            this.deletingCollectionId.set(item.id);
+            this.adminApi.deleteCollection(item.id).pipe(takeUntilDestroyed(this._destroyRef)).subscribe({
+              next: () => {
+                this.deletingCollectionId.set(null);
+                this.collections.update(list => list.filter(c => c.id !== item.id));
+                void this._toast(`"${item.title}" deleted`, 'success');
+              },
+              error: () => { this.deletingCollectionId.set(null); void this._toast('Delete failed', 'danger'); },
+            });
+          },
+        },
+      ],
+    });
+    await alert.present();
+  }
+
+  async deleteStory(item: AdminPlatformStoryListItem): Promise<void> {
+    if (this.deletingStoryId()) return;
+    const alert = await this.alertCtrl.create({
+      header: 'Delete story?',
+      message: `Permanently delete "${item.title}" and all reader progress for it? This cannot be undone.`,
+      buttons: [
+        { text: 'Cancel', role: 'cancel' },
+        {
+          text: 'Delete',
+          role: 'destructive',
+          handler: () => {
+            this.deletingStoryId.set(item.id);
+            this.adminApi.deleteStory(item.id).pipe(takeUntilDestroyed(this._destroyRef)).subscribe({
+              next: () => {
+                this.deletingStoryId.set(null);
+                this.stories.update(list => list.filter(s => s.id !== item.id));
+                void this._toast(`"${item.title}" deleted`, 'success');
+              },
+              error: () => { this.deletingStoryId.set(null); void this._toast('Delete failed', 'danger'); },
+            });
+          },
+        },
+      ],
+    });
+    await alert.present();
+  }
+
   switchTab(tab: 'collection' | 'json' | 'story' | 'manage'): void {
     this.activeTab.set(tab);
-    if (tab === 'manage' && !this.collections().length) this.loadCollections();
+    if (tab === 'manage') {
+      if (!this.collections().length) this.loadCollections();
+      if (!this.stories().length) this.loadStories();
+    }
   }
 
   importCollection(): void {

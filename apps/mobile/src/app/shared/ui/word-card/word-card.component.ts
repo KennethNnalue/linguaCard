@@ -1,8 +1,10 @@
-import {ChangeDetectionStrategy, Component, computed, input, output} from '@angular/core';
+import {ChangeDetectionStrategy, Component, computed, inject, input, output} from '@angular/core';
 import {IonIcon} from '@ionic/angular/standalone';
+import {TranslateService} from '@ngx-translate/core';
 import {addIcons} from 'ionicons';
 import {volumeHighOutline} from 'ionicons/icons';
 import {Card} from '@lingua-card/shared/domain';
+import {LanguageService} from '../../../core/services/language.service';
 import {ArticleBadgeComponent} from '../../components/article-badge/article-badge.component';
 import {MasteryDotComponent} from '../../components/mastery-dot/mastery-dot.component';
 import type {AudioReadinessStatus} from '../../audio/audio-readiness.store';
@@ -22,6 +24,8 @@ export class WordCardComponent {
 
   readonly cardClick = output<void>();
   readonly playAudio = output<void>();
+  private readonly translate = inject(TranslateService);
+  private readonly languageService = inject(LanguageService);
 
   constructor() {
     addIcons({volumeHighOutline});
@@ -34,9 +38,11 @@ export class WordCardComponent {
   );
 
   readonly masteryLabel = computed(() => {
+    this.languageService.current(); // recompute on UI language change
     const state = this.card().srsState?.state;
-    if (!state || state === 'new') return 'New';
-    return {learning: 'Learning', review: 'Review', relearning: 'Review', mastered: 'Mastered'}[state] ?? 'New';
+    if (!state || state === 'new') return this.translate.instant('srs.masteryLabel.new');
+    const key = {learning: 'srs.masteryLabel.learning', review: 'srs.masteryLabel.review', relearning: 'srs.masteryLabel.review', mastered: 'srs.masteryLabel.mastered'}[state];
+    return key ? this.translate.instant(key) : this.translate.instant('srs.masteryLabel.new');
   });
 
   readonly isDue = computed(() => {

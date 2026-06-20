@@ -10,6 +10,7 @@ import {
 } from '@angular/core';
 import { NgClass } from '@angular/common';
 import { IonToggle } from '@ionic/angular/standalone';
+import { TranslatePipe } from '@ngx-translate/core';
 import type { StoryQuizQuestion } from '@lingua-card/shared/domain';
 import { WordAudioService } from '../../../../shared/audio/word-audio.service';
 
@@ -27,7 +28,7 @@ function shuffle<T>(arr: T[]): T[] {
   templateUrl: './quiz-tab.component.html',
   styleUrls: ['./quiz-tab.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [NgClass, IonToggle],
+  imports: [NgClass, IonToggle, TranslatePipe],
 })
 export class QuizTabComponent {
   private readonly wordAudio = inject(WordAudioService);

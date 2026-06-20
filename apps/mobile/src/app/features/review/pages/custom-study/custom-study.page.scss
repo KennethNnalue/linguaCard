@@ -39,7 +39,7 @@
   width: 100%; @include u.lc-card(t.$lc-radius-md);
   border: 1.5px solid var(--lc-border); padding: 11px 14px;
   @include u.flex-between; cursor: pointer;
-  font-family: t.$lc-font-body; @include u.lc-font('sm', t.$lc-font-weight-semibold); color: var(--lc-text-primary); text-align: left;
+  font-family: t.$lc-font-body; @include u.lc-font('sm', t.$lc-font-weight-semibold); color: var(--lc-text-primary); text-align: start;
 }
 .cs-chevron { color: var(--lc-text-hint); font-size: t.$lc-text-md; flex-shrink: 0; }
 

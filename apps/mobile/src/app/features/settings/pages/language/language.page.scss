@@ -1,0 +1,94 @@
+@use '../../../../../theme/tokens' as t;
+@use '../../../../../theme/utils' as u;
+
+.lang-nav {
+  @include u.flex-between;
+  padding: t.$lc-space-2 t.$lc-space-4 t.$lc-space-3;
+}
+
+.lang-back {
+  @include u.circle(28px);
+  border: none;
+  background: var(--lc-brand-light);
+  color: var(--lc-brand);
+  @include u.flex-center;
+  cursor: pointer;
+  @include u.touch-state;
+
+  svg {
+    width: 12px;
+    height: 12px;
+    stroke: var(--lc-brand);
+  }
+}
+
+.lang-nav-title {
+  font-family: t.$lc-font-display;
+  @include u.lc-font('2xl', t.$lc-font-weight-semibold);
+  color: var(--lc-text-primary);
+}
+
+.lang-content {
+  padding: t.$lc-space-4;
+}
+
+.lang-subtitle {
+  @include u.lc-font('sm');
+  color: var(--lc-text-secondary);
+  margin-bottom: t.$lc-space-4;
+}
+
+.lang-list {
+  display: flex;
+  flex-direction: column;
+  gap: t.$lc-space-2;
+}
+
+.lang-item {
+  display: flex;
+  align-items: center;
+  gap: t.$lc-space-3;
+  padding: t.$lc-space-3 t.$lc-space-4;
+  border-radius: t.$lc-radius-lg;
+  border: 1.5px solid var(--lc-border);
+  background: var(--lc-surface);
+  cursor: pointer;
+  @include u.touch-state;
+  transition: border-color 0.15s, background 0.15s;
+
+  &--active {
+    border-color: var(--lc-brand);
+    background: var(--lc-brand-light);
+  }
+}
+
+.lang-flag {
+  font-size: t.$lc-space-6;
+  line-height: 1;
+}
+
+.lang-labels {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+}
+
+.lang-native {
+  @include u.lc-font('base', t.$lc-font-weight-medium);
+  color: var(--lc-text-primary);
+}
+
+.lang-english {
+  @include u.lc-font('sm');
+  color: var(--lc-text-secondary);
+}
+
+.lang-check {
+  @include u.flex-center;
+  color: var(--lc-brand);
+
+  svg {
+    width: 18px;
+    height: 18px;
+  }
+}

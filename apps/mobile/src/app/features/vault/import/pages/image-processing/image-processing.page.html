@@ -3,7 +3,7 @@
 
     <!-- Back button + title -->
     <div class="proc-topbar">
-      <button class="proc-back" (click)="cancel()" aria-label="Cancel">
+      <button class="proc-back" (click)="cancel()" [attr.aria-label]="'imageProcessing.nav.cancelAria' | translate">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round">
           <polyline points="15,18 9,12 15,6"/>
         </svg>
@@ -11,19 +11,19 @@
       <div class="proc-topbar-text">
         @switch (phase()) {
           @case ('extracting') {
-            <div class="proc-topbar-title">Scanning image</div>
-            <div class="proc-topbar-sub">Please wait…</div>
+            <div class="proc-topbar-title">{{ 'imageProcessing.phases.extractingTitle' | translate }}</div>
+            <div class="proc-topbar-sub">{{ 'imageProcessing.phases.extractingSubtitle' | translate }}</div>
           }
           @case ('enriching') {
-            <div class="proc-topbar-title">Generating flashcards</div>
-            <div class="proc-topbar-sub">Building your collection…</div>
+            <div class="proc-topbar-title">{{ 'imageProcessing.phases.enrichingTitle' | translate }}</div>
+            <div class="proc-topbar-sub">{{ 'imageProcessing.phases.enrichingSubtitle' | translate }}</div>
           }
           @case ('partial') {
-            <div class="proc-topbar-title">Almost done</div>
-            <div class="proc-topbar-sub">{{ enrichedCount() }} cards are ready now</div>
+            <div class="proc-topbar-title">{{ 'imageProcessing.phases.partialTitle' | translate }}</div>
+            <div class="proc-topbar-sub">{{ enrichedCount() }} {{ 'imageProcessing.phases.partialSubtitle' | translate }}</div>
           }
           @default {
-            <div class="proc-topbar-title">Done!</div>
+            <div class="proc-topbar-title">{{ 'imageProcessing.phases.doneTitle' | translate }}</div>
           }
         }
       </div>
@@ -35,7 +35,7 @@
         <img
           class="proc-img"
           [src]="'data:' + image()!.mimeType + ';base64,' + image()!.base64"
-          alt="Scanning image" />
+          [alt]="'imageProcessing.image.altText' | translate" />
         <div class="scan-overlay">
           <div class="scan-glow"></div>
           <div class="scan-line"></div>
@@ -63,7 +63,7 @@
           <div class="proc-step-title" [class.proc-step-title--muted]="phase() === 'extracting'">
             {{ phase1Label() }}
           </div>
-          <div class="proc-step-sub">Reading words from image</div>
+          <div class="proc-step-sub">{{ 'imageProcessing.phase1.stepSubtitle' | translate }}</div>
         </div>
       </div>
 
@@ -116,8 +116,8 @@
     @if (phase() === 'enriching' || phase() === 'partial') {
       <div class="proc-progress-card">
         <div class="proc-progress-header">
-          <span class="proc-progress-label">Progress</span>
-          <span class="proc-progress-count">{{ enrichedCount() }} / {{ totalCount() }} ready</span>
+          <span class="proc-progress-label">{{ 'imageProcessing.progressCard.label' | translate }}</span>
+          <span class="proc-progress-count">{{ enrichedCount() }} / {{ totalCount() }} {{ 'imageProcessing.progressCard.readyLabel' | translate }}</span>
         </div>
         <div class="proc-bar-track">
           <div class="proc-bar-fill"
@@ -125,8 +125,8 @@
           </div>
         </div>
         <div class="proc-bar-labels">
-          <span>{{ enrichedCount() }} cards</span>
-          <span>{{ totalCount() - enrichedCount() }} remaining</span>
+          <span>{{ enrichedCount() }} {{ 'imageProcessing.progressCard.cardsLabel' | translate }}</span>
+          <span>{{ totalCount() - enrichedCount() }} {{ 'imageProcessing.progressCard.remainingLabel' | translate }}</span>
         </div>
         @if (enrichedWords().length > 0) {
           <div class="proc-chip-grid">
@@ -145,7 +145,7 @@
             <rect x="2" y="7" width="20" height="14" rx="2"/>
             <path d="M16 7V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v2"/>
           </svg>
-          <span>Processing 10 words at a time — progress saved after each batch</span>
+          <span>{{ 'imageProcessing.batchInfo' | translate }}</span>
         </div>
       </div>
     }
@@ -155,9 +155,9 @@
       <div class="proc-partial-banner">
         <div class="proc-partial-icon">⏳</div>
         <div class="proc-partial-body">
-          <div class="proc-partial-title">{{ pendingCount() }} cards will be added later</div>
+          <div class="proc-partial-title">{{ pendingCount() }} {{ 'imageProcessing.partialBanner.titleSuffix' | translate }}</div>
           <div class="proc-partial-sub">
-            The AI quota limit was reached mid-import. Your collection will show a "Complete" button — tap it any time to finish.
+            {{ 'imageProcessing.partialBanner.subtitle' | translate }}
           </div>
         </div>
       </div>
@@ -165,15 +165,15 @@
       <div class="proc-partial-stats">
         <div class="proc-partial-stat">
           <div class="proc-partial-stat-val proc-partial-stat-val--ok">{{ enrichedCount() }}</div>
-          <div class="proc-partial-stat-lbl">Ready now</div>
+          <div class="proc-partial-stat-lbl">{{ 'imageProcessing.partialStats.readyLabel' | translate }}</div>
         </div>
         <div class="proc-partial-stat">
           <div class="proc-partial-stat-val proc-partial-stat-val--warn">{{ pendingCount() }}</div>
-          <div class="proc-partial-stat-lbl">Pending</div>
+          <div class="proc-partial-stat-lbl">{{ 'imageProcessing.partialStats.pendingLabel' | translate }}</div>
         </div>
         <div class="proc-partial-stat">
           <div class="proc-partial-stat-val">{{ totalCount() }}</div>
-          <div class="proc-partial-stat-lbl">Total found</div>
+          <div class="proc-partial-stat-lbl">{{ 'imageProcessing.partialStats.totalLabel' | translate }}</div>
         </div>
       </div>
     }
@@ -185,7 +185,7 @@
           <circle cx="12" cy="12" r="9"/>
           <path d="M12 8v4M12 16h.01"/>
         </svg>
-        Step 1 of 2 — quick scan. Step 2 generates translations and example sentences.
+        {{ 'imageProcessing.info.note' | translate }}
       </div>
     }
 
@@ -194,9 +194,9 @@
     <!-- Footer -->
     <button class="proc-cancel" (click)="cancel()">
       @if (phase() === 'enriching') {
-        Running in background — you can leave this screen
+        {{ 'imageProcessing.cancel.backgroundLabel' | translate }}
       } @else {
-        Cancel
+        {{ 'imageProcessing.cancel.defaultLabel' | translate }}
       }
     </button>
 

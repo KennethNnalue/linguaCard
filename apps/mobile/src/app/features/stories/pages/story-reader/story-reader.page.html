@@ -9,7 +9,7 @@
         }
         <div class="sr2-cover-overlay"></div>
         <div class="sr2-top-bar">
-          <button class="sr2-back-btn" (click)="goBack()" aria-label="Back">
+          <button class="sr2-back-btn" (click)="goBack()" [attr.aria-label]="'stories.reader.backAriaLabel' | translate">
             <ion-icon name="arrow-back-outline"></ion-icon>
           </button>
           <div class="sr2-top-actions">
@@ -17,7 +17,7 @@
               <svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" width="10" height="10">
                 <polyline points="20,6 9,17 4,12"/>
               </svg>
-              {{ isLearned() ? 'Learned' : 'Mark as learned' }}
+              {{ isLearned() ? ('stories.reader.learnedLabel' | translate) : ('stories.reader.markAsLearnedLabel' | translate) }}
             </button>
           </div>
         </div>
@@ -35,22 +35,22 @@
         class="sr2-section-tab"
         [class.active]="activeTab() === 'story'"
         (click)="setTab('story')"
-      >Story</button>
+      >{{ 'stories.reader.storyTab' | translate }}</button>
       <button
         class="sr2-section-tab"
         [class.active]="activeTab() === 'quiz'"
         (click)="setTab('quiz')"
-      >Quiz</button>
+      >{{ 'stories.reader.quizTab' | translate }}</button>
       <button
         class="sr2-section-tab"
         [class.active]="activeTab() === 'keywords'"
         (click)="setTab('keywords')"
-      >Keywords</button>
+      >{{ 'stories.reader.keywordsTab' | translate }}</button>
       <button
         class="sr2-section-tab"
         [class.active]="activeTab() === 'grammar'"
         (click)="setTab('grammar')"
-      >Grammar</button>
+      >{{ 'stories.reader.grammarTab' | translate }}</button>
     </div>
 
     <!-- ── TAB CONTENT ────────────────────────────────────────────── -->
@@ -69,8 +69,8 @@
             class="sr2-icon-btn"
             [class.active]="showTranslation()"
             (click)="showTranslation.update(v => !v)"
-            title="Toggle translation"
-            aria-label="Toggle translation"
+            [title]="'stories.reader.toggleTranslationTitle' | translate"
+            [attr.aria-label]="'stories.reader.toggleTranslationAriaLabel' | translate"
           >
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="14" height="14">
               <circle cx="12" cy="12" r="10"/>
@@ -85,13 +85,13 @@
       @if (audioGenerating()) {
         <div class="sr-audio-generating">
           <div class="sr-generating-pulse"></div>
-          <span>Generating audio narration…</span>
+          <span>{{ 'stories.reader.generatingAudio' | translate }}</span>
         </div>
       }
       @if (audioLoading() && !audioGenerating()) {
         <div class="sr-audio-generating">
           <div class="sr-generating-pulse"></div>
-          <span>Preparing audio…</span>
+          <span>{{ 'stories.reader.preparingAudio' | translate }}</span>
         </div>
       }
 
@@ -112,7 +112,7 @@
                 }
               </p>
               @if (showTranslation()) {
-                <p class="sr2-sent-en">{{ sent.english }}</p>
+                <p class="sr2-sent-en">{{ sent.native }}</p>
               }
             </div>
           }
@@ -173,7 +173,7 @@
     }
 
   } @else {
-    <div class="sr-loading">Loading story…</div>
+    <div class="sr-loading">{{ 'stories.reader.loadingMsg' | translate }}</div>
   }
 </ion-content>
 
@@ -188,7 +188,7 @@
         <div class="sr2-cover-overlay"></div>
 
         <div class="sr2-top-bar">
-          <button class="sr2-back-btn" (click)="$event.stopPropagation(); dismissTappedWord()" aria-label="Close word panel">
+          <button class="sr2-back-btn" (click)="$event.stopPropagation(); dismissTappedWord()" [attr.aria-label]="'stories.reader.closeWordPanelAriaLabel' | translate">
             <svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" width="14" height="14">
               <polyline points="15,18 9,12 15,6"/>
             </svg>
@@ -198,7 +198,7 @@
               <svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" width="10" height="10">
                 <polyline points="20,6 9,17 4,12"/>
               </svg>
-              {{ isLearned() ? 'Learned' : 'Mark as learned' }}
+              {{ isLearned() ? ('stories.reader.learnedLabel' | translate) : ('stories.reader.markAsLearnedLabel' | translate) }}
             </button>
           </div>
         </div>
@@ -209,7 +209,7 @@
           @if (wd.wordType === 'noun' && wd.plural) {
             <div class="sr-word-plural">
               {{ wd.plural }}
-              <span class="sr-word-plural-badge">Plural</span>
+              <span class="sr-word-plural-badge">{{ 'stories.reader.pluralLabel' | translate }}</span>
             </div>
           }
 
@@ -222,7 +222,7 @@
           }
 
           @if (wd.wordType === 'verb') {
-            <button class="sr-word-conj-btn" (click)="$event.stopPropagation(); showConjugations.update(v => !v)">Conjugate ▸</button>
+            <button class="sr-word-conj-btn" (click)="$event.stopPropagation(); showConjugations.update(v => !v)">{{ 'stories.reader.conjugateBtn' | translate }}</button>
           }
         </div>
 
@@ -231,7 +231,7 @@
             class="sr-word-action-btn"
             [class.sr-word-action-btn--loading]="pronunciationLoading()"
             (click)="playTappedWord()"
-            aria-label="Play pronunciation"
+            [attr.aria-label]="'stories.reader.playPronunciationAriaLabel' | translate"
           >
             @if (pronunciationLoading()) {
               <div class="sr-word-audio-spinner"></div>
@@ -245,7 +245,7 @@
             class="sr-word-action-btn"
             [class.sr-word-action-btn--in-vault]="tappedWordInVault()"
             (click)="addToVault()"
-            [attr.aria-label]="tappedWordInVault() ? 'Already in vault' : 'Add to vault'"
+            [attr.aria-label]="tappedWordInVault() ? ('stories.reader.alreadyInVaultAriaLabel' | translate) : ('stories.reader.addToVaultAriaLabel' | translate)"
           >
             @if (tappedWordInVault()) {
               <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
@@ -278,8 +278,8 @@
         <thead>
           <tr>
             <th></th>
-            <th>Präsens</th>
-            <th>Präteritum</th>
+            <th>{{ 'stories.reader.praesensHeader' | translate }}</th>
+            <th>{{ 'stories.reader.praeteritumHeader' | translate }}</th>
           </tr>
         </thead>
         <tbody>
@@ -296,15 +296,15 @@
       @if (conj.perfekt || conj.imperativ) {
         <div class="sr-conj-extra">
           @if (conj.perfekt) {
-            <span><strong>Perfekt:</strong> {{ conj.perfekt }}</span>
+            <span><strong>{{ 'stories.reader.perfektLabel' | translate }}</strong> {{ conj.perfekt }}</span>
           }
           @if (conj.imperativ) {
-            <span><strong>Imperativ:</strong> {{ conj.imperativ }}</span>
+            <span><strong>{{ 'stories.reader.imperativLabel' | translate }}</strong> {{ conj.imperativ }}</span>
           }
         </div>
       }
     } @else {
-      <div class="sr-conj-empty">No conjugation data available.</div>
+      <div class="sr-conj-empty">{{ 'stories.reader.noConjugationData' | translate }}</div>
     }
   </div>
 }

@@ -1,8 +1,8 @@
 <ion-header class="ion-no-border">
   <ion-toolbar>
     <div class="gs-nav">
-      <div class="gs-nav-title">Generate Story</div>
-      <button class="gs-close-btn" (click)="dismiss()" [disabled]="isGenerating()" aria-label="Close">
+      <div class="gs-nav-title">{{ 'stories.generate.pageTitle' | translate }}</div>
+      <button class="gs-close-btn" (click)="dismiss()" [disabled]="isGenerating()" [attr.aria-label]="'stories.generate.closeAriaLabel' | translate">
         <ion-icon name="close-outline"></ion-icon>
       </button>
     </div>
@@ -14,7 +14,7 @@
     <div class="free-usage-bar">
       <span class="free-usage-text">
         {{ subscriptionStore.status()?.storiesGenerated ?? 0 }} of
-        {{ subscriptionStore.status()?.freeStoryLimit ?? 3 }} free stories used
+        {{ subscriptionStore.status()?.freeStoryLimit ?? 3 }} {{ 'stories.generate.freeStoriesUsedLabel' | translate }}
       </span>
       <div class="free-usage-track">
         <div
@@ -29,15 +29,15 @@
     <!-- Collections picker -->
     <div class="gs-section">
       <div class="gs-section-label">
-        Pick collections
+        {{ 'stories.generate.pickCollectionsSection' | translate }}
         @if (selectedCount() > 0) {
-          <span class="gs-section-count">{{ selectedCount() }} selected</span>
+          <span class="gs-section-count">{{ selectedCount() }} {{ 'stories.generate.selectedLabel' | translate }}</span>
         }
       </div>
 
       @if (collections().length === 0) {
         <div class="gs-empty-collections">
-          No collections yet. Add words to a collection first.
+          {{ 'stories.generate.noCollectionsMsg' | translate }}
         </div>
       } @else {
         <div class="gs-collections-list">
@@ -50,7 +50,7 @@
               <span class="gs-col-emoji">{{ col.emoji }}</span>
               <div class="gs-col-info">
                 <span class="gs-col-name">{{ col.name }}</span>
-                <span class="gs-col-count">{{ col.cardCount }} words</span>
+                <span class="gs-col-count">{{ col.cardCount }} {{ 'stories.generate.wordsLabel' | translate }}</span>
               </div>
               <div class="gs-col-check" [ngClass]="{ visible: isSelected(col.id) }">
                 <ion-icon name="checkmark-outline"></ion-icon>
@@ -64,9 +64,9 @@
     <!-- Length -->
     <div class="gs-section">
       <div class="gs-section-label">
-        Story length
+        {{ 'stories.generate.lengthSection' | translate }}
         @if (!subscriptionStore.isPro()) {
-          <span class="gs-section-pro-hint">Short only on free plan</span>
+          <span class="gs-section-pro-hint">{{ 'stories.generate.freeOnlyHint' | translate }}</span>
         }
       </div>
       <div class="gs-chips">
@@ -77,27 +77,27 @@
               [ngClass]="{ active: selectedLength() === opt.value }"
               (click)="selectedLength.set(opt.value)"
             >
-              {{ opt.label }}
-              @if (opt.badge) {
-                <span class="gs-chip-badge">{{ opt.badge }}</span>
+              {{ opt.labelKey | translate }}
+              @if (opt.badgeKey) {
+                <span class="gs-chip-badge">{{ opt.badgeKey | translate }}</span>
               }
             </button>
           } @else {
             <button class="gs-chip gs-chip--locked" disabled>
-              {{ opt.label }}
+              {{ opt.labelKey | translate }}
               <ion-icon name="lock-closed-outline" class="gs-chip-lock"></ion-icon>
             </button>
           }
         }
       </div>
       @if (isLongFormat()) {
-        <div class="gs-length-warning">This may take up to 45 seconds</div>
+        <div class="gs-length-warning">{{ 'stories.generate.longWarning' | translate }}</div>
       }
     </div>
 
     <!-- Difficulty -->
     <div class="gs-section">
-      <div class="gs-section-label">Difficulty level</div>
+      <div class="gs-section-label">{{ 'stories.generate.difficultySection' | translate }}</div>
       <div class="gs-chips">
         @for (opt of difficulties; track opt.value) {
           <button
@@ -126,9 +126,9 @@
       <div class="gs-error-block">
         <div class="gs-error-msg">{{ generateError() }}</div>
         <div class="gs-error-actions">
-          <button class="gs-retry-btn" (click)="retry()">Try again</button>
+          <button class="gs-retry-btn" (click)="retry()">{{ 'stories.generate.retryBtn' | translate }}</button>
           @if (showSupportLink()) {
-            <a class="gs-support-link" href="mailto:kennethnnalue@gmail.com">Contact support</a>
+            <a class="gs-support-link" href="mailto:kennethnnalue@gmail.com">{{ 'stories.generate.contactSupportLink' | translate }}</a>
           }
         </div>
       </div>
@@ -146,10 +146,10 @@
     >
       @if (isGenerating()) {
         <ion-spinner name="crescent"></ion-spinner>
-        {{ stepMessage() || 'Generating your story…' }}
+        {{ stepMessage() || ('stories.generate.generatingDefaultMsg' | translate) }}
       } @else {
         <ion-icon name="sparkles-outline"></ion-icon>
-        Generate Story
+        {{ 'stories.generate.generateBtn' | translate }}
       }
     </button>
   </div>

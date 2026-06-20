@@ -12,6 +12,15 @@ export type SyncOperationType = (typeof SyncOperationType)[keyof typeof SyncOper
 
 // ─── MASTERY ──────────────────────────────────────────────────────────────────
 
+export const MASTERY_LABEL_KEYS: Record<MasteryLevel, string> = {
+  0: 'srs.masteryLabel.new',
+  1: 'srs.masteryLabel.learning',
+  2: 'srs.masteryLabel.familiar',
+  3: 'srs.masteryLabel.review',
+  4: 'srs.masteryLabel.good',
+  5: 'srs.masteryLabel.mastered',
+};
+
 export const MASTERY_LABELS: Record<MasteryLevel, string> = {
   0: 'New',
   1: 'Learning',

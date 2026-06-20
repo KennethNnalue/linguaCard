@@ -1,10 +1,10 @@
 <ion-header class="ion-no-border">
   <ion-toolbar>
     <div class="sh-nav">
-      <button class="sh-back-btn" (click)="goBack()" aria-label="Back">
+      <button class="sh-back-btn" (click)="goBack()" [attr.aria-label]="'review.history.backAriaLabel' | translate">
         <ion-icon name="chevron-back-outline"></ion-icon>
       </button>
-      <span class="sh-nav-title">Session History</span>
+      <span class="sh-nav-title">{{ 'review.history.pageTitle' | translate }}</span>
       <div class="sh-nav-spacer"></div>
     </div>
   </ion-toolbar>
@@ -15,9 +15,9 @@
 
     <!-- Line tab filters -->
     <div class="sh-filters">
-      <button class="sh-tab" [class.active]="filter() === 'all'" (click)="setFilter('all')">All sessions</button>
-      <button class="sh-tab" [class.active]="filter() === 'week'" (click)="setFilter('week')">This week</button>
-      <button class="sh-tab" [class.active]="filter() === 'month'" (click)="setFilter('month')">This month</button>
+      <button class="sh-tab" [class.active]="filter() === 'all'" (click)="setFilter('all')">{{ 'review.history.allSessionsTab' | translate }}</button>
+      <button class="sh-tab" [class.active]="filter() === 'week'" (click)="setFilter('week')">{{ 'review.history.thisWeekTab' | translate }}</button>
+      <button class="sh-tab" [class.active]="filter() === 'month'" (click)="setFilter('month')">{{ 'review.history.thisMonthTab' | translate }}</button>
     </div>
     <div class="sh-tab-divider"></div>
 
@@ -27,7 +27,7 @@
         <div class="sh-session-card">
           <div class="sh-session-top">
             <div class="sh-session-info">
-              <p class="sh-session-title">{{ session.collectionName ?? 'All due cards' }}</p>
+              <p class="sh-session-title">{{ session.collectionName ?? ('review.hub.allDueCardsLabel' | translate) }}</p>
               <p class="sh-session-date">{{ session.startedAt | sessionDate: true }}</p>
             </div>
             <span class="sh-rating-pill" [class]="ratingPillClass(stats.avgRating)">
@@ -37,19 +37,19 @@
           <div class="sh-stats-row">
             <div class="sh-stat">
               <span class="sh-stat-val lc-display">{{ stats.totalCards }}</span>
-              <span class="sh-stat-lbl">Ratings</span>
+              <span class="sh-stat-lbl">{{ 'review.history.ratingsStatLabel' | translate }}</span>
             </div>
             <div class="sh-stat">
               <span class="sh-stat-val lc-display">{{ stats.duration }}</span>
-              <span class="sh-stat-lbl">Duration</span>
+              <span class="sh-stat-lbl">{{ 'review.history.durationStatLabel' | translate }}</span>
             </div>
             <div class="sh-stat">
               <span class="sh-stat-val lc-display">{{ stats.struggled }}</span>
-              <span class="sh-stat-lbl">Struggled</span>
+              <span class="sh-stat-lbl">{{ 'review.history.struggledStatLabel' | translate }}</span>
             </div>
             <div class="sh-stat">
               <span class="sh-stat-val lc-display">{{ stats.nailed }}</span>
-              <span class="sh-stat-lbl">Nailed</span>
+              <span class="sh-stat-lbl">{{ 'review.history.nailedStatLabel' | translate }}</span>
             </div>
           </div>
         </div>
@@ -57,8 +57,8 @@
     } @else {
       <div class="sh-empty">
         <p class="sh-empty-icon">📋</p>
-        <p class="sh-empty-title">No review sessions yet.</p>
-        <p class="sh-empty-sub">Start your first review to see history here!</p>
+        <p class="sh-empty-title">{{ 'review.history.noSessionsTitle' | translate }}</p>
+        <p class="sh-empty-sub">{{ 'review.history.noSessionsDesc' | translate }}</p>
       </div>
     }
 

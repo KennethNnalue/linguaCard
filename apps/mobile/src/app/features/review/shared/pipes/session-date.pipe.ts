@@ -1,11 +1,13 @@
-import { Pipe, PipeTransform } from '@angular/core';
+import { inject, Pipe, PipeTransform } from '@angular/core';
+import { TranslateService } from '@ngx-translate/core';
 import { localDayKey } from '@lingua-card/shared/utils';
 
-/** Formats a session ISO timestamp to "Today", "Yesterday", or "N days ago".
- *  Pass `withTime: true` to append ", HH:MM" (used in session history).
- *  Uses local-time calendar dates so labels agree with the weekly chart. */
-@Pipe({ name: 'sessionDate', pure: true })
+// Impure: output depends on the active UI language (via TranslateService), which
+// can change without the input ISO date changing. A pure pipe would cache stale labels.
+@Pipe({ name: 'sessionDate', pure: false })
 export class SessionDatePipe implements PipeTransform {
+  private readonly translate = inject(TranslateService);
+
   transform(isoDate: string, withTime = false): string {
     if (!isoDate) return '';
     const date = new Date(isoDate);
@@ -18,13 +20,12 @@ export class SessionDatePipe implements PipeTransform {
     const todayDay = localDayKey(today);
     const yesterdayDay = localDayKey(new Date(today.getTime() - 86_400_000));
 
-    if (sessionDay === todayDay) return `Today${timeStr}`;
-    if (sessionDay === yesterdayDay) return `Yesterday${timeStr}`;
+    if (sessionDay === todayDay) return `${this.translate.instant('common.today')}${timeStr}`;
+    if (sessionDay === yesterdayDay) return `${this.translate.instant('common.yesterday')}${timeStr}`;
 
-    // Parse local-day keys as midnight UTC for diff (same offset both sides → correct diff)
     const todayMidnight = new Date(todayDay).getTime();
     const sessionMidnight = new Date(sessionDay).getTime();
     const diffDays = Math.round((todayMidnight - sessionMidnight) / 86_400_000);
-    return `${diffDays} days ago${timeStr}`;
+    return `${this.translate.instant('common.daysAgoLabel', { count: diffDays })}${timeStr}`;
   }
 }

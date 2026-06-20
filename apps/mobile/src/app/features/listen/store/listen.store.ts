@@ -332,6 +332,11 @@ export const ListenStore = signalStore(
         this.loadQueue(cards, sourceLabel);
       },
 
+      /** Replace the display label for the current source (e.g. to localize a restored session). */
+      setSourceLabel(sourceLabel: string): void {
+        patchState(store, { sourceLabel });
+      },
+
       start(opts: { shuffle?: boolean } = {}): void {
         if (opts.shuffle !== undefined) {
           const settings = { ...store.settings(), shuffle: opts.shuffle };

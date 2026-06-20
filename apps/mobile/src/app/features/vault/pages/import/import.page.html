@@ -1,14 +1,14 @@
 <ion-header class="ion-no-border">
   <ion-toolbar>
     <div class="imp-nav">
-      <button class="imp-back-btn" (click)="goBack()" [attr.aria-label]="_isModal() ? 'Close' : 'Back'">
+      <button class="imp-back-btn" (click)="goBack()" [attr.aria-label]="(_isModal() ? 'import.nav.closeAria' : 'import.nav.backAria') | translate">
         @if (_isModal()) {
           <ion-icon name="close-outline"></ion-icon>
         } @else {
           <ion-icon name="arrow-back-outline"></ion-icon>
         }
       </button>
-      <span class="imp-title lc-display">Import Words</span>
+      <span class="imp-title lc-display">{{ 'import.nav.title' | translate }}</span>
       <div class="imp-nav-spacer"></div>
     </div>
   </ion-toolbar>
@@ -23,16 +23,16 @@
         <div class="imp-method-icon imp-method-icon--camera">
           <ion-icon name="camera-outline"></ion-icon>
         </div>
-        <span class="imp-method-title">Scan Image</span>
-        <span class="imp-method-sub">Photos, menus, flashcards</span>
+        <span class="imp-method-title">{{ 'import.methods.scanLabel' | translate }}</span>
+        <span class="imp-method-sub">{{ 'import.methods.scanSubtitle' | translate }}</span>
       </button>
 
       <button class="imp-method-card" (click)="openFilePicker()">
         <div class="imp-method-icon imp-method-icon--csv">
           <ion-icon name="cloud-upload-outline"></ion-icon>
         </div>
-        <span class="imp-method-title">Upload CSV</span>
-        <span class="imp-method-sub">Bulk import from file</span>
+        <span class="imp-method-title">{{ 'import.methods.csvLabel' | translate }}</span>
+        <span class="imp-method-sub">{{ 'import.methods.csvSubtitle' | translate }}</span>
       </button>
     </div>
 
@@ -51,8 +51,8 @@
           <ion-icon name="sparkles-outline"></ion-icon>
         </div>
         <div class="imp-ai-header-text">
-          <span class="imp-ai-title">Generate a CSV with AI</span>
-          <span class="imp-ai-subtitle">Copy this prompt into ChatGPT, Claude, or any AI</span>
+          <span class="imp-ai-title">{{ 'import.ai.title' | translate }}</span>
+          <span class="imp-ai-subtitle">{{ 'import.ai.subtitle' | translate }}</span>
         </div>
       </div>
 
@@ -63,21 +63,21 @@
             <div class="imp-step-num imp-step-num--done">
               <ion-icon name="checkmark-outline"></ion-icon>
             </div>
-            <span class="imp-step-lbl imp-step-lbl--done">Copied!</span>
+            <span class="imp-step-lbl imp-step-lbl--done">{{ 'import.ai.copiedLabel' | translate }}</span>
           } @else {
             <div class="imp-step-num">1</div>
-            <span class="imp-step-lbl">Copy prompt below</span>
+            <span class="imp-step-lbl">{{ 'import.ai.steps.step1' | translate }}</span>
           }
         </div>
         <ion-icon name="chevron-forward-outline" class="imp-step-arrow"></ion-icon>
         <div class="imp-step">
           <div class="imp-step-num">2</div>
-          <span class="imp-step-lbl">Paste into AI with your words</span>
+          <span class="imp-step-lbl">{{ 'import.ai.steps.step2' | translate }}</span>
         </div>
         <ion-icon name="chevron-forward-outline" class="imp-step-arrow"></ion-icon>
         <div class="imp-step">
           <div class="imp-step-num">3</div>
-          <span class="imp-step-lbl">Upload the CSV here</span>
+          <span class="imp-step-lbl">{{ 'import.ai.steps.step3' | translate }}</span>
         </div>
       </div>
 
@@ -85,17 +85,17 @@
       <div class="imp-prompt-card" [class.imp-prompt-card--copied]="promptCopied()">
         <div class="imp-prompt-top">
           @if (promptCopied()) {
-            <span class="imp-prompt-label imp-prompt-label--copied">✓ Copied to clipboard</span>
+            <span class="imp-prompt-label imp-prompt-label--copied">{{ 'import.ai.prompt.copiedLabel' | translate }}</span>
           } @else {
-            <span class="imp-prompt-label">AI prompt</span>
+            <span class="imp-prompt-label">{{ 'import.ai.prompt.label' | translate }}</span>
           }
           <button class="imp-copy-btn" [class.imp-copy-btn--copied]="promptCopied()" (click)="copyPrompt()">
             @if (promptCopied()) {
               <ion-icon name="checkmark-outline"></ion-icon>
-              Copied!
+              {{ 'import.ai.prompt.copiedButton' | translate }}
             } @else {
               <ion-icon name="copy-outline"></ion-icon>
-              Copy
+              {{ 'import.ai.prompt.copyButton' | translate }}
             }
           </button>
         </div>
@@ -106,9 +106,9 @@
           <ion-icon name="information-circle-outline"></ion-icon>
           <span class="imp-prompt-footer-text">
             @if (promptCopied()) {
-              Now open your favourite AI tool, paste the prompt, add your words, and download the CSV
+              {{ 'import.ai.prompt.footerAfterCopy' | translate }}
             } @else {
-              Works with ChatGPT, Claude, Gemini, Copilot — any AI that generates text
+              {{ 'import.ai.prompt.footerDefault' | translate }}
             }
           </span>
         </div>
@@ -118,7 +118,7 @@
     <!-- Template download -->
     <button class="imp-dl-btn" (click)="downloadTemplate()">
       <ion-icon name="download-outline"></ion-icon>
-      Download CSV template (95 pre-made words)
+      {{ 'import.downloadTemplate' | translate }}
     </button>
 
   </div>

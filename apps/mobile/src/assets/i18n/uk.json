@@ -564,7 +564,8 @@
     },
     "collection": {
       "label": "ДОДАТИ ДО КОЛЕКЦІЇ",
-      "requiredHint": "*обов'язково"
+      "requiredHint": "*обов'язково",
+      "noSelectionLabel": "Без колекції"
     },
     "words": {
       "label": "Слова (натисніть, щоб обрати / зняти вибір)",

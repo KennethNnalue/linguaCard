@@ -101,7 +101,10 @@ apps/mobile/src/app/
 │   │   ├── sync.service.ts            ← Generic queue orchestration (no domain types)
 │   │   ├── local-data.service.ts      ← Raw IndexedDB get/set (no business logic)
 │   │   ├── network.service.ts         ← Online/offline signal
-│   │   └── theme.service.ts           ← Dark/light mode toggle
+│   │   ├── theme.service.ts           ← Dark/light mode toggle
+│   │   └── language.service.ts        ← UI language (i18n) — mirrors ThemeService pattern
+│   ├── i18n/
+│   │   └── supported-languages.ts     ← Registry of 6 supported UI languages
 │   └── core.providers.ts
 │
 ├── shared/                            ← Reusable UI + algorithms — no feature state
@@ -455,6 +458,49 @@ Never write mastery colour CSS. Never use `.lc-mastery-dot--*` global classes.
 
 ---
 
+## Internationalization (i18n)
+
+The app uses **ngx-translate** (`@ngx-translate/core` + `@ngx-translate/http-loader`) for UI internationalization. Six languages are supported: English, Spanish, Turkish, Ukrainian, Russian, and Arabic.
+
+### How it works
+
+- **`LanguageService`** (`core/services/language.service.ts`) mirrors `ThemeService` — persists to `localStorage['lc-ui-language']`, sets `<html lang>` + `<html dir>`, calls `translateService.use()`.
+- **`SUPPORTED_LANGUAGES`** registry at `core/i18n/supported-languages.ts` — single source of truth for language codes, native names, flags, and RTL direction.
+- Translation JSON bundles live at `apps/mobile/src/assets/i18n/{en,es,tr,uk,ru,ar}.json` (715 keys each).
+- `provideTranslateService({ fallbackLang: 'en' })` registered in `main.ts`.
+- Server persists `uiLanguage` on `user_settings` table (default `'en'`); reconciled on app load.
+
+### Rules for new UI strings
+
+1. **Never hardcode English text** in templates — use `{{ 'key.path' | translate }}` or `[attr]="'key.path' | translate"`
+2. **Key convention:** `feature.context.key` (e.g. `auth.login.signIn`, `home.streak.label`, `common.cancel`)
+3. **Every component using the translate pipe** must import `TranslatePipe` from `@ngx-translate/core` in its `imports` array
+4. **Programmatic strings** (toasts, alerts): inject `TranslateService`, use `this.translate.instant('key')` or `.get('key')`
+5. **Dynamic values:** use ngx-translate interpolation — `{{ 'key' | translate:{ count: value } }}` with `{{count}}` in the JSON
+6. **Add new keys to all 6 bundles** — `en.json` first, then the 5 translations. Run key-parity check.
+7. **Shared/repeated strings** live under `common.*` namespace
+
+### i18n in attribute bindings
+
+```html
+<!-- Template text -->
+{{ 'auth.login.signIn' | translate }}
+
+<!-- Placeholder -->
+[placeholder]="'common.placeholder.email' | translate"
+
+<!-- aria-label -->
+[attr.aria-label]="'common.aria.close' | translate"
+
+<!-- title -->
+[title]="'stories.keywords.playPronunciationTitle' | translate"
+
+<!-- Dynamic interpolation -->
+{{ 'listen.hero.queueCountLabel' | translate:{ count: queueCount() } }}
+```
+
+---
+
 ## SRS algorithm (FSRS-5)
 
 Rating 1–4 maps to: Again / Hard / Good / Easy.
@@ -492,6 +538,7 @@ Rating 1–4 maps to: Again / Hard / Good / Easy.
 | 16 | Streak, Goals & Web Reminders | ✅ Implemented | `apps/api/src/{settings,stats,push}/`, `features/settings/`, `shared/srs/review-stats.store.ts`, `apps/mobile/epics/epic-streak-goals-reminders.md` |
 | 17 | Global Word Dictionary & Admin | ✅ Implemented | `apps/api/src/word-dictionary/`, `apps/api/src/admin/`, `features/admin/`, `vault/services/dictionary-api.service.ts`, `apps/mobile/epics/epic-global-word-dictionary.md` |
 | 18 | Platform Vocabulary Collections | ✅ Implemented | `apps/api/src/platform-collections/`, `vault/store/platform-collection.store.ts`, `vault/services/platform-collection-api.service.ts`, `vault/pages/platform-collection-detail/`, `vault/pages/collections/` (Explore segment), `vault/pages/explore-topic/` (See All), `apps/mobile/epics/epic-platform-collections-refined.md` |
+| 19 | Multi-Language Support (i18n) | 🔄 In progress | `apps/mobile/epics/epic-multi-language-support.md` — ngx-translate UI + native-language learning content (en/ar/uk/tr/es/ru); LC-I18N-01 to LC-I18N-62. Phases 1–3 (foundation, string extraction, language selection UX) complete. Phases 4–7 (RTL, content localization, QA) remaining. |
 
 ### Implemented page inventory
 
@@ -507,7 +554,7 @@ Rating 1–4 maps to: Again / Hard / Good / Easy.
 
 **Shared:** home/dashboard, onboarding, user menu, sync-status indicator, fab button
 
-**Settings:** study goals (daily/weekly/monthly), reminders (push toggle + time picker)
+**Settings:** study goals (daily/weekly/monthly), reminders (push toggle + time picker), language (6-language picker)
 
 ---
 
@@ -517,7 +564,7 @@ Rating 1–4 maps to: Again / Hard / Good / Easy.
 - **States:** `safe` (goal met today) · `at_risk` (goal met yesterday, not yet today) · `broken` (current = 0).
 - **Server-authoritative (ADR-2):** `GET /api/v1/stats/streak` computes from `reviewSessions` table (up to 500 sessions back). Client `ReviewStatsStore` keeps an optimistic local computation for instant UI; reconciles with server on load and after each session via `refreshStreak()`.
 - **Defaults:** `dailyGoal = 20`, `weeklyGoal = 120`, `monthlyGoal = 500` — stored in `user_settings` (one row per user, created on registration).
-- **Goals API:** `GET /api/v1/settings/me` · `PATCH /api/v1/settings/me` (fields: `dailyGoal`, `weeklyGoal`, `monthlyGoal`, `remindersEnabled`, `reminderTime`, `timezone`).
+- **Goals API:** `GET /api/v1/settings/me` · `PATCH /api/v1/settings/me` (fields: `dailyGoal`, `weeklyGoal`, `monthlyGoal`, `remindersEnabled`, `reminderTime`, `timezone`, `uiLanguage`).
 - **`goalsSetAt`:** stamped whenever any goal field is explicitly updated — used by `SettingsStore.needsGoalSetup()` to prompt the user to set goals on first use or after 30 days.
 - **Milestone celebrations:** `StreakMilestoneComponent` fires on 3/7/14/30/50/100/365-day milestones; persists `lc_last_celebrated_milestone` in localStorage to avoid re-showing.
 
@@ -589,6 +636,7 @@ These are **known deviations** from the architecture. Do not "fix" them without 
 | `apps/mobile/epics/epic-streak-goals-reminders.md` | Streak, Goals & Web Reminders epic — LC-350 to LC-368 |
 | `apps/mobile/epics/design-streak-goals-reminders.html` | Design reference for Streak/Goals/Reminders screens |
 | `apps/mobile/epics/epic-global-word-dictionary.md` | Global Word Dictionary & Admin epic — LC-WD01 to LC-WD17 |
+| `apps/mobile/epics/epic-multi-language-support.md` | Multi-Language Support (i18n) epic — ngx-translate UI + native-language content; LC-I18N-01 to LC-I18N-62 |
 | `apps/api/src/word-dictionary/` | Global word dictionary module (entity, service, repository, controller) |
 | `apps/api/src/admin/` | Admin module — platform-collections import, platform-stories import, prompts |
 | `apps/api/src/admin/prompts/platform-story.prompt.md` | Canonical AI prompt for generating platform stories (paste into AI tool) |

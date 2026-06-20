@@ -10,6 +10,7 @@ import {
   ModalController,
   ToastController,
 } from '@ionic/angular/standalone';
+import { TranslateService, TranslatePipe } from '@ngx-translate/core';
 import { EmptyStateComponent } from '../../../../shared/ui/empty-state/empty-state.component';
 import { addIcons } from 'ionicons';
 import { addOutline, chevronBackOutline, cloudUploadOutline, searchOutline } from 'ionicons/icons';
@@ -26,13 +27,14 @@ type ActiveSegment = 'mine' | 'explore';
   templateUrl: './collections.page.html',
   styleUrls: ['./collections.page.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [IonHeader, IonToolbar, IonContent, IonIcon, SlicePipe, EmptyStateComponent],
+  imports: [IonHeader, IonToolbar, IonContent, IonIcon, SlicePipe, EmptyStateComponent, TranslatePipe],
 })
 export class CollectionsPage {
   private readonly router = inject(Router);
   private readonly modalCtrl = inject(ModalController);
   private readonly actionSheetCtrl = inject(ActionSheetController);
   private readonly toastCtrl = inject(ToastController);
+  private readonly translate = inject(TranslateService);
   private readonly cardStore = inject(CardStore);
   readonly store = inject(CollectionStore);
   readonly platformStore = inject(PlatformCollectionStore);
@@ -53,11 +55,11 @@ export class CollectionsPage {
       if (ev.type === 'success') {
         const count = ev.result.addedCount;
         void this._toast(
-          count > 0 ? `${count} words added — audio included ✓` : 'Already in your sets',
+          count > 0 ? this.translate.instant('collections.adopt.successMessage', { count }) : this.translate.instant('collections.adopt.alreadyInSetsMessage'),
           'success',
         );
       } else {
-        void this._toast('Could not add collection. Try again.', 'danger');
+        void this._toast(this.translate.instant('collections.adopt.errorMessage'), 'danger');
       }
     });
   }
@@ -201,12 +203,12 @@ export class CollectionsPage {
 
   private async _promptImportAfterCreate(collectionId: string): Promise<void> {
     const sheet = await this.actionSheetCtrl.create({
-      header: 'Add words to your collection?',
+      header: this.translate.instant('collections.afterCreate.title'),
       buttons: [
-        { text: 'Import from CSV', icon: 'cloud-upload-outline', handler: () => this.router.navigate(['/vault/import']) },
-        { text: 'Import from image', icon: 'cloud-upload-outline', handler: () => this.router.navigate(['/vault/import/image']) },
-        { text: 'Go to collection', handler: () => this.router.navigate(['/vault/collections', collectionId]) },
-        { text: 'Maybe later', role: 'cancel' },
+        { text: this.translate.instant('collections.afterCreate.csvOption'), icon: 'cloud-upload-outline', handler: () => this.router.navigate(['/vault/import']) },
+        { text: this.translate.instant('collections.afterCreate.imageOption'), icon: 'cloud-upload-outline', handler: () => this.router.navigate(['/vault/import/image']) },
+        { text: this.translate.instant('collections.afterCreate.goToOption'), handler: () => this.router.navigate(['/vault/collections', collectionId]) },
+        { text: this.translate.instant('collections.afterCreate.laterOption'), role: 'cancel' },
       ],
     });
     await sheet.present();

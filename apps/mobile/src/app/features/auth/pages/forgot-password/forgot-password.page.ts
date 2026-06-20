@@ -8,6 +8,7 @@ import {
   IonSpinner,
   IonToolbar,
 } from '@ionic/angular/standalone';
+import { TranslatePipe } from '@ngx-translate/core';
 import { addIcons } from 'ionicons';
 import { alertCircleOutline, arrowBackOutline, checkmarkCircleOutline, mailOutline } from 'ionicons/icons';
 import { AuthService } from '../../../../core/services/auth.service';
@@ -17,7 +18,7 @@ import { AuthService } from '../../../../core/services/auth.service';
   templateUrl: './forgot-password.page.html',
   styleUrls: ['./forgot-password.page.scss'],
   standalone: true,
-  imports: [ReactiveFormsModule, RouterLink, IonContent, IonHeader, IonToolbar, IonIcon, IonSpinner],
+  imports: [ReactiveFormsModule, RouterLink, IonContent, IonHeader, IonToolbar, IonIcon, IonSpinner, TranslatePipe],
 })
 export class ForgotPasswordPage {
   private readonly authService = inject(AuthService);

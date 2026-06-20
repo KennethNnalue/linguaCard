@@ -9,31 +9,29 @@
     </div>
 
     <!-- Title + body -->
-    <h2 class="reset-title lc-display">Reset all data?</h2>
+    <h2 class="reset-title lc-display">{{ 'settings.dangerZone.resetTitle' | translate }}?</h2>
     <p class="reset-body">
-      This will permanently delete all your words, collections, review history,
-      and progress. Your account will remain active.
+      {{ 'settings.dangerZone.resetWarning' | translate }}
     </p>
 
     <!-- Warning box -->
     <div class="reset-warning">
       <ion-icon name="alert-circle-outline" class="warning-icon"></ion-icon>
       <p class="warning-text">
-        <strong>This action cannot be undone.</strong>
-        All {{ wordCount() }} words and {{ collectionCount() }} collections will
-        be deleted permanently.
+        <strong>{{ 'settings.dangerZone.irreversible' | translate }}</strong>
+        {{ 'settings.dangerZone.deleteDetails' | translate:{ wordCount: wordCount(), collectionCount: collectionCount() } }}
       </p>
     </div>
 
     <!-- Password field -->
     <div class="field-group">
-      <label class="field-lbl" for="reset-password">Enter your password to confirm</label>
+      <label class="field-lbl" for="reset-password">{{ 'settings.dangerZone.confirmPassword' | translate }}</label>
       <input
         id="reset-password"
         type="password"
         class="field-input"
         [class.field-input--error]="passwordError()"
-        placeholder="Your password"
+        [placeholder]="'common.placeholder.password' | translate"
         autocomplete="current-password"
         [ngModel]="password()"
         (ngModelChange)="password.set($event); passwordError.set('')"
@@ -53,11 +51,11 @@
       @if (loading()) {
         <span class="btn-spinner"></span>
       } @else {
-        Yes, delete everything
+        {{ 'settings.dangerZone.confirm' | translate }}
       }
     </button>
 
     <!-- Cancel -->
-    <button class="reset-cancel" (click)="dismiss()">Cancel</button>
+    <button class="reset-cancel" (click)="dismiss()">{{ 'common.cancel' | translate }}</button>
   </div>
 </ion-content>

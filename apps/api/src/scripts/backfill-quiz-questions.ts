@@ -37,7 +37,7 @@ function buildQuizBackfillPrompt(
 ): string {
   const needed = targetTotal - existingQuestions.length;
   const sentenceList = sentences
-    .map((s, i) => `${i + 1}. DE: "${s.german}" | EN: "${s.english}"`)
+    .map((s, i) => `${i + 1}. DE: "${s.german}" | EN: "${s.native}"`)
     .join('\n');
 
   const alreadyUsed = existingQuestions

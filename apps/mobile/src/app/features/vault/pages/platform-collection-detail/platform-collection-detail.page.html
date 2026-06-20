@@ -1,10 +1,10 @@
 <ion-header class="ion-no-border">
   <ion-toolbar>
     <div class="pcd-nav">
-      <button class="lc-back-btn" (click)="goBack()" aria-label="Back">
+      <button class="lc-back-btn" (click)="goBack()" [attr.aria-label]="'platformCollectionDetail.nav.backAria' | translate">
         <ion-icon name="chevron-back-outline"></ion-icon>
       </button>
-      <span class="pcd-nav-crumb">Explore</span>
+      <span class="pcd-nav-crumb">{{ 'platformCollectionDetail.nav.breadcrumb' | translate }}</span>
       <div style="width:30px;"></div>
     </div>
   </ion-toolbar>
@@ -32,7 +32,7 @@
         <h1 class="pcd-title lc-display">{{ d.title }}</h1>
         <div class="pcd-meta">
           <span class="pcd-lvl-pill pcd-lvl-{{ d.level.toLowerCase() }}">{{ d.level }}</span>
-          <span>{{ d.wordCount }} words · with audio</span>
+          <span>{{ d.wordCount }} {{ 'platformCollectionDetail.hero.descriptionSuffix' | translate }}</span>
         </div>
       </div>
     </div>
@@ -45,24 +45,24 @@
         </div>
         <div class="pcd-prog-txt">
           @if (d.knownCount > 0) {
-            You already know <b>{{ d.knownCount }} of {{ d.wordCount }}</b> words here.<br>
-            Getting this set adds <b>{{ newCount() }} new cards</b> — instantly.
+            {{ 'platformCollectionDetail.progressBanner.knowPrefix' | translate }} <b>{{ d.knownCount }} of {{ d.wordCount }}</b> {{ 'platformCollectionDetail.progressBanner.wordsSuffix' | translate }}<br>
+            {{ 'platformCollectionDetail.progressBanner.addingPrefix' | translate }} <b>{{ newCount() }} {{ 'platformCollectionDetail.progressBanner.newCardsSuffix' | translate }}</b> {{ 'platformCollectionDetail.progressBanner.instantlySuffix' | translate }}
           } @else {
-            <b>{{ d.wordCount }} words</b> · all new for you.
+            <b>{{ d.wordCount }} words</b> · {{ 'platformCollectionDetail.progressBanner.allNewForYouSuffix' | translate }}
           }
         </div>
       </div>
     } @else {
       <div class="pcd-adopted-banner">
         <span>✓</span>
-        <span>In your sets · {{ d.knownCount }} of {{ d.wordCount }} words known</span>
+        <span>{{ 'platformCollectionDetail.adoptedBanner.inSetsLabel' | translate }} · {{ d.knownCount }} of {{ d.wordCount }} {{ 'platformCollectionDetail.adoptedBanner.wordsKnownSuffix' | translate }}</span>
       </div>
     }
 
     <!-- Words: New here -->
     @if (newWords().length > 0) {
       <div class="pcd-grp-hd">
-        New here <span class="pcd-grp-n">{{ newCount() }}</span>
+        {{ 'platformCollectionDetail.wordGroups.newHereLabel' | translate }} <span class="pcd-grp-n">{{ newCount() }}</span>
       </div>
       @for (w of newWords(); track w.dictionaryWordId) {
         <div class="pcd-word-row">
@@ -88,8 +88,8 @@
     <!-- Words: Already yours -->
     @if (knownWords().length > 0) {
       <div class="pcd-grp-hd pcd-grp-hd--known">
-        Already yours <span class="pcd-grp-n pcd-grp-n--known">{{ knownCount() }}</span>
-        <span class="pcd-grp-tap">&nbsp;· tap to {{ alreadyKnownExpanded() ? 'collapse' : 'expand' }}</span>
+        {{ 'platformCollectionDetail.wordGroups.alreadyYoursLabel' | translate }} <span class="pcd-grp-n pcd-grp-n--known">{{ knownCount() }}</span>
+        <span class="pcd-grp-tap">&nbsp;· {{ alreadyKnownExpanded() ? ('platformCollectionDetail.wordGroups.collapseLabel' | translate) : ('platformCollectionDetail.wordGroups.expandLabel' | translate) }}</span>
         <button class="pcd-expand-btn" (click)="alreadyKnownExpanded.set(!alreadyKnownExpanded())">
           {{ alreadyKnownExpanded() ? '▲' : '▼' }}
         </button>
@@ -106,7 +106,7 @@
               <div class="pcd-word-de">{{ w.displayText }}</div>
               <div class="pcd-word-en">{{ w.translation }}</div>
             </div>
-            <span class="pcd-known-chip">✓ YOURS</span>
+            <span class="pcd-known-chip">{{ 'platformCollectionDetail.wordGroups.yoursChip' | translate }}</span>
           </div>
         }
       }
@@ -116,7 +116,7 @@
     @if (d.relatedStories.length > 0) {
       <div class="pcd-shelf-hd">
         <span class="pcd-shelf-icon">📖</span>
-        <span class="pcd-shelf-name">Stories with these words</span>
+        <span class="pcd-shelf-name">{{ 'platformCollectionDetail.shelf.title' | translate }}</span>
       </div>
       <div class="pcd-stories-shelf">
         @for (story of d.relatedStories; track story.id) {
@@ -127,7 +127,7 @@
             </div>
             <div class="pcd-story-body">
               <div class="pcd-story-title">{{ story.title }}</div>
-              <div class="pcd-story-meta">~{{ story.estimatedReadMinutes }} min</div>
+              <div class="pcd-story-meta">~{{ story.estimatedReadMinutes }} {{ 'platformCollectionDetail.story.minLabel' | translate }}</div>
             </div>
           </div>
         }
@@ -145,7 +145,7 @@
         <button
           class="pcd-btn-primary"
           (click)="openAdoptedCollection(d.adoptedCollectionId!)">
-          Open in My Sets
+          {{ 'platformCollectionDetail.footer.openButton' | translate }}
         </button>
       } @else {
         <button
@@ -153,19 +153,19 @@
           [disabled]="adoptingId() === d.id"
           (click)="adoptCollection()">
           @if (adoptingId() === d.id) {
-            Adding…
+            {{ 'platformCollectionDetail.footer.addingLabel' | translate }}
           } @else if (newCount() > 0) {
-            + Get {{ newCount() }} new words
+            {{ 'platformCollectionDetail.footer.getNewButton' | translate:{ count: newCount() } }}
           } @else {
-            + Get words
+            {{ 'platformCollectionDetail.footer.getButton' | translate }}
           }
         </button>
       }
       <button class="pcd-btn-secondary" (click)="generateStory()">
-        Generate a story from this set
+        {{ 'platformCollectionDetail.footer.generateStoryButton' | translate }}
       </button>
       @if (d.adoptionStatus !== 'adopted') {
-        <p class="pcd-footer-note">Instant — no waiting, audio included</p>
+        <p class="pcd-footer-note">{{ 'platformCollectionDetail.footer.instantNote' | translate }}</p>
       }
     </div>
   }

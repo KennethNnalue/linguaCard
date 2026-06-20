@@ -411,6 +411,30 @@
   ion-icon { font-size: 14px; }
 }
 
+.adm-coll-actions {
+  display: flex;
+  align-items: center;
+  gap: t.$lc-space-2;
+  flex-shrink: 0;
+}
+
+.adm-delete-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  border: none;
+  border-radius: t.$lc-radius-sm;
+  padding: 6px;
+  cursor: pointer;
+  background: var(--lc-danger-light, rgba(220, 38, 38, 0.12));
+  color: var(--lc-danger, #dc2626);
+
+  &:disabled { opacity: 0.5; cursor: not-allowed; }
+
+  ion-icon { font-size: 16px; }
+}
+
 // ─── Submit button ────────────────────────────────────────────────────────────
 
 .adm-submit-btn {

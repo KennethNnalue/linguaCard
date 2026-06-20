@@ -99,8 +99,8 @@
 
   &:active { color: var(--lc-brand); }
 
-  &--left  { padding-left:  t.$lc-space-4; }
-  &--right { padding-right: t.$lc-space-4; }
+  &--left  { padding-inline-start:  t.$lc-space-4; }
+  &--right { padding-inline-end: t.$lc-space-4; }
 }
 
 .cat-row {

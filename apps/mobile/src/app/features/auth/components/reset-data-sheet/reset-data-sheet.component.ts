@@ -9,6 +9,7 @@ import {
 import { firstValueFrom } from 'rxjs';
 import { addIcons } from 'ionicons';
 import { alertCircleOutline, trashOutline } from 'ionicons/icons';
+import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { AuthService } from '../../../../core/services/auth.service';
 import { CardApiService } from '../../../vault/services/card-api.service';
 import { CollectionApiService } from '../../../vault/services/collection-api.service';
@@ -21,7 +22,7 @@ import { CollectionStore } from '../../../vault/store/collection.store';
   standalone: true,
   templateUrl: './reset-data-sheet.component.html',
   styleUrls: ['./reset-data-sheet.component.scss'],
-  imports: [IonContent, IonIcon, FormsModule],
+  imports: [IonContent, IonIcon, FormsModule, TranslatePipe],
 })
 export class ResetDataSheetComponent {
   private readonly auth = inject(AuthService);
@@ -32,6 +33,7 @@ export class ResetDataSheetComponent {
   private readonly collectionStore = inject(CollectionStore);
   private readonly modalCtrl = inject(ModalController);
   private readonly toastCtrl = inject(ToastController);
+  private readonly translate = inject(TranslateService);
 
   readonly password = signal('');
   readonly loading = signal(false);
@@ -58,7 +60,7 @@ export class ResetDataSheetComponent {
 
     if (!valid) {
       this.loading.set(false);
-      this.passwordError.set('Incorrect password. Please try again.');
+      this.passwordError.set(this.translate.instant('auth.reset.passwordIncorrect'));
       return;
     }
 
@@ -75,7 +77,7 @@ export class ResetDataSheetComponent {
       await this.modalCtrl.dismiss({ reset: true });
 
       const toast = await this.toastCtrl.create({
-        message: '✓ All data has been reset. Start fresh!',
+        message: this.translate.instant('auth.reset.success'),
         duration: 3000,
         color: 'success',
         position: 'top',
@@ -83,7 +85,7 @@ export class ResetDataSheetComponent {
       await toast.present();
     } catch {
       this.loading.set(false);
-      this.passwordError.set('Something went wrong. Please try again.');
+      this.passwordError.set(this.translate.instant('common.error.generic'));
     }
   }
 

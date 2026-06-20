@@ -9,6 +9,7 @@ import type {
   AdminImportStoryDto,
   AdminImportStoryResult,
   AdminPlatformCollectionListItem,
+  AdminPlatformStoryListItem,
   AdminSetStoryCategoryDto,
 } from '@lingua-card/shared/domain';
 import { environment } from '../../../../environments/environment';
@@ -20,6 +21,18 @@ export class AdminApiService {
 
   listCollections(): Observable<AdminPlatformCollectionListItem[]> {
     return this.http.get<AdminPlatformCollectionListItem[]>(`${this.apiUrl}/platform-collections`);
+  }
+
+  listStories(): Observable<AdminPlatformStoryListItem[]> {
+    return this.http.get<AdminPlatformStoryListItem[]>(`${this.apiUrl}/platform-stories`);
+  }
+
+  deleteCollection(id: string): Observable<void> {
+    return this.http.delete<void>(`${this.apiUrl}/platform-collections/${id}`);
+  }
+
+  deleteStory(id: string): Observable<void> {
+    return this.http.delete<void>(`${this.apiUrl}/platform-stories/${id}`);
   }
 
   setPublished(id: string, isPublished: boolean): Observable<void> {

@@ -9,9 +9,11 @@ import {
   IonToolbar,
   ModalController,
 } from '@ionic/angular/standalone';
+import {TranslatePipe, TranslateService} from '@ngx-translate/core';
 import {addIcons} from 'ionicons';
 import {libraryOutline, playOutline} from 'ionicons/icons';
 import {AuthService} from '../../../../core/services/auth.service';
+import {LanguageService} from '../../../../core/services/language.service';
 import {CardStore} from '../../../vault/store/card.store';
 import {CategoryStore} from '../../../vault/store/category.store';
 import {CollectionStore} from '../../../vault/store/collection.store';
@@ -53,6 +55,7 @@ import {Card} from '@lingua-card/shared/domain';
     IonToolbar,
     IonHeader,
     WordCardComponent,
+    TranslatePipe,
   ],
 })
 export class HomePage {
@@ -65,6 +68,8 @@ export class HomePage {
   private readonly modalCtrl = inject(ModalController);
   private readonly bottomSheet = inject(BottomSheetService);
   private readonly authService = inject(AuthService);
+  private readonly translate = inject(TranslateService);
+  private readonly languageService = inject(LanguageService);
   private readonly router = inject(Router);
   private readonly reviewStore = inject(ReviewStore);
   private readonly filterService = inject(ReviewFilterService);
@@ -119,10 +124,11 @@ export class HomePage {
 
   // ─── Greeting ───────────────────────────────────────────────────────────────
   readonly greeting = computed(() => {
+    this.languageService.current(); // recompute on UI language change
     const h = new Date().getHours();
-    if (h < 12) return 'Good Morning';
-    if (h < 17) return 'Good Afternoon';
-    return 'Good Evening';
+    if (h < 12) return this.translate.instant('home.greeting.morning');
+    if (h < 17) return this.translate.instant('home.greeting.afternoon');
+    return this.translate.instant('home.greeting.evening');
   });
 
   // ─── Hero ring stats ─────────────────────────────────────────────────────────
@@ -159,10 +165,11 @@ export class HomePage {
   );
 
   readonly selectedCollectionLabel = computed(() => {
+    this.languageService.current(); // recompute on UI language change
     const id = this.selectedCollectionId();
-    if (!id) return 'All collections';
+    if (!id) return this.translate.instant('home.collectionFilter.allLabel');
     const col = this.collectionStore.collections().find(c => c.id === id);
-    return col ? `${col.emoji} ${col.name}` : 'All collections';
+    return col ? `${col.emoji} ${col.name}` : this.translate.instant('home.collectionFilter.allLabel');
   });
 
   // ─── Stat cards + goal progress ─────────────────────────────────────────────
@@ -243,13 +250,13 @@ export class HomePage {
 
   async openCollectionPicker(): Promise<void> {
     const collections = this.collectionStore.collections();
-    await this.bottomSheet.open('Filter by collection', [
-      {label: 'All collections', icon: 'library-outline', handler: () => this.selectedCollectionId.set(null)},
+    await this.bottomSheet.open(this.translate.instant('vault.collectionFilter.title'), [
+      {label: this.translate.instant('home.collectionFilter.allLabel'), icon: 'library-outline', handler: () => this.selectedCollectionId.set(null)},
       ...collections.map(col => ({
         label: `${col.emoji ?? '📚'} ${col.name}`,
         handler: () => this.selectedCollectionId.set(col.id),
       })),
-      {label: 'Cancel', role: 'cancel' as const},
+      {label: this.translate.instant('common.cancel'), role: 'cancel' as const},
     ]);
   }
 

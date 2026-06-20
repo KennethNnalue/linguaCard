@@ -1,6 +1,7 @@
 import { ChangeDetectionStrategy, Component, computed, inject, signal } from '@angular/core';
 import { Router } from '@angular/router';
 import { IonContent, IonHeader, IonToolbar } from '@ionic/angular/standalone';
+import { TranslatePipe } from '@ngx-translate/core';
 import { SettingsStore } from '../../store/settings.store';
 import { PushService } from '../../../../core/services/push.service';
 
@@ -9,7 +10,7 @@ import { PushService } from '../../../../core/services/push.service';
   templateUrl: './reminders.page.html',
   styleUrl: './reminders.page.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [IonContent, IonHeader, IonToolbar],
+  imports: [IonContent, IonHeader, IonToolbar, TranslatePipe],
 })
 export class RemindersPage {
   private readonly settingsStore = inject(SettingsStore);

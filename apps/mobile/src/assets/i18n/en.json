@@ -571,7 +571,8 @@
     },
     "collection": {
       "label": "ADD TO COLLECTION",
-      "requiredHint": "*required"
+      "requiredHint": "*required",
+      "noSelectionLabel": "No collection"
     },
     "words": {
       "label": "Words (tap to select / deselect)",

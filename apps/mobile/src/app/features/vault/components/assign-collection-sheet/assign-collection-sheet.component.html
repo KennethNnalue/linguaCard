@@ -3,8 +3,8 @@
     <div class="acs-header">
       <div class="acs-handle"></div>
       <div class="acs-title-row">
-        <span class="acs-title lc-display">Add to Collection</span>
-        <button class="acs-close" (click)="dismiss()" aria-label="Close">
+        <span class="acs-title lc-display">{{ 'assignCollection.title' | translate }}</span>
+        <button class="acs-close" (click)="dismiss()" [attr.aria-label]="'assignCollection.closeAria' | translate">
           <ion-icon name="close-outline"></ion-icon>
         </button>
       </div>
@@ -23,7 +23,7 @@
         <span class="acs-emoji">{{ col.emoji }}</span>
         <div class="acs-row-info">
           <span class="acs-row-name">{{ col.name }}</span>
-          <span class="acs-row-count">{{ col.cardCount }} words</span>
+          <span class="acs-row-count">{{ col.cardCount }} {{ 'assignCollection.wordsLabel' | translate }}</span>
         </div>
         @if (selected() === col.id) {
           <ion-icon name="checkmark-outline" class="acs-check"></ion-icon>
@@ -36,7 +36,7 @@
       <div class="acs-create-icon">
         <ion-icon name="add-outline"></ion-icon>
       </div>
-      <span class="acs-create-label">Create new collection…</span>
+      <span class="acs-create-label">{{ 'assignCollection.createNewLabel' | translate }}</span>
     </button>
 
     @if (showCreateForm()) {
@@ -44,14 +44,14 @@
         <input
           class="acs-name-input"
           type="text"
-          placeholder="Collection name"
+          [placeholder]="'assignCollection.newCollection.placeholder' | translate"
           [formControl]="newNameCtrl"
           (keyup.enter)="createAndSelect()" />
         <button
           class="acs-create-btn"
           [disabled]="newNameCtrl.invalid || creating()"
           (click)="createAndSelect()">
-          @if (creating()) { Creating… } @else { Create }
+          @if (creating()) { {{ 'assignCollection.newCollection.creatingLabel' | translate }} } @else { {{ 'assignCollection.newCollection.createButton' | translate }} }
         </button>
       </div>
     }
@@ -60,10 +60,10 @@
 
   <div class="acs-footer">
     <button class="acs-confirm-btn" [disabled]="required && !selected()" (click)="confirm()">
-      Confirm selection
+      {{ 'assignCollection.confirmButton' | translate }}
     </button>
     @if (!required) {
-      <button class="acs-skip-btn" (click)="skip()">Skip for now</button>
+      <button class="acs-skip-btn" (click)="skip()">{{ 'assignCollection.skipButton' | translate }}</button>
     }
   </div>
 </ion-content>

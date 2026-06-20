@@ -369,7 +369,7 @@ ion-toolbar {
   background: var(--lc-accent-light);
   white-space: nowrap;
   flex-shrink: 0;
-  margin-left: t.$lc-space-2;
+  margin-inline-start: t.$lc-space-2;
 
   &--urgent {
     background: #FEF2F2;

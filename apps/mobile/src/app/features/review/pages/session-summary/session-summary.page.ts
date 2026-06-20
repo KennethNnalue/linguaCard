@@ -7,6 +7,7 @@ import { Card, ConfidenceRating } from '@lingua-card/shared/domain';
 import { ReviewStore } from '../../store/review.store';
 import { CardStore } from '../../../vault/store/card.store';
 import { CategoryStore } from '../../../vault/store/category.store';
+import { TranslatePipe } from '@ngx-translate/core';
 import { WordCardComponent } from '../../../../shared/ui/word-card/word-card.component';
 import { getCategoryName } from '../../../../shared/helpers/helpers';
 import { WordAudioService } from '../../../../shared/audio/word-audio.service';
@@ -23,7 +24,7 @@ import {
   templateUrl: './session-summary.page.html',
   styleUrls: ['./session-summary.page.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [IonContent, IonHeader, IonToolbar, IonIcon, WordCardComponent],
+  imports: [IonContent, IonHeader, IonToolbar, IonIcon, WordCardComponent, TranslatePipe],
 })
 export class SessionSummaryPage implements OnInit {
   private readonly reviewStore = inject(ReviewStore);

@@ -1,4 +1,4 @@
-import { Body, Controller, Get, HttpCode, Param, Patch, Post, UseGuards } from '@nestjs/common';
+import { Body, Controller, Delete, Get, HttpCode, Param, Patch, Post, UseGuards } from '@nestjs/common';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { AdminGuard } from '../auth/guards/admin.guard';
 import { AdminService } from './admin.service';
@@ -10,6 +10,7 @@ import type {
   AdminImportStoryDto,
   AdminImportStoryResult,
   AdminPlatformCollectionListItem,
+  AdminPlatformStoryListItem,
   AdminPublishToggleDto,
   AdminSetStoryCategoryDto,
 } from '@lingua-card/shared/domain';
@@ -22,6 +23,23 @@ export class AdminController {
   @Get('platform-collections')
   listCollections(): Promise<AdminPlatformCollectionListItem[]> {
     return this.adminService.listCollections();
+  }
+
+  @Get('platform-stories')
+  listStories(): Promise<AdminPlatformStoryListItem[]> {
+    return this.adminService.listStories();
+  }
+
+  @Delete('platform-collections/:id')
+  @HttpCode(204)
+  async deleteCollection(@Param('id') id: string): Promise<void> {
+    await this.adminService.deleteCollection(id);
+  }
+
+  @Delete('platform-stories/:id')
+  @HttpCode(204)
+  async deleteStory(@Param('id') id: string): Promise<void> {
+    await this.adminService.deleteStory(id);
   }
 
   @Patch('platform-collections/:id/publish')

@@ -4,45 +4,45 @@
 
   <h2 class="sgp-title" id="sgp-title">
     @if (isFirstTime()) {
-      Set your study goals
+      {{ 'settings.goalsPrompt.titleFirstTime' | translate }}
     } @else {
-      Time to update your goals
+      {{ 'settings.goalsPrompt.titleUpdate' | translate }}
     }
   </h2>
 
   <p class="sgp-body">
     @if (isFirstTime()) {
-      Tell LinguaCard how much you want to study each day. Your goals shape your streak and help you stay on track.
+      {{ 'settings.goalsPrompt.bodyFirstTime' | translate }}
     } @else {
-      It's been a while since you last updated your targets. Take a moment to make sure they still match your pace.
+      {{ 'settings.goalsPrompt.bodyUpdate' | translate }}
     }
   </p>
 
   <div class="sgp-goals-preview">
     <div class="sgp-goal-item">
-      <span class="sgp-goal-label">Daily</span>
-      <span class="sgp-goal-value">{{ dailyGoal() }} cards</span>
+      <span class="sgp-goal-label">{{ 'settings.goals.daily.name' | translate }}</span>
+      <span class="sgp-goal-value">{{ dailyGoal() }} {{ 'settings.goalsPrompt.cards' | translate }}</span>
     </div>
     <div class="sgp-divider" aria-hidden="true"></div>
     <div class="sgp-goal-item">
-      <span class="sgp-goal-label">Weekly</span>
-      <span class="sgp-goal-value">{{ weeklyGoal() }} cards</span>
+      <span class="sgp-goal-label">{{ 'settings.goals.weekly.name' | translate }}</span>
+      <span class="sgp-goal-value">{{ weeklyGoal() }} {{ 'settings.goalsPrompt.cards' | translate }}</span>
     </div>
     <div class="sgp-divider" aria-hidden="true"></div>
     <div class="sgp-goal-item">
-      <span class="sgp-goal-label">Monthly</span>
-      <span class="sgp-goal-value">{{ monthlyGoal() }} cards</span>
+      <span class="sgp-goal-label">{{ 'settings.goals.monthly.name' | translate }}</span>
+      <span class="sgp-goal-value">{{ monthlyGoal() }} {{ 'settings.goalsPrompt.cards' | translate }}</span>
     </div>
   </div>
 
   <button class="sgp-btn-primary" (click)="setGoals()" autofocus>
     @if (isFirstTime()) {
-      Set my goals
+      {{ 'settings.goalsPrompt.setMyGoals' | translate }}
     } @else {
-      Update my goals
+      {{ 'settings.goalsPrompt.updateMyGoals' | translate }}
     }
   </button>
 
-  <button class="sgp-btn-skip" (click)="dismiss()">Not now</button>
+  <button class="sgp-btn-skip" (click)="dismiss()">{{ 'common.notNow' | translate }}</button>
 
 </div>

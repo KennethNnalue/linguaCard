@@ -1,14 +1,14 @@
 <div class="lc-img-picker">
   <button class="lc-img-picker__camera" (click)="pickFromCamera()">
     <ion-icon name="camera-outline"></ion-icon>
-    <span class="lc-img-picker__label">Take a photo</span>
-    <span class="lc-img-picker__sub">Point at any German text</span>
+    <span class="lc-img-picker__label">{{ 'image.camera.label' | translate }}</span>
+    <span class="lc-img-picker__sub">{{ 'image.camera.hint' | translate }}</span>
   </button>
 
   <button class="lc-img-picker__gallery" (click)="pickFromGallery()">
     <ion-icon name="images-outline"></ion-icon>
-    <span class="lc-img-picker__label">Choose from gallery</span>
-    <span class="lc-img-picker__sub">Pick an existing photo</span>
+    <span class="lc-img-picker__label">{{ 'image.gallery.label' | translate }}</span>
+    <span class="lc-img-picker__sub">{{ 'image.gallery.hint' | translate }}</span>
   </button>
 
   <!-- Web fallback -->

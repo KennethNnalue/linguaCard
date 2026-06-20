@@ -3,6 +3,7 @@ import { Router } from '@angular/router';
 import { NavController, IonContent, IonHeader, IonIcon, IonToolbar } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
 import { chevronBackOutline } from 'ionicons/icons';
+import { TranslatePipe } from '@ngx-translate/core';
 import {Card} from '@lingua-card/shared/domain';
 import {ReviewStore} from '../../store/review.store';
 import {ReviewFilterService} from '../../services/review-filter.service';
@@ -21,7 +22,7 @@ import {
   templateUrl: './struggling-cards.page.html',
   styleUrls: ['./struggling-cards.page.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [IonContent, IonHeader, IonToolbar, IonIcon, WordCardComponent],
+  imports: [IonContent, IonHeader, IonToolbar, IonIcon, WordCardComponent, TranslatePipe],
 })
 export class StrugglingCardsPage {
   private readonly filterService = inject(ReviewFilterService);

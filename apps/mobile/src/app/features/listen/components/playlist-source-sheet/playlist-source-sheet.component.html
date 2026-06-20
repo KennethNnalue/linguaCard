@@ -2,7 +2,7 @@
   <div class="pss-wrap">
 
     <div class="pss-handle-wrap"><div class="pss-handle"></div></div>
-    <div class="pss-title">Choose a playlist source</div>
+    <div class="pss-title">{{ 'listen.sourceSheet.title' | translate }}</div>
 
     <div class="pss-options">
 
@@ -15,8 +15,8 @@
           </svg>
         </div>
         <div class="pss-opt-body">
-          <div class="pss-opt-title">Today's due words</div>
-          <div class="pss-opt-sub">Cards scheduled for today</div>
+          <div class="pss-opt-title">{{ 'listen.source.todaysDueLabel' | translate }}</div>
+          <div class="pss-opt-sub">{{ 'listen.source.todaysDueDesc' | translate }}</div>
         </div>
         <div class="pss-opt-count">{{ listenStore.dueCount() }}</div>
         @if (activeSource() === 'due') {
@@ -36,8 +36,8 @@
           </svg>
         </div>
         <div class="pss-opt-body">
-          <div class="pss-opt-title">A collection</div>
-          <div class="pss-opt-sub">Pick a specific collection</div>
+          <div class="pss-opt-title">{{ 'listen.source.collectionLabel' | translate }}</div>
+          <div class="pss-opt-sub">{{ 'listen.source.collectionDesc' | translate }}</div>
         </div>
         <div class="pss-opt-count pss-count-hint">—</div>
         <svg class="pss-chevron" [class.open]="showCollections()" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
@@ -74,8 +74,8 @@
           </svg>
         </div>
         <div class="pss-opt-body">
-          <div class="pss-opt-title">All cards</div>
-          <div class="pss-opt-sub">Your complete vocabulary</div>
+          <div class="pss-opt-title">{{ 'listen.source.allCardsLabel' | translate }}</div>
+          <div class="pss-opt-sub">{{ 'listen.source.allCardsDesc' | translate }}</div>
         </div>
         <div class="pss-opt-count pss-count-hint">{{ listenStore.allCount() }}</div>
         @if (activeSource() === 'all') {
@@ -95,8 +95,8 @@
           </svg>
         </div>
         <div class="pss-opt-body">
-          <div class="pss-opt-title">Struggling words</div>
-          <div class="pss-opt-sub">Mastery 0–2, needs practice</div>
+          <div class="pss-opt-title">{{ 'listen.source.strugglingLabel' | translate }}</div>
+          <div class="pss-opt-sub">{{ 'listen.source.strugglingDesc' | translate }}</div>
         </div>
         <div class="pss-opt-count pss-count-red">{{ listenStore.strugglingCount() }}</div>
         @if (activeSource() === 'struggling') {

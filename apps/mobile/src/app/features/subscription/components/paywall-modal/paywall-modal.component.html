@@ -2,23 +2,23 @@
   <div class="paywall-sheet">
     <div class="paywall-header">
       <ion-icon name="sparkles-outline" class="paywall-icon"></ion-icon>
-      <h2 class="paywall-title">Unlock Unlimited Stories</h2>
+      <h2 class="paywall-title">{{ 'subscription.paywall.title' | translate }}</h2>
     </div>
 
-    <p class="paywall-subtitle">You've used your 3 free stories. Upgrade to Pro for:</p>
+    <p class="paywall-subtitle">{{ 'subscription.paywall.subtitle' | translate }}</p>
 
     <ul class="paywall-benefits">
       <li>
         <ion-icon name="checkmark-circle-outline"></ion-icon>
-        Unlimited story generation
+        {{ 'subscription.paywall.benefit1' | translate }}
       </li>
       <li>
         <ion-icon name="checkmark-circle-outline"></ion-icon>
-        Claude Sonnet — highest quality
+        {{ 'subscription.paywall.benefit2' | translate }}
       </li>
       <li>
         <ion-icon name="checkmark-circle-outline"></ion-icon>
-        Priority support
+        {{ 'subscription.paywall.benefit3' | translate }}
       </li>
     </ul>
 
@@ -28,7 +28,7 @@
         [fullWidth]="true"
         (click)="openContactSheet()"
       >
-        Request Pro Access
+        {{ 'subscription.paywall.requestBtn' | translate }}
       </lc-button>
 
       <lc-button
@@ -36,7 +36,7 @@
         [fullWidth]="true"
         (click)="dismiss()"
       >
-        Not now
+        {{ 'subscription.paywall.dismissBtn' | translate }}
       </lc-button>
     </div>
   </div>

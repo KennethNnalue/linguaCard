@@ -19,6 +19,7 @@ import { CardStore } from '../../../vault/store/card.store';
 import { CategoryStore } from '../../../vault/store/category.store';
 import { CollectionStore } from '../../../vault/store/collection.store';
 import { ReviewStore } from '../../store/review.store';
+import { TranslatePipe } from '@ngx-translate/core';
 import { HighlightWordPipe } from '../../shared/pipes/highlight-word.pipe';
 import {
   ARTICLE_GENDER_MAP,
@@ -35,7 +36,7 @@ import {
   templateUrl: './review.page.html',
   styleUrls: ['./review.page.scss', './review.card.scss', './review.rating.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [IonContent, IonIcon, IonToolbar, IonHeader, HighlightWordPipe, ArticleBadgeComponent],
+  imports: [IonContent, IonIcon, IonToolbar, IonHeader, HighlightWordPipe, ArticleBadgeComponent, TranslatePipe],
 })
 export class ReviewPage implements OnInit {
   private readonly cardStore = inject(CardStore);

@@ -21,17 +21,17 @@ export class StoryPromptBuilder {
     'B2': 'complex sentences, passive voice, nuanced vocabulary, varied register, subjunctive mood',
   };
 
-  build(dto: GenerateStoryDto, cards: CardEntity[]): string {
+  build(dto: GenerateStoryDto, cards: CardEntity[], nativeLanguage = 'English'): string {
     if (dto.length === 'extra-long') {
-      return this.buildExtraLongPrompt(dto, cards);
+      return this.buildExtraLongPrompt(dto, cards, nativeLanguage);
     }
-    return this.buildStandardPrompt(dto, cards);
+    return this.buildStandardPrompt(dto, cards, nativeLanguage);
   }
 
-  buildQuizPrompt(sentences: StorySentence[], difficulty: StoryDifficulty): string {
+  buildQuizPrompt(sentences: StorySentence[], difficulty: StoryDifficulty, nativeLanguage = 'English'): string {
     const targetCount = calculateQuizCount(sentences.length);
     const sentenceList = sentences
-      .map((s, i) => `${i + 1}. DE: "${s.german}" | EN: "${s.english}"`)
+      .map((s, i) => `${i + 1}. DE: "${s.german}" | ${nativeLanguage}: "${s.native}"`)
       .join('\n');
 
     return `You are a German language teacher creating fill-in-the-blank quiz questions for a learner at ${difficulty} level.
@@ -45,7 +45,7 @@ RULES:
 3. The correct answer must come from the actual story sentence.
 4. Generate exactly 2 distractors that are plausible but grammatically wrong. For article blanks, use other German articles/cases. For verbs, use wrong conjugations.
 5. Distractors should test the SAME grammatical dimension (e.g. der/die/das/dem/den for case; kann/kannst/können for modal verbs).
-6. Include a short 1-sentence hint (in English) explaining the grammar rule — shown only after a wrong answer.
+6. Include a short 1-sentence hint (in ${nativeLanguage}) explaining the grammar rule — shown only after a wrong answer.
 7. The sentenceTemplate must have the blanked word replaced by the literal string "___".
 
 OUTPUT: valid JSON array only, no markdown fences:
@@ -61,12 +61,12 @@ OUTPUT: valid JSON array only, no markdown fences:
 ]`;
   }
 
-  buildGrammarPrompt(sentences: StorySentence[], difficulty: StoryDifficulty): string {
+  buildGrammarPrompt(sentences: StorySentence[], difficulty: StoryDifficulty, nativeLanguage = 'English'): string {
     const sentenceList = sentences
-      .map((s, i) => `${i + 1}. DE: "${s.german}" | EN: "${s.english}"`)
+      .map((s, i) => `${i + 1}. DE: "${s.german}" | ${nativeLanguage}: "${s.native}"`)
       .join('\n');
 
-    return `You are a German language teacher writing grammar notes for a learner at ${difficulty} level.
+    return `You are a German language teacher writing grammar notes for a learner at ${difficulty} level. The learner's native language is ${nativeLanguage}.
 
 STORY SENTENCES:
 ${sentenceList}
@@ -76,10 +76,10 @@ TASK: Identify 2–3 grammar topics that are ACTUALLY USED in the story above an
 For each topic:
 1. Write a clear, concise title (e.g. "Modal verb \\"können\\"", "Use of \\"manche\\"")
 2. Pick the BEST example sentence FROM THE STORY (copy it exactly)
-3. Write a 2–3 paragraph description in plain English — no jargon without explanation
+3. Write a 2–3 paragraph description in plain ${nativeLanguage} — no jargon without explanation
 4. If it's a verb: include a present-tense conjugation table (6 rows: ich/du/er-sie-es/wir/ihr/sie)
 5. If it's an article/declension pattern: include a small usage table
-6. Provide EXACTLY 2 additional example sentences (German + English translation) — different from the story
+6. Provide EXACTLY 2 additional example sentences (German + ${nativeLanguage} translation) — different from the story
 7. Generate a unique UUID for each note's id field
 
 OUTPUT: valid JSON array only, no markdown fences:
@@ -88,8 +88,8 @@ OUTPUT: valid JSON array only, no markdown fences:
     "id": "uuid-string",
     "title": "Modal verb \\"können\\"",
     "exampleDe": "Man kann auf hohe Sanddünen wandern.",
-    "exampleEn": "You can hike on high sand dunes.",
-    "description": "Modal verbs usually stand with a second verb...",
+    "exampleNative": "${nativeLanguage} translation here.",
+    "description": "Description in ${nativeLanguage}...",
     "conjugationTable": [
       { "pronoun": "ich", "form": "kann" },
       { "pronoun": "du", "form": "kannst" },
@@ -99,19 +99,19 @@ OUTPUT: valid JSON array only, no markdown fences:
       { "pronoun": "sie", "form": "können" }
     ],
     "additionalExamples": [
-      { "de": "Ich kann Klavier spielen.", "en": "I can play the piano." },
-      { "de": "Du kannst hier nicht parken.", "en": "You cannot park here." }
+      { "de": "Ich kann Klavier spielen.", "native": "${nativeLanguage} translation." },
+      { "de": "Du kannst hier nicht parken.", "native": "${nativeLanguage} translation." }
     ]
   }
 ]`;
   }
 
-  buildKeywordsPrompt(sentences: StorySentence[], difficulty: StoryDifficulty): string {
+  buildKeywordsPrompt(sentences: StorySentence[], difficulty: StoryDifficulty, nativeLanguage = 'English'): string {
     const sentenceList = sentences
       .map(s => s.german)
       .join(' ');
 
-    return `You are a German language expert. Extract the key vocabulary words from this German story for a ${difficulty} learner.
+    return `You are a German language expert. Extract the key vocabulary words from this German story for a ${difficulty} learner. Provide translations in ${nativeLanguage}.
 
 STORY TEXT:
 ${sentenceList}
@@ -121,7 +121,7 @@ TASK: Identify 8–15 important vocabulary words from the text above. Include no
 For each word provide:
 - "german": the word with article if a noun (e.g. "der Biergarten"), or base infinitive if a verb (e.g. "wandern"), or base form if adjective
 - "germanBase": the word without article (e.g. "Biergarten", "wandern", "trocken")
-- "english": clear English translation
+- "translation": clear ${nativeLanguage} translation
 - "article": "der", "die", "das", or null for non-nouns
 - "wordType": one of "noun", "verb", "adjective", "adverb", "other"
 - "level": CEFR level "A1", "A2", "B1", "B2", "C1", or "C2"
@@ -130,7 +130,7 @@ Sort by level ascending (A1 first, C2 last).
 
 OUTPUT: valid JSON array only, no markdown fences:
 [
-  { "german": "wandern", "germanBase": "wandern", "english": "to hike, to wander", "article": null, "wordType": "verb", "level": "A1" }
+  { "german": "wandern", "germanBase": "wandern", "translation": "${nativeLanguage} translation", "article": null, "wordType": "verb", "level": "A1" }
 ]`;
   }
 
@@ -160,7 +160,7 @@ Write exactly ${remaining} additional sentences that:
 OUTPUT — valid JSON only, no markdown fences, no preamble:
 {
   "sentences": [
-    { "german": "...", "english": "...", "vocabWordsUsed": [] }
+    { "german": "...", "native": "...", "vocabWordsUsed": [] }
   ]
 }`;
   }
@@ -182,7 +182,7 @@ OUTPUT — valid JSON only, no markdown fences, no preamble:
       .join('\n');
   }
 
-  private buildStandardPrompt(dto: GenerateStoryDto, cards: CardEntity[]): string {
+  private buildStandardPrompt(dto: GenerateStoryDto, cards: CardEntity[], nativeLanguage = 'English'): string {
     const vocabList = this.buildVocabList(cards);
     const cefrDesc = this.cefrDescriptions[dto.difficulty];
     const wordTarget = this.wordTargets[dto.length];
@@ -207,18 +207,18 @@ RULES:
 OUTPUT FORMAT — respond with valid JSON only, no markdown fences, no other text:
 {
   "title": "Story title in German",
-  "titleTranslation": "English translation of title",
+  "titleTranslation": "${nativeLanguage} translation of title",
   "sentences": [
     {
       "german": "German sentence.",
-      "english": "English translation.",
+      "native": "${nativeLanguage} translation.",
       "vocabWordsUsed": ["word1", "word2"]
     }
   ]
 }`;
   }
 
-  private buildExtraLongPrompt(dto: GenerateStoryDto, cards: CardEntity[]): string {
+  private buildExtraLongPrompt(dto: GenerateStoryDto, cards: CardEntity[], nativeLanguage = 'English'): string {
     const vocabList = this.buildVocabList(cards);
     const cefrDesc = this.cefrDescriptions[dto.difficulty];
 
@@ -239,9 +239,9 @@ LEVEL: ${dto.difficulty} — ${cefrDesc}
 OUTPUT — valid JSON only, no markdown fences, no other text:
 {
   "title": "Podcast episode title in German",
-  "titleTranslation": "English translation",
+  "titleTranslation": "${nativeLanguage} translation",
   "sentences": [
-    { "german": "...", "english": "...", "vocabWordsUsed": [] }
+    { "german": "...", "native": "${nativeLanguage} translation.", "vocabWordsUsed": [] }
   ]
 }`;
   }

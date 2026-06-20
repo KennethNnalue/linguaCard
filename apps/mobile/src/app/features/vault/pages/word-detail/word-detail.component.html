@@ -1,11 +1,11 @@
 <ion-header class="ion-no-border">
   <ion-toolbar>
     <div class="wd-nav">
-      <button class="wd-icon-btn" (click)="goBack()" aria-label="Go back">
+      <button class="wd-icon-btn" (click)="goBack()" [attr.aria-label]="'wordDetail.backAria' | translate">
         <ion-icon name="chevron-back-outline"></ion-icon>
       </button>
-      <span class="wd-nav-title">Word Detail</span>
-      <button class="wd-icon-btn wd-icon-btn--outline" aria-label="More options">
+      <span class="wd-nav-title">{{ 'wordDetail.pageTitle' | translate }}</span>
+      <button class="wd-icon-btn wd-icon-btn--outline" [attr.aria-label]="'wordDetail.moreOptionsAria' | translate">
         <ion-icon name="ellipsis-horizontal-outline"></ion-icon>
       </button>
     </div>
@@ -25,13 +25,13 @@
         @if (word.content.phonetic) {
           <div class="wd2-phonetic">{{ word.content.phonetic }}</div>
         }
-        <div class="wd2-trans">{{ word.content.front }}@if (word.content.article) { · noun, {{ word.content.article === 'der' ? 'masculine' : word.content.article === 'die' ? 'feminine' : 'neuter' }}}</div>
+        <div class="wd2-trans">{{ word.content.front }}@if (word.content.article) { · noun, {{ word.content.article === 'der' ? ('wordDetail.gender.masculine' | translate) : word.content.article === 'die' ? ('wordDetail.gender.feminine' | translate) : ('wordDetail.gender.neuter' | translate) }}}</div>
 
         @if (word.content.plural) {
           <div class="wd2-plural-row">
-            <span class="wd2-plural-lbl">Plural</span>
+            <span class="wd2-plural-lbl">{{ 'wordDetail.plural' | translate }}</span>
             <span class="wd2-plural-val">{{ word.content.plural }}</span>
-            <button class="wd2-plural-play" (click)="playPlural()" aria-label="Play plural">
+            <button class="wd2-plural-play" (click)="playPlural()" [attr.aria-label]="'wordDetail.playPluralAria' | translate">
               <ion-icon name="volume-high-outline"></ion-icon>
             </button>
           </div>
@@ -57,14 +57,14 @@
         <button class="wd2-listen-btn" (click)="playPronunciation()" [disabled]="isPronunciationLoading()">
           @if (isPronunciationLoading()) {
             <div class="wd-audio-spinner"></div>
-            <span>Generating…</span>
+            <span>{{ 'wordDetail.generating' | translate }}</span>
           } @else {
             <ion-icon name="volume-high-outline"></ion-icon>
-            <span>Listen to pronunciation</span>
+            <span>{{ 'wordDetail.listenToPronunciation' | translate }}</span>
             @if (isAudioReady()) {
-              <span class="wd2-audio-dot wd2-audio-dot--ready" title="AI audio cached on device"></span>
+              <span class="wd2-audio-dot wd2-audio-dot--ready" [title]="'wordDetail.aiAudioCached' | translate"></span>
             } @else if (isAudioPending()) {
-              <span class="wd2-audio-dot wd2-audio-dot--pending" title="Generating audio…"></span>
+              <span class="wd2-audio-dot wd2-audio-dot--pending" [title]="'wordDetail.generatingAudio' | translate"></span>
             }
           }
         </button>
@@ -72,7 +72,7 @@
 
       <!-- ── Mastery progress card ── -->
       <div class="wd2-section">
-        <div class="wd2-sec-lbl">Mastery Progress</div>
+        <div class="wd2-sec-lbl">{{ 'wordDetail.masteryProgress' | translate }}</div>
         <div class="wd2-mastery-visual">
           <div class="wd2-mastery-ring">
             <svg viewBox="0 0 52 52">
@@ -95,19 +95,19 @@
         <div class="wd2-stats-grid">
           <div class="wd2-stat-cell">
             <div class="wd2-stat-val">{{ word.srsState?.repetitions ?? 0 }}</div>
-            <div class="wd2-stat-lbl">Reviews</div>
+            <div class="wd2-stat-lbl">{{ 'wordDetail.stats.reviews' | translate }}</div>
           </div>
           <div class="wd2-stat-cell">
             <div class="wd2-stat-val">{{ retrievabilityLabel() }}</div>
-            <div class="wd2-stat-lbl">Recall chance</div>
+            <div class="wd2-stat-lbl">{{ 'wordDetail.stats.recallChance' | translate }}</div>
           </div>
           <div class="wd2-stat-cell">
             <div class="wd2-stat-val">{{ stabilityLabel() }}</div>
-            <div class="wd2-stat-lbl">Stability</div>
+            <div class="wd2-stat-lbl">{{ 'wordDetail.stats.stability' | translate }}</div>
           </div>
           <div class="wd2-stat-cell">
             <div class="wd2-stat-val">{{ lastReviewedText() }}</div>
-            <div class="wd2-stat-lbl">Last seen</div>
+            <div class="wd2-stat-lbl">{{ 'wordDetail.stats.lastSeen' | translate }}</div>
           </div>
         </div>
       </div>
@@ -115,12 +115,12 @@
       <!-- ── Examples card ── -->
       @if (word.content.examples.length) {
         <div class="wd2-section">
-          <div class="wd2-sec-lbl">Example Sentences</div>
+          <div class="wd2-sec-lbl">{{ 'wordDetail.sections.exampleSentences' | translate }}</div>
           @for (ex of word.content.examples; track ex.id; let last = $last) {
             <div class="wd2-example-block" [class.wd2-example-block--last]="last">
               <div class="wd2-ex-row">
                 <p class="wd2-ex-de" [innerHTML]="highlightWord(ex.target, word.content.back)"></p>
-                <button class="wd2-ex-play-btn" (click)="playExample(ex.target)" aria-label="Play example sentence">
+                <button class="wd2-ex-play-btn" (click)="playExample(ex.target)" [attr.aria-label]="'wordDetail.playExampleAria' | translate">
                   <ion-icon name="volume-high-outline"></ion-icon>
                 </button>
               </div>
@@ -141,7 +141,7 @@
       <!-- ── Synonyms card ── -->
       @if (synonyms().length > 0) {
         <div class="wd2-section">
-          <div class="wd2-sec-lbl">Synonyms</div>
+          <div class="wd2-sec-lbl">{{ 'wordDetail.sections.synonyms' | translate }}</div>
           @for (syn of synonyms(); track $index; let i = $index; let last = $last) {
             <div class="syn-item" [class.syn-item--open]="isSynonymExpanded(i)" [class.syn-item--last]="last">
               <div class="syn-head" (click)="toggleSynonym(i)">
@@ -157,7 +157,7 @@
                   <div class="syn-example">
                     <div class="syn-ex-row">
                       <p class="syn-ex-de" [innerHTML]="highlightWord(syn.example, syn.word)"></p>
-                      <button class="wd2-ex-play-btn" (click)="playSynonymExample(syn.example)" aria-label="Play synonym example">
+                      <button class="wd2-ex-play-btn" (click)="playSynonymExample(syn.example)" [attr.aria-label]="'wordDetail.playSynonymExampleAria' | translate">
                         <ion-icon name="volume-high-outline"></ion-icon>
                       </button>
                     </div>
@@ -177,8 +177,8 @@
   } @else {
     <div class="lc-empty-state">
       <span class="lc-empty-icon">🔍</span>
-      <p class="lc-empty-title">Word not found</p>
-      <p class="lc-empty-sub">This word may have been removed from your vault.</p>
+      <p class="lc-empty-title">{{ 'wordDetail.emptyState.title' | translate }}</p>
+      <p class="lc-empty-sub">{{ 'wordDetail.emptyState.subtitle' | translate }}</p>
     </div>
   }
 </ion-content>
@@ -187,7 +187,7 @@
 <div class="wd2-actions">
   <button class="wd2-btn-review" (click)="openQuickRate()">
     <ion-icon name="play-outline"></ion-icon>
-    Rate this word
+    {{ 'wordDetail.rateThisWord' | translate }}
   </button>
   <button class="wd2-btn-icon" (click)="openEdit()">
     <ion-icon name="create-outline"></ion-icon>

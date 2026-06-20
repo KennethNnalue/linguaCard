@@ -43,7 +43,7 @@
   @include u.flex-between; width: 100%; padding: 11px t.$lc-space-4; border: none;
   border-bottom: 1px solid var(--lc-border); background: none;
   @include u.lc-font('xs', t.$lc-font-weight-medium); font-family: t.$lc-font-body;
-  color: var(--lc-text-primary); cursor: pointer; text-align: left;
+  color: var(--lc-text-primary); cursor: pointer; text-align: start;
   text-decoration: none; display: flex;
   &:last-child { border-bottom: none; }
   &:active { background: var(--lc-surface); }

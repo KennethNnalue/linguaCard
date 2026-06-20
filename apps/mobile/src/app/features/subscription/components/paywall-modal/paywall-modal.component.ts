@@ -2,6 +2,7 @@ import { Component, ChangeDetectionStrategy, inject } from '@angular/core';
 import { IonContent, IonIcon, ModalController } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
 import { sparklesOutline, checkmarkCircleOutline } from 'ionicons/icons';
+import { TranslatePipe } from '@ngx-translate/core';
 import { ButtonComponent } from '../../../../shared/ui/button/button.component';
 
 @Component({
@@ -10,7 +11,7 @@ import { ButtonComponent } from '../../../../shared/ui/button/button.component';
   styleUrls: ['./paywall-modal.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
   standalone: true,
-  imports: [IonContent, IonIcon, ButtonComponent],
+  imports: [IonContent, IonIcon, ButtonComponent, TranslatePipe],
 })
 export class PaywallModalComponent {
   private readonly modalCtrl = inject(ModalController);

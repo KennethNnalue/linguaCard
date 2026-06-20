@@ -41,7 +41,7 @@
 }
 
 .col-hero-inner { @include u.flex-between; }
-.col-hero-right { text-align: right; }
+.col-hero-right { text-align: end; }
 .col-hero-lbl { @include u.lc-font('xxs', t.$lc-font-weight-semibold); letter-spacing: 0.08em; text-transform: uppercase; color: rgba(255, 255, 255, 0.5); margin-bottom: t.$lc-space-1; }
 .col-hero-count { font-size: 28px; font-weight: t.$lc-font-weight-semibold; color: white; line-height: 1; }
 .col-hero-due-lbl { @include u.lc-font('xxs'); color: rgba(255, 255, 255, 0.5); margin-bottom: 2px; }

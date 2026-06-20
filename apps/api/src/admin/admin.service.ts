@@ -5,6 +5,7 @@ import { randomUUID } from 'crypto';
 import { PlatformCollectionEntity } from './platform-collection.entity';
 import { PlatformCollectionWordEntity } from './platform-collection-word.entity';
 import { PlatformStoryEntity } from '../platform-stories/platform-story.entity';
+import { UserStoryProgressEntity } from '../platform-stories/user-story-progress.entity';
 import { WordDictionaryService } from '../word-dictionary/word-dictionary.service';
 import type {
   AdminImportCollectionDto,
@@ -14,6 +15,7 @@ import type {
   AdminImportStoryDto,
   AdminImportStoryResult,
   AdminPlatformCollectionListItem,
+  AdminPlatformStoryListItem,
 } from '@lingua-card/shared/domain';
 
 @Injectable()
@@ -25,6 +27,8 @@ export class AdminService {
     private readonly wordRepo: Repository<PlatformCollectionWordEntity>,
     @InjectRepository(PlatformStoryEntity)
     private readonly storyRepo: Repository<PlatformStoryEntity>,
+    @InjectRepository(UserStoryProgressEntity)
+    private readonly storyProgressRepo: Repository<UserStoryProgressEntity>,
     private readonly dictionary: WordDictionaryService,
   ) {}
 
@@ -117,7 +121,7 @@ export class AdminService {
     const sentences = story.sentences.map((s, i) => ({
       id: `s-${i}`,
       german: s.german,
-      english: s.english,
+      native: s.native,
       position: i,
     }));
 
@@ -125,7 +129,7 @@ export class AdminService {
       id: `kw-${i}`,
       word: kw.germanBase,
       article: kw.article,
-      translation: kw.english,
+      translation: kw.translation,
       wordType: kw.wordType,
       dictionaryWordId: keywordEntries[i]?.id ?? null,
     }));
@@ -137,7 +141,8 @@ export class AdminService {
       title: story.title,
       titleTranslation: story.titleTranslation,
       bodyDe: story.sentences.map(s => s.german).join(' '),
-      bodyEn: story.sentences.map(s => s.english).join(' '),
+      bodyNative: story.sentences.map(s => s.native).join(' '),
+      nativeLang: 'en',
       sentences,
       keywords,
       wordTimestamps: [],
@@ -210,5 +215,37 @@ export class AdminService {
     if (!entity) throw new NotFoundException(`Platform collection ${id} not found`);
     entity.storyCategory = storyCategory;
     await this.collectionRepo.save(entity);
+  }
+
+  async listStories(): Promise<AdminPlatformStoryListItem[]> {
+    const stories = await this.storyRepo.find({ order: { publishedAt: 'DESC' } });
+    return stories.map(s => ({
+      id: s.id,
+      title: s.title,
+      titleTranslation: s.titleTranslation,
+      level: s.level,
+      category: s.category,
+      wordCount: s.wordCount,
+      isPublished: s.isPublished,
+      platformCollectionId: s.platformCollectionId,
+      publishedAt: s.publishedAt instanceof Date ? s.publishedAt.toISOString() : String(s.publishedAt),
+    }));
+  }
+
+  async deleteCollection(id: string): Promise<void> {
+    const entity = await this.collectionRepo.findOneBy({ id });
+    if (!entity) throw new NotFoundException(`Platform collection ${id} not found`);
+    // Remove member word links, then detach any stories paired to this collection.
+    await this.wordRepo.delete({ platformCollectionId: id });
+    await this.storyRepo.update({ platformCollectionId: id }, { platformCollectionId: null });
+    await this.collectionRepo.delete({ id });
+  }
+
+  async deleteStory(id: string): Promise<void> {
+    const entity = await this.storyRepo.findOneBy({ id });
+    if (!entity) throw new NotFoundException(`Platform story ${id} not found`);
+    // Remove per-user progress rows referencing this story before deleting it.
+    await this.storyProgressRepo.delete({ storyId: id });
+    await this.storyRepo.delete({ id });
   }
 }

@@ -171,7 +171,7 @@
   padding: t.$lc-space-3 13px; background: var(--lc-card);
   border: 1.5px solid var(--lc-border); border-radius: t.$lc-radius-sm;
   @include u.lc-font('sm'); font-family: t.$lc-font-body; color: var(--lc-text-primary);
-  cursor: pointer; text-align: left; transition: border-color var(--lc-transition-fast);
+  cursor: pointer; text-align: start; transition: border-color var(--lc-transition-fast);
   &:focus { border-color: var(--lc-brand); outline: none; }
 }
 .aw-collection-caret { @include u.lc-font('xxs'); color: var(--lc-text-hint); }

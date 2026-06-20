@@ -3,6 +3,7 @@ import {ActivatedRoute, Router} from '@angular/router';
 import {toSignal} from '@angular/core/rxjs-interop';
 import {map} from 'rxjs/operators';
 import {AlertController, IonContent, IonHeader, IonIcon, IonToolbar, ModalController, NavController,} from '@ionic/angular/standalone';
+import {TranslatePipe, TranslateService} from '@ngx-translate/core';
 import {addIcons} from 'ionicons';
 import {
   chevronBackOutline,
@@ -13,6 +14,7 @@ import {
   trashOutline,
   volumeHighOutline,
 } from 'ionicons/icons';
+import {LanguageService} from '../../../../core/services/language.service';
 import {CardStore} from '../../store/card.store';
 import {CategoryStore} from '../../store/category.store';
 import {CollectionStore} from '../../store/collection.store';
@@ -27,10 +29,9 @@ import {normalizeForAudio} from '../../../../shared/audio/normalize';
 
 @Component({
   selector: 'lc-word-detail',
-  standalone: true,
   templateUrl: './word-detail.component.html',
   styleUrls: ['./word-detail.component.scss'],
-  imports: [IonHeader, IonToolbar, IonContent, IonIcon, ArticleBadgeComponent],
+  imports: [IonHeader, IonToolbar, IonContent, IonIcon, ArticleBadgeComponent, TranslatePipe],
 })
 export class WordDetailComponent {
   private readonly cardStore = inject(CardStore);
@@ -44,6 +45,8 @@ export class WordDetailComponent {
   private readonly alertCtrl = inject(AlertController);
   private readonly modalCtrl = inject(ModalController);
   private readonly navCtrl = inject(NavController);
+  private readonly translate = inject(TranslateService);
+  private readonly languageService = inject(LanguageService);
 
   constructor() {
     addIcons({
@@ -78,9 +81,11 @@ export class WordDetailComponent {
   );
 
   readonly masteryLabel = computed(() => {
+    this.languageService.current(); // recompute on UI language change
     const state = this.card()?.srsState?.state;
-    if (!state || state === 'new') return 'New';
-    return {learning: 'Learning', review: 'Review', relearning: 'Review', mastered: 'Mastered'}[state] ?? 'New';
+    if (!state || state === 'new') return this.translate.instant('srs.masteryLabel.new');
+    const key = {learning: 'srs.masteryLabel.learning', review: 'srs.masteryLabel.review', relearning: 'srs.masteryLabel.review', mastered: 'srs.masteryLabel.mastered'}[state];
+    return key ? this.translate.instant(key) : this.translate.instant('srs.masteryLabel.new');
   });
 
   readonly masteryRingOffset = computed(() => {
@@ -91,21 +96,22 @@ export class WordDetailComponent {
   });
 
   readonly nextReviewText = computed(() => {
+    this.languageService.current(); // recompute on UI language change
     const nextDue = this.card()?.srsState?.nextDueAt;
     if (!nextDue) return '—';
     const days = Math.ceil((new Date(nextDue).getTime() - Date.now()) / 86_400_000);
-    if (days <= 0) return 'Due now';
-    if (days === 1) return 'Tomorrow';
-    return `Next review in ${days} days`;
+    if (days <= 0) return this.translate.instant('wordDetail.nextReview.dueNow');
+    if (days === 1) return this.translate.instant('wordDetail.nextReview.tomorrow');
+    return this.translate.instant('wordDetail.nextReview.inDays', { days });
   });
 
   readonly lastReviewedText = computed(() => {
+    this.languageService.current(); // recompute on UI language change
     const last = this.card()?.srsState?.lastReviewedAt;
-    if (!last) return 'Never';
+    if (!last) return this.translate.instant('wordDetail.lastReviewed.never');
     const days = Math.floor((Date.now() - new Date(last).getTime()) / 86_400_000);
-    if (days === 0) return 'Today';
-    if (days === 1) return '1d ago';
-    return `${days}d ago`;
+    if (days === 0) return this.translate.instant('wordDetail.lastReviewed.today');
+    return this.translate.instant('wordDetail.lastReviewed.daysAgo', { days });
   });
 
   readonly stabilityLabel = computed(() => {
@@ -211,11 +217,11 @@ export class WordDetailComponent {
   async confirmDelete(): Promise<void> {
     const wordBack = this.card()?.content.back ?? 'this word';
     const alert = await this.alertCtrl.create({
-      header: 'Delete word',
-      message: `Remove "${wordBack}" from your vault? This cannot be undone.`,
+      header: this.translate.instant('wordDetail.deleteConfirm.title'),
+      message: this.translate.instant('wordDetail.deleteConfirm.message', { word: wordBack }),
       buttons: [
-        {text: 'Cancel', role: 'cancel'},
-        {text: 'Delete', role: 'destructive', handler: () => this.deleteCard()},
+        {text: this.translate.instant('common.cancel'), role: 'cancel'},
+        {text: this.translate.instant('wordDetail.deleteConfirm.confirmButton'), role: 'destructive', handler: () => this.deleteCard()},
       ],
     });
     await alert.present();

@@ -1,25 +1,23 @@
-import { Component, ElementRef, EventEmitter, Output, ViewChild } from '@angular/core';
+import { ChangeDetectionStrategy, Component, ElementRef, output, viewChild } from '@angular/core';
 import { IonIcon } from '@ionic/angular/standalone';
+import { TranslatePipe } from '@ngx-translate/core';
 import { addIcons } from 'ionicons';
 import { cameraOutline, imagesOutline } from 'ionicons/icons';
 import { PickedImage } from '../image.model';
 
-// Capacitor Camera is lazily imported to support web fallback gracefully.
-// On web, <input type="file"> is used instead.
-
 @Component({
   selector: 'lc-image-picker',
-  standalone: true,
   templateUrl: './image-picker.component.html',
   styleUrls: ['./image-picker.component.scss'],
-  imports: [IonIcon],
+  changeDetection: ChangeDetectionStrategy.OnPush,
+  imports: [IonIcon, TranslatePipe],
 })
 export class ImagePickerComponent {
-  @Output() imagePicked = new EventEmitter<PickedImage>();
-  @Output() pickCancelled = new EventEmitter<void>();
-  @Output() pickError = new EventEmitter<string>();
+  readonly imagePicked = output<PickedImage>();
+  readonly pickCancelled = output<void>();
+  readonly pickError = output<string>();
 
-  @ViewChild('fileInput') fileInputRef!: ElementRef<HTMLInputElement>;
+  readonly fileInputRef = viewChild<ElementRef<HTMLInputElement>>('fileInput');
 
   private pendingSource: 'camera' | 'gallery' = 'gallery';
 
@@ -32,8 +30,8 @@ export class ImagePickerComponent {
       await this.capacitorPick('camera');
     } else {
       this.pendingSource = 'camera';
-      this.fileInputRef.nativeElement.capture = 'environment';
-      this.fileInputRef.nativeElement.click();
+      this.fileInputRef()!.nativeElement.capture = 'environment';
+      this.fileInputRef()!.nativeElement.click();
     }
   }
 
@@ -42,8 +40,8 @@ export class ImagePickerComponent {
       await this.capacitorPick('gallery');
     } else {
       this.pendingSource = 'gallery';
-      this.fileInputRef.nativeElement.removeAttribute('capture');
-      this.fileInputRef.nativeElement.click();
+      this.fileInputRef()!.nativeElement.removeAttribute('capture');
+      this.fileInputRef()!.nativeElement.click();
     }
   }
 

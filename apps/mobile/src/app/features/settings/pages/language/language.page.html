@@ -1,0 +1,40 @@
+<ion-header class="ion-no-border">
+  <ion-toolbar>
+    <div class="lang-nav">
+      <button class="lang-back" (click)="goBack()" [attr.aria-label]="'settings.language.backAria' | translate">
+        <svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round">
+          <polyline points="9,2 4,7 9,12"/>
+        </svg>
+      </button>
+      <span class="lang-nav-title">{{ 'settings.language.title' | translate }}</span>
+    </div>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+  <div class="lang-content">
+    <p class="lang-subtitle">{{ 'settings.language.subtitle' | translate }}</p>
+
+    <div class="lang-list">
+      @for (lang of languages; track lang.code) {
+        <button
+          class="lang-item"
+          [class.lang-item--active]="currentLanguage() === lang.code"
+          (click)="selectLanguage(lang.code)">
+          <span class="lang-flag">{{ lang.flag }}</span>
+          <div class="lang-labels">
+            <span class="lang-native">{{ lang.nativeName }}</span>
+            <span class="lang-english">{{ lang.label }}</span>
+          </div>
+          @if (currentLanguage() === lang.code) {
+            <span class="lang-check">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round">
+                <polyline points="20,6 9,17 4,12"/>
+              </svg>
+            </span>
+          }
+        </button>
+      }
+    </div>
+  </div>
+</ion-content>

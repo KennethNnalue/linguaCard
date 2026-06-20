@@ -1,13 +1,13 @@
 @if (loading() && questions().length === 0) {
   <div class="quiz-empty">
     <div class="tab-loading-spinner"></div>
-    <p class="tab-loading-text">Generating quiz…</p>
+    <p class="tab-loading-text">{{ 'stories.quiz.generatingMsg' | translate }}</p>
   </div>
 } @else if (questions().length === 0) {
   <div class="quiz-empty">
     <div class="quiz-empty-icon">📝</div>
-    <p>No quiz available for this story.</p>
-    <p class="quiz-empty-sub">Quizzes are generated for new stories going forward.</p>
+    <p>{{ 'stories.quiz.noQuizTitle' | translate }}</p>
+    <p class="quiz-empty-sub">{{ 'stories.quiz.noQuizDesc' | translate }}</p>
   </div>
 
 } @else if (isComplete()) {
@@ -20,8 +20,8 @@
     <div class="quiz-complete-score">
       {{ correctCount() }} / {{ questions().length }}
     </div>
-    <div class="quiz-complete-label">correct</div>
-    <button class="quiz-retake-btn" (click)="retake()">Retake quiz</button>
+    <div class="quiz-complete-label">{{ 'stories.quiz.correctLabel' | translate }}</div>
+    <button class="quiz-retake-btn" (click)="retake()">{{ 'stories.quiz.retakeBtn' | translate }}</button>
   </div>
 
 } @else {
@@ -56,7 +56,7 @@
       class="quiz-audio-toggle"
       [class.muted]="!autoSpeak()"
       (click)="autoSpeak.update(v => !v)"
-      [attr.aria-label]="autoSpeak() ? 'Mute answer audio' : 'Unmute answer audio'"
+      [attr.aria-label]="(autoSpeak() ? 'stories.quiz.muteAriaLabel' : 'stories.quiz.unmuteAriaLabel') | translate"
     >
       @if (pronunciationLoading()) {
         <div class="quiz-audio-spinner"></div>
@@ -104,7 +104,7 @@
         }
         @if (waitingForNext()) {
           <button class="quiz-next-btn" (click)="next()">
-            Next
+            {{ 'stories.quiz.nextBtn' | translate }}
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" width="14" height="14">
               <polyline points="9,18 15,12 9,6"/>
             </svg>
@@ -117,8 +117,8 @@
     <div class="quiz-settings">
       <div class="quiz-settings-row">
         <div class="quiz-settings-label">
-          <span class="quiz-settings-title">Pause on mistakes</span>
-          <span class="quiz-settings-sub">Review the correct answer before continuing</span>
+          <span class="quiz-settings-title">{{ 'stories.quiz.pauseOnMistakesTitle' | translate }}</span>
+          <span class="quiz-settings-sub">{{ 'stories.quiz.pauseOnMistakesDesc' | translate }}</span>
         </div>
         <ion-toggle
           [checked]="pauseOnMistakes()"

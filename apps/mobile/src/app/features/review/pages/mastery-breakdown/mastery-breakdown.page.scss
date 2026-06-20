@@ -98,7 +98,7 @@
   @include u.lc-font('xs', t.$lc-font-weight-semibold);
   color: var(--lc-text-secondary);
   min-width: 30px;
-  text-align: right;
+  text-align: end;
 }
 
 .mb-play-btn {

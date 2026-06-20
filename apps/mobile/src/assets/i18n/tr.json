@@ -564,7 +564,8 @@
     },
     "collection": {
       "label": "KOLEKSIYONA EKLE",
-      "requiredHint": "*zorunlu"
+      "requiredHint": "*zorunlu",
+      "noSelectionLabel": "Koleksiyon yok"
     },
     "words": {
       "label": "Kelimeler (seçmek / seçimi kaldırmak için dokunun)",

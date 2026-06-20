@@ -13,6 +13,7 @@ import { CardEntity } from '../cards/card.entity';
 import { StorageService } from '../storage/storage.service';
 import { SubscriptionsModule } from '../subscriptions/subscriptions.module';
 import { WordDictionaryModule } from '../word-dictionary/word-dictionary.module';
+import { SettingsModule } from '../settings/settings.module';
 
 @Module({
   imports: [
@@ -21,6 +22,7 @@ import { WordDictionaryModule } from '../word-dictionary/word-dictionary.module'
     ConfigModule,
     SubscriptionsModule,
     WordDictionaryModule,
+    SettingsModule,
   ],
   controllers: [StoriesController],
   providers: [

@@ -19,10 +19,12 @@ import {
   sparklesOutline,
   volumeHighOutline,
 } from 'ionicons/icons';
+import { TranslateService, TranslatePipe } from '@ngx-translate/core';
 import type { ArticleType, Card, CardContent, ExampleSentence, Synonym, WordDictionaryEntry } from '@lingua-card/shared/domain';
 import { UpdateCardDto } from '@lingua-card/shared/dto';
 import { WordAudioService } from '../../../../shared/audio/word-audio.service';
 import { AuthService } from '../../../../core/services/auth.service';
+import { LanguageService } from '../../../../core/services/language.service';
 import { CardStore } from '../../store/card.store';
 import { CardApiService } from '../../services/card-api.service';
 import { CategoryStore } from '../../store/category.store';
@@ -51,7 +53,7 @@ function makeSynonymGroup(s?: Partial<Synonym>): FormGroup {
   templateUrl: './add-word-sheet.component.html',
   styleUrls: ['./add-word-sheet.component.scss', './add-word-sheet.fields.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [IonHeader, IonToolbar, IonContent, IonIcon, ReactiveFormsModule],
+  imports: [IonHeader, IonToolbar, IonContent, IonIcon, ReactiveFormsModule, TranslatePipe],
 })
 export class AddWordSheetComponent implements OnInit {
   private readonly categoryStore = inject(CategoryStore);
@@ -67,6 +69,8 @@ export class AddWordSheetComponent implements OnInit {
   private readonly router = inject(Router);
   private readonly dedupService = inject(CardDedupService);
   private readonly destroyRef = inject(DestroyRef);
+  private readonly translate = inject(TranslateService);
+  private readonly languageService = inject(LanguageService);
 
   // @Input() required — Ionic ModalController sets componentProps via Object.assign(),
   // bypassing Angular's setInput() API. input() signals are overwritten with plain values.
@@ -111,10 +115,11 @@ export class AddWordSheetComponent implements OnInit {
   readonly showPluralField = computed(() => !!this._article());
 
   readonly selectedCollectionLabel = computed(() => {
+    this.languageService.current(); // recompute on UI language change
     const id = this._collectionId();
-    if (!id) return 'No collection';
+    if (!id) return this.translate.instant('addWord.collection.noSelectionLabel');
     const col = this.collectionStore.collections().find(c => c.id === id);
-    return col ? `${col.emoji} ${col.name}` : 'No collection';
+    return col ? `${col.emoji} ${col.name}` : this.translate.instant('addWord.collection.noSelectionLabel');
   });
 
   readonly canAutoGenerate = computed(() =>
@@ -301,7 +306,7 @@ export class AddWordSheetComponent implements OnInit {
       error: async () => {
         this.generating.set(false);
         const toast = await this.toastCtrl.create({
-          message: 'Auto-generate failed. Fill in manually or try again.',
+          message: this.translate.instant('addWord.errors.autoGenFailed'),
           duration: 3000,
           color: 'danger',
           position: 'bottom',

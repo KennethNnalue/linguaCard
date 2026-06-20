@@ -1,27 +1,29 @@
-import { Component, inject } from '@angular/core';
+import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
+import { TranslateService } from '@ngx-translate/core';
 import { SyncService } from '../../../core/services/sync.service';
 
 @Component({
   selector: 'lc-sync-status',
   templateUrl: './sync-status.component.html',
   styleUrls: ['./sync-status.component.scss'],
-  standalone: true,
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class SyncStatusComponent {
   readonly sync = inject(SyncService);
+  private readonly translate = inject(TranslateService);
 
   get label(): string {
     const status = this.sync.syncStatus();
     const count = this.sync.pendingCount();
     switch (status) {
       case 'pending':
-        return `${count} pending`;
+        return this.translate.instant('sync.status.pending', { count });
       case 'syncing':
-        return 'Syncing…';
+        return this.translate.instant('sync.status.syncing');
       case 'error':
-        return 'Sync error';
+        return this.translate.instant('sync.status.error');
       default:
-        return 'Synced';
+        return this.translate.instant('sync.status.synced');
     }
   }
 

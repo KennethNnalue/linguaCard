@@ -15,6 +15,7 @@ import {
   checkmarkCircleOutline,
   warningOutline,
 } from 'ionicons/icons';
+import { TranslateService, TranslatePipe } from '@ngx-translate/core';
 import type {
   Card,
   CardContent,
@@ -23,6 +24,7 @@ import type {
   ParsedImportRow,
   WordDictionaryEntry,
 } from '@lingua-card/shared/domain';
+import { LanguageService } from '../../../../core/services/language.service';
 import { CardApiService } from '../../services/card-api.service';
 import { CollectionApiService } from '../../services/collection-api.service';
 import { AuthService } from '../../../../core/services/auth.service';
@@ -52,7 +54,7 @@ interface SelectableRow extends ParsedImportRow {
   standalone: true,
   templateUrl: './import-review.page.html',
   styleUrls: ['./import-review.page.scss'],
-  imports: [IonHeader, IonToolbar, IonContent, IonIcon],
+  imports: [IonHeader, IonToolbar, IonContent, IonIcon, TranslatePipe],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ImportReviewPage implements OnInit {
@@ -69,6 +71,8 @@ export class ImportReviewPage implements OnInit {
   private readonly dedupService = inject(CardDedupService);
   private readonly audioPrefetch = inject(CollectionAudioPrefetchService);
   private readonly dictionaryApi = inject(DictionaryApiService);
+  private readonly translate = inject(TranslateService);
+  private readonly languageService = inject(LanguageService);
 
   readonly importing = signal(false);
   readonly result = this.importState.result;
@@ -76,10 +80,12 @@ export class ImportReviewPage implements OnInit {
   readonly wordList = signal<SelectableRow[]>([]);
 
   readonly selectedCollectionLabel = computed(() => {
+    this.languageService.current(); // re-evaluate label when UI language changes
     const id = this.selectedCollectionId();
-    if (!id) return 'No collection';
+    const noCol = this.translate.instant('importReview.collection.noSelectionLabel');
+    if (!id) return noCol;
     const col = this.collectionStore.collections().find(c => c.id === id);
-    return col ? `${col.emoji} ${col.name}` : 'No collection';
+    return col ? `${col.emoji} ${col.name}` : noCol;
   });
 
   readonly selectedWords = computed(() => this.wordList().filter(w => w.selected));
@@ -214,7 +220,7 @@ export class ImportReviewPage implements OnInit {
 
     if (!this.selectedCollectionId()) {
       const toast = await this.toastCtrl.create({
-        message: 'Please select a collection before importing.',
+        message: this.translate.instant('importReview.errors.noCollectionSelected'),
         duration: 2500,
         position: 'bottom',
         color: 'warning',
@@ -289,9 +295,9 @@ export class ImportReviewPage implements OnInit {
         const newCards = allCards.filter(c => newRows.some(r => r.back === c.content.back));
         this.audioPrefetch.prefetchCollection(newCards);
 
-        let msg = `✓ ${newCount} word${newCount === 1 ? '' : 's'} added to your Vault`;
-        if (dictReuseCount > 0) msg += `, ${dictReuseCount} reused from library`;
-        if (reusedCount > 0) msg += `, ${reusedCount} already existed`;
+        let msg = `✓ ${newCount} ${this.translate.instant('importReview.success.newCardsSuffix')}`;
+        if (dictReuseCount > 0) msg += `, ${dictReuseCount} ${this.translate.instant('importReview.success.dictReuseText')}`;
+        if (reusedCount > 0) msg += `, ${reusedCount} ${this.translate.instant('importReview.success.existingText')}`;
 
         const toast = await this.toastCtrl.create({
           message: msg,
@@ -305,7 +311,7 @@ export class ImportReviewPage implements OnInit {
       error: async () => {
         this.importing.set(false);
         const toast = await this.toastCtrl.create({
-          message: 'Import failed. Please try again.',
+          message: this.translate.instant('importReview.errors.importFailed'),
           duration: 3000,
           position: 'bottom',
           color: 'danger',
@@ -343,9 +349,11 @@ export class ImportReviewPage implements OnInit {
     if (row.duplicateCard) {
       const col = this.collectionStore.collections()
         .find(c => c.id === row.duplicateCard!.collectionId);
-      return col ? `Already in "${col.name}"` : 'Already in your vault';
+      return col
+        ? this.translate.instant('srs.alreadyInCollection', { name: col.name })
+        : this.translate.instant('srs.alreadyInVault');
     }
-    return row.duplicateSource ?? 'Duplicate';
+    return row.duplicateSource ?? this.translate.instant('srs.alreadyInVault');
   }
 
   private _normalizeKey(article: string | null | undefined, back: string): string {

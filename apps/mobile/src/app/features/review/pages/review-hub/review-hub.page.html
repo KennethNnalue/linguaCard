@@ -1,8 +1,8 @@
 <ion-header class="ion-no-border">
   <ion-toolbar>
     <div class="rh-nav">
-      <span class="rh-nav-title lc-display">Review</span>
-      <button class="rh-info-btn" (click)="goToMastery()" aria-label="Mastery breakdown">
+      <span class="rh-nav-title lc-display">{{ 'tabs.review' | translate }}</span>
+      <button class="rh-info-btn" (click)="goToMastery()" [attr.aria-label]="'review.hub.masteryBreakdownAriaLabel' | translate">
         <ion-icon name="information-circle-outline"></ion-icon>
       </button>
     </div>
@@ -14,7 +14,7 @@
 
     <!-- ── Due today hero ── -->
     <div class="rh-due-hero">
-      <div class="rh-due-greeting">Cards due today</div>
+      <div class="rh-due-greeting">{{ 'review.hub.cardsDueToday' | translate }}</div>
 
       <div class="rh-ring-row">
         <!-- Ring progress (same pattern as home hero) -->
@@ -30,7 +30,7 @@
           </svg>
           <div class="rh-ring-text">
             <div class="rh-ring-num">{{ dueTodayCount() }}</div>
-            <div class="rh-ring-lbl">due</div>
+            <div class="rh-ring-lbl">{{ 'review.hub.dueLabel' | translate }}</div>
           </div>
         </div>
 
@@ -39,12 +39,12 @@
           @for (tag of breakdownTags(); track tag.label) {
             <div class="rh-due-tag-row">
               <span class="rh-due-stat-num">{{ tag.count }}</span>
-              <span class="rh-due-stat-lbl">{{ tag.label }}</span>
+              <span class="rh-due-stat-lbl">{{ translateTag(tag.label) }}</span>
             </div>
           }
           @if (breakdownTags().length === 0) {
             <div class="rh-due-tag-row">
-              <span class="rh-due-stat-lbl">All caught up! 🎉</span>
+              <span class="rh-due-stat-lbl">{{ 'review.hub.allCaughtUp' | translate }}</span>
             </div>
           }
         </div>
@@ -55,13 +55,13 @@
         [disabled]="dueTodayCount() === 0"
         (click)="startTodaysReview()">
         <ion-icon name="play-outline"></ion-icon>
-        {{ dueTodayCount() > 0 ? "Start today's review" : 'Nothing due right now' }}
+        {{ dueTodayCount() > 0 ? ('review.hub.startTodaysReview' | translate) : ('review.hub.nothingDueNow' | translate) }}
       </button>
     </div>
 
     <!-- ── Quick study presets ── -->
     <div class="rh-section-header">
-      <span class="rh-section-title">Quick study</span>
+      <span class="rh-section-title">{{ 'review.hub.quickStudySection' | translate }}</span>
     </div>
 
     <div class="rh-presets">
@@ -72,8 +72,8 @@
           <ion-icon name="alert-circle-outline"></ion-icon>
         </div>
         <div class="rh-preset-info">
-          <p class="rh-preset-title">Struggling cards</p>
-          <p class="rh-preset-sub">Cards you've failed 3+ times</p>
+          <p class="rh-preset-title">{{ 'review.hub.strugglingCardsTitle' | translate }}</p>
+          <p class="rh-preset-sub">{{ 'review.hub.strugglingCardsDesc' | translate }}</p>
         </div>
         @if (strugglingCount() > 0) {
           <span class="rh-preset-count lc-display">{{ strugglingCount() }}</span>
@@ -88,8 +88,8 @@
           <ion-icon name="add-circle-outline"></ion-icon>
         </div>
         <div class="rh-preset-info">
-          <p class="rh-preset-title">New cards only</p>
-          <p class="rh-preset-sub">Never-reviewed vocabulary</p>
+          <p class="rh-preset-title">{{ 'review.hub.newCardsOnlyTitle' | translate }}</p>
+          <p class="rh-preset-sub">{{ 'review.hub.newCardsOnlyDesc' | translate }}</p>
         </div>
         @if (newCount() > 0) {
           <span class="rh-preset-count lc-display">{{ newCount() }}</span>
@@ -104,8 +104,8 @@
           <ion-icon name="play-outline"></ion-icon>
         </div>
         <div class="rh-preset-info">
-          <p class="rh-preset-title">Custom study</p>
-          <p class="rh-preset-sub">Build a filtered session</p>
+          <p class="rh-preset-title">{{ 'review.hub.customStudyTitle' | translate }}</p>
+          <p class="rh-preset-sub">{{ 'review.hub.customStudyDesc' | translate }}</p>
         </div>
         <ion-icon name="chevron-forward-outline" class="rh-chevron"></ion-icon>
       </div>
@@ -114,9 +114,9 @@
 
     <!-- ── Recent sessions ── -->
     <div class="rh-section-header">
-      <span class="rh-section-title">Recent sessions</span>
+      <span class="rh-section-title">{{ 'review.hub.recentSessionsSection' | translate }}</span>
       @if (recentSessions().length > 0) {
-        <button class="rh-see-all" (click)="goToHistory()">See all →</button>
+        <button class="rh-see-all" (click)="goToHistory()">{{ 'review.hub.seeAllLink' | translate }}</button>
       }
     </div>
 
@@ -125,10 +125,10 @@
         <div class="rh-session-item">
           <div class="rh-session-dot" [style.background]="sessionDotColour(session)"></div>
           <div class="rh-session-info">
-            <p class="rh-session-title">{{ session.collectionName ?? 'All due cards' }}</p>
+            <p class="rh-session-title">{{ session.collectionName ?? ('review.hub.allDueCardsLabel' | translate) }}</p>
             <p class="rh-session-meta">
               {{ session.startedAt | sessionDate }}
-              · {{ session.totalCards }} cards
+              · {{ session.totalCards }} {{ 'review.hub.cardsUnit' | translate }}
               · {{ sessionDuration(session) }}
             </p>
           </div>
@@ -139,8 +139,8 @@
       }
     } @else {
       <div class="rh-empty-sessions">
-        <p class="rh-empty-text">No review sessions yet.</p>
-        <p class="rh-empty-sub">Complete your first review to see history here.</p>
+        <p class="rh-empty-text">{{ 'review.hub.noSessionsTitle' | translate }}</p>
+        <p class="rh-empty-sub">{{ 'review.hub.noSessionsDesc' | translate }}</p>
       </div>
     }
 

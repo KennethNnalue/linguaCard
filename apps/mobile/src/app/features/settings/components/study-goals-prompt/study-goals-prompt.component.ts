@@ -1,6 +1,7 @@
 import { ChangeDetectionStrategy, Component, computed, inject } from '@angular/core';
 import { Router } from '@angular/router';
 import { ModalController } from '@ionic/angular/standalone';
+import { TranslatePipe } from '@ngx-translate/core';
 import { SettingsStore } from '../../store/settings.store';
 import { DEFAULT_STUDY_GOALS } from '@lingua-card/shared/domain';
 
@@ -9,6 +10,7 @@ import { DEFAULT_STUDY_GOALS } from '@lingua-card/shared/domain';
   templateUrl: './study-goals-prompt.component.html',
   styleUrl: './study-goals-prompt.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
+  imports: [TranslatePipe],
 })
 export class StudyGoalsPromptComponent {
   private readonly modalCtrl = inject(ModalController);

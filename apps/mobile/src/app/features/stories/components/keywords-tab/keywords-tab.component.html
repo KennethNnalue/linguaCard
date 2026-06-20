@@ -1,19 +1,19 @@
 @if (loading() && keywords().length === 0) {
   <div class="kw-empty">
     <div class="tab-loading-spinner"></div>
-    <p class="tab-loading-text">Extracting keywords…</p>
+    <p class="tab-loading-text">{{ 'stories.keywords.extractingMsg' | translate }}</p>
   </div>
 } @else if (keywords().length === 0) {
   <div class="kw-empty">
     <div class="kw-empty-icon">📚</div>
-    <p>No keywords available for this story.</p>
+    <p>{{ 'stories.keywords.noKeywordsMsg' | translate }}</p>
   </div>
 } @else {
 
   <!-- Memorize CTA -->
   <button class="kw-memorize-btn" (click)="memorizeAll.emit()">
     <span class="kw-memorize-icon">📋</span>
-    <span class="kw-memorize-text">Memorize keywords</span>
+    <span class="kw-memorize-text">{{ 'stories.keywords.memorizeBtn' | translate }}</span>
     <span class="kw-memorize-arrow">→</span>
   </button>
 
@@ -34,9 +34,9 @@
         <div class="kw-body">
           <div class="kw-word-row">
             <span class="kw-word">{{ kw.german }}</span>
-            <span class="kw-type"> - {{ kw.wordType }}</span>
+            <span class="kw-type"> - {{ 'stories.wordType.' + kw.wordType | translate }}</span>
           </div>
-          <div class="kw-translation">{{ kw.english }}</div>
+          <div class="kw-translation">{{ kw.translation }}</div>
         </div>
 
         <div class="kw-actions">
@@ -45,7 +45,7 @@
             [class.kw-playing]="isThisPlaying(kw)"
             [disabled]="isThisPlaying(kw)"
             (click)="$event.stopPropagation(); onPlayWord(kw)"
-            title="Play pronunciation"
+            [title]="'stories.keywords.playPronunciationTitle' | translate"
           >
             @if (isThisPlaying(kw)) {
               <div class="kw-btn-spinner"></div>

@@ -9,6 +9,7 @@ import {
   ModalController,
   ToastController,
 } from '@ionic/angular/standalone';
+import { TranslateService, TranslatePipe } from '@ngx-translate/core';
 import { addIcons } from 'ionicons';
 import { chevronBackOutline, volumeHighOutline } from 'ionicons/icons';
 import type {
@@ -23,12 +24,13 @@ import { GenerateStorySheetComponent } from '../../../stories/components/generat
   templateUrl: './platform-collection-detail.page.html',
   styleUrls: ['./platform-collection-detail.page.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [IonHeader, IonToolbar, IonContent, IonFooter, IonIcon],
+  imports: [IonHeader, IonToolbar, IonContent, IonFooter, IonIcon, TranslatePipe],
 })
 export class PlatformCollectionDetailPage {
   private readonly router = inject(Router);
   private readonly modalCtrl = inject(ModalController);
   private readonly toastCtrl = inject(ToastController);
+  private readonly translate = inject(TranslateService);
   private readonly platformStore = inject(PlatformCollectionStore);
 
   readonly alreadyKnownExpanded = signal(false);
@@ -66,7 +68,7 @@ export class PlatformCollectionDetailPage {
       if (ev.type === 'success') {
         const count = ev.result.addedCount;
         void this._toast(
-          count > 0 ? `${count} words added — audio included ✓` : 'Already in your sets',
+          count > 0 ? this.translate.instant('platformCollectionDetail.adopt.successMessage', { count }) : this.translate.instant('platformCollectionDetail.adopt.alreadyInMessage'),
           'success',
         );
         if (this._pendingGenerateAfterAdopt) {
@@ -75,7 +77,7 @@ export class PlatformCollectionDetailPage {
         }
       } else {
         this._pendingGenerateAfterAdopt = false;
-        void this._toast('Could not add collection. Try again.', 'danger');
+        void this._toast(this.translate.instant('platformCollectionDetail.adopt.errorMessage'), 'danger');
       }
     });
   }

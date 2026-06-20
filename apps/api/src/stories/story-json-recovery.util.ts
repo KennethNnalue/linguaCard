@@ -1,6 +1,6 @@
 interface GeneratedSentence {
   german: string;
-  english: string;
+  native: string;
   vocabWordsUsed: string[];
 }
 
@@ -133,7 +133,7 @@ function recoverSentences(raw: string): GeneratedSentence[] {
       if (typeof obj['german'] === 'string' && obj['german'].length > 0) {
         results.push({
           german: obj['german'] as string,
-          english: typeof obj['english'] === 'string' ? obj['english'] : '',
+          native: typeof obj['native'] === 'string' ? obj['native'] : '',
           vocabWordsUsed: Array.isArray(obj['vocabWordsUsed'])
             ? (obj['vocabWordsUsed'] as string[])
             : [],

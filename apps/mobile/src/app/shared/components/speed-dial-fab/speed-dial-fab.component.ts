@@ -1,5 +1,6 @@
 import {ChangeDetectionStrategy, Component, output, signal} from '@angular/core';
 import {IonIcon} from '@ionic/angular/standalone';
+import {TranslatePipe} from '@ngx-translate/core';
 import {addIcons} from 'ionicons';
 import {addOutline, cloudUploadOutline, closeOutline, folderOpenOutline} from 'ionicons/icons';
 
@@ -8,7 +9,7 @@ import {addOutline, cloudUploadOutline, closeOutline, folderOpenOutline} from 'i
   templateUrl: './speed-dial-fab.component.html',
   styleUrls: ['./speed-dial-fab.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [IonIcon],
+  imports: [IonIcon, TranslatePipe],
   host: {
     '[class.open]': 'isOpen()',
     '(document:click)': 'closeIfOpen()',

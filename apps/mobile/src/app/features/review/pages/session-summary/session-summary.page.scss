@@ -42,7 +42,7 @@
   &--4 { background: var(--lc-mastery-4); }
   &--5 { background: var(--lc-mastery-5); }
 }
-.ss-bar-count { @include u.lc-font('xs'); color: var(--lc-text-hint); width: 20px; text-align: right; flex-shrink: 0; }
+.ss-bar-count { @include u.lc-font('xs'); color: var(--lc-text-hint); width: 20px; text-align: end; flex-shrink: 0; }
 
 .ss-word-list { display: flex; flex-direction: column; gap: t.$lc-space-2; }
 

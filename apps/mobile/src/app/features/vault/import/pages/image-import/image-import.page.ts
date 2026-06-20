@@ -1,4 +1,4 @@
-import { Component, inject } from '@angular/core';
+import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
 import { Router } from '@angular/router';
 import {
   IonContent,
@@ -10,6 +10,7 @@ import {
 } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
 import { arrowBackOutline, closeCircleOutline, documentOutline } from 'ionicons/icons';
+import { TranslatePipe } from '@ngx-translate/core';
 import { ImagePickerComponent } from '../../../../../shared/image/image-picker/image-picker.component';
 import { PickedImage } from '../../../../../shared/image/image.model';
 import {
@@ -23,10 +24,10 @@ const MAX_FILE_SIZE_BYTES = 5 * 1024 * 1024;
 
 @Component({
   selector: 'lc-image-import',
-  standalone: true,
   templateUrl: './image-import.page.html',
   styleUrls: ['./image-import.page.scss'],
-  imports: [IonHeader, IonToolbar, IonContent, IonIcon, ImagePickerComponent],
+  changeDetection: ChangeDetectionStrategy.OnPush,
+  imports: [IonHeader, IonToolbar, IonContent, IonIcon, ImagePickerComponent, TranslatePipe],
 })
 export class ImageImportPage {
   private readonly router = inject(Router);

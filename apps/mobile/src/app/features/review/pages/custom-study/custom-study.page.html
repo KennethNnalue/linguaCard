@@ -1,10 +1,10 @@
 <ion-header class="ion-no-border">
   <ion-toolbar>
     <div class="cs-nav">
-      <button class="cs-back-btn" (click)="goBack()" aria-label="Back">
+      <button class="cs-back-btn" (click)="goBack()" [attr.aria-label]="'review.custom.backAriaLabel' | translate">
         <ion-icon name="chevron-back-outline"></ion-icon>
       </button>
-      <span class="cs-nav-title">Custom Study</span>
+      <span class="cs-nav-title">{{ 'review.custom.pageTitle' | translate }}</span>
       <div class="cs-nav-spacer"></div>
     </div>
   </ion-toolbar>
@@ -15,7 +15,7 @@
 
     <!-- ── Source ── -->
     <div class="cs-section">
-      <p class="cs-sec-lbl">Source</p>
+      <p class="cs-sec-lbl">{{ 'review.custom.sourceSection' | translate }}</p>
       <button class="cs-source-btn" (click)="openSourcePicker()">
         <span>{{ sourceLabel() }}</span>
         <ion-icon name="chevron-down-outline" class="cs-chevron"></ion-icon>
@@ -24,7 +24,7 @@
 
     <!-- ── Mastery filter ── -->
     <div class="cs-section">
-      <p class="cs-sec-lbl">Filter by mastery level</p>
+      <p class="cs-sec-lbl">{{ 'review.custom.masteryFilterSection' | translate }}</p>
       <div class="cs-mastery-grid">
         @for (info of masteryInfo; track info.level) {
           <button
@@ -41,7 +41,7 @@
 
     <!-- ── Sort order ── -->
     <div class="cs-section">
-      <p class="cs-sec-lbl">Sort order</p>
+      <p class="cs-sec-lbl">{{ 'review.custom.sortOrderSection' | translate }}</p>
       <div class="cs-sort-chips">
         @for (opt of sortOptions; track opt.value) {
           <button
@@ -56,7 +56,7 @@
 
     <!-- ── Card limit ── -->
     <div class="cs-section">
-      <p class="cs-sec-lbl">Card limit</p>
+      <p class="cs-sec-lbl">{{ 'review.custom.cardLimitSection' | translate }}</p>
       <div class="cs-slider-row">
         <ion-range
           class="cs-range"
@@ -73,7 +73,7 @@
 
     <!-- ── Preview count ── -->
     <div class="cs-preview">
-      <span class="cs-preview-txt">Cards matching your filters</span>
+      <span class="cs-preview-txt">{{ 'review.custom.matchingCountLabel' | translate }}</span>
       <span class="cs-preview-count lc-display">{{ matchingCount() }}</span>
     </div>
 
@@ -84,9 +84,9 @@
         [disabled]="!masteryLevels().length || sessionCount() === 0"
         (click)="startSession()">
         @if (sessionCount() > 0) {
-          Start session ({{ sessionCount() }} cards)
+          {{ 'review.custom.startSessionBtn' | translate }} ({{ sessionCount() }} {{ 'review.hub.cardsUnit' | translate }})
         } @else {
-          No cards match your filters
+          {{ 'review.custom.noCardsMatchMsg' | translate }}
         }
       </button>
     </div>

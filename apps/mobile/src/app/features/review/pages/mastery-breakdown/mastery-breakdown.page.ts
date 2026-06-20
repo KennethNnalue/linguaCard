@@ -3,12 +3,14 @@ import { Router } from '@angular/router';
 import { NavController, IonContent, IonHeader, IonIcon, IonToolbar } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
 import { chevronBackOutline, chevronDownOutline, playOutline } from 'ionicons/icons';
+import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { MasteryLevel } from '@lingua-card/shared/domain';
 import { ReviewStore } from '../../store/review.store';
 import { ReviewFilterService } from '../../services/review-filter.service';
 import { SourcePickerService } from '../../shared/services/source-picker.service';
 import {
   MASTERY_INFO_DESC,
+  MASTERY_LABEL_KEYS,
   ReviewLimit,
   ReviewRoute,
   ReviewSortOrder,
@@ -20,7 +22,7 @@ import {
   templateUrl: './mastery-breakdown.page.html',
   styleUrls: ['./mastery-breakdown.page.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [IonContent, IonHeader, IonToolbar, IonIcon],
+  imports: [IonContent, IonHeader, IonToolbar, IonIcon, TranslatePipe],
 })
 export class MasteryBreakdownPage {
   private readonly filterService = inject(ReviewFilterService);
@@ -28,12 +30,17 @@ export class MasteryBreakdownPage {
   private readonly sourcePicker = inject(SourcePickerService);
   private readonly navCtrl = inject(NavController);
   private readonly router = inject(Router);
+  private readonly translate = inject(TranslateService);
 
   constructor() {
     addIcons({ chevronBackOutline, chevronDownOutline, playOutline });
   }
 
   readonly masteryRows = MASTERY_INFO_DESC;
+
+  translatedMasteryLabel(level: MasteryLevel): string {
+    return this.translate.instant(MASTERY_LABEL_KEYS[level]);
+  }
 
   readonly selectedCollectionId = signal<string | undefined>(undefined);
 
@@ -59,7 +66,7 @@ export class MasteryBreakdownPage {
   }
 
   async openSourcePicker(): Promise<void> {
-    const result = await this.sourcePicker.pick('Select collection');
+    const result = await this.sourcePicker.pick(this.translate.instant('srs.selectCollection'));
     if (result === null) return;
     this.selectedCollectionId.set(result === ReviewSource.ALL ? undefined : result);
   }

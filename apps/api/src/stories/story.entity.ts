@@ -27,8 +27,11 @@ export class StoryEntity {
   @Column('text')
   bodyDe!: string;
 
-  @Column('text')
-  bodyEn!: string;
+  @Column({ type: 'text', nullable: true })
+  bodyNative!: string;
+
+  @Column({ type: 'varchar', length: 5, default: 'en' })
+  nativeLang!: string;
 
   @Column('jsonb', { default: [] })
   sentences!: StorySentence[];

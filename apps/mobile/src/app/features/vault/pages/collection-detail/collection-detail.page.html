@@ -1,13 +1,13 @@
 <ion-header class="ion-no-border">
   <ion-toolbar>
     <div class="cd-nav">
-      <button class="lc-back-btn" (click)="goBack()" aria-label="Back">
+      <button class="lc-back-btn" (click)="goBack()" [attr.aria-label]="'collectionDetail.nav.backAria' | translate">
         <ion-icon name="chevron-back-outline"></ion-icon>
       </button>
       <h1 class="cd-nav-title lc-display" [class.cd-nav-title--completed]="justCompleted()">
         {{ collection()?.name ?? '' }}
       </h1>
-      <button class="cd-menu-btn" (click)="showMenu()" aria-label="Options">
+      <button class="cd-menu-btn" (click)="showMenu()" [attr.aria-label]="'collectionDetail.nav.optionsAria' | translate">
         <ion-icon name="ellipsis-horizontal-outline"></ion-icon>
       </button>
     </div>
@@ -23,9 +23,9 @@
         <ion-icon name="time-outline"></ion-icon>
       </div>
       <div class="cd-incomplete-banner__body">
-        <p class="cd-incomplete-banner__title">Import incomplete</p>
+        <p class="cd-incomplete-banner__title">{{ 'collectionDetail.incompleteImport.title' | translate }}</p>
         <p class="cd-incomplete-banner__sub">
-          {{ collection()!.pendingWords.length }} words still need flashcards
+          {{ collection()!.pendingWords.length }} {{ 'collectionDetail.incompleteImport.subtitle' | translate }}
         </p>
       </div>
       <button
@@ -36,7 +36,7 @@
         @if (completing()) {
           <span class="cd-spinner"></span>
         } @else {
-          Complete
+          {{ 'collectionDetail.incompleteImport.completeButton' | translate }}
         }
       </button>
     </div>
@@ -48,7 +48,7 @@
       <span class="cd-audio-progress__icon">♫</span>
       <div class="cd-audio-progress__body">
         <span class="cd-audio-progress__label">
-          Preparing audio… {{ audioReadyCount() }} / {{ wordCount() }} words ready
+          {{ 'collectionDetail.audio.preparingLabel' | translate }} {{ audioReadyCount() }} / {{ wordCount() }} {{ 'collectionDetail.audio.readyUnit' | translate }}
         </span>
         <div class="cd-audio-progress__track">
           <div
@@ -67,17 +67,17 @@
       <div class="cd-hero-stats">
         <div class="cd-hero-stat">
           <span class="cd-hero-stat-num">{{ wordCount() }}</span>
-          <span class="cd-hero-stat-lbl">words</span>
+          <span class="cd-hero-stat-lbl">{{ 'collectionDetail.hero.wordsLabel' | translate }}</span>
         </div>
         <div class="cd-hero-divider"></div>
         <div class="cd-hero-stat">
           <span class="cd-hero-stat-num cd-hero-stat-num--due">{{ dueCount() }}</span>
-          <span class="cd-hero-stat-lbl">due</span>
+          <span class="cd-hero-stat-lbl">{{ 'collectionDetail.hero.dueLabel' | translate }}</span>
         </div>
         <div class="cd-hero-divider"></div>
         <div class="cd-hero-stat">
           <span class="cd-hero-stat-num">{{ progressPercent() }}%</span>
-          <span class="cd-hero-stat-lbl">mastered</span>
+          <span class="cd-hero-stat-lbl">{{ 'collectionDetail.hero.masteredLabel' | translate }}</span>
         </div>
       </div>
     </div>
@@ -94,12 +94,12 @@
     <button class="cd-action-btn cd-action-btn--primary" (click)="startReview()"
             [disabled]="wordCount() === 0">
       <ion-icon name="play-outline"></ion-icon>
-      {{ dueCount() > 0 ? 'Review (' + dueCount() + ')' : 'Review all' }}
+      {{ dueCount() > 0 ? ('collectionDetail.actions.reviewLabel' | translate) + ' (' + dueCount() + ')' : ('collectionDetail.actions.reviewAllLabel' | translate) }}
     </button>
     <button class="cd-action-btn cd-action-btn--secondary" (click)="startListen()"
             [disabled]="wordCount() === 0">
       <ion-icon name="volume-high-outline"></ion-icon>
-      Listen
+      {{ 'collectionDetail.actions.listenLabel' | translate }}
     </button>
   </div>
 
@@ -112,7 +112,7 @@
           [class.lc-cat-chip--active]="!activeCategoryId()"
           [class.lc-cat-chip--inactive]="!!activeCategoryId()"
           (click)="setCategory(null)">
-          All ({{ allCards().length }})
+          {{ 'collectionDetail.categories.allLabel' | translate }} ({{ allCards().length }})
         </button>
         @for (catId of categoryIds(); track catId) {
           <button
@@ -148,8 +148,8 @@
       } @empty {
         <div class="lc-empty-state">
           <span class="lc-empty-icon">📖</span>
-          <p class="lc-empty-title">No words yet</p>
-          <p class="lc-empty-sub">Tap + to add your first word</p>
+          <p class="lc-empty-title">{{ 'collectionDetail.emptyState.title' | translate }}</p>
+          <p class="lc-empty-sub">{{ 'collectionDetail.emptyState.subtitle' | translate }}</p>
         </div>
       }
     }
@@ -160,7 +160,7 @@
     <div class="cd-pending-section">
       <div class="cd-pending-label">
         <div class="cd-pending-dot"></div>
-        Pending ({{ collection()!.pendingWords.length }}) — tap Complete above
+        {{ 'collectionDetail.pending.label' | translate }} ({{ collection()!.pendingWords.length }}) {{ 'collectionDetail.pending.instruction' | translate }}
       </div>
       @for (i of pendingGhosts(); track i) {
         <div class="cd-ghost-row">

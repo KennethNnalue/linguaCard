@@ -1,54 +1,58 @@
-import { Component, inject } from '@angular/core';
-import { NgIf } from '@angular/common';
+import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
 import { IonButton } from '@ionic/angular/standalone';
+import { TranslatePipe } from '@ngx-translate/core';
 import { PwaInstallService } from '../../../core/services/pwa-install.service';
 
 @Component({
   selector: 'lc-pwa-install-banner',
-  standalone: true,
-  imports: [NgIf, IonButton],
+  imports: [IonButton, TranslatePipe],
+  changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
     <!-- Android / Chrome / Edge: native install prompt -->
-    <div class="install-banner" *ngIf="pwa.canInstall() && !pwa.isInstalled()">
-      <div class="install-banner__content">
-        <img class="install-banner__icon" src="icons/icon-96x96.png" alt="" width="48" height="48"/>
-        <div class="install-banner__text">
-          <span class="install-banner__title">Add to Home Screen</span>
-          <span class="install-banner__subtitle">Install LinguaCard for quick access</span>
+    @if (pwa.canInstall() && !pwa.isInstalled()) {
+      <div class="install-banner">
+        <div class="install-banner__content">
+          <img class="install-banner__icon" src="icons/icon-96x96.png" alt="" width="48" height="48"/>
+          <div class="install-banner__text">
+            <span class="install-banner__title">{{ 'pwa.install.title' | translate }}</span>
+            <span class="install-banner__subtitle">{{ 'pwa.install.subtitle' | translate }}</span>
+          </div>
+        </div>
+        <div class="install-banner__actions">
+          <ion-button fill="clear" size="small" color="medium" (click)="dismiss()">{{ 'common.notNow' | translate }}</ion-button>
+          <ion-button fill="solid" size="small" (click)="install()">{{ 'common.install' | translate }}</ion-button>
         </div>
       </div>
-      <div class="install-banner__actions">
-        <ion-button fill="clear" size="small" color="medium" (click)="dismiss()">Not now</ion-button>
-        <ion-button fill="solid" size="small" (click)="install()">Install</ion-button>
-      </div>
-    </div>
+    }
 
     <!-- iOS Safari: manual instructions banner -->
-    <div class="install-banner install-banner--ios" *ngIf="pwa.canInstallIos()">
-      <button class="install-banner__close" (click)="dismissIos()" aria-label="Dismiss">✕</button>
-      <div class="install-banner__content">
-        <img class="install-banner__icon" src="icons/icon-96x96.png" alt="" width="44" height="44"/>
-        <div class="install-banner__text">
-          <span class="install-banner__title">Add to Home Screen</span>
-          <span class="install-banner__subtitle">
-            Tap
-            <span class="install-banner__share-icon" aria-label="Share">
-              <svg width="14" height="16" viewBox="0 0 14 16" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-                <path d="M7 1v9M3.5 4L7 1l3.5 3M1 8v6a1 1 0 001 1h10a1 1 0 001-1V8" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-              </svg>
+    @if (pwa.canInstallIos()) {
+      <div class="install-banner install-banner--ios">
+        <button class="install-banner__close" (click)="dismissIos()" [attr.aria-label]="'common.dismiss' | translate">✕</button>
+        <div class="install-banner__content">
+          <img class="install-banner__icon" src="icons/icon-96x96.png" alt="" width="44" height="44"/>
+          <div class="install-banner__text">
+            <span class="install-banner__title">{{ 'pwa.install.title' | translate }}</span>
+            <span class="install-banner__subtitle">
+              {{ 'pwa.installIos.tap' | translate }}
+              <span class="install-banner__share-icon" [attr.aria-label]="'common.aria.share' | translate">
+                <svg width="14" height="16" viewBox="0 0 14 16" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                  <path d="M7 1v9M3.5 4L7 1l3.5 3M1 8v6a1 1 0 001 1h10a1 1 0 001-1V8" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+              </span>
+              <strong>{{ 'pwa.installIos.action' | translate }}</strong>
             </span>
-            then <strong>Add to Home Screen</strong>
-          </span>
+          </div>
         </div>
       </div>
-    </div>
+    }
   `,
   styles: [`
     .install-banner {
       position: fixed;
       bottom: 0;
-      left: 0;
-      right: 0;
+      inset-inline-start: 0;
+      inset-inline-end: 0;
       z-index: 9999;
       background: var(--ion-background-color, #fff);
       border-top: 1px solid var(--ion-color-light-shade, #e0e0e0);
@@ -75,7 +79,7 @@ import { PwaInstallService } from '../../../core/services/pwa-install.service';
     .install-banner__close {
       position: absolute;
       top: 10px;
-      right: 12px;
+      inset-inline-end: 12px;
       background: none;
       border: none;
       font-size: 14px;

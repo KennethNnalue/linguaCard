@@ -1,10 +1,12 @@
-import { Component, EventEmitter, inject, Output } from '@angular/core';
+import { ChangeDetectionStrategy, Component, inject, output } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { IonIcon, IonToggle } from '@ionic/angular/standalone';
+import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { addIcons } from 'ionicons';
 import {
   chevronForwardOutline,
   cloudUploadOutline,
+  languageOutline,
   logOutOutline,
   moonOutline,
   notificationsOutline,
@@ -19,32 +21,33 @@ import { SubscriptionStore } from '../../../features/subscription/store/subscrip
 
 @Component({
   selector: 'lc-user-menu',
-  standalone: true,
   templateUrl: './user-menu.component.html',
   styleUrls: ['./user-menu.component.scss'],
-  imports: [IonIcon, IonToggle, RouterLink],
+  changeDetection: ChangeDetectionStrategy.OnPush,
+  imports: [IonIcon, IonToggle, RouterLink, TranslatePipe],
 })
 export class UserMenuComponent {
   readonly auth = inject(AuthService);
   readonly theme = inject(ThemeService);
   readonly sync = inject(SyncService);
   readonly subscriptionStore = inject(SubscriptionStore);
+  private readonly translate = inject(TranslateService);
 
-  @Output() closed = new EventEmitter<void>();
-  @Output() resetRequested = new EventEmitter<void>();
+  readonly closed = output<void>();
+  readonly resetRequested = output<void>();
 
   constructor() {
-    addIcons({ moonOutline, syncOutline, trashOutline, logOutOutline, chevronForwardOutline, trophyOutline, notificationsOutline, cloudUploadOutline });
+    addIcons({ moonOutline, syncOutline, trashOutline, logOutOutline, chevronForwardOutline, trophyOutline, notificationsOutline, cloudUploadOutline, languageOutline });
   }
 
   get syncLabel(): string {
     const status = this.sync.syncStatus();
     const count = this.sync.pendingCount();
     switch (status) {
-      case 'pending': return `${count} pending`;
-      case 'syncing': return 'Syncing…';
-      case 'error':   return 'Sync error — tap to retry';
-      default:        return 'Synced';
+      case 'pending': return this.translate.instant('sync.status.pending', { count });
+      case 'syncing': return this.translate.instant('sync.status.syncing');
+      case 'error':   return this.translate.instant('sync.status.errorRetry');
+      default:        return this.translate.instant('sync.status.synced');
     }
   }
 

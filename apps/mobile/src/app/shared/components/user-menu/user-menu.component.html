@@ -4,7 +4,7 @@
   <!-- User info -->
   <div class="ctx-user-row">
     <div class="ctx-user-name">
-      {{ auth.currentUser()?.name ?? 'Account' }}
+      {{ auth.currentUser()?.name ?? ('common.account' | translate) }}
       <span class="tier-badge" [class.tier-badge--pro]="subscriptionStore.isPro()">
         {{ subscriptionStore.isPro() ? 'PRO' : 'FREE' }}
       </span>
@@ -16,7 +16,7 @@
   <a class="ctx-item" role="menuitem" [routerLink]="['/settings/goals']" (click)="closed.emit()">
     <div class="ctx-item-left">
       <ion-icon name="trophy-outline"></ion-icon>
-      Study goals
+      {{ 'settings.goals.title' | translate }}
     </div>
     <ion-icon name="chevron-forward-outline" class="ctx-chevron"></ion-icon>
   </a>
@@ -25,7 +25,16 @@
   <a class="ctx-item" role="menuitem" [routerLink]="['/settings/reminders']" (click)="closed.emit()">
     <div class="ctx-item-left">
       <ion-icon name="notifications-outline"></ion-icon>
-      Reminders
+      {{ 'settings.reminders.title' | translate }}
+    </div>
+    <ion-icon name="chevron-forward-outline" class="ctx-chevron"></ion-icon>
+  </a>
+
+  <!-- Language -->
+  <a class="ctx-item" role="menuitem" [routerLink]="['/settings/language']" (click)="closed.emit()">
+    <div class="ctx-item-left">
+      <ion-icon name="language-outline"></ion-icon>
+      {{ 'settings.language.title' | translate }}
     </div>
     <ion-icon name="chevron-forward-outline" class="ctx-chevron"></ion-icon>
   </a>
@@ -34,11 +43,11 @@
   <button class="ctx-item" role="menuitem" (click)="theme.toggle()">
     <div class="ctx-item-left">
       <ion-icon name="moon-outline"></ion-icon>
-      Dark mode
+      {{ 'settings.theme.darkMode' | translate }}
     </div>
     <ion-toggle
       [checked]="theme.isDark()"
-      aria-label="Toggle dark mode"
+      [attr.aria-label]="'common.aria.toggleDarkMode' | translate"
       tabindex="-1"
     ></ion-toggle>
   </button>
@@ -52,7 +61,7 @@
   >
     <div class="ctx-item-left">
       <ion-icon name="sync-outline"></ion-icon>
-      Sync status
+      {{ 'sync.status.label' | translate }}
     </div>
     <div class="ctx-sync-right">
       <span [class]="syncClass"></span>
@@ -65,7 +74,7 @@
     <a class="ctx-item ctx-item--admin" role="menuitem" [routerLink]="['/admin/import']" (click)="closed.emit()">
       <div class="ctx-item-left">
         <ion-icon name="cloud-upload-outline"></ion-icon>
-        Admin import
+        {{ 'admin.import.label' | translate }}
       </div>
       <ion-icon name="chevron-forward-outline" class="ctx-chevron"></ion-icon>
     </a>
@@ -75,7 +84,7 @@
   <button class="ctx-item ctx-item--danger" role="menuitem" (click)="onResetClick()">
     <div class="ctx-item-left">
       <ion-icon name="trash-outline"></ion-icon>
-      Reset all data
+      {{ 'settings.dangerZone.resetTitle' | translate }}
     </div>
     <ion-icon name="chevron-forward-outline" class="ctx-chevron"></ion-icon>
   </button>
@@ -84,7 +93,7 @@
   <button class="ctx-item" role="menuitem" (click)="signOut()">
     <div class="ctx-item-left">
       <ion-icon name="log-out-outline"></ion-icon>
-      Sign out
+      {{ 'auth.signOut' | translate }}
     </div>
   </button>
 </div>

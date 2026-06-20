@@ -2,7 +2,7 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { randomUUID } from 'crypto';
-import type { Story, GenerateStoryDto } from '@lingua-card/shared/domain';
+import type { Story, GenerateStoryDto, LanguageCode } from '@lingua-card/shared/domain';
 import { StoryEntity } from './story.entity';
 import { StoryGenerationService } from './story-generation.service';
 import { StoryAudioService } from './story-audio.service';
@@ -132,7 +132,8 @@ export class StoriesService {
       title: e.title,
       titleTranslation: e.titleTranslation,
       bodyDe: e.bodyDe,
-      bodyEn: e.bodyEn,
+      bodyNative: e.bodyNative,
+      nativeLang: e.nativeLang as LanguageCode,
       sentences: e.sentences,
       wordTimestamps: e.wordTimestamps,
       vocabWords: e.vocabWords,

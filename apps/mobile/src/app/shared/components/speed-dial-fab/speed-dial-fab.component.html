@@ -13,8 +13,8 @@
         (pointerenter)="setHovered('addCard')"
         (pointerleave)="setHovered(null)"
         (click)="onAction($event, 'addCard')">
-        <span class="action-label">Add Card</span>
-        <button class="mini-btn" aria-label="Add card">
+        <span class="action-label">{{ 'vault.addCard' | translate }}</span>
+        <button class="mini-btn" [attr.aria-label]="'common.aria.addCard' | translate">
           <ion-icon name="add-outline"></ion-icon>
         </button>
       </div>
@@ -26,8 +26,8 @@
         (pointerenter)="setHovered('newCollection')"
         (pointerleave)="setHovered(null)"
         (click)="onAction($event, 'newCollection')">
-        <span class="action-label">New Collection</span>
-        <button class="mini-btn" aria-label="New collection">
+        <span class="action-label">{{ 'vault.newCollection' | translate }}</span>
+        <button class="mini-btn" [attr.aria-label]="'common.aria.newCollection' | translate">
           <ion-icon name="folder-open-outline"></ion-icon>
         </button>
       </div>
@@ -39,8 +39,8 @@
         (pointerenter)="setHovered('import')"
         (pointerleave)="setHovered(null)"
         (click)="onAction($event, 'import')">
-        <span class="action-label">Import</span>
-        <button class="mini-btn" aria-label="Import">
+        <span class="action-label">{{ 'vault.import' | translate }}</span>
+        <button class="mini-btn" [attr.aria-label]="'common.aria.import' | translate">
           <ion-icon name="cloud-upload-outline"></ion-icon>
         </button>
       </div>
@@ -52,7 +52,7 @@
     class="main-btn"
     [class.is-open]="isOpen()"
     (click)="toggle($event)"
-    [attr.aria-label]="isOpen() ? 'Close menu' : 'Quick actions'"
+    [attr.aria-label]="isOpen() ? ('common.aria.closeMenu' | translate) : ('common.aria.quickActions' | translate)"
     [attr.aria-expanded]="isOpen()">
     <ion-icon
       class="main-icon"

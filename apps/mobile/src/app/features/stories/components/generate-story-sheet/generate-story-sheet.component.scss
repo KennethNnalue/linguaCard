@@ -33,7 +33,7 @@
   display: flex; align-items: center; gap: t.$lc-space-3;
   padding: 11px t.$lc-space-3; background: var(--lc-surface);
   border: 1.5px solid var(--lc-border); border-radius: t.$lc-radius-md + 1;
-  cursor: pointer; width: 100%; text-align: left; transition: border-color t.$lc-duration-fast, background t.$lc-duration-fast;
+  cursor: pointer; width: 100%; text-align: start; transition: border-color t.$lc-duration-fast, background t.$lc-duration-fast;
   &.selected { border-color: var(--lc-brand); background: var(--lc-brand-light); }
 }
 .gs-col-emoji { font-size: 22px; line-height: 1; flex-shrink: 0; }
@@ -82,7 +82,7 @@
   @include u.lc-font('xxs', t.$lc-font-weight-semibold);
   color: var(--lc-accent); background: var(--lc-accent-light);
   padding: 2px 7px; border-radius: t.$lc-radius-sm; letter-spacing: 0; text-transform: none;
-  margin-left: auto;
+  margin-inline-start: auto;
 }
 
 .gs-chip--locked {
@@ -98,7 +98,7 @@
 }
 
 .gs-chip-badge {
-  display: inline-block; margin-left: 5px; padding: 1px 5px; border-radius: t.$lc-space-1;
+  display: inline-block; margin-inline-start: 5px; padding: 1px 5px; border-radius: t.$lc-space-1;
   background: var(--lc-accent); color: #fff; @include u.lc-font('xxs', t.$lc-font-weight-semibold);
   text-transform: uppercase; letter-spacing: 0.4px; vertical-align: middle;
 }

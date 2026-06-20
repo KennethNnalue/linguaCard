@@ -1,4 +1,5 @@
 import {inject, Injectable} from '@angular/core';
+import {TranslateService} from '@ngx-translate/core';
 import {CollectionStore} from '../../../vault/store/collection.store';
 import {ReviewSource} from '../../models/review.model';
 import {BottomSheetService} from '../../../../shared/components/bottom-sheet/bottom-sheet.service';
@@ -13,15 +14,16 @@ export interface SourcePickerResult {
 export class SourcePickerService {
   private readonly bottomSheet = inject(BottomSheetService);
   private readonly collectionStore = inject(CollectionStore);
+  private readonly translate = inject(TranslateService);
 
-  /** Opens a bottom sheet to pick ALL or a specific collection.
-   *  Returns the selected source ID (ReviewSource.ALL or a collection id), or null if cancelled. */
-  async pick(header = 'Select source'): Promise<string | null> {
+  async pick(header?: string): Promise<string | null> {
+    const resolvedHeader = header ?? this.translate.instant('srs.selectCollection');
+    const allLabel = `📚 ${this.translate.instant('srs.allCollections')}`;
     const collections = this.collectionStore.collections();
     return new Promise(resolve => {
       const actions: BottomSheetAction[] = [
         {
-          label: '📚 All collections',
+          label: allLabel,
           icon: 'library-outline',
           handler: () => resolve(ReviewSource.ALL),
         },
@@ -30,19 +32,19 @@ export class SourcePickerService {
           handler: () => resolve(col.id),
         })),
         {
-          label: 'Cancel',
+          label: this.translate.instant('common.cancel'),
           role: 'cancel' as const,
           handler: () => resolve(null),
         },
       ];
-      this.bottomSheet.open(header, actions).then(() => resolve(null));
+      this.bottomSheet.open(resolvedHeader, actions).then(() => resolve(null));
     });
   }
 
-  /** Returns the display label for a source ID. */
   labelFor(sourceId: string): string {
-    if (sourceId === ReviewSource.ALL) return '📚 All collections';
+    const allLabel = `📚 ${this.translate.instant('srs.allCollections')}`;
+    if (sourceId === ReviewSource.ALL) return allLabel;
     const col = this.collectionStore.collections().find(c => c.id === sourceId);
-    return col ? `${col.emoji ?? '📚'} ${col.name}` : '📚 All collections';
+    return col ? `${col.emoji ?? '📚'} ${col.name}` : allLabel;
   }
 }

@@ -1,30 +1,30 @@
 <ion-header class="ion-no-border">
   <ion-toolbar>
     <div class="vault-header">
-      <h1 class="vault-title">Vault <span class="vault-title-count">{{ totalCount() }}</span></h1>
+      <h1 class="vault-title">{{ 'vault.title' | translate }} <span class="vault-title-count">{{ totalCount() }}</span></h1>
     </div>
 
     <!-- Contextual action bar — adapts to active tab -->
     <div class="action-bar">
       @if (activeTab() === 'words') {
-        <button class="ab-primary" (click)="openAddWord()" aria-label="Add card">
+        <button class="ab-primary" (click)="openAddWord()" [attr.aria-label]="'common.aria.addCard' | translate">
           <ion-icon name="add-outline"></ion-icon>
-          Add Card
+          {{ 'vault.addCard' | translate }}
         </button>
-        <button class="ab-secondary" (click)="openImportSheet()" aria-label="Import">
+        <button class="ab-secondary" (click)="openImportSheet()" [attr.aria-label]="'common.aria.import' | translate">
           <ion-icon name="cloud-upload-outline"></ion-icon>
-          Import
+          {{ 'vault.import' | translate }}
         </button>
-        <button class="ab-overflow" (click)="openImportSheet()" aria-label="Import">
+        <button class="ab-overflow" (click)="openImportSheet()" [attr.aria-label]="'common.aria.import' | translate">
           <ion-icon name="ellipsis-vertical-outline"></ion-icon>
         </button>
       }
       @if (activeTab() === 'collections') {
-        <button class="ab-primary ab-primary--full" (click)="openCreateCollection()" aria-label="New collection">
+        <button class="ab-primary ab-primary--full" (click)="openCreateCollection()" [attr.aria-label]="'common.aria.newCollection' | translate">
           <ion-icon name="add-outline"></ion-icon>
-          New Collection
+          {{ 'vault.newCollection' | translate }}
         </button>
-        <button class="ab-overflow" (click)="openImportSheet()" aria-label="Import">
+        <button class="ab-overflow" (click)="openImportSheet()" [attr.aria-label]="'common.aria.import' | translate">
           <ion-icon name="ellipsis-vertical-outline"></ion-icon>
         </button>
       }
@@ -36,14 +36,14 @@
         class="tab-item"
         [class.tab-item--active]="activeTab() === 'words'"
         (click)="activeTab.set('words')"
-        aria-label="Words tab">
-        Words
+        [attr.aria-label]="'vault.tabs.wordsAria' | translate">
+        {{ 'vault.tabs.wordsLabel' | translate }}
       </button>
       <button
         class="tab-item"
         (click)="openCollectionsPage()"
-        aria-label="Collections tab">
-        Collections
+        [attr.aria-label]="'vault.tabs.collectionsAria' | translate">
+        {{ 'vault.tabs.collectionsLabel' | translate }}
       </button>
     </div>
     <div class="tab-divider"></div>
@@ -63,29 +63,29 @@
       <input
         class="v2-search-input"
         type="search"
-        placeholder="Search words…"
+        [placeholder]="'vault.search.placeholder' | translate"
         (input)="onSearch($event)"
-        aria-label="Search vocabulary"
+        [attr.aria-label]="'vault.search.aria' | translate"
       />
     </div>
 
     <!-- Text-tab filter toolbar + sort -->
     <div class="n-toolbar">
       <button class="n-filter" [class.active]="masteryFilter() === 'all'" (click)="setMasteryFilter('all')">
-        All ({{ totalCount() }})
+        {{ 'vault.filter.allLabel' | translate }} ({{ totalCount() }})
       </button>
       @if (dueCount() > 0) {
         <button class="n-filter" [class.active]="masteryFilter() === 'due'" (click)="setMasteryFilter('due')">
-          Due ({{ dueCount() }})
+          {{ 'vault.filter.dueLabel' | translate }} ({{ dueCount() }})
         </button>
       }
       @if (newCount() > 0) {
         <button class="n-filter" [class.active]="masteryFilter() === 'new'" (click)="setMasteryFilter('new')">
-          New ({{ newCount() }})
+          {{ 'vault.filter.newLabel' | translate }} ({{ newCount() }})
         </button>
       }
       <button class="n-filter" [class.active]="masteryFilter() === 'mastered'" (click)="setMasteryFilter('mastered')">
-        Mastered ({{ masteredCount() }})
+        {{ 'vault.filter.masteredLabel' | translate }} ({{ masteredCount() }})
       </button>
       <button class="n-sort" (click)="openSortSheet()">
         <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><polyline points="19,12 12,19 5,12"/></svg>
@@ -97,10 +97,10 @@
     @if (masteryFilter() === 'all') {
       <p class="n-context">
         @if (dueCount() > 0) {
-          <span class="n-context-accent">{{ dueCount() }}</span> need review&nbsp;·&nbsp;
+          <span class="n-context-accent">{{ dueCount() }}</span> {{ 'vault.filter.needReviewText' | translate }}&nbsp;·&nbsp;
         }
         @if (newCount() > 0) {
-          <span class="n-context-accent">{{ newCount() }}</span> never studied
+          <span class="n-context-accent">{{ newCount() }}</span> {{ 'vault.filter.neverStudiedText' | translate }}
         }
       </p>
     }
@@ -122,8 +122,8 @@
         } @empty {
           <div class="lc-empty-state">
             <span class="lc-empty-icon">🔍</span>
-            <p class="lc-empty-title">No words found</p>
-            <p class="lc-empty-sub">Try a different filter or search</p>
+            <p class="lc-empty-title">{{ 'vault.emptyState.title' | translate }}</p>
+            <p class="lc-empty-sub">{{ 'vault.emptyState.subtitle' | translate }}</p>
           </div>
         }
       }
@@ -136,17 +136,17 @@
     <div class="stats-banner">
       <div class="stats-item">
         <div class="stats-val">{{ totalCards() }}</div>
-        <div class="stats-lbl">Total words</div>
+        <div class="stats-lbl">{{ 'vault.collections.totalWordsLabel' | translate }}</div>
       </div>
       <div class="stats-div"></div>
       <div class="stats-item">
         <div class="stats-val">{{ collections().length }}</div>
-        <div class="stats-lbl">Collections</div>
+        <div class="stats-lbl">{{ 'vault.collections.collectionsLabel' | translate }}</div>
       </div>
       <div class="stats-div"></div>
       <div class="stats-item">
         <div class="stats-val stats-val--due">{{ totalDue() }}</div>
-        <div class="stats-lbl">Due today</div>
+        <div class="stats-lbl">{{ 'vault.collections.dueTodayLabel' | translate }}</div>
       </div>
     </div>
 
@@ -188,17 +188,17 @@
                 </div>
                 @if (col.dueCount > 0) {
                   <span class="col-due-badge" [class.col-due-badge--urgent]="urgency === 'high'">
-                    {{ col.dueCount }} due
+                    {{ col.dueCount }} {{ 'common.due' | translate }}
                   </span>
                 } @else if (col.cardCount > 0) {
-                  <span class="col-due-badge col-due-badge--ok">✓ up to date</span>
+                  <span class="col-due-badge col-due-badge--ok">✓ {{ 'collections.card.upToDateLabel' | translate }}</span>
                 }
               </div>
 
               <!-- Meta row: words · mastered -->
               <div class="col-meta">
-                <span><strong>{{ col.cardCount }}</strong> words</span>
-                <span><strong>{{ col.masteredCount }}</strong> mastered</span>
+                <span><strong>{{ col.cardCount }}</strong> {{ 'common.words' | translate }}</span>
+                <span><strong>{{ col.masteredCount }}</strong> {{ 'collections.card.masteredLabel' | translate }}</span>
               </div>
 
               <!-- Progress bar -->
@@ -208,9 +208,9 @@
 
               <!-- Footer labels -->
               <div class="col-progress-footer">
-                <span>{{ progressPercent(col) }}% complete</span>
+                <span>{{ progressPercent(col) }}% {{ 'collections.card.completeLabel' | translate }}</span>
                 @if (col.cardCount > 0) {
-                  <span>{{ duePercent(col) }}% due</span>
+                  <span>{{ duePercent(col) }}% {{ 'common.due' | translate }}</span>
                 }
               </div>
             </div>
@@ -218,8 +218,8 @@
         } @empty {
           <div class="lc-empty-state">
             <span class="lc-empty-icon">📚</span>
-            <p class="lc-empty-title">No collections yet</p>
-            <p class="lc-empty-sub">Tap + New Collection to get started</p>
+            <p class="lc-empty-title">{{ 'vault.collections.emptyTitle' | translate }}</p>
+            <p class="lc-empty-sub">{{ 'vault.collections.emptySubtitle' | translate }}</p>
           </div>
         }
       }

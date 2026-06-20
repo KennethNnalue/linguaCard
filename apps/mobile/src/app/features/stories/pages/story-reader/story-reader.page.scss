@@ -452,7 +452,7 @@
   flex-shrink: 0;
 }
 .sr-word-content {
-  position: absolute; left: 16px; bottom: 16px; right: 90px;
+  position: absolute; inset-inline-start: 16px; bottom: 16px; inset-inline-end: 90px;
   display: flex; flex-direction: column; gap: t.$lc-space-1; z-index: 2;
 }
 .sr-word-main {
@@ -478,7 +478,7 @@
   letter-spacing: 0.04em; align-self: flex-start; margin-top: 2px;
 }
 .sr-word-actions {
-  position: absolute; right: 14px; bottom: 16px;
+  position: absolute; inset-inline-end: 14px; bottom: 16px;
   display: flex; flex-direction: column; gap: t.$lc-space-2; z-index: 2;
 }
 
@@ -580,7 +580,7 @@
     font-size: 10px;
     font-weight: 600;
     color: var(--lc-brand);
-    text-align: left;
+    text-align: start;
     padding: 6px 8px;
     border-bottom: 1px solid var(--lc-border);
     text-transform: uppercase;

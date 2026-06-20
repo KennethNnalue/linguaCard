@@ -1,10 +1,10 @@
 <ion-header class="ion-no-border">
   <ion-toolbar>
     <div class="imp-nav">
-      <button class="imp-back-btn" (click)="goBack()" aria-label="Back">
+      <button class="imp-back-btn" (click)="goBack()" [attr.aria-label]="'importReview.nav.backAria' | translate">
         <ion-icon name="arrow-back-outline"></ion-icon>
       </button>
-      <span class="imp-title lc-display">Review Import</span>
+      <span class="imp-title lc-display">{{ 'importReview.nav.title' | translate }}</span>
       <div class="imp-nav-spacer"></div>
     </div>
   </ion-toolbar>
@@ -19,7 +19,7 @@
         <ion-icon name="checkmark-circle-outline" class="imp-file-icon"></ion-icon>
         <div class="imp-file-text">
           <p class="imp-file-name">{{ result()!.fileName }}</p>
-          <p class="imp-file-sub">{{ totalCount() }} words detected</p>
+          <p class="imp-file-sub">{{ totalCount() }} {{ 'importReview.fileInfo.wordsDetected' | translate }}</p>
         </div>
       </div>
 
@@ -28,8 +28,8 @@
         <div class="imp-dedup-bar">
           <ion-icon name="warning-outline" class="imp-dedup-bar__icon"></ion-icon>
           <span class="imp-dedup-bar__text">
-            {{ vaultDuplicateCount() }} of {{ totalCount() }} words already in your vault
-            <span class="imp-dedup-bar__hint">(deselected)</span>
+            {{ vaultDuplicateCount() }} {{ 'common.of' | translate }} {{ totalCount() }} {{ 'importReview.duplicates.messagePrefix' | translate }}
+            <span class="imp-dedup-bar__hint">{{ 'importReview.duplicates.deselectedNote' | translate }}</span>
           </span>
         </div>
       }
@@ -39,8 +39,8 @@
         <div class="imp-reuse-bar">
           <span class="imp-reuse-bar__icon">⚡</span>
           <span class="imp-reuse-bar__text">
-            <strong>{{ reuseCount() }} known</strong> to the library — reused at no cost.
-            {{ newEnrichCount() }} will be enriched.
+            <strong>{{ reuseCount() }} {{ 'importReview.reuseBar.knownLabel' | translate }}</strong> {{ 'importReview.reuseBar.reuseText' | translate }}
+            {{ newEnrichCount() }} {{ 'importReview.reuseBar.enrichText' | translate }}
           </span>
         </div>
       }
@@ -49,35 +49,35 @@
       <div class="imp-summary-row">
         <div class="imp-sum-cell">
           <span class="imp-sum-val">{{ totalCount() }}</span>
-          <span class="imp-sum-lbl">Total</span>
+          <span class="imp-sum-lbl">{{ 'importReview.summary.totalLabel' | translate }}</span>
         </div>
         @if (reuseCount() > 0) {
           <div class="imp-sum-cell imp-sum-cell--reuse">
             <span class="imp-sum-val">{{ reuseCount() }}</span>
-            <span class="imp-sum-lbl">Reuse</span>
+            <span class="imp-sum-lbl">{{ 'importReview.summary.reuseLabel' | translate }}</span>
           </div>
         }
         <div class="imp-sum-cell imp-sum-cell--ready">
           <span class="imp-sum-val">{{ newEnrichCount() }}</span>
-          <span class="imp-sum-lbl">New</span>
+          <span class="imp-sum-lbl">{{ 'importReview.summary.newLabel' | translate }}</span>
         </div>
         @if (vaultDuplicateCount() > 0) {
           <div class="imp-sum-cell imp-sum-cell--warn">
             <span class="imp-sum-val">{{ vaultDuplicateCount() }}</span>
-            <span class="imp-sum-lbl">In vault</span>
+            <span class="imp-sum-lbl">{{ 'importReview.summary.inVaultLabel' | translate }}</span>
           </div>
         }
         @if (errorCount() > 0) {
           <div class="imp-sum-cell imp-sum-cell--error">
             <span class="imp-sum-val">{{ errorCount() }}</span>
-            <span class="imp-sum-lbl">Skipped</span>
+            <span class="imp-sum-lbl">{{ 'importReview.summary.skippedLabel' | translate }}</span>
           </div>
         }
       </div>
 
       <!-- Collection picker -->
       <div class="imp-field">
-        <p class="imp-section-lbl">ADD TO COLLECTION <span class="imp-required">*required</span></p>
+        <p class="imp-section-lbl">{{ 'importReview.collection.label' | translate }} <span class="imp-required">{{ 'importReview.collection.requiredHint' | translate }}</span></p>
         <button
           class="imp-collection-btn"
           [class.imp-collection-btn--empty]="!selectedCollectionId()"
@@ -88,7 +88,7 @@
       </div>
 
       <!-- Full selectable word list -->
-      <p class="imp-section-lbl">Words (tap to select / deselect)</p>
+      <p class="imp-section-lbl">{{ 'importReview.words.label' | translate }}</p>
       <div class="imp-word-list">
         @for (row of wordList(); track row.rowIndex) {
           <div
@@ -117,11 +117,11 @@
               </div>
               @if (row.isDuplicate) {
                 <div class="imp-dup-row">
-                  <span class="imp-dup-badge">In vault</span>
+                  <span class="imp-dup-badge">{{ 'importReview.words.duplicateBadge' | translate }}</span>
                   <span class="imp-dup-hint">{{ getDuplicateLabel(row) }}</span>
                   @if (row.duplicateCard) {
                     <button class="imp-dup-go" (click)="$event.stopPropagation(); suppressDuplicate(row.rowIndex)">
-                      Add anyway
+                      {{ 'addWord.duplicateWarning.addAnywayButton' | translate }}
                     </button>
                   }
                 </div>
@@ -130,7 +130,7 @@
 
             @if (row.dictionaryEntry && !row.isDuplicate) {
               <div class="imp-reuse-tog" (click)="$event.stopPropagation(); toggleReuse(row.rowIndex)">
-                <span class="imp-reuse-lbl">{{ row.reuseFromDictionary ? '★ library' : 'enrich' }}</span>
+                <span class="imp-reuse-lbl">{{ row.reuseFromDictionary ? ('importReview.words.reuseLabel' | translate) : ('importReview.words.enrichLabel' | translate) }}</span>
                 <span class="imp-tog" [class.imp-tog--on]="row.reuseFromDictionary"></span>
               </div>
             }
@@ -150,14 +150,14 @@
         [disabled]="importing() || selectedCount() === 0 || !selectedCollectionId()"
         (click)="confirmImport()">
         @if (importing()) {
-          Importing…
+          {{ 'importReview.importButton.importingLabel' | translate }}
         } @else {
-          Import {{ selectedCount() }} word{{ selectedCount() === 1 ? '' : 's' }} →
+          {{ 'importReview.importButton.prefix' | translate }} {{ selectedCount() }} {{ selectedCount() === 1 ? ('importReview.importButton.wordSingular' | translate) : ('importReview.importButton.wordsPlural' | translate) }} →
         }
       </button>
 
       <!-- Cancel -->
-      <button class="imp-cancel-lnk" (click)="cancel()">Cancel</button>
+      <button class="imp-cancel-lnk" (click)="cancel()">{{ 'importReview.cancel.link' | translate }}</button>
 
     </div>
   }

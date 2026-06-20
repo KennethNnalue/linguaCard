@@ -11,6 +11,7 @@ import {
 import { Router } from '@angular/router';
 import { NavController } from '@ionic/angular';
 import { IonContent, IonHeader, IonToolbar } from '@ionic/angular/standalone';
+import { TranslatePipe } from '@ngx-translate/core';
 import { PlayMode } from '@lingua-card/shared/domain';
 import { ListenStore } from '../../store/listen.store';
 import { ArticleBadgeComponent } from '../../../../shared/components/article-badge/article-badge.component';
@@ -27,7 +28,7 @@ interface SegmentViewModel {
   templateUrl: './now-playing.page.html',
   styleUrl: './now-playing.page.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [IonContent, IonHeader, IonToolbar, ArticleBadgeComponent],
+  imports: [IonContent, IonHeader, IonToolbar, ArticleBadgeComponent, TranslatePipe],
 })
 export class NowPlayingPage {
   protected readonly listenStore = inject(ListenStore);

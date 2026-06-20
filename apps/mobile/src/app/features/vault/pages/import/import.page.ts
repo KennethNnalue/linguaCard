@@ -22,6 +22,7 @@ import {
   informationCircleOutline,
   sparklesOutline,
 } from 'ionicons/icons';
+import {TranslateService, TranslatePipe} from '@ngx-translate/core';
 import {CsvParserService} from '../../../../shared/csv/csv-parser.service';
 import {CategoryStore} from '../../store/category.store';
 import {ImportStateService} from '../../services/import-state.service';
@@ -32,7 +33,7 @@ import {CLIPBOARD_PROMPT, DISPLAY_PROMPT} from './import-prompt.constants';
   standalone: true,
   templateUrl: './import.page.html',
   styleUrls: ['./import.page.scss'],
-  imports: [IonHeader, IonToolbar, IonContent, IonIcon],
+  imports: [IonHeader, IonToolbar, IonContent, IonIcon, TranslatePipe],
 })
 export class ImportPage {
   @ViewChild('fileInput') fileInput!: ElementRef<HTMLInputElement>;
@@ -43,6 +44,7 @@ export class ImportPage {
   private readonly router = inject(Router);
   private readonly toastCtrl = inject(ToastController);
   private readonly modalCtrl = inject(ModalController);
+  private readonly translate = inject(TranslateService);
 
   set isModal(v: boolean) { this._isModal.set(v ?? false); }
   readonly _isModal = signal(false);
@@ -117,7 +119,7 @@ export class ImportPage {
 
   private onPromptCopied(): void {
     this.promptCopied.set(true);
-    this.showToast('Prompt copied to clipboard');
+    this.showToast(this.translate.instant('import.toast.promptCopied'));
     setTimeout(() => this.promptCopied.set(false), 8_000);
   }
 
@@ -135,7 +137,7 @@ export class ImportPage {
 
   private processFile(file: File): void {
     if (!file.name.toLowerCase().endsWith('.csv')) {
-      this.showToast('Please select a .csv file');
+      this.showToast(this.translate.instant('import.errors.invalidFileType'));
       return;
     }
     const reader = new FileReader();
@@ -143,7 +145,7 @@ export class ImportPage {
       const text = e.target?.result as string;
       const result = this.csvService.parse(text, file.name, this.categoryStore.categories());
       if (result.totalRows === 0) {
-        this.showToast('No words found in this file');
+        this.showToast(this.translate.instant('import.errors.noWordsFound'));
         return;
       }
       this.importState.set(result);

@@ -1,6 +1,6 @@
 // ─── PRIMITIVE TYPES ─────────────────────────────────────────────────────────
 
-export type LanguageCode = 'en' | 'de' | 'fr' | 'es' | 'it' | 'pt' | 'ja' | 'zh' | 'ko' | 'ar';
+export type LanguageCode = 'en' | 'de' | 'fr' | 'es' | 'it' | 'pt' | 'ja' | 'zh' | 'ko' | 'ar' | 'uk' | 'tr' | 'ru';
 export type GenderType = 'masculine' | 'feminine' | 'neuter' | null;
 export type ArticleType = 'der' | 'die' | 'das' | 'le' | 'la' | 'el' | 'un' | 'une' | null;
 export type MasteryLevel = 0 | 1 | 2 | 3 | 4 | 5;
@@ -437,10 +437,10 @@ export interface StoryGrammarNote {
   id: string;
   title: string;               // "Modal verb \"können\""
   exampleDe: string;           // Story sentence used as example
-  exampleEn: string;           // English translation of example
+  exampleNative: string;       // Native-language translation of example
   description: string;         // Multi-paragraph plain text explanation
   conjugationTable?: Array<{ pronoun: string; form: string }>;
-  additionalExamples: Array<{ de: string; en: string }>;
+  additionalExamples: Array<{ de: string; native: string }>;
 }
 
 export interface VerbConjugations {
@@ -454,7 +454,7 @@ export interface StoryKeyword {
   cardId: string | null;       // null if not in user's vault
   german: string;              // "der Sternenhimmel" (with article)
   germanBase: string;          // "Sternenhimmel"
-  english: string;             // "starry sky"
+  translation: string;         // native-language translation (e.g. "starry sky")
   article: 'der' | 'die' | 'das' | null;
   wordType: 'noun' | 'verb' | 'adjective' | 'adverb' | 'other';
   level: 'A1' | 'A2' | 'B1' | 'B2' | 'C1' | 'C2';
@@ -464,7 +464,7 @@ export interface StoryKeyword {
 export interface StorySentence {
   index: number;
   german: string;
-  english: string;
+  native: string;
   vocabWordIds: string[];
 }
 
@@ -513,7 +513,8 @@ export interface Story {
   title: string;
   titleTranslation: string;
   bodyDe: string;
-  bodyEn: string;
+  bodyNative: string;
+  nativeLang: LanguageCode;
   sentences: StorySentence[];
   wordTimestamps: WordTimestamp[];
   vocabWords: StoryVocabWord[];
@@ -682,7 +683,8 @@ export interface PlatformStory {
   title: string;
   titleTranslation: string;
   bodyDe: string;
-  bodyEn: string;
+  bodyNative: string;
+  nativeLang: LanguageCode;
   sentences: StorySentence[];
   wordTimestamps: WordTimestamp[];
   keywords: StoryKeyword[];
@@ -755,9 +757,10 @@ export interface ReminderSettings {
 export interface UserSettings extends StudyGoals, ReminderSettings {
   userId: string;
   goalsSetAt: string | null;
+  uiLanguage: LanguageCode;
 }
 
-export type UpdateUserSettingsDto = Partial<StudyGoals & ReminderSettings>;
+export type UpdateUserSettingsDto = Partial<StudyGoals & ReminderSettings & { uiLanguage: LanguageCode }>;
 
 export const DEFAULT_STUDY_GOALS: StudyGoals = {
   dailyGoal: 20,
@@ -867,14 +870,14 @@ export interface AdminImportCollectionResult {
 
 export interface GeneratedPlatformStorySentence {
   german: string;
-  english: string;
+  native: string;
   wordsUsed: string[];
 }
 
 export interface GeneratedPlatformStoryKeyword {
   germanBase: string;
   article: 'der' | 'die' | 'das' | null;
-  english: string;
+  translation: string;
   wordType: 'noun' | 'verb' | 'adjective' | 'adverb' | 'other';
   level: CefrLevel;
 }
@@ -943,6 +946,18 @@ export interface AdminPlatformCollectionListItem {
   /** Admin-set story category for deterministic story pairing (LC-414). */
   storyCategory: string | null;
   createdAt: string;
+}
+
+export interface AdminPlatformStoryListItem {
+  id: string;
+  title: string;
+  titleTranslation: string;
+  level: string;
+  category: string;
+  wordCount: number;
+  isPublished: boolean;
+  platformCollectionId: string | null;
+  publishedAt: string;
 }
 
 export interface AdminPublishToggleDto {

@@ -8,12 +8,13 @@ import {StoryStore} from '../../store/story.store';
 import {StoryApiService} from '../../services/story-api.service';
 import {firstValueFrom} from 'rxjs';
 import {ArticleBadgeComponent} from '../../../../shared/components/article-badge/article-badge.component';
+import {TranslatePipe} from '@ngx-translate/core';
 
 @Component({
   selector: 'lc-story-complete',
   templateUrl: './story-complete.page.html',
   styleUrls: ['./story-complete.page.scss'],
-  imports: [IonContent, IonHeader, IonToolbar, IonIcon, ArticleBadgeComponent],
+  imports: [IonContent, IonHeader, IonToolbar, IonIcon, ArticleBadgeComponent, TranslatePipe],
 })
 export class StoryCompletePage implements OnInit {
   private readonly route = inject(ActivatedRoute);

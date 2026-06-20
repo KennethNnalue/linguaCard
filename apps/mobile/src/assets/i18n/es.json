@@ -564,7 +564,8 @@
     },
     "collection": {
       "label": "AÑADIR A COLECCIÓN",
-      "requiredHint": "*obligatorio"
+      "requiredHint": "*obligatorio",
+      "noSelectionLabel": "Sin colección"
     },
     "words": {
       "label": "Palabras (toca para seleccionar / deseleccionar)",

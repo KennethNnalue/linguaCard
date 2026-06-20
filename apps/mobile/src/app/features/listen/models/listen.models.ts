@@ -36,14 +36,14 @@ export const PLAYBACK_SPEEDS: PlaybackSpeed[] = LISTEN_SPEEDS_EXTENDED;
 
 export interface PlayModeOption {
   value: PlayMode;
-  label: string;
-  desc: string;
+  labelKey: string;
+  descKey: string;
 }
 
 export const PLAY_MODE_OPTIONS: PlayModeOption[] = [
-  { value: 'compact',  label: 'Compact',   desc: 'Word + meaning' },
-  { value: 'examples', label: 'Examples',  desc: 'Full sentences' },
-  { value: 'deepDive', label: 'Deep Dive', desc: '+ grammar tip'  },
+  { value: 'compact',  labelKey: 'listen.playlistMode.compactLabel',  descKey: 'listen.playlistMode.compactDesc' },
+  { value: 'examples', labelKey: 'listen.playlistMode.examplesLabel', descKey: 'listen.playlistMode.examplesDesc' },
+  { value: 'deepDive', labelKey: 'listen.playlistMode.deepDiveLabel', descKey: 'listen.playlistMode.deepDiveDesc' },
 ];
 
 export const PlayModeLabel: Record<PlayMode, string> = {

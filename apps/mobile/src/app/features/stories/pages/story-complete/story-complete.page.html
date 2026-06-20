@@ -1,10 +1,10 @@
 <ion-header class="ion-no-border">
   <ion-toolbar>
     <div class="sc-nav">
-      <button class="sc-back-btn" (click)="goToLibrary()" aria-label="Back to library">
+      <button class="sc-back-btn" (click)="goToLibrary()" [attr.aria-label]="'stories.complete.backAriaLabel' | translate">
         <ion-icon name="arrow-back-outline"></ion-icon>
       </button>
-      <span class="sc-nav-title">Story Complete</span>
+      <span class="sc-nav-title">{{ 'stories.complete.pageTitle' | translate }}</span>
       <div style="width: 32px;"></div>
     </div>
   </ion-toolbar>
@@ -18,29 +18,29 @@
       <div class="sc-banner-icon">
         <ion-icon name="checkmark-circle-outline"></ion-icon>
       </div>
-      <div class="sc-banner-title">Great read!</div>
-      <div class="sc-banner-sub">You finished "{{ s.title }}"</div>
+      <div class="sc-banner-title">{{ 'stories.complete.title' | translate }}</div>
+      <div class="sc-banner-sub">{{ 'stories.complete.finishedMsg' | translate: { title: s.title } }}</div>
       <div class="sc-banner-stats">
         <div class="sc-stat">
           <span class="sc-stat-value">{{ s.vocabWords.length }}</span>
-          <span class="sc-stat-label">vocab words</span>
+          <span class="sc-stat-label">{{ 'stories.complete.vocabWordsLabel' | translate }}</span>
         </div>
         <div class="sc-stat-divider"></div>
         <div class="sc-stat">
           <span class="sc-stat-value">{{ s.sentences.length }}</span>
-          <span class="sc-stat-label">sentences</span>
+          <span class="sc-stat-label">{{ 'stories.complete.sentencesLabel' | translate }}</span>
         </div>
         <div class="sc-stat-divider"></div>
         <div class="sc-stat">
           <span class="sc-stat-value">{{ s.listenCount }}</span>
-          <span class="sc-stat-label">{{ s.listenCount === 1 ? 'listen' : 'listens' }}</span>
+          <span class="sc-stat-label">{{ s.listenCount === 1 ? ('stories.complete.listenSingular' | translate) : ('stories.complete.listenPlural' | translate) }}</span>
         </div>
       </div>
     </div>
 
     <!-- Vocab words -->
     <div class="sc-section-header">
-      <span class="sc-section-title">Words in this story</span>
+      <span class="sc-section-title">{{ 'stories.complete.wordsSection' | translate }}</span>
     </div>
 
     <div class="sc-vocab-list">
@@ -69,16 +69,16 @@
     <div class="sc-actions">
       <button class="sc-btn-replay" (click)="replayStory()">
         <ion-icon name="play-outline"></ion-icon>
-        Read again
+        {{ 'stories.complete.readAgainBtn' | translate }}
       </button>
       <button class="sc-btn-library" (click)="goToLibrary()">
         <ion-icon name="sparkles-outline"></ion-icon>
-        More stories
+        {{ 'stories.complete.moreStoriesBtn' | translate }}
       </button>
     </div>
 
   } @else {
-    <div class="sc-loading">Loading…</div>
+    <div class="sc-loading">{{ 'stories.complete.loadingMsg' | translate }}</div>
   }
 
   <div style="height: 32px;"></div>

@@ -15,7 +15,6 @@ import {
   PLAYLIST_SOURCE_SHEET_CSS_CLASS,
   PlaybackSpeed,
 } from '../../models/listen.models';
-import { patchState } from '@ngrx/signals';
 
 @Component({
   selector: 'lc-listen',
@@ -48,8 +47,8 @@ export class ListenComponent implements ViewWillEnter {
         const collectionName = sourceLabel.substring('Collection:'.length).trim();
         const prefix = this.translate.instant('listen.card.collectionPrefix');
         const newLabel = `${prefix} ${collectionName}`;
-        // Directly patch the store state to update the label
-        patchState(this.listenStore, { sourceLabel: newLabel });
+        // Update the label through the store's method (signalStore state is not writable from outside)
+        this.listenStore.setSourceLabel(newLabel);
       }
     });
   }

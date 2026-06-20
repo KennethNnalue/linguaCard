@@ -16,6 +16,7 @@ import {
   ToastController,
   ViewWillLeave,
 } from '@ionic/angular/standalone';
+import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { addIcons } from 'ionicons';
 import { arrowBackOutline } from 'ionicons/icons';
 import type { Story, StoryKeyword, StorySentence, VerbConjugations, WordTimestamp } from '@lingua-card/shared/domain';
@@ -71,6 +72,7 @@ export interface WordDetail {
     IonIcon,
     NgClass,
     TitleCasePipe,
+    TranslatePipe,
     QuizTabComponent,
     KeywordsTabComponent,
     GrammarTabComponent,
@@ -89,6 +91,7 @@ export class StoryReaderPage implements OnInit, OnDestroy, ViewWillLeave {
   private readonly dedupService = inject(CardDedupService);
   private readonly modalCtrl = inject(ModalController);
   private readonly toastCtrl = inject(ToastController);
+  private readonly translate = inject(TranslateService);
 
   // ── Story state ─────────────────────────────────────────────────
   readonly story = signal<Story | null>(null);
@@ -166,7 +169,7 @@ export class StoryReaderPage implements OnInit, OnDestroy, ViewWillLeave {
       return {
         display:      keyword.german,
         base:         keyword.germanBase,
-        english:      keyword.english,
+        english:      keyword.translation,
         article:      keyword.article,
         wordType:     keyword.wordType,
         plural,
@@ -492,7 +495,7 @@ export class StoryReaderPage implements OnInit, OnDestroy, ViewWillLeave {
 
     if (this.tappedWordInVault()) {
       const toast = await this.toastCtrl.create({
-        message: 'Already in your vault',
+        message: this.translate.instant('srs.alreadyInVault'),
         duration: 2000,
         position: 'bottom',
         color: 'success',

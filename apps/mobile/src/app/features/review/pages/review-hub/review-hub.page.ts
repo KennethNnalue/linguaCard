@@ -12,6 +12,7 @@ import {
 import { ReviewStore } from '../../store/review.store';
 import { ReviewFilterService } from '../../services/review-filter.service';
 import { SessionStatsService } from '../../shared/services/session-stats.service';
+import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { SessionDatePipe } from '../../shared/pipes/session-date.pipe';
 import { ReviewStatsStore } from '../../../../shared/srs/review-stats.store';
 import {
@@ -33,7 +34,7 @@ import {
   templateUrl: './review-hub.page.html',
   styleUrls: ['./review-hub.page.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [IonContent, IonHeader, IonToolbar, IonIcon, SessionDatePipe],
+  imports: [IonContent, IonHeader, IonToolbar, IonIcon, SessionDatePipe, TranslatePipe],
 })
 export class ReviewHubPage {
   private readonly reviewStore = inject(ReviewStore);
@@ -41,6 +42,7 @@ export class ReviewHubPage {
   private readonly reviewStats = inject(ReviewStatsStore);
   readonly stats = inject(SessionStatsService);
   private readonly router = inject(Router);
+  private readonly translate = inject(TranslateService);
 
   constructor() {
     addIcons({ alertCircleOutline, addCircleOutline, chevronForwardOutline, playOutline, informationCircleOutline });
@@ -109,6 +111,10 @@ export class ReviewHubPage {
       { label: BreakdownTagLabel.REVIEW, count: (dist[3] ?? 0) + (dist[4] ?? 0) + (dist[5] ?? 0), colour: MASTERY_COLOURS[3] },
     ].filter(t => t.count > 0);
   });
+
+  translateTag(label: string): string {
+    return this.translate.instant(`srs.breakdownTag.${label}`);
+  }
 
   startTodaysReview(): void {
     const queue = this.filterService.buildQueue({

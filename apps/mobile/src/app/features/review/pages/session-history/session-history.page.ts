@@ -5,6 +5,7 @@ import { addIcons } from 'ionicons';
 import { chevronBackOutline } from 'ionicons/icons';
 import { ReviewStore, ReviewSession } from '../../store/review.store';
 import { SessionStatsService } from '../../shared/services/session-stats.service';
+import { TranslatePipe } from '@ngx-translate/core';
 import { SessionDatePipe } from '../../shared/pipes/session-date.pipe';
 import {
   FILTER_PERIOD_DAYS,
@@ -21,7 +22,7 @@ export type { FilterPeriod, SessionStats };
   templateUrl: './session-history.page.html',
   styleUrls: ['./session-history.page.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [IonContent, IonHeader, IonToolbar, IonIcon, SessionDatePipe],
+  imports: [IonContent, IonHeader, IonToolbar, IonIcon, SessionDatePipe, TranslatePipe],
 })
 export class SessionHistoryPage {
   private readonly reviewStore = inject(ReviewStore);

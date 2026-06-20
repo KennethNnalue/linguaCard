@@ -7,6 +7,7 @@ import { MasteryLevel } from '@lingua-card/shared/domain';
 import { ReviewStore } from '../../store/review.store';
 import { ReviewFilterService } from '../../services/review-filter.service';
 import { SourcePickerService } from '../../shared/services/source-picker.service';
+import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { FormsModule } from '@angular/forms';
 import {
   MASTERY_INFO,
@@ -23,7 +24,7 @@ import {
   templateUrl: './custom-study.page.html',
   styleUrls: ['./custom-study.page.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [IonContent, IonHeader, IonToolbar, IonIcon, IonRange, FormsModule],
+  imports: [IonContent, IonHeader, IonToolbar, IonIcon, IonRange, FormsModule, TranslatePipe],
 })
 export class CustomStudyPage {
   private readonly filterService = inject(ReviewFilterService);
@@ -32,6 +33,7 @@ export class CustomStudyPage {
   private readonly navCtrl = inject(NavController);
   private readonly router = inject(Router);
   private readonly toastCtrl = inject(ToastController);
+  private readonly translate = inject(TranslateService);
 
   constructor() {
     addIcons({ chevronBackOutline, chevronDownOutline });
@@ -96,7 +98,7 @@ export class CustomStudyPage {
   async startSession(): Promise<void> {
     if (!this.masteryLevels().length || !this.sessionCount()) {
       const toast = await this.toastCtrl.create({
-        message: 'No cards match your filters.',
+        message: this.translate.instant('review.custom.noCardsMatchToast'),
         duration: 2000,
         position: 'bottom',
         color: 'warning',

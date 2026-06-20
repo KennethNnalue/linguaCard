@@ -1,6 +1,7 @@
 import { Component, computed, inject, OnDestroy, OnInit, signal } from '@angular/core';
 import { Router } from '@angular/router';
 import { IonContent, ToastController } from '@ionic/angular/standalone';
+import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { firstValueFrom } from 'rxjs';
 import { EnrichWordsResult, WordExtractionResult } from '@lingua-card/shared/domain';
 import { ImageImportApiService } from '../../services/image-import-api.service';
@@ -13,13 +14,14 @@ export type ProcessingPhase = 'extracting' | 'enriching' | 'partial' | 'done';
   standalone: true,
   templateUrl: './image-processing.page.html',
   styleUrls: ['./image-processing.page.scss'],
-  imports: [IonContent],
+  imports: [IonContent, TranslatePipe],
 })
 export class ImageProcessingPage implements OnInit, OnDestroy {
   private readonly importImageState = inject(ImageImportStateService);
   private readonly imageImportApi   = inject(ImageImportApiService);
   private readonly router           = inject(Router);
   private readonly toastCtrl        = inject(ToastController);
+  private readonly translateService = inject(TranslateService);
 
   readonly image          = this.importImageState.image;
   readonly phase          = signal<ProcessingPhase>('extracting');
@@ -75,7 +77,7 @@ export class ImageProcessingPage implements OnInit, OnDestroy {
 
     if (extraction.totalFound === 0) {
       const toast = await this.toastCtrl.create({
-        message: 'No German words found in this image.',
+        message: this.translateService.instant('imageProcessing.errors.noWordsFound'),
         duration: 3500,
         color: 'warning',
       });

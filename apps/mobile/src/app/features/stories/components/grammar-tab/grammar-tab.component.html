@@ -3,13 +3,13 @@
   @if (loading() && grammarNotes().length === 0) {
     <div class="grammar-empty">
       <div class="tab-loading-spinner"></div>
-      <p class="tab-loading-text">Generating grammar notes…</p>
+      <p class="tab-loading-text">{{ 'stories.grammar.generatingMsg' | translate }}</p>
     </div>
   } @else if (grammarNotes().length === 0) {
     <div class="grammar-empty">
       <div class="grammar-empty-icon">📖</div>
-      <p>No grammar notes available for this story.</p>
-      <p class="grammar-empty-sub">Grammar notes are generated for new stories.</p>
+      <p>{{ 'stories.grammar.noNotesTitle' | translate }}</p>
+      <p class="grammar-empty-sub">{{ 'stories.grammar.noNotesDesc' | translate }}</p>
     </div>
   }
 
@@ -21,14 +21,14 @@
 
       <!-- Example section -->
       <div class="grammar-section">
-        <div class="grammar-section-label">Example</div>
+        <div class="grammar-section-label">{{ 'stories.grammar.exampleSection' | translate }}</div>
         <p class="grammar-example-de" [innerHTML]="boldKeywords(note.exampleDe)"></p>
-        <p class="grammar-example-en">{{ note.exampleEn }}</p>
+        <p class="grammar-example-en">{{ note.exampleNative }}</p>
       </div>
 
       <!-- Description section -->
       <div class="grammar-section">
-        <div class="grammar-section-label">Description</div>
+        <div class="grammar-section-label">{{ 'stories.grammar.descriptionSection' | translate }}</div>
         <p class="grammar-description" [innerHTML]="boldKeywords(note.description)"></p>
 
         <!-- Conjugation table if present -->
@@ -47,7 +47,7 @@
         @for (ex of note.additionalExamples; track $index) {
           <div class="grammar-example-card">
             <p class="grammar-ex-de" [innerHTML]="boldKeywords(ex.de)"></p>
-            <p class="grammar-ex-en">{{ ex.en }}</p>
+            <p class="grammar-ex-en">{{ ex.native }}</p>
           </div>
         }
       </div>

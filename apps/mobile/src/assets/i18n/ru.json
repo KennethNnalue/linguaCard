@@ -564,7 +564,8 @@
     },
     "collection": {
       "label": "ДОБАВИТЬ В КОЛЛЕКЦИЮ",
-      "requiredHint": "*обязательно"
+      "requiredHint": "*обязательно",
+      "noSelectionLabel": "Без коллекции"
     },
     "words": {
       "label": "Слова (нажмите, чтобы выбрать / снять)",

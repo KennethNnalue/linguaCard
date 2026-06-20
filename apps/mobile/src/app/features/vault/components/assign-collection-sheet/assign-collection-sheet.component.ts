@@ -7,6 +7,7 @@ import {
   IonToolbar,
   ModalController,
 } from '@ionic/angular/standalone';
+import { TranslatePipe } from '@ngx-translate/core';
 import { addIcons } from 'ionicons';
 import { addOutline, checkmarkOutline, closeOutline } from 'ionicons/icons';
 import { CreateCollectionDto } from '../../../../core/models/mock-data';
@@ -17,7 +18,7 @@ import { CollectionStore } from '../../store/collection.store';
   templateUrl: './assign-collection-sheet.component.html',
   styleUrls: ['./assign-collection-sheet.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [IonHeader, IonToolbar, IonContent, IonIcon, ReactiveFormsModule],
+  imports: [IonHeader, IonToolbar, IonContent, IonIcon, ReactiveFormsModule, TranslatePipe],
 })
 export class AssignCollectionSheetComponent implements OnInit {
   @Input() selectedCollectionId: string | null = null;

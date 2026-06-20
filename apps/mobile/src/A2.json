@@ -1,0 +1,1746 @@
+[
+  {
+    "topic": "Rund ums Essen",
+    "topicEn": "Food & Eating",
+    "cards": [
+      {
+        "back": "Hunger",
+        "front": "hunger",
+        "article": "der",
+        "plural": null,
+        "phonetic": "ˈhʊŋɐ",
+        "cefrLevel": "A1",
+        "categoryName": "Food",
+        "wordType": "noun",
+        "examples": [
+          { "target": "Ich habe großen Hunger.", "native": "I'm very hungry." }
+        ],
+        "synonyms": [
+          { "word": "Appetit", "article": "der", "translation": "appetite", "example": "Ich habe richtig Appetit auf Pizza.", "exampleNative": "I really fancy some pizza." }
+        ]
+      },
+      {
+        "back": "Currywurst",
+        "front": "sausage with curry sauce",
+        "article": "die",
+        "plural": "die Currywürste",
+        "phonetic": "ˈkœʁiˌvʊʁst",
+        "cefrLevel": "A2",
+        "categoryName": "Food",
+        "wordType": "noun",
+        "examples": [
+          { "target": "Am Imbiss gibt es die beste Currywurst.", "native": "The snack stand has the best currywurst." }
+        ],
+        "synonyms": []
+      },
+      {
+        "back": "Mikrowelle",
+        "front": "microwave",
+        "article": "die",
+        "plural": "die Mikrowellen",
+        "phonetic": "ˈmiːkʁoˌvɛlə",
+        "cefrLevel": "A2",
+        "categoryName": "Home",
+        "wordType": "noun",
+        "examples": [
+          { "target": "Wärm die Suppe in der Mikrowelle.", "native": "Heat the soup in the microwave." }
+        ],
+        "synonyms": []
+      },
+      {
+        "back": "Topf",
+        "front": "pot",
+        "article": "der",
+        "plural": "die Töpfe",
+        "phonetic": "tɔpf",
+        "cefrLevel": "A2",
+        "categoryName": "Home",
+        "wordType": "noun",
+        "examples": [
+          { "target": "Die Nudeln kochen schon im Topf.", "native": "The pasta is already cooking in the pot." }
+        ],
+        "synonyms": [
+          { "word": "Pfanne", "article": "die", "translation": "pan", "example": "Das Steak brät in der Pfanne.", "exampleNative": "The steak is frying in the pan." }
+        ]
+      },
+      {
+        "back": "backen",
+        "front": "to bake",
+        "article": null,
+        "plural": null,
+        "phonetic": "ˈbakn̩",
+        "cefrLevel": "A2",
+        "categoryName": "Food",
+        "wordType": "verb",
+        "examples": [
+          { "target": "Am Wochenende backe ich gern einen Kuchen.", "native": "On weekends I like to bake a cake." }
+        ],
+        "synonyms": [
+          { "word": "zubereiten", "article": null, "translation": "to prepare", "example": "Sie bereitet das Abendessen zu.", "exampleNative": "She is preparing dinner." }
+        ]
+      },
+      {
+        "back": "riechen",
+        "front": "to smell",
+        "article": null,
+        "plural": null,
+        "phonetic": "ˈʁiːçn̩",
+        "cefrLevel": "A2",
+        "categoryName": "Body",
+        "wordType": "verb",
+        "examples": [
+          { "target": "Das frische Brot riecht wunderbar.", "native": "The fresh bread smells wonderful." }
+        ],
+        "synonyms": [
+          { "word": "duften", "article": null, "translation": "to give off a pleasant smell", "example": "Die Blumen duften nach Frühling.", "exampleNative": "The flowers smell of spring." }
+        ]
+      },
+      {
+        "back": "scharf",
+        "front": "spicy",
+        "article": null,
+        "plural": null,
+        "phonetic": "ʃaʁf",
+        "cefrLevel": "A2",
+        "categoryName": "Food",
+        "wordType": "adjective",
+        "examples": [
+          { "target": "Das Curry ist mir zu scharf.", "native": "The curry is too spicy for me." }
+        ],
+        "synonyms": [
+          { "word": "würzig", "article": null, "translation": "savoury, well-seasoned", "example": "Die Soße ist schön würzig.", "exampleNative": "The sauce is nicely seasoned." }
+        ]
+      },
+      {
+        "back": "süß",
+        "front": "sweet",
+        "article": null,
+        "plural": null,
+        "phonetic": "zyːs",
+        "cefrLevel": "A1",
+        "categoryName": "Food",
+        "wordType": "adjective",
+        "examples": [
+          { "target": "Der Nachtisch ist sehr süß.", "native": "The dessert is very sweet." }
+        ],
+        "synonyms": [
+          { "word": "lecker", "article": null, "translation": "tasty", "example": "Der Kuchen schmeckt richtig lecker.", "exampleNative": "The cake tastes really tasty." }
+        ]
+      }
+    ]
+  },
+  {
+    "topic": "Nach der Schulzeit",
+    "topicEn": "School & Education",
+    "cards": [
+      {
+        "back": "Abitur",
+        "front": "high school graduation",
+        "article": "das",
+        "plural": null,
+        "phonetic": "abiˈtuːɐ̯",
+        "cefrLevel": "A2",
+        "categoryName": "Education",
+        "wordType": "noun",
+        "examples": [
+          { "target": "Nach dem Abitur möchte ich studieren.", "native": "After my high school diploma I want to study." }
+        ],
+        "synonyms": [
+          { "word": "Abschluss", "article": "der", "translation": "degree, graduation", "example": "Sie hat einen guten Abschluss gemacht.", "exampleNative": "She earned a good degree." }
+        ]
+      },
+      {
+        "back": "Zeugnis",
+        "front": "report card",
+        "article": "das",
+        "plural": "die Zeugnisse",
+        "phonetic": "ˈtsɔɪ̯knɪs",
+        "cefrLevel": "A2",
+        "categoryName": "Education",
+        "wordType": "noun",
+        "examples": [
+          { "target": "Mein Zeugnis war dieses Jahr richtig gut.", "native": "My report card was really good this year." }
+        ],
+        "synonyms": [
+          { "word": "Note", "article": "die", "translation": "grade", "example": "Er hat eine sehr gute Note bekommen.", "exampleNative": "He got a very good grade." }
+        ]
+      },
+      {
+        "back": "Praktikum",
+        "front": "internship",
+        "article": "das",
+        "plural": "die Praktika",
+        "phonetic": "ˈpʁaktikʊm",
+        "cefrLevel": "A2",
+        "categoryName": "Education",
+        "wordType": "noun",
+        "examples": [
+          { "target": "Im Sommer mache ich ein Praktikum bei einer Bank.", "native": "In summer I'm doing an internship at a bank." }
+        ],
+        "synonyms": [
+          { "word": "Lehre", "article": "die", "translation": "apprenticeship", "example": "Er macht eine Lehre als Tischler.", "exampleNative": "He is doing an apprenticeship as a carpenter." }
+        ]
+      },
+      {
+        "back": "Ferien",
+        "front": "vacation, holidays",
+        "article": "die",
+        "plural": "die Ferien",
+        "phonetic": "ˈfeːʁiən",
+        "cefrLevel": "A1",
+        "categoryName": "Education",
+        "wordType": "noun",
+        "examples": [
+          { "target": "In den Ferien fahren wir ans Meer.", "native": "During the holidays we're going to the sea." }
+        ],
+        "synonyms": [
+          { "word": "Urlaub", "article": "der", "translation": "vacation, leave", "example": "Sie macht zwei Wochen Urlaub.", "exampleNative": "She is taking two weeks of vacation." }
+        ]
+      },
+      {
+        "back": "Hausaufgabe",
+        "front": "homework",
+        "article": "die",
+        "plural": "die Hausaufgaben",
+        "phonetic": "ˈhaʊ̯sˌʔaʊ̯fɡaːbə",
+        "cefrLevel": "A1",
+        "categoryName": "Education",
+        "wordType": "noun",
+        "examples": [
+          { "target": "Ich muss noch meine Hausaufgaben machen.", "native": "I still have to do my homework." }
+        ],
+        "synonyms": []
+      },
+      {
+        "back": "Unterricht",
+        "front": "lessons, instruction",
+        "article": "der",
+        "plural": null,
+        "phonetic": "ˈʊntɐʁɪçt",
+        "cefrLevel": "A2",
+        "categoryName": "Education",
+        "wordType": "noun",
+        "examples": [
+          { "target": "Der Unterricht beginnt um acht Uhr.", "native": "Class starts at eight o'clock." }
+        ],
+        "synonyms": [
+          { "word": "Vorlesung", "article": "die", "translation": "lecture", "example": "Die Vorlesung dauert zwei Stunden.", "exampleNative": "The lecture lasts two hours." }
+        ]
+      },
+      {
+        "back": "schrecklich",
+        "front": "terrible",
+        "article": null,
+        "plural": null,
+        "phonetic": "ˈʃʁɛklɪç",
+        "cefrLevel": "A2",
+        "categoryName": "Emotion",
+        "wordType": "adjective",
+        "examples": [
+          { "target": "Die Prüfung war schrecklich schwer.", "native": "The exam was terribly hard." }
+        ],
+        "synonyms": [
+          { "word": "furchtbar", "article": null, "translation": "awful", "example": "Das Wetter ist heute furchtbar.", "exampleNative": "The weather is awful today." }
+        ]
+      },
+      {
+        "back": "erwachsen",
+        "front": "grown-up, mature",
+        "article": null,
+        "plural": null,
+        "phonetic": "ɛɐ̯ˈvaksn̩",
+        "cefrLevel": "B1",
+        "categoryName": "People",
+        "wordType": "adjective",
+        "examples": [
+          { "target": "Meine Kinder sind jetzt fast erwachsen.", "native": "My children are nearly grown up now." }
+        ],
+        "synonyms": []
+      }
+    ]
+  },
+  {
+    "topic": "Medien im Alltag",
+    "topicEn": "Media & Digital Life",
+    "cards": [
+      {
+        "back": "Datei",
+        "front": "file",
+        "article": "die",
+        "plural": "die Dateien",
+        "phonetic": "daˈtaɪ̯",
+        "cefrLevel": "A2",
+        "categoryName": "Technology",
+        "wordType": "noun",
+        "examples": [
+          { "target": "Ich schicke dir die Datei per E-Mail.", "native": "I'll send you the file by email." }
+        ],
+        "synonyms": [
+          { "word": "Dokument", "article": "das", "translation": "document", "example": "Bitte unterschreib das Dokument.", "exampleNative": "Please sign the document." }
+        ]
+      },
+      {
+        "back": "herunterladen",
+        "front": "to download",
+        "article": null,
+        "plural": null,
+        "phonetic": "hɛˈʁʊntɐˌlaːdn̩",
+        "cefrLevel": "A2",
+        "categoryName": "Technology",
+        "wordType": "verb",
+        "examples": [
+          { "target": "Lade die App kostenlos herunter.", "native": "Download the app for free." }
+        ],
+        "synonyms": [
+          { "word": "downloaden", "article": null, "translation": "to download", "example": "Ich downloade gerade ein Video.", "exampleNative": "I'm downloading a video right now." }
+        ]
+      },
+      {
+        "back": "Tastatur",
+        "front": "keyboard",
+        "article": "die",
+        "plural": "die Tastaturen",
+        "phonetic": "tastaˈtuːɐ̯",
+        "cefrLevel": "A2",
+        "categoryName": "Technology",
+        "wordType": "noun",
+        "examples": [
+          { "target": "Meine Tastatur ist kaputt.", "native": "My keyboard is broken." }
+        ],
+        "synonyms": []
+      },
+      {
+        "back": "Drucker",
+        "front": "printer",
+        "article": "der",
+        "plural": "die Drucker",
+        "phonetic": "ˈdʁʊkɐ",
+        "cefrLevel": "A2",
+        "categoryName": "Technology",
+        "wordType": "noun",
+        "examples": [
+          { "target": "Der Drucker hat kein Papier mehr.", "native": "The printer is out of paper." }
+        ],
+        "synonyms": []
+      },
+      {
+        "back": "Meinung",
+        "front": "opinion",
+        "article": "die",
+        "plural": "die Meinungen",
+        "phonetic": "ˈmaɪ̯nʊŋ",
+        "cefrLevel": "A2",
+        "categoryName": "Communication",
+        "wordType": "noun",
+        "examples": [
+          { "target": "Meiner Meinung nach ist das gefährlich.", "native": "In my opinion that's dangerous." }
+        ],
+        "synonyms": [
+          { "word": "Ansicht", "article": "die", "translation": "view, opinion", "example": "Das ist auch meine Ansicht.", "exampleNative": "That's my view too." }
+        ]
+      },
+      {
+        "back": "privat",
+        "front": "private",
+        "article": null,
+        "plural": null,
+        "phonetic": "pʁiˈvaːt",
+        "cefrLevel": "A2",
+        "categoryName": "Communication",
+        "wordType": "adjective",
+        "examples": [
+          { "target": "Stell nicht zu viele private Fotos ins Netz.", "native": "Don't put too many private photos online." }
+        ],
+        "synonyms": [
+          { "word": "persönlich", "article": null, "translation": "personal", "example": "Das ist eine persönliche Frage.", "exampleNative": "That's a personal question." }
+        ]
+      },
+      {
+        "back": "gefährlich",
+        "front": "dangerous",
+        "article": null,
+        "plural": null,
+        "phonetic": "ɡəˈfɛːɐ̯lɪç",
+        "cefrLevel": "A2",
+        "categoryName": "Safety",
+        "wordType": "adjective",
+        "examples": [
+          { "target": "Das Internet kann auch gefährlich sein.", "native": "The internet can be dangerous too." }
+        ],
+        "synonyms": [
+          { "word": "riskant", "article": null, "translation": "risky", "example": "Das ist ein riskantes Geschäft.", "exampleNative": "That's a risky deal." }
+        ]
+      },
+      {
+        "back": "nützlich",
+        "front": "useful",
+        "article": null,
+        "plural": null,
+        "phonetic": "ˈnʏtslɪç",
+        "cefrLevel": "A2",
+        "categoryName": "Communication",
+        "wordType": "adjective",
+        "examples": [
+          { "target": "Diese App ist wirklich nützlich.", "native": "This app is really useful." }
+        ],
+        "synonyms": [
+          { "word": "praktisch", "article": null, "translation": "practical, handy", "example": "Das Werkzeug ist sehr praktisch.", "exampleNative": "The tool is very handy." }
+        ]
+      }
+    ]
+  },
+  {
+    "topic": "Große und kleine Gefühle",
+    "topicEn": "Emotions & Celebrations",
+    "cards": [
+      {
+        "back": "Hochzeit",
+        "front": "wedding",
+        "article": "die",
+        "plural": "die Hochzeiten",
+        "phonetic": "ˈhɔxˌtsaɪ̯t",
+        "cefrLevel": "A2",
+        "categoryName": "Family",
+        "wordType": "noun",
+        "examples": [
+          { "target": "Wir feiern im Juni unsere Hochzeit.", "native": "We're celebrating our wedding in June." }
+        ],
+        "synonyms": [
+          { "word": "Feier", "article": "die", "translation": "celebration, party", "example": "Die Feier war sehr schön.", "exampleNative": "The celebration was lovely." }
+        ]
+      },
+      {
+        "back": "heiraten",
+        "front": "to marry",
+        "article": null,
+        "plural": null,
+        "phonetic": "ˈhaɪ̯ʁaːtn̩",
+        "cefrLevel": "A2",
+        "categoryName": "Family",
+        "wordType": "verb",
+        "examples": [
+          { "target": "Nächstes Jahr heiraten die beiden.", "native": "The two of them are getting married next year." }
+        ],
+        "synonyms": []
+      },
+      {
+        "back": "Geburt",
+        "front": "birth",
+        "article": "die",
+        "plural": "die Geburten",
+        "phonetic": "ɡəˈbuːɐ̯t",
+        "cefrLevel": "A2",
+        "categoryName": "Family",
+        "wordType": "noun",
+        "examples": [
+          { "target": "Wir gratulieren euch zur Geburt eurer Tochter.", "native": "Congratulations on the birth of your daughter." }
+        ],
+        "synonyms": []
+      },
+      {
+        "back": "Freude",
+        "front": "joy",
+        "article": "die",
+        "plural": "die Freuden",
+        "phonetic": "ˈfʁɔɪ̯də",
+        "cefrLevel": "A2",
+        "categoryName": "Emotion",
+        "wordType": "noun",
+        "examples": [
+          { "target": "Das Geschenk hat ihm große Freude gemacht.", "native": "The gift gave him great joy." }
+        ],
+        "synonyms": [
+          { "word": "Glück", "article": "das", "translation": "happiness, luck", "example": "Ich wünsche dir viel Glück.", "exampleNative": "I wish you a lot of luck." }
+        ]
+      },
+      {
+        "back": "Angst",
+        "front": "fear",
+        "article": "die",
+        "plural": "die Ängste",
+        "phonetic": "aŋst",
+        "cefrLevel": "A2",
+        "categoryName": "Emotion",
+        "wordType": "noun",
+        "examples": [
+          { "target": "Ich habe Angst vor großen Hunden.", "native": "I'm afraid of big dogs." }
+        ],
+        "synonyms": [
+          { "word": "Sorge", "article": "die", "translation": "worry", "example": "Mach dir keine Sorgen.", "exampleNative": "Don't worry." }
+        ]
+      },
+      {
+        "back": "traurig",
+        "front": "sad",
+        "article": null,
+        "plural": null,
+        "phonetic": "ˈtʁaʊ̯ʁɪç",
+        "cefrLevel": "A1",
+        "categoryName": "Emotion",
+        "wordType": "adjective",
+        "examples": [
+          { "target": "Sie ist traurig, weil ihr Freund weggezogen ist.", "native": "She's sad because her friend moved away." }
+        ],
+        "synonyms": [
+          { "word": "unglücklich", "article": null, "translation": "unhappy", "example": "Er sieht heute unglücklich aus.", "exampleNative": "He looks unhappy today." }
+        ]
+      },
+      {
+        "back": "fröhlich",
+        "front": "cheerful, happy",
+        "article": null,
+        "plural": null,
+        "phonetic": "ˈfʁøːlɪç",
+        "cefrLevel": "A2",
+        "categoryName": "Emotion",
+        "wordType": "adjective",
+        "examples": [
+          { "target": "Auf der Party waren alle fröhlich.", "native": "Everyone was cheerful at the party." }
+        ],
+        "synonyms": [
+          { "word": "glücklich", "article": null, "translation": "happy", "example": "Ich bin heute sehr glücklich.", "exampleNative": "I'm very happy today." }
+        ]
+      },
+      {
+        "back": "böse",
+        "front": "angry, mad",
+        "article": null,
+        "plural": null,
+        "phonetic": "ˈbøːzə",
+        "cefrLevel": "A2",
+        "categoryName": "Emotion",
+        "wordType": "adjective",
+        "examples": [
+          { "target": "Bist du jetzt böse auf mich?", "native": "Are you mad at me now?" }
+        ],
+        "synonyms": [
+          { "word": "wütend", "article": null, "translation": "furious", "example": "Er war wütend über die Verspätung.", "exampleNative": "He was furious about the delay." }
+        ]
+      }
+    ]
+  },
+  {
+    "topic": "Was machen Sie beruflich?",
+    "topicEn": "Work & Career",
+    "cards": [
+      {
+        "back": "Anwalt",
+        "front": "lawyer",
+        "article": "der",
+        "plural": "die Anwälte",
+        "phonetic": "ˈanvalt",
+        "cefrLevel": "A2",
+        "categoryName": "Work",
+        "wordType": "noun",
+        "examples": [
+          { "target": "Mein Bruder arbeitet als Anwalt.", "native": "My brother works as a lawyer." }
+        ],
+        "synonyms": []
+      },
+      {
+        "back": "Tischler",
+        "front": "carpenter",
+        "article": "der",
+        "plural": "die Tischler",
+        "phonetic": "ˈtɪʃlɐ",
+        "cefrLevel": "A2",
+        "categoryName": "Work",
+        "wordType": "noun",
+        "examples": [
+          { "target": "Der Tischler baut uns einen neuen Tisch.", "native": "The carpenter is building us a new table." }
+        ],
+        "synonyms": [
+          { "word": "Schreiner", "article": "der", "translation": "joiner, carpenter", "example": "Der Schreiner repariert die Tür.", "exampleNative": "The joiner is repairing the door." }
+        ]
+      },
+      {
+        "back": "Geschäftsreise",
+        "front": "business trip",
+        "article": "die",
+        "plural": "die Geschäftsreisen",
+        "phonetic": "ɡəˈʃɛftsˌʁaɪ̯zə",
+        "cefrLevel": "A2",
+        "categoryName": "Work",
+        "wordType": "noun",
+        "examples": [
+          { "target": "Sie ist auf Geschäftsreise in Berlin.", "native": "She is on a business trip in Berlin." }
+        ],
+        "synonyms": []
+      },
+      {
+        "back": "arbeitslos",
+        "front": "unemployed",
+        "article": null,
+        "plural": null,
+        "phonetic": "ˈaʁbaɪ̯tsloːs",
+        "cefrLevel": "A2",
+        "categoryName": "Work",
+        "wordType": "adjective",
+        "examples": [
+          { "target": "Nach der Firmenschließung wurde er arbeitslos.", "native": "After the company closed he became unemployed." }
+        ],
+        "synonyms": []
+      },
+      {
+        "back": "erfolgreich",
+        "front": "successful",
+        "article": null,
+        "plural": null,
+        "phonetic": "ɛɐ̯ˈfɔlkʁaɪ̯ç",
+        "cefrLevel": "B1",
+        "categoryName": "Work",
+        "wordType": "adjective",
+        "examples": [
+          { "target": "Ihr Geschäft ist sehr erfolgreich.", "native": "Her business is very successful." }
+        ],
+        "synonyms": []
+      },
+      {
+        "back": "Besprechung",
+        "front": "meeting",
+        "article": "die",
+        "plural": "die Besprechungen",
+        "phonetic": "bəˈʃpʁɛçʊŋ",
+        "cefrLevel": "A2",
+        "categoryName": "Work",
+        "wordType": "noun",
+        "examples": [
+          { "target": "Die Besprechung beginnt um zehn Uhr.", "native": "The meeting starts at ten." }
+        ],
+        "synonyms": [
+          { "word": "Konferenz", "article": "die", "translation": "conference", "example": "Wir haben morgen eine Konferenz.", "exampleNative": "We have a conference tomorrow." }
+        ]
+      },
+      {
+        "back": "zurückrufen",
+        "front": "to call back",
+        "article": null,
+        "plural": null,
+        "phonetic": "tsuˈʁʏkˌʁuːfn̩",
+        "cefrLevel": "A2",
+        "categoryName": "Communication",
+        "wordType": "verb",
+        "examples": [
+          { "target": "Können Sie mich später zurückrufen?", "native": "Can you call me back later?" }
+        ],
+        "synonyms": []
+      },
+      {
+        "back": "selbstständig",
+        "front": "self-employed, independent",
+        "article": null,
+        "plural": null,
+        "phonetic": "ˈzɛlpstʃtɛndɪç",
+        "cefrLevel": "B1",
+        "categoryName": "Work",
+        "wordType": "adjective",
+        "examples": [
+          { "target": "Seit zwei Jahren ist sie selbstständig.", "native": "She has been self-employed for two years." }
+        ],
+        "synonyms": [
+          { "word": "freiberuflich", "article": null, "translation": "freelance", "example": "Er arbeitet freiberuflich als Übersetzer.", "exampleNative": "He works freelance as a translator." }
+        ]
+      }
+    ]
+  },
+  {
+    "topic": "Ganz schön mobil",
+    "topicEn": "Travel & Mobility",
+    "cards": [
+      {
+        "back": "Fahrplan",
+        "front": "timetable, schedule",
+        "article": "der",
+        "plural": "die Fahrpläne",
+        "phonetic": "ˈfaːɐ̯plaːn",
+        "cefrLevel": "A2",
+        "categoryName": "Travel",
+        "wordType": "noun",
+        "examples": [
+          { "target": "Schau im Fahrplan, wann der Zug fährt.", "native": "Check the timetable for when the train leaves." }
+        ],
+        "synonyms": []
+      },
+      {
+        "back": "Gepäck",
+        "front": "luggage",
+        "article": "das",
+        "plural": null,
+        "phonetic": "ɡəˈpɛk",
+        "cefrLevel": "A2",
+        "categoryName": "Travel",
+        "wordType": "noun",
+        "examples": [
+          { "target": "Mein Gepäck ist zu schwer.", "native": "My luggage is too heavy." }
+        ],
+        "synonyms": [
+          { "word": "Koffer", "article": "der", "translation": "suitcase", "example": "Der Koffer steht im Auto.", "exampleNative": "The suitcase is in the car." }
+        ]
+      },
+      {
+        "back": "Stau",
+        "front": "traffic jam",
+        "article": "der",
+        "plural": "die Staus",
+        "phonetic": "ʃtaʊ̯",
+        "cefrLevel": "A2",
+        "categoryName": "Travel",
+        "wordType": "noun",
+        "examples": [
+          { "target": "Wir stehen seit einer Stunde im Stau.", "native": "We've been stuck in a traffic jam for an hour." }
+        ],
+        "synonyms": []
+      },
+      {
+        "back": "Tankstelle",
+        "front": "gas station",
+        "article": "die",
+        "plural": "die Tankstellen",
+        "phonetic": "ˈtaŋkˌʃtɛlə",
+        "cefrLevel": "A2",
+        "categoryName": "Travel",
+        "wordType": "noun",
+        "examples": [
+          { "target": "An der Tankstelle kaufe ich noch Wasser.", "native": "I'll buy some water at the gas station." }
+        ],
+        "synonyms": []
+      },
+      {
+        "back": "pendeln",
+        "front": "to commute",
+        "article": null,
+        "plural": null,
+        "phonetic": "ˈpɛndl̩n",
+        "cefrLevel": "B1",
+        "categoryName": "Travel",
+        "wordType": "verb",
+        "examples": [
+          { "target": "Ich pendle jeden Tag nach Köln.", "native": "I commute to Cologne every day." }
+        ],
+        "synonyms": []
+      },
+      {
+        "back": "Brücke",
+        "front": "bridge",
+        "article": "die",
+        "plural": "die Brücken",
+        "phonetic": "ˈbʁʏkə",
+        "cefrLevel": "A2",
+        "categoryName": "Travel",
+        "wordType": "noun",
+        "examples": [
+          { "target": "Geh über die Brücke und dann nach links.", "native": "Go over the bridge and then turn left." }
+        ],
+        "synonyms": []
+      },
+      {
+        "back": "mieten",
+        "front": "to rent",
+        "article": null,
+        "plural": null,
+        "phonetic": "ˈmiːtn̩",
+        "cefrLevel": "A2",
+        "categoryName": "Travel",
+        "wordType": "verb",
+        "examples": [
+          { "target": "Im Urlaub mieten wir ein Auto.", "native": "On vacation we rent a car." }
+        ],
+        "synonyms": [
+          { "word": "leihen", "article": null, "translation": "to borrow", "example": "Kann ich dein Fahrrad leihen?", "exampleNative": "Can I borrow your bike?" }
+        ]
+      },
+      {
+        "back": "öffentlich",
+        "front": "public",
+        "article": null,
+        "plural": null,
+        "phonetic": "ˈœfn̩tlɪç",
+        "cefrLevel": "B1",
+        "categoryName": "Travel",
+        "wordType": "adjective",
+        "examples": [
+          { "target": "Ich fahre lieber mit öffentlichen Verkehrsmitteln.", "native": "I prefer to travel by public transport." }
+        ],
+        "synonyms": []
+      }
+    ]
+  },
+  {
+    "topic": "Gelernt ist gelernt",
+    "topicEn": "Learning & Study",
+    "cards": [
+      {
+        "back": "Prüfung",
+        "front": "exam",
+        "article": "die",
+        "plural": "die Prüfungen",
+        "phonetic": "ˈpʁyːfʊŋ",
+        "cefrLevel": "A2",
+        "categoryName": "Education",
+        "wordType": "noun",
+        "examples": [
+          { "target": "Morgen habe ich eine wichtige Prüfung.", "native": "I have an important exam tomorrow." }
+        ],
+        "synonyms": [
+          { "word": "Test", "article": "der", "translation": "test", "example": "Der Test war nicht schwer.", "exampleNative": "The test wasn't difficult." }
+        ]
+      },
+      {
+        "back": "Zeitplan",
+        "front": "schedule",
+        "article": "der",
+        "plural": "die Zeitpläne",
+        "phonetic": "ˈtsaɪ̯tplaːn",
+        "cefrLevel": "A2",
+        "categoryName": "Education",
+        "wordType": "noun",
+        "examples": [
+          { "target": "Mach dir einen festen Zeitplan zum Lernen.", "native": "Make yourself a fixed study schedule." }
+        ],
+        "synonyms": []
+      },
+      {
+        "back": "entspannen",
+        "front": "to relax",
+        "article": null,
+        "plural": null,
+        "phonetic": "ɛntˈʃpanən",
+        "cefrLevel": "A2",
+        "categoryName": "Health",
+        "wordType": "verb",
+        "examples": [
+          { "target": "Nach dem Lernen muss ich mich entspannen.", "native": "After studying I need to relax." }
+        ],
+        "synonyms": [
+          { "word": "ausruhen", "article": null, "translation": "to rest", "example": "Ruh dich nach der Arbeit aus.", "exampleNative": "Rest after work." }
+        ]
+      },
+      {
+        "back": "verschieben",
+        "front": "to postpone",
+        "article": null,
+        "plural": null,
+        "phonetic": "fɛɐ̯ˈʃiːbn̩",
+        "cefrLevel": "B1",
+        "categoryName": "Education",
+        "wordType": "verb",
+        "examples": [
+          { "target": "Wir müssen den Termin verschieben.", "native": "We have to postpone the appointment." }
+        ],
+        "synonyms": []
+      },
+      {
+        "back": "lösen",
+        "front": "to solve",
+        "article": null,
+        "plural": null,
+        "phonetic": "ˈløːzn̩",
+        "cefrLevel": "A2",
+        "categoryName": "Education",
+        "wordType": "verb",
+        "examples": [
+          { "target": "Kannst du diese Aufgabe lösen?", "native": "Can you solve this problem?" }
+        ],
+        "synonyms": []
+      },
+      {
+        "back": "motivieren",
+        "front": "to motivate",
+        "article": null,
+        "plural": null,
+        "phonetic": "motiˈviːʁən",
+        "cefrLevel": "B1",
+        "categoryName": "Education",
+        "wordType": "verb",
+        "examples": [
+          { "target": "Gute Musik motiviert mich beim Lernen.", "native": "Good music motivates me while studying." }
+        ],
+        "synonyms": [
+          { "word": "belohnen", "article": null, "translation": "to reward", "example": "Belohne dich nach dem Lernen.", "exampleNative": "Reward yourself after studying." }
+        ]
+      },
+      {
+        "back": "dringend",
+        "front": "urgent",
+        "article": null,
+        "plural": null,
+        "phonetic": "ˈdʁɪŋənt",
+        "cefrLevel": "A2",
+        "categoryName": "Communication",
+        "wordType": "adjective",
+        "examples": [
+          { "target": "Ich muss dringend mit dir sprechen.", "native": "I urgently need to talk to you." }
+        ],
+        "synonyms": []
+      },
+      {
+        "back": "übrigens",
+        "front": "by the way",
+        "article": null,
+        "plural": null,
+        "phonetic": "ˈyːbʁiɡn̩s",
+        "cefrLevel": "A2",
+        "categoryName": "Communication",
+        "wordType": "adverb",
+        "examples": [
+          { "target": "Übrigens, ich habe morgen Geburtstag.", "native": "By the way, it's my birthday tomorrow." }
+        ],
+        "synonyms": []
+      }
+    ]
+  },
+  {
+    "topic": "Sportlich, sportlich!",
+    "topicEn": "Sport & Fitness",
+    "cards": [
+      {
+        "back": "reiten",
+        "front": "to ride (a horse)",
+        "article": null,
+        "plural": null,
+        "phonetic": "ˈʁaɪ̯tn̩",
+        "cefrLevel": "A2",
+        "categoryName": "Sport",
+        "wordType": "verb",
+        "examples": [
+          { "target": "Am Wochenende reite ich gern im Wald.", "native": "On weekends I like to ride in the forest." }
+        ],
+        "synonyms": []
+      },
+      {
+        "back": "tauchen",
+        "front": "to dive",
+        "article": null,
+        "plural": null,
+        "phonetic": "ˈtaʊ̯xn̩",
+        "cefrLevel": "A2",
+        "categoryName": "Sport",
+        "wordType": "verb",
+        "examples": [
+          { "target": "Im Urlaub möchte ich tauchen lernen.", "native": "On vacation I want to learn to dive." }
+        ],
+        "synonyms": []
+      },
+      {
+        "back": "Muskel",
+        "front": "muscle",
+        "article": "der",
+        "plural": "die Muskeln",
+        "phonetic": "ˈmʊskl̩",
+        "cefrLevel": "A2",
+        "categoryName": "Body",
+        "wordType": "noun",
+        "examples": [
+          { "target": "Nach dem Training tun mir die Muskeln weh.", "native": "After the workout my muscles hurt." }
+        ],
+        "synonyms": []
+      },
+      {
+        "back": "Mannschaft",
+        "front": "team",
+        "article": "die",
+        "plural": "die Mannschaften",
+        "phonetic": "ˈmanʃaft",
+        "cefrLevel": "A2",
+        "categoryName": "Sport",
+        "wordType": "noun",
+        "examples": [
+          { "target": "Unsere Mannschaft hat das Spiel gewonnen.", "native": "Our team won the game." }
+        ],
+        "synonyms": [
+          { "word": "Team", "article": "das", "translation": "team", "example": "Das Team arbeitet sehr gut zusammen.", "exampleNative": "The team works together very well." }
+        ]
+      },
+      {
+        "back": "verlieren",
+        "front": "to lose",
+        "article": null,
+        "plural": null,
+        "phonetic": "fɛɐ̯ˈliːʁən",
+        "cefrLevel": "A2",
+        "categoryName": "Sport",
+        "wordType": "verb",
+        "examples": [
+          { "target": "Leider haben wir das Spiel verloren.", "native": "Unfortunately we lost the game." }
+        ],
+        "synonyms": []
+      },
+      {
+        "back": "Hoffnung",
+        "front": "hope",
+        "article": "die",
+        "plural": "die Hoffnungen",
+        "phonetic": "ˈhɔfnʊŋ",
+        "cefrLevel": "B1",
+        "categoryName": "Emotion",
+        "wordType": "noun",
+        "examples": [
+          { "target": "Wir haben noch Hoffnung auf den Sieg.", "native": "We still have hope of winning." }
+        ],
+        "synonyms": []
+      },
+      {
+        "back": "Sieg",
+        "front": "victory",
+        "article": "der",
+        "plural": "die Siege",
+        "phonetic": "ziːk",
+        "cefrLevel": "B1",
+        "categoryName": "Sport",
+        "wordType": "noun",
+        "examples": [
+          { "target": "Der Sieg war eine große Überraschung.", "native": "The victory was a big surprise." }
+        ],
+        "synonyms": [
+          { "word": "Erfolg", "article": "der", "translation": "success", "example": "Das war ein großer Erfolg.", "exampleNative": "That was a great success." }
+        ]
+      },
+      {
+        "back": "begeistert",
+        "front": "enthusiastic",
+        "article": null,
+        "plural": null,
+        "phonetic": "bəˈɡaɪ̯stɐt",
+        "cefrLevel": "B1",
+        "categoryName": "Emotion",
+        "wordType": "adjective",
+        "examples": [
+          { "target": "Die Fans waren völlig begeistert.", "native": "The fans were completely thrilled." }
+        ],
+        "synonyms": []
+      }
+    ]
+  },
+  {
+    "topic": "Zusammen leben",
+    "topicEn": "Home, Neighbors & Animals",
+    "cards": [
+      {
+        "back": "Nachbarschaft",
+        "front": "neighborhood",
+        "article": "die",
+        "plural": "die Nachbarschaften",
+        "phonetic": "ˈnaːxbaːɐ̯ʃaft",
+        "cefrLevel": "A2",
+        "categoryName": "Home",
+        "wordType": "noun",
+        "examples": [
+          { "target": "In unserer Nachbarschaft kennt man sich gut.", "native": "In our neighborhood people know each other well." }
+        ],
+        "synonyms": []
+      },
+      {
+        "back": "einziehen",
+        "front": "to move in",
+        "article": null,
+        "plural": null,
+        "phonetic": "ˈaɪ̯nˌtsiːən",
+        "cefrLevel": "A2",
+        "categoryName": "Home",
+        "wordType": "verb",
+        "examples": [
+          { "target": "Nächste Woche ziehen wir in die neue Wohnung ein.", "native": "Next week we're moving into the new apartment." }
+        ],
+        "synonyms": []
+      },
+      {
+        "back": "Müll",
+        "front": "trash, garbage",
+        "article": "der",
+        "plural": null,
+        "phonetic": "mʏl",
+        "cefrLevel": "A2",
+        "categoryName": "Home",
+        "wordType": "noun",
+        "examples": [
+          { "target": "Bring bitte den Müll raus.", "native": "Please take the trash out." }
+        ],
+        "synonyms": []
+      },
+      {
+        "back": "Katze",
+        "front": "cat",
+        "article": "die",
+        "plural": "die Katzen",
+        "phonetic": "ˈkatsə",
+        "cefrLevel": "A1",
+        "categoryName": "Nature",
+        "wordType": "noun",
+        "examples": [
+          { "target": "Unsere Katze schläft den ganzen Tag.", "native": "Our cat sleeps all day." }
+        ],
+        "synonyms": []
+      },
+      {
+        "back": "Haustier",
+        "front": "pet",
+        "article": "das",
+        "plural": "die Haustiere",
+        "phonetic": "ˈhaʊ̯sˌtiːɐ̯",
+        "cefrLevel": "A2",
+        "categoryName": "Nature",
+        "wordType": "noun",
+        "examples": [
+          { "target": "Habt ihr ein Haustier zu Hause?", "native": "Do you have a pet at home?" }
+        ],
+        "synonyms": [
+          { "word": "Tier", "article": "das", "translation": "animal", "example": "Im Zoo gibt es viele Tiere.", "exampleNative": "There are many animals at the zoo." }
+        ]
+      },
+      {
+        "back": "leise",
+        "front": "quiet",
+        "article": null,
+        "plural": null,
+        "phonetic": "ˈlaɪ̯zə",
+        "cefrLevel": "A2",
+        "categoryName": "Home",
+        "wordType": "adjective",
+        "examples": [
+          { "target": "Sei bitte leise, das Baby schläft.", "native": "Please be quiet, the baby is sleeping." }
+        ],
+        "synonyms": [
+          { "word": "still", "article": null, "translation": "silent", "example": "Im Wald war es ganz still.", "exampleNative": "It was completely silent in the forest." }
+        ]
+      },
+      {
+        "back": "versprechen",
+        "front": "to promise",
+        "article": null,
+        "plural": null,
+        "phonetic": "fɛɐ̯ˈʃpʁɛçn̩",
+        "cefrLevel": "A2",
+        "categoryName": "Communication",
+        "wordType": "verb",
+        "examples": [
+          { "target": "Ich verspreche dir, leiser zu sein.", "native": "I promise you I'll be quieter." }
+        ],
+        "synonyms": []
+      },
+      {
+        "back": "trocken",
+        "front": "dry",
+        "article": null,
+        "plural": null,
+        "phonetic": "ˈtʁɔkn̩",
+        "cefrLevel": "A2",
+        "categoryName": "Nature",
+        "wordType": "adjective",
+        "examples": [
+          { "target": "Die Wäsche ist endlich trocken.", "native": "The laundry is finally dry." }
+        ],
+        "synonyms": []
+      }
+    ]
+  },
+  {
+    "topic": "Gute Unterhaltung!",
+    "topicEn": "Entertainment & Arts",
+    "cards": [
+      {
+        "back": "Unterhaltung",
+        "front": "entertainment",
+        "article": "die",
+        "plural": "die Unterhaltungen",
+        "phonetic": "ˌʊntɐˈhaltʊŋ",
+        "cefrLevel": "B1",
+        "categoryName": "Culture",
+        "wordType": "noun",
+        "examples": [
+          { "target": "Im Theater gibt es heute gute Unterhaltung.", "native": "There's good entertainment at the theater today." }
+        ],
+        "synonyms": []
+      },
+      {
+        "back": "Führung",
+        "front": "guided tour",
+        "article": "die",
+        "plural": "die Führungen",
+        "phonetic": "ˈfyːʁʊŋ",
+        "cefrLevel": "A2",
+        "categoryName": "Culture",
+        "wordType": "noun",
+        "examples": [
+          { "target": "Wir machen eine Führung durch das Schloss.", "native": "We're taking a guided tour of the castle." }
+        ],
+        "synonyms": []
+      },
+      {
+        "back": "Stehplatz",
+        "front": "standing room",
+        "article": "der",
+        "plural": "die Stehplätze",
+        "phonetic": "ˈʃteːˌplats",
+        "cefrLevel": "B1",
+        "categoryName": "Culture",
+        "wordType": "noun",
+        "examples": [
+          { "target": "Für das Konzert gibt es nur noch Stehplätze.", "native": "There's only standing room left for the concert." }
+        ],
+        "synonyms": []
+      },
+      {
+        "back": "Nachrichten",
+        "front": "news",
+        "article": "die",
+        "plural": "die Nachrichten",
+        "phonetic": "ˈnaːxˌʁɪçtn̩",
+        "cefrLevel": "A2",
+        "categoryName": "Media",
+        "wordType": "noun",
+        "examples": [
+          { "target": "Hast du heute die Nachrichten gesehen?", "native": "Did you watch the news today?" }
+        ],
+        "synonyms": []
+      },
+      {
+        "back": "ausverkauft",
+        "front": "sold out",
+        "article": null,
+        "plural": null,
+        "phonetic": "ˈaʊ̯sfɛɐ̯ˌkaʊ̯ft",
+        "cefrLevel": "B1",
+        "categoryName": "Culture",
+        "wordType": "adjective",
+        "examples": [
+          { "target": "Das Konzert ist leider ausverkauft.", "native": "Unfortunately the concert is sold out." }
+        ],
+        "synonyms": []
+      },
+      {
+        "back": "Malerei",
+        "front": "painting (art form)",
+        "article": "die",
+        "plural": "die Malereien",
+        "phonetic": "maːləˈʁaɪ̯",
+        "cefrLevel": "B1",
+        "categoryName": "Culture",
+        "wordType": "noun",
+        "examples": [
+          { "target": "Sie interessiert sich für moderne Malerei.", "native": "She's interested in modern painting." }
+        ],
+        "synonyms": []
+      },
+      {
+        "back": "berühmt",
+        "front": "famous",
+        "article": null,
+        "plural": null,
+        "phonetic": "bəˈʁyːmt",
+        "cefrLevel": "A2",
+        "categoryName": "Culture",
+        "wordType": "adjective",
+        "examples": [
+          { "target": "Das Bild ist auf der ganzen Welt berühmt.", "native": "The painting is famous all over the world." }
+        ],
+        "synonyms": [
+          { "word": "bekannt", "article": null, "translation": "well-known", "example": "Der Sänger ist sehr bekannt.", "exampleNative": "The singer is very well-known." }
+        ]
+      },
+      {
+        "back": "aufgeregt",
+        "front": "excited",
+        "article": null,
+        "plural": null,
+        "phonetic": "ˈaʊ̯fɡəˌʁeːkt",
+        "cefrLevel": "B1",
+        "categoryName": "Emotion",
+        "wordType": "adjective",
+        "examples": [
+          { "target": "Vor der Show war sie sehr aufgeregt.", "native": "She was very excited before the show." }
+        ],
+        "synonyms": []
+      }
+    ]
+  },
+  {
+    "topic": "Ein Einkaufsbummel",
+    "topicEn": "Shopping & Fashion",
+    "cards": [
+      {
+        "back": "Bekleidung",
+        "front": "clothing",
+        "article": "die",
+        "plural": null,
+        "phonetic": "bəˈklaɪ̯dʊŋ",
+        "cefrLevel": "A2",
+        "categoryName": "Fashion",
+        "wordType": "noun",
+        "examples": [
+          { "target": "Im zweiten Stock gibt es Bekleidung für Damen.", "native": "On the second floor there's women's clothing." }
+        ],
+        "synonyms": [
+          { "word": "Kleidung", "article": "die", "translation": "clothes", "example": "Pack warme Kleidung ein.", "exampleNative": "Pack warm clothes." }
+        ]
+      },
+      {
+        "back": "bummeln",
+        "front": "to stroll, to wander around shops",
+        "article": null,
+        "plural": null,
+        "phonetic": "ˈbʊml̩n",
+        "cefrLevel": "B1",
+        "categoryName": "Fashion",
+        "wordType": "verb",
+        "examples": [
+          { "target": "Samstags bummeln wir gern durch die Stadt.", "native": "On Saturdays we like to stroll around town." }
+        ],
+        "synonyms": []
+      },
+      {
+        "back": "Schmuck",
+        "front": "jewelry",
+        "article": "der",
+        "plural": null,
+        "phonetic": "ʃmʊk",
+        "cefrLevel": "A2",
+        "categoryName": "Fashion",
+        "wordType": "noun",
+        "examples": [
+          { "target": "Sie trägt heute schönen Schmuck.", "native": "She's wearing lovely jewelry today." }
+        ],
+        "synonyms": []
+      },
+      {
+        "back": "Gürtel",
+        "front": "belt",
+        "article": "der",
+        "plural": "die Gürtel",
+        "phonetic": "ˈɡʏʁtl̩",
+        "cefrLevel": "A2",
+        "categoryName": "Fashion",
+        "wordType": "noun",
+        "examples": [
+          { "target": "Der Gürtel passt gut zu der Hose.", "native": "The belt goes well with the trousers." }
+        ],
+        "synonyms": []
+      },
+      {
+        "back": "Schnäppchen",
+        "front": "bargain, deal",
+        "article": "das",
+        "plural": "die Schnäppchen",
+        "phonetic": "ˈʃnɛpçən",
+        "cefrLevel": "B1",
+        "categoryName": "Shopping",
+        "wordType": "noun",
+        "examples": [
+          { "target": "Diese Jacke war ein echtes Schnäppchen.", "native": "This jacket was a real bargain." }
+        ],
+        "synonyms": []
+      },
+      {
+        "back": "anhaben",
+        "front": "to be wearing",
+        "article": null,
+        "plural": null,
+        "phonetic": "ˈanˌhaːbn̩",
+        "cefrLevel": "A2",
+        "categoryName": "Fashion",
+        "wordType": "verb",
+        "examples": [
+          { "target": "Was hast du auf der Party angehabt?", "native": "What were you wearing at the party?" }
+        ],
+        "synonyms": [
+          { "word": "tragen", "article": null, "translation": "to wear", "example": "Sie trägt heute ein rotes Kleid.", "exampleNative": "She's wearing a red dress today." }
+        ]
+      },
+      {
+        "back": "schick",
+        "front": "chic, smart",
+        "article": null,
+        "plural": null,
+        "phonetic": "ʃɪk",
+        "cefrLevel": "A2",
+        "categoryName": "Fashion",
+        "wordType": "adjective",
+        "examples": [
+          { "target": "In dem Anzug siehst du sehr schick aus.", "native": "You look very smart in that suit." }
+        ],
+        "synonyms": [
+          { "word": "elegant", "article": null, "translation": "elegant", "example": "Das Kleid ist sehr elegant.", "exampleNative": "The dress is very elegant." }
+        ]
+      },
+      {
+        "back": "bunt",
+        "front": "colorful",
+        "article": null,
+        "plural": null,
+        "phonetic": "bʊnt",
+        "cefrLevel": "A2",
+        "categoryName": "Fashion",
+        "wordType": "adjective",
+        "examples": [
+          { "target": "Ich mag bunte Kleidung im Sommer.", "native": "I like colorful clothes in summer." }
+        ],
+        "synonyms": [
+          { "word": "gestreift", "article": null, "translation": "striped", "example": "Er trägt ein gestreiftes Hemd.", "exampleNative": "He's wearing a striped shirt." }
+        ]
+      }
+    ]
+  },
+  {
+    "topic": "Gesund sein und gesund bleiben",
+    "topicEn": "Health & Wellbeing",
+    "cards": [
+      {
+        "back": "Behandlung",
+        "front": "treatment",
+        "article": "die",
+        "plural": "die Behandlungen",
+        "phonetic": "bəˈhandlʊŋ",
+        "cefrLevel": "B1",
+        "categoryName": "Health",
+        "wordType": "noun",
+        "examples": [
+          { "target": "Die Behandlung beim Arzt war teuer.", "native": "The treatment at the doctor's was expensive." }
+        ],
+        "synonyms": [
+          { "word": "Therapie", "article": "die", "translation": "therapy", "example": "Die Therapie hat ihr sehr geholfen.", "exampleNative": "The therapy helped her a lot." }
+        ]
+      },
+      {
+        "back": "Massage",
+        "front": "massage",
+        "article": "die",
+        "plural": "die Massagen",
+        "phonetic": "maˈsaːʒə",
+        "cefrLevel": "B1",
+        "categoryName": "Health",
+        "wordType": "noun",
+        "examples": [
+          { "target": "Nach der Massage fühle ich mich viel besser.", "native": "After the massage I feel much better." }
+        ],
+        "synonyms": []
+      },
+      {
+        "back": "Haut",
+        "front": "skin",
+        "article": "die",
+        "plural": "die Häute",
+        "phonetic": "haʊ̯t",
+        "cefrLevel": "A2",
+        "categoryName": "Body",
+        "wordType": "noun",
+        "examples": [
+          { "target": "Meine Haut ist im Winter sehr trocken.", "native": "My skin is very dry in winter." }
+        ],
+        "synonyms": []
+      },
+      {
+        "back": "Schmerztablette",
+        "front": "pain medication",
+        "article": "die",
+        "plural": "die Schmerztabletten",
+        "phonetic": "ˈʃmɛʁtsˌtablɛtə",
+        "cefrLevel": "B1",
+        "categoryName": "Health",
+        "wordType": "noun",
+        "examples": [
+          { "target": "Gegen die Kopfschmerzen nehme ich eine Schmerztablette.", "native": "I'll take a painkiller for the headache." }
+        ],
+        "synonyms": []
+      },
+      {
+        "back": "gesund",
+        "front": "healthy",
+        "article": null,
+        "plural": null,
+        "phonetic": "ɡəˈzʊnt",
+        "cefrLevel": "A1",
+        "categoryName": "Health",
+        "wordType": "adjective",
+        "examples": [
+          { "target": "Obst und Gemüse sind sehr gesund.", "native": "Fruit and vegetables are very healthy." }
+        ],
+        "synonyms": [
+          { "word": "fit", "article": null, "translation": "fit", "example": "Sport hält dich fit.", "exampleNative": "Exercise keeps you fit." }
+        ]
+      },
+      {
+        "back": "empfindlich",
+        "front": "sensitive",
+        "article": null,
+        "plural": null,
+        "phonetic": "ɛmˈpfɪntlɪç",
+        "cefrLevel": "B1",
+        "categoryName": "Health",
+        "wordType": "adjective",
+        "examples": [
+          { "target": "Meine Augen sind empfindlich gegen Licht.", "native": "My eyes are sensitive to light." }
+        ],
+        "synonyms": []
+      },
+      {
+        "back": "kühlen",
+        "front": "to cool",
+        "article": null,
+        "plural": null,
+        "phonetic": "ˈkyːlən",
+        "cefrLevel": "A2",
+        "categoryName": "Health",
+        "wordType": "verb",
+        "examples": [
+          { "target": "Kühl die Verletzung mit Eis.", "native": "Cool the injury with ice." }
+        ],
+        "synonyms": []
+      },
+      {
+        "back": "ständig",
+        "front": "constantly",
+        "article": null,
+        "plural": null,
+        "phonetic": "ˈʃtɛndɪç",
+        "cefrLevel": "B1",
+        "categoryName": "Health",
+        "wordType": "adverb",
+        "examples": [
+          { "target": "Er hat ständig Rückenschmerzen.", "native": "He constantly has back pain." }
+        ],
+        "synonyms": [
+          { "word": "immer", "article": null, "translation": "always", "example": "Sie kommt immer zu spät.", "exampleNative": "She always arrives late." }
+        ]
+      }
+    ]
+  },
+  {
+    "topic": "Auf der Bank",
+    "topicEn": "Money & Banking",
+    "cards": [
+      {
+        "back": "Bargeld",
+        "front": "cash",
+        "article": "das",
+        "plural": null,
+        "phonetic": "ˈbaːɐ̯ɡɛlt",
+        "cefrLevel": "A2",
+        "categoryName": "Money",
+        "wordType": "noun",
+        "examples": [
+          { "target": "Ich habe leider kein Bargeld dabei.", "native": "Unfortunately I don't have any cash on me." }
+        ],
+        "synonyms": []
+      },
+      {
+        "back": "Konto",
+        "front": "account",
+        "article": "das",
+        "plural": "die Konten",
+        "phonetic": "ˈkɔnto",
+        "cefrLevel": "A2",
+        "categoryName": "Money",
+        "wordType": "noun",
+        "examples": [
+          { "target": "Ich möchte ein Konto eröffnen.", "native": "I'd like to open an account." }
+        ],
+        "synonyms": []
+      },
+      {
+        "back": "überweisen",
+        "front": "to transfer (money)",
+        "article": null,
+        "plural": null,
+        "phonetic": "ˌyːbɐˈvaɪ̯zn̩",
+        "cefrLevel": "A2",
+        "categoryName": "Money",
+        "wordType": "verb",
+        "examples": [
+          { "target": "Bitte überweisen Sie das Geld bis Freitag.", "native": "Please transfer the money by Friday." }
+        ],
+        "synonyms": []
+      },
+      {
+        "back": "Gebühr",
+        "front": "fee",
+        "article": "die",
+        "plural": "die Gebühren",
+        "phonetic": "ɡəˈbyːɐ̯",
+        "cefrLevel": "A2",
+        "categoryName": "Money",
+        "wordType": "noun",
+        "examples": [
+          { "target": "Für die Karte gibt es keine Gebühren.", "native": "There are no fees for the card." }
+        ],
+        "synonyms": []
+      },
+      {
+        "back": "abheben",
+        "front": "to withdraw (money)",
+        "article": null,
+        "plural": null,
+        "phonetic": "ˈapˌheːbn̩",
+        "cefrLevel": "A2",
+        "categoryName": "Money",
+        "wordType": "verb",
+        "examples": [
+          { "target": "Ich muss noch Geld am Automaten abheben.", "native": "I still need to withdraw money at the cash machine." }
+        ],
+        "synonyms": []
+      },
+      {
+        "back": "Kreditkarte",
+        "front": "credit card",
+        "article": "die",
+        "plural": "die Kreditkarten",
+        "phonetic": "kʁeˈdiːtˌkaʁtə",
+        "cefrLevel": "A2",
+        "categoryName": "Money",
+        "wordType": "noun",
+        "examples": [
+          { "target": "Kann ich mit Kreditkarte bezahlen?", "native": "Can I pay by credit card?" }
+        ],
+        "synonyms": []
+      },
+      {
+        "back": "sparen",
+        "front": "to save (money)",
+        "article": null,
+        "plural": null,
+        "phonetic": "ˈʃpaːʁən",
+        "cefrLevel": "A2",
+        "categoryName": "Money",
+        "wordType": "verb",
+        "examples": [
+          { "target": "Wir sparen für ein neues Auto.", "native": "We're saving for a new car." }
+        ],
+        "synonyms": []
+      },
+      {
+        "back": "Rechnung",
+        "front": "bill, invoice",
+        "article": "die",
+        "plural": "die Rechnungen",
+        "phonetic": "ˈʁɛçnʊŋ",
+        "cefrLevel": "A2",
+        "categoryName": "Money",
+        "wordType": "noun",
+        "examples": [
+          { "target": "Die Rechnung kommt nächste Woche.", "native": "The bill will arrive next week." }
+        ],
+        "synonyms": []
+      }
+    ]
+  },
+  {
+    "topic": "Typisch, oder?",
+    "topicEn": "Customs & Manners",
+    "cards": [
+      {
+        "back": "Gastfreundschaft",
+        "front": "hospitality",
+        "article": "die",
+        "plural": null,
+        "phonetic": "ˈɡastfʁɔɪ̯ntˌʃaft",
+        "cefrLevel": "B1",
+        "categoryName": "Culture",
+        "wordType": "noun",
+        "examples": [
+          { "target": "Die Gastfreundschaft hier ist wunderbar.", "native": "The hospitality here is wonderful." }
+        ],
+        "synonyms": []
+      },
+      {
+        "back": "Höflichkeit",
+        "front": "politeness",
+        "article": "die",
+        "plural": "die Höflichkeiten",
+        "phonetic": "ˈhøːflɪçkaɪ̯t",
+        "cefrLevel": "B1",
+        "categoryName": "Culture",
+        "wordType": "noun",
+        "examples": [
+          { "target": "Höflichkeit ist in jedem Land wichtig.", "native": "Politeness is important in every country." }
+        ],
+        "synonyms": []
+      },
+      {
+        "back": "duzen",
+        "front": "to address someone with \"du\"",
+        "article": null,
+        "plural": null,
+        "phonetic": "ˈduːtsn̩",
+        "cefrLevel": "B1",
+        "categoryName": "Communication",
+        "wordType": "verb",
+        "examples": [
+          { "target": "Unter Kollegen duzen wir uns hier.", "native": "Here we use \"du\" among colleagues." }
+        ],
+        "synonyms": []
+      },
+      {
+        "back": "siezen",
+        "front": "to address someone with \"Sie\"",
+        "article": null,
+        "plural": null,
+        "phonetic": "ˈziːtsn̩",
+        "cefrLevel": "B1",
+        "categoryName": "Communication",
+        "wordType": "verb",
+        "examples": [
+          { "target": "Ältere Menschen sollte man siezen.", "native": "You should address older people with \"Sie\"." }
+        ],
+        "synonyms": []
+      },
+      {
+        "back": "ausziehen",
+        "front": "to take off (clothes/shoes)",
+        "article": null,
+        "plural": null,
+        "phonetic": "ˈaʊ̯sˌtsiːən",
+        "cefrLevel": "A2",
+        "categoryName": "Culture",
+        "wordType": "verb",
+        "examples": [
+          { "target": "Bitte zieh deine Schuhe an der Tür aus.", "native": "Please take off your shoes at the door." }
+        ],
+        "synonyms": []
+      },
+      {
+        "back": "unhöflich",
+        "front": "impolite",
+        "article": null,
+        "plural": null,
+        "phonetic": "ˈʊnhøːflɪç",
+        "cefrLevel": "A2",
+        "categoryName": "Culture",
+        "wordType": "adjective",
+        "examples": [
+          { "target": "Es ist unhöflich, zu spät zu kommen.", "native": "It's impolite to arrive late." }
+        ],
+        "synonyms": []
+      },
+      {
+        "back": "Klischee",
+        "front": "cliché, stereotype",
+        "article": "das",
+        "plural": "die Klischees",
+        "phonetic": "kliˈʃeː",
+        "cefrLevel": "B1",
+        "categoryName": "Culture",
+        "wordType": "noun",
+        "examples": [
+          { "target": "Über Deutsche gibt es viele Klischees.", "native": "There are many clichés about Germans." }
+        ],
+        "synonyms": [
+          { "word": "Vorurteil", "article": "das", "translation": "prejudice", "example": "Wir sollten Vorurteile abbauen.", "exampleNative": "We should break down prejudices." }
+        ]
+      },
+      {
+        "back": "altmodisch",
+        "front": "old-fashioned",
+        "article": null,
+        "plural": null,
+        "phonetic": "ˈaltˌmoːdɪʃ",
+        "cefrLevel": "B1",
+        "categoryName": "Culture",
+        "wordType": "adjective",
+        "examples": [
+          { "target": "Diese Regeln sind ein bisschen altmodisch.", "native": "These rules are a little old-fashioned." }
+        ],
+        "synonyms": [
+          { "word": "modern", "article": null, "translation": "modern", "example": "Die Wohnung ist sehr modern eingerichtet.", "exampleNative": "The flat is furnished very modernly." }
+        ]
+      }
+    ]
+  }
+]

@@ -1,10 +1,10 @@
 <ion-header class="ion-no-border">
   <ion-toolbar>
     <div class="sc-nav">
-      <button class="sc-back-btn" (click)="goBack()" aria-label="Back">
+      <button class="sc-back-btn" (click)="goBack()" [attr.aria-label]="'review.struggling.backAriaLabel' | translate">
         <ion-icon name="chevron-back-outline"></ion-icon>
       </button>
-      <span class="sc-nav-title">Struggling Cards</span>
+      <span class="sc-nav-title">{{ 'review.struggling.pageTitle' | translate }}</span>
       <div class="sc-nav-spacer"></div>
     </div>
   </ion-toolbar>
@@ -19,8 +19,8 @@
       <div class="sc-banner">
         <span class="sc-banner-icon">⚠️</span>
         <div>
-          <p class="sc-banner-title">{{ strugglingCards().length }} cards need extra attention</p>
-          <p class="sc-banner-sub">These cards keep getting failed. Focus on them to break through.</p>
+          <p class="sc-banner-title">{{ strugglingCards().length }} {{ 'review.struggling.needsAttentionMsg' | translate }}</p>
+          <p class="sc-banner-sub">{{ 'review.struggling.focusMsg' | translate }}</p>
         </div>
       </div>
 
@@ -35,7 +35,7 @@
               (playAudio)="openWordDetail(card)"
             />
             <span class="sc-fail-badge" [class.sc-fail-badge--red]="failCount(card) >= 4">
-              {{ failCount(card) }} {{ failCount(card) === 1 ? 'fail' : 'fails' }}
+              {{ failCount(card) }} {{ failCount(card) === 1 ? ('review.struggling.failSingular' | translate) : ('review.struggling.failPlural' | translate) }}
             </span>
           </div>
         }
@@ -44,7 +44,7 @@
       <!-- Review button -->
       <div class="sc-review-wrap">
         <button class="sc-review-btn" (click)="startReview()">
-          Review all {{ strugglingCards().length }} struggling cards
+          {{ 'review.struggling.reviewAllBtn' | translate }} ({{ strugglingCards().length }})
         </button>
       </div>
 
@@ -53,8 +53,8 @@
       <!-- Empty state -->
       <div class="sc-empty">
         <p class="sc-empty-icon">🎉</p>
-        <p class="sc-empty-title">No struggling cards!</p>
-        <p class="sc-empty-sub">You're doing great. Keep it up!</p>
+        <p class="sc-empty-title">{{ 'review.struggling.noCardsTitle' | translate }}</p>
+        <p class="sc-empty-sub">{{ 'review.struggling.encouragementMsg' | translate }}</p>
       </div>
 
     }

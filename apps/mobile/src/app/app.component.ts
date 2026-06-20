@@ -4,6 +4,7 @@ import {App} from '@capacitor/app';
 import {Capacitor} from '@capacitor/core';
 import {Network} from '@capacitor/network';
 import {ThemeService} from './core/services/theme.service';
+import {LanguageService} from './core/services/language.service';
 import {LocalDataService} from './core/services/local-data.service';
 import {SyncService} from './core/services/sync.service';
 import {SyncNotificationService} from './core/services/sync-notification.service';
@@ -23,6 +24,7 @@ import {OfflineBannerComponent} from './shared/components/offline-banner/offline
 })
 export class AppComponent implements OnInit {
   private readonly themeService = inject(ThemeService);
+  private readonly languageService = inject(LanguageService);
   private readonly localData = inject(LocalDataService);
   private readonly syncService = inject(SyncService);
   private readonly syncNotification = inject(SyncNotificationService);
@@ -35,6 +37,7 @@ export class AppComponent implements OnInit {
 
   constructor() {
     this.themeService.initialize();
+    this.languageService.initialize();
   }
 
   async ngOnInit(): Promise<void> {
@@ -45,7 +48,8 @@ export class AppComponent implements OnInit {
 
     if (this.authService.isAuthenticated()) {
       this.subscriptionStore.loadStatus();
-      void this.settingsStore.load();
+      await this.settingsStore.load();
+      this.languageService.reconcileFromServer(this.settingsStore.settings()?.uiLanguage);
       void this.reviewStats.refreshStreak();
       void this.reviewStats.refreshGoalProgress();
     }

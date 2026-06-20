@@ -7,7 +7,7 @@ import {
   OnInit,
   signal,
 } from '@angular/core';
-import { NgClass, TitleCasePipe } from '@angular/common';
+import { NgClass } from '@angular/common';
 import { Router } from '@angular/router';
 import {
   ActionSheetController,
@@ -38,6 +38,7 @@ import {
   gridOutline,
   ellipsisHorizontalOutline,
 } from 'ionicons/icons';
+import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import type { Story, PlatformStoryCard, StoryDifficulty, StoryCategory } from '@lingua-card/shared/domain';
 import { STORY_CATEGORIES } from '@lingua-card/shared/domain';
 import { StoryStore } from '../../store/story.store';
@@ -63,7 +64,7 @@ const LEVEL_FILTERS: Array<{ value: StoryDifficulty | null; label: string }> = [
   imports: [
     IonContent, IonHeader, IonToolbar, IonIcon,
     IonRefresher, IonRefresherContent, IonSpinner,
-    NgClass, TitleCasePipe,
+    NgClass, TranslatePipe,
   ],
 })
 export class StoryLibraryPage implements OnInit {
@@ -76,6 +77,7 @@ export class StoryLibraryPage implements OnInit {
   private readonly subscriptionStore   = inject(SubscriptionStore);
   private readonly platformApi         = inject(PlatformStoryApiService);
   private readonly actionSheetCtrl     = inject(ActionSheetController);
+  private readonly translate           = inject(TranslateService);
 
   // ── My Stories (user-generated) ──────────────────────────────────────────
   readonly stories       = this.storyStore.sortedStories;
@@ -115,7 +117,7 @@ export class StoryLibraryPage implements OnInit {
       const err = this.storyStore.extendError();
       if (err) {
         const toast = await this.toastCtrl.create({
-          message: 'Extension failed — please try again.',
+          message: this.translate.instant('stories.library.extensionFailedToast'),
           duration: 3000,
           color: 'danger',
           position: 'bottom',
@@ -207,11 +209,11 @@ export class StoryLibraryPage implements OnInit {
     const sheet = await this.actionSheetCtrl.create({
       buttons: [
         {
-          text: 'Delete story',
+          text: this.translate.instant('stories.library.deleteAction'),
           role: 'destructive',
           handler: () => this.confirmDelete(story),
         },
-        { text: 'Cancel', role: 'cancel' },
+        { text: this.translate.instant('stories.library.cancelAction'), role: 'cancel' },
       ],
     });
     await sheet.present();
@@ -219,12 +221,12 @@ export class StoryLibraryPage implements OnInit {
 
   private async confirmDelete(story: Story): Promise<void> {
     const alert = await this.alertCtrl.create({
-      header: 'Delete story',
-      message: `Remove "${story.title}"? The audio will also be deleted.`,
+      header: this.translate.instant('stories.library.deleteAlertHeader'),
+      message: this.translate.instant('stories.library.deleteAlertMsg', { title: story.title }),
       buttons: [
-        { text: 'Cancel', role: 'cancel' },
+        { text: this.translate.instant('common.cancel'), role: 'cancel' },
         {
-          text: 'Delete',
+          text: this.translate.instant('stories.library.deleteActionBtn'),
           role: 'destructive',
           handler: () => this.storyStore.deleteStory(story.id),
         },
@@ -237,7 +239,16 @@ export class StoryLibraryPage implements OnInit {
 
   readingTime(story: Story): string {
     const mins = Math.max(1, Math.ceil(story.audioDurationMs / 60000));
-    return `${mins} min`;
+    return `${mins} ${this.translate.instant('stories.cardMeta.min')}`;
+  }
+
+  translateLength(lengthType: string): string {
+    const keyMap: Record<string, string> = {
+      'short': 'stories.length.short', 'medium': 'stories.length.medium',
+      'long': 'stories.length.long', 'very-long': 'stories.length.veryLong',
+      'extra-long': 'stories.length.extraLong',
+    };
+    return this.translate.instant(keyMap[lengthType] ?? lengthType);
   }
 
   storyWordCount(story: Story): number {

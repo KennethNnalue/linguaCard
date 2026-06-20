@@ -1,16 +1,16 @@
 <ion-header class="ion-no-border">
   <ion-toolbar>
     <div class="col-nav">
-      <button class="lc-back-btn" (click)="goBack()" aria-label="Back">
+      <button class="lc-back-btn" (click)="goBack()" [attr.aria-label]="'common.back' | translate">
         <ion-icon name="chevron-back-outline"></ion-icon>
       </button>
-      <h1 class="col-nav-title lc-display">Collections</h1>
+      <h1 class="col-nav-title lc-display">{{ 'collections.title' | translate }}</h1>
       <div class="col-nav-actions">
         @if (activeSegment() === 'mine') {
-          <button class="col-icon-btn" (click)="navigateToImport()" aria-label="Import">
+          <button class="col-icon-btn" (click)="navigateToImport()" [attr.aria-label]="'common.aria.import' | translate">
             <ion-icon name="cloud-upload-outline"></ion-icon>
           </button>
-          <button class="lc-fab" (click)="openCreateSheet()" aria-label="New collection">
+          <button class="lc-fab" (click)="openCreateSheet()" [attr.aria-label]="'common.aria.newCollection' | translate">
             <ion-icon name="add-outline"></ion-icon>
           </button>
         }
@@ -22,13 +22,13 @@
         class="col-seg-btn"
         [class.col-seg-btn--active]="activeSegment() === 'mine'"
         (click)="switchSegment('mine')">
-        My Sets
+        {{ 'collections.segments.mySets' | translate }}
       </button>
       <button
         class="col-seg-btn"
         [class.col-seg-btn--active]="activeSegment() === 'explore'"
         (click)="switchSegment('explore')">
-        Explore
+        {{ 'collections.segments.explore' | translate }}
       </button>
     </div>
   </ion-toolbar>
@@ -42,11 +42,11 @@
     <div class="col-hero">
       <div class="col-hero-inner">
         <div>
-          <div class="col-hero-lbl">Total across all sets</div>
-          <div class="col-hero-count lc-display">{{ totalCards() }} words</div>
+          <div class="col-hero-lbl">{{ 'collections.mySets.totalLabel' | translate }}</div>
+          <div class="col-hero-count lc-display">{{ totalCards() }} {{ 'collections.mySets.wordsUnit' | translate }}</div>
         </div>
         <div class="col-hero-right">
-          <div class="col-hero-due-lbl">Due today</div>
+          <div class="col-hero-due-lbl">{{ 'collections.mySets.dueLabel' | translate }}</div>
           <div class="col-hero-due lc-display">{{ totalDue() }}</div>
         </div>
       </div>
@@ -76,22 +76,22 @@
                   <span class="col-card-emoji">{{ col.emoji }}</span>
                   <span class="col-card-name lc-display">{{ col.name }}</span>
                   @if (col.sourcePlatformCollectionId) {
-                    <span class="col-lib-badge">FROM LIBRARY</span>
+                    <span class="col-lib-badge">{{ 'collections.card.libraryBadge' | translate }}</span>
                   }
                   @if (col.importStatus === 'incomplete') {
                     <span class="col-incomplete-dot" [title]="col.pendingWords.length + ' cards pending'"></span>
                   }
                 </div>
                 <div class="col-card-meta">
-                  {{ col.cardCount }} words
+                  {{ col.cardCount }} {{ 'collections.card.wordsLabel' | translate }}
                   @if (col.level) { · {{ col.level }} }
                   @if (col.description) { · {{ col.description | slice:0:40 }} }
                 </div>
               </div>
               @if (col.dueCount > 0) {
-                <div class="col-due-badge col-due-badge--amber">{{ col.dueCount }} due</div>
+                <div class="col-due-badge col-due-badge--amber">{{ col.dueCount }} {{ 'collections.card.dueLabel' | translate }}</div>
               } @else if (col.cardCount > 0) {
-                <div class="col-due-badge col-due-badge--green">✓ up to date</div>
+                <div class="col-due-badge col-due-badge--green">✓ {{ 'collections.card.upToDateLabel' | translate }}</div>
               }
             </div>
 
@@ -100,14 +100,14 @@
                 <div class="col-progress-fill" [style.width.%]="progressPercent(col)"></div>
               </div>
               <div class="col-progress-meta">
-                <span>{{ col.masteredCount }} mastered</span>
-                <span>{{ progressPercent(col) }}% complete</span>
+                <span>{{ col.masteredCount }} {{ 'collections.card.masteredLabel' | translate }}</span>
+                <span>{{ progressPercent(col) }}% {{ 'collections.card.completeLabel' | translate }}</span>
               </div>
             }
 
           </div>
         } @empty {
-          <lc-empty-state icon="📚" title="No sets yet" subtitle="Tap + to create one, or explore the library" />
+          <lc-empty-state icon="📚" [title]="'collections.mySets.emptyTitle' | translate" [subtitle]="'collections.mySets.emptySubtitle' | translate" />
         }
       }
 
@@ -124,7 +124,7 @@
         <ion-icon name="search-outline"></ion-icon>
         <input
           class="exp-search-input"
-          placeholder="Search sets &amp; topics…"
+          [placeholder]="'collections.explore.searchPlaceholder' | translate"
           [value]="exploreSearch()"
           (input)="setSearch($any($event.target).value)" />
       </div>
@@ -139,7 +139,7 @@
           role="tab"
           (click)="setLevel(opt.value)">
           @if (opt.forYou) {
-            <span class="exp-chip-foryou">FOR YOU</span>
+            <span class="exp-chip-foryou">{{ 'collections.explore.forYouLabel' | translate }}</span>
           }
           {{ opt.label }}
           @if (opt.count > 0) {
@@ -163,7 +163,7 @@
         }
       </div>
     } @else if (shelves().length === 0) {
-      <lc-empty-state icon="🔍" title="No sets at this level" subtitle="Try a different level or clear the search" />
+      <lc-empty-state icon="🔍" [title]="'collections.explore.emptyTitle' | translate" [subtitle]="'collections.explore.emptySubtitle' | translate" />
     } @else {
       @for (shelf of shelves(); track shelf.topic) {
         <div>
@@ -172,7 +172,7 @@
               <span class="exp-shelf-emoji">{{ shelf.collections[0].emoji }}</span>
             }
             <span class="exp-shelf-name">{{ shelf.topic }}</span>
-            <button class="exp-see-all" (click)="openTopicSeeAll(shelf.topic)">See all ›</button>
+            <button class="exp-see-all" (click)="openTopicSeeAll(shelf.topic)">{{ 'collections.explore.seeAllLink' | translate }}</button>
           </div>
           <div class="exp-shelf">
             @for (col of shelf.collections; track col.id) {
@@ -192,15 +192,15 @@
                   <div class="exp-mastery-bar">
                     <div class="exp-mastery-fill" [style.width.%]="masteryPercent(col.adoptedCollectionId)"></div>
                   </div>
-                  <div class="exp-mastery-lbl">{{ masteryPercent(col.adoptedCollectionId) }}% mastered · In your sets</div>
+                  <div class="exp-mastery-lbl">{{ masteryPercent(col.adoptedCollectionId) }}% {{ 'collections.card.masteredLabel' | translate }} · {{ 'exploreTopic.card.inSetsLabel' | translate }}</div>
                 } @else if (col.knownCount > 0) {
                   <div class="exp-ringrow">
                     <div class="exp-ring" [style]="ringStyle(col.knownCount, col.wordCount)">
                       <div class="exp-ring-inner">{{ col.knownCount }}/{{ col.wordCount }}</div>
                     </div>
                     <div class="exp-ring-txt">
-                      <b>{{ col.knownCount }} known</b><br>
-                      {{ col.wordCount - col.knownCount }} new
+                      <b>{{ col.knownCount }} {{ 'exploreTopic.card.knownLabel' | translate }}</b><br>
+                      {{ col.wordCount - col.knownCount }} {{ 'exploreTopic.card.newLabel' | translate }}
                     </div>
                   </div>
                 } @else {
@@ -208,7 +208,7 @@
                     <div class="exp-ring exp-ring--empty">
                       <div class="exp-ring-inner">0/{{ col.wordCount }}</div>
                     </div>
-                    <div class="exp-ring-txt">{{ col.wordCount }} words<br>all new</div>
+                    <div class="exp-ring-txt">{{ col.wordCount }} {{ 'exploreTopic.card.wordsUnit' | translate }}<br>{{ 'exploreTopic.card.allNewLabel' | translate }}</div>
                   </div>
                 }
 
@@ -217,7 +217,7 @@
                   <button
                     class="exp-btn exp-btn--open"
                     (click)="$event.stopPropagation(); openAdoptedCollection(col.adoptedCollectionId!)">
-                    Open
+                    {{ 'collections.explore.openButton' | translate }}
                   </button>
                 } @else {
                   <button
@@ -225,11 +225,11 @@
                     [disabled]="adoptingId() === col.id"
                     (click)="$event.stopPropagation(); adoptCollection(col)">
                     @if (adoptingId() === col.id) {
-                      Adding…
+                      {{ 'collections.explore.addingLabel' | translate }}
                     } @else if (col.knownCount > 0) {
-                      + Get {{ col.wordCount - col.knownCount }} new
+                      {{ 'collections.explore.getNewButton' | translate:{ count: col.wordCount - col.knownCount } }}
                     } @else {
-                      + Get
+                      {{ 'collections.explore.getButton' | translate }}
                     }
                   </button>
                 }

@@ -172,6 +172,11 @@ export const routes: Routes = [
           import('./features/settings/pages/reminders/reminders.page').then(m => m.RemindersPage),
       },
       {
+        path: 'settings/language',
+        loadComponent: () =>
+          import('./features/settings/pages/language/language.page').then(m => m.LanguagePage),
+      },
+      {
         path: 'admin/import',
         canActivate: [AdminGuard],
         loadComponent: () =>

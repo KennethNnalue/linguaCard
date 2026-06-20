@@ -1,5 +1,6 @@
 import { effect, Injectable, inject } from '@angular/core';
 import { ToastController } from '@ionic/angular/standalone';
+import { TranslateService } from '@ngx-translate/core';
 import { SyncService } from './sync.service';
 import { LocalDataService } from './local-data.service';
 import { AuthService } from './auth.service';
@@ -9,6 +10,7 @@ import type { SyncResult } from './sync.service';
 @Injectable({ providedIn: 'root' })
 export class SyncNotificationService {
   private readonly toastCtrl = inject(ToastController);
+  private readonly translate = inject(TranslateService);
   private readonly syncService = inject(SyncService);
   private readonly localData = inject(LocalDataService);
   private readonly authService = inject(AuthService);
@@ -32,7 +34,7 @@ export class SyncNotificationService {
     // Recovered from error state
     if (current === 'synced' && this.previousStatus === 'error') {
       await this.dismissErrorToast();
-      await this.showToast('Sync recovered — data is up to date', 'success', 3000);
+      await this.showToast(this.translate.instant('sync.notifications.recovered'), 'success', 3000);
       return;
     }
 
@@ -45,7 +47,7 @@ export class SyncNotificationService {
     // Successful flush of queued operations
     if (current === 'synced' && result && result.flushedCount > 0) {
       await this.showToast(
-        `${result.flushedCount} queued change${result.flushedCount > 1 ? 's' : ''} synced`,
+        this.translate.instant('sync.notifications.changesSynced', { count: result.flushedCount }),
         'success',
         2500
       );
@@ -55,13 +57,13 @@ export class SyncNotificationService {
     // First-ever sync
     if (current === 'synced' && result && this.previousStatus === 'syncing') {
       void this.isFirstSync().then(async (first) => {
-        if (first) await this.showToast('Everything is up to date', 'success', 2500);
+        if (first) await this.showToast(this.translate.instant('sync.notifications.upToDate'), 'success', 2500);
       });
     }
 
     // Partial failure
     if (current === 'synced' && result && result.failedFeatures.length > 0) {
-      await this.showToast("Some data couldn't sync. Will retry.", 'warning', 4000);
+      await this.showToast(this.translate.instant('sync.notifications.partialFailure'), 'warning', 4000);
     }
   }
 
@@ -94,15 +96,15 @@ export class SyncNotificationService {
   private async showPersistentErrorBanner(): Promise<void> {
     await this.dismissErrorToast();
     this.activeErrorToast = await this.toastCtrl.create({
-      message: 'Sync failed — will retry automatically',
+      message: this.translate.instant('sync.notifications.failed'),
       color: 'danger',
       position: 'bottom',
       buttons: [
         {
-          text: 'Retry now',
+          text: this.translate.instant('sync.notifications.retryNow'),
           handler: () => { void this.syncService.forceSync(); },
         },
-        { text: 'Dismiss', role: 'cancel' },
+        { text: this.translate.instant('common.dismiss'), role: 'cancel' },
       ],
     });
     await this.activeErrorToast.present();

@@ -5,6 +5,7 @@ import { In, Repository } from 'typeorm';
 import { randomUUID } from 'crypto';
 import type {
   GenerateStoryDto,
+  LanguageCode,
   Story,
   StoryVocabWord,
   StorySentence,
@@ -24,13 +25,19 @@ import { StoryAudioService } from './story-audio.service';
 import { StoryVocabMapper } from './story-vocab.mapper';
 import { SubscriptionService } from '../subscriptions/subscription.service';
 import { WordDictionaryService } from '../word-dictionary/word-dictionary.service';
+import { UserSettingsService } from '../settings/user-settings.service';
 import type { AiConfig } from '../config/ai.config';
+
+const LANGUAGE_NAMES: Record<string, string> = {
+  en: 'English', es: 'Spanish', tr: 'Turkish',
+  uk: 'Ukrainian', ru: 'Russian', ar: 'Arabic',
+};
 
 const MIN_RECOVERABLE_SENTENCES = 5;
 
 interface GeneratedSentence {
   german: string;
-  english: string;
+  native: string;
   vocabWordsUsed: string[];
 }
 
@@ -61,6 +68,7 @@ export class StoryGenerationService {
     private readonly vocabMapper:   StoryVocabMapper,
     private readonly subscriptions: SubscriptionService,
     private readonly dictionary: WordDictionaryService,
+    private readonly userSettings: UserSettingsService,
   ) {
     const ai = this.config.get<AiConfig>('ai')!;
     this.storyModelPro  = ai.storyModelPro;
@@ -89,9 +97,13 @@ export class StoryGenerationService {
 
     const tier  = status.isActive ? 'pro' : 'free';
     const model = this.modelForTier(tier);
-    this.logger.log(`Generating story for userId=${userId} tier=${tier} model=${model}`);
 
-    const { content, isPartial } = await this.generateTextWithModel(dto, cards, model);
+    const settings = await this.userSettings.getForUser(userId);
+    const nativeLangName = LANGUAGE_NAMES[settings.uiLanguage] ?? 'English';
+
+    this.logger.log(`Generating story for userId=${userId} tier=${tier} model=${model} nativeLang=${nativeLangName}`);
+
+    const { content, isPartial } = await this.generateTextWithModel(dto, cards, model, nativeLangName);
 
     const vocabWords: StoryVocabWord[] = cards.map(card => ({
       cardId: card.id,
@@ -108,7 +120,7 @@ export class StoryGenerationService {
     }));
 
     const bodyDe = content.sentences.map(s => s.german).join(' ');
-    const bodyEn = content.sentences.map(s => s.english).join(' ');
+    const bodyNative = content.sentences.map(s => s.native).join(' ');
     const storyId = randomUUID();
 
     const { audioUrl, timestamps, durationMs } =
@@ -119,7 +131,7 @@ export class StoryGenerationService {
     const sentences: StorySentence[] = content.sentences.map((s, i) => ({
       index: i,
       german: s.german,
-      english: s.english,
+      native: s.native,
       vocabWordIds: vocabWords
         .filter(v => v.sentenceIndices.includes(i))
         .map(v => v.cardId),
@@ -127,9 +139,9 @@ export class StoryGenerationService {
 
     // Generate quiz, grammar, and keywords concurrently — failures don't block save
     const [quizQuestions, grammarNotes, aiKeywords] = await Promise.all([
-      this.generateQuizQuestions(sentences, dto.difficulty, model),
-      this.generateGrammarNotes(sentences, dto.difficulty, model),
-      this.generateKeywords(sentences, dto.difficulty, model),
+      this.generateQuizQuestions(sentences, dto.difficulty, model, nativeLangName),
+      this.generateGrammarNotes(sentences, dto.difficulty, model, nativeLangName),
+      this.generateKeywords(sentences, dto.difficulty, model, nativeLangName),
     ]);
 
     // Merge AI keywords with vault words; enrich known words from dictionary
@@ -142,7 +154,8 @@ export class StoryGenerationService {
       title: content.title,
       titleTranslation: content.titleTranslation,
       bodyDe,
-      bodyEn,
+      bodyNative,
+      nativeLang: settings.uiLanguage,
       sentences,
       wordTimestamps: markedTimestamps,
       vocabWords,
@@ -170,9 +183,10 @@ export class StoryGenerationService {
     sentences: StorySentence[],
     difficulty: string,
     model: string,
+    nativeLanguage = 'English',
   ): Promise<StoryQuizQuestion[]> {
     try {
-      const prompt = this.promptBuilder.buildQuizPrompt(sentences, difficulty as Parameters<typeof this.promptBuilder.buildQuizPrompt>[1]);
+      const prompt = this.promptBuilder.buildQuizPrompt(sentences, difficulty as Parameters<typeof this.promptBuilder.buildQuizPrompt>[1], nativeLanguage);
       const response = await this.openRouter.generateText({
         messages:  [{ role: 'user', content: prompt }],
         maxTokens: 2048,
@@ -191,9 +205,10 @@ export class StoryGenerationService {
     sentences: StorySentence[],
     difficulty: string,
     model: string,
+    nativeLanguage = 'English',
   ): Promise<StoryGrammarNote[]> {
     try {
-      const prompt = this.promptBuilder.buildGrammarPrompt(sentences, difficulty as Parameters<typeof this.promptBuilder.buildGrammarPrompt>[1]);
+      const prompt = this.promptBuilder.buildGrammarPrompt(sentences, difficulty as Parameters<typeof this.promptBuilder.buildGrammarPrompt>[1], nativeLanguage);
       const response = await this.openRouter.generateText({
         messages:  [{ role: 'user', content: prompt }],
         maxTokens: 3072,
@@ -212,9 +227,10 @@ export class StoryGenerationService {
     sentences: StorySentence[],
     difficulty: string,
     model: string,
+    nativeLanguage = 'English',
   ): Promise<StoryKeyword[]> {
     try {
-      const prompt = this.promptBuilder.buildKeywordsPrompt(sentences, difficulty as Parameters<typeof this.promptBuilder.buildKeywordsPrompt>[1]);
+      const prompt = this.promptBuilder.buildKeywordsPrompt(sentences, difficulty as Parameters<typeof this.promptBuilder.buildKeywordsPrompt>[1], nativeLanguage);
       const response = await this.openRouter.generateText({
         messages:  [{ role: 'user', content: prompt }],
         maxTokens: 2048,
@@ -255,15 +271,18 @@ export class StoryGenerationService {
     const tier = await this.subscriptions.getEffectiveTier(userId);
     const enrichModel = this.modelForTier(tier);
 
+    const settings = await this.userSettings.getForUser(userId);
+    const nativeLangName = LANGUAGE_NAMES[settings.uiLanguage] ?? 'English';
+
     const [quizQuestions, grammarNotes, aiKeywords] = await Promise.all([
       (entity.quizQuestions ?? []).length === 0
-        ? this.generateQuizQuestions(sentences, difficulty, enrichModel)
+        ? this.generateQuizQuestions(sentences, difficulty, enrichModel, nativeLangName)
         : Promise.resolve(entity.quizQuestions!),
       (entity.grammarNotes ?? []).length === 0
-        ? this.generateGrammarNotes(sentences, difficulty, enrichModel)
+        ? this.generateGrammarNotes(sentences, difficulty, enrichModel, nativeLangName)
         : Promise.resolve(entity.grammarNotes!),
       (entity.keywords ?? []).length === 0
-        ? this.generateKeywords(sentences, difficulty, enrichModel)
+        ? this.generateKeywords(sentences, difficulty, enrichModel, nativeLangName)
         : Promise.resolve(entity.keywords!),
     ]);
 
@@ -297,7 +316,7 @@ export class StoryGenerationService {
           cardId: v.cardId,
           german: v.german,
           germanBase: v.germanBase,
-          english: v.english,
+          translation: v.english,
           article: v.article,
           wordType: 'noun',
           level: 'A2',
@@ -324,7 +343,7 @@ export class StoryGenerationService {
         }
         return {
           ...kw,
-          english: entry.translation,
+          translation: entry.translation,
           article: entry.article ?? kw.article,
           wordType: entry.wordType as StoryKeyword['wordType'],
         };
@@ -337,8 +356,9 @@ export class StoryGenerationService {
     dto: GenerateStoryDto,
     cards: CardEntity[],
     model: string,
+    nativeLanguage = 'English',
   ): Promise<{ content: GeneratedStoryContent; isPartial: boolean }> {
-    const prompt = this.promptBuilder.build(dto, cards);
+    const prompt = this.promptBuilder.build(dto, cards, nativeLanguage);
 
     let rawText: string;
     try {
@@ -406,14 +426,14 @@ export class StoryGenerationService {
     const newSentences: StorySentence[] = content.sentences.map((s, i) => ({
       index: startIndex + i,
       german: s.german,
-      english: s.english,
+      native: s.native,
       vocabWordIds: [],
     }));
 
     entity.sentences = [...existingSentences, ...newSentences];
     entity.generationStatus = 'complete';
     entity.bodyDe = entity.sentences.map(s => s.german).join(' ');
-    entity.bodyEn = entity.sentences.map(s => s.english).join(' ');
+    entity.bodyNative = entity.sentences.map(s => s.native).join(' ');
 
     const saved = await this.storyRepo.save(entity);
 
@@ -451,7 +471,8 @@ export class StoryGenerationService {
       title: e.title,
       titleTranslation: e.titleTranslation,
       bodyDe: e.bodyDe,
-      bodyEn: e.bodyEn,
+      bodyNative: e.bodyNative,
+      nativeLang: e.nativeLang as LanguageCode,
       sentences: e.sentences,
       wordTimestamps: e.wordTimestamps,
       vocabWords: e.vocabWords,

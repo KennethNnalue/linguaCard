@@ -1,6 +1,7 @@
 import { ChangeDetectionStrategy, Component, computed, effect, inject, OnInit, signal } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { IonContent, IonHeader, IonIcon, IonToolbar, ToastController } from '@ionic/angular/standalone';
+import { TranslateService, TranslatePipe } from '@ngx-translate/core';
 import { addIcons } from 'ionicons';
 import { chevronBackOutline } from 'ionicons/icons';
 import type { CefrLevel, PlatformCollectionSummary } from '@lingua-card/shared/domain';
@@ -12,12 +13,13 @@ import { CollectionStore } from '../../store/collection.store';
   templateUrl: './explore-topic.page.html',
   styleUrls: ['./explore-topic.page.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [IonHeader, IonToolbar, IonContent, IonIcon],
+  imports: [IonHeader, IonToolbar, IonContent, IonIcon, TranslatePipe],
 })
 export class ExploreTopicPage implements OnInit {
   private readonly route = inject(ActivatedRoute);
   private readonly router = inject(Router);
   private readonly toastCtrl = inject(ToastController);
+  private readonly translate = inject(TranslateService);
   private readonly platformStore = inject(PlatformCollectionStore);
   private readonly collectionStore = inject(CollectionStore);
 
@@ -71,11 +73,11 @@ export class ExploreTopicPage implements OnInit {
       if (ev.type === 'success') {
         const count = ev.result.addedCount;
         void this._toast(
-          count > 0 ? `${count} words added — audio included ✓` : 'Already in your sets',
+          count > 0 ? this.translate.instant('exploreTopic.adopt.successMessage', { count }) : this.translate.instant('exploreTopic.adopt.alreadyInMessage'),
           'success',
         );
       } else {
-        void this._toast('Could not add collection. Try again.', 'danger');
+        void this._toast(this.translate.instant('exploreTopic.adopt.errorMessage'), 'danger');
       }
     });
   }

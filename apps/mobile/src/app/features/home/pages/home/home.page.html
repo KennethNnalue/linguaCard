@@ -1,7 +1,7 @@
 <ion-header class="ion-no-border">
   <ion-toolbar>
     <div class="home-nav">
-      <span class="home-logo">LinguaCard</span>
+      <span class="home-logo">{{ 'common.appName' | translate }}</span>
       <button
         class="home-avatar"
         (click)="toggleMenu($event)"
@@ -31,11 +31,11 @@
     <!-- ── Hero card ── -->
     <div class="hero-card" [class.hero-card--complete]="dailyGoalPct() >= 1">
       @if (dailyGoalPct() >= 1) {
-        <div class="hero-greeting hero-greeting--complete">Nice work</div>
-        <div class="hero-title">Goal complete today ✓</div>
+        <div class="hero-greeting hero-greeting--complete">{{ 'home.hero.completeGreeting' | translate }}</div>
+        <div class="hero-title">{{ 'home.hero.completeTitle' | translate }}</div>
       } @else {
         <div class="hero-greeting">{{ greeting() }}</div>
-        <div class="hero-title">Ready to learn today?</div>
+        <div class="hero-title">{{ 'home.hero.readyTitle' | translate }}</div>
       }
 
       <div class="hero-ring-row">
@@ -51,18 +51,18 @@
           </svg>
           <div class="ring-text">
             <div class="ring-num">{{ totalDue() }}</div>
-            <div class="ring-lbl">due</div>
+            <div class="ring-lbl">{{ 'home.stats.dueLabel' | translate }}</div>
           </div>
         </div>
 
         <div class="hero-meta">
           <div class="hero-stat-row">
             <span class="hero-stat-num">{{ newCardsCount() }}</span>
-            <span class="hero-stat-lbl">new cards</span>
+            <span class="hero-stat-lbl">{{ 'home.stats.newCardsLabel' | translate }}</span>
           </div>
           <div class="hero-stat-row">
             <span class="hero-stat-num">{{ reviewsCount() }}</span>
-            <span class="hero-stat-lbl">reviews</span>
+            <span class="hero-stat-lbl">{{ 'home.stats.reviewsLabel' | translate }}</span>
           </div>
           <button class="hero-col-pill" (click)="openCollectionPicker()">
             {{ selectedCollectionLabel() }}
@@ -73,11 +73,11 @@
       <div class="hero-actions">
         <button class="hero-btn-start" (click)="startSession()">
           <ion-icon name="play-outline"></ion-icon>
-          Start session
+          {{ 'home.actions.startSession' | translate }}
         </button>
         <button class="hero-btn-filter" (click)="openCollectionPicker()">
           <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round"><path d="M4 6h16M4 12h10M4 18h6"/></svg>
-          Filter
+          {{ 'home.actions.filter' | translate }}
         </button>
       </div>
     </div>
@@ -87,13 +87,13 @@
       <div class="at-risk-banner" [class.at-risk-banner--broken]="streak().state === 'broken'">
         <span class="at-risk-flame">🔥</span>
         @if (streak().state === 'at_risk') {
-          <div class="at-risk-txt">Review now to keep your {{ streak().current }}-day streak alive</div>
+          <div class="at-risk-txt">{{ 'home.atRisk.keepStreakPrefix' | translate }} {{ streak().current }}-{{ 'home.atRisk.keepStreakSuffix' | translate }}</div>
         } @else if (streak().state === 'broken') {
-          <div class="at-risk-txt">Review {{ dailyGoal() }} cards today to start a streak</div>
+          <div class="at-risk-txt">{{ 'home.atRisk.reviewText' | translate }} {{ dailyGoal() }} {{ 'home.atRisk.startStreakSuffix' | translate }}</div>
         } @else {
-          <div class="at-risk-txt">{{ dailyGoal() - completedToday() }} more cards to hit your daily goal</div>
+          <div class="at-risk-txt">{{ dailyGoal() - completedToday() }} {{ 'home.atRisk.dailyGoalSuffix' | translate }}</div>
         }
-        <button class="at-risk-cta" (click)="startSession()">Start</button>
+        <button class="at-risk-cta" (click)="startSession()">{{ 'home.atRisk.startButton' | translate }}</button>
       </div>
     }
 
@@ -103,13 +103,13 @@
       <div class="streak-card">
         <span class="streak-flame">🔥</span>
         <div class="streak-num">{{ streak().current }}</div>
-        <div class="streak-unit">Day streak</div>
+        <div class="streak-unit">{{ 'home.streak.label' | translate }}</div>
         @if (streak().state === 'safe') {
-          <div class="streak-state streak-state--safe">On track today ✓</div>
+          <div class="streak-state streak-state--safe">{{ 'home.streak.onTrack' | translate }}</div>
         } @else if (streak().state === 'at_risk') {
-          <div class="streak-state streak-state--risk">At risk!</div>
+          <div class="streak-state streak-state--risk">{{ 'home.streak.atRisk' | translate }}</div>
         } @else {
-          <div class="streak-state streak-state--broken">Start a new streak</div>
+          <div class="streak-state streak-state--broken">{{ 'home.streak.broken' | translate }}</div>
         }
       </div>
 
@@ -152,17 +152,17 @@
               <span class="goal-check">✓</span>
             } @else {
               <div class="goal-ring-num">{{ completedToday() }}/{{ dailyGoal() }}</div>
-              <div class="goal-ring-sub">today</div>
+              <div class="goal-ring-sub">{{ 'home.goalRing.todayLabel' | translate }}</div>
             }
           </div>
         </div>
-        <div class="streak-unit">Daily goal</div>
+        <div class="streak-unit">{{ 'home.goalRing.label' | translate }}</div>
         @if (dailyGoalPct() >= 1) {
-          <div class="streak-state streak-state--safe">{{ completedToday() }}/{{ dailyGoal() }} done</div>
+          <div class="streak-state streak-state--safe">{{ completedToday() }}/{{ dailyGoal() }} {{ 'home.goalRing.doneLabel' | translate }}</div>
         } @else if (streak().state === 'at_risk') {
-          <div class="streak-state streak-state--risk">Not started</div>
+          <div class="streak-state streak-state--risk">{{ 'home.goalRing.notStarted' | translate }}</div>
         } @else {
-          <div class="streak-state streak-state--safe">{{ dailyGoal() - completedToday() }} to go</div>
+          <div class="streak-state streak-state--safe">{{ dailyGoal() - completedToday() }} {{ 'home.goalRing.toGoLabel' | translate }}</div>
         }
       </div>
     </div>
@@ -171,8 +171,8 @@
     @if (wordOfTheDay(); as wotd) {
       <div class="wotd-card">
         <div class="wotd-header">
-          <span class="wotd-label">✦ Word of the Day</span>
-          <button class="wotd-play" (click)="playWotd()" aria-label="Play pronunciation">
+          <span class="wotd-label">{{ 'home.wordOfDay.label' | translate }}</span>
+          <button class="wotd-play" (click)="playWotd()" [attr.aria-label]="'home.wordOfDay.playAria' | translate">
             <ion-icon name="play-outline"></ion-icon>
           </button>
         </div>
@@ -188,8 +188,8 @@
 
     <!-- ── This week ── -->
     <div class="sec-header">
-      <span class="sec-title">This week</span>
-      <span class="sec-link" [routerLink]="['/review/history']">Details →</span>
+      <span class="sec-title">{{ 'home.weeklyChart.title' | translate }}</span>
+      <span class="sec-link" [routerLink]="['/review/history']">{{ 'home.weeklyChart.detailsLink' | translate }}</span>
     </div>
     <div class="weekly-card">
       <div class="weekly-bars">
@@ -206,38 +206,38 @@
         }
       </div>
       <div class="weekly-legend">
-        <span class="weekly-total"><strong>{{ weeklyTotal() }}</strong> cards reviewed</span>
-        <span class="weekly-goal">Goal: <strong>{{ weeklyGoal() }}</strong></span>
+        <span class="weekly-total"><strong>{{ weeklyTotal() }}</strong> {{ 'home.weeklyChart.reviewed' | translate }}</span>
+        <span class="weekly-goal">{{ 'home.weeklyChart.goalLabel' | translate }} <strong>{{ weeklyGoal() }}</strong></span>
       </div>
     </div>
 
     <!-- ── Quick actions ── -->
     <div class="sec-header">
-      <span class="sec-title">Quick actions</span>
+      <span class="sec-title">{{ 'home.quickActions.title' | translate }}</span>
     </div>
     <div class="quick-actions">
       <button class="quick-action" [routerLink]="['/vault/import/image']">
         <span class="quick-icon">📸</span>
-        <div class="quick-lbl">Scan</div>
-        <div class="quick-sub">Import words</div>
+        <div class="quick-lbl">{{ 'home.quickActions.scanLabel' | translate }}</div>
+        <div class="quick-sub">{{ 'home.quickActions.scanSub' | translate }}</div>
       </button>
       <button class="quick-action" [routerLink]="['/stories']">
         <span class="quick-icon">📖</span>
-        <div class="quick-lbl">Story</div>
-        <div class="quick-sub">Generate new</div>
+        <div class="quick-lbl">{{ 'home.quickActions.storyLabel' | translate }}</div>
+        <div class="quick-sub">{{ 'home.quickActions.storySub' | translate }}</div>
       </button>
       <button class="quick-action" [routerLink]="['/listen']">
         <span class="quick-icon">🎧</span>
-        <div class="quick-lbl">Listen</div>
-        <div class="quick-sub">Audio playlist</div>
+        <div class="quick-lbl">{{ 'home.quickActions.listenLabel' | translate }}</div>
+        <div class="quick-sub">{{ 'home.quickActions.listenSub' | translate }}</div>
       </button>
     </div>
 
     <!-- ── Recently added ── -->
     @if (recentCards().length > 0) {
       <div class="sec-header">
-        <span class="sec-title">Recently added</span>
-        <span class="sec-link" [routerLink]="['/vault']">See all →</span>
+        <span class="sec-title">{{ 'home.recentCards.title' | translate }}</span>
+        <span class="sec-link" [routerLink]="['/vault']">{{ 'home.recentCards.seeAllLink' | translate }}</span>
       </div>
       <div class="recent-list">
         @for (card of recentCards(); track card.id) {

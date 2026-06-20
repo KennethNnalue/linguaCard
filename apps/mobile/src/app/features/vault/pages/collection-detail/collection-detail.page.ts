@@ -18,6 +18,7 @@ import {
   timeOutline,
   volumeHighOutline,
 } from 'ionicons/icons';
+import {TranslateService, TranslatePipe} from '@ngx-translate/core';
 import {Card, Collection} from '@lingua-card/shared/domain';
 import {isDue, isMastered} from '../../../../shared/srs/srs-status';
 import {firstValueFrom} from 'rxjs';
@@ -43,7 +44,7 @@ import {ImageImportApiService} from '../../import/services/image-import-api.serv
   standalone: true,
   templateUrl: './collection-detail.page.html',
   styleUrls: ['./collection-detail.page.scss'],
-  imports: [IonHeader, IonToolbar, IonContent, IonIcon, FabButtonComponent, WordCardComponent],
+  imports: [IonHeader, IonToolbar, IonContent, IonIcon, FabButtonComponent, WordCardComponent, TranslatePipe],
 })
 export class CollectionDetailPage implements OnInit {
   private readonly route = inject(ActivatedRoute);
@@ -60,6 +61,7 @@ export class CollectionDetailPage implements OnInit {
   private readonly audioReadiness = inject(AudioReadinessStore);
   private readonly audioPrefetch = inject(CollectionAudioPrefetchService);
   private readonly importApi = inject(ImageImportApiService);
+  private readonly translate = inject(TranslateService);
   private readonly cardStore = inject(CardStore);
 
   // Derived from the global CardStore — automatically reflects edits and deletes
@@ -219,11 +221,11 @@ export class CollectionDetailPage implements OnInit {
       if (!result.isComplete) {
         message = `✓ ${result.newCards} cards added — ${result.pendingWords.length} still pending`;
       } else if (reused > 0 && result.newCards > 0) {
-        message = `✓ ${result.newCards} added, ${reused} duplicate${reused === 1 ? '' : 's'} reused — collection complete!`;
+        message = this.translate.instant('collectionDetail.importComplete.addedWithDuplicates', { added: result.newCards, duplicates: reused });
       } else if (reused > 0 && result.newCards === 0) {
-        message = `All ${reused} words already in your vault — collection complete!`;
+        message = this.translate.instant('collectionDetail.importComplete.allAlreadyMessage', { count: reused });
       } else {
-        message = `✓ All cards added — collection complete!`;
+        message = this.translate.instant('collectionDetail.importComplete.allAddedMessage');
       }
 
       const toast = await this.toastCtrl.create({
@@ -234,7 +236,7 @@ export class CollectionDetailPage implements OnInit {
       await toast.present();
     } catch {
       const toast = await this.toastCtrl.create({
-        message: 'Could not complete import. Try again later.',
+        message: this.translate.instant('collectionDetail.importComplete.errorMessage'),
         duration: 3000,
         color: 'danger',
       });
@@ -295,16 +297,16 @@ export class CollectionDetailPage implements OnInit {
       header: col.name,
       buttons: [
         ...(this.wordCount() > 0 ? [{
-          text: 'Clear all words',
+          text: this.translate.instant('collectionDetail.menu.clearAllOption'),
           role: 'destructive',
           handler: () => this.confirmClearWords(),
         }] : []),
         {
-          text: 'Delete collection',
+          text: this.translate.instant('collectionDetail.menu.deleteOption'),
           role: 'destructive',
           handler: () => this.confirmDelete(),
         },
-        {text: 'Cancel', role: 'cancel'},
+        {text: this.translate.instant('collectionDetail.menu.cancelOption'), role: 'cancel'},
       ],
     });
     await alert.present();
@@ -314,15 +316,15 @@ export class CollectionDetailPage implements OnInit {
     const col = this.collection();
     if (!col) return;
     const alert = await this.alertCtrl.create({
-      header: 'Clear all words?',
-      message: `This will permanently delete all ${this.wordCount()} word${this.wordCount() === 1 ? '' : 's'} in "${col.name}". This cannot be undone.`,
+      header: this.translate.instant('collectionDetail.clearWords.title'),
+      message: this.translate.instant('collectionDetail.clearWords.message', { count: this.wordCount(), name: col.name }),
       buttons: [
         {
-          text: 'Clear all',
+          text: this.translate.instant('collectionDetail.clearWords.confirmButton'),
           role: 'destructive',
           handler: () => this.clearAllWords(),
         },
-        {text: 'Cancel', role: 'cancel'},
+        {text: this.translate.instant('common.cancel'), role: 'cancel'},
       ],
     });
     await alert.present();
@@ -350,18 +352,18 @@ export class CollectionDetailPage implements OnInit {
     const col = this.collection();
     if (!col) return;
     const alert = await this.alertCtrl.create({
-      header: 'Delete collection?',
-      message: `Words will not be deleted — they'll appear under "All words" in the Vault.`,
+      header: this.translate.instant('collectionDetail.deleteCollection.title'),
+      message: this.translate.instant('collectionDetail.deleteCollection.message'),
       buttons: [
         {
-          text: 'Delete',
+          text: this.translate.instant('collectionDetail.deleteCollection.confirmButton'),
           role: 'destructive',
           handler: () => {
             this.collectionStore.deleteCollection(col.id).subscribe();
             this.router.navigate(['/vault'], {queryParams: {tab: 'collections'}});
           },
         },
-        {text: 'Cancel', role: 'cancel'},
+        {text: this.translate.instant('common.cancel'), role: 'cancel'},
       ],
     });
     await alert.present();

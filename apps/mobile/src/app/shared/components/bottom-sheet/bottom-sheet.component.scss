@@ -61,7 +61,7 @@
   font-family: t.$lc-font-body;
   color: var(--lc-text-primary);
   cursor: pointer;
-  text-align: left;
+  text-align: start;
   transition: var(--lc-transition-fast);
   @include u.touch-state;
 

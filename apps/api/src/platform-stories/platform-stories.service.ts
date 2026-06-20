@@ -3,7 +3,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import type {
   PlatformStory, PlatformStoryCard, UserStoryProgress,
-  StoryDifficulty, StoryCategory,
+  StoryDifficulty, StoryCategory, LanguageCode,
 } from '@lingua-card/shared/domain';
 import { PlatformStoryEntity } from './platform-story.entity';
 import { UserStoryProgressEntity } from './user-story-progress.entity';
@@ -123,7 +123,8 @@ export class PlatformStoriesService {
       title: e.title,
       titleTranslation: e.titleTranslation,
       bodyDe: e.bodyDe,
-      bodyEn: e.bodyEn,
+      bodyNative: e.bodyNative,
+      nativeLang: e.nativeLang as LanguageCode,
       sentences: e.sentences,
       wordTimestamps: e.wordTimestamps,
       keywords: e.keywords,

@@ -32,6 +32,9 @@ export class UserSettingsEntity {
   @Column({ name: 'timezone', type: 'varchar', length: 64, default: 'UTC' })
   timezone!: string;
 
+  @Column({ name: 'ui_language', type: 'varchar', length: 10, default: 'en' })
+  uiLanguage!: string;
+
   @Column({ name: 'goals_set_at', type: 'timestamptz', nullable: true, default: null })
   goalsSetAt!: Date | null;
 

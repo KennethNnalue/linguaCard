@@ -2,7 +2,7 @@
   <ion-toolbar>
     <div class="lh-nav">
       <div class="lh-nav-spacer"></div>
-      <span class="lh-nav-title">Listen &amp; Learn</span>
+      <span class="lh-nav-title">{{ 'listen.main.pageTitle' | translate }}</span>
       <div class="lh-nav-spacer"></div>
     </div>
   </ion-toolbar>
@@ -21,46 +21,46 @@
         <polyline points="6,9 12,15 18,9"/>
       </svg>
     </button>
-    <span class="lh-queue-meta">~{{ listenStore.estimatedMinutes() }} min</span>
+    <span class="lh-queue-meta">~{{ listenStore.estimatedMinutes() }} {{ 'listen.queue.durationUnit' | translate }}</span>
   </div>
 
   <!-- Hero -->
   <div class="lh-hero">
-    <div class="lh-hero-label">Playing from</div>
+    <div class="lh-hero-label">{{ 'listen.hero.playingFromLabel' | translate }}</div>
     <div class="lh-hero-title">{{ listenStore.sourceLabel() }}</div>
-    <div class="lh-hero-sub">{{ queueCount() }} words in queue</div>
+    <div class="lh-hero-sub">{{ 'listen.hero.queueCountLabel' | translate:{ count: queueCount() } }}</div>
     <div class="lh-hero-btns">
       <button class="lh-btn-play" (click)="play()" [disabled]="!queueCount()">
         <svg viewBox="0 0 24 24"><polygon points="5,3 19,12 5,21" fill="currentColor"/></svg>
-        Play
+        {{ 'listen.hero.playBtn' | translate }}
       </button>
       <button class="lh-btn-shuffle" (click)="shuffle()" [disabled]="!queueCount()">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round">
           <polyline points="16,3 21,3 21,8"/><line x1="4" y1="20" x2="21" y2="3"/>
           <polyline points="21,16 21,21 16,21"/><line x1="4" y1="4" x2="9" y2="9"/>
         </svg>
-        Shuffle
+        {{ 'listen.hero.shuffleBtn' | translate }}
       </button>
     </div>
   </div>
 
   <!-- Playlist type -->
-  <div class="lh-section-lbl">Playlist type</div>
+  <div class="lh-section-lbl">{{ 'listen.hero.playlistTypeSection' | translate }}</div>
   <div class="lh-mode-toggle">
     @for (m of MODES; track m.value) {
       <button
         class="lh-mode-btn"
         [class.active]="listenStore.playMode() === m.value"
         (click)="setMode(m.value)">
-        <div class="lh-mode-title">{{ m.label }}</div>
-        <div class="lh-mode-sub">{{ m.desc }}</div>
+        <div class="lh-mode-title">{{ m.labelKey | translate }}</div>
+        <div class="lh-mode-sub">{{ m.descKey | translate }}</div>
       </button>
     }
   </div>
 
   <!-- Speed -->
   <div class="lh-speed-row">
-    <span class="lh-speed-label">Speed</span>
+    <span class="lh-speed-label">{{ 'listen.controls.speedSection' | translate }}</span>
     @for (s of SPEEDS; track s) {
       <button
         class="lh-speed-chip"
@@ -73,8 +73,8 @@
 
   <!-- Queue header -->
   <div class="lh-queue-hdr">
-    <span class="lh-queue-hdr-title">Queue ({{ queueCount() }} words)</span>
-    <span class="lh-queue-hdr-time">~{{ listenStore.estimatedMinutes() }} min</span>
+    <span class="lh-queue-hdr-title">{{ 'listen.queue.headerLabel' | translate }} ({{ queueCount() }} {{ 'common.words' | translate }})</span>
+    <span class="lh-queue-hdr-time">~{{ listenStore.estimatedMinutes() }} {{ 'listen.queue.durationUnit' | translate }}</span>
   </div>
 
   <!-- Queue list -->
@@ -82,8 +82,8 @@
     @if (!queueCount()) {
       <div class="lh-empty">
         <span class="lh-empty-icon">🎧</span>
-        <p class="lh-empty-title">No words in queue</p>
-        <p class="lh-empty-sub">Tap the source above to choose a playlist</p>
+        <p class="lh-empty-title">{{ 'listen.queue.emptyTitle' | translate }}</p>
+        <p class="lh-empty-sub">{{ 'listen.queue.emptyDesc' | translate }}</p>
       </div>
     } @else {
       @for (card of listenStore.queue(); track card.id) {
@@ -115,7 +115,7 @@
                 <span class="lh-card-status">{{ card.srsState!.state }}</span>
               }
               @if (card.srsState?.nextDueAt) {
-                <span class="lh-card-due">Due</span>
+                <span class="lh-card-due">{{ 'srs.status.due' | translate }}</span>
               }
               @let categoryLabel = getCategoryLabel(card);
               @if (categoryLabel) {
@@ -123,7 +123,7 @@
               }
             </div>
           </div>
-          <button class="lh-card-audio" (click)="playCardAudio(card)" aria-label="Preview audio">
+          <button class="lh-card-audio" (click)="playCardAudio(card)" [attr.aria-label]="'listen.queue.previewAriaLabel' | translate">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round">
               <polygon points="11,5 6,9 2,9 2,15 6,15 11,19"/>
               <path d="M15.54,8.46a5,5,0,0,1,0,7.07"/>

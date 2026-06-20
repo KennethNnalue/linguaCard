@@ -1,12 +1,12 @@
 <ion-header class="ion-no-border">
   <ion-toolbar>
     <div class="et-nav">
-      <button class="lc-back-btn" (click)="goBack()" aria-label="Back">
+      <button class="lc-back-btn" (click)="goBack()" [attr.aria-label]="'exploreTopic.nav.backAria' | translate">
         <ion-icon name="chevron-back-outline"></ion-icon>
       </button>
       <div class="et-nav-center">
         <span class="et-topic lc-display">{{ topic() }}</span>
-        <span class="et-count">{{ topicCollections().length }} sets</span>
+        <span class="et-count">{{ topicCollections().length }} {{ 'exploreTopic.nav.setsLabel' | translate }}</span>
       </div>
       <div style="width: 30px;"></div>
     </div>
@@ -23,7 +23,7 @@
         role="tab"
         (click)="setLevel(opt.value)">
         @if (first && opt.value !== 'all') {
-          <span class="et-chip-foryou">FOR YOU</span>
+          <span class="et-chip-foryou">{{ 'collections.explore.forYouLabel' | translate }}</span>
         }
         {{ opt.label }}
         @if (opt.count > 0) {
@@ -37,8 +37,8 @@
   @if (topicCollections().length === 0) {
     <div class="et-empty">
       <span class="et-empty-icon">🔍</span>
-      <p class="et-empty-title">No sets in this topic</p>
-      <p class="et-empty-sub">Try switching the level filter</p>
+      <p class="et-empty-title">{{ 'exploreTopic.emptyState.title' | translate }}</p>
+      <p class="et-empty-sub">{{ 'exploreTopic.emptyState.subtitle' | translate }}</p>
     </div>
   } @else {
     <div class="et-grid">
@@ -56,15 +56,15 @@
             <div class="et-mastery-bar">
               <div class="et-mastery-fill" [style.width.%]="masteryPercent(col.adoptedCollectionId)"></div>
             </div>
-            <div class="et-mastery-lbl">{{ masteryPercent(col.adoptedCollectionId) }}% mastered · In your sets</div>
+            <div class="et-mastery-lbl">{{ masteryPercent(col.adoptedCollectionId) }}% {{ 'exploreTopic.card.masteredLabel' | translate }} · {{ 'exploreTopic.card.inSetsLabel' | translate }}</div>
           } @else if (col.knownCount > 0) {
             <div class="et-ringrow">
               <div class="et-ring" [style]="ringStyle(col.knownCount, col.wordCount)">
                 <div class="et-ring-inner">{{ col.knownCount }}/{{ col.wordCount }}</div>
               </div>
               <div class="et-ring-txt">
-                <b>{{ col.knownCount }} known</b><br>
-                {{ col.wordCount - col.knownCount }} new
+                <b>{{ col.knownCount }} {{ 'exploreTopic.card.knownLabel' | translate }}</b><br>
+                {{ col.wordCount - col.knownCount }} {{ 'exploreTopic.card.newLabel' | translate }}
               </div>
             </div>
           } @else {
@@ -72,7 +72,7 @@
               <div class="et-ring et-ring--empty">
                 <div class="et-ring-inner">0/{{ col.wordCount }}</div>
               </div>
-              <div class="et-ring-txt">{{ col.wordCount }} words<br>all new</div>
+              <div class="et-ring-txt">{{ col.wordCount }} {{ 'exploreTopic.card.wordsUnit' | translate }}<br>{{ 'exploreTopic.card.allNewLabel' | translate }}</div>
             </div>
           }
 
@@ -80,7 +80,7 @@
             <button
               class="et-btn et-btn--open"
               (click)="$event.stopPropagation(); openAdoptedCollection(col.adoptedCollectionId!)">
-              Open
+              {{ 'exploreTopic.card.openButton' | translate }}
             </button>
           } @else {
             <button
@@ -88,11 +88,11 @@
               [disabled]="adoptingId() === col.id"
               (click)="$event.stopPropagation(); adoptCollection(col)">
               @if (adoptingId() === col.id) {
-                Adding…
+                {{ 'exploreTopic.card.addingLabel' | translate }}
               } @else if (col.knownCount > 0) {
-                + Get {{ col.wordCount - col.knownCount }} new
+                {{ 'exploreTopic.card.getNewButton' | translate }} {{ col.wordCount - col.knownCount }}
               } @else {
-                + Get
+                {{ 'exploreTopic.card.getButton' | translate }}
               }
             </button>
           }

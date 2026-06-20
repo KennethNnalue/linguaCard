@@ -11,6 +11,8 @@ import {
 import { addIcons } from 'ionicons';
 import { sparklesOutline, closeOutline, checkmarkOutline, lockClosedOutline } from 'ionicons/icons';
 import type { GenerateStoryDto, StoryDifficulty, StoryLength } from '@lingua-card/shared/domain';
+import { TranslatePipe, TranslateService } from '@ngx-translate/core';
+import { LanguageService } from '../../../../core/services/language.service';
 import { CollectionStore } from '../../../vault/store/collection.store';
 import { StoryStore } from '../../store/story.store';
 import { SubscriptionStore } from '../../../subscription/store/subscription.store';
@@ -21,13 +23,15 @@ type GenerationStep = 0 | 1 | 2 | 3;
   selector: 'lc-generate-story-sheet',
   templateUrl: './generate-story-sheet.component.html',
   styleUrls: ['./generate-story-sheet.component.scss'],
-  imports: [IonHeader, IonToolbar, IonContent, IonIcon, IonSpinner, NgClass],
+  imports: [IonHeader, IonToolbar, IonContent, IonIcon, IonSpinner, NgClass, TranslatePipe],
 })
 export class GenerateStorySheetComponent implements OnDestroy {
   private readonly collectionStore = inject(CollectionStore);
   private readonly storyStore = inject(StoryStore);
   private readonly modalCtrl = inject(ModalController);
   readonly subscriptionStore = inject(SubscriptionStore);
+  private readonly translateService = inject(TranslateService);
+  private readonly languageService = inject(LanguageService);
 
   readonly collections = this.collectionStore.collections;
   readonly isGenerating = this.storyStore.isGenerating;
@@ -41,12 +45,12 @@ export class GenerateStorySheetComponent implements OnDestroy {
 
   readonly canGenerate = computed(() => this.selectedIds().size > 0 && !this.isGenerating());
 
-  readonly lengths: Array<{ value: StoryLength; label: string; badge?: string }> = [
-    { value: 'short', label: 'Short' },
-    { value: 'medium', label: 'Medium' },
-    { value: 'long', label: 'Long' },
-    { value: 'very-long', label: 'Very Long' },
-    { value: 'extra-long', label: 'Extra Long', badge: 'Podcast' },
+  readonly lengths: Array<{ value: StoryLength; labelKey: string; badgeKey?: string }> = [
+    { value: 'short', labelKey: 'stories.length.short' },
+    { value: 'medium', labelKey: 'stories.length.medium' },
+    { value: 'long', labelKey: 'stories.length.long' },
+    { value: 'very-long', labelKey: 'stories.length.veryLong' },
+    { value: 'extra-long', labelKey: 'stories.length.extraLong', badgeKey: 'stories.length.podcast' },
   ];
 
   readonly isLongFormat = computed(() =>
@@ -67,9 +71,12 @@ export class GenerateStorySheetComponent implements OnDestroy {
     'Almost ready…',
   ][this.generationStep()]);
 
-  readonly estimatedWait = computed(() =>
-    this.isLongFormat() ? 'Usually 25–40 seconds' : 'Usually 10–20 seconds'
-  );
+  readonly estimatedWait = computed(() => {
+    this.languageService.current(); // recompute on UI language change
+    return this.isLongFormat()
+      ? this.translateService.instant('stories.generate.estimatedWaitLong')
+      : this.translateService.instant('stories.generate.estimatedWaitShort');
+  });
 
   readonly showSupportLink = computed(() => this.retryCount() >= 3);
 
