@@ -1,0 +1,34 @@
+<ion-content>
+  <lc-onboarding-shell [step]="store.step()" [total]="store.totalSteps()" (backClick)="onBack()" (skipClick)="onSkip()">
+    <p class="ob-step">{{ 'onboarding.common.step' | translate:{ current: store.step() + 1, total: store.totalSteps() } }}</p>
+    <h1 class="ob-title">{{ 'onboarding.level.title' | translate }}</h1>
+    <p class="ob-sub">{{ 'onboarding.level.subtitle' | translate }}</p>
+
+    @for (lvl of levels; track lvl.value) {
+      <button
+        class="level-card"
+        [class.level-card--active]="selected() === lvl.value"
+        [attr.aria-pressed]="selected() === lvl.value"
+        (click)="select(lvl.value)">
+        <span class="level-dot">{{ lvl.emoji }}</span>
+        <span class="level-info">
+          <span class="level-name">{{ lvl.nameKey | translate }}</span>
+          <span class="level-desc">{{ lvl.descKey | translate }}</span>
+        </span>
+        <span class="level-radio"></span>
+      </button>
+    }
+
+    @if (selected()) {
+      <div class="goal-note">
+        🎯 {{ 'onboarding.level.suggestedGoal' | translate:{ count: store.suggestedGoal() } }}
+      </div>
+    }
+
+    <div class="spacer"></div>
+
+    <button class="ob-cta" (click)="onNext()">
+      {{ 'onboarding.common.next' | translate }}
+    </button>
+  </lc-onboarding-shell>
+</ion-content>

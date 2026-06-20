@@ -1,0 +1,25 @@
+<div class="ob-shell">
+  <div class="ob-top">
+    @if (showBack() && step() > 0) {
+      <button class="ob-back" (click)="backClick.emit()" [attr.aria-label]="'onboarding.common.back' | translate">
+        <svg viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg>
+      </button>
+    } @else {
+      <span class="ob-back-spacer"></span>
+    }
+
+    <div class="ob-dots" role="progressbar" [attr.aria-valuenow]="step() + 1" [attr.aria-valuemax]="total()" [attr.aria-label]="'onboarding.common.step' | translate:{ current: step() + 1, total: total() }">
+      @for (i of steps; track i) {
+        <span class="ob-dot" [class.ob-dot--active]="i === step()" aria-hidden="true"></span>
+      }
+    </div>
+
+    <button class="ob-skip" (click)="skipClick.emit()">
+      {{ 'onboarding.common.skip' | translate }}
+    </button>
+  </div>
+
+  <div class="ob-body">
+    <ng-content />
+  </div>
+</div>

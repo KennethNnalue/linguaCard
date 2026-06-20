@@ -236,6 +236,7 @@ export const CardStore = signalStore(
 | `StoryStore` | `stories/store/` | stories only |
 | `SettingsStore` | `settings/store/` | home, settings, `ReviewStatsStore` (for `dailyGoal`) |
 | `ReviewStatsStore` | `shared/srs/` | home (streak/progress display); depends on `SettingsStore` for goal threshold |
+| `OnboardingStore` | `onboarding/store/` | onboarding flow only; reuses `SettingsStore`, `PlatformCollectionStore`, `CardStore` |
 
 **Dictionary service (not a store — stateless API wrapper):**
 
@@ -374,11 +375,11 @@ The LinguaCard Design System (LDS) is the single source of truth for all visual 
 ### SCSS import pattern (start every component `.scss` file with this)
 
 ```scss
-@use '../../../../theme/tokens' as t;
-@use '../../../../theme/utils' as u;
+@use 'theme/tokens' as t;
+@use 'theme/utils' as u;
 ```
 
-Adjust the relative depth (`../../../../`) to match the file's actual location.
+The build has `includePaths` configured, so use the short form `'theme/tokens'` — no relative depth needed.
 
 ### Article gender — always use the component
 
@@ -422,6 +423,7 @@ Never write mastery colour CSS. Never use `.lc-mastery-dot--*` global classes.
 | `ButtonComponent` | `<lc-button>` | `variant`, `size`, `disabled`, `loading`, `fullWidth` |
 | `CategoryChipComponent` | `<lc-category-chip>` | `label`, `count?`, `active`; output: `chipClick` |
 | `EmptyStateComponent` | `<lc-empty-state>` | `icon`, `title`, `subtitle`; slot: `[action]` |
+| `LanguagePickerComponent` | `<lc-language-picker>` | (none — self-contained dropdown, uses `LanguageService`) |
 
 ---
 
@@ -539,6 +541,7 @@ Rating 1–4 maps to: Again / Hard / Good / Easy.
 | 17 | Global Word Dictionary & Admin | ✅ Implemented | `apps/api/src/word-dictionary/`, `apps/api/src/admin/`, `features/admin/`, `vault/services/dictionary-api.service.ts`, `apps/mobile/epics/epic-global-word-dictionary.md` |
 | 18 | Platform Vocabulary Collections | ✅ Implemented | `apps/api/src/platform-collections/`, `vault/store/platform-collection.store.ts`, `vault/services/platform-collection-api.service.ts`, `vault/pages/platform-collection-detail/`, `vault/pages/collections/` (Explore segment), `vault/pages/explore-topic/` (See All), `apps/mobile/epics/epic-platform-collections-refined.md` |
 | 19 | Multi-Language Support (i18n) | 🔄 In progress | `apps/mobile/epics/epic-multi-language-support.md` — ngx-translate UI + native-language learning content (en/ar/uk/tr/es/ru); LC-I18N-01 to LC-I18N-62. Phases 1–3 (foundation, string extraction, language selection UX) complete. Phases 4–7 (RTL, content localization, QA) remaining. |
+| 20 | User Onboarding | ✅ Implemented | `features/onboarding/`, `apps/mobile/epics/epic-user-onboarding.md` — 6-step guided first-run flow (language → welcome → motivation → level → seed vault → goal), Home activation checklist, empty-state CTAs. Language picker on auth pages (login, register, forgot-password). LC-ONB-01 to LC-ONB-18. |
 
 ### Implemented page inventory
 
@@ -550,9 +553,11 @@ Rating 1–4 maps to: Again / Hard / Good / Easy.
 
 **Stories:** story library, generate story sheet, story reader (German + translation + grammar + keywords tabs), story complete
 
-**Auth:** login, register, forgot password, reset-data sheet
+**Auth:** login (+ language picker), register (+ language picker), forgot password (+ language picker), reset-data sheet
 
-**Shared:** home/dashboard, onboarding, user menu, sync-status indicator, fab button
+**Onboarding:** language, welcome, motivation, level, seed vault, goal & finish, getting-started checklist (Home)
+
+**Shared:** home/dashboard, user menu, sync-status indicator, fab button
 
 **Settings:** study goals (daily/weekly/monthly), reminders (push toggle + time picker), language (6-language picker)
 
@@ -637,6 +642,8 @@ These are **known deviations** from the architecture. Do not "fix" them without 
 | `apps/mobile/epics/design-streak-goals-reminders.html` | Design reference for Streak/Goals/Reminders screens |
 | `apps/mobile/epics/epic-global-word-dictionary.md` | Global Word Dictionary & Admin epic — LC-WD01 to LC-WD17 |
 | `apps/mobile/epics/epic-multi-language-support.md` | Multi-Language Support (i18n) epic — ngx-translate UI + native-language content; LC-I18N-01 to LC-I18N-62 |
+| `apps/mobile/epics/epic-user-onboarding.md` | User Onboarding epic — 6-step guided first-run flow (language step first); LC-ONB-01 to LC-ONB-18 |
+| `apps/mobile/epics/design-user-onboarding.html` | Design reference for onboarding screens |
 | `apps/api/src/word-dictionary/` | Global word dictionary module (entity, service, repository, controller) |
 | `apps/api/src/admin/` | Admin module — platform-collections import, platform-stories import, prompts |
 | `apps/api/src/admin/prompts/platform-story.prompt.md` | Canonical AI prompt for generating platform stories (paste into AI tool) |

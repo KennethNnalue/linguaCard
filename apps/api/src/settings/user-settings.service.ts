@@ -63,6 +63,12 @@ export class UserSettingsService {
     if (dto.timezone !== undefined && isNewer('timezone'))              { patch.timezone = dto.timezone; stamp('timezone'); }
     if (dto.uiLanguage !== undefined && isNewer('uiLanguage'))          { patch.uiLanguage = dto.uiLanguage; stamp('uiLanguage'); }
 
+    // Onboarding fields (no last-write-wins — these only move forward)
+    if (dto.onboardingStep !== undefined)  { patch.onboardingStep = dto.onboardingStep; }
+    if (dto.motivation !== undefined)      { patch.motivation = dto.motivation; }
+    if (dto.level !== undefined)           { patch.level = dto.level; }
+    if (dto.completeOnboarding)            { patch.onboardingCompletedAt = new Date(editedAt); }
+
     // goalsSetAt drives the "set your goals" prompt — stamp it with the edit
     // time only when a goal field was actually (re)applied.
     if (goalApplied) patch.goalsSetAt = new Date(editedAt);
@@ -91,6 +97,10 @@ export class UserSettingsService {
       timezone: e.timezone,
       goalsSetAt: e.goalsSetAt ? e.goalsSetAt.toISOString() : null,
       uiLanguage: (e.uiLanguage ?? 'en') as UserSettings['uiLanguage'],
+      onboardingCompletedAt: e.onboardingCompletedAt ? e.onboardingCompletedAt.toISOString() : null,
+      onboardingStep: e.onboardingStep,
+      motivation: e.motivation as UserSettings['motivation'],
+      level: e.level as UserSettings['level'],
     };
   }
 }

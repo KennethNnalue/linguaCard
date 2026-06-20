@@ -1252,5 +1252,88 @@
     "review": "Repaso",
     "stories": "Historias",
     "listen": "Escuchar"
+  },
+  "onboarding": {
+    "common": {
+      "back": "Atrás",
+      "skip": "Omitir",
+      "next": "Siguiente",
+      "step": "Paso {{current}} de {{total}}"
+    },
+    "welcome": {
+      "title": "Bienvenido a LinguaCard",
+      "subtitle": "Aprende alemán con tarjetas inteligentes, audio e historias — unos minutos al día.",
+      "bulletReview": "Repetición espaciada que se adapta a ti",
+      "bulletListen": "Audio nativo que puedes escuchar en cualquier lugar",
+      "bulletStories": "Historias cortas con IA a tu nivel",
+      "getStarted": "Empezar",
+      "skip": "Prefiero explorar por mi cuenta"
+    },
+    "motivation": {
+      "title": "¿Por qué estás aprendiendo alemán?",
+      "subtitle": "Personalizaremos tus primeras palabras. Puedes cambiarlo en cualquier momento.",
+      "travel": "Viajes",
+      "work": "Trabajo y carrera",
+      "family": "Familia y amigos",
+      "culture": "Cultura y medios",
+      "exams": "Exámenes y estudio"
+    },
+    "level": {
+      "title": "¿Cuánto alemán sabes?",
+      "subtitle": "Esto establece un objetivo inicial — puedes ajustarlo después.",
+      "beginner": "Recién empezando",
+      "beginnerDesc": "Nuevo en alemán",
+      "some": "Sé algunas palabras",
+      "someDesc": "Vocabulario y frases básicas",
+      "intermediate": "Puedo mantener una conversación",
+      "intermediateDesc": "Intermedio",
+      "suggestedGoal": "Apuntaremos a {{count}} tarjetas al día"
+    },
+    "seed": {
+      "title": "Consigamos tus primeras palabras",
+      "subtitle": "Añade un set listo con audio o trae las tuyas.",
+      "adoptedTitle": "¡Genial — tu bóveda tiene palabras!",
+      "adoptedSubtitle": "Puedes añadir más colecciones en cualquier momento desde Explorar.",
+      "recommended": "Recomendado para ti",
+      "wordsCount": "{{count}} palabras",
+      "adopt": "Añadir estas palabras",
+      "adopting": "Añadiendo palabras…",
+      "adopted": "Se añadieron {{count}} palabras a tu bóveda",
+      "addOwn": "Añadir mi propia palabra",
+      "import": "Importar de una lista",
+      "error": "No se pudieron añadir esas palabras. Intenta añadir las tuyas para continuar.",
+      "importHint": "Puedes importar palabras desde CSV o imágenes en la Bóveda después de la configuración.",
+      "orLabel": "o trae las tuyas"
+    },
+    "goal": {
+      "title": "Establece tu objetivo diario",
+      "subtitle": "Cúmplelo cada día para hacer crecer tu racha.",
+      "dailyGoalLabel": "Tarjetas por día",
+      "remindersLabel": "Recuérdame practicar",
+      "remindersHint": "Te avisaremos si no has cumplido tu objetivo.",
+      "finish": "Empezar a aprender"
+    },
+    "checklist": {
+      "title": "Primeros pasos",
+      "progress": "{{done}} de {{total}} completados",
+      "addWord": "Añade tu primera palabra",
+      "setGoal": "Establece tu objetivo diario",
+      "firstReview": "Completa tu primer repaso",
+      "tryStory": "Lee tu primera historia",
+      "dismiss": "Descartar",
+      "allDone": "¡Todo listo!"
+    },
+    "empty": {
+      "vaultTitle": "Tu bóveda está vacía",
+      "vaultSubtitle": "Añade colecciones preparadas o tus propias palabras para empezar a aprender.",
+      "vaultExplore": "Explorar colecciones",
+      "vaultAdd": "Añadir una palabra",
+      "reviewTitle": "Nada pendiente ahora",
+      "reviewSubtitle": "Añade más palabras o explora una colección para seguir.",
+      "reviewExplore": "Explorar colecciones"
+    },
+    "tour": {
+      "takeTour": "Repetir configuración"
+    }
   }
 }

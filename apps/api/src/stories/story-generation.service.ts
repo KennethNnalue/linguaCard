@@ -15,6 +15,7 @@ import type {
   SubscriptionTier,
 } from '@lingua-card/shared/domain';
 import { recoverStoryContent } from './story-json-recovery.util';
+import { normalizeStorySentences, resolveBodyNative } from './story-sentence.util';
 import { CardEntity } from '../cards/card.entity';
 import { StoryEntity } from './story.entity';
 import { AnthropicAdapter } from '../ai/providers/anthropic.adapter';
@@ -465,15 +466,16 @@ export class StoryGenerationService {
   }
 
   private toModel(e: StoryEntity): Story {
+    const sentences = normalizeStorySentences(e.sentences);
     return {
       id: e.id,
       userId: e.userId,
       title: e.title,
       titleTranslation: e.titleTranslation,
       bodyDe: e.bodyDe,
-      bodyNative: e.bodyNative,
+      bodyNative: resolveBodyNative(e.bodyNative, sentences),
       nativeLang: e.nativeLang as LanguageCode,
-      sentences: e.sentences,
+      sentences,
       wordTimestamps: e.wordTimestamps,
       vocabWords: e.vocabWords,
       audioUrl: e.audioUrl,

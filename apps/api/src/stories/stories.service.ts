@@ -9,6 +9,7 @@ import { StoryAudioService } from './story-audio.service';
 import { StoryVocabMapper } from './story-vocab.mapper';
 import { StorageService } from '../storage/storage.service';
 import { SEED_STORY } from './seed/seed-story';
+import { normalizeStorySentences, resolveBodyNative } from './story-sentence.util';
 
 @Injectable()
 export class StoriesService {
@@ -126,15 +127,16 @@ export class StoriesService {
   }
 
   private toModel(e: StoryEntity): Story {
+    const sentences = normalizeStorySentences(e.sentences);
     return {
       id: e.id,
       userId: e.userId,
       title: e.title,
       titleTranslation: e.titleTranslation,
       bodyDe: e.bodyDe,
-      bodyNative: e.bodyNative,
+      bodyNative: resolveBodyNative(e.bodyNative, sentences),
       nativeLang: e.nativeLang as LanguageCode,
-      sentences: e.sentences,
+      sentences,
       wordTimestamps: e.wordTimestamps,
       vocabWords: e.vocabWords,
       audioUrl: e.audioUrl,

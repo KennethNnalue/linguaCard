@@ -1,0 +1,102 @@
+@use 'theme/tokens' as t;
+@use 'theme/utils' as u;
+
+.welcome-hero {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: t.$lc-space-6 t.$lc-space-2;
+}
+
+.welcome-mark {
+  width: 84px;
+  height: 84px;
+  border-radius: t.$lc-radius-lg;
+  background: t.$lc-brand;
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: t.$lc-font-display;
+  font-size: 38px;
+  font-weight: 600;
+  box-shadow: t.$lc-shadow-float;
+  margin-bottom: t.$lc-space-5;
+}
+
+.welcome-title {
+  font-family: t.$lc-font-display;
+  font-size: 26px;
+  font-weight: 600;
+  color: t.$lc-text-primary;
+  margin-bottom: t.$lc-space-2;
+}
+
+.welcome-sub {
+  @include u.lc-font('sm');
+  color: t.$lc-text-secondary;
+  line-height: 1.5;
+  max-width: 240px;
+  margin-bottom: t.$lc-space-6;
+}
+
+.welcome-bullets {
+  display: flex;
+  flex-direction: column;
+  gap: t.$lc-space-3;
+  width: 100%;
+  text-align: left;
+}
+
+.welcome-bullet {
+  display: flex;
+  align-items: center;
+  gap: t.$lc-space-3;
+  @include u.lc-font('sm', 500);
+  color: t.$lc-text-primary;
+}
+
+.welcome-bullet-icon {
+  width: 30px;
+  height: 30px;
+  border-radius: t.$lc-radius-sm + 2px;
+  background: t.$lc-brand-light;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 15px;
+  flex-shrink: 0;
+}
+
+.welcome-actions {
+  display: flex;
+  flex-direction: column;
+  gap: t.$lc-space-1;
+  padding-bottom: t.$lc-space-4;
+}
+
+.welcome-cta {
+  width: 100%;
+  background: t.$lc-brand;
+  color: white;
+  border: none;
+  border-radius: t.$lc-radius-md + 2px;
+  padding: t.$lc-space-3 + 2px;
+  @include u.lc-font('md', 700);
+  font-family: t.$lc-font-body;
+  cursor: pointer;
+}
+
+.welcome-ghost {
+  width: 100%;
+  background: none;
+  color: t.$lc-text-secondary;
+  border: none;
+  padding: t.$lc-space-3;
+  @include u.lc-font('sm', 600);
+  font-family: t.$lc-font-body;
+  cursor: pointer;
+}

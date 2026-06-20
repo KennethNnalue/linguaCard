@@ -1,0 +1,101 @@
+@use 'theme/tokens' as t;
+@use 'theme/utils' as u;
+
+.lp-wrap {
+  position: relative;
+  display: inline-block;
+}
+
+.lp-trigger {
+  display: flex;
+  align-items: center;
+  gap: t.$lc-space-2;
+  background: t.$lc-card;
+  border: 1.5px solid t.$lc-border;
+  border-radius: t.$lc-radius-full;
+  padding: t.$lc-space-1 + 2px t.$lc-space-3 t.$lc-space-1 + 2px t.$lc-space-2 + 2px;
+  cursor: pointer;
+  font-family: t.$lc-font-body;
+  transition: border-color 0.15s ease;
+
+  &:active {
+    border-color: t.$lc-brand;
+  }
+}
+
+.lp-flag {
+  font-size: 18px;
+  line-height: 1;
+}
+
+.lp-code {
+  @include u.lc-font('xs', 600);
+  color: t.$lc-text-primary;
+}
+
+.lp-caret {
+  @include u.lc-font('xs');
+  color: t.$lc-text-hint;
+  transition: transform 0.15s ease;
+
+  &--open {
+    transform: rotate(180deg);
+  }
+}
+
+.lp-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 99;
+}
+
+.lp-dropdown {
+  position: absolute;
+  top: calc(100% + #{t.$lc-space-2});
+  right: 0;
+  min-width: 200px;
+  background: t.$lc-card;
+  border: 1.5px solid t.$lc-border;
+  border-radius: t.$lc-radius-md + 2px;
+  box-shadow: t.$lc-shadow-float;
+  z-index: 100;
+  overflow: hidden;
+}
+
+.lp-option {
+  display: flex;
+  align-items: center;
+  gap: t.$lc-space-3;
+  width: 100%;
+  padding: t.$lc-space-3 t.$lc-space-4;
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-family: t.$lc-font-body;
+  transition: background 0.1s ease;
+
+  &:active {
+    background: t.$lc-brand-light;
+  }
+
+  &--active {
+    background: t.$lc-brand-light;
+  }
+}
+
+.lp-option-flag {
+  font-size: 20px;
+  line-height: 1;
+}
+
+.lp-option-name {
+  @include u.lc-font('sm', 500);
+  color: t.$lc-text-primary;
+  flex: 1;
+  text-align: left;
+}
+
+.lp-option-check {
+  @include u.lc-font('sm', 700);
+  color: t.$lc-brand;
+}

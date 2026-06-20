@@ -1,0 +1,171 @@
+@use 'theme/tokens' as t;
+@use 'theme/utils' as u;
+
+.ob-step {
+  @include u.lc-font('xxs', 700);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: t.$lc-text-hint;
+  margin-bottom: t.$lc-space-1 + 2px;
+}
+
+.ob-title {
+  font-family: t.$lc-font-display;
+  font-size: 23px;
+  font-weight: 600;
+  color: t.$lc-text-primary;
+  line-height: 1.18;
+  margin-bottom: t.$lc-space-2 - 1px;
+}
+
+.ob-sub {
+  @include u.lc-font('sm');
+  color: t.$lc-text-secondary;
+  line-height: 1.5;
+  margin-bottom: t.$lc-space-5;
+}
+
+.goal-big {
+  display: flex;
+  align-items: baseline;
+  justify-content: center;
+  gap: t.$lc-space-2 - 1px;
+  padding: t.$lc-space-2 0 t.$lc-space-3 + 2px;
+}
+
+.goal-big-num {
+  font-family: t.$lc-font-display;
+  font-size: 46px;
+  font-weight: 600;
+  color: t.$lc-brand;
+  line-height: 1;
+}
+
+.goal-big-label {
+  @include u.lc-font('sm');
+  color: t.$lc-text-secondary;
+}
+
+.field-card {
+  background: t.$lc-card;
+  border-radius: t.$lc-radius-md + 4px;
+  box-shadow: t.$lc-shadow-card;
+  padding: t.$lc-space-4;
+  margin-bottom: t.$lc-space-3 + 1px;
+}
+
+.field-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: t.$lc-space-3;
+}
+
+.field-info {
+  flex: 1;
+}
+
+.field-name {
+  @include u.lc-font('md', 600);
+  color: t.$lc-text-primary;
+}
+
+.field-desc {
+  @include u.lc-font('xs');
+  color: t.$lc-text-secondary;
+  margin-top: 2px;
+  line-height: 1.4;
+}
+
+.stepper {
+  display: flex;
+  align-items: center;
+  border: 1px solid t.$lc-border;
+  border-radius: t.$lc-radius-md;
+  overflow: hidden;
+  flex-shrink: 0;
+
+  button {
+    width: 36px;
+    height: 38px;
+    border: none;
+    background: t.$lc-surface;
+    color: t.$lc-brand;
+    font-size: 19px;
+    font-weight: 600;
+    font-family: t.$lc-font-body;
+    cursor: pointer;
+
+    &:disabled {
+      opacity: 0.35;
+      cursor: default;
+    }
+  }
+}
+
+.stepper-val {
+  width: 50px;
+  text-align: center;
+  font-family: t.$lc-font-display;
+  font-size: 19px;
+  font-weight: 600;
+  color: t.$lc-text-primary;
+}
+
+.toggle {
+  width: 46px;
+  height: 27px;
+  border-radius: t.$lc-radius-md + 2px;
+  position: relative;
+  flex-shrink: 0;
+  border: none;
+  cursor: pointer;
+  transition: background var(--lc-transition-fast);
+
+  &--on {
+    background: t.$lc-brand;
+  }
+
+  &--off {
+    background: t.$lc-border-strong;
+  }
+}
+
+.toggle-knob {
+  position: absolute;
+  top: 3px;
+  width: 21px;
+  height: 21px;
+  border-radius: t.$lc-radius-full;
+  background: white;
+  box-shadow: t.$lc-shadow-card;
+  transition: left var(--lc-transition-fast);
+
+  .toggle--on & {
+    left: 22px;
+  }
+
+  .toggle--off & {
+    left: 3px;
+  }
+}
+
+.spacer {
+  flex: 1;
+}
+
+.ob-cta {
+  width: 100%;
+  color: white;
+  border: none;
+  border-radius: t.$lc-radius-md + 2px;
+  padding: t.$lc-space-3 + 2px;
+  @include u.lc-font('md', 700);
+  font-family: t.$lc-font-body;
+  cursor: pointer;
+  margin-top: t.$lc-space-4;
+
+  &--accent {
+    background: t.$lc-accent;
+  }
+}

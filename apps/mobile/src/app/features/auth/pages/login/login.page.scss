@@ -10,6 +10,13 @@ ion-content {
   min-height: 100%;
 }
 
+/* ── Language picker ──────────────────────────────────────── */
+.auth-lang {
+  display: flex;
+  justify-content: flex-end;
+  padding-top: 16px;
+}
+
 /* ── Logo ─────────────────────────────────────────────────── */
 .auth-logo-area {
   display: flex;

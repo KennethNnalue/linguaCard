@@ -1,0 +1,33 @@
+<ion-content>
+  <lc-onboarding-shell [step]="store.step()" [total]="store.totalSteps()" (backClick)="onBack()" (skipClick)="onSkip()">
+    <div class="welcome-hero">
+      <div class="welcome-mark">L</div>
+      <h1 class="welcome-title">{{ 'onboarding.welcome.title' | translate }}</h1>
+      <p class="welcome-sub">{{ 'onboarding.welcome.subtitle' | translate }}</p>
+
+      <div class="welcome-bullets">
+        <div class="welcome-bullet">
+          <span class="welcome-bullet-icon">🎯</span>
+          <span>{{ 'onboarding.welcome.bulletReview' | translate }}</span>
+        </div>
+        <div class="welcome-bullet">
+          <span class="welcome-bullet-icon">🎧</span>
+          <span>{{ 'onboarding.welcome.bulletListen' | translate }}</span>
+        </div>
+        <div class="welcome-bullet">
+          <span class="welcome-bullet-icon">📖</span>
+          <span>{{ 'onboarding.welcome.bulletStories' | translate }}</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="welcome-actions">
+      <button class="welcome-cta" (click)="onGetStarted()">
+        {{ 'onboarding.welcome.getStarted' | translate }}
+      </button>
+      <button class="welcome-ghost" (click)="onSkip()">
+        {{ 'onboarding.welcome.skip' | translate }}
+      </button>
+    </div>
+  </lc-onboarding-shell>
+</ion-content>

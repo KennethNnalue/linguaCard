@@ -121,9 +121,19 @@
           />
         } @empty {
           <div class="lc-empty-state">
-            <span class="lc-empty-icon">🔍</span>
-            <p class="lc-empty-title">{{ 'vault.emptyState.title' | translate }}</p>
-            <p class="lc-empty-sub">{{ 'vault.emptyState.subtitle' | translate }}</p>
+            @if (totalCount() === 0) {
+              <span class="lc-empty-icon">📚</span>
+              <p class="lc-empty-title">{{ 'onboarding.empty.vaultTitle' | translate }}</p>
+              <p class="lc-empty-sub">{{ 'onboarding.empty.vaultSubtitle' | translate }}</p>
+              <div class="lc-empty-actions">
+                <button class="lc-empty-primary" (click)="navigateTo('/vault/collections')">{{ 'onboarding.empty.vaultExplore' | translate }}</button>
+                <button class="lc-empty-secondary" (click)="openAddWord()">{{ 'onboarding.empty.vaultAdd' | translate }}</button>
+              </div>
+            } @else {
+              <span class="lc-empty-icon">🔍</span>
+              <p class="lc-empty-title">{{ 'vault.emptyState.title' | translate }}</p>
+              <p class="lc-empty-sub">{{ 'vault.emptyState.subtitle' | translate }}</p>
+            }
           </div>
         }
       }

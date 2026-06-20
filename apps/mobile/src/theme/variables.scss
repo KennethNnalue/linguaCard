@@ -412,6 +412,9 @@ body.ion-palette-dark {
 .lc-empty-icon  { font-size: 48px; opacity: 0.4; }
 .lc-empty-title { font-family: var(--lc-font-display); font-size: 18px; font-weight: 600; color: var(--lc-text-primary); }
 .lc-empty-sub   { font-size: 13px; color: var(--lc-text-secondary); max-width: 260px; line-height: 1.5; }
+.lc-empty-actions { display: flex; flex-direction: column; gap: 9px; width: 100%; max-width: 280px; margin-top: 8px; }
+.lc-empty-primary { background: var(--lc-brand); color: white; border: none; border-radius: 13px; padding: 12px; font-size: 13px; font-weight: 700; font-family: var(--lc-font-body); cursor: pointer; }
+.lc-empty-secondary { background: var(--lc-brand-light); color: var(--lc-brand); border: none; border-radius: 13px; padding: 12px; font-size: 13px; font-weight: 700; font-family: var(--lc-font-body); cursor: pointer; }
 
 // Word item row
 .lc-word-item {

@@ -6,13 +6,13 @@ import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { addIcons } from 'ionicons';
 import { alertCircleOutline, eyeOffOutline, eyeOutline, logoGoogle } from 'ionicons/icons';
 import { AuthService } from '../../../../core/services/auth.service';
+import { LanguagePickerComponent } from '../../../../shared/components/language-picker/language-picker.component';
 
 @Component({
   selector: 'lc-login',
   templateUrl: './login.page.html',
   styleUrls: ['./login.page.scss'],
-  standalone: true,
-  imports: [ReactiveFormsModule, RouterLink, IonContent, IonIcon, IonSpinner, TranslatePipe],
+  imports: [ReactiveFormsModule, RouterLink, IonContent, IonIcon, IonSpinner, TranslatePipe, LanguagePickerComponent],
 })
 export class LoginPage {
   private readonly authService = inject(AuthService);

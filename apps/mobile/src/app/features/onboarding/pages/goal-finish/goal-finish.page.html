@@ -1,0 +1,50 @@
+<ion-content>
+  <lc-onboarding-shell [step]="store.step()" [total]="store.totalSteps()" (backClick)="onBack()" (skipClick)="onSkip()">
+    <p class="ob-step">{{ 'onboarding.common.step' | translate:{ current: store.step() + 1, total: store.totalSteps() } }}</p>
+    <h1 class="ob-title">{{ 'onboarding.goal.title' | translate }}</h1>
+    <p class="ob-sub">{{ 'onboarding.goal.subtitle' | translate }}</p>
+
+    <div class="goal-big">
+      <span class="goal-big-num">{{ dailyGoal() }}</span>
+      <span class="goal-big-label">{{ 'onboarding.goal.dailyGoalLabel' | translate }}</span>
+    </div>
+
+    <div class="field-card">
+      <div class="field-head">
+        <div class="field-info">
+          <div class="field-name">{{ 'onboarding.goal.dailyGoalLabel' | translate }}</div>
+        </div>
+        <div class="stepper">
+          <button (click)="decrement()" [disabled]="dailyGoal() <= 5">−</button>
+          <span class="stepper-val">{{ dailyGoal() }}</span>
+          <button (click)="increment()" [disabled]="dailyGoal() >= 100">+</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="field-card">
+      <div class="field-head">
+        <div class="field-info">
+          <div class="field-name">{{ 'onboarding.goal.remindersLabel' | translate }}</div>
+          <div class="field-desc">{{ 'onboarding.goal.remindersHint' | translate }}</div>
+        </div>
+        <button
+          class="toggle"
+          role="switch"
+          [class.toggle--on]="remindersEnabled()"
+          [class.toggle--off]="!remindersEnabled()"
+          (click)="toggleReminders()"
+          [attr.aria-checked]="remindersEnabled()"
+          [attr.aria-label]="'onboarding.goal.remindersLabel' | translate">
+          <span class="toggle-knob"></span>
+        </button>
+      </div>
+    </div>
+
+    <div class="spacer"></div>
+
+    <button class="ob-cta ob-cta--accent" (click)="onFinish()">
+      {{ 'onboarding.goal.finish' | translate }}
+    </button>
+  </lc-onboarding-shell>
+</ion-content>

@@ -7,6 +7,8 @@ export type MasteryLevel = 0 | 1 | 2 | 3 | 4 | 5;
 export type SRSState = 'new' | 'learning' | 'review' | 'relearning' | 'mastered';
 export type ConfidenceRating = 1 | 2 | 3 | 4;
 export type ThemeMode = 'light' | 'dark' | 'system';
+export type OnboardingMotivation = 'travel' | 'work' | 'family' | 'culture' | 'exams';
+export type OnboardingLevel = 'beginner' | 'some' | 'intermediate';
 export type PlaylistType = 'word-meaning' | 'examples-only' | 'deep-dive';
 export type ReviewMode = 'flashcard' | 'listen' | 'cloze' | 'write';
 export type SyncStatus = 'synced' | 'pending' | 'syncing' | 'error';
@@ -758,9 +760,20 @@ export interface UserSettings extends StudyGoals, ReminderSettings {
   userId: string;
   goalsSetAt: string | null;
   uiLanguage: LanguageCode;
+  onboardingCompletedAt: string | null;
+  onboardingStep: number | null;
+  motivation: OnboardingMotivation | null;
+  level: OnboardingLevel | null;
 }
 
-export type UpdateUserSettingsDto = Partial<StudyGoals & ReminderSettings & { uiLanguage: LanguageCode }> & {
+export interface OnboardingSettings {
+  onboardingStep: number | null;
+  motivation: OnboardingMotivation | null;
+  level: OnboardingLevel | null;
+  completeOnboarding: boolean;
+}
+
+export type UpdateUserSettingsDto = Partial<StudyGoals & ReminderSettings & { uiLanguage: LanguageCode } & OnboardingSettings> & {
   /**
    * ISO timestamp of when the edit was made on the originating device.
    * Used for per-field last-write-wins reconciliation so a stale offline
@@ -780,6 +793,12 @@ export const DEFAULT_STUDY_GOALS: StudyGoals = {
 export const DEFAULT_REMINDER_SETTINGS: Omit<ReminderSettings, 'timezone'> = {
   remindersEnabled: false,
   reminderTime: '19:00',
+};
+
+export const SUGGESTED_DAILY_GOAL: Record<OnboardingLevel, number> = {
+  beginner: 10,
+  some: 20,
+  intermediate: 30,
 };
 
 // ─── STREAK & GOAL PROGRESS ───────────────────────────────────────────────────

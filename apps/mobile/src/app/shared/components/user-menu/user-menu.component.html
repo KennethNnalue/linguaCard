@@ -39,6 +39,15 @@
     <ion-icon name="chevron-forward-outline" class="ctx-chevron"></ion-icon>
   </a>
 
+  <!-- Replay onboarding -->
+  <a class="ctx-item" role="menuitem" [routerLink]="['/onboarding']" (click)="closed.emit()">
+    <div class="ctx-item-left">
+      <ion-icon name="rocket-outline"></ion-icon>
+      {{ 'onboarding.tour.takeTour' | translate }}
+    </div>
+    <ion-icon name="chevron-forward-outline" class="ctx-chevron"></ion-icon>
+  </a>
+
   <!-- Dark mode -->
   <button class="ctx-item" role="menuitem" (click)="theme.toggle()">
     <div class="ctx-item-left">

@@ -1,0 +1,79 @@
+@use 'theme/tokens' as t;
+@use 'theme/utils' as u;
+
+.ob-shell {
+  display: flex;
+  flex-direction: column;
+  min-height: 100%;
+  padding: 0 t.$lc-space-4 t.$lc-space-5;
+}
+
+.ob-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: t.$lc-space-2 0 t.$lc-space-4;
+}
+
+.ob-back {
+  width: 30px;
+  height: 30px;
+  border-radius: t.$lc-radius-full;
+  background: t.$lc-brand-light;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  cursor: pointer;
+
+  svg {
+    width: 13px;
+    height: 13px;
+    stroke: t.$lc-brand;
+    fill: none;
+    stroke-width: 2.4;
+    stroke-linecap: round;
+  }
+}
+
+.ob-back-spacer {
+  width: 30px;
+}
+
+.ob-dots {
+  display: flex;
+  gap: t.$lc-space-1 + 2px;
+}
+
+.ob-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: t.$lc-radius-full;
+  background: t.$lc-border-strong;
+  transition: width var(--lc-transition-fast), background var(--lc-transition-fast);
+
+  @media (prefers-reduced-motion: reduce) {
+    transition: none;
+  }
+
+  &--active {
+    background: t.$lc-brand;
+    width: 20px;
+    border-radius: 4px;
+  }
+}
+
+.ob-skip {
+  @include u.lc-font('sm', 600);
+  color: t.$lc-text-hint;
+  background: none;
+  border: none;
+  font-family: t.$lc-font-body;
+  cursor: pointer;
+}
+
+.ob-body {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+}

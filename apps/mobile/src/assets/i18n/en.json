@@ -1252,5 +1252,88 @@
       "deleted": "Word deleted",
       "updated": "Word updated"
     }
+  },
+  "onboarding": {
+    "common": {
+      "back": "Back",
+      "skip": "Skip",
+      "next": "Next",
+      "step": "Step {{current}} of {{total}}"
+    },
+    "welcome": {
+      "title": "Welcome to LinguaCard",
+      "subtitle": "Learn German with smart flashcards, audio, and stories — a few minutes a day.",
+      "bulletReview": "Spaced repetition that adapts to you",
+      "bulletListen": "Native audio you can listen to anywhere",
+      "bulletStories": "Short AI stories at your level",
+      "getStarted": "Get started",
+      "skip": "I'll explore on my own"
+    },
+    "motivation": {
+      "title": "Why are you learning German?",
+      "subtitle": "We'll tailor your starter words. You can change this anytime.",
+      "travel": "Travel",
+      "work": "Work & career",
+      "family": "Family & friends",
+      "culture": "Culture & media",
+      "exams": "Exams & study"
+    },
+    "level": {
+      "title": "How much German do you know?",
+      "subtitle": "This sets a starting goal — you can adjust it later.",
+      "beginner": "Just starting",
+      "beginnerDesc": "New to German",
+      "some": "I know some words",
+      "someDesc": "Basic vocabulary & phrases",
+      "intermediate": "I can hold a conversation",
+      "intermediateDesc": "Intermediate",
+      "suggestedGoal": "We'll aim for {{count}} cards a day"
+    },
+    "seed": {
+      "title": "Let's get your first words",
+      "subtitle": "Add a ready-made set with audio, or bring your own.",
+      "adoptedTitle": "Nice — your vault has words!",
+      "adoptedSubtitle": "You can add more collections anytime from Explore.",
+      "recommended": "Recommended for you",
+      "wordsCount": "{{count}} words",
+      "adopt": "Add these words",
+      "adopting": "Adding words…",
+      "adopted": "Added {{count}} words to your vault",
+      "addOwn": "Add my own word",
+      "import": "Import from a list",
+      "importHint": "You can import words from CSV or images in the Vault after setup.",
+      "error": "Couldn't add those words. Try adding your own to continue.",
+      "orLabel": "or bring your own"
+    },
+    "goal": {
+      "title": "Set your daily goal",
+      "subtitle": "Hit it each day to grow your streak.",
+      "dailyGoalLabel": "Cards per day",
+      "remindersLabel": "Remind me to practice",
+      "remindersHint": "We'll nudge you if you haven't hit your goal.",
+      "finish": "Start learning"
+    },
+    "checklist": {
+      "title": "Getting started",
+      "progress": "{{done}} of {{total}} done",
+      "addWord": "Add your first word",
+      "setGoal": "Set your daily goal",
+      "firstReview": "Complete your first review",
+      "tryStory": "Read your first story",
+      "dismiss": "Dismiss",
+      "allDone": "You're all set!"
+    },
+    "empty": {
+      "vaultTitle": "Your vault is empty",
+      "vaultSubtitle": "Add ready-made collections or your own words to start learning.",
+      "vaultExplore": "Explore collections",
+      "vaultAdd": "Add a word",
+      "reviewTitle": "Nothing due right now",
+      "reviewSubtitle": "Add more words or explore a collection to keep going.",
+      "reviewExplore": "Explore collections"
+    },
+    "tour": {
+      "takeTour": "Replay setup"
+    }
   }
 }

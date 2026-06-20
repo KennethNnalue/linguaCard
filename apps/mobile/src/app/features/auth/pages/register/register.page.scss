@@ -10,6 +10,12 @@ ion-content {
   min-height: 100%;
 }
 
+.auth-lang {
+  display: flex;
+  justify-content: flex-end;
+  padding-top: 16px;
+}
+
 .auth-logo-area {
   display: flex;
   flex-direction: column;

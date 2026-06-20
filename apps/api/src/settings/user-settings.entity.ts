@@ -49,6 +49,18 @@ export class UserSettingsEntity {
   @Column({ name: 'last_reminded_on', type: 'varchar', length: 10, nullable: true, default: null })
   lastRemindedOn!: string | null;
 
+  @Column({ name: 'onboarding_completed_at', type: 'timestamptz', nullable: true, default: null })
+  onboardingCompletedAt!: Date | null;
+
+  @Column({ name: 'onboarding_step', type: 'int', nullable: true, default: null })
+  onboardingStep!: number | null;
+
+  @Column({ name: 'motivation', type: 'varchar', length: 20, nullable: true, default: null })
+  motivation!: string | null;
+
+  @Column({ name: 'level', type: 'varchar', length: 20, nullable: true, default: null })
+  level!: string | null;
+
   @CreateDateColumn({ name: 'created_at' })
   createdAt!: Date;
 

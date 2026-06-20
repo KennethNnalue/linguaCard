@@ -1,0 +1,26 @@
+<div class="lp-wrap">
+  <button class="lp-trigger" (click)="toggle()" type="button">
+    <span class="lp-flag">{{ currentLang().flag }}</span>
+    <span class="lp-code">{{ currentLang().nativeName }}</span>
+    <span class="lp-caret" [class.lp-caret--open]="open()">▾</span>
+  </button>
+
+  @if (open()) {
+    <div class="lp-backdrop" (click)="open.set(false)"></div>
+    <div class="lp-dropdown">
+      @for (lang of languages; track lang.code) {
+        <button
+          class="lp-option"
+          [class.lp-option--active]="current() === lang.code"
+          (click)="select(lang.code)"
+          type="button">
+          <span class="lp-option-flag">{{ lang.flag }}</span>
+          <span class="lp-option-name">{{ lang.nativeName }}</span>
+          @if (current() === lang.code) {
+            <span class="lp-option-check">✓</span>
+          }
+        </button>
+      }
+    </div>
+  }
+</div>

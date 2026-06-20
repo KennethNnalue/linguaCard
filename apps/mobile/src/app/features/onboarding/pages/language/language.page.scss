@@ -1,0 +1,105 @@
+@use 'theme/tokens' as t;
+@use 'theme/utils' as u;
+
+.lang-page {
+  display: flex;
+  flex-direction: column;
+  min-height: 100%;
+  padding: t.$lc-space-6 t.$lc-space-5 t.$lc-space-5;
+}
+
+.lang-hero {
+  text-align: center;
+  margin-bottom: t.$lc-space-6;
+}
+
+.lang-globe {
+  font-size: 52px;
+  margin-bottom: t.$lc-space-4;
+}
+
+.lang-title {
+  font-family: t.$lc-font-display;
+  font-size: 24px;
+  font-weight: 600;
+  color: t.$lc-text-primary;
+  margin-bottom: t.$lc-space-2;
+}
+
+.lang-sub {
+  @include u.lc-font('sm');
+  color: t.$lc-text-hint;
+  line-height: 1.5;
+}
+
+.lang-list {
+  display: flex;
+  flex-direction: column;
+  gap: t.$lc-space-2;
+}
+
+.lang-option {
+  display: flex;
+  align-items: center;
+  gap: t.$lc-space-3;
+  background: t.$lc-card;
+  border: 1.5px solid t.$lc-border;
+  border-radius: t.$lc-radius-md + 2px;
+  padding: t.$lc-space-3 + 2px t.$lc-space-4;
+  cursor: pointer;
+  font-family: t.$lc-font-body;
+  transition: border-color 0.15s ease, background 0.15s ease;
+
+  &--active {
+    border-color: t.$lc-brand;
+    background: t.$lc-brand-light;
+  }
+}
+
+.lang-flag {
+  font-size: 26px;
+  line-height: 1;
+}
+
+.lang-name {
+  @include u.lc-font('md', 600);
+  color: t.$lc-text-primary;
+  flex: 1;
+  text-align: left;
+}
+
+.lang-check {
+  width: 26px;
+  height: 26px;
+  border-radius: t.$lc-radius-full;
+  background: t.$lc-brand;
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px;
+  font-weight: 700;
+  flex-shrink: 0;
+}
+
+.lang-spacer {
+  flex: 1;
+  min-height: t.$lc-space-5;
+}
+
+.lang-cta {
+  width: 56px;
+  height: 56px;
+  border-radius: t.$lc-radius-full;
+  background: t.$lc-brand;
+  color: white;
+  border: none;
+  font-size: 22px;
+  font-weight: 700;
+  cursor: pointer;
+  align-self: center;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: t.$lc-shadow-card;
+}

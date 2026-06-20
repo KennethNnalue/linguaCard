@@ -35,6 +35,7 @@ import {WordAudioService} from '../../../../shared/audio/word-audio.service';
 import {ReviewStatsStore} from '../../../../shared/srs/review-stats.store';
 import {SettingsStore} from '../../../settings/store/settings.store';
 import {StreakMilestoneComponent} from '../../components/streak-milestone/streak-milestone.component';
+import {GettingStartedChecklistComponent} from '../../components/getting-started-checklist/getting-started-checklist.component';
 import {StudyGoalsPromptComponent} from '../../../settings/components/study-goals-prompt/study-goals-prompt.component';
 import {BottomSheetService} from '../../../../shared/components/bottom-sheet/bottom-sheet.service';
 import {isDue, isNew} from '../../../../shared/srs/srs-status';
@@ -56,6 +57,7 @@ import {Card} from '@lingua-card/shared/domain';
     IonHeader,
     WordCardComponent,
     TranslatePipe,
+    GettingStartedChecklistComponent,
   ],
 })
 export class HomePage {

@@ -59,6 +59,17 @@
       </button>
     </div>
 
+    @if (!hasCards()) {
+      <div class="lc-empty-state">
+        <span class="lc-empty-icon">🎉</span>
+        <p class="lc-empty-title">{{ 'onboarding.empty.reviewTitle' | translate }}</p>
+        <p class="lc-empty-sub">{{ 'onboarding.empty.reviewSubtitle' | translate }}</p>
+        <div class="lc-empty-actions">
+          <button class="lc-empty-primary" (click)="navigateTo('/vault/collections')">{{ 'onboarding.empty.reviewExplore' | translate }}</button>
+        </div>
+      </div>
+    }
+
     <!-- ── Quick study presets ── -->
     <div class="rh-section-header">
       <span class="rh-section-title">{{ 'review.hub.quickStudySection' | translate }}</span>

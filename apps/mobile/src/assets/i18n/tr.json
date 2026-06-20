@@ -1252,5 +1252,88 @@
     "review": "Tekrar",
     "stories": "Hikayeler",
     "listen": "Dinle"
+  },
+  "onboarding": {
+    "common": {
+      "back": "Geri",
+      "skip": "Atla",
+      "next": "İleri",
+      "step": "Adım {{current}} / {{total}}"
+    },
+    "welcome": {
+      "title": "LinguaCard'a Hoş Geldiniz",
+      "subtitle": "Akıllı kartlar, ses ve hikayelerle Almanca öğrenin — günde birkaç dakika.",
+      "bulletReview": "Size uyum sağlayan aralıklı tekrar",
+      "bulletListen": "Her yerde dinleyebileceğiniz ana dil sesi",
+      "bulletStories": "Seviyenize uygun kısa yapay zekâ hikayeleri",
+      "getStarted": "Başla",
+      "skip": "Kendi başıma keşfedeceğim"
+    },
+    "motivation": {
+      "title": "Neden Almanca öğreniyorsunuz?",
+      "subtitle": "Başlangıç kelimelerinizi kişiselleştireceğiz. İstediğiniz zaman değiştirebilirsiniz.",
+      "travel": "Seyahat",
+      "work": "İş ve kariyer",
+      "family": "Aile ve arkadaşlar",
+      "culture": "Kültür ve medya",
+      "exams": "Sınavlar ve çalışma"
+    },
+    "level": {
+      "title": "Ne kadar Almanca biliyorsunuz?",
+      "subtitle": "Bu bir başlangıç hedefi belirler — daha sonra ayarlayabilirsiniz.",
+      "beginner": "Yeni başlıyorum",
+      "beginnerDesc": "Almancaya yeni",
+      "some": "Bazı kelimeler biliyorum",
+      "someDesc": "Temel kelime ve ifadeler",
+      "intermediate": "Sohbet edebilirim",
+      "intermediateDesc": "Orta seviye",
+      "suggestedGoal": "Günde {{count}} kart hedefleyeceğiz"
+    },
+    "seed": {
+      "title": "İlk kelimelerinizi alalım",
+      "subtitle": "Sesli hazır bir set ekleyin veya kendinizinkini getirin.",
+      "adoptedTitle": "Harika — kasanızda kelimeler var!",
+      "adoptedSubtitle": "Keşfet bölümünden istediğiniz zaman daha fazla koleksiyon ekleyebilirsiniz.",
+      "recommended": "Sizin için önerilen",
+      "wordsCount": "{{count}} kelime",
+      "adopt": "Bu kelimeleri ekle",
+      "adopting": "Kelimeler ekleniyor…",
+      "adopted": "Kasanıza {{count}} kelime eklendi",
+      "addOwn": "Kendi kelimemi ekle",
+      "import": "Listeden içe aktar",
+      "error": "Bu kelimeler eklenemedi. Devam etmek için kendi kelimelerinizi eklemeyi deneyin.",
+      "importHint": "Kurulumdan sonra Kasa'da CSV veya görselden kelime içe aktarabilirsiniz.",
+      "orLabel": "veya kendiniz ekleyin"
+    },
+    "goal": {
+      "title": "Günlük hedefinizi belirleyin",
+      "subtitle": "Her gün ulaşarak serinizi büyütün.",
+      "dailyGoalLabel": "Günlük kart sayısı",
+      "remindersLabel": "Pratik yapmamı hatırlat",
+      "remindersHint": "Hedefinize ulaşmadıysanız sizi uyaracağız.",
+      "finish": "Öğrenmeye başla"
+    },
+    "checklist": {
+      "title": "Başlangıç",
+      "progress": "{{done}} / {{total}} tamamlandı",
+      "addWord": "İlk kelimeni ekle",
+      "setGoal": "Günlük hedefini belirle",
+      "firstReview": "İlk tekrarını tamamla",
+      "tryStory": "İlk hikayeni oku",
+      "dismiss": "Kapat",
+      "allDone": "Hazırsınız!"
+    },
+    "empty": {
+      "vaultTitle": "Kasanız boş",
+      "vaultSubtitle": "Öğrenmeye başlamak için hazır koleksiyonlar veya kendi kelimelerinizi ekleyin.",
+      "vaultExplore": "Koleksiyonları keşfet",
+      "vaultAdd": "Kelime ekle",
+      "reviewTitle": "Şu anda bekleyen yok",
+      "reviewSubtitle": "Devam etmek için daha fazla kelime ekleyin veya bir koleksiyon keşfedin.",
+      "reviewExplore": "Koleksiyonları keşfet"
+    },
+    "tour": {
+      "takeTour": "Kurulumu tekrarla"
+    }
   }
 }

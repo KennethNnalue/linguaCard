@@ -10,6 +10,7 @@ import {
   informationCircleOutline,
 } from 'ionicons/icons';
 import { ReviewStore } from '../../store/review.store';
+import { CardStore } from '../../../vault/store/card.store';
 import { ReviewFilterService } from '../../services/review-filter.service';
 import { SessionStatsService } from '../../shared/services/session-stats.service';
 import { TranslatePipe, TranslateService } from '@ngx-translate/core';
@@ -38,6 +39,7 @@ import {
 })
 export class ReviewHubPage {
   private readonly reviewStore = inject(ReviewStore);
+  private readonly cardStore = inject(CardStore);
   private readonly filterService = inject(ReviewFilterService);
   private readonly reviewStats = inject(ReviewStatsStore);
   readonly stats = inject(SessionStatsService);
@@ -47,6 +49,8 @@ export class ReviewHubPage {
   constructor() {
     addIcons({ alertCircleOutline, addCircleOutline, chevronForwardOutline, playOutline, informationCircleOutline });
   }
+
+  readonly hasCards = computed(() => this.cardStore.cards().length > 0);
 
   // Due reviews = studied cards with nextDueAt <= now
   readonly overdueCount = computed(() => this.filterService.getDueTodayCount());
@@ -144,6 +148,7 @@ export class ReviewHubPage {
   goToCustom(): void { void this.router.navigate([ReviewRoute.CUSTOM]); }
   goToHistory(): void { void this.router.navigate([ReviewRoute.HISTORY]); }
   goToMastery(): void { void this.router.navigate([ReviewRoute.MASTERY]); }
+  navigateTo(path: string): void { void this.router.navigateByUrl(path); }
 
   // Thin wrappers — delegate to SessionStatsService so template bindings stay simple
   sessionRatingColour(s: LocalReviewSession): string { return this.stats.ratingColour(s); }

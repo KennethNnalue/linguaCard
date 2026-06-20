@@ -1,0 +1,26 @@
+<ion-content>
+  <lc-onboarding-shell [step]="store.step()" [total]="store.totalSteps()" (backClick)="onBack()" (skipClick)="onSkip()">
+    <p class="ob-step">{{ 'onboarding.common.step' | translate:{ current: store.step() + 1, total: store.totalSteps() } }}</p>
+    <h1 class="ob-title">{{ 'onboarding.motivation.title' | translate }}</h1>
+    <p class="ob-sub">{{ 'onboarding.motivation.subtitle' | translate }}</p>
+
+    <div class="persona-grid">
+      @for (opt of options; track opt.value) {
+        <button
+          class="persona"
+          [class.persona--active]="selected() === opt.value"
+          [attr.aria-pressed]="selected() === opt.value"
+          (click)="select(opt.value)">
+          <span class="persona-emoji">{{ opt.emoji }}</span>
+          <span class="persona-name">{{ opt.labelKey | translate }}</span>
+        </button>
+      }
+    </div>
+
+    <div class="spacer"></div>
+
+    <button class="ob-cta" (click)="onNext()">
+      {{ 'onboarding.common.next' | translate }}
+    </button>
+  </lc-onboarding-shell>
+</ion-content>

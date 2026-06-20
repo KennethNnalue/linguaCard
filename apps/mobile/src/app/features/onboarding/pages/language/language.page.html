@@ -1,0 +1,28 @@
+<ion-content>
+  <div class="lang-page">
+    <div class="lang-hero">
+      <div class="lang-globe">🌍</div>
+      <h1 class="lang-title">Choose your language</h1>
+      <p class="lang-sub">Wählen Sie Ihre Sprache · Elige tu idioma</p>
+    </div>
+
+    <div class="lang-list">
+      @for (lang of languages; track lang.code) {
+        <button
+          class="lang-option"
+          [class.lang-option--active]="currentLanguage() === lang.code"
+          (click)="select(lang.code)">
+          <span class="lang-flag">{{ lang.flag }}</span>
+          <span class="lang-name">{{ lang.nativeName }}</span>
+          @if (currentLanguage() === lang.code) {
+            <span class="lang-check">✓</span>
+          }
+        </button>
+      }
+    </div>
+
+    <div class="lang-spacer"></div>
+
+    <button class="lang-cta" (click)="onNext()" aria-label="Continue">→</button>
+  </div>
+</ion-content>

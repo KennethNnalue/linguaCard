@@ -1,0 +1,74 @@
+<ion-content>
+  <lc-onboarding-shell [step]="store.step()" [total]="store.totalSteps()" (backClick)="onBack()" (skipClick)="onSkip()">
+    <p class="ob-step">{{ 'onboarding.common.step' | translate:{ current: store.step() + 1, total: store.totalSteps() } }}</p>
+
+    @if (seededCount() > 0) {
+      <h1 class="ob-title">{{ 'onboarding.seed.adoptedTitle' | translate }}</h1>
+      <p class="ob-sub">{{ 'onboarding.seed.adoptedSubtitle' | translate }}</p>
+
+      <div class="seed-done">
+        <span class="seed-done-icon">✓</span>
+        <span class="seed-done-text">{{ 'onboarding.seed.adopted' | translate:{ count: seededCount() } }}</span>
+      </div>
+
+      <div class="spacer"></div>
+
+      <button class="ob-cta" (click)="onNext()">
+        {{ 'onboarding.common.next' | translate }}
+      </button>
+    } @else {
+      <h1 class="ob-title">{{ 'onboarding.seed.title' | translate }}</h1>
+      <p class="ob-sub">{{ 'onboarding.seed.subtitle' | translate }}</p>
+
+      @if (collection(); as col) {
+        <p class="seed-tag">★ {{ 'onboarding.seed.recommended' | translate }}</p>
+        <div class="seed-card">
+          <div class="seed-cover">
+            {{ col.emoji ?? '📚' }}
+          </div>
+          <div class="seed-body">
+            <div class="seed-name">{{ col.title }}</div>
+            <div class="seed-meta">
+              <span class="seed-pill">{{ col.level }}</span>
+              <span>{{ 'onboarding.seed.wordsCount' | translate:{ count: col.wordCount } }}</span>
+            </div>
+          </div>
+        </div>
+
+        @if (isSeeding()) {
+          <button class="ob-cta ob-cta--loading" disabled>
+            <ion-spinner name="crescent" />
+            {{ 'onboarding.seed.adopting' | translate }}
+          </button>
+        } @else {
+          <button class="ob-cta" (click)="onAdopt()">
+            {{ 'onboarding.seed.adopt' | translate }}
+          </button>
+        }
+      }
+
+      @if (seedError()) {
+        <p class="seed-error">{{ 'onboarding.seed.error' | translate }}</p>
+      }
+
+      <p class="seed-or">{{ 'onboarding.seed.orLabel' | translate }}</p>
+
+      <div class="seed-alt">
+        <button class="seed-alt-btn" (click)="onAddOwn()">
+          <span class="seed-alt-icon">✏️</span>
+          <span class="seed-alt-label">{{ 'onboarding.seed.addOwn' | translate }}</span>
+        </button>
+        <button class="seed-alt-btn" (click)="onImport()">
+          <span class="seed-alt-icon">📄</span>
+          <span class="seed-alt-label">{{ 'onboarding.seed.import' | translate }}</span>
+        </button>
+      </div>
+
+      <div class="spacer"></div>
+
+      <button class="ob-cta-secondary" (click)="onNext()">
+        {{ 'onboarding.common.next' | translate }}
+      </button>
+    }
+  </lc-onboarding-shell>
+</ion-content>

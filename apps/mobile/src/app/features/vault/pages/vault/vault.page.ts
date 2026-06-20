@@ -155,6 +155,10 @@ export class VaultPage {
     ]);
   }
 
+  navigateTo(path: string): void {
+    this.router.navigateByUrl(path);
+  }
+
   async openAddWord(): Promise<void> {
     const modal = await this.modalCtrl.create({
       component: AddWordSheetComponent,

@@ -10,6 +10,7 @@ import {
   logOutOutline,
   moonOutline,
   notificationsOutline,
+  rocketOutline,
   syncOutline,
   trashOutline,
   trophyOutline,
@@ -37,7 +38,7 @@ export class UserMenuComponent {
   readonly resetRequested = output<void>();
 
   constructor() {
-    addIcons({ moonOutline, syncOutline, trashOutline, logOutOutline, chevronForwardOutline, trophyOutline, notificationsOutline, cloudUploadOutline, languageOutline });
+    addIcons({ moonOutline, syncOutline, trashOutline, logOutOutline, chevronForwardOutline, trophyOutline, notificationsOutline, cloudUploadOutline, languageOutline, rocketOutline });
   }
 
   get syncLabel(): string {

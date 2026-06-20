@@ -1,0 +1,29 @@
+@if (visible()) {
+  <div class="checklist">
+    <div class="cl-head">
+      <span class="cl-title">{{ 'onboarding.checklist.title' | translate }}</span>
+      @if (allDone()) {
+        <button class="cl-dismiss" (click)="dismiss()">{{ 'onboarding.checklist.dismiss' | translate }}</button>
+      } @else {
+        <span class="cl-progress">{{ 'onboarding.checklist.progress' | translate:{ done: doneCount(), total: totalCount() } }}</span>
+      }
+    </div>
+
+    @for (item of items(); track item.labelKey) {
+      <div class="cl-row">
+        @if (item.done) {
+          <span class="cl-check cl-check--done">✓</span>
+          <span class="cl-text cl-text--done">{{ item.labelKey | translate }}</span>
+        } @else {
+          <span class="cl-check cl-check--todo"></span>
+          <span class="cl-text">{{ item.labelKey | translate }}</span>
+          <button class="cl-go" (click)="navigate(item.route)">{{ 'onboarding.common.next' | translate }} →</button>
+        }
+      </div>
+    }
+
+    @if (allDone()) {
+      <div class="cl-done-msg">{{ 'onboarding.checklist.allDone' | translate }}</div>
+    }
+  </div>
+}

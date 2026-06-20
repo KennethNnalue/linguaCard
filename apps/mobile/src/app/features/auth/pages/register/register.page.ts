@@ -6,13 +6,13 @@ import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { addIcons } from 'ionicons';
 import { alertCircleOutline, eyeOffOutline, eyeOutline, logoGoogle } from 'ionicons/icons';
 import { AuthService } from '../../../../core/services/auth.service';
+import { LanguagePickerComponent } from '../../../../shared/components/language-picker/language-picker.component';
 
 @Component({
   selector: 'lc-register',
   templateUrl: './register.page.html',
   styleUrls: ['./register.page.scss'],
-  standalone: true,
-  imports: [ReactiveFormsModule, RouterLink, IonContent, IonIcon, IonSpinner, TranslatePipe],
+  imports: [ReactiveFormsModule, RouterLink, IonContent, IonIcon, IonSpinner, TranslatePipe, LanguagePickerComponent],
 })
 export class RegisterPage {
   private readonly authService = inject(AuthService);
@@ -45,7 +45,7 @@ export class RegisterPage {
       .subscribe({
         next: () => {
           this.loading.set(false);
-          this.router.navigateByUrl('/home');
+          this.router.navigateByUrl('/onboarding');
         },
         error: (err: Error) => {
           this.loading.set(false);

@@ -1,4 +1,4 @@
-import { Component, inject, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, inject, signal } from '@angular/core';
 import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { RouterLink } from '@angular/router';
 import {
@@ -12,13 +12,14 @@ import { TranslatePipe } from '@ngx-translate/core';
 import { addIcons } from 'ionicons';
 import { alertCircleOutline, arrowBackOutline, checkmarkCircleOutline, mailOutline } from 'ionicons/icons';
 import { AuthService } from '../../../../core/services/auth.service';
+import { LanguagePickerComponent } from '../../../../shared/components/language-picker/language-picker.component';
 
 @Component({
   selector: 'lc-forgot-password',
   templateUrl: './forgot-password.page.html',
   styleUrls: ['./forgot-password.page.scss'],
-  standalone: true,
-  imports: [ReactiveFormsModule, RouterLink, IonContent, IonHeader, IonToolbar, IonIcon, IonSpinner, TranslatePipe],
+  changeDetection: ChangeDetectionStrategy.OnPush,
+  imports: [ReactiveFormsModule, RouterLink, IonContent, IonHeader, IonToolbar, IonIcon, IonSpinner, TranslatePipe, LanguagePickerComponent],
 })
 export class ForgotPasswordPage {
   private readonly authService = inject(AuthService);

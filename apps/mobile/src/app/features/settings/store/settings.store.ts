@@ -57,15 +57,15 @@ export const SettingsStore = signalStore(
       },
 
       async update(dto: UpdateUserSettingsDto): Promise<void> {
-        // Stamp the edit with the on-device time so the server can resolve
-        // conflicts by last-write-wins. The queued payload carries the same
-        // original edit time, so a stale offline edit stays stale even if it
-        // reaches the server long after a newer edit from another device.
         const stamped: UpdateUserSettingsDto = { ...dto, clientUpdatedAt: new Date().toISOString() };
-        // Optimistic — apply immediately so the UI responds instantly.
         const current = store.settings();
         if (current) {
-          patchState(store, { settings: { ...current, ...dto } });
+          const { completeOnboarding, clientUpdatedAt, ...settingsFields } = dto;
+          const optimistic: Partial<UserSettings> = { ...settingsFields };
+          if (completeOnboarding) {
+            optimistic.onboardingCompletedAt = new Date().toISOString();
+          }
+          patchState(store, { settings: { ...current, ...optimistic } });
         }
         try {
           const saved = await firstValueFrom(api.update(stamped));
