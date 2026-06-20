@@ -1,10 +1,10 @@
 <ion-header class="ion-no-border">
   <ion-toolbar>
     <div class="aw-nav">
-      <button class="aw-close-btn" (click)="dismiss()" aria-label="Close">
+      <button class="aw-close-btn" (click)="dismiss()" [attr.aria-label]="'addWord.nav.closeAria' | translate">
         <ion-icon name="close-outline"></ion-icon>
       </button>
-      <span class="aw-title lc-display">{{ isEditing ? 'Edit Word' : 'Add New Word' }}</span>
+      <span class="aw-title lc-display">{{ (isEditing ? 'addWord.nav.editTitle' : 'addWord.nav.addTitle') | translate }}</span>
       <div class="aw-nav-spacer"></div>
     </div>
   </ion-toolbar>
@@ -15,23 +15,23 @@
 
     <!-- Language direction (visual only) -->
     <div class="aw-field">
-      <p class="aw-lbl">Language direction</p>
+      <p class="aw-lbl">{{ 'addWord.langDirection.label' | translate }}</p>
       <div class="aw-lang-row">
-        <div class="aw-lang-chip aw-lang-chip--active">🇬🇧 English</div>
-        <span class="aw-lang-arrow">→</span>
-        <div class="aw-lang-chip aw-lang-chip--active">🇩🇪 German</div>
+        <div class="aw-lang-chip aw-lang-chip--active">{{ 'addWord.langDirection.english' | translate }}</div>
+        <span class="aw-lang-arrow">{{ 'addWord.langDirection.arrow' | translate }}</span>
+        <div class="aw-lang-chip aw-lang-chip--active">{{ 'addWord.langDirection.german' | translate }}</div>
       </div>
     </div>
 
     <!-- Back — German + Auto-generate button -->
     <div class="aw-field">
-      <p class="aw-lbl">Back — German <span class="aw-lbl-hint">(article auto-detected)</span></p>
+      <p class="aw-lbl">{{ 'addWord.back.label' | translate }} <span class="aw-lbl-hint">{{ 'addWord.back.hint' | translate }}</span></p>
       <div class="aw-back-row">
         <input
           class="aw-input aw-input--flex"
           [class.aw-input--error]="form.get('back')?.invalid && form.get('back')?.touched"
           type="text"
-          placeholder="German word (e.g. Zug)"
+          [placeholder]="'addWord.back.placeholder' | translate"
           formControlName="back"
           autocomplete="off" />
         <button
@@ -40,13 +40,13 @@
           [class.aw-gen-btn--loading]="generating()"
           [disabled]="!canAutoGenerate()"
           (click)="autoGenerate()"
-          aria-label="Auto-generate translation, plural and synonyms">
+          [attr.aria-label]="'addWord.back.autoGenAria' | translate">
           @if (generating()) {
             <span class="aw-spinner"></span>
-            Generating…
+            {{ 'addWord.back.generatingLabel' | translate }}
           } @else {
             <ion-icon name="sparkles-outline"></ion-icon>
-            Auto
+            {{ 'addWord.back.autoGenLabel' | translate }}
           }
         </button>
       </div>
@@ -55,20 +55,20 @@
       @if (fromLibrary()) {
         <div class="aw-library-banner">
           <span class="aw-library-banner__icon">⚡</span>
-          <span class="aw-library-banner__text">Filled from the library — no AI call</span>
+          <span class="aw-library-banner__text">{{ 'addWord.back.libraryBanner' | translate }}</span>
         </div>
       }
 
       <!-- Article segmented selector -->
       <div class="aw-article-group">
-        <span class="aw-article-lbl">Article</span>
+        <span class="aw-article-lbl">{{ 'addWord.article.label' | translate }}</span>
         <div class="aw-article-seg">
           <button
             type="button"
             class="aw-art-seg-btn"
             [class.aw-art-seg-btn--active]="!form.get('article')?.value"
             (click)="selectArticle(null)">
-            None
+            {{ 'addWord.article.noneOption' | translate }}
           </button>
           @for (art of articles; track art) {
             <button
@@ -85,12 +85,12 @@
 
     <!-- Front — English -->
     <div class="aw-field">
-      <p class="aw-lbl">Front — English</p>
+      <p class="aw-lbl">{{ 'addWord.front.label' | translate }}</p>
       <input
         class="aw-input"
         [class.aw-input--error]="form.get('front')?.invalid && form.get('front')?.touched"
         type="text"
-        placeholder="e.g. the train"
+        [placeholder]="'addWord.front.placeholder' | translate"
         formControlName="front"
         autocomplete="off" />
     </div>
@@ -98,11 +98,11 @@
     <!-- Plural — only shown when an article is selected -->
     @if (showPluralField()) {
       <div class="aw-field">
-        <p class="aw-lbl">Plural <span class="aw-lbl-hint">— include the article</span></p>
+        <p class="aw-lbl">{{ 'addWord.plural.label' | translate }} <span class="aw-lbl-hint">{{ 'addWord.plural.hint' | translate }}</span></p>
         <input
           class="aw-input"
           type="text"
-          placeholder="e.g. die Flugzeuge"
+          [placeholder]="'addWord.plural.placeholder' | translate"
           formControlName="plural"
           autocomplete="off" />
       </div>
@@ -110,7 +110,7 @@
 
     <!-- Synonyms chip editor (LC-136) -->
     <div class="aw-field">
-      <p class="aw-lbl">Synonyms</p>
+      <p class="aw-lbl">{{ 'addWord.synonyms.label' | translate }}</p>
       <div class="aw-syn-list" formArrayName="synonyms">
         @for (group of synonymsArray.controls; track $index; let i = $index) {
           <div class="aw-syn-chip" [formGroupName]="i">
@@ -119,7 +119,7 @@
                 <span class="aw-syn-art aw-syn-art--{{ art }}">{{ art }}</span>
               }
               <span class="aw-syn-chip-word">
-                {{ getSynonymGroup(i).get('word')?.value || 'New synonym' }}
+                {{ getSynonymGroup(i).get('word')?.value || ('addWord.synonyms.newLabel' | translate) }}
               </span>
               <span class="aw-syn-chip-trans">
                 {{ getSynonymGroup(i).get('translation')?.value }}
@@ -128,14 +128,14 @@
                 type="button"
                 class="aw-syn-chip-x"
                 (click)="$event.stopPropagation(); removeSynonym(i)"
-                aria-label="Remove synonym">
+                [attr.aria-label]="'addWord.synonyms.removeAria' | translate">
                 <ion-icon name="close-outline"></ion-icon>
               </button>
             </div>
             @if (expandedSynonymIdx() === i) {
               <div class="aw-syn-fields">
                 <div class="aw-syn-field-row">
-                  <input class="aw-input aw-input--sm" placeholder="Synonym word" formControlName="word" autocomplete="off" />
+                  <input class="aw-input aw-input--sm" [placeholder]="'addWord.synonyms.wordPlaceholder' | translate" formControlName="word" autocomplete="off" />
                   <div class="aw-syn-art-seg">
                     <button type="button" class="aw-syn-art-btn" [class.active]="!getSynonymGroup(i).get('article')?.value" (click)="getSynonymGroup(i).get('article')!.setValue(null)">—</button>
                     @for (art of articles; track art) {
@@ -143,16 +143,16 @@
                     }
                   </div>
                 </div>
-                <input class="aw-input aw-input--sm" placeholder="Translation (English)" formControlName="translation" autocomplete="off" />
-                <input class="aw-input aw-input--sm" placeholder="Example sentence (German)" formControlName="example" autocomplete="off" />
-                <input class="aw-input aw-input--sm" placeholder="Example translation (English)" formControlName="exampleNative" autocomplete="off" />
+                <input class="aw-input aw-input--sm" [placeholder]="'addWord.synonyms.translationPlaceholder' | translate" formControlName="translation" autocomplete="off" />
+                <input class="aw-input aw-input--sm" [placeholder]="'addWord.synonyms.examplePlaceholder' | translate" formControlName="example" autocomplete="off" />
+                <input class="aw-input aw-input--sm" [placeholder]="'addWord.synonyms.exampleNativePlaceholder' | translate" formControlName="exampleNative" autocomplete="off" />
               </div>
             }
           </div>
         }
         <button type="button" class="aw-syn-add" (click)="addSynonym()">
           <ion-icon name="add-outline"></ion-icon>
-          Add synonym
+          {{ 'addWord.synonyms.addButton' | translate }}
         </button>
       </div>
     </div>
@@ -163,18 +163,18 @@
         <span class="aw-duplicate-icon">⚠</span>
         <span class="aw-duplicate-msg">
           "{{ (duplicateCard()?.content?.article ? duplicateCard()!.content.article + ' ' : '') + duplicateCard()?.content?.back }}"
-          already exists@if (duplicateCollectionName()) { in "{{ duplicateCollectionName() }}"} @else { in your vault}.
+          {{ 'addWord.duplicateWarning.messageSuffix' | translate }}@if (duplicateCollectionName()) { {{ 'addWord.duplicateWarning.inLabel' | translate }} "{{ duplicateCollectionName() }}"} @else { {{ 'addWord.duplicateWarning.defaultLocation' | translate }}}.
         </span>
         <div class="aw-duplicate-actions">
-          <button type="button" class="aw-duplicate-btn aw-duplicate-btn--dismiss" (click)="dismissDuplicateWarning()">Add anyway</button>
-          <button type="button" class="aw-duplicate-btn aw-duplicate-btn--go" (click)="goToExisting()">Go to existing</button>
+          <button type="button" class="aw-duplicate-btn aw-duplicate-btn--dismiss" (click)="dismissDuplicateWarning()">{{ 'addWord.duplicateWarning.addAnywayButton' | translate }}</button>
+          <button type="button" class="aw-duplicate-btn aw-duplicate-btn--go" (click)="goToExisting()">{{ 'addWord.duplicateWarning.goToButton' | translate }}</button>
         </div>
       </div>
     }
 
     <!-- Collection -->
     <div class="aw-field">
-      <p class="aw-lbl">Collection <span class="aw-lbl-hint aw-lbl-hint--required">*required</span></p>
+      <p class="aw-lbl">{{ 'addWord.collection.label' | translate }} <span class="aw-lbl-hint aw-lbl-hint--required">{{ 'addWord.collection.requiredHint' | translate }}</span></p>
       @if (lockedCollectionId) {
         <div class="aw-collection-locked">{{ selectedCollectionLabel() }}</div>
       } @else {
@@ -191,7 +191,7 @@
 
     <!-- Category -->
     <div class="aw-field">
-      <p class="aw-lbl">Category</p>
+      <p class="aw-lbl">{{ 'addWord.category.label' | translate }}</p>
       <div class="aw-chip-row">
         @for (cat of categories(); track cat.id) {
           <button
@@ -208,7 +208,7 @@
           [class.aw-cat-chip--selected]="showNewCategoryInput()"
           (click)="toggleNewCategoryInput()">
           <ion-icon [name]="showNewCategoryInput() ? 'close-outline' : 'add-outline'"></ion-icon>
-          {{ showNewCategoryInput() ? 'Cancel' : 'New' }}
+          {{ (showNewCategoryInput() ? 'addWord.category.cancelButton' : 'addWord.category.newButton') | translate }}
         </button>
       </div>
       @if (showNewCategoryInput()) {
@@ -216,7 +216,7 @@
           <input
             class="aw-input aw-input--grow"
             type="text"
-            placeholder="Category name"
+            [placeholder]="'addWord.newCategory.placeholder' | translate"
             [value]="newCategoryName()"
             (input)="newCategoryName.set($any($event.target).value)"
             (keyup.enter)="addNewCategory()"
@@ -226,7 +226,7 @@
             class="aw-new-cat-add-btn"
             [disabled]="!newCategoryName().trim()"
             (click)="addNewCategory()">
-            Add
+            {{ 'addWord.newCategory.addButton' | translate }}
           </button>
         </div>
       }
@@ -234,17 +234,17 @@
 
     <!-- Example sentence -->
     <div class="aw-field">
-      <p class="aw-lbl">Example sentence</p>
+      <p class="aw-lbl">{{ 'addWord.examples.label' | translate }}</p>
       <div class="aw-example-wrap">
         <textarea
           class="aw-textarea"
-          placeholder="German sentence (e.g. Der Zug fährt um 8 Uhr ab.)"
+          [placeholder]="'addWord.examples.targetPlaceholder' | translate"
           formControlName="exampleTarget"
           rows="2"></textarea>
         <div class="aw-example-sep"></div>
         <textarea
           class="aw-textarea aw-textarea--translation"
-          placeholder='"English translation"'
+          [placeholder]="'addWord.examples.nativePlaceholder' | translate"
           formControlName="exampleNative"
           rows="2"></textarea>
       </div>
@@ -252,27 +252,27 @@
 
     <!-- Pronunciation -->
     <div class="aw-field">
-      <p class="aw-lbl">Pronunciation</p>
+      <p class="aw-lbl">{{ 'addWord.pronunciation.label' | translate }}</p>
       <div class="aw-pron-row">
         <button type="button" class="aw-pron-btn">
           <ion-icon name="mic-outline"></ion-icon>
-          Record
+          {{ 'addWord.pronunciation.recordButton' | translate }}
         </button>
         <button type="button" class="aw-pron-btn aw-pron-btn--tts" (click)="playTTS()">
           <ion-icon name="volume-high-outline"></ion-icon>
-          Use TTS
+          {{ 'addWord.pronunciation.ttsButton' | translate }}
         </button>
       </div>
     </div>
 
     <!-- Save -->
     <button type="submit" class="aw-save-btn" [disabled]="saving()">
-      @if (saving()) { Saving… } @else if (isEditing) { Save changes } @else { Save to Vault }
+      @if (saving()) { {{ 'addWord.save.savingLabel' | translate }} } @else if (isEditing) { {{ 'addWord.save.editLabel' | translate }} } @else { {{ 'addWord.save.createLabel' | translate }} }
     </button>
 
     @if (!isEditing) {
       <p class="aw-import-link" (click)="navigateToImport()">
-        Add multiple words? Import a CSV →
+        {{ 'addWord.importLink.text' | translate }}
       </p>
     }
 

@@ -326,10 +326,10 @@ export const ListenStore = signalStore(
         this.loadQueue(cards, ListenSourceLabel.Struggling);
       },
 
-      loadCollectionCards(colId: string, colName: string): void {
+      loadCollectionCards(colId: string, sourceLabel: string): void {
         patchState(store, { selectedSource: `collection:${colId}` });
         const cards = cardStore.cards().filter(c => c.collectionId === colId);
-        this.loadQueue(cards, `Collection: ${colName}`);
+        this.loadQueue(cards, sourceLabel);
       },
 
       start(opts: { shuffle?: boolean } = {}): void {

@@ -1,0 +1,1194 @@
+{
+  "common": {
+    "appName": "LinguaCard",
+    "cancel": "İptal",
+    "close": "Kapat",
+    "save": "Kaydet",
+    "delete": "Sil",
+    "retry": "Tekrar dene",
+    "loading": "Yükleniyor…",
+    "back": "Geri",
+    "done": "Tamam",
+    "or": "veya",
+    "install": "Yükle",
+    "dismiss": "Kapat",
+    "notNow": "Şimdi değil",
+    "email": "E-posta",
+    "password": "Şifre",
+    "fullName": "Ad Soyad",
+    "words": "kelime",
+    "cards": "kart",
+    "due": "bekleyen",
+    "min": "dk",
+    "of": "/",
+    "new": "Yeni",
+    "all": "Tümü",
+    "today": "bugün",
+    "placeholder": {
+      "email": "you@example.com",
+      "password": "••••••••",
+      "name": "Jan Schmidt"
+    },
+    "error": {
+      "generic": "Bir sorun oluştu. Lütfen tekrar deneyin."
+    },
+    "divider": {
+      "or": "veya"
+    },
+    "aria": {
+      "toggleDarkMode": "Karanlık modu aç/kapat",
+      "togglePasswordVisibility": "Şifreyi göster/gizle",
+      "close": "Kapat",
+      "closeMenu": "Menüyü kapat",
+      "quickActions": "Hızlı işlemler",
+      "addCard": "Kart ekle",
+      "newCollection": "Yeni koleksiyon",
+      "import": "İçe aktar",
+      "backToLogin": "Girişe dön",
+      "syncStatus": "Senkronizasyon durumu",
+      "playPronunciation": "Telaffuzu dinle",
+      "share": "Paylaş"
+    },
+    "account": "Hesap",
+    "refresh": "Yenile",
+    "yesterday": "Dün",
+    "daysAgoLabel": "{{count}} gün önce",
+    "todayCapital": "Bugün"
+  },
+  "auth": {
+    "login": {
+      "tagline": "Almanca kelime bilgisini geliştir",
+      "signIn": "Giriş yap",
+      "forgotPassword": "Şifreni mi unuttun?",
+      "noAccount": "Hesabın yok mu?"
+    },
+    "register": {
+      "title": "Hesap Oluştur",
+      "tagline": "Dil yolculuğuna başla",
+      "passwordHint": "En az 8 karakter",
+      "submit": "Hesap Oluştur",
+      "hasAccount": "Zaten hesabın var mı?",
+      "error": "Kayıt başarısız oldu. Lütfen tekrar deneyin."
+    },
+    "forgotPassword": {
+      "title": "Şifre Sıfırla",
+      "heading": "Şifreni mi unuttun?",
+      "description": "E-postanı gir, sana sıfırlama bağlantısı gönderelim.",
+      "submit": "Sıfırlama Bağlantısı Gönder",
+      "remember": "Şifreni hatırlıyor musun?",
+      "checkEmail": "E-postanı kontrol et",
+      "linkSent": "Şifre sıfırlama bağlantısını gönderdik:",
+      "notReceived": "Almadın mı? Spam klasörünü kontrol et veya birkaç dakika bekle.",
+      "backToLogin": "Girişe Dön"
+    },
+    "validation": {
+      "emailInvalid": "Geçerli bir e-posta adresi girin",
+      "passwordMinLength": "Şifre en az 8 karakter olmalıdır",
+      "nameMinLength": "İsim en az 2 karakter olmalıdır"
+    },
+    "oauth": {
+      "google": "Google ile devam et",
+      "googleComingSoon": "Google ile giriş yakında"
+    },
+    "signOut": "Çıkış yap",
+    "reset": {
+      "passwordIncorrect": "Şifre yanlış. Lütfen tekrar deneyin.",
+      "success": "✓ Tüm veriler sıfırlandı. Yeni bir başlangıç!"
+    }
+  },
+  "home": {
+    "greeting": {
+      "morning": "Günaydın",
+      "afternoon": "İyi Öğlenler",
+      "evening": "İyi Akşamlar"
+    },
+    "hero": {
+      "completeGreeting": "Harika iş",
+      "completeTitle": "Bugünkü hedef tamamlandı ✓",
+      "readyTitle": "Bugün öğrenmeye hazır mısın?"
+    },
+    "stats": {
+      "dueLabel": "bekleyen",
+      "newCardsLabel": "yeni kart",
+      "reviewsLabel": "tekrar"
+    },
+    "actions": {
+      "startSession": "Oturumu başlat",
+      "filter": "Filtre"
+    },
+    "atRisk": {
+      "keepStreakPrefix": "Serini korumak için şimdi tekrar et:",
+      "keepStreakSuffix": "günlük seri",
+      "startStreakSuffix": "seri başlatmak için bugün kartları tekrar et",
+      "dailyGoalSuffix": "günlük hedefe ulaşmak için daha fazla kart",
+      "reviewText": "Tekrar et",
+      "startButton": "Başla"
+    },
+    "streak": {
+      "label": "Günlük seri",
+      "onTrack": "Bugün yoldasın ✓",
+      "atRisk": "Risk altında!",
+      "broken": "Yeni bir seri başlat"
+    },
+    "goalRing": {
+      "label": "Günlük hedef",
+      "todayLabel": "bugün",
+      "doneLabel": "tamamlandı",
+      "notStarted": "Başlanmadı",
+      "toGoLabel": "kaldı"
+    },
+    "wordOfDay": {
+      "label": "✦ Günün Kelimesi",
+      "playAria": "Telaffuzu dinle"
+    },
+    "weeklyChart": {
+      "title": "Bu hafta",
+      "detailsLink": "Detaylar →",
+      "reviewed": "kart tekrar edildi",
+      "goalLabel": "Hedef:"
+    },
+    "quickActions": {
+      "title": "Hızlı işlemler",
+      "scanLabel": "Tara",
+      "scanSub": "Kelime içe aktar",
+      "storyLabel": "Hikaye",
+      "storySub": "Yeni oluştur",
+      "listenLabel": "Dinle",
+      "listenSub": "Sesli çalma listesi"
+    },
+    "recentCards": {
+      "title": "Son eklenenler",
+      "seeAllLink": "Tümünü gör →"
+    },
+    "collectionFilter": {
+      "allLabel": "Tüm koleksiyonlar"
+    },
+    "wotd": {
+      "genderMasculine": "eril",
+      "genderFeminine": "dişil",
+      "genderNeuter": "nötr"
+    }
+  },
+  "vault": {
+    "title": "Kasa",
+    "addCard": "Kart Ekle",
+    "import": "İçe Aktar",
+    "newCollection": "Yeni Koleksiyon",
+    "search": {
+      "placeholder": "Kelime ara…",
+      "aria": "Kelime ara"
+    },
+    "filter": {
+      "allLabel": "Tümü",
+      "dueLabel": "Bekleyen",
+      "newLabel": "Yeni",
+      "masteredLabel": "Ustalaşılan",
+      "needReviewText": "tekrar gerekli",
+      "neverStudiedText": "hiç çalışılmadı"
+    },
+    "sort": {
+      "title": "Sırala",
+      "newestFirst": "En yeniler önce",
+      "alphabetical": "A–Z (alfabetik)",
+      "masteryLowest": "Ustalık (en düşük önce)",
+      "dueDate": "Tekrar tarihi"
+    },
+    "emptyState": {
+      "title": "Kelime bulunamadı",
+      "subtitle": "Farklı bir filtre veya arama deneyin"
+    },
+    "tabs": {
+      "wordsLabel": "Kelimeler",
+      "collectionsLabel": "Koleksiyonlar",
+      "wordsAria": "Kelimeler sekmesi",
+      "collectionsAria": "Koleksiyonlar sekmesi"
+    },
+    "afterCreate": {
+      "title": "Koleksiyonunuza kelime eklemek ister misiniz?",
+      "importOption": "Kelime içe aktar",
+      "goToOption": "Koleksiyona git",
+      "laterOption": "Belki sonra"
+    },
+    "collectionFilter": {
+      "title": "Koleksiyona göre filtrele"
+    },
+    "collections": {
+      "totalWordsLabel": "Toplam kelime",
+      "collectionsLabel": "Koleksiyon",
+      "dueTodayLabel": "Bugün bekleyen",
+      "emptyTitle": "Henüz koleksiyon yok",
+      "emptySubtitle": "Başlamak için + Yeni Koleksiyon'a dokunun"
+    }
+  },
+  "collections": {
+    "title": "Koleksiyonlar",
+    "segments": {
+      "mySets": "Setlerim",
+      "explore": "Keşfet"
+    },
+    "mySets": {
+      "totalLabel": "Tüm setlerdeki toplam",
+      "wordsUnit": "kelime",
+      "dueLabel": "Bugün bekleyen",
+      "emptyTitle": "Henüz set yok",
+      "emptySubtitle": "Oluşturmak için + simgesine dokunun veya kütüphaneyi keşfedin"
+    },
+    "explore": {
+      "searchPlaceholder": "Set ve konu ara…",
+      "allLevel": "Tümü",
+      "emptyTitle": "Bu seviyede set yok",
+      "emptySubtitle": "Farklı bir seviye deneyin veya aramayı temizleyin",
+      "seeAllLink": "Tümünü gör ›",
+      "openButton": "Aç",
+      "getButton": "+ Al",
+      "getNewButton": "+ Yenileri al",
+      "addingLabel": "Ekleniyor…",
+      "forYouLabel": "SİZİN İÇİN"
+    },
+    "card": {
+      "masteredLabel": "ustalaşılan",
+      "completeLabel": "tamamlandı",
+      "libraryBadge": "KÜTÜPHANEDEN",
+      "dueLabel": "bekleyen",
+      "upToDateLabel": "güncel",
+      "wordsLabel": "kelime"
+    },
+    "adopt": {
+      "successMessage": "başarılı",
+      "alreadyInSetsMessage": "Zaten setlerinizde",
+      "errorMessage": "Koleksiyon eklenemedi. Tekrar deneyin."
+    },
+    "afterCreate": {
+      "title": "Koleksiyonunuza kelime eklemek ister misiniz?",
+      "csvOption": "CSV'den içe aktar",
+      "imageOption": "Görüntüden içe aktar",
+      "goToOption": "Koleksiyona git",
+      "laterOption": "Belki sonra"
+    }
+  },
+  "collectionDetail": {
+    "nav": {
+      "backAria": "Geri",
+      "optionsAria": "Seçenekler"
+    },
+    "incompleteImport": {
+      "title": "İçe aktarma tamamlanmadı",
+      "subtitle": "kelimenin kartı henüz oluşturulmadı",
+      "completeButton": "Tamamla"
+    },
+    "audio": {
+      "preparingLabel": "Ses hazırlanıyor…",
+      "readyUnit": "kelime hazır"
+    },
+    "hero": {
+      "wordsLabel": "kelime",
+      "dueLabel": "bekleyen",
+      "masteredLabel": "ustalaşılan"
+    },
+    "actions": {
+      "reviewAllLabel": "Tümünü tekrar et",
+      "reviewLabel": "Tekrar et",
+      "listenLabel": "Dinle"
+    },
+    "categories": {
+      "allLabel": "Tümü"
+    },
+    "emptyState": {
+      "title": "Henüz kelime yok",
+      "subtitle": "İlk kelimenizi eklemek için + simgesine dokunun"
+    },
+    "pending": {
+      "label": "Beklemede",
+      "instruction": "— yukarıdaki Tamamla'ya dokunun"
+    },
+    "menu": {
+      "clearAllOption": "Tüm kelimeleri temizle",
+      "deleteOption": "Koleksiyonu sil",
+      "cancelOption": "İptal"
+    },
+    "clearWords": {
+      "title": "Tüm kelimeler temizlensin mi?",
+      "message": "Bu işlem {{name}} içindeki {{count}} kelimeyi kalıcı olarak silecektir. Bu geri alınamaz.",
+      "confirmButton": "Tümünü temizle"
+    },
+    "deleteCollection": {
+      "title": "Koleksiyon silinsin mi?",
+      "message": "Kelimeler silinmeyecek — Kasa'daki \"Tüm kelimeler\" bölümünde görünecekler.",
+      "confirmButton": "Sil"
+    },
+    "importComplete": {
+      "allAddedMessage": "Tüm kartlar eklendi — koleksiyon tamamlandı!",
+      "cardsAddedWithAudio": "{{count}} kart eklendi — ses dahil ✓",
+      "alreadyInMessage": "Zaten setlerinizde",
+      "errorMessage": "İçe aktarma tamamlanamadı. Daha sonra tekrar deneyin.",
+      "addedWithDuplicates": "✓ {{added}} eklendi, {{duplicates}} kopya yeniden kullanıldı — koleksiyon tamamlandı!",
+      "allAlreadyMessage": "{{count}} kelime zaten kasanızda — koleksiyon tamamlandı!"
+    }
+  },
+  "platformCollectionDetail": {
+    "nav": {
+      "breadcrumb": "Keşfet",
+      "backAria": "Geri"
+    },
+    "hero": {
+      "descriptionSuffix": "kelime · sesli"
+    },
+    "progressBanner": {
+      "knowPrefix": "Zaten bildiğiniz",
+      "wordsSuffix": "kelime var.",
+      "addingPrefix": "Bu seti almak",
+      "newCardsSuffix": "yeni kart ekler",
+      "instantlySuffix": "— anında.",
+      "allNewForYouSuffix": "hepsi sizin için yeni."
+    },
+    "adoptedBanner": {
+      "inSetsLabel": "Setlerinizde",
+      "wordsKnownSuffix": "bilinen kelime"
+    },
+    "wordGroups": {
+      "newHereLabel": "Burada yeni",
+      "alreadyYoursLabel": "Zaten sizde",
+      "expandLabel": "genişletmek için dokunun",
+      "collapseLabel": "daraltmak için dokunun",
+      "yoursChip": "✓ SİZDE"
+    },
+    "shelf": {
+      "title": "Bu kelimelerle hikayeler"
+    },
+    "story": {
+      "minLabel": "dk"
+    },
+    "footer": {
+      "openButton": "Setlerimde Aç",
+      "getButton": "+ Al",
+      "getNewButton": "+ Yeni kelimeleri al",
+      "addingLabel": "Ekleniyor…",
+      "generateStoryButton": "Bu setten hikaye oluştur",
+      "instantNote": "Anında — bekleme yok, ses dahil"
+    },
+    "adopt": {
+      "successMessage": "{{count}} kelime eklendi — ses dahil ✓",
+      "alreadyInMessage": "Zaten setlerinizde",
+      "errorMessage": "Koleksiyon eklenemedi. Tekrar deneyin."
+    }
+  },
+  "exploreTopic": {
+    "nav": {
+      "backAria": "Geri",
+      "setsLabel": "set"
+    },
+    "emptyState": {
+      "title": "Bu konuda set yok",
+      "subtitle": "Seviye filtresini değiştirmeyi deneyin"
+    },
+    "card": {
+      "masteredLabel": "ustalaşılan",
+      "inSetsLabel": "Setlerinizde",
+      "knownLabel": "bilinen",
+      "newLabel": "yeni",
+      "wordsUnit": "kelime",
+      "allNewLabel": "hepsi yeni",
+      "openButton": "Aç",
+      "getButton": "+ Al",
+      "getNewButton": "+ Yenileri al",
+      "addingLabel": "Ekleniyor…"
+    },
+    "adopt": {
+      "successMessage": "{{count}} kelime eklendi — ses dahil ✓",
+      "alreadyInMessage": "Zaten setlerinizde",
+      "errorMessage": "Koleksiyon eklenemedi. Tekrar deneyin."
+    }
+  },
+  "addWord": {
+    "nav": {
+      "closeAria": "Kapat",
+      "editTitle": "Kelimeyi Düzenle",
+      "addTitle": "Yeni Kelime Ekle"
+    },
+    "langDirection": {
+      "label": "Dil yönü",
+      "english": "🇬🇧 İngilizce",
+      "arrow": "→",
+      "german": "🇩🇪 Almanca"
+    },
+    "back": {
+      "label": "Arka — Almanca",
+      "hint": "(artikel otomatik algılanır)",
+      "placeholder": "German word (e.g. Zug)",
+      "autoGenAria": "Çeviri, çoğul ve eş anlamlıları otomatik oluştur",
+      "autoGenLabel": "Otomatik",
+      "generatingLabel": "Oluşturuluyor…",
+      "libraryBanner": "Kütüphaneden dolduruldu — yapay zeka çağrısı yok"
+    },
+    "article": {
+      "label": "Artikel",
+      "noneOption": "Yok"
+    },
+    "front": {
+      "label": "Ön — İngilizce",
+      "placeholder": "e.g. the train"
+    },
+    "plural": {
+      "label": "Çoğul",
+      "hint": "— artikeli de ekleyin",
+      "placeholder": "e.g. die Flugzeuge"
+    },
+    "synonyms": {
+      "label": "Eş Anlamlılar",
+      "newLabel": "Yeni eş anlamlı",
+      "addButton": "Eş anlamlı ekle",
+      "removeAria": "Eş anlamlıyı kaldır",
+      "wordPlaceholder": "Eş anlamlı kelime",
+      "translationPlaceholder": "Çeviri (İngilizce)",
+      "examplePlaceholder": "Örnek cümle (Almanca)",
+      "exampleNativePlaceholder": "Örnek çeviri (İngilizce)"
+    },
+    "duplicateWarning": {
+      "messageSuffix": "zaten mevcut",
+      "inLabel": "içinde:",
+      "defaultLocation": "kasanızda",
+      "addAnywayButton": "Yine de ekle",
+      "goToButton": "Mevcut olana git"
+    },
+    "collection": {
+      "label": "Koleksiyon",
+      "requiredHint": "*zorunlu",
+      "noSelectionLabel": "Koleksiyon seçilmedi"
+    },
+    "category": {
+      "label": "Kategori",
+      "newButton": "Yeni",
+      "cancelButton": "İptal"
+    },
+    "newCategory": {
+      "placeholder": "Kategori adı",
+      "addButton": "Ekle"
+    },
+    "examples": {
+      "label": "Örnek cümle",
+      "targetPlaceholder": "German sentence (e.g. Der Zug fährt um 8 Uhr ab.)",
+      "nativePlaceholder": "İngilizce çeviri"
+    },
+    "pronunciation": {
+      "label": "Telaffuz",
+      "recordButton": "Kaydet",
+      "ttsButton": "TTS Kullan"
+    },
+    "save": {
+      "savingLabel": "Kaydediliyor…",
+      "editLabel": "Değişiklikleri kaydet",
+      "createLabel": "Kasaya Kaydet"
+    },
+    "importLink": {
+      "text": "Birden fazla kelime mi ekleyeceksiniz? CSV içe aktarın →"
+    },
+    "errors": {
+      "autoGenFailed": "Otomatik oluşturma başarısız oldu. Elle doldurun veya tekrar deneyin."
+    }
+  },
+  "assignCollection": {
+    "title": "Koleksiyona Ekle",
+    "closeAria": "Kapat",
+    "wordsLabel": "kelime",
+    "createNewLabel": "Yeni koleksiyon oluştur…",
+    "newCollection": {
+      "placeholder": "Koleksiyon adı",
+      "creatingLabel": "Oluşturuluyor…",
+      "createButton": "Oluştur"
+    },
+    "confirmButton": "Seçimi onayla",
+    "skipButton": "Şimdilik geç"
+  },
+  "import": {
+    "nav": {
+      "closeAria": "Kapat",
+      "backAria": "Geri",
+      "title": "Kelime İçe Aktar"
+    },
+    "methods": {
+      "scanLabel": "Görüntü Tara",
+      "scanSubtitle": "Fotoğraflar, menüler, kartlar",
+      "csvLabel": "CSV Yükle",
+      "csvSubtitle": "Dosyadan toplu içe aktarma"
+    },
+    "ai": {
+      "title": "Yapay zeka ile CSV oluştur",
+      "subtitle": "Bu istemi ChatGPT, Claude veya herhangi bir yapay zekaya kopyalayın",
+      "copiedLabel": "Kopyalandı!",
+      "steps": {
+        "step1": "Aşağıdaki istemi kopyalayın",
+        "step2": "Kelimelerinizle birlikte yapay zekaya yapıştırın",
+        "step3": "CSV'yi buraya yükleyin"
+      },
+      "prompt": {
+        "label": "Yapay zeka istemi",
+        "copiedLabel": "✓ Panoya kopyalandı",
+        "copyButton": "Kopyala",
+        "copiedButton": "Kopyalandı!",
+        "footerAfterCopy": "Şimdi favori yapay zeka aracınızı açın, istemi yapıştırın, kelimelerinizi ekleyin ve CSV'yi indirin",
+        "footerDefault": "ChatGPT, Claude, Gemini, Copilot — metin üreten her yapay zeka ile çalışır"
+      }
+    },
+    "downloadTemplate": "CSV şablonunu indirin (95 hazır kelime)",
+    "errors": {
+      "invalidFileType": "Lütfen bir .csv dosyası seçin",
+      "noWordsFound": "Bu dosyada kelime bulunamadı"
+    },
+    "toast": {
+      "promptCopied": "İstem panoya kopyalandı"
+    }
+  },
+  "importReview": {
+    "nav": {
+      "backAria": "Geri",
+      "title": "İçe Aktarmayı İncele"
+    },
+    "fileInfo": {
+      "wordsDetected": "kelime algılandı"
+    },
+    "duplicates": {
+      "messagePrefix": "kelime zaten kasanızda",
+      "deselectedNote": "(seçim kaldırıldı)"
+    },
+    "reuseBar": {
+      "knownLabel": "bilinen",
+      "reuseText": "kütüphanede — ücretsiz yeniden kullanıldı.",
+      "enrichText": "zenginleştirilecek."
+    },
+    "summary": {
+      "totalLabel": "Toplam",
+      "reuseLabel": "Yeniden kullanım",
+      "newLabel": "Yeni",
+      "inVaultLabel": "Kasada",
+      "skippedLabel": "Atlanan"
+    },
+    "collection": {
+      "label": "KOLEKSIYONA EKLE",
+      "requiredHint": "*zorunlu"
+    },
+    "words": {
+      "label": "Kelimeler (seçmek / seçimi kaldırmak için dokunun)",
+      "duplicateBadge": "Kasada",
+      "reuseLabel": "★ kütüphane",
+      "enrichLabel": "zenginleştir"
+    },
+    "importButton": {
+      "prefix": "İçe Aktar",
+      "wordSingular": "kelime",
+      "wordsPlural": "kelime",
+      "importingLabel": "İçe aktarılıyor…"
+    },
+    "cancel": {
+      "link": "İptal"
+    },
+    "errors": {
+      "noCollectionSelected": "Lütfen içe aktarmadan önce bir koleksiyon seçin.",
+      "importFailed": "İçe aktarma başarısız oldu. Lütfen tekrar deneyin."
+    },
+    "success": {
+      "newCardsSuffix": "kelime Kasanıza eklendi",
+      "dictReuseText": "kütüphaneden yeniden kullanıldı",
+      "existingText": "zaten mevcuttu"
+    }
+  },
+  "imageProcessing": {
+    "nav": {
+      "cancelAria": "İptal"
+    },
+    "phases": {
+      "extractingTitle": "Görüntü taranıyor",
+      "extractingSubtitle": "Lütfen bekleyin…",
+      "enrichingTitle": "Kartlar oluşturuluyor",
+      "enrichingSubtitle": "Koleksiyonunuz hazırlanıyor…",
+      "partialTitle": "Neredeyse bitti",
+      "partialSubtitle": "kart şimdi hazır",
+      "doneTitle": "Tamamlandı!"
+    },
+    "image": {
+      "altText": "Görüntü taranıyor"
+    },
+    "phase1": {
+      "stepSubtitle": "Görüntüden kelimeler okunuyor"
+    },
+    "info": {
+      "note": "Adım 1/2 — hızlı tarama. Adım 2 çevirileri ve örnek cümleleri oluşturur."
+    },
+    "progressCard": {
+      "label": "İlerleme",
+      "readyLabel": "hazır",
+      "cardsLabel": "kart",
+      "remainingLabel": "kalan"
+    },
+    "batchInfo": "Her seferinde 10 kelime işleniyor — ilerleme her gruptan sonra kaydedilir",
+    "partialBanner": {
+      "titleSuffix": "kart daha sonra eklenecek",
+      "subtitle": "İçe aktarma sırasında yapay zeka kota sınırına ulaşıldı. Koleksiyonunuzda bir \"Tamamla\" düğmesi görünecek — istediğiniz zaman dokunarak bitirebilirsiniz."
+    },
+    "partialStats": {
+      "readyLabel": "Şimdi hazır",
+      "pendingLabel": "Beklemede",
+      "totalLabel": "Toplam bulunan"
+    },
+    "cancel": {
+      "backgroundLabel": "Arka planda çalışıyor — bu ekrandan ayrılabilirsiniz",
+      "defaultLabel": "İptal"
+    },
+    "errors": {
+      "noWordsFound": "Bu görüntüde Almanca kelime bulunamadı."
+    }
+  },
+  "image": {
+    "camera": {
+      "label": "Fotoğraf çek",
+      "hint": "Herhangi bir Almanca metne doğrultun"
+    },
+    "gallery": {
+      "label": "Galeriden seç",
+      "hint": "Mevcut bir fotoğraf seçin"
+    },
+    "error": {
+      "unsupportedFormat": "Desteklenmeyen görüntü formatı. Lütfen JPEG, PNG veya WebP kullanın.",
+      "cameraPermission": "Kamera izni reddedildi veya kullanılamıyor."
+    }
+  },
+  "review": {
+    "hub": {
+      "cardsDueToday": "Bugün bekleyen kartlar",
+      "dueLabel": "bekleyen",
+      "allCaughtUp": "Hepsini tamamladın! 🎉",
+      "startTodaysReview": "Bugünkü tekrarı başlat",
+      "nothingDueNow": "Şu an bekleyen kart yok",
+      "quickStudySection": "Hızlı çalışma",
+      "strugglingCardsTitle": "Zorlanılan kartlar",
+      "strugglingCardsDesc": "3+ kez yanlış yaptığınız kartlar",
+      "newCardsOnlyTitle": "Sadece yeni kartlar",
+      "newCardsOnlyDesc": "Hiç tekrar edilmemiş kelimeler",
+      "customStudyTitle": "Özel çalışma",
+      "customStudyDesc": "Filtrelenmiş oturum oluştur",
+      "recentSessionsSection": "Son oturumlar",
+      "seeAllLink": "Tümünü gör →",
+      "allDueCardsLabel": "Tüm bekleyen kartlar",
+      "cardsUnit": "kart",
+      "noSessionsTitle": "Henüz tekrar oturumu yok.",
+      "noSessionsDesc": "Geçmişi görmek için ilk tekrarınızı tamamlayın.",
+      "masteryBreakdownAriaLabel": "Ustalık dağılımı"
+    },
+    "session": {
+      "goBackAriaLabel": "Geri dön",
+      "pageTitle": "Tekrar Oturumu",
+      "yourLanguageLabel": "Diliniz",
+      "englishLangChip": "🇬🇧 İngilizce",
+      "tapToRevealGerman": "Almancayı görmek için dokunun",
+      "germanLangChip": "🇩🇪 Almanca",
+      "pluralLabel": "Çoğul",
+      "synonymsHeader": "Eş Anlamlılar",
+      "playPronunciationBtn": "Telaffuzu dinle",
+      "generatingAudio": "Oluşturuluyor…",
+      "playExampleAriaLabel": "Örneği dinle",
+      "ratingPrompt": "Bu kelimeyi ne kadar iyi biliyordun?",
+      "previousBtn": "Önceki",
+      "skipBtn": "Atla",
+      "allCaughtUpMsg": "Hepsini tamamladın!",
+      "noDueCardsMsg": "Şu an tekrar edilecek kart yok.",
+      "backToHomeBtn": "Ana Sayfaya Dön"
+    },
+    "summary": {
+      "backAriaLabel": "Kasaya dön",
+      "title": "Oturum Tamamlandı!",
+      "cardsReviewedLabel": "kart tekrar edildi",
+      "reviewedStat": "Tekrar edildi",
+      "durationStat": "Süre",
+      "avgRatingStat": "Ort. Puan",
+      "ratingBreakdownSection": "Puan dağılımı",
+      "wordsReviewedSection": "Tekrar edilen kelimeler",
+      "retryStruggled": "Zorlanılanları tekrar et",
+      "reviewAllAgain": "Tümünü tekrar et",
+      "backToVault": "Kasaya dön"
+    },
+    "custom": {
+      "backAriaLabel": "Geri",
+      "pageTitle": "Özel Çalışma",
+      "sourceSection": "Kaynak",
+      "masteryFilterSection": "Ustalık seviyesine göre filtrele",
+      "sortOrderSection": "Sıralama",
+      "cardLimitSection": "Kart limiti",
+      "matchingCountLabel": "Filtrelerinize uyan kartlar",
+      "startSessionBtn": "Oturumu başlat",
+      "noCardsMatchMsg": "Filtrelerinize uyan kart yok",
+      "noCardsMatchToast": "Filtrelerinize uyan kart yok."
+    },
+    "mastery": {
+      "backAriaLabel": "Geri",
+      "pageTitle": "Ustalık Dağılımı",
+      "selectCollectionMsg": "Koleksiyon seçin",
+      "barsLabel": "Ustalık seviyesine göre kartlar",
+      "reviewLevelAriaLabel": "Bu seviyeyi tekrar et",
+      "tipText": "Sadece o seviyedeki kartlarla tekrar oturumu başlatmak için herhangi bir seviyenin yanındaki ▶ oynat düğmesine dokunun."
+    },
+    "history": {
+      "backAriaLabel": "Geri",
+      "pageTitle": "Oturum Geçmişi",
+      "allSessionsTab": "Tüm oturumlar",
+      "thisWeekTab": "Bu hafta",
+      "thisMonthTab": "Bu ay",
+      "ratingsStatLabel": "Puanlar",
+      "durationStatLabel": "Süre",
+      "struggledStatLabel": "Zorlanılan",
+      "nailedStatLabel": "Başarılı",
+      "noSessionsTitle": "Henüz tekrar oturumu yok.",
+      "noSessionsDesc": "Geçmişi görmek için ilk tekrarınızı başlatın!"
+    },
+    "struggling": {
+      "backAriaLabel": "Geri",
+      "pageTitle": "Zorlanılan Kartlar",
+      "needsAttentionMsg": "kart ekstra ilgi gerektiriyor",
+      "focusMsg": "Bu kartlarda sürekli başarısız oluyorsunuz. Aşmak için bunlara odaklanın.",
+      "failSingular": "başarısız",
+      "failPlural": "başarısız",
+      "reviewAllBtn": "Tümünü tekrar et",
+      "noCardsTitle": "Zorlanılan kart yok!",
+      "encouragementMsg": "Harika gidiyorsun. Böyle devam et!"
+    }
+  },
+  "listen": {
+    "main": {
+      "pageTitle": "Dinle ve Öğren"
+    },
+    "hero": {
+      "playingFromLabel": "Kaynağı",
+      "queueCountLabel": "{{count}} kelime sırada",
+      "playBtn": "Oynat",
+      "shuffleBtn": "Karıştır",
+      "playlistTypeSection": "Çalma listesi türü"
+    },
+    "controls": {
+      "speedSection": "Hız"
+    },
+    "queue": {
+      "durationUnit": "dk",
+      "headerLabel": "Sıra",
+      "emptyTitle": "Sırada kelime yok",
+      "emptyDesc": "Çalma listesi seçmek için yukarıdaki kaynağa dokunun",
+      "previewAriaLabel": "Sesi önizle"
+    },
+    "sourceSheet": {
+      "title": "Çalma listesi kaynağı seçin"
+    },
+    "source": {
+      "todaysDueLabel": "Bugün bekleyen kelimeler",
+      "todaysDueDesc": "Bugün için planlanan kartlar",
+      "collectionLabel": "Bir koleksiyon",
+      "collectionDesc": "Belirli bir koleksiyon seçin",
+      "allCardsLabel": "Tüm kartlar",
+      "allCardsDesc": "Tüm kelime dağarcığınız",
+      "strugglingLabel": "Zorlanılan kelimeler",
+      "strugglingDesc": "Ustalık 0–2, pratik gerekli"
+    },
+    "nowPlaying": {
+      "pageTitle": "Şimdi Çalıyor",
+      "sessionComplete": "Oturum tamamlandı!",
+      "seeSummary": "Özeti gör",
+      "audioUnavailable": "Ses mevcut değil",
+      "retryBtn": "Tekrar dene",
+      "skipCard": "Bu kartı atla",
+      "grammarTipLabel": "Gramer ipucu"
+    },
+    "playlistMode": {
+      "compactLabel": "Kompakt",
+      "compactDesc": "Kelime + anlam",
+      "examplesLabel": "Örnekler",
+      "examplesDesc": "Tam cümleler",
+      "deepDiveLabel": "Derinlemesine",
+      "deepDiveDesc": "+ dilbilgisi ipucu"
+    },
+    "card": {
+      "collectionPrefix": "Koleksiyon:"
+    }
+  },
+  "stories": {
+    "library": {
+      "pageTitle": "Hikaye Stüdyosu",
+      "generateAriaLabel": "Yeni hikaye oluştur",
+      "exploreSection": "Keşfet",
+      "exploreLink": "Tümünü gör →",
+      "exploreErrorMsg": "Hikayeler yüklenemedi. Yenilemek için aşağı çekin.",
+      "noStoriesYetMsg": "Hikayeler yolda! Yakında tekrar kontrol edin.",
+      "noStoriesFilteredMsg": "Bu filtre için hikaye bulunamadı.",
+      "premiumBadge": "Pro",
+      "myStoriesSection": "Hikayelerim",
+      "savedLabel": "kaydedildi",
+      "generateFirstLink": "İlkini oluştur →",
+      "noStoriesTitle": "Henüz hikaye yok",
+      "noStoriesDesc": "Kelime dağarcığınızdan ilk hikayenizi oluşturun.",
+      "generateBtn": "Hikaye oluştur",
+      "incompleteStatus": "Tamamlanmamış",
+      "extendBtn": "Uzat",
+      "extendingLabel": "Uzatılıyor…",
+      "listenBtn": "Dinle",
+      "readBtn": "Oku",
+      "moreOptionsAriaLabel": "Daha fazla seçenek",
+      "deleteAction": "Hikayeyi sil",
+      "cancelAction": "İptal",
+      "deleteAlertHeader": "Hikayeyi sil",
+      "deleteAlertMsg": "\"{{title}}\" silinsin mi? Ses dosyası da silinecektir.",
+      "deleteActionBtn": "Sil",
+      "extensionFailedToast": "Uzatma başarısız oldu — lütfen tekrar deneyin."
+    },
+    "reader": {
+      "backAriaLabel": "Geri",
+      "toggleTranslationTitle": "Çeviriyi aç/kapat",
+      "toggleTranslationAriaLabel": "Çeviriyi aç/kapat",
+      "learnedLabel": "Öğrenildi",
+      "markAsLearnedLabel": "Öğrenildi olarak işaretle",
+      "storyTab": "Hikaye",
+      "quizTab": "Test",
+      "keywordsTab": "Anahtar Kelimeler",
+      "grammarTab": "Dil Bilgisi",
+      "generatingAudio": "Sesli anlatım oluşturuluyor…",
+      "preparingAudio": "Ses hazırlanıyor…",
+      "closeWordPanelAriaLabel": "Kelime panelini kapat",
+      "pluralLabel": "Çoğul",
+      "playPronunciationAriaLabel": "Telaffuzu dinle",
+      "alreadyInVaultAriaLabel": "Zaten kasada",
+      "addToVaultAriaLabel": "Kasaya ekle",
+      "conjugateBtn": "Çekim ▸",
+      "praesensHeader": "Präsens",
+      "praeteritumHeader": "Präteritum",
+      "perfektLabel": "Perfekt:",
+      "imperativLabel": "Imperativ:",
+      "noConjugationData": "Çekim verisi mevcut değil.",
+      "pauseAriaLabel": "Duraklat",
+      "playAriaLabel": "Oynat",
+      "restartAriaLabel": "Yeniden başlat",
+      "loadingMsg": "Hikaye yükleniyor…"
+    },
+    "complete": {
+      "backAriaLabel": "Kütüphaneye dön",
+      "pageTitle": "Hikaye Tamamlandı",
+      "title": "Harika okuma!",
+      "finishedMsg": "\"{{title}}\" hikayesini bitirdiniz",
+      "vocabWordsLabel": "kelime",
+      "sentencesLabel": "cümle",
+      "listenSingular": "dinleme",
+      "listenPlural": "dinleme",
+      "wordsSection": "Bu hikayedeki kelimeler",
+      "readAgainBtn": "Tekrar oku",
+      "moreStoriesBtn": "Daha fazla hikaye",
+      "loadingMsg": "Yükleniyor…"
+    },
+    "generate": {
+      "pageTitle": "Hikaye Oluştur",
+      "closeAriaLabel": "Kapat",
+      "freeStoriesUsedLabel": "ücretsiz hikaye kullanıldı",
+      "pickCollectionsSection": "Koleksiyon seçin",
+      "selectedLabel": "seçildi",
+      "noCollectionsMsg": "Henüz koleksiyon yok. Önce bir koleksiyona kelime ekleyin.",
+      "wordsLabel": "kelime",
+      "lengthSection": "Hikaye uzunluğu",
+      "freeOnlyHint": "Ücretsiz planda sadece kısa",
+      "longWarning": "Bu işlem 45 saniye kadar sürebilir",
+      "difficultySection": "Zorluk seviyesi",
+      "estimatedWaitLong": "Genellikle 25–40 saniye",
+      "estimatedWaitShort": "Genellikle 10–20 saniye",
+      "retryBtn": "Tekrar dene",
+      "contactSupportLink": "Destek ile iletişime geçin",
+      "generateBtn": "Hikaye Oluştur",
+      "generatingDefaultMsg": "Hikayeniz oluşturuluyor…"
+    },
+    "keywords": {
+      "extractingMsg": "Anahtar kelimeler çıkarılıyor…",
+      "noKeywordsMsg": "Bu hikaye için anahtar kelime mevcut değil.",
+      "memorizeBtn": "Anahtar kelimeleri ezberle",
+      "playPronunciationTitle": "Telaffuzu dinle"
+    },
+    "grammar": {
+      "generatingMsg": "Dil bilgisi notları oluşturuluyor…",
+      "noNotesTitle": "Bu hikaye için dil bilgisi notu mevcut değil.",
+      "noNotesDesc": "Dil bilgisi notları yeni hikayeler için oluşturulur.",
+      "exampleSection": "Örnek",
+      "descriptionSection": "Açıklama"
+    },
+    "quiz": {
+      "generatingMsg": "Test oluşturuluyor…",
+      "noQuizTitle": "Bu hikaye için test mevcut değil.",
+      "noQuizDesc": "Testler bundan sonraki yeni hikayeler için oluşturulur.",
+      "correctLabel": "doğru",
+      "retakeBtn": "Testi tekrarla",
+      "muteAriaLabel": "Cevap sesini kapat",
+      "unmuteAriaLabel": "Cevap sesini aç",
+      "nextBtn": "Sonraki",
+      "pauseOnMistakesTitle": "Hatalarda duraklat",
+      "pauseOnMistakesDesc": "Devam etmeden önce doğru cevabı inceleyin"
+    },
+    "length": {
+      "short": "Kısa",
+      "medium": "Orta",
+      "long": "Uzun",
+      "veryLong": "Çok uzun",
+      "extraLong": "Ekstra uzun",
+      "podcast": "PODCAST"
+    },
+    "category": {
+      "daily-life": "Günlük yaşam",
+      "travel": "Seyahat",
+      "food-culture": "Yemek ve kültür",
+      "work-career": "İş ve kariyer",
+      "technology": "Teknoloji",
+      "nature": "Doğa",
+      "fiction": "Kurgu"
+    },
+    "wordType": {
+      "noun": "isim",
+      "verb": "fiil",
+      "adjective": "sıfat",
+      "adverb": "zarf",
+      "other": "diğer"
+    },
+    "cardMeta": {
+      "words": "kelime",
+      "min": "dk",
+      "more": "+{{count}} daha"
+    }
+  },
+  "settings": {
+    "goals": {
+      "title": "Çalışma hedefleri",
+      "backAria": "Geri",
+      "targetsSection": "Hedefler",
+      "daily": {
+        "name": "Günlük",
+        "desc": "Serinizi korumak için günlük kart sayısı",
+        "decreaseAria": "Günlük hedefi azalt",
+        "increaseAria": "Günlük hedefi artır"
+      },
+      "weekly": {
+        "name": "Haftalık",
+        "desc": "Haftalık toplam tekrar edilen kart",
+        "decreaseAria": "Haftalık hedefi azalt",
+        "increaseAria": "Haftalık hedefi artır"
+      },
+      "monthly": {
+        "name": "Aylık",
+        "desc": "Aylık toplam tekrar edilen kart",
+        "decreaseAria": "Aylık hedefi azalt",
+        "increaseAria": "Aylık hedefi artır"
+      },
+      "streakNote": "🔥 Günlük hedefinize ulaşmak serinizi uzatır. Bir gün kaçırırsanız seri sıfırlanır."
+    },
+    "goalsPrompt": {
+      "titleFirstTime": "Çalışma hedeflerini belirle",
+      "titleUpdate": "Hedeflerini güncelleme zamanı",
+      "bodyFirstTime": "LinguaCard'a her gün ne kadar çalışmak istediğini söyle. Hedeflerin serini şekillendirir ve yolunda kalmana yardımcı olur.",
+      "bodyUpdate": "Hedeflerini en son güncellediğinden beri biraz zaman geçti. Hâlâ hızına uygun olduklarından emin olmak için bir dakikanı ayır.",
+      "cards": "kart",
+      "setMyGoals": "Hedeflerimi belirle",
+      "updateMyGoals": "Hedeflerimi güncelle"
+    },
+    "reminders": {
+      "title": "Hatırlatmalar",
+      "backAriaLabel": "Geri",
+      "pageTitle": "Hatırlatmalar",
+      "dailyReminderSection": "Günlük hatırlatma",
+      "enableToggleLabel": "Hatırlatmaları etkinleştir",
+      "enableDesc": "Hedefinize ulaşamadıysanız tarayıcı bildirimi alın",
+      "toggleAriaLabel": "Hatırlatmaları aç/kapat",
+      "permissionDeniedMsg": "Bildirim izni reddedildi. Hatırlatmaları etkinleştirmek için tarayıcı ayarlarınızı açın ve bu site için bildirimlere izin verin.",
+      "timeLabel": "Hatırlatma saati",
+      "timeDesc": "Hedefinize henüz ulaşmadıysanız size hatırlatacağız",
+      "howItWorksMsg": "Hatırlatmalar tarayıcınızın bildirim sistemini kullanır ve LinguaCard kapalıyken bile çalışır. Mobil uygulama bildirimleri (iOS / Android) daha sonra eklenecektir.",
+      "unsupportedMsg": "Mevcut tarayıcınız veya ortamınız web push bildirimlerini desteklemiyor. LinguaCard'ı Chrome veya Edge'de açmayı veya PWA olarak yüklemeyi deneyin.",
+      "permissionSection": "İzin",
+      "grantedTitle": "Bildirimlere izin verildi",
+      "deniedTitle": "Bildirimler engellendi",
+      "defaultTitle": "Bildirimler",
+      "grantedDesc": "Bu tarayıcı için verildi ✓",
+      "deniedDesc": "Engellendi — tarayıcı ayarlarından değiştirin",
+      "defaultDesc": "Henüz istenmedi"
+    },
+    "theme": {
+      "darkMode": "Karanlık mod"
+    },
+    "dangerZone": {
+      "resetTitle": "Tüm verileri sıfırla",
+      "resetWarning": "Bu işlem tüm kelimelerinizi, koleksiyonlarınızı, tekrar geçmişinizi ve ilerlemenizi kalıcı olarak silecektir. Hesabınız aktif kalacaktır.",
+      "irreversible": "Bu işlem geri alınamaz.",
+      "deleteDetails": "Tüm {{wordCount}} kelime ve {{collectionCount}} koleksiyon kalıcı olarak silinecektir.",
+      "confirmPassword": "Onaylamak için şifrenizi girin",
+      "confirm": "Evet, her şeyi sil"
+    },
+    "language": {
+      "title": "Dil",
+      "backAria": "Geri",
+      "subtitle": "Arayüz dilini seçin",
+      "currentLabel": "Mevcut"
+    }
+  },
+  "sync": {
+    "status": {
+      "label": "Senkronizasyon durumu",
+      "pending": "{{count}} beklemede",
+      "syncing": "Senkronize ediliyor…",
+      "error": "Senkronizasyon hatası",
+      "errorRetry": "Senkronizasyon hatası — tekrar denemek için dokunun",
+      "synced": "Senkronize edildi"
+    },
+    "notifications": {
+      "recovered": "Senkronizasyon düzeldi — veriler güncel",
+      "changesSynced": "{{count}} sıradaki değişiklik senkronize edildi",
+      "upToDate": "Her şey güncel",
+      "partialFailure": "Bazı veriler senkronize edilemedi. Tekrar denenecek.",
+      "failed": "Senkronizasyon başarısız oldu — otomatik olarak tekrar denenecek",
+      "retryNow": "Şimdi tekrar dene"
+    }
+  },
+  "offline": {
+    "banner": {
+      "message": "Çevrimdışısınız — kayıtlı veriler gösteriliyor"
+    }
+  },
+  "pwa": {
+    "install": {
+      "title": "Ana Ekrana Ekle",
+      "subtitle": "Hızlı erişim için LinguaCard'ı yükleyin"
+    },
+    "installIos": {
+      "tap": "Dokunun",
+      "action": "Ana Ekrana Ekle"
+    }
+  },
+  "srs": {
+    "status": {
+      "due": "Bekleyen",
+      "interval": "{{days}}g aralık"
+    },
+    "masteryLabel": {
+      "new": "Yeni",
+      "learning": "Öğreniliyor",
+      "review": "Tekrar",
+      "mastered": "Ustalaşıldı",
+      "familiar": "Tanıdık",
+      "good": "İyi"
+    },
+    "breakdownTag": {
+      "new": "yeni",
+      "hard": "zor",
+      "learning": "öğreniliyor",
+      "review": "tekrar"
+    },
+    "selectCollection": "Koleksiyon seçin",
+    "allCollections": "Tüm koleksiyonlar",
+    "alreadyInVault": "Zaten kasanızda",
+    "alreadyInCollection": "Zaten \"{{name}}\" içinde"
+  },
+  "subscription": {
+    "paywall": {
+      "title": "Sınırsız Hikayelerin Kilidini Aç",
+      "subtitle": "3 ücretsiz hikayenizi kullandınız. Pro'ya yükseltin:",
+      "benefit1": "Sınırsız hikaye oluşturma",
+      "benefit2": "Claude Sonnet — en yüksek kalite",
+      "benefit3": "Öncelikli destek",
+      "requestBtn": "Pro Erişim Talep Et",
+      "dismissBtn": "Şimdi değil"
+    }
+  },
+  "admin": {
+    "import": {
+      "label": "Yönetici içe aktarma",
+      "pageTitle": "Yönetici İçe Aktarma",
+      "tabs": {
+        "wordList": "Kelime Listesi",
+        "json": "JSON İçe Aktarma",
+        "story": "Hikaye",
+        "collections": "Koleksiyonlar"
+      },
+      "fields": {
+        "title": "Başlık *",
+        "level": "Seviye *",
+        "topic": "Konu *",
+        "emoji": "Emoji",
+        "words": "Kelimeler (satır başına bir tane)",
+        "json": "JSON verisi",
+        "storyJson": "Hikaye JSON"
+      },
+      "buttons": {
+        "importCollection": "Koleksiyon İçe Aktar",
+        "importJson": "JSON Koleksiyon İçe Aktar",
+        "importStory": "Hikaye İçe Aktar"
+      },
+      "status": {
+        "loading": "Yükleniyor…",
+        "noCollections": "Henüz koleksiyon yok. Önce bir tane içe aktarın."
+      }
+    }
+  },
+  "wordDetail": {
+    "pageTitle": "Kelime Detayı",
+    "backAria": "Geri dön",
+    "moreOptionsAria": "Daha fazla seçenek",
+    "playPluralAria": "Çoğulu dinle",
+    "playExampleAria": "Örnek cümleyi dinle",
+    "playSynonymExampleAria": "Eş anlamlı örneği dinle",
+    "generating": "Oluşturuluyor…",
+    "listenToPronunciation": "Telaffuzu dinle",
+    "aiAudioCached": "Yapay zeka sesi cihaza kaydedildi",
+    "generatingAudio": "Ses oluşturuluyor…",
+    "gender": {
+      "masculine": "eril",
+      "feminine": "dişil",
+      "neuter": "nötr"
+    },
+    "plural": "Çoğul",
+    "masteryProgress": "Ustalık İlerlemesi",
+    "level": "Seviye {{level}} — {{label}}",
+    "stats": {
+      "reviews": "Tekrarlar",
+      "recallChance": "Hatırlama şansı",
+      "stability": "Kararlılık",
+      "lastSeen": "Son görülme"
+    },
+    "nextReview": {
+      "dueNow": "Şimdi bekliyor",
+      "tomorrow": "Yarın",
+      "inDays": "Sonraki tekrar {{days}} gün içinde"
+    },
+    "lastReviewed": {
+      "never": "Hiçbir zaman",
+      "today": "Bugün",
+      "daysAgo": "{{days}}g önce"
+    },
+    "sections": {
+      "exampleSentences": "Örnek Cümleler",
+      "synonyms": "Eş Anlamlılar"
+    },
+    "rateThisWord": "Bu kelimeyi puanla",
+    "emptyState": {
+      "title": "Kelime bulunamadı",
+      "subtitle": "Bu kelime kasanızdan kaldırılmış olabilir."
+    },
+    "deleteConfirm": {
+      "title": "Kelimeyi sil",
+      "message": "\"{{word}}\" kasanızdan kaldırılsın mı? Bu geri alınamaz.",
+      "confirmButton": "Sil"
+    },
+    "toast": {
+      "deleted": "Kelime silindi",
+      "updated": "Kelime güncellendi"
+    }
+  },
+  "imageImport": {
+    "title": "Görüntüden İçe Aktar",
+    "bestResults": {
+      "label": "EN İYİ SONUÇLAR İÇİN",
+      "tip1": "İyi aydınlatma — metin üzerindeki gölgelerden kaçının",
+      "tip2": "Kamerayı sabit tutun — bulanık görüntüler kelimeleri kaçırabilir",
+      "tip3": "Çok kelimeli büyük görüntüler gruplar halinde daha iyi çalışır"
+    }
+  },
+  "tabs": {
+    "home": "Ana sayfa",
+    "vault": "Kasa",
+    "review": "Tekrar",
+    "stories": "Hikayeler",
+    "listen": "Dinle"
+  }
+}

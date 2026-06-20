@@ -1,12 +1,12 @@
 <ion-header class="ion-no-border">
   <ion-toolbar>
     <div class="np-nav">
-      <button class="np-back" (click)="goBack()" aria-label="Back">
+      <button class="np-back" (click)="goBack()" [attr.aria-label]="'common.back' | translate">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round">
           <polyline points="15,18 9,12 15,6"/>
         </svg>
       </button>
-      <span class="np-nav-title">Now Playing</span>
+      <span class="np-nav-title">{{ 'listen.nowPlaying.pageTitle' | translate }}</span>
       <button class="np-more" aria-label="More options">
         <svg viewBox="0 0 24 24" fill="currentColor">
           <circle cx="12" cy="5" r="1.5"/>
@@ -27,8 +27,8 @@
           <polyline points="20,6 9,17 4,12"/>
         </svg>
       </div>
-      <p class="np-complete-msg">Session complete!</p>
-      <button class="np-complete-btn" (click)="goComplete()">See summary</button>
+      <p class="np-complete-msg">{{ 'listen.nowPlaying.sessionComplete' | translate }}</p>
+      <button class="np-complete-btn" (click)="goComplete()">{{ 'listen.nowPlaying.seeSummary' | translate }}</button>
     </div>
   } @else {
 
@@ -70,7 +70,7 @@
         <div class="np-grammar-pill">
           <span class="np-grammar-icon">💡</span>
           <div class="np-grammar-text">
-            <strong>Grammar tip:</strong> {{ grammarNote() }}
+            <strong>{{ 'listen.nowPlaying.grammarTipLabel' | translate }}:</strong> {{ grammarNote() }}
           </div>
         </div>
       }
@@ -83,10 +83,10 @@
             <line x1="12" y1="8" x2="12" y2="12"/>
             <line x1="12" y1="16" x2="12.01" y2="16"/>
           </svg>
-          <span class="np-error-text">Audio unavailable</span>
-          <button class="np-error-retry" (click)="retry()">Retry</button>
+          <span class="np-error-text">{{ 'listen.nowPlaying.audioUnavailable' | translate }}</span>
+          <button class="np-error-retry" (click)="retry()">{{ 'listen.nowPlaying.retryBtn' | translate }}</button>
         </div>
-        <button class="np-skip-link" (click)="skipCard()">Skip this card</button>
+        <button class="np-skip-link" (click)="skipCard()">{{ 'listen.nowPlaying.skipCard' | translate }}</button>
       }
     </div>
 
@@ -97,7 +97,7 @@
       </div>
       <div class="np-progress-labels">
         <span>{{ listenStore.cardIndex() + 1 }} / {{ listenStore.queue().length }}</span>
-        <span>~{{ listenStore.estimatedMinutes() }} min</span>
+        <span>~{{ listenStore.estimatedMinutes() }} {{ 'listen.queue.durationUnit' | translate }}</span>
       </div>
     </div>
 
@@ -108,15 +108,15 @@
           class="np-mode-btn"
           [class.active]="listenStore.playMode() === m.value"
           (click)="setMode(m.value)">
-          <div class="np-mode-title">{{ m.label }}</div>
-          <div class="np-mode-sub">{{ m.desc }}</div>
+          <div class="np-mode-title">{{ m.labelKey | translate }}</div>
+          <div class="np-mode-sub">{{ m.descKey | translate }}</div>
         </button>
       }
     </div>
 
     <!-- ── Speed ──────────────────────────────────────────────────────── -->
     <div class="np-speed-row">
-      <span class="np-speed-label">Speed</span>
+      <span class="np-speed-label">{{ 'listen.controls.speedSection' | translate }}</span>
       @for (s of SPEEDS; track s) {
         <button
           class="np-speed-chip"

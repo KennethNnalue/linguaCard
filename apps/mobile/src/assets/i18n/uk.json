@@ -1,0 +1,1194 @@
+{
+  "common": {
+    "appName": "LinguaCard",
+    "cancel": "Скасувати",
+    "close": "Закрити",
+    "save": "Зберегти",
+    "delete": "Видалити",
+    "retry": "Повторити",
+    "loading": "Завантаження…",
+    "back": "Назад",
+    "done": "Готово",
+    "or": "або",
+    "install": "Встановити",
+    "dismiss": "Відхилити",
+    "notNow": "Не зараз",
+    "email": "Електронна пошта",
+    "password": "Пароль",
+    "fullName": "Повне ім'я",
+    "words": "слів",
+    "cards": "карток",
+    "due": "до повторення",
+    "min": "хв",
+    "of": "з",
+    "new": "Нові",
+    "all": "Усі",
+    "today": "сьогодні",
+    "placeholder": {
+      "email": "you@example.com",
+      "password": "••••••••",
+      "name": "Jan Schmidt"
+    },
+    "error": {
+      "generic": "Щось пішло не так. Спробуйте ще раз."
+    },
+    "divider": {
+      "or": "або"
+    },
+    "aria": {
+      "toggleDarkMode": "Перемкнути темний режим",
+      "togglePasswordVisibility": "Перемкнути видимість пароля",
+      "close": "Закрити",
+      "closeMenu": "Закрити меню",
+      "quickActions": "Швидкі дії",
+      "addCard": "Додати картку",
+      "newCollection": "Нова колекція",
+      "import": "Імпорт",
+      "backToLogin": "Повернутися до входу",
+      "syncStatus": "Стан синхронізації",
+      "playPronunciation": "Відтворити вимову",
+      "share": "Поділитися"
+    },
+    "account": "Акаунт",
+    "refresh": "Оновити",
+    "yesterday": "Вчора",
+    "daysAgoLabel": "{{count}} днів тому",
+    "todayCapital": "Сьогодні"
+  },
+  "auth": {
+    "login": {
+      "tagline": "Опануйте німецьку лексику",
+      "signIn": "Увійти",
+      "forgotPassword": "Забули пароль?",
+      "noAccount": "Не маєте акаунту?"
+    },
+    "register": {
+      "title": "Створити акаунт",
+      "tagline": "Розпочніть свою мовну подорож",
+      "passwordHint": "Мін. 8 символів",
+      "submit": "Створити акаунт",
+      "hasAccount": "Вже маєте акаунт?",
+      "error": "Реєстрація не вдалася. Спробуйте ще раз."
+    },
+    "forgotPassword": {
+      "title": "Скидання пароля",
+      "heading": "Забули пароль?",
+      "description": "Введіть вашу електронну пошту, і ми надішлемо посилання для скидання.",
+      "submit": "Надіслати посилання для скидання",
+      "remember": "Пам'ятаєте свій пароль?",
+      "checkEmail": "Перевірте вашу пошту",
+      "linkSent": "Ми надіслали посилання для скидання пароля на",
+      "notReceived": "Не отримали? Перевірте папку зі спамом або зачекайте кілька хвилин.",
+      "backToLogin": "Повернутися до входу"
+    },
+    "validation": {
+      "emailInvalid": "Введіть дійсну електронну адресу",
+      "passwordMinLength": "Пароль має містити щонайменше 8 символів",
+      "nameMinLength": "Ім'я має містити щонайменше 2 символи"
+    },
+    "oauth": {
+      "google": "Продовжити з Google",
+      "googleComingSoon": "Вхід через Google з'явиться незабаром"
+    },
+    "signOut": "Вийти",
+    "reset": {
+      "passwordIncorrect": "Невірний пароль. Спробуйте ще раз.",
+      "success": "✓ Усі дані скинуто. Починайте з чистого аркуша!"
+    }
+  },
+  "home": {
+    "greeting": {
+      "morning": "Доброго ранку",
+      "afternoon": "Доброго дня",
+      "evening": "Доброго вечора"
+    },
+    "hero": {
+      "completeGreeting": "Чудова робота",
+      "completeTitle": "Мету на сьогодні досягнуто ✓",
+      "readyTitle": "Готові вчитися сьогодні?"
+    },
+    "stats": {
+      "dueLabel": "до повторення",
+      "newCardsLabel": "нових карток",
+      "reviewsLabel": "повторень"
+    },
+    "actions": {
+      "startSession": "Почати сесію",
+      "filter": "Фільтр"
+    },
+    "atRisk": {
+      "keepStreakPrefix": "Повторіть зараз, щоб зберегти вашу серію",
+      "keepStreakSuffix": "днів",
+      "startStreakSuffix": "карток сьогодні, щоб розпочати серію",
+      "dailyGoalSuffix": "карток до вашої денної мети",
+      "reviewText": "Повторити",
+      "startButton": "Почати"
+    },
+    "streak": {
+      "label": "Серія днів",
+      "onTrack": "Сьогодні виконано ✓",
+      "atRisk": "Під загрозою!",
+      "broken": "Розпочніть нову серію"
+    },
+    "goalRing": {
+      "label": "Денна мета",
+      "todayLabel": "сьогодні",
+      "doneLabel": "виконано",
+      "notStarted": "Не розпочато",
+      "toGoLabel": "залишилось"
+    },
+    "wordOfDay": {
+      "label": "✦ Слово дня",
+      "playAria": "Відтворити вимову"
+    },
+    "weeklyChart": {
+      "title": "Цього тижня",
+      "detailsLink": "Деталі →",
+      "reviewed": "карток повторено",
+      "goalLabel": "Мета:"
+    },
+    "quickActions": {
+      "title": "Швидкі дії",
+      "scanLabel": "Сканувати",
+      "scanSub": "Імпорт слів",
+      "storyLabel": "Історія",
+      "storySub": "Згенерувати нову",
+      "listenLabel": "Слухати",
+      "listenSub": "Аудіо плейлист"
+    },
+    "recentCards": {
+      "title": "Нещодавно додані",
+      "seeAllLink": "Дивитися всі →"
+    },
+    "collectionFilter": {
+      "allLabel": "Усі колекції"
+    },
+    "wotd": {
+      "genderMasculine": "чоловічий",
+      "genderFeminine": "жіночий",
+      "genderNeuter": "середній"
+    }
+  },
+  "vault": {
+    "title": "Сховище",
+    "addCard": "Додати картку",
+    "import": "Імпорт",
+    "newCollection": "Нова колекція",
+    "search": {
+      "placeholder": "Шукати слова…",
+      "aria": "Шукати словниковий запас"
+    },
+    "filter": {
+      "allLabel": "Усі",
+      "dueLabel": "До повторення",
+      "newLabel": "Нові",
+      "masteredLabel": "Засвоєні",
+      "needReviewText": "потребують повторення",
+      "neverStudiedText": "ще не вивчалися"
+    },
+    "sort": {
+      "title": "Сортувати за",
+      "newestFirst": "Найновіші спочатку",
+      "alphabetical": "А–Я (за алфавітом)",
+      "masteryLowest": "Рівень засвоєння (найнижчий)",
+      "dueDate": "Дата повторення"
+    },
+    "emptyState": {
+      "title": "Слів не знайдено",
+      "subtitle": "Спробуйте інший фільтр або пошук"
+    },
+    "tabs": {
+      "wordsLabel": "Слова",
+      "collectionsLabel": "Колекції",
+      "wordsAria": "Вкладка «Слова»",
+      "collectionsAria": "Вкладка «Колекції»"
+    },
+    "afterCreate": {
+      "title": "Додати слова до вашої колекції?",
+      "importOption": "Імпортувати слова",
+      "goToOption": "Перейти до колекції",
+      "laterOption": "Можливо пізніше"
+    },
+    "collectionFilter": {
+      "title": "Фільтрувати за колекцією"
+    },
+    "collections": {
+      "totalWordsLabel": "Загалом слів",
+      "collectionsLabel": "Колекцій",
+      "dueTodayLabel": "На сьогодні",
+      "emptyTitle": "Колекцій ще немає",
+      "emptySubtitle": "Натисніть + Нова колекція, щоб почати"
+    }
+  },
+  "collections": {
+    "title": "Колекції",
+    "segments": {
+      "mySets": "Мої набори",
+      "explore": "Огляд"
+    },
+    "mySets": {
+      "totalLabel": "Загалом у всіх наборах",
+      "wordsUnit": "слів",
+      "dueLabel": "На сьогодні",
+      "emptyTitle": "Наборів ще немає",
+      "emptySubtitle": "Натисніть +, щоб створити, або перегляньте бібліотеку"
+    },
+    "explore": {
+      "searchPlaceholder": "Шукати набори й теми…",
+      "allLevel": "Усі",
+      "emptyTitle": "Немає наборів для цього рівня",
+      "emptySubtitle": "Спробуйте інший рівень або очистіть пошук",
+      "seeAllLink": "Дивитися всі ›",
+      "openButton": "Відкрити",
+      "getButton": "+ Отримати",
+      "getNewButton": "+ Отримати нові",
+      "addingLabel": "Додавання…",
+      "forYouLabel": "ДЛЯ ВАС"
+    },
+    "card": {
+      "masteredLabel": "засвоєно",
+      "completeLabel": "завершено",
+      "libraryBadge": "З БІБЛІОТЕКИ",
+      "dueLabel": "до повторення",
+      "upToDateLabel": "актуально",
+      "wordsLabel": "слів"
+    },
+    "adopt": {
+      "successMessage": "успішно",
+      "alreadyInSetsMessage": "Вже у ваших наборах",
+      "errorMessage": "Не вдалося додати колекцію. Спробуйте ще раз."
+    },
+    "afterCreate": {
+      "title": "Додати слова до вашої колекції?",
+      "csvOption": "Імпорт із CSV",
+      "imageOption": "Імпорт із зображення",
+      "goToOption": "Перейти до колекції",
+      "laterOption": "Можливо пізніше"
+    }
+  },
+  "collectionDetail": {
+    "nav": {
+      "backAria": "Назад",
+      "optionsAria": "Параметри"
+    },
+    "incompleteImport": {
+      "title": "Імпорт незавершено",
+      "subtitle": "слів ще потребують карток",
+      "completeButton": "Завершити"
+    },
+    "audio": {
+      "preparingLabel": "Підготовка аудіо…",
+      "readyUnit": "слів готово"
+    },
+    "hero": {
+      "wordsLabel": "слів",
+      "dueLabel": "до повторення",
+      "masteredLabel": "засвоєно"
+    },
+    "actions": {
+      "reviewAllLabel": "Повторити все",
+      "reviewLabel": "Повторити",
+      "listenLabel": "Слухати"
+    },
+    "categories": {
+      "allLabel": "Усі"
+    },
+    "emptyState": {
+      "title": "Слів ще немає",
+      "subtitle": "Натисніть +, щоб додати перше слово"
+    },
+    "pending": {
+      "label": "Очікує",
+      "instruction": "— натисніть «Завершити» вище"
+    },
+    "menu": {
+      "clearAllOption": "Видалити всі слова",
+      "deleteOption": "Видалити колекцію",
+      "cancelOption": "Скасувати"
+    },
+    "clearWords": {
+      "title": "Видалити всі слова?",
+      "message": "Це назавжди видалить усі {{count}} слів у {{name}}. Цю дію неможливо скасувати.",
+      "confirmButton": "Видалити все"
+    },
+    "deleteCollection": {
+      "title": "Видалити колекцію?",
+      "message": "Слова не буде видалено — вони з'являться у розділі «Усі слова» в Сховищі.",
+      "confirmButton": "Видалити"
+    },
+    "importComplete": {
+      "allAddedMessage": "Усі картки додано — колекцію завершено!",
+      "cardsAddedWithAudio": "{{count}} карток додано — аудіо включено ✓",
+      "alreadyInMessage": "Вже у ваших наборах",
+      "errorMessage": "Не вдалося завершити імпорт. Спробуйте пізніше.",
+      "addedWithDuplicates": "✓ {{added}} додано, {{duplicates}} дублікат(ів) використано повторно — колекцію завершено!",
+      "allAlreadyMessage": "Усі {{count}} вже у вашому сховищі — колекцію завершено!"
+    }
+  },
+  "platformCollectionDetail": {
+    "nav": {
+      "breadcrumb": "Огляд",
+      "backAria": "Назад"
+    },
+    "hero": {
+      "descriptionSuffix": "слів · з аудіо"
+    },
+    "progressBanner": {
+      "knowPrefix": "Ви вже знаєте",
+      "wordsSuffix": "слів тут.",
+      "addingPrefix": "Додавання цього набору додасть",
+      "newCardsSuffix": "нових карток",
+      "instantlySuffix": "— миттєво.",
+      "allNewForYouSuffix": "усі нові для вас."
+    },
+    "adoptedBanner": {
+      "inSetsLabel": "У ваших наборах",
+      "wordsKnownSuffix": "слів відомо"
+    },
+    "wordGroups": {
+      "newHereLabel": "Нові тут",
+      "alreadyYoursLabel": "Вже ваші",
+      "expandLabel": "натисніть, щоб розгорнути",
+      "collapseLabel": "натисніть, щоб згорнути",
+      "yoursChip": "✓ ВАШЕ"
+    },
+    "shelf": {
+      "title": "Історії з цими словами"
+    },
+    "story": {
+      "minLabel": "хв"
+    },
+    "footer": {
+      "openButton": "Відкрити в Моїх наборах",
+      "getButton": "+ Отримати",
+      "getNewButton": "+ Отримати нові слова",
+      "addingLabel": "Додавання…",
+      "generateStoryButton": "Згенерувати історію з цього набору",
+      "instantNote": "Миттєво — без очікування, аудіо включено"
+    },
+    "adopt": {
+      "successMessage": "{{count}} слів додано — аудіо включено ✓",
+      "alreadyInMessage": "Вже у ваших наборах",
+      "errorMessage": "Не вдалося додати колекцію. Спробуйте ще раз."
+    }
+  },
+  "exploreTopic": {
+    "nav": {
+      "backAria": "Назад",
+      "setsLabel": "наборів"
+    },
+    "emptyState": {
+      "title": "Немає наборів у цій темі",
+      "subtitle": "Спробуйте змінити фільтр рівня"
+    },
+    "card": {
+      "masteredLabel": "засвоєно",
+      "inSetsLabel": "У ваших наборах",
+      "knownLabel": "відомо",
+      "newLabel": "нових",
+      "wordsUnit": "слів",
+      "allNewLabel": "усі нові",
+      "openButton": "Відкрити",
+      "getButton": "+ Отримати",
+      "getNewButton": "+ Отримати нові",
+      "addingLabel": "Додавання…"
+    },
+    "adopt": {
+      "successMessage": "{{count}} слів додано — аудіо включено ✓",
+      "alreadyInMessage": "Вже у ваших наборах",
+      "errorMessage": "Не вдалося додати колекцію. Спробуйте ще раз."
+    }
+  },
+  "addWord": {
+    "nav": {
+      "closeAria": "Закрити",
+      "editTitle": "Редагувати слово",
+      "addTitle": "Додати нове слово"
+    },
+    "langDirection": {
+      "label": "Напрямок мови",
+      "english": "🇺🇦 Українська",
+      "arrow": "→",
+      "german": "🇩🇪 Німецька"
+    },
+    "back": {
+      "label": "Зворот — Німецька",
+      "hint": "(артикль визначається автоматично)",
+      "placeholder": "e.g. Zug",
+      "autoGenAria": "Автогенерація перекладу, множини та синонімів",
+      "autoGenLabel": "Авто",
+      "generatingLabel": "Генерування…",
+      "libraryBanner": "Заповнено з бібліотеки — без виклику ШІ"
+    },
+    "article": {
+      "label": "Артикль",
+      "noneOption": "Немає"
+    },
+    "front": {
+      "label": "Лицьова сторона — Українська",
+      "placeholder": "напр. потяг"
+    },
+    "plural": {
+      "label": "Множина",
+      "hint": "— вкажіть з артиклем",
+      "placeholder": "e.g. die Flugzeuge"
+    },
+    "synonyms": {
+      "label": "Синоніми",
+      "newLabel": "Новий синонім",
+      "addButton": "Додати синонім",
+      "removeAria": "Видалити синонім",
+      "wordPlaceholder": "Слово-синонім",
+      "translationPlaceholder": "Переклад (англійська)",
+      "examplePlaceholder": "Приклад речення (німецька)",
+      "exampleNativePlaceholder": "Переклад прикладу (англійська)"
+    },
+    "duplicateWarning": {
+      "messageSuffix": "вже існує",
+      "inLabel": "в",
+      "defaultLocation": "у вашому сховищі",
+      "addAnywayButton": "Додати все одно",
+      "goToButton": "Перейти до наявного"
+    },
+    "collection": {
+      "label": "Колекція",
+      "requiredHint": "*обов'язково",
+      "noSelectionLabel": "Без колекції"
+    },
+    "category": {
+      "label": "Категорія",
+      "newButton": "Нова",
+      "cancelButton": "Скасувати"
+    },
+    "newCategory": {
+      "placeholder": "Назва категорії",
+      "addButton": "Додати"
+    },
+    "examples": {
+      "label": "Приклад речення",
+      "targetPlaceholder": "e.g. Der Zug fährt um 8 Uhr ab.",
+      "nativePlaceholder": "Переклад українською"
+    },
+    "pronunciation": {
+      "label": "Вимова",
+      "recordButton": "Записати",
+      "ttsButton": "Використати TTS"
+    },
+    "save": {
+      "savingLabel": "Збереження…",
+      "editLabel": "Зберегти зміни",
+      "createLabel": "Зберегти до Сховища"
+    },
+    "importLink": {
+      "text": "Додати кілька слів? Імпортуйте CSV →"
+    },
+    "errors": {
+      "autoGenFailed": "Автогенерація не вдалася. Заповніть вручну або спробуйте ще раз."
+    }
+  },
+  "assignCollection": {
+    "title": "Додати до колекції",
+    "closeAria": "Закрити",
+    "wordsLabel": "слів",
+    "createNewLabel": "Створити нову колекцію…",
+    "newCollection": {
+      "placeholder": "Назва колекції",
+      "creatingLabel": "Створення…",
+      "createButton": "Створити"
+    },
+    "confirmButton": "Підтвердити вибір",
+    "skipButton": "Пропустити поки що"
+  },
+  "import": {
+    "nav": {
+      "closeAria": "Закрити",
+      "backAria": "Назад",
+      "title": "Імпорт слів"
+    },
+    "methods": {
+      "scanLabel": "Сканувати зображення",
+      "scanSubtitle": "Фото, меню, картки",
+      "csvLabel": "Завантажити CSV",
+      "csvSubtitle": "Масовий імпорт із файлу"
+    },
+    "ai": {
+      "title": "Згенерувати CSV за допомогою ШІ",
+      "subtitle": "Скопіюйте цей промпт у ChatGPT, Claude або будь-який ШІ",
+      "copiedLabel": "Скопійовано!",
+      "steps": {
+        "step1": "Скопіюйте промпт нижче",
+        "step2": "Вставте в ШІ разом зі своїми словами",
+        "step3": "Завантажте CSV сюди"
+      },
+      "prompt": {
+        "label": "Промпт для ШІ",
+        "copiedLabel": "✓ Скопійовано до буфера обміну",
+        "copyButton": "Копіювати",
+        "copiedButton": "Скопійовано!",
+        "footerAfterCopy": "Тепер відкрийте улюблений ШІ-інструмент, вставте промпт, додайте ваші слова та завантажте CSV",
+        "footerDefault": "Працює з ChatGPT, Claude, Gemini, Copilot — будь-яким ШІ, що генерує текст"
+      }
+    },
+    "downloadTemplate": "Завантажити шаблон CSV (95 готових слів)",
+    "errors": {
+      "invalidFileType": "Оберіть файл .csv",
+      "noWordsFound": "У цьому файлі не знайдено слів"
+    },
+    "toast": {
+      "promptCopied": "Промпт скопійовано до буфера обміну"
+    }
+  },
+  "importReview": {
+    "nav": {
+      "backAria": "Назад",
+      "title": "Перегляд імпорту"
+    },
+    "fileInfo": {
+      "wordsDetected": "слів виявлено"
+    },
+    "duplicates": {
+      "messagePrefix": "слів вже у вашому сховищі",
+      "deselectedNote": "(знято виділення)"
+    },
+    "reuseBar": {
+      "knownLabel": "відомо",
+      "reuseText": "до бібліотеки — використано повторно безкоштовно.",
+      "enrichText": "буде збагачено."
+    },
+    "summary": {
+      "totalLabel": "Усього",
+      "reuseLabel": "Повторне використання",
+      "newLabel": "Нові",
+      "inVaultLabel": "У сховищі",
+      "skippedLabel": "Пропущено"
+    },
+    "collection": {
+      "label": "ДОДАТИ ДО КОЛЕКЦІЇ",
+      "requiredHint": "*обов'язково"
+    },
+    "words": {
+      "label": "Слова (натисніть, щоб обрати / зняти вибір)",
+      "duplicateBadge": "У сховищі",
+      "reuseLabel": "★ бібліотека",
+      "enrichLabel": "збагатити"
+    },
+    "importButton": {
+      "prefix": "Імпортувати",
+      "wordSingular": "слово",
+      "wordsPlural": "слів",
+      "importingLabel": "Імпортування…"
+    },
+    "cancel": {
+      "link": "Скасувати"
+    },
+    "errors": {
+      "noCollectionSelected": "Оберіть колекцію перед імпортом.",
+      "importFailed": "Імпорт не вдався. Спробуйте ще раз."
+    },
+    "success": {
+      "newCardsSuffix": "слів додано до вашого Сховища",
+      "dictReuseText": "використано з бібліотеки",
+      "existingText": "вже існували"
+    }
+  },
+  "imageProcessing": {
+    "nav": {
+      "cancelAria": "Скасувати"
+    },
+    "phases": {
+      "extractingTitle": "Сканування зображення",
+      "extractingSubtitle": "Зачекайте…",
+      "enrichingTitle": "Генерування карток",
+      "enrichingSubtitle": "Створення вашої колекції…",
+      "partialTitle": "Майже готово",
+      "partialSubtitle": "карток вже готово",
+      "doneTitle": "Готово!"
+    },
+    "image": {
+      "altText": "Сканування зображення"
+    },
+    "phase1": {
+      "stepSubtitle": "Зчитування слів із зображення"
+    },
+    "info": {
+      "note": "Крок 1 з 2 — швидке сканування. Крок 2 генерує переклади та приклади речень."
+    },
+    "progressCard": {
+      "label": "Прогрес",
+      "readyLabel": "готово",
+      "cardsLabel": "карток",
+      "remainingLabel": "залишилось"
+    },
+    "batchInfo": "Обробка по 10 слів за раз — прогрес зберігається після кожної партії",
+    "partialBanner": {
+      "titleSuffix": "карток буде додано пізніше",
+      "subtitle": "Ліміт ШІ-квоти досягнуто під час імпорту. У вашій колекції з'явиться кнопка «Завершити» — натисніть її будь-коли, щоб закінчити."
+    },
+    "partialStats": {
+      "readyLabel": "Готово зараз",
+      "pendingLabel": "Очікує",
+      "totalLabel": "Знайдено загалом"
+    },
+    "cancel": {
+      "backgroundLabel": "Працює у фоновому режимі — ви можете залишити цей екран",
+      "defaultLabel": "Скасувати"
+    },
+    "errors": {
+      "noWordsFound": "На цьому зображенні не знайдено німецьких слів."
+    }
+  },
+  "image": {
+    "camera": {
+      "label": "Зробити фото",
+      "hint": "Наведіть на будь-який німецький текст"
+    },
+    "gallery": {
+      "label": "Обрати з галереї",
+      "hint": "Виберіть наявне фото"
+    },
+    "error": {
+      "unsupportedFormat": "Непідтримуваний формат зображення. Використовуйте JPEG, PNG або WebP.",
+      "cameraPermission": "Доступ до камери відхилено або недоступний."
+    }
+  },
+  "review": {
+    "hub": {
+      "cardsDueToday": "Карток на сьогодні",
+      "dueLabel": "до повторення",
+      "allCaughtUp": "Все повторено! 🎉",
+      "startTodaysReview": "Почати сьогоднішнє повторення",
+      "nothingDueNow": "Зараз нічого до повторення",
+      "quickStudySection": "Швидке вивчення",
+      "strugglingCardsTitle": "Складні картки",
+      "strugglingCardsDesc": "Картки, які ви провалили 3+ рази",
+      "newCardsOnlyTitle": "Лише нові картки",
+      "newCardsOnlyDesc": "Лексика, яку ще не повторювали",
+      "customStudyTitle": "Користувацьке вивчення",
+      "customStudyDesc": "Створіть фільтровану сесію",
+      "recentSessionsSection": "Останні сесії",
+      "seeAllLink": "Дивитися всі →",
+      "allDueCardsLabel": "Усі картки до повторення",
+      "cardsUnit": "карток",
+      "noSessionsTitle": "Сесій повторення ще немає.",
+      "noSessionsDesc": "Завершіть перше повторення, щоб побачити тут історію.",
+      "masteryBreakdownAriaLabel": "Розподіл за рівнем засвоєння"
+    },
+    "session": {
+      "goBackAriaLabel": "Повернутися",
+      "pageTitle": "Сесія повторення",
+      "yourLanguageLabel": "Ваша мова",
+      "englishLangChip": "🇺🇦 Українська",
+      "tapToRevealGerman": "Натисніть, щоб відкрити німецьку",
+      "germanLangChip": "🇩🇪 Німецька",
+      "pluralLabel": "Множина",
+      "synonymsHeader": "Синоніми",
+      "playPronunciationBtn": "Відтворити вимову",
+      "generatingAudio": "Генерування…",
+      "playExampleAriaLabel": "Відтворити приклад",
+      "ratingPrompt": "Наскільки добре ви це знали?",
+      "previousBtn": "Попередня",
+      "skipBtn": "Пропустити",
+      "allCaughtUpMsg": "Все повторено!",
+      "noDueCardsMsg": "Зараз немає карток до повторення.",
+      "backToHomeBtn": "На головну"
+    },
+    "summary": {
+      "backAriaLabel": "Назад до сховища",
+      "title": "Сесію завершено!",
+      "cardsReviewedLabel": "карток повторено",
+      "reviewedStat": "Повторено",
+      "durationStat": "Тривалість",
+      "avgRatingStat": "Середня оцінка",
+      "ratingBreakdownSection": "Розподіл оцінок",
+      "wordsReviewedSection": "Повторені слова",
+      "retryStruggled": "Повторити складні картки",
+      "reviewAllAgain": "Повторити все знову",
+      "backToVault": "Назад до сховища"
+    },
+    "custom": {
+      "backAriaLabel": "Назад",
+      "pageTitle": "Користувацьке вивчення",
+      "sourceSection": "Джерело",
+      "masteryFilterSection": "Фільтр за рівнем засвоєння",
+      "sortOrderSection": "Порядок сортування",
+      "cardLimitSection": "Ліміт карток",
+      "matchingCountLabel": "Карток за вашими фільтрами",
+      "startSessionBtn": "Почати сесію",
+      "noCardsMatchMsg": "Жодна картка не відповідає фільтрам",
+      "noCardsMatchToast": "Жодна картка не відповідає вашим фільтрам."
+    },
+    "mastery": {
+      "backAriaLabel": "Назад",
+      "pageTitle": "Розподіл засвоєння",
+      "selectCollectionMsg": "Обрати колекцію",
+      "barsLabel": "Картки за рівнем засвоєння",
+      "reviewLevelAriaLabel": "Повторити цей рівень",
+      "tipText": "Натисніть кнопку ▶ відтворення біля будь-якого рівня, щоб почати повторення лише з цими картками."
+    },
+    "history": {
+      "backAriaLabel": "Назад",
+      "pageTitle": "Історія сесій",
+      "allSessionsTab": "Усі сесії",
+      "thisWeekTab": "Цей тиждень",
+      "thisMonthTab": "Цей місяць",
+      "ratingsStatLabel": "Оцінки",
+      "durationStatLabel": "Тривалість",
+      "struggledStatLabel": "Складні",
+      "nailedStatLabel": "Засвоєні",
+      "noSessionsTitle": "Сесій повторення ще немає.",
+      "noSessionsDesc": "Почніть перше повторення, щоб побачити тут історію!"
+    },
+    "struggling": {
+      "backAriaLabel": "Назад",
+      "pageTitle": "Складні картки",
+      "needsAttentionMsg": "карток потребують додаткової уваги",
+      "focusMsg": "Ці картки постійно провалюються. Зосередьтеся на них, щоб подолати бар'єр.",
+      "failSingular": "невдача",
+      "failPlural": "невдач",
+      "reviewAllBtn": "Повторити все",
+      "noCardsTitle": "Немає складних карток!",
+      "encouragementMsg": "Ви чудово справляєтесь. Так тримати!"
+    }
+  },
+  "listen": {
+    "main": {
+      "pageTitle": "Слухай і вчися"
+    },
+    "hero": {
+      "playingFromLabel": "Відтворення з",
+      "queueCountLabel": "{{count}} слів у черзі",
+      "playBtn": "Відтворити",
+      "shuffleBtn": "Перемішати",
+      "playlistTypeSection": "Тип плейлиста"
+    },
+    "controls": {
+      "speedSection": "Швидкість"
+    },
+    "queue": {
+      "durationUnit": "хв",
+      "headerLabel": "Черга",
+      "emptyTitle": "Немає слів у черзі",
+      "emptyDesc": "Натисніть на джерело вище, щоб обрати плейлист",
+      "previewAriaLabel": "Попередній перегляд аудіо"
+    },
+    "sourceSheet": {
+      "title": "Оберіть джерело плейлиста"
+    },
+    "source": {
+      "todaysDueLabel": "Слова на сьогодні",
+      "todaysDueDesc": "Картки, заплановані на сьогодні",
+      "collectionLabel": "Колекція",
+      "collectionDesc": "Оберіть конкретну колекцію",
+      "allCardsLabel": "Усі картки",
+      "allCardsDesc": "Весь ваш словниковий запас",
+      "strugglingLabel": "Складні слова",
+      "strugglingDesc": "Рівень засвоєння 0–2, потребують практики"
+    },
+    "nowPlaying": {
+      "pageTitle": "Зараз відтворюється",
+      "sessionComplete": "Сесію завершено!",
+      "seeSummary": "Переглянути підсумок",
+      "audioUnavailable": "Аудіо недоступне",
+      "retryBtn": "Спробувати знову",
+      "skipCard": "Пропустити цю картку",
+      "grammarTipLabel": "Поради з граматики"
+    },
+    "playlistMode": {
+      "compactLabel": "Компактно",
+      "compactDesc": "Слово + значення",
+      "examplesLabel": "Приклади",
+      "examplesDesc": "Повні речення",
+      "deepDiveLabel": "Поглиблено",
+      "deepDiveDesc": "+ граматична порада"
+    },
+    "card": {
+      "collectionPrefix": "Колекція:"
+    }
+  },
+  "stories": {
+    "library": {
+      "pageTitle": "Студія історій",
+      "generateAriaLabel": "Згенерувати нову історію",
+      "exploreSection": "Огляд",
+      "exploreLink": "Дивитися всі →",
+      "exploreErrorMsg": "Не вдалося завантажити історії. Потягніть вниз для оновлення.",
+      "noStoriesYetMsg": "Історії вже на підході! Перевірте трохи пізніше.",
+      "noStoriesFilteredMsg": "Не знайдено історій за цим фільтром.",
+      "premiumBadge": "Pro",
+      "myStoriesSection": "Мої історії",
+      "savedLabel": "збережено",
+      "generateFirstLink": "Згенерувати першу →",
+      "noStoriesTitle": "Історій ще немає",
+      "noStoriesDesc": "Згенеруйте першу історію зі свого словникового запасу.",
+      "generateBtn": "Згенерувати історію",
+      "incompleteStatus": "Незавершено",
+      "extendBtn": "Продовжити",
+      "extendingLabel": "Продовження…",
+      "listenBtn": "Слухати",
+      "readBtn": "Читати",
+      "moreOptionsAriaLabel": "Більше опцій",
+      "deleteAction": "Видалити історію",
+      "cancelAction": "Скасувати",
+      "deleteAlertHeader": "Видалити історію",
+      "deleteAlertMsg": "Видалити «{{title}}»? Аудіо також буде видалено.",
+      "deleteActionBtn": "Видалити",
+      "extensionFailedToast": "Продовження не вдалося — спробуйте ще раз."
+    },
+    "reader": {
+      "backAriaLabel": "Назад",
+      "toggleTranslationTitle": "Перемкнути переклад",
+      "toggleTranslationAriaLabel": "Перемкнути переклад",
+      "learnedLabel": "Вивчено",
+      "markAsLearnedLabel": "Позначити як вивчене",
+      "storyTab": "Історія",
+      "quizTab": "Тест",
+      "keywordsTab": "Ключові слова",
+      "grammarTab": "Граматика",
+      "generatingAudio": "Генерування аудіо озвучення…",
+      "preparingAudio": "Підготовка аудіо…",
+      "closeWordPanelAriaLabel": "Закрити панель слова",
+      "pluralLabel": "Множина",
+      "playPronunciationAriaLabel": "Відтворити вимову",
+      "alreadyInVaultAriaLabel": "Вже в сховищі",
+      "addToVaultAriaLabel": "Додати до сховища",
+      "conjugateBtn": "Відмінювати ▸",
+      "praesensHeader": "Präsens",
+      "praeteritumHeader": "Präteritum",
+      "perfektLabel": "Perfekt:",
+      "imperativLabel": "Imperativ:",
+      "noConjugationData": "Дані для відмінювання недоступні.",
+      "pauseAriaLabel": "Пауза",
+      "playAriaLabel": "Відтворити",
+      "restartAriaLabel": "Перезапустити",
+      "loadingMsg": "Завантаження історії…"
+    },
+    "complete": {
+      "backAriaLabel": "Назад до бібліотеки",
+      "pageTitle": "Історію завершено",
+      "title": "Чудове читання!",
+      "finishedMsg": "Ви завершили «{{title}}»",
+      "vocabWordsLabel": "слів лексики",
+      "sentencesLabel": "речень",
+      "listenSingular": "прослуховування",
+      "listenPlural": "прослуховувань",
+      "wordsSection": "Слова в цій історії",
+      "readAgainBtn": "Читати знову",
+      "moreStoriesBtn": "Більше історій",
+      "loadingMsg": "Завантаження…"
+    },
+    "generate": {
+      "pageTitle": "Згенерувати історію",
+      "closeAriaLabel": "Закрити",
+      "freeStoriesUsedLabel": "безкоштовних історій використано",
+      "pickCollectionsSection": "Оберіть колекції",
+      "selectedLabel": "обрано",
+      "noCollectionsMsg": "Колекцій ще немає. Спочатку додайте слова до колекції.",
+      "wordsLabel": "слів",
+      "lengthSection": "Довжина історії",
+      "freeOnlyHint": "Лише коротка на безкоштовному плані",
+      "longWarning": "Це може зайняти до 45 секунд",
+      "difficultySection": "Рівень складності",
+      "estimatedWaitLong": "Зазвичай 25–40 секунд",
+      "estimatedWaitShort": "Зазвичай 10–20 секунд",
+      "retryBtn": "Спробувати знову",
+      "contactSupportLink": "Зв'язатися з підтримкою",
+      "generateBtn": "Згенерувати історію",
+      "generatingDefaultMsg": "Генерування вашої історії…"
+    },
+    "keywords": {
+      "extractingMsg": "Вилучення ключових слів…",
+      "noKeywordsMsg": "Для цієї історії немає ключових слів.",
+      "memorizeBtn": "Запам'ятати ключові слова",
+      "playPronunciationTitle": "Відтворити вимову"
+    },
+    "grammar": {
+      "generatingMsg": "Генерування граматичних нотаток…",
+      "noNotesTitle": "Для цієї історії немає граматичних нотаток.",
+      "noNotesDesc": "Граматичні нотатки генеруються для нових історій.",
+      "exampleSection": "Приклад",
+      "descriptionSection": "Опис"
+    },
+    "quiz": {
+      "generatingMsg": "Генерування тесту…",
+      "noQuizTitle": "Для цієї історії немає тесту.",
+      "noQuizDesc": "Тести генеруються для нових історій надалі.",
+      "correctLabel": "правильно",
+      "retakeBtn": "Пройти тест знову",
+      "muteAriaLabel": "Вимкнути звук відповіді",
+      "unmuteAriaLabel": "Увімкнути звук відповіді",
+      "nextBtn": "Далі",
+      "pauseOnMistakesTitle": "Пауза на помилках",
+      "pauseOnMistakesDesc": "Перегляньте правильну відповідь перед продовженням"
+    },
+    "length": {
+      "short": "Коротка",
+      "medium": "Середня",
+      "long": "Довга",
+      "veryLong": "Дуже довга",
+      "extraLong": "Надзвичайно довга",
+      "podcast": "ПОДКАСТ"
+    },
+    "category": {
+      "daily-life": "Повсякденне життя",
+      "travel": "Подорожі",
+      "food-culture": "Їжа та культура",
+      "work-career": "Робота та кар'єра",
+      "technology": "Технології",
+      "nature": "Природа",
+      "fiction": "Художня література"
+    },
+    "wordType": {
+      "noun": "іменник",
+      "verb": "дієслово",
+      "adjective": "прикметник",
+      "adverb": "прислівник",
+      "other": "інше"
+    },
+    "cardMeta": {
+      "words": "слів",
+      "min": "хв",
+      "more": "+{{count}} ще"
+    }
+  },
+  "settings": {
+    "goals": {
+      "title": "Навчальні цілі",
+      "backAria": "Назад",
+      "targetsSection": "Цілі",
+      "daily": {
+        "name": "Щоденна",
+        "desc": "Карток на день для збереження серії",
+        "decreaseAria": "Зменшити щоденну мету",
+        "increaseAria": "Збільшити щоденну мету"
+      },
+      "weekly": {
+        "name": "Щотижнева",
+        "desc": "Загалом карток повторено за тиждень",
+        "decreaseAria": "Зменшити щотижневу мету",
+        "increaseAria": "Збільшити щотижневу мету"
+      },
+      "monthly": {
+        "name": "Щомісячна",
+        "desc": "Загалом карток повторено за місяць",
+        "decreaseAria": "Зменшити щомісячну мету",
+        "increaseAria": "Збільшити щомісячну мету"
+      },
+      "streakNote": "🔥 Досягнення щоденної мети продовжує вашу серію. Пропустіть день — і серія скинеться."
+    },
+    "goalsPrompt": {
+      "titleFirstTime": "Встановіть ваші навчальні цілі",
+      "titleUpdate": "Час оновити ваші цілі",
+      "bodyFirstTime": "Вкажіть LinguaCard, скільки ви хочете вчити щодня. Ваші цілі формують серію та допомагають залишатися на шляху.",
+      "bodyUpdate": "Минуло багато часу з останнього оновлення ваших цілей. Виділіть хвилинку, щоб переконатися, що вони досі відповідають вашому темпу.",
+      "cards": "карток",
+      "setMyGoals": "Встановити мої цілі",
+      "updateMyGoals": "Оновити мої цілі"
+    },
+    "reminders": {
+      "title": "Нагадування",
+      "backAriaLabel": "Назад",
+      "pageTitle": "Нагадування",
+      "dailyReminderSection": "Щоденне нагадування",
+      "enableToggleLabel": "Увімкнути нагадування",
+      "enableDesc": "Отримуйте сповіщення у браузері, якщо ви ще не досягли мети",
+      "toggleAriaLabel": "Перемкнути нагадування",
+      "permissionDeniedMsg": "Дозвіл на сповіщення відхилено. Щоб увімкнути нагадування, відкрийте налаштування браузера та дозвольте сповіщення для цього сайту.",
+      "timeLabel": "Час нагадування",
+      "timeDesc": "Ми нагадаємо лише тоді, коли вашу мету ще не досягнуто",
+      "howItWorksMsg": "Нагадування використовують систему сповіщень вашого браузера та працюють навіть коли LinguaCard закрито. Сповіщення для мобільних застосунків (iOS / Android) з'являться пізніше.",
+      "unsupportedMsg": "Ваш поточний браузер або контекст не підтримує веб-push-сповіщення. Спробуйте відкрити LinguaCard у Chrome або Edge, або встановіть як PWA.",
+      "permissionSection": "Дозвіл",
+      "grantedTitle": "Сповіщення дозволено",
+      "deniedTitle": "Сповіщення заблоковано",
+      "defaultTitle": "Сповіщення",
+      "grantedDesc": "Надано для цього браузера ✓",
+      "deniedDesc": "Заблоковано — змініть у налаштуваннях браузера",
+      "defaultDesc": "Ще не запитано"
+    },
+    "theme": {
+      "darkMode": "Темний режим"
+    },
+    "dangerZone": {
+      "resetTitle": "Скинути всі дані",
+      "resetWarning": "Це назавжди видалить усі ваші слова, колекції, історію повторень та прогрес. Ваш акаунт залишиться активним.",
+      "irreversible": "Цю дію неможливо скасувати.",
+      "deleteDetails": "Усі {{wordCount}} слів та {{collectionCount}} колекцій буде видалено назавжди.",
+      "confirmPassword": "Введіть пароль для підтвердження",
+      "confirm": "Так, видалити все"
+    },
+    "language": {
+      "title": "Мова",
+      "backAria": "Назад",
+      "subtitle": "Оберіть мову інтерфейсу",
+      "currentLabel": "Поточна"
+    }
+  },
+  "sync": {
+    "status": {
+      "label": "Стан синхронізації",
+      "pending": "{{count}} в очікуванні",
+      "syncing": "Синхронізація…",
+      "error": "Помилка синхронізації",
+      "errorRetry": "Помилка синхронізації — натисніть для повтору",
+      "synced": "Синхронізовано"
+    },
+    "notifications": {
+      "recovered": "Синхронізацію відновлено — дані актуальні",
+      "changesSynced": "{{count}} зміну(и) з черги синхронізовано",
+      "upToDate": "Все актуально",
+      "partialFailure": "Деякі дані не вдалося синхронізувати. Буде повторна спроба.",
+      "failed": "Синхронізація не вдалася — буде повторена автоматично",
+      "retryNow": "Повторити зараз"
+    }
+  },
+  "offline": {
+    "banner": {
+      "message": "Ви офлайн — показуємо збережені дані"
+    }
+  },
+  "pwa": {
+    "install": {
+      "title": "Додати на головний екран",
+      "subtitle": "Встановіть LinguaCard для швидкого доступу"
+    },
+    "installIos": {
+      "tap": "Натисніть",
+      "action": "Додати на головний екран"
+    }
+  },
+  "srs": {
+    "status": {
+      "due": "До повторення",
+      "interval": "{{days}}д інтервал"
+    },
+    "masteryLabel": {
+      "new": "Новий",
+      "learning": "Вивчення",
+      "review": "Повторення",
+      "mastered": "Засвоєно",
+      "familiar": "Знайомий",
+      "good": "Добре"
+    },
+    "breakdownTag": {
+      "new": "нові",
+      "hard": "складні",
+      "learning": "вивчаються",
+      "review": "повторення"
+    },
+    "selectCollection": "Обрати колекцію",
+    "allCollections": "Усі колекції",
+    "alreadyInVault": "Вже у вашому сховищі",
+    "alreadyInCollection": "Вже в \"{{name}}\""
+  },
+  "subscription": {
+    "paywall": {
+      "title": "Розблокуйте необмежені історії",
+      "subtitle": "Ви використали 3 безкоштовні історії. Оновіть до Pro для:",
+      "benefit1": "Необмежена генерація історій",
+      "benefit2": "Claude Sonnet — найвища якість",
+      "benefit3": "Пріоритетна підтримка",
+      "requestBtn": "Запросити Pro-доступ",
+      "dismissBtn": "Не зараз"
+    }
+  },
+  "admin": {
+    "import": {
+      "label": "Адмін-імпорт",
+      "pageTitle": "Адмін імпорт",
+      "tabs": {
+        "wordList": "Список слів",
+        "json": "Імпорт JSON",
+        "story": "Історія",
+        "collections": "Колекції"
+      },
+      "fields": {
+        "title": "Назва *",
+        "level": "Рівень *",
+        "topic": "Тема *",
+        "emoji": "Емоджі",
+        "words": "Слова (по одному на рядок)",
+        "json": "Дані JSON",
+        "storyJson": "JSON історії"
+      },
+      "buttons": {
+        "importCollection": "Імпортувати колекцію",
+        "importJson": "Імпортувати JSON колекцію",
+        "importStory": "Імпортувати історію"
+      },
+      "status": {
+        "loading": "Завантаження…",
+        "noCollections": "Колекцій ще немає. Спочатку імпортуйте одну."
+      }
+    }
+  },
+  "wordDetail": {
+    "pageTitle": "Деталі слова",
+    "backAria": "Повернутися",
+    "moreOptionsAria": "Більше опцій",
+    "playPluralAria": "Відтворити множину",
+    "playExampleAria": "Відтворити приклад речення",
+    "playSynonymExampleAria": "Відтворити приклад синоніма",
+    "generating": "Генерування…",
+    "listenToPronunciation": "Прослухати вимову",
+    "aiAudioCached": "ШІ-аудіо збережено на пристрої",
+    "generatingAudio": "Генерування аудіо…",
+    "gender": {
+      "masculine": "чоловічий",
+      "feminine": "жіночий",
+      "neuter": "середній"
+    },
+    "plural": "Множина",
+    "masteryProgress": "Прогрес засвоєння",
+    "level": "Рівень {{level}} — {{label}}",
+    "stats": {
+      "reviews": "Повторень",
+      "recallChance": "Шанс пригадати",
+      "stability": "Стабільність",
+      "lastSeen": "Останній перегляд"
+    },
+    "nextReview": {
+      "dueNow": "До повторення зараз",
+      "tomorrow": "Завтра",
+      "inDays": "Наступне повторення через {{days}} днів"
+    },
+    "lastReviewed": {
+      "never": "Ніколи",
+      "today": "Сьогодні",
+      "daysAgo": "{{days}}д тому"
+    },
+    "sections": {
+      "exampleSentences": "Приклади речень",
+      "synonyms": "Синоніми"
+    },
+    "rateThisWord": "Оцініть це слово",
+    "emptyState": {
+      "title": "Слово не знайдено",
+      "subtitle": "Це слово, можливо, було видалено з вашого сховища."
+    },
+    "deleteConfirm": {
+      "title": "Видалити слово",
+      "message": "Видалити «{{word}}» з вашого сховища? Цю дію неможливо скасувати.",
+      "confirmButton": "Видалити"
+    },
+    "toast": {
+      "deleted": "Слово видалено",
+      "updated": "Слово оновлено"
+    }
+  },
+  "imageImport": {
+    "title": "Імпорт із зображення",
+    "bestResults": {
+      "label": "ДЛЯ НАЙКРАЩИХ РЕЗУЛЬТАТІВ",
+      "tip1": "Гарне освітлення — уникайте тіней на тексті",
+      "tip2": "Тримайте камеру нерухомо — розмиті зображення можуть пропустити слова",
+      "tip3": "Великі зображення з багатьма словами краще працюють партіями"
+    }
+  },
+  "tabs": {
+    "home": "Головна",
+    "vault": "Сховище",
+    "review": "Повторення",
+    "stories": "Історії",
+    "listen": "Слухати"
+  }
+}

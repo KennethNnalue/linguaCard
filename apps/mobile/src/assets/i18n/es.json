@@ -1,0 +1,1194 @@
+{
+  "common": {
+    "appName": "LinguaCard",
+    "cancel": "Cancelar",
+    "close": "Cerrar",
+    "save": "Guardar",
+    "delete": "Eliminar",
+    "retry": "Reintentar",
+    "loading": "Cargando…",
+    "back": "Atrás",
+    "done": "Listo",
+    "or": "o",
+    "install": "Instalar",
+    "dismiss": "Descartar",
+    "notNow": "Ahora no",
+    "email": "Correo electrónico",
+    "password": "Contraseña",
+    "fullName": "Nombre completo",
+    "words": "palabras",
+    "cards": "tarjetas",
+    "due": "pendientes",
+    "min": "min",
+    "of": "de",
+    "new": "Nuevo",
+    "all": "Todo",
+    "today": "hoy",
+    "placeholder": {
+      "email": "you@example.com",
+      "password": "••••••••",
+      "name": "Jan Schmidt"
+    },
+    "error": {
+      "generic": "Algo salió mal. Por favor, inténtalo de nuevo."
+    },
+    "divider": {
+      "or": "o"
+    },
+    "aria": {
+      "toggleDarkMode": "Alternar modo oscuro",
+      "togglePasswordVisibility": "Mostrar/ocultar contraseña",
+      "close": "Cerrar",
+      "closeMenu": "Cerrar menú",
+      "quickActions": "Acciones rápidas",
+      "addCard": "Añadir tarjeta",
+      "newCollection": "Nueva colección",
+      "import": "Importar",
+      "backToLogin": "Volver al inicio de sesión",
+      "syncStatus": "Estado de sincronización",
+      "playPronunciation": "Reproducir pronunciación",
+      "share": "Compartir"
+    },
+    "account": "Cuenta",
+    "refresh": "Actualizar",
+    "yesterday": "Ayer",
+    "daysAgoLabel": "Hace {{count}} días",
+    "todayCapital": "Hoy"
+  },
+  "auth": {
+    "login": {
+      "tagline": "Domina el vocabulario alemán",
+      "signIn": "Iniciar sesión",
+      "forgotPassword": "¿Olvidaste tu contraseña?",
+      "noAccount": "¿No tienes una cuenta?"
+    },
+    "register": {
+      "title": "Crear cuenta",
+      "tagline": "Comienza tu aventura lingüística",
+      "passwordHint": "Mín. 8 caracteres",
+      "submit": "Crear cuenta",
+      "hasAccount": "¿Ya tienes una cuenta?",
+      "error": "Error en el registro. Por favor, inténtalo de nuevo."
+    },
+    "forgotPassword": {
+      "title": "Restablecer contraseña",
+      "heading": "¿Olvidaste tu contraseña?",
+      "description": "Introduce tu correo y te enviaremos un enlace para restablecerla.",
+      "submit": "Enviar enlace",
+      "remember": "¿Recuerdas tu contraseña?",
+      "checkEmail": "Revisa tu correo",
+      "linkSent": "Hemos enviado un enlace de restablecimiento a",
+      "notReceived": "¿No lo recibiste? Revisa tu carpeta de spam o espera unos minutos.",
+      "backToLogin": "Volver a iniciar sesión"
+    },
+    "validation": {
+      "emailInvalid": "Introduce un correo electrónico válido",
+      "passwordMinLength": "La contraseña debe tener al menos 8 caracteres",
+      "nameMinLength": "El nombre debe tener al menos 2 caracteres"
+    },
+    "oauth": {
+      "google": "Continuar con Google",
+      "googleComingSoon": "Inicio de sesión con Google próximamente"
+    },
+    "signOut": "Cerrar sesión",
+    "reset": {
+      "passwordIncorrect": "Contraseña incorrecta. Por favor, inténtalo de nuevo.",
+      "success": "✓ Todos los datos se han restablecido. ¡Empieza de cero!"
+    }
+  },
+  "home": {
+    "greeting": {
+      "morning": "Buenos días",
+      "afternoon": "Buenas tardes",
+      "evening": "Buenas noches"
+    },
+    "hero": {
+      "completeGreeting": "¡Buen trabajo!",
+      "completeTitle": "Meta cumplida hoy ✓",
+      "readyTitle": "¿Listo para aprender hoy?"
+    },
+    "stats": {
+      "dueLabel": "pendientes",
+      "newCardsLabel": "tarjetas nuevas",
+      "reviewsLabel": "repasos"
+    },
+    "actions": {
+      "startSession": "Iniciar sesión",
+      "filter": "Filtrar"
+    },
+    "atRisk": {
+      "keepStreakPrefix": "Repasa ahora para mantener tu racha de",
+      "keepStreakSuffix": "días",
+      "startStreakSuffix": "tarjetas hoy para iniciar una racha",
+      "dailyGoalSuffix": "tarjetas más para cumplir tu meta diaria",
+      "reviewText": "Repasar",
+      "startButton": "Empezar"
+    },
+    "streak": {
+      "label": "Racha de días",
+      "onTrack": "Al día ✓",
+      "atRisk": "¡En riesgo!",
+      "broken": "Inicia una nueva racha"
+    },
+    "goalRing": {
+      "label": "Meta diaria",
+      "todayLabel": "hoy",
+      "doneLabel": "hechas",
+      "notStarted": "Sin empezar",
+      "toGoLabel": "faltan"
+    },
+    "wordOfDay": {
+      "label": "✦ Palabra del día",
+      "playAria": "Reproducir pronunciación"
+    },
+    "weeklyChart": {
+      "title": "Esta semana",
+      "detailsLink": "Detalles →",
+      "reviewed": "tarjetas repasadas",
+      "goalLabel": "Meta:"
+    },
+    "quickActions": {
+      "title": "Acciones rápidas",
+      "scanLabel": "Escanear",
+      "scanSub": "Importar palabras",
+      "storyLabel": "Historia",
+      "storySub": "Generar nueva",
+      "listenLabel": "Escuchar",
+      "listenSub": "Lista de audio"
+    },
+    "recentCards": {
+      "title": "Añadidas recientemente",
+      "seeAllLink": "Ver todo →"
+    },
+    "collectionFilter": {
+      "allLabel": "Todas las colecciones"
+    },
+    "wotd": {
+      "genderMasculine": "masculino",
+      "genderFeminine": "femenino",
+      "genderNeuter": "neutro"
+    }
+  },
+  "vault": {
+    "title": "Bóveda",
+    "addCard": "Añadir tarjeta",
+    "import": "Importar",
+    "newCollection": "Nueva colección",
+    "search": {
+      "placeholder": "Buscar palabras…",
+      "aria": "Buscar vocabulario"
+    },
+    "filter": {
+      "allLabel": "Todo",
+      "dueLabel": "Pendientes",
+      "newLabel": "Nuevas",
+      "masteredLabel": "Dominadas",
+      "needReviewText": "necesitan repaso",
+      "neverStudiedText": "nunca estudiadas"
+    },
+    "sort": {
+      "title": "Ordenar por",
+      "newestFirst": "Más recientes primero",
+      "alphabetical": "A–Z (alfabético)",
+      "masteryLowest": "Dominio (menor primero)",
+      "dueDate": "Fecha de repaso"
+    },
+    "emptyState": {
+      "title": "No se encontraron palabras",
+      "subtitle": "Prueba con otro filtro o búsqueda"
+    },
+    "tabs": {
+      "wordsLabel": "Palabras",
+      "collectionsLabel": "Colecciones",
+      "wordsAria": "Pestaña de palabras",
+      "collectionsAria": "Pestaña de colecciones"
+    },
+    "afterCreate": {
+      "title": "¿Añadir palabras a tu colección?",
+      "importOption": "Importar palabras",
+      "goToOption": "Ir a la colección",
+      "laterOption": "Quizás más tarde"
+    },
+    "collectionFilter": {
+      "title": "Filtrar por colección"
+    },
+    "collections": {
+      "totalWordsLabel": "Total de palabras",
+      "collectionsLabel": "Colecciones",
+      "dueTodayLabel": "Pendientes hoy",
+      "emptyTitle": "Aún no hay colecciones",
+      "emptySubtitle": "Toca + Nueva colección para empezar"
+    }
+  },
+  "collections": {
+    "title": "Colecciones",
+    "segments": {
+      "mySets": "Mis sets",
+      "explore": "Explorar"
+    },
+    "mySets": {
+      "totalLabel": "Total en todos los sets",
+      "wordsUnit": "palabras",
+      "dueLabel": "Pendientes hoy",
+      "emptyTitle": "Aún no hay sets",
+      "emptySubtitle": "Toca + para crear uno, o explora la biblioteca"
+    },
+    "explore": {
+      "searchPlaceholder": "Buscar sets y temas…",
+      "allLevel": "Todos",
+      "emptyTitle": "No hay sets en este nivel",
+      "emptySubtitle": "Prueba con otro nivel o borra la búsqueda",
+      "seeAllLink": "Ver todo ›",
+      "openButton": "Abrir",
+      "getButton": "+ Obtener",
+      "getNewButton": "+ Obtener nuevo",
+      "addingLabel": "Añadiendo…",
+      "forYouLabel": "PARA TI"
+    },
+    "card": {
+      "masteredLabel": "dominadas",
+      "completeLabel": "completo",
+      "libraryBadge": "DE LA BIBLIOTECA",
+      "dueLabel": "pendientes",
+      "upToDateLabel": "al día",
+      "wordsLabel": "palabras"
+    },
+    "adopt": {
+      "successMessage": "listo",
+      "alreadyInSetsMessage": "Ya está en tus sets",
+      "errorMessage": "No se pudo añadir la colección. Inténtalo de nuevo."
+    },
+    "afterCreate": {
+      "title": "¿Añadir palabras a tu colección?",
+      "csvOption": "Importar desde CSV",
+      "imageOption": "Importar desde imagen",
+      "goToOption": "Ir a la colección",
+      "laterOption": "Quizás más tarde"
+    }
+  },
+  "collectionDetail": {
+    "nav": {
+      "backAria": "Atrás",
+      "optionsAria": "Opciones"
+    },
+    "incompleteImport": {
+      "title": "Importación incompleta",
+      "subtitle": "palabras aún necesitan tarjetas",
+      "completeButton": "Completar"
+    },
+    "audio": {
+      "preparingLabel": "Preparando audio…",
+      "readyUnit": "palabras listas"
+    },
+    "hero": {
+      "wordsLabel": "palabras",
+      "dueLabel": "pendientes",
+      "masteredLabel": "dominadas"
+    },
+    "actions": {
+      "reviewAllLabel": "Repasar todo",
+      "reviewLabel": "Repasar",
+      "listenLabel": "Escuchar"
+    },
+    "categories": {
+      "allLabel": "Todo"
+    },
+    "emptyState": {
+      "title": "Aún no hay palabras",
+      "subtitle": "Toca + para añadir tu primera palabra"
+    },
+    "pending": {
+      "label": "Pendiente",
+      "instruction": "— toca Completar arriba"
+    },
+    "menu": {
+      "clearAllOption": "Borrar todas las palabras",
+      "deleteOption": "Eliminar colección",
+      "cancelOption": "Cancelar"
+    },
+    "clearWords": {
+      "title": "¿Borrar todas las palabras?",
+      "message": "Esto eliminará permanentemente las {{count}} palabras en {{name}}. No se puede deshacer.",
+      "confirmButton": "Borrar todo"
+    },
+    "deleteCollection": {
+      "title": "¿Eliminar colección?",
+      "message": "Las palabras no se eliminarán — aparecerán en \"Todas las palabras\" en la Bóveda.",
+      "confirmButton": "Eliminar"
+    },
+    "importComplete": {
+      "allAddedMessage": "Todas las tarjetas añadidas — ¡colección completa!",
+      "cardsAddedWithAudio": "{{count}} tarjetas añadidas — audio incluido ✓",
+      "alreadyInMessage": "Ya está en tus sets",
+      "errorMessage": "No se pudo completar la importación. Inténtalo más tarde.",
+      "addedWithDuplicates": "✓ {{added}} añadidas, {{duplicates}} duplicada(s) reutilizada(s) — ¡colección completa!",
+      "allAlreadyMessage": "Las {{count}} ya están en tu bóveda — ¡colección completa!"
+    }
+  },
+  "platformCollectionDetail": {
+    "nav": {
+      "breadcrumb": "Explorar",
+      "backAria": "Atrás"
+    },
+    "hero": {
+      "descriptionSuffix": "palabras · con audio"
+    },
+    "progressBanner": {
+      "knowPrefix": "Ya conoces",
+      "wordsSuffix": "palabras de aquí.",
+      "addingPrefix": "Obtener este set añade",
+      "newCardsSuffix": "tarjetas nuevas",
+      "instantlySuffix": "— al instante.",
+      "allNewForYouSuffix": "todas nuevas para ti."
+    },
+    "adoptedBanner": {
+      "inSetsLabel": "En tus sets",
+      "wordsKnownSuffix": "palabras conocidas"
+    },
+    "wordGroups": {
+      "newHereLabel": "Nuevas aquí",
+      "alreadyYoursLabel": "Ya son tuyas",
+      "expandLabel": "toca para expandir",
+      "collapseLabel": "toca para contraer",
+      "yoursChip": "✓ TUYA"
+    },
+    "shelf": {
+      "title": "Historias con estas palabras"
+    },
+    "story": {
+      "minLabel": "min"
+    },
+    "footer": {
+      "openButton": "Abrir en Mis sets",
+      "getButton": "+ Obtener",
+      "getNewButton": "+ Obtener palabras nuevas",
+      "addingLabel": "Añadiendo…",
+      "generateStoryButton": "Generar una historia con este set",
+      "instantNote": "Instantáneo — sin esperas, audio incluido"
+    },
+    "adopt": {
+      "successMessage": "{{count}} palabras añadidas — audio incluido ✓",
+      "alreadyInMessage": "Ya está en tus sets",
+      "errorMessage": "No se pudo añadir la colección. Inténtalo de nuevo."
+    }
+  },
+  "exploreTopic": {
+    "nav": {
+      "backAria": "Atrás",
+      "setsLabel": "sets"
+    },
+    "emptyState": {
+      "title": "No hay sets en este tema",
+      "subtitle": "Prueba cambiando el filtro de nivel"
+    },
+    "card": {
+      "masteredLabel": "dominadas",
+      "inSetsLabel": "En tus sets",
+      "knownLabel": "conocidas",
+      "newLabel": "nuevas",
+      "wordsUnit": "palabras",
+      "allNewLabel": "todas nuevas",
+      "openButton": "Abrir",
+      "getButton": "+ Obtener",
+      "getNewButton": "+ Obtener nuevo",
+      "addingLabel": "Añadiendo…"
+    },
+    "adopt": {
+      "successMessage": "{{count}} palabras añadidas — audio incluido ✓",
+      "alreadyInMessage": "Ya está en tus sets",
+      "errorMessage": "No se pudo añadir la colección. Inténtalo de nuevo."
+    }
+  },
+  "addWord": {
+    "nav": {
+      "closeAria": "Cerrar",
+      "editTitle": "Editar palabra",
+      "addTitle": "Añadir nueva palabra"
+    },
+    "langDirection": {
+      "label": "Dirección del idioma",
+      "english": "🇬🇧 Inglés",
+      "arrow": "→",
+      "german": "🇩🇪 Alemán"
+    },
+    "back": {
+      "label": "Reverso — Alemán",
+      "hint": "(artículo detectado automáticamente)",
+      "placeholder": "Palabra en alemán (e.g. Zug)",
+      "autoGenAria": "Generar automáticamente traducción, plural y sinónimos",
+      "autoGenLabel": "Auto",
+      "generatingLabel": "Generando…",
+      "libraryBanner": "Completado desde la biblioteca — sin llamada a IA"
+    },
+    "article": {
+      "label": "Artículo",
+      "noneOption": "Ninguno"
+    },
+    "front": {
+      "label": "Anverso — Inglés",
+      "placeholder": "e.g. the train"
+    },
+    "plural": {
+      "label": "Plural",
+      "hint": "— incluye el artículo",
+      "placeholder": "e.g. die Flugzeuge"
+    },
+    "synonyms": {
+      "label": "Sinónimos",
+      "newLabel": "Nuevo sinónimo",
+      "addButton": "Añadir sinónimo",
+      "removeAria": "Eliminar sinónimo",
+      "wordPlaceholder": "Palabra sinónima",
+      "translationPlaceholder": "Traducción (Inglés)",
+      "examplePlaceholder": "Frase de ejemplo (Alemán)",
+      "exampleNativePlaceholder": "Traducción de ejemplo (Inglés)"
+    },
+    "duplicateWarning": {
+      "messageSuffix": "ya existe",
+      "inLabel": "en",
+      "defaultLocation": "en tu bóveda",
+      "addAnywayButton": "Añadir de todos modos",
+      "goToButton": "Ir a la existente"
+    },
+    "collection": {
+      "label": "Colección",
+      "requiredHint": "*obligatorio",
+      "noSelectionLabel": "Sin colección"
+    },
+    "category": {
+      "label": "Categoría",
+      "newButton": "Nueva",
+      "cancelButton": "Cancelar"
+    },
+    "newCategory": {
+      "placeholder": "Nombre de la categoría",
+      "addButton": "Añadir"
+    },
+    "examples": {
+      "label": "Frase de ejemplo",
+      "targetPlaceholder": "Frase en alemán (e.g. Der Zug fährt um 8 Uhr ab.)",
+      "nativePlaceholder": "Traducción al inglés"
+    },
+    "pronunciation": {
+      "label": "Pronunciación",
+      "recordButton": "Grabar",
+      "ttsButton": "Usar TTS"
+    },
+    "save": {
+      "savingLabel": "Guardando…",
+      "editLabel": "Guardar cambios",
+      "createLabel": "Guardar en la Bóveda"
+    },
+    "importLink": {
+      "text": "¿Añadir varias palabras? Importa un CSV →"
+    },
+    "errors": {
+      "autoGenFailed": "La generación automática falló. Complétalo manualmente o inténtalo de nuevo."
+    }
+  },
+  "assignCollection": {
+    "title": "Añadir a colección",
+    "closeAria": "Cerrar",
+    "wordsLabel": "palabras",
+    "createNewLabel": "Crear nueva colección…",
+    "newCollection": {
+      "placeholder": "Nombre de la colección",
+      "creatingLabel": "Creando…",
+      "createButton": "Crear"
+    },
+    "confirmButton": "Confirmar selección",
+    "skipButton": "Omitir por ahora"
+  },
+  "import": {
+    "nav": {
+      "closeAria": "Cerrar",
+      "backAria": "Atrás",
+      "title": "Importar palabras"
+    },
+    "methods": {
+      "scanLabel": "Escanear imagen",
+      "scanSubtitle": "Fotos, menús, tarjetas",
+      "csvLabel": "Subir CSV",
+      "csvSubtitle": "Importación masiva desde archivo"
+    },
+    "ai": {
+      "title": "Genera un CSV con IA",
+      "subtitle": "Copia este prompt en ChatGPT, Claude o cualquier IA",
+      "copiedLabel": "¡Copiado!",
+      "steps": {
+        "step1": "Copia el prompt de abajo",
+        "step2": "Pégalo en la IA con tus palabras",
+        "step3": "Sube el CSV aquí"
+      },
+      "prompt": {
+        "label": "Prompt de IA",
+        "copiedLabel": "✓ Copiado al portapapeles",
+        "copyButton": "Copiar",
+        "copiedButton": "¡Copiado!",
+        "footerAfterCopy": "Ahora abre tu herramienta de IA favorita, pega el prompt, añade tus palabras y descarga el CSV",
+        "footerDefault": "Funciona con ChatGPT, Claude, Gemini, Copilot — cualquier IA que genere texto"
+      }
+    },
+    "downloadTemplate": "Descargar plantilla CSV (95 palabras predefinidas)",
+    "errors": {
+      "invalidFileType": "Por favor, selecciona un archivo .csv",
+      "noWordsFound": "No se encontraron palabras en este archivo"
+    },
+    "toast": {
+      "promptCopied": "Prompt copiado al portapapeles"
+    }
+  },
+  "importReview": {
+    "nav": {
+      "backAria": "Atrás",
+      "title": "Revisar importación"
+    },
+    "fileInfo": {
+      "wordsDetected": "palabras detectadas"
+    },
+    "duplicates": {
+      "messagePrefix": "palabras ya están en tu bóveda",
+      "deselectedNote": "(deseleccionadas)"
+    },
+    "reuseBar": {
+      "knownLabel": "conocidas",
+      "reuseText": "de la biblioteca — reutilizadas sin coste.",
+      "enrichText": "serán enriquecidas."
+    },
+    "summary": {
+      "totalLabel": "Total",
+      "reuseLabel": "Reutilizar",
+      "newLabel": "Nuevas",
+      "inVaultLabel": "En bóveda",
+      "skippedLabel": "Omitidas"
+    },
+    "collection": {
+      "label": "AÑADIR A COLECCIÓN",
+      "requiredHint": "*obligatorio"
+    },
+    "words": {
+      "label": "Palabras (toca para seleccionar / deseleccionar)",
+      "duplicateBadge": "En bóveda",
+      "reuseLabel": "★ biblioteca",
+      "enrichLabel": "enriquecer"
+    },
+    "importButton": {
+      "prefix": "Importar",
+      "wordSingular": "palabra",
+      "wordsPlural": "palabras",
+      "importingLabel": "Importando…"
+    },
+    "cancel": {
+      "link": "Cancelar"
+    },
+    "errors": {
+      "noCollectionSelected": "Por favor, selecciona una colección antes de importar.",
+      "importFailed": "La importación falló. Por favor, inténtalo de nuevo."
+    },
+    "success": {
+      "newCardsSuffix": "palabras añadidas a tu Bóveda",
+      "dictReuseText": "reutilizadas de la biblioteca",
+      "existingText": "ya existían"
+    }
+  },
+  "imageProcessing": {
+    "nav": {
+      "cancelAria": "Cancelar"
+    },
+    "phases": {
+      "extractingTitle": "Escaneando imagen",
+      "extractingSubtitle": "Por favor, espera…",
+      "enrichingTitle": "Generando tarjetas",
+      "enrichingSubtitle": "Construyendo tu colección…",
+      "partialTitle": "Casi listo",
+      "partialSubtitle": "tarjetas listas ahora",
+      "doneTitle": "¡Listo!"
+    },
+    "image": {
+      "altText": "Escaneando imagen"
+    },
+    "phase1": {
+      "stepSubtitle": "Leyendo palabras de la imagen"
+    },
+    "info": {
+      "note": "Paso 1 de 2 — escaneo rápido. El paso 2 genera traducciones y frases de ejemplo."
+    },
+    "progressCard": {
+      "label": "Progreso",
+      "readyLabel": "listas",
+      "cardsLabel": "tarjetas",
+      "remainingLabel": "restantes"
+    },
+    "batchInfo": "Procesando 10 palabras a la vez — progreso guardado tras cada lote",
+    "partialBanner": {
+      "titleSuffix": "tarjetas se añadirán después",
+      "subtitle": "Se alcanzó el límite de IA durante la importación. Tu colección mostrará un botón \"Completar\" — tócalo en cualquier momento para finalizar."
+    },
+    "partialStats": {
+      "readyLabel": "Listas ahora",
+      "pendingLabel": "Pendientes",
+      "totalLabel": "Total encontradas"
+    },
+    "cancel": {
+      "backgroundLabel": "Ejecutándose en segundo plano — puedes salir de esta pantalla",
+      "defaultLabel": "Cancelar"
+    },
+    "errors": {
+      "noWordsFound": "No se encontraron palabras en alemán en esta imagen."
+    }
+  },
+  "image": {
+    "camera": {
+      "label": "Tomar una foto",
+      "hint": "Apunta a cualquier texto en alemán"
+    },
+    "gallery": {
+      "label": "Elegir de la galería",
+      "hint": "Selecciona una foto existente"
+    },
+    "error": {
+      "unsupportedFormat": "Formato de imagen no compatible. Usa JPEG, PNG o WebP.",
+      "cameraPermission": "Permiso de cámara denegado o no disponible."
+    }
+  },
+  "review": {
+    "hub": {
+      "cardsDueToday": "Tarjetas pendientes hoy",
+      "dueLabel": "pendientes",
+      "allCaughtUp": "¡Todo al día! 🎉",
+      "startTodaysReview": "Iniciar el repaso de hoy",
+      "nothingDueNow": "Nada pendiente ahora",
+      "quickStudySection": "Estudio rápido",
+      "strugglingCardsTitle": "Tarjetas difíciles",
+      "strugglingCardsDesc": "Tarjetas que has fallado 3+ veces",
+      "newCardsOnlyTitle": "Solo tarjetas nuevas",
+      "newCardsOnlyDesc": "Vocabulario nunca repasado",
+      "customStudyTitle": "Estudio personalizado",
+      "customStudyDesc": "Crea una sesión con filtros",
+      "recentSessionsSection": "Sesiones recientes",
+      "seeAllLink": "Ver todo →",
+      "allDueCardsLabel": "Todas las tarjetas pendientes",
+      "cardsUnit": "tarjetas",
+      "noSessionsTitle": "Aún no hay sesiones de repaso.",
+      "noSessionsDesc": "Completa tu primer repaso para ver el historial aquí.",
+      "masteryBreakdownAriaLabel": "Desglose de dominio"
+    },
+    "session": {
+      "goBackAriaLabel": "Volver",
+      "pageTitle": "Sesión de repaso",
+      "yourLanguageLabel": "Tu idioma",
+      "englishLangChip": "🇬🇧 Inglés",
+      "tapToRevealGerman": "Toca para revelar el alemán",
+      "germanLangChip": "🇩🇪 Alemán",
+      "pluralLabel": "Plural",
+      "synonymsHeader": "Sinónimos",
+      "playPronunciationBtn": "Reproducir pronunciación",
+      "generatingAudio": "Generando…",
+      "playExampleAriaLabel": "Reproducir ejemplo",
+      "ratingPrompt": "¿Qué tan bien lo sabías?",
+      "previousBtn": "Anterior",
+      "skipBtn": "Saltar",
+      "allCaughtUpMsg": "¡Todo al día!",
+      "noDueCardsMsg": "No hay tarjetas pendientes de repaso ahora.",
+      "backToHomeBtn": "Volver al inicio"
+    },
+    "summary": {
+      "backAriaLabel": "Volver a la bóveda",
+      "title": "¡Sesión completada!",
+      "cardsReviewedLabel": "tarjetas repasadas",
+      "reviewedStat": "Repasadas",
+      "durationStat": "Duración",
+      "avgRatingStat": "Valoración media",
+      "ratingBreakdownSection": "Desglose de valoraciones",
+      "wordsReviewedSection": "Palabras repasadas",
+      "retryStruggled": "Reintentar tarjetas difíciles",
+      "reviewAllAgain": "Repasar todo de nuevo",
+      "backToVault": "Volver a la bóveda"
+    },
+    "custom": {
+      "backAriaLabel": "Atrás",
+      "pageTitle": "Estudio personalizado",
+      "sourceSection": "Fuente",
+      "masteryFilterSection": "Filtrar por nivel de dominio",
+      "sortOrderSection": "Orden",
+      "cardLimitSection": "Límite de tarjetas",
+      "matchingCountLabel": "Tarjetas que coinciden con tus filtros",
+      "startSessionBtn": "Iniciar sesión",
+      "noCardsMatchMsg": "Ninguna tarjeta coincide con tus filtros",
+      "noCardsMatchToast": "Ninguna tarjeta coincide con tus filtros."
+    },
+    "mastery": {
+      "backAriaLabel": "Atrás",
+      "pageTitle": "Desglose de dominio",
+      "selectCollectionMsg": "Seleccionar colección",
+      "barsLabel": "Tarjetas por nivel de dominio",
+      "reviewLevelAriaLabel": "Repasar este nivel",
+      "tipText": "Toca el botón ▶ de reproducción junto a cualquier nivel para iniciar una sesión de repaso solo con esas tarjetas."
+    },
+    "history": {
+      "backAriaLabel": "Atrás",
+      "pageTitle": "Historial de sesiones",
+      "allSessionsTab": "Todas las sesiones",
+      "thisWeekTab": "Esta semana",
+      "thisMonthTab": "Este mes",
+      "ratingsStatLabel": "Valoraciones",
+      "durationStatLabel": "Duración",
+      "struggledStatLabel": "Con dificultad",
+      "nailedStatLabel": "Acertadas",
+      "noSessionsTitle": "Aún no hay sesiones de repaso.",
+      "noSessionsDesc": "¡Inicia tu primer repaso para ver el historial aquí!"
+    },
+    "struggling": {
+      "backAriaLabel": "Atrás",
+      "pageTitle": "Tarjetas difíciles",
+      "needsAttentionMsg": "tarjetas necesitan más atención",
+      "focusMsg": "Estas tarjetas siguen fallando. Concéntrate en ellas para avanzar.",
+      "failSingular": "fallo",
+      "failPlural": "fallos",
+      "reviewAllBtn": "Repasar todo",
+      "noCardsTitle": "¡Sin tarjetas difíciles!",
+      "encouragementMsg": "Lo estás haciendo genial. ¡Sigue así!"
+    }
+  },
+  "listen": {
+    "main": {
+      "pageTitle": "Escucha y aprende"
+    },
+    "hero": {
+      "playingFromLabel": "Reproduciendo de",
+      "queueCountLabel": "{{count}} palabras en cola",
+      "playBtn": "Reproducir",
+      "shuffleBtn": "Aleatorio",
+      "playlistTypeSection": "Tipo de lista"
+    },
+    "controls": {
+      "speedSection": "Velocidad"
+    },
+    "queue": {
+      "durationUnit": "min",
+      "headerLabel": "Cola",
+      "emptyTitle": "No hay palabras en la cola",
+      "emptyDesc": "Toca la fuente de arriba para elegir una lista de reproducción",
+      "previewAriaLabel": "Vista previa de audio"
+    },
+    "sourceSheet": {
+      "title": "Elige una fuente de lista de reproducción"
+    },
+    "source": {
+      "todaysDueLabel": "Palabras pendientes de hoy",
+      "todaysDueDesc": "Tarjetas programadas para hoy",
+      "collectionLabel": "Una colección",
+      "collectionDesc": "Elige una colección específica",
+      "allCardsLabel": "Todas las tarjetas",
+      "allCardsDesc": "Tu vocabulario completo",
+      "strugglingLabel": "Palabras difíciles",
+      "strugglingDesc": "Dominio 0–2, necesitan práctica"
+    },
+    "nowPlaying": {
+      "pageTitle": "Reproduciendo",
+      "sessionComplete": "¡Sesión completa!",
+      "seeSummary": "Ver resumen",
+      "audioUnavailable": "Audio no disponible",
+      "retryBtn": "Reintentar",
+      "skipCard": "Saltar esta tarjeta",
+      "grammarTipLabel": "Consejo de gramática"
+    },
+    "playlistMode": {
+      "compactLabel": "Compacto",
+      "compactDesc": "Palabra + significado",
+      "examplesLabel": "Ejemplos",
+      "examplesDesc": "Oraciones completas",
+      "deepDiveLabel": "Profundizar",
+      "deepDiveDesc": "+ consejo gramatical"
+    },
+    "card": {
+      "collectionPrefix": "Colección:"
+    }
+  },
+  "stories": {
+    "library": {
+      "pageTitle": "Story Studio",
+      "generateAriaLabel": "Generar nueva historia",
+      "exploreSection": "Explorar",
+      "exploreLink": "Ver todo →",
+      "exploreErrorMsg": "No se pudieron cargar las historias. Desliza para actualizar.",
+      "noStoriesYetMsg": "¡Las historias están en camino! Vuelve pronto.",
+      "noStoriesFilteredMsg": "No se encontraron historias para este filtro.",
+      "premiumBadge": "Pro",
+      "myStoriesSection": "Mis historias",
+      "savedLabel": "guardadas",
+      "generateFirstLink": "Genera la primera →",
+      "noStoriesTitle": "Aún no hay historias",
+      "noStoriesDesc": "Genera tu primera historia a partir de tu vocabulario.",
+      "generateBtn": "Generar una historia",
+      "incompleteStatus": "Incompleta",
+      "extendBtn": "Extender",
+      "extendingLabel": "Extendiendo…",
+      "listenBtn": "Escuchar",
+      "readBtn": "Leer",
+      "moreOptionsAriaLabel": "Más opciones",
+      "deleteAction": "Eliminar historia",
+      "cancelAction": "Cancelar",
+      "deleteAlertHeader": "Eliminar historia",
+      "deleteAlertMsg": "¿Eliminar \"{{title}}\"? El audio también se eliminará.",
+      "deleteActionBtn": "Eliminar",
+      "extensionFailedToast": "La extensión falló — por favor, inténtalo de nuevo."
+    },
+    "reader": {
+      "backAriaLabel": "Atrás",
+      "toggleTranslationTitle": "Alternar traducción",
+      "toggleTranslationAriaLabel": "Alternar traducción",
+      "learnedLabel": "Aprendida",
+      "markAsLearnedLabel": "Marcar como aprendida",
+      "storyTab": "Historia",
+      "quizTab": "Quiz",
+      "keywordsTab": "Palabras clave",
+      "grammarTab": "Gramática",
+      "generatingAudio": "Generando narración de audio…",
+      "preparingAudio": "Preparando audio…",
+      "closeWordPanelAriaLabel": "Cerrar panel de palabra",
+      "pluralLabel": "Plural",
+      "playPronunciationAriaLabel": "Reproducir pronunciación",
+      "alreadyInVaultAriaLabel": "Ya está en la bóveda",
+      "addToVaultAriaLabel": "Añadir a la bóveda",
+      "conjugateBtn": "Conjugar ▸",
+      "praesensHeader": "Präsens",
+      "praeteritumHeader": "Präteritum",
+      "perfektLabel": "Perfekt:",
+      "imperativLabel": "Imperativ:",
+      "noConjugationData": "No hay datos de conjugación disponibles.",
+      "pauseAriaLabel": "Pausar",
+      "playAriaLabel": "Reproducir",
+      "restartAriaLabel": "Reiniciar",
+      "loadingMsg": "Cargando historia…"
+    },
+    "complete": {
+      "backAriaLabel": "Volver a la biblioteca",
+      "pageTitle": "Historia completada",
+      "title": "¡Buena lectura!",
+      "finishedMsg": "Has terminado \"{{title}}\"",
+      "vocabWordsLabel": "palabras de vocabulario",
+      "sentencesLabel": "frases",
+      "listenSingular": "escucha",
+      "listenPlural": "escuchas",
+      "wordsSection": "Palabras en esta historia",
+      "readAgainBtn": "Leer de nuevo",
+      "moreStoriesBtn": "Más historias",
+      "loadingMsg": "Cargando…"
+    },
+    "generate": {
+      "pageTitle": "Generar historia",
+      "closeAriaLabel": "Cerrar",
+      "freeStoriesUsedLabel": "historias gratis usadas",
+      "pickCollectionsSection": "Elige colecciones",
+      "selectedLabel": "seleccionadas",
+      "noCollectionsMsg": "Aún no hay colecciones. Primero añade palabras a una colección.",
+      "wordsLabel": "palabras",
+      "lengthSection": "Extensión de la historia",
+      "freeOnlyHint": "Solo corta en el plan gratuito",
+      "longWarning": "Esto puede tardar hasta 45 segundos",
+      "difficultySection": "Nivel de dificultad",
+      "estimatedWaitLong": "Normalmente 25–40 segundos",
+      "estimatedWaitShort": "Normalmente 10–20 segundos",
+      "retryBtn": "Intentar de nuevo",
+      "contactSupportLink": "Contactar soporte",
+      "generateBtn": "Generar historia",
+      "generatingDefaultMsg": "Generando tu historia…"
+    },
+    "keywords": {
+      "extractingMsg": "Extrayendo palabras clave…",
+      "noKeywordsMsg": "No hay palabras clave disponibles para esta historia.",
+      "memorizeBtn": "Memorizar palabras clave",
+      "playPronunciationTitle": "Reproducir pronunciación"
+    },
+    "grammar": {
+      "generatingMsg": "Generando notas gramaticales…",
+      "noNotesTitle": "No hay notas gramaticales disponibles para esta historia.",
+      "noNotesDesc": "Las notas gramaticales se generan para las historias nuevas.",
+      "exampleSection": "Ejemplo",
+      "descriptionSection": "Descripción"
+    },
+    "quiz": {
+      "generatingMsg": "Generando quiz…",
+      "noQuizTitle": "No hay quiz disponible para esta historia.",
+      "noQuizDesc": "Los quizzes se generan para las historias nuevas.",
+      "correctLabel": "correctas",
+      "retakeBtn": "Repetir quiz",
+      "muteAriaLabel": "Silenciar audio de respuesta",
+      "unmuteAriaLabel": "Activar audio de respuesta",
+      "nextBtn": "Siguiente",
+      "pauseOnMistakesTitle": "Pausar en errores",
+      "pauseOnMistakesDesc": "Revisa la respuesta correcta antes de continuar"
+    },
+    "length": {
+      "short": "Corto",
+      "medium": "Medio",
+      "long": "Largo",
+      "veryLong": "Muy largo",
+      "extraLong": "Extra largo",
+      "podcast": "PODCAST"
+    },
+    "category": {
+      "daily-life": "Vida diaria",
+      "travel": "Viajes",
+      "food-culture": "Comida y cultura",
+      "work-career": "Trabajo y carrera",
+      "technology": "Tecnología",
+      "nature": "Naturaleza",
+      "fiction": "Ficción"
+    },
+    "wordType": {
+      "noun": "sustantivo",
+      "verb": "verbo",
+      "adjective": "adjetivo",
+      "adverb": "adverbio",
+      "other": "otro"
+    },
+    "cardMeta": {
+      "words": "palabras",
+      "min": "min",
+      "more": "+{{count}} más"
+    }
+  },
+  "settings": {
+    "goals": {
+      "title": "Metas de estudio",
+      "backAria": "Atrás",
+      "targetsSection": "Objetivos",
+      "daily": {
+        "name": "Diario",
+        "desc": "Tarjetas por día para mantener tu racha",
+        "decreaseAria": "Reducir meta diaria",
+        "increaseAria": "Aumentar meta diaria"
+      },
+      "weekly": {
+        "name": "Semanal",
+        "desc": "Total de tarjetas repasadas por semana",
+        "decreaseAria": "Reducir meta semanal",
+        "increaseAria": "Aumentar meta semanal"
+      },
+      "monthly": {
+        "name": "Mensual",
+        "desc": "Total de tarjetas repasadas por mes",
+        "decreaseAria": "Reducir meta mensual",
+        "increaseAria": "Aumentar meta mensual"
+      },
+      "streakNote": "🔥 Cumplir tu meta diaria extiende tu racha. Si fallas un día, la racha se reinicia."
+    },
+    "goalsPrompt": {
+      "titleFirstTime": "Establece tus metas de estudio",
+      "titleUpdate": "Es hora de actualizar tus metas",
+      "bodyFirstTime": "Dile a LinguaCard cuánto quieres estudiar cada día. Tus metas definen tu racha y te ayudan a mantener el ritmo.",
+      "bodyUpdate": "Ha pasado un tiempo desde que actualizaste tus objetivos. Tómate un momento para asegurarte de que aún se ajustan a tu ritmo.",
+      "cards": "tarjetas",
+      "setMyGoals": "Establecer mis metas",
+      "updateMyGoals": "Actualizar mis metas"
+    },
+    "reminders": {
+      "title": "Recordatorios",
+      "backAriaLabel": "Atrás",
+      "pageTitle": "Recordatorios",
+      "dailyReminderSection": "Recordatorio diario",
+      "enableToggleLabel": "Activar recordatorios",
+      "enableDesc": "Recibe una notificación del navegador si no has cumplido tu meta",
+      "toggleAriaLabel": "Alternar recordatorios",
+      "permissionDeniedMsg": "El permiso de notificaciones fue denegado. Para activar los recordatorios, abre la configuración de tu navegador y permite las notificaciones para este sitio.",
+      "timeLabel": "Hora del recordatorio",
+      "timeDesc": "Solo te avisaremos si aún no has cumplido tu meta",
+      "howItWorksMsg": "Los recordatorios usan el sistema de notificaciones de tu navegador y funcionan incluso cuando LinguaCard está cerrado. Las notificaciones de la app móvil (iOS / Android) llegarán más adelante.",
+      "unsupportedMsg": "Tu navegador o contexto actual no admite notificaciones push web. Intenta abrir LinguaCard en Chrome o Edge, o instálalo como PWA.",
+      "permissionSection": "Permiso",
+      "grantedTitle": "Notificaciones permitidas",
+      "deniedTitle": "Notificaciones bloqueadas",
+      "defaultTitle": "Notificaciones",
+      "grantedDesc": "Concedido para este navegador ✓",
+      "deniedDesc": "Bloqueado — cambia en la configuración del navegador",
+      "defaultDesc": "Aún no solicitado"
+    },
+    "theme": {
+      "darkMode": "Modo oscuro"
+    },
+    "dangerZone": {
+      "resetTitle": "Restablecer todos los datos",
+      "resetWarning": "Esto eliminará permanentemente todas tus palabras, colecciones, historial de repasos y progreso. Tu cuenta seguirá activa.",
+      "irreversible": "Esta acción no se puede deshacer.",
+      "deleteDetails": "Las {{wordCount}} palabras y {{collectionCount}} colecciones se eliminarán permanentemente.",
+      "confirmPassword": "Introduce tu contraseña para confirmar",
+      "confirm": "Sí, eliminar todo"
+    },
+    "language": {
+      "title": "Idioma",
+      "backAria": "Atrás",
+      "subtitle": "Elige tu idioma de interfaz",
+      "currentLabel": "Actual"
+    }
+  },
+  "sync": {
+    "status": {
+      "label": "Estado de sincronización",
+      "pending": "{{count}} pendientes",
+      "syncing": "Sincronizando…",
+      "error": "Error de sincronización",
+      "errorRetry": "Error de sincronización — toca para reintentar",
+      "synced": "Sincronizado"
+    },
+    "notifications": {
+      "recovered": "Sincronización recuperada — los datos están actualizados",
+      "changesSynced": "{{count}} cambio(s) en cola sincronizado(s)",
+      "upToDate": "Todo está actualizado",
+      "partialFailure": "Algunos datos no se pudieron sincronizar. Se reintentará.",
+      "failed": "La sincronización falló — se reintentará automáticamente",
+      "retryNow": "Reintentar ahora"
+    }
+  },
+  "offline": {
+    "banner": {
+      "message": "Estás sin conexión — mostrando datos guardados"
+    }
+  },
+  "pwa": {
+    "install": {
+      "title": "Añadir a la pantalla de inicio",
+      "subtitle": "Instala LinguaCard para un acceso rápido"
+    },
+    "installIos": {
+      "tap": "Toca",
+      "action": "Añadir a la pantalla de inicio"
+    }
+  },
+  "srs": {
+    "status": {
+      "due": "Pendiente",
+      "interval": "Intervalo de {{days}}d"
+    },
+    "masteryLabel": {
+      "new": "Nueva",
+      "learning": "Aprendiendo",
+      "review": "Repaso",
+      "mastered": "Dominada",
+      "familiar": "Familiar",
+      "good": "Bueno"
+    },
+    "breakdownTag": {
+      "new": "nuevo",
+      "hard": "difícil",
+      "learning": "aprendiendo",
+      "review": "repaso"
+    },
+    "selectCollection": "Seleccionar colección",
+    "allCollections": "Todas las colecciones",
+    "alreadyInVault": "Ya está en tu bóveda",
+    "alreadyInCollection": "Ya está en \"{{name}}\""
+  },
+  "subscription": {
+    "paywall": {
+      "title": "Desbloquea historias ilimitadas",
+      "subtitle": "Has usado tus 3 historias gratis. Pasa a Pro para:",
+      "benefit1": "Generación ilimitada de historias",
+      "benefit2": "Claude Sonnet — la mayor calidad",
+      "benefit3": "Soporte prioritario",
+      "requestBtn": "Solicitar acceso Pro",
+      "dismissBtn": "Ahora no"
+    }
+  },
+  "admin": {
+    "import": {
+      "label": "Importación admin",
+      "pageTitle": "Importar Admin",
+      "tabs": {
+        "wordList": "Lista de palabras",
+        "json": "Importar JSON",
+        "story": "Historia",
+        "collections": "Colecciones"
+      },
+      "fields": {
+        "title": "Título *",
+        "level": "Nivel *",
+        "topic": "Tema *",
+        "emoji": "Emoji",
+        "words": "Palabras (una por línea)",
+        "json": "Datos JSON",
+        "storyJson": "JSON de historia"
+      },
+      "buttons": {
+        "importCollection": "Importar colección",
+        "importJson": "Importar colección JSON",
+        "importStory": "Importar historia"
+      },
+      "status": {
+        "loading": "Cargando…",
+        "noCollections": "Aún no hay colecciones. Importa una primero."
+      }
+    }
+  },
+  "wordDetail": {
+    "pageTitle": "Detalle de palabra",
+    "backAria": "Volver",
+    "moreOptionsAria": "Más opciones",
+    "playPluralAria": "Reproducir plural",
+    "playExampleAria": "Reproducir frase de ejemplo",
+    "playSynonymExampleAria": "Reproducir ejemplo de sinónimo",
+    "generating": "Generando…",
+    "listenToPronunciation": "Escuchar pronunciación",
+    "aiAudioCached": "Audio IA almacenado en el dispositivo",
+    "generatingAudio": "Generando audio…",
+    "gender": {
+      "masculine": "masculino",
+      "feminine": "femenino",
+      "neuter": "neutro"
+    },
+    "plural": "Plural",
+    "masteryProgress": "Progreso de dominio",
+    "level": "Nivel {{level}} — {{label}}",
+    "stats": {
+      "reviews": "Repasos",
+      "recallChance": "Probabilidad de recuerdo",
+      "stability": "Estabilidad",
+      "lastSeen": "Última vez visto"
+    },
+    "nextReview": {
+      "dueNow": "Pendiente ahora",
+      "tomorrow": "Mañana",
+      "inDays": "Próximo repaso en {{days}} días"
+    },
+    "lastReviewed": {
+      "never": "Nunca",
+      "today": "Hoy",
+      "daysAgo": "Hace {{days}}d"
+    },
+    "sections": {
+      "exampleSentences": "Frases de ejemplo",
+      "synonyms": "Sinónimos"
+    },
+    "rateThisWord": "Valora esta palabra",
+    "emptyState": {
+      "title": "Palabra no encontrada",
+      "subtitle": "Esta palabra puede haber sido eliminada de tu bóveda."
+    },
+    "deleteConfirm": {
+      "title": "Eliminar palabra",
+      "message": "¿Eliminar \"{{word}}\" de tu bóveda? No se puede deshacer.",
+      "confirmButton": "Eliminar"
+    },
+    "toast": {
+      "deleted": "Palabra eliminada",
+      "updated": "Palabra actualizada"
+    }
+  },
+  "imageImport": {
+    "title": "Importar desde imagen",
+    "bestResults": {
+      "label": "PARA MEJORES RESULTADOS",
+      "tip1": "Buena iluminación — evita sombras sobre el texto",
+      "tip2": "Mantén la cámara quieta — las imágenes borrosas pueden omitir palabras",
+      "tip3": "Las imágenes grandes con muchas palabras funcionan mejor en lotes"
+    }
+  },
+  "tabs": {
+    "home": "Inicio",
+    "vault": "Bóveda",
+    "review": "Repaso",
+    "stories": "Historias",
+    "listen": "Escuchar"
+  }
+}

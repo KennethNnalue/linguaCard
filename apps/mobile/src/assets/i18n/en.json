@@ -1,0 +1,1194 @@
+{
+  "common": {
+    "appName": "LinguaCard",
+    "cancel": "Cancel",
+    "close": "Close",
+    "save": "Save",
+    "delete": "Delete",
+    "retry": "Retry",
+    "loading": "Loading…",
+    "back": "Back",
+    "done": "Done",
+    "or": "or",
+    "install": "Install",
+    "dismiss": "Dismiss",
+    "notNow": "Not now",
+    "account": "Account",
+    "refresh": "Refresh",
+    "email": "Email",
+    "password": "Password",
+    "fullName": "Full Name",
+    "words": "words",
+    "cards": "cards",
+    "due": "due",
+    "min": "min",
+    "of": "of",
+    "new": "New",
+    "all": "All",
+    "today": "today",
+    "todayCapital": "Today",
+    "yesterday": "Yesterday",
+    "daysAgoLabel": "{{count}} days ago",
+    "placeholder": {
+      "email": "you@example.com",
+      "password": "••••••••",
+      "name": "Jan Schmidt"
+    },
+    "error": {
+      "generic": "Something went wrong. Please try again."
+    },
+    "divider": {
+      "or": "or"
+    },
+    "aria": {
+      "toggleDarkMode": "Toggle dark mode",
+      "togglePasswordVisibility": "Toggle password visibility",
+      "close": "Close",
+      "closeMenu": "Close menu",
+      "quickActions": "Quick actions",
+      "addCard": "Add card",
+      "newCollection": "New collection",
+      "import": "Import",
+      "backToLogin": "Back to login",
+      "syncStatus": "Sync status",
+      "playPronunciation": "Play pronunciation",
+      "share": "Share"
+    }
+  },
+  "tabs": {
+    "home": "Home",
+    "vault": "Vault",
+    "review": "Review",
+    "stories": "Stories",
+    "listen": "Listen"
+  },
+  "auth": {
+    "login": {
+      "tagline": "Master German vocabulary",
+      "signIn": "Sign in",
+      "forgotPassword": "Forgot password?",
+      "noAccount": "Don't have an account?"
+    },
+    "register": {
+      "title": "Create Account",
+      "tagline": "Start your language journey",
+      "passwordHint": "Min. 8 characters",
+      "submit": "Create Account",
+      "hasAccount": "Already have an account?",
+      "error": "Registration failed. Please try again."
+    },
+    "forgotPassword": {
+      "title": "Reset Password",
+      "heading": "Forgot your password?",
+      "description": "Enter your email and we'll send you a reset link.",
+      "submit": "Send Reset Link",
+      "remember": "Remember your password?",
+      "checkEmail": "Check your email",
+      "linkSent": "We've sent a password reset link to",
+      "notReceived": "Didn't receive it? Check your spam folder or wait a few minutes.",
+      "backToLogin": "Back to Sign In"
+    },
+    "validation": {
+      "emailInvalid": "Enter a valid email address",
+      "passwordMinLength": "Password must be at least 8 characters",
+      "nameMinLength": "Name must be at least 2 characters"
+    },
+    "oauth": {
+      "google": "Continue with Google",
+      "googleComingSoon": "Google Sign-In coming soon"
+    },
+    "signOut": "Sign out",
+    "reset": {
+      "passwordIncorrect": "Incorrect password. Please try again.",
+      "success": "✓ All data has been reset. Start fresh!"
+    }
+  },
+  "home": {
+    "greeting": {
+      "morning": "Good Morning",
+      "afternoon": "Good Afternoon",
+      "evening": "Good Evening"
+    },
+    "hero": {
+      "completeGreeting": "Nice work",
+      "completeTitle": "Goal complete today ✓",
+      "readyTitle": "Ready to learn today?"
+    },
+    "stats": {
+      "dueLabel": "due",
+      "newCardsLabel": "new cards",
+      "reviewsLabel": "reviews"
+    },
+    "actions": {
+      "startSession": "Start session",
+      "filter": "Filter"
+    },
+    "atRisk": {
+      "keepStreakPrefix": "Review now to keep your",
+      "keepStreakSuffix": "day streak alive",
+      "startStreakSuffix": "cards today to start a streak",
+      "dailyGoalSuffix": "more cards to hit your daily goal",
+      "reviewText": "Review",
+      "startButton": "Start"
+    },
+    "streak": {
+      "label": "Day streak",
+      "onTrack": "On track today ✓",
+      "atRisk": "At risk!",
+      "broken": "Start a new streak"
+    },
+    "goalRing": {
+      "label": "Daily goal",
+      "todayLabel": "today",
+      "doneLabel": "done",
+      "notStarted": "Not started",
+      "toGoLabel": "to go"
+    },
+    "wordOfDay": {
+      "label": "✦ Word of the Day",
+      "playAria": "Play pronunciation"
+    },
+    "weeklyChart": {
+      "title": "This week",
+      "detailsLink": "Details →",
+      "reviewed": "cards reviewed",
+      "goalLabel": "Goal:"
+    },
+    "quickActions": {
+      "title": "Quick actions",
+      "scanLabel": "Scan",
+      "scanSub": "Import words",
+      "storyLabel": "Story",
+      "storySub": "Generate new",
+      "listenLabel": "Listen",
+      "listenSub": "Audio playlist"
+    },
+    "recentCards": {
+      "title": "Recently added",
+      "seeAllLink": "See all →"
+    },
+    "collectionFilter": {
+      "allLabel": "All collections"
+    },
+    "wotd": {
+      "genderMasculine": "masculine",
+      "genderFeminine": "feminine",
+      "genderNeuter": "neuter"
+    }
+  },
+  "vault": {
+    "title": "Vault",
+    "addCard": "Add Card",
+    "import": "Import",
+    "newCollection": "New Collection",
+    "search": {
+      "placeholder": "Search words…",
+      "aria": "Search vocabulary"
+    },
+    "filter": {
+      "allLabel": "All",
+      "dueLabel": "Due",
+      "newLabel": "New",
+      "masteredLabel": "Mastered",
+      "needReviewText": "need review",
+      "neverStudiedText": "never studied"
+    },
+    "sort": {
+      "title": "Sort by",
+      "newestFirst": "Newest first",
+      "alphabetical": "A–Z (alphabetical)",
+      "masteryLowest": "Mastery (lowest first)",
+      "dueDate": "Due date"
+    },
+    "emptyState": {
+      "title": "No words found",
+      "subtitle": "Try a different filter or search"
+    },
+    "tabs": {
+      "wordsLabel": "Words",
+      "collectionsLabel": "Collections",
+      "wordsAria": "Words tab",
+      "collectionsAria": "Collections tab"
+    },
+    "afterCreate": {
+      "title": "Add words to your collection?",
+      "importOption": "Import words",
+      "goToOption": "Go to collection",
+      "laterOption": "Maybe later"
+    },
+    "collectionFilter": {
+      "title": "Filter by collection"
+    },
+    "collections": {
+      "totalWordsLabel": "Total words",
+      "collectionsLabel": "Collections",
+      "dueTodayLabel": "Due today",
+      "emptyTitle": "No collections yet",
+      "emptySubtitle": "Tap + New Collection to get started"
+    }
+  },
+  "collections": {
+    "title": "Collections",
+    "segments": {
+      "mySets": "My Sets",
+      "explore": "Explore"
+    },
+    "mySets": {
+      "totalLabel": "Total across all sets",
+      "wordsUnit": "words",
+      "dueLabel": "Due today",
+      "emptyTitle": "No sets yet",
+      "emptySubtitle": "Tap + to create one, or explore the library"
+    },
+    "explore": {
+      "searchPlaceholder": "Search sets & topics…",
+      "allLevel": "All",
+      "emptyTitle": "No sets at this level",
+      "emptySubtitle": "Try a different level or clear the search",
+      "seeAllLink": "See all ›",
+      "openButton": "Open",
+      "getButton": "+ Get",
+      "getNewButton": "+ Get new",
+      "addingLabel": "Adding…",
+      "forYouLabel": "FOR YOU"
+    },
+    "card": {
+      "masteredLabel": "mastered",
+      "completeLabel": "complete",
+      "libraryBadge": "FROM LIBRARY",
+      "dueLabel": "due",
+      "upToDateLabel": "up to date",
+      "wordsLabel": "words"
+    },
+    "adopt": {
+      "successMessage": "success",
+      "alreadyInSetsMessage": "Already in your sets",
+      "errorMessage": "Could not add collection. Try again."
+    },
+    "afterCreate": {
+      "title": "Add words to your collection?",
+      "csvOption": "Import from CSV",
+      "imageOption": "Import from image",
+      "goToOption": "Go to collection",
+      "laterOption": "Maybe later"
+    }
+  },
+  "collectionDetail": {
+    "nav": {
+      "backAria": "Back",
+      "optionsAria": "Options"
+    },
+    "incompleteImport": {
+      "title": "Import incomplete",
+      "subtitle": "words still need flashcards",
+      "completeButton": "Complete"
+    },
+    "audio": {
+      "preparingLabel": "Preparing audio…",
+      "readyUnit": "words ready"
+    },
+    "hero": {
+      "wordsLabel": "words",
+      "dueLabel": "due",
+      "masteredLabel": "mastered"
+    },
+    "actions": {
+      "reviewAllLabel": "Review all",
+      "reviewLabel": "Review",
+      "listenLabel": "Listen"
+    },
+    "categories": {
+      "allLabel": "All"
+    },
+    "emptyState": {
+      "title": "No words yet",
+      "subtitle": "Tap + to add your first word"
+    },
+    "pending": {
+      "label": "Pending",
+      "instruction": "— tap Complete above"
+    },
+    "menu": {
+      "clearAllOption": "Clear all words",
+      "deleteOption": "Delete collection",
+      "cancelOption": "Cancel"
+    },
+    "clearWords": {
+      "title": "Clear all words?",
+      "message": "This will permanently delete all {{count}} words in {{name}}. This cannot be undone.",
+      "confirmButton": "Clear all"
+    },
+    "deleteCollection": {
+      "title": "Delete collection?",
+      "message": "Words will not be deleted — they'll appear under \"All words\" in the Vault.",
+      "confirmButton": "Delete"
+    },
+    "importComplete": {
+      "allAddedMessage": "All cards added — collection complete!",
+      "cardsAddedWithAudio": "{{count}} cards added — audio included ✓",
+      "alreadyInMessage": "Already in your sets",
+      "errorMessage": "Could not complete import. Try again later.",
+      "addedWithDuplicates": "✓ {{added}} added, {{duplicates}} duplicate(s) reused — collection complete!",
+      "allAlreadyMessage": "All {{count}} already in your vault — collection complete!"
+    }
+  },
+  "platformCollectionDetail": {
+    "nav": {
+      "breadcrumb": "Explore",
+      "backAria": "Back"
+    },
+    "hero": {
+      "descriptionSuffix": "words · with audio"
+    },
+    "progressBanner": {
+      "knowPrefix": "You already know",
+      "wordsSuffix": "words here.",
+      "addingPrefix": "Getting this set adds",
+      "newCardsSuffix": "new cards",
+      "instantlySuffix": "— instantly.",
+      "allNewForYouSuffix": "all new for you."
+    },
+    "adoptedBanner": {
+      "inSetsLabel": "In your sets",
+      "wordsKnownSuffix": "words known"
+    },
+    "wordGroups": {
+      "newHereLabel": "New here",
+      "alreadyYoursLabel": "Already yours",
+      "expandLabel": "tap to expand",
+      "collapseLabel": "tap to collapse",
+      "yoursChip": "✓ YOURS"
+    },
+    "shelf": {
+      "title": "Stories with these words"
+    },
+    "story": {
+      "minLabel": "min"
+    },
+    "footer": {
+      "openButton": "Open in My Sets",
+      "getButton": "+ Get",
+      "getNewButton": "+ Get new words",
+      "addingLabel": "Adding…",
+      "generateStoryButton": "Generate a story from this set",
+      "instantNote": "Instant — no waiting, audio included"
+    },
+    "adopt": {
+      "successMessage": "{{count}} words added — audio included ✓",
+      "alreadyInMessage": "Already in your sets",
+      "errorMessage": "Could not add collection. Try again."
+    }
+  },
+  "exploreTopic": {
+    "nav": {
+      "backAria": "Back",
+      "setsLabel": "sets"
+    },
+    "emptyState": {
+      "title": "No sets in this topic",
+      "subtitle": "Try switching the level filter"
+    },
+    "card": {
+      "masteredLabel": "mastered",
+      "inSetsLabel": "In your sets",
+      "knownLabel": "known",
+      "newLabel": "new",
+      "wordsUnit": "words",
+      "allNewLabel": "all new",
+      "openButton": "Open",
+      "getButton": "+ Get",
+      "getNewButton": "+ Get new",
+      "addingLabel": "Adding…"
+    },
+    "adopt": {
+      "successMessage": "{{count}} words added — audio included ✓",
+      "alreadyInMessage": "Already in your sets",
+      "errorMessage": "Could not add collection. Try again."
+    }
+  },
+  "addWord": {
+    "nav": {
+      "closeAria": "Close",
+      "editTitle": "Edit Word",
+      "addTitle": "Add New Word"
+    },
+    "langDirection": {
+      "label": "Language direction",
+      "english": "🇬🇧 English",
+      "arrow": "→",
+      "german": "🇩🇪 German"
+    },
+    "back": {
+      "label": "Back — German",
+      "hint": "(article auto-detected)",
+      "placeholder": "German word (e.g. Zug)",
+      "autoGenAria": "Auto-generate translation, plural and synonyms",
+      "autoGenLabel": "Auto",
+      "generatingLabel": "Generating…",
+      "libraryBanner": "Filled from the library — no AI call"
+    },
+    "article": {
+      "label": "Article",
+      "noneOption": "None"
+    },
+    "front": {
+      "label": "Front — English",
+      "placeholder": "e.g. the train"
+    },
+    "plural": {
+      "label": "Plural",
+      "hint": "— include the article",
+      "placeholder": "e.g. die Flugzeuge"
+    },
+    "synonyms": {
+      "label": "Synonyms",
+      "newLabel": "New synonym",
+      "addButton": "Add synonym",
+      "removeAria": "Remove synonym",
+      "wordPlaceholder": "Synonym word",
+      "translationPlaceholder": "Translation (English)",
+      "examplePlaceholder": "Example sentence (German)",
+      "exampleNativePlaceholder": "Example translation (English)"
+    },
+    "duplicateWarning": {
+      "messageSuffix": "already exists",
+      "inLabel": "in",
+      "defaultLocation": "in your vault",
+      "addAnywayButton": "Add anyway",
+      "goToButton": "Go to existing"
+    },
+    "collection": {
+      "label": "Collection",
+      "requiredHint": "*required",
+      "noSelectionLabel": "No collection"
+    },
+    "category": {
+      "label": "Category",
+      "newButton": "New",
+      "cancelButton": "Cancel"
+    },
+    "newCategory": {
+      "placeholder": "Category name",
+      "addButton": "Add"
+    },
+    "examples": {
+      "label": "Example sentence",
+      "targetPlaceholder": "German sentence (e.g. Der Zug fährt um 8 Uhr ab.)",
+      "nativePlaceholder": "English translation"
+    },
+    "pronunciation": {
+      "label": "Pronunciation",
+      "recordButton": "Record",
+      "ttsButton": "Use TTS"
+    },
+    "save": {
+      "savingLabel": "Saving…",
+      "editLabel": "Save changes",
+      "createLabel": "Save to Vault"
+    },
+    "importLink": {
+      "text": "Add multiple words? Import a CSV →"
+    },
+    "errors": {
+      "autoGenFailed": "Auto-generate failed. Fill in manually or try again."
+    }
+  },
+  "assignCollection": {
+    "title": "Add to Collection",
+    "closeAria": "Close",
+    "wordsLabel": "words",
+    "createNewLabel": "Create new collection…",
+    "newCollection": {
+      "placeholder": "Collection name",
+      "creatingLabel": "Creating…",
+      "createButton": "Create"
+    },
+    "confirmButton": "Confirm selection",
+    "skipButton": "Skip for now"
+  },
+  "import": {
+    "nav": {
+      "closeAria": "Close",
+      "backAria": "Back",
+      "title": "Import Words"
+    },
+    "methods": {
+      "scanLabel": "Scan Image",
+      "scanSubtitle": "Photos, menus, flashcards",
+      "csvLabel": "Upload CSV",
+      "csvSubtitle": "Bulk import from file"
+    },
+    "ai": {
+      "title": "Generate a CSV with AI",
+      "subtitle": "Copy this prompt into ChatGPT, Claude, or any AI",
+      "copiedLabel": "Copied!",
+      "steps": {
+        "step1": "Copy prompt below",
+        "step2": "Paste into AI with your words",
+        "step3": "Upload the CSV here"
+      },
+      "prompt": {
+        "label": "AI prompt",
+        "copiedLabel": "✓ Copied to clipboard",
+        "copyButton": "Copy",
+        "copiedButton": "Copied!",
+        "footerAfterCopy": "Now open your favourite AI tool, paste the prompt, add your words, and download the CSV",
+        "footerDefault": "Works with ChatGPT, Claude, Gemini, Copilot — any AI that generates text"
+      }
+    },
+    "downloadTemplate": "Download CSV template (95 pre-made words)",
+    "errors": {
+      "invalidFileType": "Please select a .csv file",
+      "noWordsFound": "No words found in this file"
+    },
+    "toast": {
+      "promptCopied": "Prompt copied to clipboard"
+    }
+  },
+  "importReview": {
+    "nav": {
+      "backAria": "Back",
+      "title": "Review Import"
+    },
+    "fileInfo": {
+      "wordsDetected": "words detected"
+    },
+    "duplicates": {
+      "messagePrefix": "words already in your vault",
+      "deselectedNote": "(deselected)"
+    },
+    "reuseBar": {
+      "knownLabel": "known",
+      "reuseText": "to the library — reused at no cost.",
+      "enrichText": "will be enriched."
+    },
+    "summary": {
+      "totalLabel": "Total",
+      "reuseLabel": "Reuse",
+      "newLabel": "New",
+      "inVaultLabel": "In vault",
+      "skippedLabel": "Skipped"
+    },
+    "collection": {
+      "label": "ADD TO COLLECTION",
+      "requiredHint": "*required"
+    },
+    "words": {
+      "label": "Words (tap to select / deselect)",
+      "duplicateBadge": "In vault",
+      "reuseLabel": "★ library",
+      "enrichLabel": "enrich"
+    },
+    "importButton": {
+      "prefix": "Import",
+      "wordSingular": "word",
+      "wordsPlural": "words",
+      "importingLabel": "Importing…"
+    },
+    "cancel": {
+      "link": "Cancel"
+    },
+    "errors": {
+      "noCollectionSelected": "Please select a collection before importing.",
+      "importFailed": "Import failed. Please try again."
+    },
+    "success": {
+      "newCardsSuffix": "words added to your Vault",
+      "dictReuseText": "reused from library",
+      "existingText": "already existed"
+    }
+  },
+  "imageProcessing": {
+    "nav": {
+      "cancelAria": "Cancel"
+    },
+    "phases": {
+      "extractingTitle": "Scanning image",
+      "extractingSubtitle": "Please wait…",
+      "enrichingTitle": "Generating flashcards",
+      "enrichingSubtitle": "Building your collection…",
+      "partialTitle": "Almost done",
+      "partialSubtitle": "cards are ready now",
+      "doneTitle": "Done!"
+    },
+    "image": {
+      "altText": "Scanning image"
+    },
+    "phase1": {
+      "stepSubtitle": "Reading words from image"
+    },
+    "info": {
+      "note": "Step 1 of 2 — quick scan. Step 2 generates translations and example sentences."
+    },
+    "progressCard": {
+      "label": "Progress",
+      "readyLabel": "ready",
+      "cardsLabel": "cards",
+      "remainingLabel": "remaining"
+    },
+    "batchInfo": "Processing 10 words at a time — progress saved after each batch",
+    "partialBanner": {
+      "titleSuffix": "cards will be added later",
+      "subtitle": "The AI quota limit was reached mid-import. Your collection will show a \"Complete\" button — tap it any time to finish."
+    },
+    "partialStats": {
+      "readyLabel": "Ready now",
+      "pendingLabel": "Pending",
+      "totalLabel": "Total found"
+    },
+    "cancel": {
+      "backgroundLabel": "Running in background — you can leave this screen",
+      "defaultLabel": "Cancel"
+    },
+    "errors": {
+      "noWordsFound": "No German words found in this image."
+    }
+  },
+  "image": {
+    "camera": {
+      "label": "Take a photo",
+      "hint": "Point at any German text"
+    },
+    "gallery": {
+      "label": "Choose from gallery",
+      "hint": "Pick an existing photo"
+    },
+    "error": {
+      "unsupportedFormat": "Unsupported image format. Please use JPEG, PNG, or WebP.",
+      "cameraPermission": "Camera permission denied or unavailable."
+    }
+  },
+  "imageImport": {
+    "title": "Import from Image",
+    "bestResults": {
+      "label": "FOR BEST RESULTS",
+      "tip1": "Good lighting — avoid shadows on the text",
+      "tip2": "Hold the camera still — blurry images may miss words",
+      "tip3": "Large images with many words work better in batches"
+    }
+  },
+  "review": {
+    "hub": {
+      "cardsDueToday": "Cards due today",
+      "dueLabel": "due",
+      "allCaughtUp": "All caught up! 🎉",
+      "startTodaysReview": "Start today's review",
+      "nothingDueNow": "Nothing due right now",
+      "quickStudySection": "Quick study",
+      "strugglingCardsTitle": "Struggling cards",
+      "strugglingCardsDesc": "Cards you've failed 3+ times",
+      "newCardsOnlyTitle": "New cards only",
+      "newCardsOnlyDesc": "Never-reviewed vocabulary",
+      "customStudyTitle": "Custom study",
+      "customStudyDesc": "Build a filtered session",
+      "recentSessionsSection": "Recent sessions",
+      "seeAllLink": "See all →",
+      "allDueCardsLabel": "All due cards",
+      "cardsUnit": "cards",
+      "noSessionsTitle": "No review sessions yet.",
+      "noSessionsDesc": "Complete your first review to see history here.",
+      "masteryBreakdownAriaLabel": "Mastery breakdown"
+    },
+    "session": {
+      "goBackAriaLabel": "Go back",
+      "pageTitle": "Review Session",
+      "yourLanguageLabel": "Your language",
+      "englishLangChip": "🇬🇧 English",
+      "tapToRevealGerman": "Tap to reveal German",
+      "germanLangChip": "🇩🇪 German",
+      "pluralLabel": "Plural",
+      "synonymsHeader": "Synonyms",
+      "playPronunciationBtn": "Play pronunciation",
+      "generatingAudio": "Generating…",
+      "playExampleAriaLabel": "Play example",
+      "ratingPrompt": "How well did you know this?",
+      "previousBtn": "Previous",
+      "skipBtn": "Skip",
+      "allCaughtUpMsg": "All caught up!",
+      "noDueCardsMsg": "No cards due for review right now.",
+      "backToHomeBtn": "Back to Home"
+    },
+    "summary": {
+      "backAriaLabel": "Back to vault",
+      "title": "Session Complete!",
+      "cardsReviewedLabel": "cards reviewed",
+      "reviewedStat": "Reviewed",
+      "durationStat": "Duration",
+      "avgRatingStat": "Avg Rating",
+      "ratingBreakdownSection": "Rating breakdown",
+      "wordsReviewedSection": "Words reviewed",
+      "retryStruggled": "Retry struggled cards",
+      "reviewAllAgain": "Review all again",
+      "backToVault": "Back to vault"
+    },
+    "custom": {
+      "backAriaLabel": "Back",
+      "pageTitle": "Custom Study",
+      "sourceSection": "Source",
+      "masteryFilterSection": "Filter by mastery level",
+      "sortOrderSection": "Sort order",
+      "cardLimitSection": "Card limit",
+      "matchingCountLabel": "Cards matching your filters",
+      "startSessionBtn": "Start session",
+      "noCardsMatchMsg": "No cards match your filters",
+      "noCardsMatchToast": "No cards match your filters."
+    },
+    "mastery": {
+      "backAriaLabel": "Back",
+      "pageTitle": "Mastery Breakdown",
+      "selectCollectionMsg": "Select collection",
+      "barsLabel": "Cards by mastery level",
+      "reviewLevelAriaLabel": "Review this level",
+      "tipText": "Tap the ▶ play button next to any level to start a review session with just those cards."
+    },
+    "history": {
+      "backAriaLabel": "Back",
+      "pageTitle": "Session History",
+      "allSessionsTab": "All sessions",
+      "thisWeekTab": "This week",
+      "thisMonthTab": "This month",
+      "ratingsStatLabel": "Ratings",
+      "durationStatLabel": "Duration",
+      "struggledStatLabel": "Struggled",
+      "nailedStatLabel": "Nailed",
+      "noSessionsTitle": "No review sessions yet.",
+      "noSessionsDesc": "Start your first review to see history here!"
+    },
+    "struggling": {
+      "backAriaLabel": "Back",
+      "pageTitle": "Struggling Cards",
+      "needsAttentionMsg": "cards need extra attention",
+      "focusMsg": "These cards keep getting failed. Focus on them to break through.",
+      "failSingular": "fail",
+      "failPlural": "fails",
+      "reviewAllBtn": "Review all",
+      "noCardsTitle": "No struggling cards!",
+      "encouragementMsg": "You're doing great. Keep it up!"
+    }
+  },
+  "listen": {
+    "main": {
+      "pageTitle": "Listen & Learn"
+    },
+    "playlistMode": {
+      "compactLabel": "Compact",
+      "compactDesc": "Word + meaning",
+      "examplesLabel": "Examples",
+      "examplesDesc": "Full sentences",
+      "deepDiveLabel": "Deep Dive",
+      "deepDiveDesc": "+ grammar tip"
+    },
+    "card": {
+      "collectionPrefix": "Collection:"
+    },
+    "nowPlaying": {
+      "pageTitle": "Now Playing",
+      "sessionComplete": "Session complete!",
+      "seeSummary": "See summary",
+      "audioUnavailable": "Audio unavailable",
+      "retryBtn": "Retry",
+      "skipCard": "Skip this card",
+      "grammarTipLabel": "Grammar tip"
+    },
+    "hero": {
+      "playingFromLabel": "Playing from",
+      "queueCountLabel": "{{count}} words in queue",
+      "playBtn": "Play",
+      "shuffleBtn": "Shuffle",
+      "playlistTypeSection": "Playlist type"
+    },
+    "controls": {
+      "speedSection": "Speed"
+    },
+    "queue": {
+      "durationUnit": "min",
+      "headerLabel": "Queue",
+      "emptyTitle": "No words in queue",
+      "emptyDesc": "Tap the source above to choose a playlist",
+      "previewAriaLabel": "Preview audio"
+    },
+    "sourceSheet": {
+      "title": "Choose a playlist source"
+    },
+    "source": {
+      "todaysDueLabel": "Today's due words",
+      "todaysDueDesc": "Cards scheduled for today",
+      "collectionLabel": "A collection",
+      "collectionDesc": "Pick a specific collection",
+      "allCardsLabel": "All cards",
+      "allCardsDesc": "Your complete vocabulary",
+      "strugglingLabel": "Struggling words",
+      "strugglingDesc": "Mastery 0–2, needs practice"
+    }
+  },
+  "stories": {
+    "library": {
+      "pageTitle": "Story Studio",
+      "generateAriaLabel": "Generate new story",
+      "exploreSection": "Explore",
+      "exploreLink": "See all →",
+      "exploreErrorMsg": "Couldn't load stories. Pull to refresh.",
+      "noStoriesYetMsg": "Stories are on the way! Check back soon.",
+      "noStoriesFilteredMsg": "No stories found for this filter.",
+      "premiumBadge": "Pro",
+      "myStoriesSection": "My Stories",
+      "savedLabel": "saved",
+      "generateFirstLink": "Generate first →",
+      "noStoriesTitle": "No stories yet",
+      "noStoriesDesc": "Generate your first story from your vocabulary.",
+      "generateBtn": "Generate a story",
+      "incompleteStatus": "Incomplete",
+      "extendBtn": "Extend",
+      "extendingLabel": "Extending…",
+      "listenBtn": "Listen",
+      "readBtn": "Read",
+      "moreOptionsAriaLabel": "More options",
+      "deleteAction": "Delete story",
+      "cancelAction": "Cancel",
+      "deleteAlertHeader": "Delete story",
+      "deleteAlertMsg": "Remove \"{{title}}\"? The audio will also be deleted.",
+      "deleteActionBtn": "Delete",
+      "extensionFailedToast": "Extension failed — please try again."
+    },
+    "reader": {
+      "backAriaLabel": "Back",
+      "toggleTranslationTitle": "Toggle translation",
+      "toggleTranslationAriaLabel": "Toggle translation",
+      "learnedLabel": "Learned",
+      "markAsLearnedLabel": "Mark as learned",
+      "storyTab": "Story",
+      "quizTab": "Quiz",
+      "keywordsTab": "Keywords",
+      "grammarTab": "Grammar",
+      "generatingAudio": "Generating audio narration…",
+      "preparingAudio": "Preparing audio…",
+      "closeWordPanelAriaLabel": "Close word panel",
+      "pluralLabel": "Plural",
+      "playPronunciationAriaLabel": "Play pronunciation",
+      "alreadyInVaultAriaLabel": "Already in vault",
+      "addToVaultAriaLabel": "Add to vault",
+      "conjugateBtn": "Conjugate ▸",
+      "praesensHeader": "Präsens",
+      "praeteritumHeader": "Präteritum",
+      "perfektLabel": "Perfekt:",
+      "imperativLabel": "Imperativ:",
+      "noConjugationData": "No conjugation data available.",
+      "pauseAriaLabel": "Pause",
+      "playAriaLabel": "Play",
+      "restartAriaLabel": "Restart",
+      "loadingMsg": "Loading story…"
+    },
+    "complete": {
+      "backAriaLabel": "Back to library",
+      "pageTitle": "Story Complete",
+      "title": "Great read!",
+      "finishedMsg": "You finished \"{{title}}\"",
+      "vocabWordsLabel": "vocab words",
+      "sentencesLabel": "sentences",
+      "listenSingular": "listen",
+      "listenPlural": "listens",
+      "wordsSection": "Words in this story",
+      "readAgainBtn": "Read again",
+      "moreStoriesBtn": "More stories",
+      "loadingMsg": "Loading…"
+    },
+    "generate": {
+      "pageTitle": "Generate Story",
+      "closeAriaLabel": "Close",
+      "freeStoriesUsedLabel": "free stories used",
+      "pickCollectionsSection": "Pick collections",
+      "selectedLabel": "selected",
+      "noCollectionsMsg": "No collections yet. Add words to a collection first.",
+      "wordsLabel": "words",
+      "lengthSection": "Story length",
+      "freeOnlyHint": "Short only on free plan",
+      "longWarning": "This may take up to 45 seconds",
+      "difficultySection": "Difficulty level",
+      "estimatedWaitLong": "Usually 25–40 seconds",
+      "estimatedWaitShort": "Usually 10–20 seconds",
+      "retryBtn": "Try again",
+      "contactSupportLink": "Contact support",
+      "generateBtn": "Generate Story",
+      "generatingDefaultMsg": "Generating your story…"
+    },
+    "length": {
+      "short": "Short",
+      "medium": "Medium",
+      "long": "Long",
+      "veryLong": "Very Long",
+      "extraLong": "Extra Long",
+      "podcast": "PODCAST"
+    },
+    "category": {
+      "daily-life": "Daily Life",
+      "travel": "Travel",
+      "food-culture": "Food & Culture",
+      "work-career": "Work & Career",
+      "technology": "Technology",
+      "nature": "Nature",
+      "fiction": "Fiction"
+    },
+    "wordType": {
+      "noun": "noun",
+      "verb": "verb",
+      "adjective": "adjective",
+      "adverb": "adverb",
+      "other": "other"
+    },
+    "cardMeta": {
+      "words": "words",
+      "min": "min",
+      "more": "+{{count}} more"
+    },
+    "keywords": {
+      "extractingMsg": "Extracting keywords…",
+      "noKeywordsMsg": "No keywords available for this story.",
+      "memorizeBtn": "Memorize keywords",
+      "playPronunciationTitle": "Play pronunciation"
+    },
+    "grammar": {
+      "generatingMsg": "Generating grammar notes…",
+      "noNotesTitle": "No grammar notes available for this story.",
+      "noNotesDesc": "Grammar notes are generated for new stories.",
+      "exampleSection": "Example",
+      "descriptionSection": "Description"
+    },
+    "quiz": {
+      "generatingMsg": "Generating quiz…",
+      "noQuizTitle": "No quiz available for this story.",
+      "noQuizDesc": "Quizzes are generated for new stories going forward.",
+      "correctLabel": "correct",
+      "retakeBtn": "Retake quiz",
+      "muteAriaLabel": "Mute answer audio",
+      "unmuteAriaLabel": "Unmute answer audio",
+      "nextBtn": "Next",
+      "pauseOnMistakesTitle": "Pause on mistakes",
+      "pauseOnMistakesDesc": "Review the correct answer before continuing"
+    }
+  },
+  "settings": {
+    "goals": {
+      "title": "Study goals",
+      "backAria": "Back",
+      "targetsSection": "Targets",
+      "daily": {
+        "name": "Daily",
+        "desc": "Cards per day to keep your streak",
+        "decreaseAria": "Decrease daily goal",
+        "increaseAria": "Increase daily goal"
+      },
+      "weekly": {
+        "name": "Weekly",
+        "desc": "Total cards reviewed per week",
+        "decreaseAria": "Decrease weekly goal",
+        "increaseAria": "Increase weekly goal"
+      },
+      "monthly": {
+        "name": "Monthly",
+        "desc": "Total cards reviewed per month",
+        "decreaseAria": "Decrease monthly goal",
+        "increaseAria": "Increase monthly goal"
+      },
+      "streakNote": "🔥 Hitting your daily goal extends your streak. Miss a day and the streak resets."
+    },
+    "goalsPrompt": {
+      "titleFirstTime": "Set your study goals",
+      "titleUpdate": "Time to update your goals",
+      "bodyFirstTime": "Tell LinguaCard how much you want to study each day. Your goals shape your streak and help you stay on track.",
+      "bodyUpdate": "It's been a while since you last updated your targets. Take a moment to make sure they still match your pace.",
+      "cards": "cards",
+      "setMyGoals": "Set my goals",
+      "updateMyGoals": "Update my goals"
+    },
+    "reminders": {
+      "title": "Reminders",
+      "backAriaLabel": "Back",
+      "pageTitle": "Reminders",
+      "dailyReminderSection": "Daily reminder",
+      "enableToggleLabel": "Enable reminders",
+      "enableDesc": "Get a browser notification if you haven't hit your goal",
+      "toggleAriaLabel": "Toggle reminders",
+      "permissionDeniedMsg": "Notification permission was denied. To enable reminders, open your browser settings and allow notifications for this site.",
+      "timeLabel": "Reminder time",
+      "timeDesc": "We'll only nudge you if your goal isn't met yet",
+      "howItWorksMsg": "Reminders use your browser's notification system and work even when LinguaCard is closed. Mobile app notifications (iOS / Android) are coming later.",
+      "unsupportedMsg": "Your current browser or context doesn't support web push notifications. Try opening LinguaCard in Chrome or Edge, or install it as a PWA.",
+      "permissionSection": "Permission",
+      "grantedTitle": "Notifications allowed",
+      "deniedTitle": "Notifications blocked",
+      "defaultTitle": "Notifications",
+      "grantedDesc": "Granted for this browser ✓",
+      "deniedDesc": "Blocked — change in browser settings",
+      "defaultDesc": "Not yet requested"
+    },
+    "language": {
+      "title": "Language",
+      "backAria": "Back",
+      "subtitle": "Choose your interface language",
+      "currentLabel": "Current"
+    },
+    "theme": {
+      "darkMode": "Dark mode"
+    },
+    "dangerZone": {
+      "resetTitle": "Reset all data",
+      "resetWarning": "This will permanently delete all your words, collections, review history, and progress. Your account will remain active.",
+      "irreversible": "This action cannot be undone.",
+      "deleteDetails": "All {{wordCount}} words and {{collectionCount}} collections will be deleted permanently.",
+      "confirmPassword": "Enter your password to confirm",
+      "confirm": "Yes, delete everything"
+    }
+  },
+  "sync": {
+    "status": {
+      "label": "Sync status",
+      "pending": "{{count}} pending",
+      "syncing": "Syncing…",
+      "error": "Sync error",
+      "errorRetry": "Sync error — tap to retry",
+      "synced": "Synced"
+    },
+    "notifications": {
+      "recovered": "Sync recovered — data is up to date",
+      "changesSynced": "{{count}} queued change(s) synced",
+      "upToDate": "Everything is up to date",
+      "partialFailure": "Some data couldn't sync. Will retry.",
+      "failed": "Sync failed — will retry automatically",
+      "retryNow": "Retry now"
+    }
+  },
+  "offline": {
+    "banner": {
+      "message": "You're offline — showing saved data"
+    }
+  },
+  "pwa": {
+    "install": {
+      "title": "Add to Home Screen",
+      "subtitle": "Install LinguaCard for quick access"
+    },
+    "installIos": {
+      "tap": "Tap",
+      "action": "Add to Home Screen"
+    }
+  },
+  "srs": {
+    "status": {
+      "due": "Due",
+      "interval": "{{days}}d interval"
+    },
+    "masteryLabel": {
+      "new": "New",
+      "learning": "Learning",
+      "familiar": "Familiar",
+      "review": "Review",
+      "good": "Good",
+      "mastered": "Mastered"
+    },
+    "breakdownTag": {
+      "new": "new",
+      "hard": "hard",
+      "learning": "learning",
+      "review": "review"
+    },
+    "selectCollection": "Select collection",
+    "allCollections": "All collections",
+    "alreadyInVault": "Already in your vault",
+    "alreadyInCollection": "Already in \"{{name}}\""
+  },
+  "subscription": {
+    "paywall": {
+      "title": "Unlock Unlimited Stories",
+      "subtitle": "You've used your 3 free stories. Upgrade to Pro for:",
+      "benefit1": "Unlimited story generation",
+      "benefit2": "Claude Sonnet — highest quality",
+      "benefit3": "Priority support",
+      "requestBtn": "Request Pro Access",
+      "dismissBtn": "Not now"
+    }
+  },
+  "admin": {
+    "import": {
+      "label": "Admin import",
+      "pageTitle": "Admin Import",
+      "tabs": {
+        "wordList": "Word List",
+        "json": "JSON Import",
+        "story": "Story",
+        "collections": "Collections"
+      },
+      "fields": {
+        "title": "Title *",
+        "level": "Level *",
+        "topic": "Topic *",
+        "emoji": "Emoji",
+        "words": "Words (one per line)",
+        "json": "JSON data",
+        "storyJson": "Story JSON"
+      },
+      "buttons": {
+        "importCollection": "Import Collection",
+        "importJson": "Import JSON Collection",
+        "importStory": "Import Story"
+      },
+      "status": {
+        "loading": "Loading…",
+        "noCollections": "No collections yet. Import one first."
+      }
+    }
+  },
+  "wordDetail": {
+    "pageTitle": "Word Detail",
+    "backAria": "Go back",
+    "moreOptionsAria": "More options",
+    "playPluralAria": "Play plural",
+    "playExampleAria": "Play example sentence",
+    "playSynonymExampleAria": "Play synonym example",
+    "generating": "Generating…",
+    "listenToPronunciation": "Listen to pronunciation",
+    "aiAudioCached": "AI audio cached on device",
+    "generatingAudio": "Generating audio…",
+    "gender": {
+      "masculine": "masculine",
+      "feminine": "feminine",
+      "neuter": "neuter"
+    },
+    "plural": "Plural",
+    "masteryProgress": "Mastery Progress",
+    "level": "Level {{level}} — {{label}}",
+    "stats": {
+      "reviews": "Reviews",
+      "recallChance": "Recall chance",
+      "stability": "Stability",
+      "lastSeen": "Last seen"
+    },
+    "nextReview": {
+      "dueNow": "Due now",
+      "tomorrow": "Tomorrow",
+      "inDays": "Next review in {{days}} days"
+    },
+    "lastReviewed": {
+      "never": "Never",
+      "today": "Today",
+      "daysAgo": "{{days}}d ago"
+    },
+    "sections": {
+      "exampleSentences": "Example Sentences",
+      "synonyms": "Synonyms"
+    },
+    "rateThisWord": "Rate this word",
+    "emptyState": {
+      "title": "Word not found",
+      "subtitle": "This word may have been removed from your vault."
+    },
+    "deleteConfirm": {
+      "title": "Delete word",
+      "message": "Remove \"{{word}}\" from your vault? This cannot be undone.",
+      "confirmButton": "Delete"
+    },
+    "toast": {
+      "deleted": "Word deleted",
+      "updated": "Word updated"
+    }
+  }
+}

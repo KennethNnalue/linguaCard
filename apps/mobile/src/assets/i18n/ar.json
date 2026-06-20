@@ -1,0 +1,1194 @@
+{
+  "common": {
+    "appName": "LinguaCard",
+    "cancel": "إلغاء",
+    "close": "إغلاق",
+    "save": "حفظ",
+    "delete": "حذف",
+    "retry": "إعادة المحاولة",
+    "loading": "جارٍ التحميل…",
+    "back": "رجوع",
+    "done": "تم",
+    "or": "أو",
+    "install": "تثبيت",
+    "dismiss": "تجاهل",
+    "notNow": "ليس الآن",
+    "email": "البريد الإلكتروني",
+    "password": "كلمة المرور",
+    "fullName": "الاسم الكامل",
+    "words": "كلمات",
+    "cards": "بطاقات",
+    "due": "مستحقة",
+    "min": "د",
+    "of": "من",
+    "new": "جديد",
+    "all": "الكل",
+    "today": "اليوم",
+    "placeholder": {
+      "email": "you@example.com",
+      "password": "••••••••",
+      "name": "Jan Schmidt"
+    },
+    "error": {
+      "generic": "حدث خطأ ما. يرجى المحاولة مرة أخرى."
+    },
+    "divider": {
+      "or": "أو"
+    },
+    "aria": {
+      "toggleDarkMode": "تبديل الوضع الداكن",
+      "togglePasswordVisibility": "إظهار/إخفاء كلمة المرور",
+      "close": "إغلاق",
+      "closeMenu": "إغلاق القائمة",
+      "quickActions": "إجراءات سريعة",
+      "addCard": "إضافة بطاقة",
+      "newCollection": "مجموعة جديدة",
+      "import": "استيراد",
+      "backToLogin": "العودة لتسجيل الدخول",
+      "syncStatus": "حالة المزامنة",
+      "playPronunciation": "تشغيل النطق",
+      "share": "مشاركة"
+    },
+    "account": "الحساب",
+    "refresh": "تحديث",
+    "yesterday": "أمس",
+    "daysAgoLabel": "قبل {{count}} أيام",
+    "todayCapital": "اليوم"
+  },
+  "auth": {
+    "login": {
+      "tagline": "أتقن المفردات الألمانية",
+      "signIn": "تسجيل الدخول",
+      "forgotPassword": "نسيت كلمة المرور؟",
+      "noAccount": "ليس لديك حساب؟"
+    },
+    "register": {
+      "title": "إنشاء حساب",
+      "tagline": "ابدأ رحلتك في تعلم اللغة",
+      "passwordHint": "٨ أحرف على الأقل",
+      "submit": "إنشاء حساب",
+      "hasAccount": "لديك حساب بالفعل؟",
+      "error": "فشل التسجيل. يرجى المحاولة مرة أخرى."
+    },
+    "forgotPassword": {
+      "title": "إعادة تعيين كلمة المرور",
+      "heading": "نسيت كلمة المرور؟",
+      "description": "أدخل بريدك الإلكتروني وسنرسل لك رابط إعادة التعيين.",
+      "submit": "إرسال رابط إعادة التعيين",
+      "remember": "تتذكر كلمة المرور؟",
+      "checkEmail": "تحقق من بريدك الإلكتروني",
+      "linkSent": "لقد أرسلنا رابط إعادة تعيين كلمة المرور إلى",
+      "notReceived": "لم تستلمه؟ تحقق من مجلد البريد العشوائي أو انتظر بضع دقائق.",
+      "backToLogin": "العودة لتسجيل الدخول"
+    },
+    "validation": {
+      "emailInvalid": "أدخل عنوان بريد إلكتروني صالح",
+      "passwordMinLength": "يجب أن تتكون كلمة المرور من ٨ أحرف على الأقل",
+      "nameMinLength": "يجب أن يتكون الاسم من حرفين على الأقل"
+    },
+    "oauth": {
+      "google": "المتابعة مع Google",
+      "googleComingSoon": "تسجيل الدخول بـ Google قريبًا"
+    },
+    "signOut": "تسجيل الخروج",
+    "reset": {
+      "passwordIncorrect": "كلمة المرور غير صحيحة. يرجى المحاولة مرة أخرى.",
+      "success": "✓ تم إعادة تعيين جميع البيانات. ابدأ من جديد!"
+    }
+  },
+  "home": {
+    "greeting": {
+      "morning": "صباح الخير",
+      "afternoon": "مساء الخير",
+      "evening": "مساء الخير"
+    },
+    "hero": {
+      "completeGreeting": "أحسنت",
+      "completeTitle": "تم تحقيق هدف اليوم ✓",
+      "readyTitle": "هل أنت مستعد للتعلم اليوم؟"
+    },
+    "stats": {
+      "dueLabel": "مستحقة",
+      "newCardsLabel": "بطاقات جديدة",
+      "reviewsLabel": "مراجعات"
+    },
+    "actions": {
+      "startSession": "بدء الجلسة",
+      "filter": "تصفية"
+    },
+    "atRisk": {
+      "keepStreakPrefix": "راجع الآن للحفاظ على سلسلتك",
+      "keepStreakSuffix": "يوم متتالي",
+      "startStreakSuffix": "بطاقات اليوم لبدء سلسلة",
+      "dailyGoalSuffix": "بطاقات أخرى لتحقيق هدفك اليومي",
+      "reviewText": "مراجعة",
+      "startButton": "ابدأ"
+    },
+    "streak": {
+      "label": "أيام متتالية",
+      "onTrack": "على المسار الصحيح اليوم ✓",
+      "atRisk": "معرضة للخطر!",
+      "broken": "ابدأ سلسلة جديدة"
+    },
+    "goalRing": {
+      "label": "الهدف اليومي",
+      "todayLabel": "اليوم",
+      "doneLabel": "أُنجز",
+      "notStarted": "لم تبدأ بعد",
+      "toGoLabel": "متبقي"
+    },
+    "wordOfDay": {
+      "label": "✦ كلمة اليوم",
+      "playAria": "تشغيل النطق"
+    },
+    "weeklyChart": {
+      "title": "هذا الأسبوع",
+      "detailsLink": "التفاصيل →",
+      "reviewed": "بطاقات تمت مراجعتها",
+      "goalLabel": "الهدف:"
+    },
+    "quickActions": {
+      "title": "إجراءات سريعة",
+      "scanLabel": "مسح",
+      "scanSub": "استيراد كلمات",
+      "storyLabel": "قصة",
+      "storySub": "إنشاء جديدة",
+      "listenLabel": "استماع",
+      "listenSub": "قائمة تشغيل صوتية"
+    },
+    "recentCards": {
+      "title": "أُضيفت مؤخرًا",
+      "seeAllLink": "عرض الكل →"
+    },
+    "collectionFilter": {
+      "allLabel": "جميع المجموعات"
+    },
+    "wotd": {
+      "genderMasculine": "مذكر",
+      "genderFeminine": "مؤنث",
+      "genderNeuter": "محايد"
+    }
+  },
+  "vault": {
+    "title": "الخزنة",
+    "addCard": "إضافة بطاقة",
+    "import": "استيراد",
+    "newCollection": "مجموعة جديدة",
+    "search": {
+      "placeholder": "البحث عن كلمات…",
+      "aria": "البحث في المفردات"
+    },
+    "filter": {
+      "allLabel": "الكل",
+      "dueLabel": "مستحقة",
+      "newLabel": "جديدة",
+      "masteredLabel": "متقنة",
+      "needReviewText": "تحتاج مراجعة",
+      "neverStudiedText": "لم تُدرس أبدًا"
+    },
+    "sort": {
+      "title": "الترتيب حسب",
+      "newestFirst": "الأحدث أولًا",
+      "alphabetical": "أ–ي (أبجدي)",
+      "masteryLowest": "الإتقان (الأقل أولًا)",
+      "dueDate": "تاريخ الاستحقاق"
+    },
+    "emptyState": {
+      "title": "لم يتم العثور على كلمات",
+      "subtitle": "جرب تصفية أو بحث مختلف"
+    },
+    "tabs": {
+      "wordsLabel": "الكلمات",
+      "collectionsLabel": "المجموعات",
+      "wordsAria": "تبويب الكلمات",
+      "collectionsAria": "تبويب المجموعات"
+    },
+    "afterCreate": {
+      "title": "هل تريد إضافة كلمات إلى مجموعتك؟",
+      "importOption": "استيراد كلمات",
+      "goToOption": "الذهاب إلى المجموعة",
+      "laterOption": "ربما لاحقًا"
+    },
+    "collectionFilter": {
+      "title": "التصفية حسب المجموعة"
+    },
+    "collections": {
+      "totalWordsLabel": "إجمالي الكلمات",
+      "collectionsLabel": "المجموعات",
+      "dueTodayLabel": "مستحقة اليوم",
+      "emptyTitle": "لا توجد مجموعات بعد",
+      "emptySubtitle": "اضغط + مجموعة جديدة للبدء"
+    }
+  },
+  "collections": {
+    "title": "المجموعات",
+    "segments": {
+      "mySets": "مجموعاتي",
+      "explore": "استكشاف"
+    },
+    "mySets": {
+      "totalLabel": "الإجمالي عبر جميع المجموعات",
+      "wordsUnit": "كلمات",
+      "dueLabel": "مستحقة اليوم",
+      "emptyTitle": "لا توجد مجموعات بعد",
+      "emptySubtitle": "اضغط + لإنشاء واحدة، أو استكشف المكتبة"
+    },
+    "explore": {
+      "searchPlaceholder": "البحث في المجموعات والمواضيع…",
+      "allLevel": "الكل",
+      "emptyTitle": "لا توجد مجموعات في هذا المستوى",
+      "emptySubtitle": "جرب مستوى آخر أو امسح البحث",
+      "seeAllLink": "عرض الكل ›",
+      "openButton": "فتح",
+      "getButton": "+ إضافة",
+      "getNewButton": "+ إضافة جديدة",
+      "addingLabel": "جارٍ الإضافة…",
+      "forYouLabel": "مقترحة لك"
+    },
+    "card": {
+      "masteredLabel": "متقنة",
+      "completeLabel": "مكتملة",
+      "libraryBadge": "من المكتبة",
+      "dueLabel": "مستحقة",
+      "upToDateLabel": "محدّثة",
+      "wordsLabel": "كلمات"
+    },
+    "adopt": {
+      "successMessage": "تمت الإضافة بنجاح",
+      "alreadyInSetsMessage": "موجودة بالفعل في مجموعاتك",
+      "errorMessage": "تعذرت إضافة المجموعة. حاول مرة أخرى."
+    },
+    "afterCreate": {
+      "title": "هل تريد إضافة كلمات إلى مجموعتك؟",
+      "csvOption": "استيراد من ملف CSV",
+      "imageOption": "استيراد من صورة",
+      "goToOption": "الذهاب إلى المجموعة",
+      "laterOption": "ربما لاحقًا"
+    }
+  },
+  "collectionDetail": {
+    "nav": {
+      "backAria": "رجوع",
+      "optionsAria": "خيارات"
+    },
+    "incompleteImport": {
+      "title": "الاستيراد غير مكتمل",
+      "subtitle": "كلمات لا تزال بحاجة إلى بطاقات",
+      "completeButton": "إكمال"
+    },
+    "audio": {
+      "preparingLabel": "جارٍ تحضير الصوت…",
+      "readyUnit": "كلمات جاهزة"
+    },
+    "hero": {
+      "wordsLabel": "كلمات",
+      "dueLabel": "مستحقة",
+      "masteredLabel": "متقنة"
+    },
+    "actions": {
+      "reviewAllLabel": "مراجعة الكل",
+      "reviewLabel": "مراجعة",
+      "listenLabel": "استماع"
+    },
+    "categories": {
+      "allLabel": "الكل"
+    },
+    "emptyState": {
+      "title": "لا توجد كلمات بعد",
+      "subtitle": "اضغط + لإضافة أول كلمة"
+    },
+    "pending": {
+      "label": "قيد الانتظار",
+      "instruction": "— اضغط إكمال أعلاه"
+    },
+    "menu": {
+      "clearAllOption": "مسح جميع الكلمات",
+      "deleteOption": "حذف المجموعة",
+      "cancelOption": "إلغاء"
+    },
+    "clearWords": {
+      "title": "مسح جميع الكلمات؟",
+      "message": "سيتم حذف جميع الكلمات الـ {{count}} في {{name}} نهائيًا. لا يمكن التراجع عن هذا.",
+      "confirmButton": "مسح الكل"
+    },
+    "deleteCollection": {
+      "title": "حذف المجموعة؟",
+      "message": "لن يتم حذف الكلمات — ستظهر ضمن \"جميع الكلمات\" في الخزنة.",
+      "confirmButton": "حذف"
+    },
+    "importComplete": {
+      "allAddedMessage": "تمت إضافة جميع البطاقات — المجموعة مكتملة!",
+      "cardsAddedWithAudio": "تمت إضافة {{count}} بطاقات — مع الصوت ✓",
+      "alreadyInMessage": "موجودة بالفعل في مجموعاتك",
+      "errorMessage": "تعذر إكمال الاستيراد. حاول مرة أخرى لاحقًا.",
+      "addedWithDuplicates": "✓ تمت إضافة {{added}}، أُعيد استخدام {{duplicates}} مكرر(ة) — المجموعة مكتملة!",
+      "allAlreadyMessage": "جميع الـ {{count}} موجودة بالفعل في خزنتك — المجموعة مكتملة!"
+    }
+  },
+  "platformCollectionDetail": {
+    "nav": {
+      "breadcrumb": "استكشاف",
+      "backAria": "رجوع"
+    },
+    "hero": {
+      "descriptionSuffix": "كلمات · مع صوت"
+    },
+    "progressBanner": {
+      "knowPrefix": "أنت تعرف بالفعل",
+      "wordsSuffix": "كلمات هنا.",
+      "addingPrefix": "إضافة هذه المجموعة ستضيف",
+      "newCardsSuffix": "بطاقات جديدة",
+      "instantlySuffix": "— فورًا.",
+      "allNewForYouSuffix": "كلها جديدة بالنسبة لك."
+    },
+    "adoptedBanner": {
+      "inSetsLabel": "في مجموعاتك",
+      "wordsKnownSuffix": "كلمات معروفة"
+    },
+    "wordGroups": {
+      "newHereLabel": "جديدة هنا",
+      "alreadyYoursLabel": "لديك بالفعل",
+      "expandLabel": "اضغط للتوسيع",
+      "collapseLabel": "اضغط للطي",
+      "yoursChip": "✓ لديك"
+    },
+    "shelf": {
+      "title": "قصص بهذه الكلمات"
+    },
+    "story": {
+      "minLabel": "د"
+    },
+    "footer": {
+      "openButton": "فتح في مجموعاتي",
+      "getButton": "+ إضافة",
+      "getNewButton": "+ إضافة كلمات جديدة",
+      "addingLabel": "جارٍ الإضافة…",
+      "generateStoryButton": "إنشاء قصة من هذه المجموعة",
+      "instantNote": "فوري — بدون انتظار، مع الصوت"
+    },
+    "adopt": {
+      "successMessage": "تمت إضافة {{count}} كلمات — مع الصوت ✓",
+      "alreadyInMessage": "موجودة بالفعل في مجموعاتك",
+      "errorMessage": "تعذرت إضافة المجموعة. حاول مرة أخرى."
+    }
+  },
+  "exploreTopic": {
+    "nav": {
+      "backAria": "رجوع",
+      "setsLabel": "مجموعات"
+    },
+    "emptyState": {
+      "title": "لا توجد مجموعات في هذا الموضوع",
+      "subtitle": "جرب تغيير مرشح المستوى"
+    },
+    "card": {
+      "masteredLabel": "متقنة",
+      "inSetsLabel": "في مجموعاتك",
+      "knownLabel": "معروفة",
+      "newLabel": "جديدة",
+      "wordsUnit": "كلمات",
+      "allNewLabel": "كلها جديدة",
+      "openButton": "فتح",
+      "getButton": "+ إضافة",
+      "getNewButton": "+ إضافة جديدة",
+      "addingLabel": "جارٍ الإضافة…"
+    },
+    "adopt": {
+      "successMessage": "تمت إضافة {{count}} كلمات — مع الصوت ✓",
+      "alreadyInMessage": "موجودة بالفعل في مجموعاتك",
+      "errorMessage": "تعذرت إضافة المجموعة. حاول مرة أخرى."
+    }
+  },
+  "addWord": {
+    "nav": {
+      "closeAria": "إغلاق",
+      "editTitle": "تعديل كلمة",
+      "addTitle": "إضافة كلمة جديدة"
+    },
+    "langDirection": {
+      "label": "اتجاه اللغة",
+      "english": "🇬🇧 الإنجليزية",
+      "arrow": "→",
+      "german": "🇩🇪 الألمانية"
+    },
+    "back": {
+      "label": "الخلف — الألمانية",
+      "hint": "(يتم الكشف عن الأداة تلقائيًا)",
+      "placeholder": "German word (e.g. Zug)",
+      "autoGenAria": "توليد الترجمة والجمع والمرادفات تلقائيًا",
+      "autoGenLabel": "تلقائي",
+      "generatingLabel": "جارٍ التوليد…",
+      "libraryBanner": "تم الملء من المكتبة — بدون استدعاء ذكاء اصطناعي"
+    },
+    "article": {
+      "label": "الأداة",
+      "noneOption": "بدون"
+    },
+    "front": {
+      "label": "الأمام — الإنجليزية",
+      "placeholder": "e.g. the train"
+    },
+    "plural": {
+      "label": "الجمع",
+      "hint": "— مع الأداة",
+      "placeholder": "e.g. die Flugzeuge"
+    },
+    "synonyms": {
+      "label": "المرادفات",
+      "newLabel": "مرادف جديد",
+      "addButton": "إضافة مرادف",
+      "removeAria": "إزالة مرادف",
+      "wordPlaceholder": "كلمة مرادفة",
+      "translationPlaceholder": "الترجمة (الإنجليزية)",
+      "examplePlaceholder": "جملة مثال (الألمانية)",
+      "exampleNativePlaceholder": "ترجمة المثال (الإنجليزية)"
+    },
+    "duplicateWarning": {
+      "messageSuffix": "موجودة بالفعل",
+      "inLabel": "في",
+      "defaultLocation": "في خزنتك",
+      "addAnywayButton": "إضافة على أي حال",
+      "goToButton": "الذهاب إلى الموجودة"
+    },
+    "collection": {
+      "label": "المجموعة",
+      "requiredHint": "*مطلوب",
+      "noSelectionLabel": "بدون مجموعة"
+    },
+    "category": {
+      "label": "الفئة",
+      "newButton": "جديدة",
+      "cancelButton": "إلغاء"
+    },
+    "newCategory": {
+      "placeholder": "اسم الفئة",
+      "addButton": "إضافة"
+    },
+    "examples": {
+      "label": "جملة مثال",
+      "targetPlaceholder": "German sentence (e.g. Der Zug fährt um 8 Uhr ab.)",
+      "nativePlaceholder": "الترجمة الإنجليزية"
+    },
+    "pronunciation": {
+      "label": "النطق",
+      "recordButton": "تسجيل",
+      "ttsButton": "استخدام النطق الآلي"
+    },
+    "save": {
+      "savingLabel": "جارٍ الحفظ…",
+      "editLabel": "حفظ التغييرات",
+      "createLabel": "حفظ في الخزنة"
+    },
+    "importLink": {
+      "text": "تريد إضافة كلمات متعددة؟ استورد ملف CSV →"
+    },
+    "errors": {
+      "autoGenFailed": "فشل التوليد التلقائي. أكمل يدويًا أو حاول مرة أخرى."
+    }
+  },
+  "assignCollection": {
+    "title": "إضافة إلى مجموعة",
+    "closeAria": "إغلاق",
+    "wordsLabel": "كلمات",
+    "createNewLabel": "إنشاء مجموعة جديدة…",
+    "newCollection": {
+      "placeholder": "اسم المجموعة",
+      "creatingLabel": "جارٍ الإنشاء…",
+      "createButton": "إنشاء"
+    },
+    "confirmButton": "تأكيد الاختيار",
+    "skipButton": "تخطي الآن"
+  },
+  "import": {
+    "nav": {
+      "closeAria": "إغلاق",
+      "backAria": "رجوع",
+      "title": "استيراد كلمات"
+    },
+    "methods": {
+      "scanLabel": "مسح صورة",
+      "scanSubtitle": "صور، قوائم، بطاقات",
+      "csvLabel": "رفع ملف CSV",
+      "csvSubtitle": "استيراد مجمّع من ملف"
+    },
+    "ai": {
+      "title": "إنشاء ملف CSV باستخدام الذكاء الاصطناعي",
+      "subtitle": "انسخ هذا الأمر إلى ChatGPT أو Claude أو أي ذكاء اصطناعي",
+      "copiedLabel": "تم النسخ!",
+      "steps": {
+        "step1": "انسخ الأمر أدناه",
+        "step2": "الصقه في أداة الذكاء الاصطناعي مع كلماتك",
+        "step3": "ارفع ملف CSV هنا"
+      },
+      "prompt": {
+        "label": "أمر الذكاء الاصطناعي",
+        "copiedLabel": "✓ تم النسخ إلى الحافظة",
+        "copyButton": "نسخ",
+        "copiedButton": "تم النسخ!",
+        "footerAfterCopy": "افتح الآن أداة الذكاء الاصطناعي المفضلة لديك، الصق الأمر، أضف كلماتك، ثم حمّل ملف CSV",
+        "footerDefault": "يعمل مع ChatGPT و Claude و Gemini و Copilot — أي ذكاء اصطناعي ينشئ نصوصًا"
+      }
+    },
+    "downloadTemplate": "تحميل قالب CSV (٩٥ كلمة جاهزة)",
+    "errors": {
+      "invalidFileType": "يرجى اختيار ملف بصيغة .csv",
+      "noWordsFound": "لم يتم العثور على كلمات في هذا الملف"
+    },
+    "toast": {
+      "promptCopied": "تم نسخ الأمر إلى الحافظة"
+    }
+  },
+  "importReview": {
+    "nav": {
+      "backAria": "رجوع",
+      "title": "مراجعة الاستيراد"
+    },
+    "fileInfo": {
+      "wordsDetected": "كلمات تم اكتشافها"
+    },
+    "duplicates": {
+      "messagePrefix": "كلمات موجودة بالفعل في خزنتك",
+      "deselectedNote": "(غير محددة)"
+    },
+    "reuseBar": {
+      "knownLabel": "معروفة",
+      "reuseText": "في المكتبة — أُعيد استخدامها بدون تكلفة.",
+      "enrichText": "سيتم إثراؤها."
+    },
+    "summary": {
+      "totalLabel": "الإجمالي",
+      "reuseLabel": "إعادة استخدام",
+      "newLabel": "جديدة",
+      "inVaultLabel": "في الخزنة",
+      "skippedLabel": "تم تخطيها"
+    },
+    "collection": {
+      "label": "إضافة إلى مجموعة",
+      "requiredHint": "*مطلوب"
+    },
+    "words": {
+      "label": "الكلمات (اضغط للتحديد / إلغاء التحديد)",
+      "duplicateBadge": "في الخزنة",
+      "reuseLabel": "★ المكتبة",
+      "enrichLabel": "إثراء"
+    },
+    "importButton": {
+      "prefix": "استيراد",
+      "wordSingular": "كلمة",
+      "wordsPlural": "كلمات",
+      "importingLabel": "جارٍ الاستيراد…"
+    },
+    "cancel": {
+      "link": "إلغاء"
+    },
+    "errors": {
+      "noCollectionSelected": "يرجى اختيار مجموعة قبل الاستيراد.",
+      "importFailed": "فشل الاستيراد. يرجى المحاولة مرة أخرى."
+    },
+    "success": {
+      "newCardsSuffix": "كلمات أُضيفت إلى خزنتك",
+      "dictReuseText": "أُعيد استخدامها من المكتبة",
+      "existingText": "كانت موجودة بالفعل"
+    }
+  },
+  "imageProcessing": {
+    "nav": {
+      "cancelAria": "إلغاء"
+    },
+    "phases": {
+      "extractingTitle": "جارٍ مسح الصورة",
+      "extractingSubtitle": "يرجى الانتظار…",
+      "enrichingTitle": "جارٍ إنشاء البطاقات",
+      "enrichingSubtitle": "جارٍ بناء مجموعتك…",
+      "partialTitle": "اقترب الانتهاء",
+      "partialSubtitle": "بطاقات جاهزة الآن",
+      "doneTitle": "تم!"
+    },
+    "image": {
+      "altText": "جارٍ مسح الصورة"
+    },
+    "phase1": {
+      "stepSubtitle": "قراءة الكلمات من الصورة"
+    },
+    "info": {
+      "note": "الخطوة ١ من ٢ — مسح سريع. الخطوة ٢ تنشئ الترجمات وجمل الأمثلة."
+    },
+    "progressCard": {
+      "label": "التقدم",
+      "readyLabel": "جاهزة",
+      "cardsLabel": "بطاقات",
+      "remainingLabel": "متبقية"
+    },
+    "batchInfo": "تتم معالجة ١٠ كلمات في كل مرة — يتم حفظ التقدم بعد كل دفعة",
+    "partialBanner": {
+      "titleSuffix": "بطاقات ستُضاف لاحقًا",
+      "subtitle": "تم الوصول إلى حد الذكاء الاصطناعي أثناء الاستيراد. ستظهر في مجموعتك زر \"إكمال\" — اضغط عليه في أي وقت للإنهاء."
+    },
+    "partialStats": {
+      "readyLabel": "جاهزة الآن",
+      "pendingLabel": "قيد الانتظار",
+      "totalLabel": "إجمالي ما تم العثور عليه"
+    },
+    "cancel": {
+      "backgroundLabel": "يعمل في الخلفية — يمكنك مغادرة هذه الشاشة",
+      "defaultLabel": "إلغاء"
+    },
+    "errors": {
+      "noWordsFound": "لم يتم العثور على كلمات ألمانية في هذه الصورة."
+    }
+  },
+  "image": {
+    "camera": {
+      "label": "التقط صورة",
+      "hint": "وجّه الكاميرا نحو أي نص ألماني"
+    },
+    "gallery": {
+      "label": "اختر من المعرض",
+      "hint": "اختر صورة موجودة"
+    },
+    "error": {
+      "unsupportedFormat": "صيغة صورة غير مدعومة. يرجى استخدام JPEG أو PNG أو WebP.",
+      "cameraPermission": "تم رفض إذن الكاميرا أو غير متاح."
+    }
+  },
+  "review": {
+    "hub": {
+      "cardsDueToday": "بطاقات مستحقة اليوم",
+      "dueLabel": "مستحقة",
+      "allCaughtUp": "لا شيء متأخر! 🎉",
+      "startTodaysReview": "ابدأ مراجعة اليوم",
+      "nothingDueNow": "لا شيء مستحق الآن",
+      "quickStudySection": "دراسة سريعة",
+      "strugglingCardsTitle": "بطاقات صعبة",
+      "strugglingCardsDesc": "بطاقات فشلت فيها ٣ مرات أو أكثر",
+      "newCardsOnlyTitle": "بطاقات جديدة فقط",
+      "newCardsOnlyDesc": "مفردات لم تُراجع أبدًا",
+      "customStudyTitle": "دراسة مخصصة",
+      "customStudyDesc": "أنشئ جلسة مصفاة",
+      "recentSessionsSection": "الجلسات الأخيرة",
+      "seeAllLink": "عرض الكل →",
+      "allDueCardsLabel": "جميع البطاقات المستحقة",
+      "cardsUnit": "بطاقات",
+      "noSessionsTitle": "لا توجد جلسات مراجعة بعد.",
+      "noSessionsDesc": "أكمل أول مراجعة لك لرؤية السجل هنا.",
+      "masteryBreakdownAriaLabel": "تفصيل الإتقان"
+    },
+    "session": {
+      "goBackAriaLabel": "رجوع",
+      "pageTitle": "جلسة المراجعة",
+      "yourLanguageLabel": "لغتك",
+      "englishLangChip": "🇬🇧 الإنجليزية",
+      "tapToRevealGerman": "اضغط لكشف الألمانية",
+      "germanLangChip": "🇩🇪 الألمانية",
+      "pluralLabel": "الجمع",
+      "synonymsHeader": "المرادفات",
+      "playPronunciationBtn": "تشغيل النطق",
+      "generatingAudio": "جارٍ التوليد…",
+      "playExampleAriaLabel": "تشغيل المثال",
+      "ratingPrompt": "كم كنت تعرف هذه الكلمة؟",
+      "previousBtn": "السابقة",
+      "skipBtn": "تخطي",
+      "allCaughtUpMsg": "لا شيء متأخر!",
+      "noDueCardsMsg": "لا توجد بطاقات مستحقة للمراجعة الآن.",
+      "backToHomeBtn": "العودة للرئيسية"
+    },
+    "summary": {
+      "backAriaLabel": "العودة للخزنة",
+      "title": "اكتملت الجلسة!",
+      "cardsReviewedLabel": "بطاقات تمت مراجعتها",
+      "reviewedStat": "تمت مراجعتها",
+      "durationStat": "المدة",
+      "avgRatingStat": "متوسط التقييم",
+      "ratingBreakdownSection": "تفصيل التقييمات",
+      "wordsReviewedSection": "الكلمات التي تمت مراجعتها",
+      "retryStruggled": "إعادة البطاقات الصعبة",
+      "reviewAllAgain": "مراجعة الكل مرة أخرى",
+      "backToVault": "العودة للخزنة"
+    },
+    "custom": {
+      "backAriaLabel": "رجوع",
+      "pageTitle": "دراسة مخصصة",
+      "sourceSection": "المصدر",
+      "masteryFilterSection": "التصفية حسب مستوى الإتقان",
+      "sortOrderSection": "ترتيب الفرز",
+      "cardLimitSection": "حد البطاقات",
+      "matchingCountLabel": "بطاقات تطابق مرشحاتك",
+      "startSessionBtn": "بدء الجلسة",
+      "noCardsMatchMsg": "لا توجد بطاقات تطابق مرشحاتك",
+      "noCardsMatchToast": "لا توجد بطاقات تطابق مرشحاتك."
+    },
+    "mastery": {
+      "backAriaLabel": "رجوع",
+      "pageTitle": "تفصيل الإتقان",
+      "selectCollectionMsg": "اختر مجموعة",
+      "barsLabel": "البطاقات حسب مستوى الإتقان",
+      "reviewLevelAriaLabel": "مراجعة هذا المستوى",
+      "tipText": "اضغط على زر ▶ التشغيل بجانب أي مستوى لبدء جلسة مراجعة بتلك البطاقات فقط."
+    },
+    "history": {
+      "backAriaLabel": "رجوع",
+      "pageTitle": "سجل الجلسات",
+      "allSessionsTab": "جميع الجلسات",
+      "thisWeekTab": "هذا الأسبوع",
+      "thisMonthTab": "هذا الشهر",
+      "ratingsStatLabel": "التقييمات",
+      "durationStatLabel": "المدة",
+      "struggledStatLabel": "صعبة",
+      "nailedStatLabel": "متقنة",
+      "noSessionsTitle": "لا توجد جلسات مراجعة بعد.",
+      "noSessionsDesc": "ابدأ أول مراجعة لك لرؤية السجل هنا!"
+    },
+    "struggling": {
+      "backAriaLabel": "رجوع",
+      "pageTitle": "البطاقات الصعبة",
+      "needsAttentionMsg": "بطاقات تحتاج اهتمامًا إضافيًا",
+      "focusMsg": "هذه البطاقات تفشل باستمرار. ركز عليها لتتجاوز العقبة.",
+      "failSingular": "فشل",
+      "failPlural": "إخفاقات",
+      "reviewAllBtn": "مراجعة الكل",
+      "noCardsTitle": "لا توجد بطاقات صعبة!",
+      "encouragementMsg": "أداؤك ممتاز. استمر!"
+    }
+  },
+  "listen": {
+    "main": {
+      "pageTitle": "استمع وتعلم"
+    },
+    "hero": {
+      "playingFromLabel": "يتم التشغيل من",
+      "queueCountLabel": "{{count}} كلمات في قائمة الانتظار",
+      "playBtn": "تشغيل",
+      "shuffleBtn": "خلط",
+      "playlistTypeSection": "نوع قائمة التشغيل"
+    },
+    "controls": {
+      "speedSection": "السرعة"
+    },
+    "queue": {
+      "durationUnit": "د",
+      "headerLabel": "قائمة الانتظار",
+      "emptyTitle": "لا توجد كلمات في قائمة الانتظار",
+      "emptyDesc": "اضغط على المصدر أعلاه لاختيار قائمة تشغيل",
+      "previewAriaLabel": "معاينة الصوت"
+    },
+    "sourceSheet": {
+      "title": "اختر مصدر قائمة التشغيل"
+    },
+    "source": {
+      "todaysDueLabel": "كلمات اليوم المستحقة",
+      "todaysDueDesc": "بطاقات مجدولة لليوم",
+      "collectionLabel": "مجموعة",
+      "collectionDesc": "اختر مجموعة محددة",
+      "allCardsLabel": "جميع البطاقات",
+      "allCardsDesc": "جميع مفرداتك",
+      "strugglingLabel": "كلمات صعبة",
+      "strugglingDesc": "إتقان ٠–٢، تحتاج تدريبًا"
+    },
+    "nowPlaying": {
+      "pageTitle": "قيد التشغيل",
+      "sessionComplete": "اكتملت الجلسة!",
+      "seeSummary": "عرض الملخص",
+      "audioUnavailable": "الصوت غير متاح",
+      "retryBtn": "إعادة المحاولة",
+      "skipCard": "تخطي هذه البطاقة",
+      "grammarTipLabel": "نصيحة النحو"
+    },
+    "playlistMode": {
+      "compactLabel": "مختصر",
+      "compactDesc": "كلمة + معنى",
+      "examplesLabel": "أمثلة",
+      "examplesDesc": "جمل كاملة",
+      "deepDiveLabel": "تعمق",
+      "deepDiveDesc": "+ نصيحة نحوية"
+    },
+    "card": {
+      "collectionPrefix": "المجموعة:"
+    }
+  },
+  "stories": {
+    "library": {
+      "pageTitle": "استوديو القصص",
+      "generateAriaLabel": "إنشاء قصة جديدة",
+      "exploreSection": "استكشاف",
+      "exploreLink": "عرض الكل →",
+      "exploreErrorMsg": "تعذر تحميل القصص. اسحب للتحديث.",
+      "noStoriesYetMsg": "القصص في طريقها! تحقق لاحقًا.",
+      "noStoriesFilteredMsg": "لم يتم العثور على قصص لهذا المرشح.",
+      "premiumBadge": "Pro",
+      "myStoriesSection": "قصصي",
+      "savedLabel": "محفوظة",
+      "generateFirstLink": "أنشئ الأولى →",
+      "noStoriesTitle": "لا توجد قصص بعد",
+      "noStoriesDesc": "أنشئ أول قصة من مفرداتك.",
+      "generateBtn": "إنشاء قصة",
+      "incompleteStatus": "غير مكتملة",
+      "extendBtn": "تمديد",
+      "extendingLabel": "جارٍ التمديد…",
+      "listenBtn": "استماع",
+      "readBtn": "قراءة",
+      "moreOptionsAriaLabel": "خيارات إضافية",
+      "deleteAction": "حذف القصة",
+      "cancelAction": "إلغاء",
+      "deleteAlertHeader": "حذف القصة",
+      "deleteAlertMsg": "هل تريد إزالة \"{{title}}\"؟ سيتم حذف الصوت أيضًا.",
+      "deleteActionBtn": "حذف",
+      "extensionFailedToast": "فشل التمديد — يرجى المحاولة مرة أخرى."
+    },
+    "reader": {
+      "backAriaLabel": "رجوع",
+      "toggleTranslationTitle": "تبديل الترجمة",
+      "toggleTranslationAriaLabel": "تبديل الترجمة",
+      "learnedLabel": "تم تعلمها",
+      "markAsLearnedLabel": "تحديد كمُتعلمة",
+      "storyTab": "القصة",
+      "quizTab": "الاختبار",
+      "keywordsTab": "الكلمات المفتاحية",
+      "grammarTab": "القواعد",
+      "generatingAudio": "جارٍ إنشاء السرد الصوتي…",
+      "preparingAudio": "جارٍ تحضير الصوت…",
+      "closeWordPanelAriaLabel": "إغلاق لوحة الكلمة",
+      "pluralLabel": "الجمع",
+      "playPronunciationAriaLabel": "تشغيل النطق",
+      "alreadyInVaultAriaLabel": "موجودة بالفعل في الخزنة",
+      "addToVaultAriaLabel": "إضافة إلى الخزنة",
+      "conjugateBtn": "تصريف ▸",
+      "praesensHeader": "Präsens",
+      "praeteritumHeader": "Präteritum",
+      "perfektLabel": "Perfekt:",
+      "imperativLabel": "Imperativ:",
+      "noConjugationData": "لا تتوفر بيانات تصريف.",
+      "pauseAriaLabel": "إيقاف مؤقت",
+      "playAriaLabel": "تشغيل",
+      "restartAriaLabel": "إعادة التشغيل",
+      "loadingMsg": "جارٍ تحميل القصة…"
+    },
+    "complete": {
+      "backAriaLabel": "العودة للمكتبة",
+      "pageTitle": "اكتملت القصة",
+      "title": "قراءة ممتازة!",
+      "finishedMsg": "أنهيت \"{{title}}\"",
+      "vocabWordsLabel": "كلمات مفردات",
+      "sentencesLabel": "جمل",
+      "listenSingular": "استماع",
+      "listenPlural": "استماعات",
+      "wordsSection": "الكلمات في هذه القصة",
+      "readAgainBtn": "إعادة القراءة",
+      "moreStoriesBtn": "المزيد من القصص",
+      "loadingMsg": "جارٍ التحميل…"
+    },
+    "generate": {
+      "pageTitle": "إنشاء قصة",
+      "closeAriaLabel": "إغلاق",
+      "freeStoriesUsedLabel": "قصص مجانية مستخدمة",
+      "pickCollectionsSection": "اختر مجموعات",
+      "selectedLabel": "محددة",
+      "noCollectionsMsg": "لا توجد مجموعات بعد. أضف كلمات إلى مجموعة أولًا.",
+      "wordsLabel": "كلمات",
+      "lengthSection": "طول القصة",
+      "freeOnlyHint": "قصيرة فقط في الخطة المجانية",
+      "longWarning": "قد يستغرق هذا حتى ٤٥ ثانية",
+      "difficultySection": "مستوى الصعوبة",
+      "estimatedWaitLong": "عادةً ٢٥–٤٠ ثانية",
+      "estimatedWaitShort": "عادةً ١٠–٢٠ ثانية",
+      "retryBtn": "حاول مرة أخرى",
+      "contactSupportLink": "تواصل مع الدعم",
+      "generateBtn": "إنشاء قصة",
+      "generatingDefaultMsg": "جارٍ إنشاء قصتك…"
+    },
+    "keywords": {
+      "extractingMsg": "جارٍ استخراج الكلمات المفتاحية…",
+      "noKeywordsMsg": "لا تتوفر كلمات مفتاحية لهذه القصة.",
+      "memorizeBtn": "حفظ الكلمات المفتاحية",
+      "playPronunciationTitle": "تشغيل النطق"
+    },
+    "grammar": {
+      "generatingMsg": "جارٍ إنشاء ملاحظات القواعد…",
+      "noNotesTitle": "لا تتوفر ملاحظات قواعد لهذه القصة.",
+      "noNotesDesc": "يتم إنشاء ملاحظات القواعد للقصص الجديدة.",
+      "exampleSection": "مثال",
+      "descriptionSection": "الوصف"
+    },
+    "quiz": {
+      "generatingMsg": "جارٍ إنشاء الاختبار…",
+      "noQuizTitle": "لا يتوفر اختبار لهذه القصة.",
+      "noQuizDesc": "يتم إنشاء الاختبارات للقصص الجديدة من الآن فصاعدًا.",
+      "correctLabel": "صحيحة",
+      "retakeBtn": "إعادة الاختبار",
+      "muteAriaLabel": "كتم صوت الإجابة",
+      "unmuteAriaLabel": "تشغيل صوت الإجابة",
+      "nextBtn": "التالي",
+      "pauseOnMistakesTitle": "التوقف عند الأخطاء",
+      "pauseOnMistakesDesc": "مراجعة الإجابة الصحيحة قبل المتابعة"
+    },
+    "length": {
+      "short": "قصير",
+      "medium": "متوسط",
+      "long": "طويل",
+      "veryLong": "طويل جداً",
+      "extraLong": "طويل للغاية",
+      "podcast": "بودكاست"
+    },
+    "category": {
+      "daily-life": "الحياة اليومية",
+      "travel": "السفر",
+      "food-culture": "الطعام والثقافة",
+      "work-career": "العمل والمهنة",
+      "technology": "التكنولوجيا",
+      "nature": "الطبيعة",
+      "fiction": "خيال"
+    },
+    "wordType": {
+      "noun": "اسم",
+      "verb": "فعل",
+      "adjective": "صفة",
+      "adverb": "ظرف",
+      "other": "أخرى"
+    },
+    "cardMeta": {
+      "words": "كلمات",
+      "min": "دقيقة",
+      "more": "+{{count}} أخرى"
+    }
+  },
+  "settings": {
+    "goals": {
+      "title": "أهداف الدراسة",
+      "backAria": "رجوع",
+      "targetsSection": "الأهداف",
+      "daily": {
+        "name": "يومي",
+        "desc": "بطاقات في اليوم للحفاظ على سلسلتك",
+        "decreaseAria": "تقليل الهدف اليومي",
+        "increaseAria": "زيادة الهدف اليومي"
+      },
+      "weekly": {
+        "name": "أسبوعي",
+        "desc": "إجمالي البطاقات المراجعة في الأسبوع",
+        "decreaseAria": "تقليل الهدف الأسبوعي",
+        "increaseAria": "زيادة الهدف الأسبوعي"
+      },
+      "monthly": {
+        "name": "شهري",
+        "desc": "إجمالي البطاقات المراجعة في الشهر",
+        "decreaseAria": "تقليل الهدف الشهري",
+        "increaseAria": "زيادة الهدف الشهري"
+      },
+      "streakNote": "🔥 تحقيق هدفك اليومي يمدد سلسلتك. فوّت يومًا وستنقطع السلسلة."
+    },
+    "goalsPrompt": {
+      "titleFirstTime": "حدد أهداف دراستك",
+      "titleUpdate": "حان وقت تحديث أهدافك",
+      "bodyFirstTime": "أخبر LinguaCard بمقدار ما تريد دراسته يوميًا. أهدافك تشكّل سلسلتك وتساعدك على البقاء على المسار.",
+      "bodyUpdate": "مر وقت منذ آخر تحديث لأهدافك. خذ لحظة للتأكد من أنها لا تزال تناسب وتيرتك.",
+      "cards": "بطاقات",
+      "setMyGoals": "تحديد أهدافي",
+      "updateMyGoals": "تحديث أهدافي"
+    },
+    "reminders": {
+      "title": "التذكيرات",
+      "backAriaLabel": "رجوع",
+      "pageTitle": "التذكيرات",
+      "dailyReminderSection": "التذكير اليومي",
+      "enableToggleLabel": "تفعيل التذكيرات",
+      "enableDesc": "احصل على إشعار في المتصفح إذا لم تحقق هدفك",
+      "toggleAriaLabel": "تبديل التذكيرات",
+      "permissionDeniedMsg": "تم رفض إذن الإشعارات. لتفعيل التذكيرات، افتح إعدادات المتصفح واسمح بالإشعارات لهذا الموقع.",
+      "timeLabel": "وقت التذكير",
+      "timeDesc": "سنذكرك فقط إذا لم يتحقق هدفك بعد",
+      "howItWorksMsg": "تستخدم التذكيرات نظام إشعارات المتصفح وتعمل حتى عند إغلاق LinguaCard. إشعارات تطبيق الجوال (iOS / Android) قادمة لاحقًا.",
+      "unsupportedMsg": "متصفحك الحالي لا يدعم إشعارات الويب. جرب فتح LinguaCard في Chrome أو Edge، أو ثبّته كتطبيق ويب تقدمي.",
+      "permissionSection": "الإذن",
+      "grantedTitle": "الإشعارات مسموح بها",
+      "deniedTitle": "الإشعارات محظورة",
+      "defaultTitle": "الإشعارات",
+      "grantedDesc": "ممنوح لهذا المتصفح ✓",
+      "deniedDesc": "محظورة — غيّر من إعدادات المتصفح",
+      "defaultDesc": "لم يُطلب بعد"
+    },
+    "theme": {
+      "darkMode": "الوضع الداكن"
+    },
+    "dangerZone": {
+      "resetTitle": "إعادة تعيين جميع البيانات",
+      "resetWarning": "سيتم حذف جميع كلماتك ومجموعاتك وسجل المراجعة والتقدم نهائيًا. سيظل حسابك نشطًا.",
+      "irreversible": "لا يمكن التراجع عن هذا الإجراء.",
+      "deleteDetails": "سيتم حذف جميع الكلمات الـ {{wordCount}} والمجموعات الـ {{collectionCount}} نهائيًا.",
+      "confirmPassword": "أدخل كلمة المرور للتأكيد",
+      "confirm": "نعم، احذف كل شيء"
+    },
+    "language": {
+      "title": "اللغة",
+      "backAria": "رجوع",
+      "subtitle": "اختر لغة الواجهة",
+      "currentLabel": "الحالية"
+    }
+  },
+  "sync": {
+    "status": {
+      "label": "حالة المزامنة",
+      "pending": "{{count}} قيد الانتظار",
+      "syncing": "جارٍ المزامنة…",
+      "error": "خطأ في المزامنة",
+      "errorRetry": "خطأ في المزامنة — اضغط لإعادة المحاولة",
+      "synced": "تمت المزامنة"
+    },
+    "notifications": {
+      "recovered": "تعافت المزامنة — البيانات محدّثة",
+      "changesSynced": "تمت مزامنة {{count}} تغيير(ات) في قائمة الانتظار",
+      "upToDate": "كل شيء محدّث",
+      "partialFailure": "تعذرت مزامنة بعض البيانات. ستتم إعادة المحاولة.",
+      "failed": "فشلت المزامنة — ستتم إعادة المحاولة تلقائيًا",
+      "retryNow": "إعادة المحاولة الآن"
+    }
+  },
+  "offline": {
+    "banner": {
+      "message": "أنت غير متصل — يتم عرض البيانات المحفوظة"
+    }
+  },
+  "pwa": {
+    "install": {
+      "title": "إضافة إلى الشاشة الرئيسية",
+      "subtitle": "ثبّت LinguaCard للوصول السريع"
+    },
+    "installIos": {
+      "tap": "اضغط",
+      "action": "إضافة إلى الشاشة الرئيسية"
+    }
+  },
+  "srs": {
+    "status": {
+      "due": "مستحقة",
+      "interval": "فاصل {{days}} يوم"
+    },
+    "masteryLabel": {
+      "new": "جديدة",
+      "learning": "قيد التعلم",
+      "review": "مراجعة",
+      "mastered": "متقنة",
+      "familiar": "مألوف",
+      "good": "جيد"
+    },
+    "breakdownTag": {
+      "new": "جديد",
+      "hard": "صعب",
+      "learning": "قيد التعلم",
+      "review": "مراجعة"
+    },
+    "selectCollection": "اختر مجموعة",
+    "allCollections": "كل المجموعات",
+    "alreadyInVault": "موجود بالفعل في خزنتك",
+    "alreadyInCollection": "موجود بالفعل في \"{{name}}\""
+  },
+  "subscription": {
+    "paywall": {
+      "title": "افتح قصصًا غير محدودة",
+      "subtitle": "لقد استخدمت قصصك المجانية الثلاث. ترقَّ إلى Pro للحصول على:",
+      "benefit1": "إنشاء قصص غير محدود",
+      "benefit2": "Claude Sonnet — أعلى جودة",
+      "benefit3": "دعم ذو أولوية",
+      "requestBtn": "طلب الوصول إلى Pro",
+      "dismissBtn": "ليس الآن"
+    }
+  },
+  "admin": {
+    "import": {
+      "label": "استيراد المشرف",
+      "pageTitle": "استيراد المسؤول",
+      "tabs": {
+        "wordList": "قائمة الكلمات",
+        "json": "استيراد JSON",
+        "story": "قصة",
+        "collections": "المجموعات"
+      },
+      "fields": {
+        "title": "العنوان *",
+        "level": "المستوى *",
+        "topic": "الموضوع *",
+        "emoji": "إيموجي",
+        "words": "الكلمات (واحدة في كل سطر)",
+        "json": "بيانات JSON",
+        "storyJson": "JSON القصة"
+      },
+      "buttons": {
+        "importCollection": "استيراد المجموعة",
+        "importJson": "استيراد مجموعة JSON",
+        "importStory": "استيراد القصة"
+      },
+      "status": {
+        "loading": "جارٍ التحميل…",
+        "noCollections": "لا توجد مجموعات بعد. قم باستيراد واحدة أولاً."
+      }
+    }
+  },
+  "wordDetail": {
+    "pageTitle": "تفاصيل الكلمة",
+    "backAria": "رجوع",
+    "moreOptionsAria": "خيارات إضافية",
+    "playPluralAria": "تشغيل الجمع",
+    "playExampleAria": "تشغيل جملة المثال",
+    "playSynonymExampleAria": "تشغيل مثال المرادف",
+    "generating": "جارٍ التوليد…",
+    "listenToPronunciation": "استمع للنطق",
+    "aiAudioCached": "صوت الذكاء الاصطناعي محفوظ على الجهاز",
+    "generatingAudio": "جارٍ إنشاء الصوت…",
+    "gender": {
+      "masculine": "مذكر",
+      "feminine": "مؤنث",
+      "neuter": "محايد"
+    },
+    "plural": "الجمع",
+    "masteryProgress": "تقدم الإتقان",
+    "level": "المستوى {{level}} — {{label}}",
+    "stats": {
+      "reviews": "المراجعات",
+      "recallChance": "احتمال التذكر",
+      "stability": "الثبات",
+      "lastSeen": "آخر مرة"
+    },
+    "nextReview": {
+      "dueNow": "مستحقة الآن",
+      "tomorrow": "غدًا",
+      "inDays": "المراجعة القادمة بعد {{days}} أيام"
+    },
+    "lastReviewed": {
+      "never": "أبدًا",
+      "today": "اليوم",
+      "daysAgo": "قبل {{days}} يوم"
+    },
+    "sections": {
+      "exampleSentences": "جمل أمثلة",
+      "synonyms": "مرادفات"
+    },
+    "rateThisWord": "قيّم هذه الكلمة",
+    "emptyState": {
+      "title": "الكلمة غير موجودة",
+      "subtitle": "ربما تم حذف هذه الكلمة من خزنتك."
+    },
+    "deleteConfirm": {
+      "title": "حذف الكلمة",
+      "message": "هل تريد إزالة \"{{word}}\" من خزنتك؟ لا يمكن التراجع عن هذا.",
+      "confirmButton": "حذف"
+    },
+    "toast": {
+      "deleted": "تم حذف الكلمة",
+      "updated": "تم تحديث الكلمة"
+    }
+  },
+  "imageImport": {
+    "title": "الاستيراد من صورة",
+    "bestResults": {
+      "label": "للحصول على أفضل النتائج",
+      "tip1": "إضاءة جيدة — تجنب الظلال على النص",
+      "tip2": "أمسك الكاميرا ثابتة — الصور الضبابية قد تفوت الكلمات",
+      "tip3": "الصور الكبيرة التي تحتوي على كلمات كثيرة تعمل بشكل أفضل على دفعات"
+    }
+  },
+  "tabs": {
+    "home": "الرئيسية",
+    "vault": "الخزنة",
+    "review": "المراجعة",
+    "stories": "القصص",
+    "listen": "استماع"
+  }
+}

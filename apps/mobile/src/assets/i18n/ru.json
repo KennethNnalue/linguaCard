@@ -1,0 +1,1194 @@
+{
+  "common": {
+    "appName": "LinguaCard",
+    "cancel": "Отмена",
+    "close": "Закрыть",
+    "save": "Сохранить",
+    "delete": "Удалить",
+    "retry": "Повторить",
+    "loading": "Загрузка…",
+    "back": "Назад",
+    "done": "Готово",
+    "or": "или",
+    "install": "Установить",
+    "dismiss": "Закрыть",
+    "notNow": "Не сейчас",
+    "email": "Эл. почта",
+    "password": "Пароль",
+    "fullName": "Полное имя",
+    "words": "слов",
+    "cards": "карточек",
+    "due": "к повторению",
+    "min": "мин",
+    "of": "из",
+    "new": "Новые",
+    "all": "Все",
+    "today": "сегодня",
+    "placeholder": {
+      "email": "you@example.com",
+      "password": "••••••••",
+      "name": "Jan Schmidt"
+    },
+    "error": {
+      "generic": "Что-то пошло не так. Попробуйте ещё раз."
+    },
+    "divider": {
+      "or": "или"
+    },
+    "aria": {
+      "toggleDarkMode": "Переключить тёмный режим",
+      "togglePasswordVisibility": "Показать/скрыть пароль",
+      "close": "Закрыть",
+      "closeMenu": "Закрыть меню",
+      "quickActions": "Быстрые действия",
+      "addCard": "Добавить карточку",
+      "newCollection": "Новая коллекция",
+      "import": "Импорт",
+      "backToLogin": "Вернуться к входу",
+      "syncStatus": "Статус синхронизации",
+      "playPronunciation": "Воспроизвести произношение",
+      "share": "Поделиться"
+    },
+    "account": "Аккаунт",
+    "refresh": "Обновить",
+    "yesterday": "Вчера",
+    "daysAgoLabel": "{{count}} дней назад",
+    "todayCapital": "Сегодня"
+  },
+  "auth": {
+    "login": {
+      "tagline": "Осваивайте немецкую лексику",
+      "signIn": "Войти",
+      "forgotPassword": "Забыли пароль?",
+      "noAccount": "Нет аккаунта?"
+    },
+    "register": {
+      "title": "Создать аккаунт",
+      "tagline": "Начните своё языковое путешествие",
+      "passwordHint": "Мин. 8 символов",
+      "submit": "Создать аккаунт",
+      "hasAccount": "Уже есть аккаунт?",
+      "error": "Регистрация не удалась. Попробуйте ещё раз."
+    },
+    "forgotPassword": {
+      "title": "Сброс пароля",
+      "heading": "Забыли пароль?",
+      "description": "Введите вашу почту, и мы отправим ссылку для сброса.",
+      "submit": "Отправить ссылку",
+      "remember": "Вспомнили пароль?",
+      "checkEmail": "Проверьте почту",
+      "linkSent": "Мы отправили ссылку для сброса пароля на",
+      "notReceived": "Не получили? Проверьте папку «Спам» или подождите несколько минут.",
+      "backToLogin": "Вернуться к входу"
+    },
+    "validation": {
+      "emailInvalid": "Введите корректный адрес электронной почты",
+      "passwordMinLength": "Пароль должен содержать не менее 8 символов",
+      "nameMinLength": "Имя должно содержать не менее 2 символов"
+    },
+    "oauth": {
+      "google": "Продолжить с Google",
+      "googleComingSoon": "Вход через Google скоро появится"
+    },
+    "signOut": "Выйти",
+    "reset": {
+      "passwordIncorrect": "Неверный пароль. Попробуйте ещё раз.",
+      "success": "✓ Все данные сброшены. Начните с чистого листа!"
+    }
+  },
+  "home": {
+    "greeting": {
+      "morning": "Доброе утро",
+      "afternoon": "Добрый день",
+      "evening": "Добрый вечер"
+    },
+    "hero": {
+      "completeGreeting": "Отличная работа",
+      "completeTitle": "Цель на сегодня выполнена ✓",
+      "readyTitle": "Готовы учиться сегодня?"
+    },
+    "stats": {
+      "dueLabel": "к повторению",
+      "newCardsLabel": "новых карточек",
+      "reviewsLabel": "повторений"
+    },
+    "actions": {
+      "startSession": "Начать занятие",
+      "filter": "Фильтр"
+    },
+    "atRisk": {
+      "keepStreakPrefix": "Повторите сейчас, чтобы сохранить серию в",
+      "keepStreakSuffix": "дн.",
+      "startStreakSuffix": "карточек сегодня, чтобы начать серию",
+      "dailyGoalSuffix": "ещё карточек до дневной цели",
+      "reviewText": "Повторить",
+      "startButton": "Начать"
+    },
+    "streak": {
+      "label": "Дней подряд",
+      "onTrack": "Сегодня всё по плану ✓",
+      "atRisk": "Под угрозой!",
+      "broken": "Начните новую серию"
+    },
+    "goalRing": {
+      "label": "Дневная цель",
+      "todayLabel": "сегодня",
+      "doneLabel": "готово",
+      "notStarted": "Не начато",
+      "toGoLabel": "осталось"
+    },
+    "wordOfDay": {
+      "label": "✦ Слово дня",
+      "playAria": "Воспроизвести произношение"
+    },
+    "weeklyChart": {
+      "title": "Эта неделя",
+      "detailsLink": "Подробнее →",
+      "reviewed": "карточек повторено",
+      "goalLabel": "Цель:"
+    },
+    "quickActions": {
+      "title": "Быстрые действия",
+      "scanLabel": "Скан",
+      "scanSub": "Импорт слов",
+      "storyLabel": "Рассказ",
+      "storySub": "Создать новый",
+      "listenLabel": "Слушать",
+      "listenSub": "Аудиоплейлист"
+    },
+    "recentCards": {
+      "title": "Недавно добавленные",
+      "seeAllLink": "Все →"
+    },
+    "collectionFilter": {
+      "allLabel": "Все коллекции"
+    },
+    "wotd": {
+      "genderMasculine": "мужской род",
+      "genderFeminine": "женский род",
+      "genderNeuter": "средний род"
+    }
+  },
+  "vault": {
+    "title": "Хранилище",
+    "addCard": "Добавить карточку",
+    "import": "Импорт",
+    "newCollection": "Новая коллекция",
+    "search": {
+      "placeholder": "Поиск слов…",
+      "aria": "Поиск по словарю"
+    },
+    "filter": {
+      "allLabel": "Все",
+      "dueLabel": "К повторению",
+      "newLabel": "Новые",
+      "masteredLabel": "Освоенные",
+      "needReviewText": "нужно повторить",
+      "neverStudiedText": "не изучались"
+    },
+    "sort": {
+      "title": "Сортировка",
+      "newestFirst": "Сначала новые",
+      "alphabetical": "А–Я (по алфавиту)",
+      "masteryLowest": "Уровень (сначала низкий)",
+      "dueDate": "Дата повторения"
+    },
+    "emptyState": {
+      "title": "Слова не найдены",
+      "subtitle": "Попробуйте другой фильтр или поиск"
+    },
+    "tabs": {
+      "wordsLabel": "Слова",
+      "collectionsLabel": "Коллекции",
+      "wordsAria": "Вкладка «Слова»",
+      "collectionsAria": "Вкладка «Коллекции»"
+    },
+    "afterCreate": {
+      "title": "Добавить слова в коллекцию?",
+      "importOption": "Импортировать слова",
+      "goToOption": "Перейти к коллекции",
+      "laterOption": "Может быть, позже"
+    },
+    "collectionFilter": {
+      "title": "Фильтр по коллекции"
+    },
+    "collections": {
+      "totalWordsLabel": "Всего слов",
+      "collectionsLabel": "Коллекции",
+      "dueTodayLabel": "К повторению сегодня",
+      "emptyTitle": "Коллекций пока нет",
+      "emptySubtitle": "Нажмите + Новая коллекция, чтобы начать"
+    }
+  },
+  "collections": {
+    "title": "Коллекции",
+    "segments": {
+      "mySets": "Мои наборы",
+      "explore": "Обзор"
+    },
+    "mySets": {
+      "totalLabel": "Всего во всех наборах",
+      "wordsUnit": "слов",
+      "dueLabel": "К повторению сегодня",
+      "emptyTitle": "Наборов пока нет",
+      "emptySubtitle": "Нажмите +, чтобы создать, или откройте библиотеку"
+    },
+    "explore": {
+      "searchPlaceholder": "Поиск наборов и тем…",
+      "allLevel": "Все",
+      "emptyTitle": "Нет наборов на этом уровне",
+      "emptySubtitle": "Попробуйте другой уровень или очистите поиск",
+      "seeAllLink": "Все ›",
+      "openButton": "Открыть",
+      "getButton": "+ Добавить",
+      "getNewButton": "+ Новые",
+      "addingLabel": "Добавление…",
+      "forYouLabel": "ДЛЯ ВАС"
+    },
+    "card": {
+      "masteredLabel": "освоено",
+      "completeLabel": "завершено",
+      "libraryBadge": "ИЗ БИБЛИОТЕКИ",
+      "dueLabel": "к повторению",
+      "upToDateLabel": "всё повторено",
+      "wordsLabel": "слов"
+    },
+    "adopt": {
+      "successMessage": "успешно",
+      "alreadyInSetsMessage": "Уже в ваших наборах",
+      "errorMessage": "Не удалось добавить коллекцию. Попробуйте ещё раз."
+    },
+    "afterCreate": {
+      "title": "Добавить слова в коллекцию?",
+      "csvOption": "Импорт из CSV",
+      "imageOption": "Импорт из изображения",
+      "goToOption": "Перейти к коллекции",
+      "laterOption": "Может быть, позже"
+    }
+  },
+  "collectionDetail": {
+    "nav": {
+      "backAria": "Назад",
+      "optionsAria": "Настройки"
+    },
+    "incompleteImport": {
+      "title": "Импорт не завершён",
+      "subtitle": "слов ещё без карточек",
+      "completeButton": "Завершить"
+    },
+    "audio": {
+      "preparingLabel": "Подготовка аудио…",
+      "readyUnit": "слов готово"
+    },
+    "hero": {
+      "wordsLabel": "слов",
+      "dueLabel": "к повторению",
+      "masteredLabel": "освоено"
+    },
+    "actions": {
+      "reviewAllLabel": "Повторить все",
+      "reviewLabel": "Повторить",
+      "listenLabel": "Слушать"
+    },
+    "categories": {
+      "allLabel": "Все"
+    },
+    "emptyState": {
+      "title": "Слов пока нет",
+      "subtitle": "Нажмите +, чтобы добавить первое слово"
+    },
+    "pending": {
+      "label": "Ожидание",
+      "instruction": "— нажмите «Завершить» выше"
+    },
+    "menu": {
+      "clearAllOption": "Удалить все слова",
+      "deleteOption": "Удалить коллекцию",
+      "cancelOption": "Отмена"
+    },
+    "clearWords": {
+      "title": "Удалить все слова?",
+      "message": "Это навсегда удалит все {{count}} слов в «{{name}}». Отменить это действие нельзя.",
+      "confirmButton": "Удалить все"
+    },
+    "deleteCollection": {
+      "title": "Удалить коллекцию?",
+      "message": "Слова не будут удалены — они останутся в разделе «Все слова» в Хранилище.",
+      "confirmButton": "Удалить"
+    },
+    "importComplete": {
+      "allAddedMessage": "Все карточки добавлены — коллекция готова!",
+      "cardsAddedWithAudio": "{{count}} карточек добавлено — аудио включено ✓",
+      "alreadyInMessage": "Уже в ваших наборах",
+      "errorMessage": "Не удалось завершить импорт. Попробуйте позже.",
+      "addedWithDuplicates": "✓ {{added}} добавлено, {{duplicates}} дубликат(ов) использовано повторно — коллекция готова!",
+      "allAlreadyMessage": "Все {{count}} уже в вашем хранилище — коллекция готова!"
+    }
+  },
+  "platformCollectionDetail": {
+    "nav": {
+      "breadcrumb": "Обзор",
+      "backAria": "Назад"
+    },
+    "hero": {
+      "descriptionSuffix": "слов · с аудио"
+    },
+    "progressBanner": {
+      "knowPrefix": "Вы уже знаете",
+      "wordsSuffix": "слов отсюда.",
+      "addingPrefix": "Добавление этого набора принесёт",
+      "newCardsSuffix": "новых карточек",
+      "instantlySuffix": "— мгновенно.",
+      "allNewForYouSuffix": "все новые для вас."
+    },
+    "adoptedBanner": {
+      "inSetsLabel": "В ваших наборах",
+      "wordsKnownSuffix": "слов изучено"
+    },
+    "wordGroups": {
+      "newHereLabel": "Новые здесь",
+      "alreadyYoursLabel": "Уже у вас",
+      "expandLabel": "нажмите, чтобы развернуть",
+      "collapseLabel": "нажмите, чтобы свернуть",
+      "yoursChip": "✓ ВАШЕ"
+    },
+    "shelf": {
+      "title": "Рассказы с этими словами"
+    },
+    "story": {
+      "minLabel": "мин"
+    },
+    "footer": {
+      "openButton": "Открыть в «Мои наборы»",
+      "getButton": "+ Добавить",
+      "getNewButton": "+ Добавить новые слова",
+      "addingLabel": "Добавление…",
+      "generateStoryButton": "Создать рассказ из этого набора",
+      "instantNote": "Мгновенно — без ожидания, аудио включено"
+    },
+    "adopt": {
+      "successMessage": "{{count}} слов добавлено — аудио включено ✓",
+      "alreadyInMessage": "Уже в ваших наборах",
+      "errorMessage": "Не удалось добавить коллекцию. Попробуйте ещё раз."
+    }
+  },
+  "exploreTopic": {
+    "nav": {
+      "backAria": "Назад",
+      "setsLabel": "наборов"
+    },
+    "emptyState": {
+      "title": "Нет наборов по этой теме",
+      "subtitle": "Попробуйте изменить фильтр уровня"
+    },
+    "card": {
+      "masteredLabel": "освоено",
+      "inSetsLabel": "В ваших наборах",
+      "knownLabel": "изучено",
+      "newLabel": "новых",
+      "wordsUnit": "слов",
+      "allNewLabel": "все новые",
+      "openButton": "Открыть",
+      "getButton": "+ Добавить",
+      "getNewButton": "+ Новые",
+      "addingLabel": "Добавление…"
+    },
+    "adopt": {
+      "successMessage": "{{count}} слов добавлено — аудио включено ✓",
+      "alreadyInMessage": "Уже в ваших наборах",
+      "errorMessage": "Не удалось добавить коллекцию. Попробуйте ещё раз."
+    }
+  },
+  "addWord": {
+    "nav": {
+      "closeAria": "Закрыть",
+      "editTitle": "Редактировать слово",
+      "addTitle": "Добавить новое слово"
+    },
+    "langDirection": {
+      "label": "Направление перевода",
+      "english": "🇷🇺 Русский",
+      "arrow": "→",
+      "german": "🇩🇪 Немецкий"
+    },
+    "back": {
+      "label": "Обратная сторона — Немецкий",
+      "hint": "(артикль определяется автоматически)",
+      "placeholder": "German word (e.g. Zug)",
+      "autoGenAria": "Автоматически создать перевод, множественное число и синонимы",
+      "autoGenLabel": "Авто",
+      "generatingLabel": "Генерация…",
+      "libraryBanner": "Заполнено из библиотеки — без вызова ИИ"
+    },
+    "article": {
+      "label": "Артикль",
+      "noneOption": "Нет"
+    },
+    "front": {
+      "label": "Лицевая сторона — Русский",
+      "placeholder": "e.g. the train"
+    },
+    "plural": {
+      "label": "Множественное число",
+      "hint": "— включая артикль",
+      "placeholder": "e.g. die Flugzeuge"
+    },
+    "synonyms": {
+      "label": "Синонимы",
+      "newLabel": "Новый синоним",
+      "addButton": "Добавить синоним",
+      "removeAria": "Удалить синоним",
+      "wordPlaceholder": "Слово-синоним",
+      "translationPlaceholder": "Перевод (английский)",
+      "examplePlaceholder": "Пример предложения (немецкий)",
+      "exampleNativePlaceholder": "Перевод примера (английский)"
+    },
+    "duplicateWarning": {
+      "messageSuffix": "уже существует",
+      "inLabel": "в",
+      "defaultLocation": "в вашем хранилище",
+      "addAnywayButton": "Всё равно добавить",
+      "goToButton": "Перейти к существующему"
+    },
+    "collection": {
+      "label": "Коллекция",
+      "requiredHint": "*обязательно",
+      "noSelectionLabel": "Без коллекции"
+    },
+    "category": {
+      "label": "Категория",
+      "newButton": "Новая",
+      "cancelButton": "Отмена"
+    },
+    "newCategory": {
+      "placeholder": "Название категории",
+      "addButton": "Добавить"
+    },
+    "examples": {
+      "label": "Пример предложения",
+      "targetPlaceholder": "German sentence (e.g. Der Zug fährt um 8 Uhr ab.)",
+      "nativePlaceholder": "Перевод на русский"
+    },
+    "pronunciation": {
+      "label": "Произношение",
+      "recordButton": "Записать",
+      "ttsButton": "Озвучить"
+    },
+    "save": {
+      "savingLabel": "Сохранение…",
+      "editLabel": "Сохранить изменения",
+      "createLabel": "Сохранить в Хранилище"
+    },
+    "importLink": {
+      "text": "Добавить несколько слов? Импортируйте CSV →"
+    },
+    "errors": {
+      "autoGenFailed": "Автогенерация не удалась. Заполните вручную или попробуйте ещё раз."
+    }
+  },
+  "assignCollection": {
+    "title": "Добавить в коллекцию",
+    "closeAria": "Закрыть",
+    "wordsLabel": "слов",
+    "createNewLabel": "Создать новую коллекцию…",
+    "newCollection": {
+      "placeholder": "Название коллекции",
+      "creatingLabel": "Создание…",
+      "createButton": "Создать"
+    },
+    "confirmButton": "Подтвердить выбор",
+    "skipButton": "Пропустить"
+  },
+  "import": {
+    "nav": {
+      "closeAria": "Закрыть",
+      "backAria": "Назад",
+      "title": "Импорт слов"
+    },
+    "methods": {
+      "scanLabel": "Сканировать изображение",
+      "scanSubtitle": "Фото, меню, карточки",
+      "csvLabel": "Загрузить CSV",
+      "csvSubtitle": "Массовый импорт из файла"
+    },
+    "ai": {
+      "title": "Сгенерировать CSV с помощью ИИ",
+      "subtitle": "Скопируйте этот промпт в ChatGPT, Claude или любой ИИ",
+      "copiedLabel": "Скопировано!",
+      "steps": {
+        "step1": "Скопируйте промпт ниже",
+        "step2": "Вставьте в ИИ вместе со своими словами",
+        "step3": "Загрузите полученный CSV сюда"
+      },
+      "prompt": {
+        "label": "Промпт для ИИ",
+        "copiedLabel": "✓ Скопировано в буфер обмена",
+        "copyButton": "Копировать",
+        "copiedButton": "Скопировано!",
+        "footerAfterCopy": "Теперь откройте любой ИИ-инструмент, вставьте промпт, добавьте свои слова и скачайте CSV",
+        "footerDefault": "Работает с ChatGPT, Claude, Gemini, Copilot — с любым ИИ, генерирующим текст"
+      }
+    },
+    "downloadTemplate": "Скачать шаблон CSV (95 готовых слов)",
+    "errors": {
+      "invalidFileType": "Выберите файл формата .csv",
+      "noWordsFound": "В этом файле слова не найдены"
+    },
+    "toast": {
+      "promptCopied": "Промпт скопирован в буфер обмена"
+    }
+  },
+  "importReview": {
+    "nav": {
+      "backAria": "Назад",
+      "title": "Проверка импорта"
+    },
+    "fileInfo": {
+      "wordsDetected": "слов обнаружено"
+    },
+    "duplicates": {
+      "messagePrefix": "слов уже в вашем хранилище",
+      "deselectedNote": "(сняты с выбора)"
+    },
+    "reuseBar": {
+      "knownLabel": "известных",
+      "reuseText": "в библиотеке — используются бесплатно.",
+      "enrichText": "будут обогащены."
+    },
+    "summary": {
+      "totalLabel": "Всего",
+      "reuseLabel": "Повторное использование",
+      "newLabel": "Новые",
+      "inVaultLabel": "В хранилище",
+      "skippedLabel": "Пропущено"
+    },
+    "collection": {
+      "label": "ДОБАВИТЬ В КОЛЛЕКЦИЮ",
+      "requiredHint": "*обязательно"
+    },
+    "words": {
+      "label": "Слова (нажмите, чтобы выбрать / снять)",
+      "duplicateBadge": "В хранилище",
+      "reuseLabel": "★ библиотека",
+      "enrichLabel": "обогатить"
+    },
+    "importButton": {
+      "prefix": "Импортировать",
+      "wordSingular": "слово",
+      "wordsPlural": "слов",
+      "importingLabel": "Импорт…"
+    },
+    "cancel": {
+      "link": "Отмена"
+    },
+    "errors": {
+      "noCollectionSelected": "Выберите коллекцию перед импортом.",
+      "importFailed": "Импорт не удался. Попробуйте ещё раз."
+    },
+    "success": {
+      "newCardsSuffix": "слов добавлено в Хранилище",
+      "dictReuseText": "использовано из библиотеки",
+      "existingText": "уже существовали"
+    }
+  },
+  "imageProcessing": {
+    "nav": {
+      "cancelAria": "Отмена"
+    },
+    "phases": {
+      "extractingTitle": "Сканирование изображения",
+      "extractingSubtitle": "Подождите…",
+      "enrichingTitle": "Создание карточек",
+      "enrichingSubtitle": "Собираем вашу коллекцию…",
+      "partialTitle": "Почти готово",
+      "partialSubtitle": "карточек уже готово",
+      "doneTitle": "Готово!"
+    },
+    "image": {
+      "altText": "Сканирование изображения"
+    },
+    "phase1": {
+      "stepSubtitle": "Чтение слов с изображения"
+    },
+    "info": {
+      "note": "Шаг 1 из 2 — быстрое сканирование. Шаг 2 создаёт переводы и примеры предложений."
+    },
+    "progressCard": {
+      "label": "Прогресс",
+      "readyLabel": "готово",
+      "cardsLabel": "карточек",
+      "remainingLabel": "осталось"
+    },
+    "batchInfo": "Обработка по 10 слов за раз — прогресс сохраняется после каждой группы",
+    "partialBanner": {
+      "titleSuffix": "карточек будут добавлены позже",
+      "subtitle": "Лимит ИИ-запросов достигнут. В коллекции появится кнопка «Завершить» — нажмите её в любой момент."
+    },
+    "partialStats": {
+      "readyLabel": "Готово сейчас",
+      "pendingLabel": "Ожидают",
+      "totalLabel": "Всего найдено"
+    },
+    "cancel": {
+      "backgroundLabel": "Выполняется в фоне — можете покинуть этот экран",
+      "defaultLabel": "Отмена"
+    },
+    "errors": {
+      "noWordsFound": "Немецких слов на этом изображении не найдено."
+    }
+  },
+  "image": {
+    "camera": {
+      "label": "Сделать фото",
+      "hint": "Наведите на любой немецкий текст"
+    },
+    "gallery": {
+      "label": "Выбрать из галереи",
+      "hint": "Выберите существующее фото"
+    },
+    "error": {
+      "unsupportedFormat": "Неподдерживаемый формат изображения. Используйте JPEG, PNG или WebP.",
+      "cameraPermission": "Доступ к камере отклонён или недоступен."
+    }
+  },
+  "review": {
+    "hub": {
+      "cardsDueToday": "Карточки к повторению сегодня",
+      "dueLabel": "к повторению",
+      "allCaughtUp": "Всё повторено! 🎉",
+      "startTodaysReview": "Начать сегодняшнее повторение",
+      "nothingDueNow": "Сейчас нечего повторять",
+      "quickStudySection": "Быстрое изучение",
+      "strugglingCardsTitle": "Сложные карточки",
+      "strugglingCardsDesc": "Карточки с 3+ ошибками",
+      "newCardsOnlyTitle": "Только новые карточки",
+      "newCardsOnlyDesc": "Ещё не изученные слова",
+      "customStudyTitle": "Пользовательское занятие",
+      "customStudyDesc": "Создайте занятие с фильтрами",
+      "recentSessionsSection": "Последние занятия",
+      "seeAllLink": "Все →",
+      "allDueCardsLabel": "Все карточки к повторению",
+      "cardsUnit": "карточек",
+      "noSessionsTitle": "Занятий ещё не было.",
+      "noSessionsDesc": "Пройдите первое повторение, чтобы увидеть здесь историю.",
+      "masteryBreakdownAriaLabel": "Разбор по уровню освоения"
+    },
+    "session": {
+      "goBackAriaLabel": "Вернуться",
+      "pageTitle": "Занятие",
+      "yourLanguageLabel": "Ваш язык",
+      "englishLangChip": "🇷🇺 Русский",
+      "tapToRevealGerman": "Нажмите, чтобы показать немецкий",
+      "germanLangChip": "🇩🇪 Немецкий",
+      "pluralLabel": "Множественное число",
+      "synonymsHeader": "Синонимы",
+      "playPronunciationBtn": "Воспроизвести произношение",
+      "generatingAudio": "Генерация…",
+      "playExampleAriaLabel": "Воспроизвести пример",
+      "ratingPrompt": "Насколько хорошо вы знали это?",
+      "previousBtn": "Предыдущая",
+      "skipBtn": "Пропустить",
+      "allCaughtUpMsg": "Всё повторено!",
+      "noDueCardsMsg": "Сейчас нет карточек к повторению.",
+      "backToHomeBtn": "На главную"
+    },
+    "summary": {
+      "backAriaLabel": "Назад в хранилище",
+      "title": "Занятие завершено!",
+      "cardsReviewedLabel": "карточек повторено",
+      "reviewedStat": "Повторено",
+      "durationStat": "Длительность",
+      "avgRatingStat": "Средняя оценка",
+      "ratingBreakdownSection": "Разбор по оценкам",
+      "wordsReviewedSection": "Повторённые слова",
+      "retryStruggled": "Повторить сложные",
+      "reviewAllAgain": "Повторить все заново",
+      "backToVault": "Назад в хранилище"
+    },
+    "custom": {
+      "backAriaLabel": "Назад",
+      "pageTitle": "Пользовательское занятие",
+      "sourceSection": "Источник",
+      "masteryFilterSection": "Фильтр по уровню освоения",
+      "sortOrderSection": "Порядок сортировки",
+      "cardLimitSection": "Лимит карточек",
+      "matchingCountLabel": "Карточек, соответствующих фильтрам",
+      "startSessionBtn": "Начать занятие",
+      "noCardsMatchMsg": "Нет карточек по вашим фильтрам",
+      "noCardsMatchToast": "Нет карточек по вашим фильтрам."
+    },
+    "mastery": {
+      "backAriaLabel": "Назад",
+      "pageTitle": "Разбор по уровню освоения",
+      "selectCollectionMsg": "Выберите коллекцию",
+      "barsLabel": "Карточки по уровню освоения",
+      "reviewLevelAriaLabel": "Повторить этот уровень",
+      "tipText": "Нажмите ▶ рядом с любым уровнем, чтобы начать повторение только этих карточек."
+    },
+    "history": {
+      "backAriaLabel": "Назад",
+      "pageTitle": "История занятий",
+      "allSessionsTab": "Все занятия",
+      "thisWeekTab": "Эта неделя",
+      "thisMonthTab": "Этот месяц",
+      "ratingsStatLabel": "Оценки",
+      "durationStatLabel": "Длительность",
+      "struggledStatLabel": "Сложные",
+      "nailedStatLabel": "Отлично",
+      "noSessionsTitle": "Занятий ещё не было.",
+      "noSessionsDesc": "Начните первое повторение, чтобы увидеть здесь историю!"
+    },
+    "struggling": {
+      "backAriaLabel": "Назад",
+      "pageTitle": "Сложные карточки",
+      "needsAttentionMsg": "карточек требуют внимания",
+      "focusMsg": "Эти карточки часто отвечаются неправильно. Сосредоточьтесь на них.",
+      "failSingular": "ошибка",
+      "failPlural": "ошибок",
+      "reviewAllBtn": "Повторить все",
+      "noCardsTitle": "Нет сложных карточек!",
+      "encouragementMsg": "Вы отлично справляетесь. Так держать!"
+    }
+  },
+  "listen": {
+    "main": {
+      "pageTitle": "Слушай и учись"
+    },
+    "hero": {
+      "playingFromLabel": "Воспроизведение из",
+      "queueCountLabel": "{{count}} слов в очереди",
+      "playBtn": "Воспроизвести",
+      "shuffleBtn": "Перемешать",
+      "playlistTypeSection": "Тип плейлиста"
+    },
+    "controls": {
+      "speedSection": "Скорость"
+    },
+    "queue": {
+      "durationUnit": "мин",
+      "headerLabel": "Очередь",
+      "emptyTitle": "Нет слов в очереди",
+      "emptyDesc": "Нажмите на источник выше, чтобы выбрать плейлист",
+      "previewAriaLabel": "Предпрослушивание"
+    },
+    "sourceSheet": {
+      "title": "Выберите источник плейлиста"
+    },
+    "source": {
+      "todaysDueLabel": "Слова к повторению сегодня",
+      "todaysDueDesc": "Карточки, запланированные на сегодня",
+      "collectionLabel": "Коллекция",
+      "collectionDesc": "Выберите конкретную коллекцию",
+      "allCardsLabel": "Все карточки",
+      "allCardsDesc": "Весь ваш словарный запас",
+      "strugglingLabel": "Сложные слова",
+      "strugglingDesc": "Уровень 0–2, нужна практика"
+    },
+    "nowPlaying": {
+      "pageTitle": "Сейчас играет",
+      "sessionComplete": "Сессия завершена!",
+      "seeSummary": "Посмотреть итоги",
+      "audioUnavailable": "Аудио недоступно",
+      "retryBtn": "Повторить",
+      "skipCard": "Пропустить эту карточку",
+      "grammarTipLabel": "Совет по грамматике"
+    },
+    "playlistMode": {
+      "compactLabel": "Компактно",
+      "compactDesc": "Слово + значение",
+      "examplesLabel": "Примеры",
+      "examplesDesc": "Полные предложения",
+      "deepDiveLabel": "Углублённо",
+      "deepDiveDesc": "+ грамматическая подсказка"
+    },
+    "card": {
+      "collectionPrefix": "Коллекция:"
+    }
+  },
+  "stories": {
+    "library": {
+      "pageTitle": "Студия рассказов",
+      "generateAriaLabel": "Создать новый рассказ",
+      "exploreSection": "Обзор",
+      "exploreLink": "Все →",
+      "exploreErrorMsg": "Не удалось загрузить рассказы. Потяните вниз для обновления.",
+      "noStoriesYetMsg": "Рассказы скоро появятся! Загляните позже.",
+      "noStoriesFilteredMsg": "По этому фильтру рассказов не найдено.",
+      "premiumBadge": "Pro",
+      "myStoriesSection": "Мои рассказы",
+      "savedLabel": "сохранено",
+      "generateFirstLink": "Создать первый →",
+      "noStoriesTitle": "Рассказов пока нет",
+      "noStoriesDesc": "Создайте свой первый рассказ из вашего словарного запаса.",
+      "generateBtn": "Создать рассказ",
+      "incompleteStatus": "Не завершён",
+      "extendBtn": "Продолжить",
+      "extendingLabel": "Продолжение…",
+      "listenBtn": "Слушать",
+      "readBtn": "Читать",
+      "moreOptionsAriaLabel": "Ещё",
+      "deleteAction": "Удалить рассказ",
+      "cancelAction": "Отмена",
+      "deleteAlertHeader": "Удалить рассказ",
+      "deleteAlertMsg": "Удалить «{{title}}»? Аудио тоже будет удалено.",
+      "deleteActionBtn": "Удалить",
+      "extensionFailedToast": "Продолжение не удалось — попробуйте ещё раз."
+    },
+    "reader": {
+      "backAriaLabel": "Назад",
+      "toggleTranslationTitle": "Показать/скрыть перевод",
+      "toggleTranslationAriaLabel": "Показать/скрыть перевод",
+      "learnedLabel": "Изучено",
+      "markAsLearnedLabel": "Отметить как изученное",
+      "storyTab": "Рассказ",
+      "quizTab": "Тест",
+      "keywordsTab": "Ключевые слова",
+      "grammarTab": "Грамматика",
+      "generatingAudio": "Генерация аудиозаписи…",
+      "preparingAudio": "Подготовка аудио…",
+      "closeWordPanelAriaLabel": "Закрыть панель слова",
+      "pluralLabel": "Множественное число",
+      "playPronunciationAriaLabel": "Воспроизвести произношение",
+      "alreadyInVaultAriaLabel": "Уже в хранилище",
+      "addToVaultAriaLabel": "Добавить в хранилище",
+      "conjugateBtn": "Спряжение ▸",
+      "praesensHeader": "Präsens",
+      "praeteritumHeader": "Präteritum",
+      "perfektLabel": "Perfekt:",
+      "imperativLabel": "Imperativ:",
+      "noConjugationData": "Данные о спряжении недоступны.",
+      "pauseAriaLabel": "Пауза",
+      "playAriaLabel": "Воспроизвести",
+      "restartAriaLabel": "Начать сначала",
+      "loadingMsg": "Загрузка рассказа…"
+    },
+    "complete": {
+      "backAriaLabel": "Назад в библиотеку",
+      "pageTitle": "Рассказ завершён",
+      "title": "Отличное чтение!",
+      "finishedMsg": "Вы прочитали «{{title}}»",
+      "vocabWordsLabel": "слов",
+      "sentencesLabel": "предложений",
+      "listenSingular": "прослушивание",
+      "listenPlural": "прослушиваний",
+      "wordsSection": "Слова в этом рассказе",
+      "readAgainBtn": "Прочитать ещё раз",
+      "moreStoriesBtn": "Ещё рассказы",
+      "loadingMsg": "Загрузка…"
+    },
+    "generate": {
+      "pageTitle": "Создание рассказа",
+      "closeAriaLabel": "Закрыть",
+      "freeStoriesUsedLabel": "бесплатных рассказов использовано",
+      "pickCollectionsSection": "Выберите коллекции",
+      "selectedLabel": "выбрано",
+      "noCollectionsMsg": "Коллекций пока нет. Сначала добавьте слова в коллекцию.",
+      "wordsLabel": "слов",
+      "lengthSection": "Длина рассказа",
+      "freeOnlyHint": "На бесплатном плане — только короткие",
+      "longWarning": "Это может занять до 45 секунд",
+      "difficultySection": "Уровень сложности",
+      "estimatedWaitLong": "Обычно 25–40 секунд",
+      "estimatedWaitShort": "Обычно 10–20 секунд",
+      "retryBtn": "Попробовать снова",
+      "contactSupportLink": "Связаться с поддержкой",
+      "generateBtn": "Создать рассказ",
+      "generatingDefaultMsg": "Создаём ваш рассказ…"
+    },
+    "keywords": {
+      "extractingMsg": "Извлечение ключевых слов…",
+      "noKeywordsMsg": "Для этого рассказа ключевых слов нет.",
+      "memorizeBtn": "Запомнить ключевые слова",
+      "playPronunciationTitle": "Воспроизвести произношение"
+    },
+    "grammar": {
+      "generatingMsg": "Создание грамматических заметок…",
+      "noNotesTitle": "Грамматических заметок для этого рассказа нет.",
+      "noNotesDesc": "Грамматические заметки создаются для новых рассказов.",
+      "exampleSection": "Пример",
+      "descriptionSection": "Описание"
+    },
+    "quiz": {
+      "generatingMsg": "Создание теста…",
+      "noQuizTitle": "Для этого рассказа тест недоступен.",
+      "noQuizDesc": "Тесты создаются для новых рассказов.",
+      "correctLabel": "правильно",
+      "retakeBtn": "Пройти заново",
+      "muteAriaLabel": "Выключить звук ответа",
+      "unmuteAriaLabel": "Включить звук ответа",
+      "nextBtn": "Далее",
+      "pauseOnMistakesTitle": "Пауза при ошибках",
+      "pauseOnMistakesDesc": "Просмотрите правильный ответ перед продолжением"
+    },
+    "length": {
+      "short": "Короткая",
+      "medium": "Средняя",
+      "long": "Длинная",
+      "veryLong": "Очень длинная",
+      "extraLong": "Сверхдлинная",
+      "podcast": "ПОДКАСТ"
+    },
+    "category": {
+      "daily-life": "Повседневная жизнь",
+      "travel": "Путешествия",
+      "food-culture": "Еда и культура",
+      "work-career": "Работа и карьера",
+      "technology": "Технологии",
+      "nature": "Природа",
+      "fiction": "Художественная литература"
+    },
+    "wordType": {
+      "noun": "существительное",
+      "verb": "глагол",
+      "adjective": "прилагательное",
+      "adverb": "наречие",
+      "other": "другое"
+    },
+    "cardMeta": {
+      "words": "слов",
+      "min": "мин",
+      "more": "+{{count}} ещё"
+    }
+  },
+  "settings": {
+    "goals": {
+      "title": "Цели обучения",
+      "backAria": "Назад",
+      "targetsSection": "Цели",
+      "daily": {
+        "name": "Ежедневно",
+        "desc": "Карточек в день для сохранения серии",
+        "decreaseAria": "Уменьшить дневную цель",
+        "increaseAria": "Увеличить дневную цель"
+      },
+      "weekly": {
+        "name": "Еженедельно",
+        "desc": "Всего карточек за неделю",
+        "decreaseAria": "Уменьшить недельную цель",
+        "increaseAria": "Увеличить недельную цель"
+      },
+      "monthly": {
+        "name": "Ежемесячно",
+        "desc": "Всего карточек за месяц",
+        "decreaseAria": "Уменьшить месячную цель",
+        "increaseAria": "Увеличить месячную цель"
+      },
+      "streakNote": "🔥 Выполнение дневной цели продлевает серию. Пропустите день — серия обнулится."
+    },
+    "goalsPrompt": {
+      "titleFirstTime": "Установите цели обучения",
+      "titleUpdate": "Пора обновить цели",
+      "bodyFirstTime": "Скажите LinguaCard, сколько вы хотите учить каждый день. Ваши цели формируют серию и помогают не сбиться с пути.",
+      "bodyUpdate": "Прошло много времени с последнего обновления целей. Убедитесь, что они по-прежнему соответствуют вашему темпу.",
+      "cards": "карточек",
+      "setMyGoals": "Установить цели",
+      "updateMyGoals": "Обновить цели"
+    },
+    "reminders": {
+      "title": "Напоминания",
+      "backAriaLabel": "Назад",
+      "pageTitle": "Напоминания",
+      "dailyReminderSection": "Ежедневное напоминание",
+      "enableToggleLabel": "Включить напоминания",
+      "enableDesc": "Получайте уведомление в браузере, если цель ещё не выполнена",
+      "toggleAriaLabel": "Переключить напоминания",
+      "permissionDeniedMsg": "Разрешение на уведомления отклонено. Чтобы включить напоминания, откройте настройки браузера и разрешите уведомления для этого сайта.",
+      "timeLabel": "Время напоминания",
+      "timeDesc": "Мы напомним только если цель ещё не выполнена",
+      "howItWorksMsg": "Напоминания используют систему уведомлений браузера и работают даже когда LinguaCard закрыт. Уведомления в мобильном приложении (iOS / Android) появятся позже.",
+      "unsupportedMsg": "Ваш браузер или контекст не поддерживает веб-уведомления. Попробуйте открыть LinguaCard в Chrome или Edge, либо установите его как PWA.",
+      "permissionSection": "Разрешение",
+      "grantedTitle": "Уведомления разрешены",
+      "deniedTitle": "Уведомления заблокированы",
+      "defaultTitle": "Уведомления",
+      "grantedDesc": "Разрешены для этого браузера ✓",
+      "deniedDesc": "Заблокированы — измените в настройках браузера",
+      "defaultDesc": "Ещё не запрошены"
+    },
+    "theme": {
+      "darkMode": "Тёмный режим"
+    },
+    "dangerZone": {
+      "resetTitle": "Сбросить все данные",
+      "resetWarning": "Это навсегда удалит все ваши слова, коллекции, историю повторений и прогресс. Аккаунт останется активным.",
+      "irreversible": "Это действие нельзя отменить.",
+      "deleteDetails": "Все {{wordCount}} слов и {{collectionCount}} коллекций будут удалены безвозвратно.",
+      "confirmPassword": "Введите пароль для подтверждения",
+      "confirm": "Да, удалить всё"
+    },
+    "language": {
+      "title": "Язык",
+      "backAria": "Назад",
+      "subtitle": "Выберите язык интерфейса",
+      "currentLabel": "Текущий"
+    }
+  },
+  "sync": {
+    "status": {
+      "label": "Статус синхронизации",
+      "pending": "{{count}} в ожидании",
+      "syncing": "Синхронизация…",
+      "error": "Ошибка синхронизации",
+      "errorRetry": "Ошибка синхронизации — нажмите для повтора",
+      "synced": "Синхронизировано"
+    },
+    "notifications": {
+      "recovered": "Синхронизация восстановлена — данные актуальны",
+      "changesSynced": "{{count}} отложенных изменений синхронизировано",
+      "upToDate": "Всё актуально",
+      "partialFailure": "Часть данных не удалось синхронизировать. Повторим позже.",
+      "failed": "Синхронизация не удалась — повторим автоматически",
+      "retryNow": "Повторить сейчас"
+    }
+  },
+  "offline": {
+    "banner": {
+      "message": "Вы офлайн — показаны сохранённые данные"
+    }
+  },
+  "pwa": {
+    "install": {
+      "title": "Добавить на главный экран",
+      "subtitle": "Установите LinguaCard для быстрого доступа"
+    },
+    "installIos": {
+      "tap": "Нажмите",
+      "action": "На экран «Домой»"
+    }
+  },
+  "srs": {
+    "status": {
+      "due": "К повторению",
+      "interval": "{{days}} дн. интервал"
+    },
+    "masteryLabel": {
+      "new": "Новое",
+      "learning": "Изучение",
+      "review": "Повторение",
+      "mastered": "Освоено",
+      "familiar": "Знакомо",
+      "good": "Хорошо"
+    },
+    "breakdownTag": {
+      "new": "новые",
+      "hard": "сложные",
+      "learning": "изучаемые",
+      "review": "повторение"
+    },
+    "selectCollection": "Выбрать коллекцию",
+    "allCollections": "Все коллекции",
+    "alreadyInVault": "Уже в вашем хранилище",
+    "alreadyInCollection": "Уже в \"{{name}}\""
+  },
+  "subscription": {
+    "paywall": {
+      "title": "Разблокируйте безлимитные рассказы",
+      "subtitle": "Вы использовали 3 бесплатных рассказа. Перейдите на Pro:",
+      "benefit1": "Безлимитная генерация рассказов",
+      "benefit2": "Claude Sonnet — наивысшее качество",
+      "benefit3": "Приоритетная поддержка",
+      "requestBtn": "Запросить Pro-доступ",
+      "dismissBtn": "Не сейчас"
+    }
+  },
+  "admin": {
+    "import": {
+      "label": "Админ-импорт",
+      "pageTitle": "Админ импорт",
+      "tabs": {
+        "wordList": "Список слов",
+        "json": "Импорт JSON",
+        "story": "История",
+        "collections": "Коллекции"
+      },
+      "fields": {
+        "title": "Название *",
+        "level": "Уровень *",
+        "topic": "Тема *",
+        "emoji": "Эмодзи",
+        "words": "Слова (по одному на строку)",
+        "json": "JSON данные",
+        "storyJson": "JSON истории"
+      },
+      "buttons": {
+        "importCollection": "Импортировать коллекцию",
+        "importJson": "Импортировать JSON коллекцию",
+        "importStory": "Импортировать историю"
+      },
+      "status": {
+        "loading": "Загрузка…",
+        "noCollections": "Коллекций пока нет. Сначала импортируйте одну."
+      }
+    }
+  },
+  "wordDetail": {
+    "pageTitle": "Карточка слова",
+    "backAria": "Назад",
+    "moreOptionsAria": "Ещё",
+    "playPluralAria": "Воспроизвести множественное число",
+    "playExampleAria": "Воспроизвести пример предложения",
+    "playSynonymExampleAria": "Воспроизвести пример синонима",
+    "generating": "Генерация…",
+    "listenToPronunciation": "Послушать произношение",
+    "aiAudioCached": "ИИ-аудио сохранено на устройстве",
+    "generatingAudio": "Генерация аудио…",
+    "gender": {
+      "masculine": "мужской род",
+      "feminine": "женский род",
+      "neuter": "средний род"
+    },
+    "plural": "Множественное число",
+    "masteryProgress": "Прогресс освоения",
+    "level": "Уровень {{level}} — {{label}}",
+    "stats": {
+      "reviews": "Повторений",
+      "recallChance": "Шанс вспомнить",
+      "stability": "Стабильность",
+      "lastSeen": "Последний раз"
+    },
+    "nextReview": {
+      "dueNow": "Повторить сейчас",
+      "tomorrow": "Завтра",
+      "inDays": "Следующее повторение через {{days}} дн."
+    },
+    "lastReviewed": {
+      "never": "Никогда",
+      "today": "Сегодня",
+      "daysAgo": "{{days}} дн. назад"
+    },
+    "sections": {
+      "exampleSentences": "Примеры предложений",
+      "synonyms": "Синонимы"
+    },
+    "rateThisWord": "Оцените это слово",
+    "emptyState": {
+      "title": "Слово не найдено",
+      "subtitle": "Это слово могло быть удалено из вашего хранилища."
+    },
+    "deleteConfirm": {
+      "title": "Удалить слово",
+      "message": "Удалить «{{word}}» из хранилища? Это действие нельзя отменить.",
+      "confirmButton": "Удалить"
+    },
+    "toast": {
+      "deleted": "Слово удалено",
+      "updated": "Слово обновлено"
+    }
+  },
+  "imageImport": {
+    "title": "Импорт из изображения",
+    "bestResults": {
+      "label": "ДЛЯ ЛУЧШИХ РЕЗУЛЬТАТОВ",
+      "tip1": "Хорошее освещение — избегайте теней на тексте",
+      "tip2": "Держите камеру неподвижно — размытые изображения могут пропустить слова",
+      "tip3": "Большие изображения с множеством слов лучше обрабатываются партиями"
+    }
+  },
+  "tabs": {
+    "home": "Главная",
+    "vault": "Хранилище",
+    "review": "Повторение",
+    "stories": "Истории",
+    "listen": "Слушать"
+  }
+}
