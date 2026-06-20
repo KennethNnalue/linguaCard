@@ -103,9 +103,9 @@
           </div>
           <div class="proc-step-sub">
             @if (phase() === 'partial') {
-              {{ pendingCount() }} words paused — quota limit reached
+              {{ pendingCount() }} {{ 'imageProcessing.phase2.pausedSuffix' | translate }}
             } @else {
-              Translations + examples
+              {{ 'imageProcessing.phase2.stepSubtitle' | translate }}
             }
           </div>
         </div>

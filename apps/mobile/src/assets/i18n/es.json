@@ -611,6 +611,10 @@
     "phase1": {
       "stepSubtitle": "Leyendo palabras de la imagen"
     },
+    "phase2": {
+      "stepSubtitle": "Traducciones + ejemplos",
+      "pausedSuffix": "palabras en pausa — límite de cuota alcanzado"
+    },
     "info": {
       "note": "Paso 1 de 2 — escaneo rápido. El paso 2 genera traducciones y frases de ejemplo."
     },
@@ -1183,6 +1187,63 @@
       "tip1": "Buena iluminación — evita sombras sobre el texto",
       "tip2": "Mantén la cámara quieta — las imágenes borrosas pueden omitir palabras",
       "tip3": "Las imágenes grandes con muchas palabras funcionan mejor en lotes"
+    }
+  },
+  "imageImportReview": {
+    "nav": {
+      "backAria": "Atrás",
+      "title": "Revisar importación"
+    },
+    "fileBar": {
+      "wordsFound": "{{count}} palabras encontradas",
+      "readySuffix": "listas",
+      "aiScanned": "Escaneado con IA",
+      "pendingSuffix": "pendientes",
+      "imageAlt": "Imagen subida"
+    },
+    "dedupBanner": "{{duplicates}} de {{total}} palabras ya están en tu bóveda (deseleccionadas)",
+    "summary": {
+      "totalFound": "Total encontrado",
+      "selected": "Seleccionadas",
+      "pending": "Pendientes",
+      "duplicates": "Duplicados",
+      "lowConfidence": "Baja conf."
+    },
+    "selectAll": "Seleccionar todo",
+    "deselectAll": "Deseleccionar todo",
+    "collection": {
+      "label": "AÑADIR A COLECCIÓN",
+      "required": "*obligatorio",
+      "selectPlaceholder": "Seleccionar colección"
+    },
+    "extractedWords": "Palabras extraídas",
+    "row": {
+      "duplicateBadge": "Duplicado",
+      "lowConfidenceTitle": "Baja confianza — verifica por favor"
+    },
+    "allPending": {
+      "title": "Aún no hay tarjetas listas",
+      "subtitle": "Las {{count}} palabras alcanzaron el límite de cuota. Guarda en la colección ahora — toca \"Completar\" en cualquier momento para generar las tarjetas.",
+      "dedupWarning": "{{duplicates}} de {{total}} palabras ya existen en tu bóveda. Cuando toques \"Completar\", los duplicados se reutilizarán automáticamente — no se crearán tarjetas nuevas."
+    },
+    "importBtn": {
+      "saving": "Guardando…",
+      "saveCollection": "Guardar en colección — generar tarjetas después",
+      "importWords": "Importar {{count}} palabras a la bóveda"
+    },
+    "cancel": "Cancelar",
+    "warnings": {
+      "duplicateInImport": "Duplicado de la fila {{row}} en esta importación",
+      "lowConfidence": "Baja confianza — verifica por favor",
+      "alreadyInVault": "Ya está en tu bóveda"
+    },
+    "toast": {
+      "pendingSuccess": "✓ {{created}} tarjetas añadidas — {{pending}} más se generarán después",
+      "reusedSuccess": "✓ {{created}} importadas, {{reused}} ya existían (reutilizadas)",
+      "addedSuccess": "✓ {{created}} palabras añadidas a tu bóveda",
+      "importFailed": "Error al importar. Inténtalo de nuevo.",
+      "collectionSaved": "Colección guardada — toca \"Completar\" para generar {{count}} tarjetas cuando estés listo",
+      "saveFailed": "No se pudo guardar la colección. Inténtalo de nuevo."
     }
   },
   "tabs": {

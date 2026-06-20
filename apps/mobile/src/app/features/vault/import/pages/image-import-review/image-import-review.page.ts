@@ -15,6 +15,7 @@ import {
   checkmarkCircleOutline,
   warningOutline,
 } from 'ionicons/icons';
+import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import {
   Card,
   CardContent,
@@ -51,7 +52,7 @@ interface SelectableWord extends ParsedImportRow {
   standalone: true,
   templateUrl: './image-import-review.page.html',
   styleUrls: ['./image-import-review.page.scss'],
-  imports: [IonHeader, IonToolbar, IonContent, IonIcon],
+  imports: [IonHeader, IonToolbar, IonContent, IonIcon, TranslatePipe],
 })
 export class ImageImportReviewPage implements OnInit {
   private readonly destroyRef = inject(DestroyRef);
@@ -68,6 +69,7 @@ export class ImageImportReviewPage implements OnInit {
   private readonly dedupService = inject(CardDedupService);
   private readonly audioPrefetch = inject(CollectionAudioPrefetchService);
   private readonly subscriptionStore = inject(SubscriptionStore);
+  private readonly translate = inject(TranslateService);
 
   readonly image      = this.importImageState.image;
   readonly result     = this.importImageState.result;
@@ -84,9 +86,10 @@ export class ImageImportReviewPage implements OnInit {
 
   readonly selectedCollectionLabel = computed(() => {
     const id = this.selectedCollectionId();
-    if (!id) return 'Select collection';
+    const placeholder = this.translate.instant('imageImportReview.collection.selectPlaceholder');
+    if (!id) return placeholder;
     const col = this.collectionStore.collections().find(c => c.id === id);
-    return col ? `${col.emoji} ${col.name}` : 'Select collection';
+    return col ? `${col.emoji} ${col.name}` : placeholder;
   });
 
   readonly duplicateCount = computed(() => this.wordList().filter(w => w.isDuplicate).length);
@@ -158,7 +161,9 @@ export class ImageImportReviewPage implements OnInit {
       const key = `${row.article ?? ''}:${row.back.toLowerCase().trim()}`;
       if (seen.has(key)) {
         row.status = 'warning';
-        row.warningMessages.push(`Duplicate of row ${seen.get(key)! + 1} in this import`);
+        row.warningMessages.push(
+          this.translate.instant('imageImportReview.warnings.duplicateInImport', { row: seen.get(key)! + 1 }),
+        );
       } else {
         seen.set(key, row.id);
       }
@@ -194,7 +199,7 @@ export class ImageImportReviewPage implements OnInit {
           duplicateCollectionName: match.collectionId ?? null,
           selected: false,
           status: 'warning' as const,
-          warningMessages: [...w.warningMessages, 'Already in your vault'],
+          warningMessages: [...w.warningMessages, this.translate.instant('imageImportReview.warnings.alreadyInVault')],
         };
       }),
     );
@@ -318,10 +323,10 @@ export class ImageImportReviewPage implements OnInit {
         const hasPending = pending.length > 0;
         const toast = await this.toastCtrl.create({
           message: hasPending
-            ? `✓ ${created} cards added — ${pending.length} more will be generated later`
+            ? this.translate.instant('imageImportReview.toast.pendingSuccess', { created, pending: pending.length })
             : reused > 0
-              ? `✓ ${created} imported, ${reused} already existed (reused)`
-              : `✓ ${created} words added to your Vault`,
+              ? this.translate.instant('imageImportReview.toast.reusedSuccess', { created, reused })
+              : this.translate.instant('imageImportReview.toast.addedSuccess', { created }),
           duration: 3500,
           position: 'bottom',
           color: hasPending ? 'warning' : 'success',
@@ -332,7 +337,7 @@ export class ImageImportReviewPage implements OnInit {
       error: async () => {
         this.importing.set(false);
         const toast = await this.toastCtrl.create({
-          message: 'Import failed. Please try again.',
+          message: this.translate.instant('imageImportReview.toast.importFailed'),
           duration: 3000,
           position: 'bottom',
           color: 'danger',
@@ -354,7 +359,7 @@ export class ImageImportReviewPage implements OnInit {
       this.collectionStore.loadCollections();
       this.subscriptionStore.onImageImported();
       const toast = await this.toastCtrl.create({
-        message: `Collection saved — tap "Complete" to generate ${pending.length} flashcards when ready`,
+        message: this.translate.instant('imageImportReview.toast.collectionSaved', { count: pending.length }),
         duration: 4000,
         position: 'bottom',
         color: 'warning',
@@ -363,7 +368,7 @@ export class ImageImportReviewPage implements OnInit {
       this.router.navigate(['/vault/collections', collectionId]);
     } catch {
       const toast = await this.toastCtrl.create({
-        message: 'Could not save collection. Please try again.',
+        message: this.translate.instant('imageImportReview.toast.saveFailed'),
         duration: 3000,
         color: 'danger',
       });
@@ -397,7 +402,7 @@ export class ImageImportReviewPage implements OnInit {
       plural: word.plural,
       synonyms: word.synonyms,
       status: word.confidence >= 0.6 ? 'valid' : 'warning',
-      warningMessages: word.confidence < 0.6 ? ['Low confidence — please verify'] : [],
+      warningMessages: word.confidence < 0.6 ? [this.translate.instant('imageImportReview.warnings.lowConfidence')] : [],
       errorMessages: [],
     };
   }

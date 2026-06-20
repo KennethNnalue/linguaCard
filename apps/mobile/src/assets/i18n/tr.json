@@ -611,6 +611,10 @@
     "phase1": {
       "stepSubtitle": "Görüntüden kelimeler okunuyor"
     },
+    "phase2": {
+      "stepSubtitle": "Çeviriler + örnekler",
+      "pausedSuffix": "kelime duraklatıldı — kota sınırına ulaşıldı"
+    },
     "info": {
       "note": "Adım 1/2 — hızlı tarama. Adım 2 çevirileri ve örnek cümleleri oluşturur."
     },
@@ -1183,6 +1187,63 @@
       "tip1": "İyi aydınlatma — metin üzerindeki gölgelerden kaçının",
       "tip2": "Kamerayı sabit tutun — bulanık görüntüler kelimeleri kaçırabilir",
       "tip3": "Çok kelimeli büyük görüntüler gruplar halinde daha iyi çalışır"
+    }
+  },
+  "imageImportReview": {
+    "nav": {
+      "backAria": "Geri",
+      "title": "İçe Aktarmayı İncele"
+    },
+    "fileBar": {
+      "wordsFound": "{{count}} kelime bulundu",
+      "readySuffix": "hazır",
+      "aiScanned": "Yapay zekâ ile tarandı",
+      "pendingSuffix": "bekliyor",
+      "imageAlt": "Yüklenen görüntü"
+    },
+    "dedupBanner": "{{total}} kelimeden {{duplicates}} tanesi zaten kasanızda (seçimi kaldırıldı)",
+    "summary": {
+      "totalFound": "Toplam bulunan",
+      "selected": "Seçilen",
+      "pending": "Bekleyen",
+      "duplicates": "Yinelenenler",
+      "lowConfidence": "Düşük güven"
+    },
+    "selectAll": "Tümünü seç",
+    "deselectAll": "Tümünü kaldır",
+    "collection": {
+      "label": "KOLEKSİYONA EKLE",
+      "required": "*zorunlu",
+      "selectPlaceholder": "Koleksiyon seç"
+    },
+    "extractedWords": "Çıkarılan kelimeler",
+    "row": {
+      "duplicateBadge": "Yinelenen",
+      "lowConfidenceTitle": "Düşük güven — lütfen doğrulayın"
+    },
+    "allPending": {
+      "title": "Henüz hazır kart yok",
+      "subtitle": "{{count}} kelimenin tümü kota sınırına ulaştı. Şimdi koleksiyona kaydedin — kartları oluşturmak için istediğiniz zaman \"Tamamla\"ya dokunun.",
+      "dedupWarning": "{{total}} kelimeden {{duplicates}} tanesi zaten kasanızda mevcut. \"Tamamla\"ya dokunduğunuzda yinelenenler otomatik olarak yeniden kullanılır — yeni kart oluşturulmaz."
+    },
+    "importBtn": {
+      "saving": "Kaydediliyor…",
+      "saveCollection": "Koleksiyona kaydet — kartları sonra oluştur",
+      "importWords": "{{count}} kelimeyi kasaya aktar"
+    },
+    "cancel": "İptal",
+    "warnings": {
+      "duplicateInImport": "Bu içe aktarmadaki {{row}}. satırın kopyası",
+      "lowConfidence": "Düşük güven — lütfen doğrulayın",
+      "alreadyInVault": "Zaten kasanızda"
+    },
+    "toast": {
+      "pendingSuccess": "✓ {{created}} kart eklendi — {{pending}} tanesi daha sonra oluşturulacak",
+      "reusedSuccess": "✓ {{created}} aktarıldı, {{reused}} tanesi zaten mevcuttu (yeniden kullanıldı)",
+      "addedSuccess": "✓ {{created}} kelime kasanıza eklendi",
+      "importFailed": "İçe aktarma başarısız. Lütfen tekrar deneyin.",
+      "collectionSaved": "Koleksiyon kaydedildi — hazır olduğunuzda {{count}} kart oluşturmak için \"Tamamla\"ya dokunun",
+      "saveFailed": "Koleksiyon kaydedilemedi. Lütfen tekrar deneyin."
     }
   },
   "tabs": {

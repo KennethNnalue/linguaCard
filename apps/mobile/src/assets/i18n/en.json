@@ -618,6 +618,10 @@
     "phase1": {
       "stepSubtitle": "Reading words from image"
     },
+    "phase2": {
+      "stepSubtitle": "Translations + examples",
+      "pausedSuffix": "words paused — quota limit reached"
+    },
     "info": {
       "note": "Step 1 of 2 — quick scan. Step 2 generates translations and example sentences."
     },
@@ -666,6 +670,63 @@
       "tip1": "Good lighting — avoid shadows on the text",
       "tip2": "Hold the camera still — blurry images may miss words",
       "tip3": "Large images with many words work better in batches"
+    }
+  },
+  "imageImportReview": {
+    "nav": {
+      "backAria": "Back",
+      "title": "Review Import"
+    },
+    "fileBar": {
+      "wordsFound": "{{count}} words found",
+      "readySuffix": "ready",
+      "aiScanned": "AI-scanned",
+      "pendingSuffix": "pending",
+      "imageAlt": "Uploaded image"
+    },
+    "dedupBanner": "{{duplicates}} of {{total}} words already in your vault (deselected)",
+    "summary": {
+      "totalFound": "Total found",
+      "selected": "Selected",
+      "pending": "Pending",
+      "duplicates": "Duplicates",
+      "lowConfidence": "Low conf."
+    },
+    "selectAll": "Select all",
+    "deselectAll": "Deselect all",
+    "collection": {
+      "label": "ADD TO COLLECTION",
+      "required": "*required",
+      "selectPlaceholder": "Select collection"
+    },
+    "extractedWords": "Extracted words",
+    "row": {
+      "duplicateBadge": "Duplicate",
+      "lowConfidenceTitle": "Low confidence — please verify"
+    },
+    "allPending": {
+      "title": "No cards ready yet",
+      "subtitle": "All {{count}} words hit the quota limit. Save to collection now — tap \"Complete\" any time to generate the flashcards.",
+      "dedupWarning": "{{duplicates}} of {{total}} words already exist in your vault. When you tap \"Complete\", duplicates will be reused automatically — no new cards created."
+    },
+    "importBtn": {
+      "saving": "Saving…",
+      "saveCollection": "Save to collection — generate cards later",
+      "importWords": "Import {{count}} words to Vault"
+    },
+    "cancel": "Cancel",
+    "warnings": {
+      "duplicateInImport": "Duplicate of row {{row}} in this import",
+      "lowConfidence": "Low confidence — please verify",
+      "alreadyInVault": "Already in your vault"
+    },
+    "toast": {
+      "pendingSuccess": "✓ {{created}} cards added — {{pending}} more will be generated later",
+      "reusedSuccess": "✓ {{created}} imported, {{reused}} already existed (reused)",
+      "addedSuccess": "✓ {{created}} words added to your Vault",
+      "importFailed": "Import failed. Please try again.",
+      "collectionSaved": "Collection saved — tap \"Complete\" to generate {{count}} flashcards when ready",
+      "saveFailed": "Could not save collection. Please try again."
     }
   },
   "review": {

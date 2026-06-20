@@ -1,10 +1,10 @@
 <ion-header class="ion-no-border">
   <ion-toolbar>
     <div class="imp-nav">
-      <button class="imp-back-btn" (click)="goBack()" aria-label="Back">
+      <button class="imp-back-btn" (click)="goBack()" [attr.aria-label]="'imageImportReview.nav.backAria' | translate">
         <ion-icon name="arrow-back-outline"></ion-icon>
       </button>
-      <span class="imp-title lc-display">Review Import</span>
+      <span class="imp-title lc-display">{{ 'imageImportReview.nav.title' | translate }}</span>
       <div class="imp-nav-spacer"></div>
     </div>
   </ion-toolbar>
@@ -19,23 +19,23 @@
         <img
           class="imp-thumb"
           [src]="'data:' + image()!.mimeType + ';base64,' + image()!.base64"
-          alt="Uploaded image" />
+          [alt]="'imageImportReview.fileBar.imageAlt' | translate" />
       } @else {
         <ion-icon name="checkmark-circle-outline" class="imp-file-icon"></ion-icon>
       }
       <div style="flex:1;min-width:0;">
         <p class="imp-file-name">
-          {{ totalFound() }} words found
-          @if (pendingCount() > 0) { · {{ wordList().length }} ready }
+          {{ 'imageImportReview.fileBar.wordsFound' | translate:{ count: totalFound() } }}
+          @if (pendingCount() > 0) { · {{ wordList().length }} {{ 'imageImportReview.fileBar.readySuffix' | translate }} }
         </p>
-        <p class="imp-file-sub">AI-scanned · {{ image()?.mimeType }}</p>
+        <p class="imp-file-sub">{{ 'imageImportReview.fileBar.aiScanned' | translate }} · {{ image()?.mimeType }}</p>
       </div>
       @if (pendingCount() > 0) {
         <div class="imp-pending-badge">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
             <circle cx="12" cy="12" r="9"/><polyline points="12,6 12,12 16,14"/>
           </svg>
-          {{ pendingCount() }} pending
+          {{ pendingCount() }} {{ 'imageImportReview.fileBar.pendingSuffix' | translate }}
         </div>
       } @else {
         <ion-icon name="checkmark-circle-outline" style="color: var(--lc-brand); font-size: 22px; flex-shrink:0;"></ion-icon>
@@ -45,7 +45,7 @@
     <!-- Duplicate summary banner -->
     @if (duplicateCount() > 0) {
       <div class="imp-dedup-banner imp-dedup-banner--warn">
-        ⚠ {{ duplicateCount() }} of {{ wordList().length }} words already in your vault (deselected)
+        ⚠ {{ 'imageImportReview.dedupBanner' | translate:{ duplicates: duplicateCount(), total: wordList().length } }}
       </div>
     }
 
@@ -53,28 +53,28 @@
     <div class="imp-summary-row">
       <div class="imp-sum-cell">
         <span class="imp-sum-val">{{ totalFound() }}</span>
-        <span class="imp-sum-lbl">Total found</span>
+        <span class="imp-sum-lbl">{{ 'imageImportReview.summary.totalFound' | translate }}</span>
       </div>
       <div class="imp-sum-cell imp-sum-cell--ready">
         <span class="imp-sum-val">{{ selectedCount() }}</span>
-        <span class="imp-sum-lbl">Selected</span>
+        <span class="imp-sum-lbl">{{ 'imageImportReview.summary.selected' | translate }}</span>
       </div>
       @if (pendingCount() > 0) {
         <div class="imp-sum-cell imp-sum-cell--warn">
           <span class="imp-sum-val">{{ pendingCount() }}</span>
-          <span class="imp-sum-lbl">Pending</span>
+          <span class="imp-sum-lbl">{{ 'imageImportReview.summary.pending' | translate }}</span>
         </div>
       }
       @if (duplicateCount() > 0) {
         <div class="imp-sum-cell imp-sum-cell--warn">
           <span class="imp-sum-val">{{ duplicateCount() }}</span>
-          <span class="imp-sum-lbl">Duplicates</span>
+          <span class="imp-sum-lbl">{{ 'imageImportReview.summary.duplicates' | translate }}</span>
         </div>
       }
       @if (warningCount() > 0) {
         <div class="imp-sum-cell imp-sum-cell--warn">
           <span class="imp-sum-val">{{ warningCount() }}</span>
-          <span class="imp-sum-lbl">Low conf.</span>
+          <span class="imp-sum-lbl">{{ 'imageImportReview.summary.lowConfidence' | translate }}</span>
         </div>
       }
     </div>
@@ -83,16 +83,16 @@
     <div class="imp-select-all-row">
       <button class="imp-select-all-btn" (click)="toggleAll()">
         @if (allSelected()) {
-          Deselect all
+          {{ 'imageImportReview.deselectAll' | translate }}
         } @else {
-          Select all
+          {{ 'imageImportReview.selectAll' | translate }}
         }
       </button>
     </div>
 
     <!-- Collection picker -->
     <div class="imp-field">
-      <p class="imp-section-lbl">ADD TO COLLECTION <span class="imp-required">*required</span></p>
+      <p class="imp-section-lbl">{{ 'imageImportReview.collection.label' | translate }} <span class="imp-required">{{ 'imageImportReview.collection.required' | translate }}</span></p>
       <button
         class="imp-collection-btn"
         [class.imp-collection-btn--empty]="!selectedCollectionId()"
@@ -103,7 +103,7 @@
     </div>
 
     <!-- Word list (LC-089: checkboxes, dimming) -->
-    <p class="imp-section-lbl">Extracted words</p>
+    <p class="imp-section-lbl">{{ 'imageImportReview.extractedWords' | translate }}</p>
     <div class="imp-preview-list">
       @for (word of wordList(); track word.id) {
         <div
@@ -129,12 +129,12 @@
 
             <!-- Duplicate badge -->
             @if (word.isDuplicate) {
-              <span class="imp-row-duplicate-badge">Duplicate</span>
+              <span class="imp-row-duplicate-badge">{{ 'imageImportReview.row.duplicateBadge' | translate }}</span>
             }
 
             <!-- Confidence indicator -->
             @if (word.confidence < 0.7) {
-              <div class="imp-row-warn" title="Low confidence — please verify">
+              <div class="imp-row-warn" [title]="'imageImportReview.row.lowConfidenceTitle' | translate">
                 <ion-icon name="warning-outline"></ion-icon>
               </div>
             } @else {
@@ -158,14 +158,13 @@
       <div class="imp-all-pending-banner">
         <div class="imp-all-pending-icon">⏳</div>
         <div class="imp-all-pending-body">
-          <div class="imp-all-pending-title">No cards ready yet</div>
+          <div class="imp-all-pending-title">{{ 'imageImportReview.allPending.title' | translate }}</div>
           <div class="imp-all-pending-sub">
-            All {{ pendingCount() }} words hit the quota limit. Save to collection now — tap "Complete" any time to generate the flashcards.
+            {{ 'imageImportReview.allPending.subtitle' | translate:{ count: pendingCount() } }}
           </div>
           @if (pendingDuplicateCount() > 0) {
             <div class="imp-pending-dedup-warn">
-              ⚠ {{ pendingDuplicateCount() }} of {{ pendingCount() }} words already exist in your vault.
-              When you tap "Complete", duplicates will be reused automatically — no new cards created.
+              ⚠ {{ 'imageImportReview.allPending.dedupWarning' | translate:{ duplicates: pendingDuplicateCount(), total: pendingCount() } }}
             </div>
           }
         </div>
@@ -178,15 +177,15 @@
       [disabled]="importing() || (!allPending() && selectedCount() === 0) || !selectedCollectionId()"
       (click)="confirmImport()">
       @if (importing()) {
-        Saving…
+        {{ 'imageImportReview.importBtn.saving' | translate }}
       } @else if (allPending()) {
-        Save to collection — generate cards later
+        {{ 'imageImportReview.importBtn.saveCollection' | translate }}
       } @else {
-        Import {{ selectedCount() }} words to Vault
+        {{ 'imageImportReview.importBtn.importWords' | translate:{ count: selectedCount() } }}
       }
     </button>
 
-    <button class="imp-cancel-lnk" (click)="cancel()">Cancel</button>
+    <button class="imp-cancel-lnk" (click)="cancel()">{{ 'imageImportReview.cancel' | translate }}</button>
 
   </div>
 </ion-content>
