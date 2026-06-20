@@ -38,6 +38,14 @@ export class UserSettingsEntity {
   @Column({ name: 'goals_set_at', type: 'timestamptz', nullable: true, default: null })
   goalsSetAt!: Date | null;
 
+  /**
+   * Per-field last-modified timestamps (field name → ISO string), used for
+   * last-write-wins reconciliation. A PATCH only overwrites a field when its
+   * client edit time is newer than the timestamp recorded here.
+   */
+  @Column({ name: 'field_timestamps', type: 'jsonb', default: () => "'{}'" })
+  fieldTimestamps!: Record<string, string>;
+
   @Column({ name: 'last_reminded_on', type: 'varchar', length: 10, nullable: true, default: null })
   lastRemindedOn!: string | null;
 

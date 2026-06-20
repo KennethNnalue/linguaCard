@@ -760,7 +760,16 @@ export interface UserSettings extends StudyGoals, ReminderSettings {
   uiLanguage: LanguageCode;
 }
 
-export type UpdateUserSettingsDto = Partial<StudyGoals & ReminderSettings & { uiLanguage: LanguageCode }>;
+export type UpdateUserSettingsDto = Partial<StudyGoals & ReminderSettings & { uiLanguage: LanguageCode }> & {
+  /**
+   * ISO timestamp of when the edit was made on the originating device.
+   * Used for per-field last-write-wins reconciliation so a stale offline
+   * edit that arrives late cannot clobber a newer edit from another device.
+   * Optional for back-compat: legacy clients that omit it fall back to
+   * server receive-time.
+   */
+  clientUpdatedAt?: string;
+};
 
 export const DEFAULT_STUDY_GOALS: StudyGoals = {
   dailyGoal: 20,

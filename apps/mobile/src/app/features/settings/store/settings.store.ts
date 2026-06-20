@@ -42,11 +42,12 @@ export const SettingsStore = signalStore(
             const tz = Intl.DateTimeFormat().resolvedOptions().timeZone;
             if (tz && tz !== 'UTC') {
               patchState(store, { settings: { ...settings, timezone: tz } });
+              const dto: UpdateUserSettingsDto = { timezone: tz, clientUpdatedAt: new Date().toISOString() };
               try {
-                const saved = await firstValueFrom(api.update({ timezone: tz }));
+                const saved = await firstValueFrom(api.update(dto));
                 patchState(store, { settings: saved });
               } catch {
-                await sync.enqueue({ type: 'PATCH_SETTINGS', payload: { timezone: tz } });
+                await sync.enqueue({ type: 'PATCH_SETTINGS', payload: dto });
               }
             }
           }
@@ -56,18 +57,23 @@ export const SettingsStore = signalStore(
       },
 
       async update(dto: UpdateUserSettingsDto): Promise<void> {
-        // Optimistic — apply immediately so the UI responds instantly
+        // Stamp the edit with the on-device time so the server can resolve
+        // conflicts by last-write-wins. The queued payload carries the same
+        // original edit time, so a stale offline edit stays stale even if it
+        // reaches the server long after a newer edit from another device.
+        const stamped: UpdateUserSettingsDto = { ...dto, clientUpdatedAt: new Date().toISOString() };
+        // Optimistic — apply immediately so the UI responds instantly.
         const current = store.settings();
         if (current) {
           patchState(store, { settings: { ...current, ...dto } });
         }
         try {
-          const saved = await firstValueFrom(api.update(dto));
+          const saved = await firstValueFrom(api.update(stamped));
           patchState(store, { settings: saved });
         } catch {
           // Offline or transient failure — queue for retry when connectivity returns.
           // The optimistic value stays in memory; the server will be updated on reconnect.
-          await sync.enqueue({ type: 'PATCH_SETTINGS', payload: dto });
+          await sync.enqueue({ type: 'PATCH_SETTINGS', payload: stamped });
         }
       },
 

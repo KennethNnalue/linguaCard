@@ -65,6 +65,17 @@ export class SyncService {
     () => this._queue().filter((op) => op.status === 'pending').length
   );
 
+  /**
+   * Payloads of queued ops of a given type that haven't permanently failed.
+   * Lets a refresher re-apply still-pending local edits on top of a server
+   * response so a refresh never visually reverts an edit awaiting sync.
+   */
+  pendingPayloads(type: SyncOperationType): unknown[] {
+    return this._queue()
+      .filter((op) => op.type === type && op.status !== 'failed')
+      .map((op) => op.payload);
+  }
+
   registerHandler(handler: SyncHandler): void {
     this.handlers.set(handler.type, handler);
   }

@@ -33,17 +33,41 @@ export class UserSettingsService {
   }
 
   async update(userId: string, dto: UpdateUserSettingsDto): Promise<UserSettings> {
-    await this.getForUser(userId);
+    await this.getForUser(userId); // ensure a row exists
+    const entity = await this.repo.findOneByOrFail({ userId });
+
+    // Edit time on the originating device. Legacy clients that don't send a
+    // timestamp fall back to server receive-time (preserves old behaviour).
+    const editedAt = dto.clientUpdatedAt ?? new Date().toISOString();
+    const stamps: Record<string, string> = { ...(entity.fieldTimestamps ?? {}) };
+
+    // A field is only overwritten when this edit is at least as recent as the
+    // last recorded change to that field — this is what stops a stale offline
+    // edit from clobbering a newer edit made on another device.
+    const isNewer = (field: string): boolean => {
+      const prev = stamps[field];
+      return !prev || editedAt >= prev;
+    };
+    const stamp = (field: string): void => {
+      stamps[field] = editedAt;
+    };
+
     const patch: Partial<UserSettingsEntity> = {};
-    const goalTouched = dto.dailyGoal !== undefined || dto.weeklyGoal !== undefined || dto.monthlyGoal !== undefined;
-    if (dto.dailyGoal !== undefined)        patch.dailyGoal = clampGoal(dto.dailyGoal, 500);
-    if (dto.weeklyGoal !== undefined)       patch.weeklyGoal = clampGoal(dto.weeklyGoal, 2000);
-    if (dto.monthlyGoal !== undefined)      patch.monthlyGoal = clampGoal(dto.monthlyGoal, 5000);
-    if (goalTouched)                        patch.goalsSetAt = new Date();
-    if (dto.remindersEnabled !== undefined) patch.remindersEnabled = dto.remindersEnabled;
-    if (dto.reminderTime !== undefined)     patch.reminderTime = dto.reminderTime;
-    if (dto.timezone !== undefined)         patch.timezone = dto.timezone;
-    if (dto.uiLanguage !== undefined)      patch.uiLanguage = dto.uiLanguage;
+    let goalApplied = false;
+
+    if (dto.dailyGoal !== undefined && isNewer('dailyGoal'))             { patch.dailyGoal = clampGoal(dto.dailyGoal, 500); stamp('dailyGoal'); goalApplied = true; }
+    if (dto.weeklyGoal !== undefined && isNewer('weeklyGoal'))          { patch.weeklyGoal = clampGoal(dto.weeklyGoal, 2000); stamp('weeklyGoal'); goalApplied = true; }
+    if (dto.monthlyGoal !== undefined && isNewer('monthlyGoal'))        { patch.monthlyGoal = clampGoal(dto.monthlyGoal, 5000); stamp('monthlyGoal'); goalApplied = true; }
+    if (dto.remindersEnabled !== undefined && isNewer('remindersEnabled')) { patch.remindersEnabled = dto.remindersEnabled; stamp('remindersEnabled'); }
+    if (dto.reminderTime !== undefined && isNewer('reminderTime'))      { patch.reminderTime = dto.reminderTime; stamp('reminderTime'); }
+    if (dto.timezone !== undefined && isNewer('timezone'))              { patch.timezone = dto.timezone; stamp('timezone'); }
+    if (dto.uiLanguage !== undefined && isNewer('uiLanguage'))          { patch.uiLanguage = dto.uiLanguage; stamp('uiLanguage'); }
+
+    // goalsSetAt drives the "set your goals" prompt — stamp it with the edit
+    // time only when a goal field was actually (re)applied.
+    if (goalApplied) patch.goalsSetAt = new Date(editedAt);
+
+    patch.fieldTimestamps = stamps;
     await this.repo.update({ userId }, patch);
     return this.getForUser(userId);
   }
