@@ -1,4 +1,4 @@
-import { computed, inject } from '@angular/core';
+import { computed, inject, Injector } from '@angular/core';
 import { toObservable } from '@angular/core/rxjs-interop';
 import { Router } from '@angular/router';
 import { filter, firstValueFrom, take, timeout } from 'rxjs';
@@ -48,6 +48,7 @@ export const OnboardingStore = signalStore(
     const platformStore = inject(PlatformCollectionStore);
     const cardStore = inject(CardStore);
     const router = inject(Router);
+    const injector = inject(Injector);
 
     const persistStep = async (step: number): Promise<void> => {
       await settings.update({ onboardingStep: step });
@@ -96,7 +97,7 @@ export const OnboardingStore = signalStore(
         patchState(store, { isSeeding: true, seedError: null });
         platformStore.adopt(collectionId);
 
-        const adoptingDone$ = toObservable(platformStore.adoptingId).pipe(
+        const adoptingDone$ = toObservable(platformStore.adoptingId, { injector }).pipe(
           filter(id => !id),
           take(1),
           timeout(30_000),
