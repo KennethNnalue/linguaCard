@@ -67,7 +67,8 @@ export class UserSettingsService {
     if (dto.onboardingStep !== undefined)  { patch.onboardingStep = dto.onboardingStep; }
     if (dto.motivation !== undefined)      { patch.motivation = dto.motivation; }
     if (dto.level !== undefined)           { patch.level = dto.level; }
-    if (dto.completeOnboarding)            { patch.onboardingCompletedAt = new Date(editedAt); }
+    if (dto.completeOnboarding === true)    { patch.onboardingCompletedAt = new Date(editedAt); }
+    if (dto.completeOnboarding === false)   { patch.onboardingCompletedAt = null; }
 
     // goalsSetAt drives the "set your goals" prompt — stamp it with the edit
     // time only when a goal field was actually (re)applied.

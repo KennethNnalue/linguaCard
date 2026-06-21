@@ -40,13 +40,13 @@
   </a>
 
   <!-- Replay onboarding -->
-  <a class="ctx-item" role="menuitem" [routerLink]="['/onboarding']" (click)="closed.emit()">
+  <button class="ctx-item" role="menuitem" (click)="replayOnboarding()">
     <div class="ctx-item-left">
       <ion-icon name="rocket-outline"></ion-icon>
       {{ 'onboarding.tour.takeTour' | translate }}
     </div>
     <ion-icon name="chevron-forward-outline" class="ctx-chevron"></ion-icon>
-  </a>
+  </button>
 
   <!-- Dark mode -->
   <button class="ctx-item" role="menuitem" (click)="theme.toggle()">

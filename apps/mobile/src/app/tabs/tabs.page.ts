@@ -1,18 +1,17 @@
-import { Component, computed, EnvironmentInjector, inject, signal } from '@angular/core';
-import { NavigationEnd, Router } from '@angular/router';
-import { IonIcon, IonLabel, IonTabBar, IonTabButton, IonTabs } from '@ionic/angular/standalone';
-import { TranslatePipe } from '@ngx-translate/core';
-import { addIcons } from 'ionicons';
+import {Component, computed, EnvironmentInjector, inject, signal} from '@angular/core';
+import {NavigationEnd, Router} from '@angular/router';
+import {IonIcon, IonLabel, IonTabBar, IonTabButton, IonTabs} from '@ionic/angular/standalone';
+import {TranslatePipe} from '@ngx-translate/core';
+import {addIcons} from 'ionicons';
 import {
   analyticsOutline,
   bookOutline,
   folderOpenOutline,
   homeOutline,
   playCircleOutline,
-  tvOutline,
   volumeHighOutline
 } from 'ionicons/icons';
-import { ReviewRoute } from '../features/review/models/review.model';
+import {ReviewRoute} from '../features/review/models/review.model';
 
 // Routes where the tab bar should be hidden (player / complete screens)
 const HIDE_TAB_BAR_ROUTES = [
@@ -37,7 +36,7 @@ export class TabsPage {
   );
 
   constructor() {
-    addIcons({ analyticsOutline, bookOutline, volumeHighOutline, playCircleOutline, folderOpenOutline, homeOutline });
+    addIcons({analyticsOutline, bookOutline, volumeHighOutline, playCircleOutline, folderOpenOutline, homeOutline});
 
     this.router.events.subscribe(event => {
       if (event instanceof NavigationEnd) {

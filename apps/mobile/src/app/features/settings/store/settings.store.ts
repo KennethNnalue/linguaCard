@@ -62,8 +62,10 @@ export const SettingsStore = signalStore(
         if (current) {
           const { completeOnboarding, clientUpdatedAt, ...settingsFields } = dto;
           const optimistic: Partial<UserSettings> = { ...settingsFields };
-          if (completeOnboarding) {
+          if (completeOnboarding === true) {
             optimistic.onboardingCompletedAt = new Date().toISOString();
+          } else if (completeOnboarding === false) {
+            optimistic.onboardingCompletedAt = null;
           }
           patchState(store, { settings: { ...current, ...optimistic } });
         }

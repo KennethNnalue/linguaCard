@@ -1,5 +1,5 @@
 import { ChangeDetectionStrategy, Component, inject, output } from '@angular/core';
-import { RouterLink } from '@angular/router';
+import { Router, RouterLink } from '@angular/router';
 import { IonIcon, IonToggle } from '@ionic/angular/standalone';
 import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { addIcons } from 'ionicons';
@@ -18,6 +18,7 @@ import {
 import { AuthService } from '../../../core/services/auth.service';
 import { SyncService } from '../../../core/services/sync.service';
 import { ThemeService } from '../../../core/services/theme.service';
+import { SettingsStore } from '../../../features/settings/store/settings.store';
 import { SubscriptionStore } from '../../../features/subscription/store/subscription.store';
 
 @Component({
@@ -33,6 +34,8 @@ export class UserMenuComponent {
   readonly sync = inject(SyncService);
   readonly subscriptionStore = inject(SubscriptionStore);
   private readonly translate = inject(TranslateService);
+  private readonly settingsStore = inject(SettingsStore);
+  private readonly router = inject(Router);
 
   readonly closed = output<void>();
   readonly resetRequested = output<void>();
@@ -65,6 +68,20 @@ export class UserMenuComponent {
   onResetClick(): void {
     this.closed.emit();
     this.resetRequested.emit();
+  }
+
+  async replayOnboarding(): Promise<void> {
+    this.closed.emit();
+    await this.settingsStore.update({
+      onboardingStep: 0,
+      completeOnboarding: false,
+    });
+    this.settingsStore.setFromServer({
+      ...this.settingsStore.settings()!,
+      onboardingCompletedAt: null,
+      onboardingStep: 0,
+    });
+    void this.router.navigateByUrl('/onboarding');
   }
 
   signOut(): void {
