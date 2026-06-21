@@ -13,13 +13,14 @@
   align-items: center;
   justify-content: space-between;
   padding: t.$lc-space-2 0 t.$lc-space-4;
+  padding-top: calc(env(safe-area-inset-top, 0px) + #{t.$lc-space-2});
 }
 
 .ob-back {
   width: 30px;
   height: 30px;
   border-radius: t.$lc-radius-full;
-  background: t.$lc-brand-light;
+  background: var(--lc-brand-light);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -29,7 +30,7 @@
   svg {
     width: 13px;
     height: 13px;
-    stroke: t.$lc-brand;
+    stroke: var(--lc-brand);
     fill: none;
     stroke-width: 2.4;
     stroke-linecap: round;
@@ -49,7 +50,7 @@
   width: 7px;
   height: 7px;
   border-radius: t.$lc-radius-full;
-  background: t.$lc-border-strong;
+  background: var(--lc-border-strong);
   transition: width var(--lc-transition-fast), background var(--lc-transition-fast);
 
   @media (prefers-reduced-motion: reduce) {
@@ -57,7 +58,7 @@
   }
 
   &--active {
-    background: t.$lc-brand;
+    background: var(--lc-brand);
     width: 20px;
     border-radius: 4px;
   }
@@ -65,7 +66,7 @@
 
 .ob-skip {
   @include u.lc-font('sm', 600);
-  color: t.$lc-text-hint;
+  color: var(--lc-text-hint);
   background: none;
   border: none;
   font-family: t.$lc-font-body;

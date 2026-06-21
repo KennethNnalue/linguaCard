@@ -6,6 +6,7 @@
   flex-direction: column;
   min-height: 100%;
   padding: t.$lc-space-6 t.$lc-space-5 t.$lc-space-5;
+  padding-top: calc(env(safe-area-inset-top, 0px) + #{t.$lc-space-6});
 }
 
 .lang-hero {
@@ -22,13 +23,13 @@
   font-family: t.$lc-font-display;
   font-size: 24px;
   font-weight: 600;
-  color: t.$lc-text-primary;
+  color: var(--lc-text-primary);
   margin-bottom: t.$lc-space-2;
 }
 
 .lang-sub {
   @include u.lc-font('sm');
-  color: t.$lc-text-hint;
+  color: var(--lc-text-hint);
   line-height: 1.5;
 }
 
@@ -42,8 +43,8 @@
   display: flex;
   align-items: center;
   gap: t.$lc-space-3;
-  background: t.$lc-card;
-  border: 1.5px solid t.$lc-border;
+  background: var(--lc-card);
+  border: 1.5px solid var(--lc-border);
   border-radius: t.$lc-radius-md + 2px;
   padding: t.$lc-space-3 + 2px t.$lc-space-4;
   cursor: pointer;
@@ -51,8 +52,8 @@
   transition: border-color 0.15s ease, background 0.15s ease;
 
   &--active {
-    border-color: t.$lc-brand;
-    background: t.$lc-brand-light;
+    border-color: var(--lc-brand);
+    background: var(--lc-brand-light);
   }
 }
 
@@ -63,7 +64,7 @@
 
 .lang-name {
   @include u.lc-font('md', 600);
-  color: t.$lc-text-primary;
+  color: var(--lc-text-primary);
   flex: 1;
   text-align: left;
 }
@@ -72,7 +73,7 @@
   width: 26px;
   height: 26px;
   border-radius: t.$lc-radius-full;
-  background: t.$lc-brand;
+  background: var(--lc-brand);
   color: white;
   display: flex;
   align-items: center;
@@ -91,7 +92,7 @@
   width: 56px;
   height: 56px;
   border-radius: t.$lc-radius-full;
-  background: t.$lc-brand;
+  background: var(--lc-brand);
   color: white;
   border: none;
   font-size: 22px;
@@ -101,5 +102,5 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  box-shadow: t.$lc-shadow-card;
+  box-shadow: var(--lc-shadow-card);
 }

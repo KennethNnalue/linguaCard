@@ -5,7 +5,7 @@
   @include u.lc-font('xxs', 700);
   letter-spacing: 0.08em;
   text-transform: uppercase;
-  color: t.$lc-text-hint;
+  color: var(--lc-text-hint);
   margin-bottom: t.$lc-space-1 + 2px;
 }
 
@@ -13,14 +13,14 @@
   font-family: t.$lc-font-display;
   font-size: 23px;
   font-weight: 600;
-  color: t.$lc-text-primary;
+  color: var(--lc-text-primary);
   line-height: 1.18;
   margin-bottom: t.$lc-space-2 - 1px;
 }
 
 .ob-sub {
   @include u.lc-font('sm');
-  color: t.$lc-text-secondary;
+  color: var(--lc-text-secondary);
   line-height: 1.5;
   margin-bottom: t.$lc-space-5;
 }
@@ -37,19 +37,19 @@
   font-family: t.$lc-font-display;
   font-size: 46px;
   font-weight: 600;
-  color: t.$lc-brand;
+  color: var(--lc-brand);
   line-height: 1;
 }
 
 .goal-big-label {
   @include u.lc-font('sm');
-  color: t.$lc-text-secondary;
+  color: var(--lc-text-secondary);
 }
 
 .field-card {
-  background: t.$lc-card;
+  background: var(--lc-card);
   border-radius: t.$lc-radius-md + 4px;
-  box-shadow: t.$lc-shadow-card;
+  box-shadow: var(--lc-shadow-card);
   padding: t.$lc-space-4;
   margin-bottom: t.$lc-space-3 + 1px;
 }
@@ -67,12 +67,12 @@
 
 .field-name {
   @include u.lc-font('md', 600);
-  color: t.$lc-text-primary;
+  color: var(--lc-text-primary);
 }
 
 .field-desc {
   @include u.lc-font('xs');
-  color: t.$lc-text-secondary;
+  color: var(--lc-text-secondary);
   margin-top: 2px;
   line-height: 1.4;
 }
@@ -80,7 +80,7 @@
 .stepper {
   display: flex;
   align-items: center;
-  border: 1px solid t.$lc-border;
+  border: 1px solid var(--lc-border);
   border-radius: t.$lc-radius-md;
   overflow: hidden;
   flex-shrink: 0;
@@ -89,8 +89,8 @@
     width: 36px;
     height: 38px;
     border: none;
-    background: t.$lc-surface;
-    color: t.$lc-brand;
+    background: var(--lc-surface);
+    color: var(--lc-brand);
     font-size: 19px;
     font-weight: 600;
     font-family: t.$lc-font-body;
@@ -109,7 +109,7 @@
   font-family: t.$lc-font-display;
   font-size: 19px;
   font-weight: 600;
-  color: t.$lc-text-primary;
+  color: var(--lc-text-primary);
 }
 
 .toggle {
@@ -123,11 +123,11 @@
   transition: background var(--lc-transition-fast);
 
   &--on {
-    background: t.$lc-brand;
+    background: var(--lc-brand);
   }
 
   &--off {
-    background: t.$lc-border-strong;
+    background: var(--lc-border-strong);
   }
 }
 
@@ -138,7 +138,7 @@
   height: 21px;
   border-radius: t.$lc-radius-full;
   background: white;
-  box-shadow: t.$lc-shadow-card;
+  box-shadow: var(--lc-shadow-card);
   transition: left var(--lc-transition-fast);
 
   .toggle--on & {
@@ -166,6 +166,6 @@
   margin-top: t.$lc-space-4;
 
   &--accent {
-    background: t.$lc-accent;
+    background: var(--lc-accent);
   }
 }

@@ -5,7 +5,7 @@
   @include u.lc-font('xxs', 700);
   letter-spacing: 0.08em;
   text-transform: uppercase;
-  color: t.$lc-text-hint;
+  color: var(--lc-text-hint);
   margin-bottom: t.$lc-space-1 + 2px;
 }
 
@@ -13,14 +13,14 @@
   font-family: t.$lc-font-display;
   font-size: 23px;
   font-weight: 600;
-  color: t.$lc-text-primary;
+  color: var(--lc-text-primary);
   line-height: 1.18;
   margin-bottom: t.$lc-space-2 - 1px;
 }
 
 .ob-sub {
   @include u.lc-font('sm');
-  color: t.$lc-text-secondary;
+  color: var(--lc-text-secondary);
   line-height: 1.5;
   margin-bottom: t.$lc-space-5;
 }
@@ -34,22 +34,22 @@
 .persona {
   flex: 1 1 calc(50% - #{t.$lc-space-2 + 2px});
   min-width: 120px;
-  background: t.$lc-card;
-  border: 1.5px solid t.$lc-border;
+  background: var(--lc-card);
+  border: 1.5px solid var(--lc-border);
   border-radius: t.$lc-radius-md + 4px;
   padding: t.$lc-space-4 t.$lc-space-3;
   display: flex;
   flex-direction: column;
   align-items: center;
   gap: t.$lc-space-2 - 1px;
-  box-shadow: t.$lc-shadow-card;
+  box-shadow: var(--lc-shadow-card);
   cursor: pointer;
   font-family: t.$lc-font-body;
   transition: border-color var(--lc-transition-fast), background var(--lc-transition-fast);
 
   &--active {
-    border-color: t.$lc-brand;
-    background: t.$lc-brand-light;
+    border-color: var(--lc-brand);
+    background: var(--lc-brand-light);
   }
 }
 
@@ -60,11 +60,11 @@
 
 .persona-name {
   @include u.lc-font('xs', 600);
-  color: t.$lc-text-primary;
+  color: var(--lc-text-primary);
   text-align: center;
 
   .persona--active & {
-    color: t.$lc-brand-dark;
+    color: var(--lc-brand-dark);
   }
 }
 
@@ -74,7 +74,7 @@
 
 .ob-cta {
   width: 100%;
-  background: t.$lc-brand;
+  background: var(--lc-brand);
   color: white;
   border: none;
   border-radius: t.$lc-radius-md + 2px;

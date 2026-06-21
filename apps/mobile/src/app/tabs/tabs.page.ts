@@ -6,6 +6,7 @@ import { addIcons } from 'ionicons';
 import {
   analyticsOutline,
   bookOutline,
+  folderOpenOutline,
   homeOutline,
   playCircleOutline,
   tvOutline,
@@ -36,7 +37,7 @@ export class TabsPage {
   );
 
   constructor() {
-    addIcons({ analyticsOutline, bookOutline, volumeHighOutline, playCircleOutline, tvOutline, homeOutline });
+    addIcons({ analyticsOutline, bookOutline, volumeHighOutline, playCircleOutline, folderOpenOutline, homeOutline });
 
     this.router.events.subscribe(event => {
       if (event instanceof NavigationEnd) {

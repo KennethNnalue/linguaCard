@@ -3,9 +3,9 @@
 
 .checklist {
   margin: 0 t.$lc-space-3 + 1px t.$lc-space-3 + 1px;
-  background: t.$lc-card;
+  background: var(--lc-card);
   border-radius: t.$lc-radius-md + 4px;
-  box-shadow: t.$lc-shadow-card;
+  box-shadow: var(--lc-shadow-card);
   padding: t.$lc-space-4 - 1px t.$lc-space-4;
 }
 
@@ -18,17 +18,17 @@
 
 .cl-title {
   @include u.lc-font('sm', 700);
-  color: t.$lc-text-primary;
+  color: var(--lc-text-primary);
 }
 
 .cl-progress {
   @include u.lc-font('xs', 600);
-  color: t.$lc-brand;
+  color: var(--lc-brand);
 }
 
 .cl-dismiss {
   @include u.lc-font('xs', 600);
-  color: t.$lc-text-hint;
+  color: var(--lc-text-hint);
   background: none;
   border: none;
   font-family: t.$lc-font-body;
@@ -42,7 +42,7 @@
   padding: t.$lc-space-2 0;
 
   & + & {
-    border-top: 1px solid t.$lc-border;
+    border-top: 1px solid var(--lc-border);
   }
 }
 
@@ -56,30 +56,30 @@
   justify-content: center;
 
   &--done {
-    background: t.$lc-brand;
+    background: var(--lc-brand);
     color: white;
     @include u.lc-font('xs', 700);
   }
 
   &--todo {
-    border: 2px solid t.$lc-border-strong;
+    border: 2px solid var(--lc-border-strong);
   }
 }
 
 .cl-text {
   flex: 1;
   @include u.lc-font('sm', 500);
-  color: t.$lc-text-primary;
+  color: var(--lc-text-primary);
 
   &--done {
-    color: t.$lc-text-hint;
+    color: var(--lc-text-hint);
     text-decoration: line-through;
   }
 }
 
 .cl-go {
   @include u.lc-font('xs', 700);
-  color: t.$lc-brand;
+  color: var(--lc-brand);
   background: none;
   border: none;
   font-family: t.$lc-font-body;
@@ -89,7 +89,7 @@
 
 .cl-done-msg {
   @include u.lc-font('sm', 600);
-  color: t.$lc-brand;
+  color: var(--lc-brand);
   text-align: center;
   padding: t.$lc-space-2 0 0;
 }

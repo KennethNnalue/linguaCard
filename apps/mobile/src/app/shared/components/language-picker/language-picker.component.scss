@@ -10,8 +10,8 @@
   display: flex;
   align-items: center;
   gap: t.$lc-space-2;
-  background: t.$lc-card;
-  border: 1.5px solid t.$lc-border;
+  background: var(--lc-card);
+  border: 1.5px solid var(--lc-border);
   border-radius: t.$lc-radius-full;
   padding: t.$lc-space-1 + 2px t.$lc-space-3 t.$lc-space-1 + 2px t.$lc-space-2 + 2px;
   cursor: pointer;
@@ -19,7 +19,7 @@
   transition: border-color 0.15s ease;
 
   &:active {
-    border-color: t.$lc-brand;
+    border-color: var(--lc-brand);
   }
 }
 
@@ -30,12 +30,12 @@
 
 .lp-code {
   @include u.lc-font('xs', 600);
-  color: t.$lc-text-primary;
+  color: var(--lc-text-primary);
 }
 
 .lp-caret {
   @include u.lc-font('xs');
-  color: t.$lc-text-hint;
+  color: var(--lc-text-hint);
   transition: transform 0.15s ease;
 
   &--open {
@@ -54,10 +54,10 @@
   top: calc(100% + #{t.$lc-space-2});
   right: 0;
   min-width: 200px;
-  background: t.$lc-card;
-  border: 1.5px solid t.$lc-border;
+  background: var(--lc-card);
+  border: 1.5px solid var(--lc-border);
   border-radius: t.$lc-radius-md + 2px;
-  box-shadow: t.$lc-shadow-float;
+  box-shadow: var(--lc-shadow-float);
   z-index: 100;
   overflow: hidden;
 }
@@ -75,11 +75,11 @@
   transition: background 0.1s ease;
 
   &:active {
-    background: t.$lc-brand-light;
+    background: var(--lc-brand-light);
   }
 
   &--active {
-    background: t.$lc-brand-light;
+    background: var(--lc-brand-light);
   }
 }
 
@@ -90,12 +90,12 @@
 
 .lp-option-name {
   @include u.lc-font('sm', 500);
-  color: t.$lc-text-primary;
+  color: var(--lc-text-primary);
   flex: 1;
   text-align: left;
 }
 
 .lp-option-check {
   @include u.lc-font('sm', 700);
-  color: t.$lc-brand;
+  color: var(--lc-brand);
 }

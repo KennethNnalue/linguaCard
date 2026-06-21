@@ -1,7 +1,7 @@
 <ion-content>
-  <lc-onboarding-shell [step]="store.step()" [total]="store.totalSteps()" (backClick)="onBack()" (skipClick)="onSkip()">
+  <lc-onboarding-shell [step]="store.step()" [total]="store.totalSteps()" (backClick)="onBack()" (skipClick)="onSkip()" (nextClick)="onGetStarted()">
     <div class="welcome-hero">
-      <div class="welcome-mark">L</div>
+      <img class="welcome-mark" src="assets/icon/icon-192.png" alt="LinguaCard" />
       <h1 class="welcome-title">{{ 'onboarding.welcome.title' | translate }}</h1>
       <p class="welcome-sub">{{ 'onboarding.welcome.subtitle' | translate }}</p>
 

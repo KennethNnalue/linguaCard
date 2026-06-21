@@ -5,7 +5,7 @@
   @include u.lc-font('xxs', 700);
   letter-spacing: 0.08em;
   text-transform: uppercase;
-  color: t.$lc-text-hint;
+  color: var(--lc-text-hint);
   margin-bottom: t.$lc-space-1 + 2px;
 }
 
@@ -13,14 +13,14 @@
   font-family: t.$lc-font-display;
   font-size: 23px;
   font-weight: 600;
-  color: t.$lc-text-primary;
+  color: var(--lc-text-primary);
   line-height: 1.18;
   margin-bottom: t.$lc-space-2 - 1px;
 }
 
 .ob-sub {
   @include u.lc-font('sm');
-  color: t.$lc-text-secondary;
+  color: var(--lc-text-secondary);
   line-height: 1.5;
   margin-bottom: t.$lc-space-5;
 }
@@ -29,21 +29,21 @@
   @include u.lc-font('xxs', 700);
   letter-spacing: 0.06em;
   text-transform: uppercase;
-  color: t.$lc-accent-dark;
+  color: var(--lc-accent-dark);
   margin-bottom: t.$lc-space-2;
 }
 
 .seed-card {
-  background: t.$lc-card;
+  background: var(--lc-card);
   border-radius: t.$lc-radius-lg - 2px;
-  box-shadow: t.$lc-shadow-card;
+  box-shadow: var(--lc-shadow-card);
   overflow: hidden;
   margin-bottom: t.$lc-space-3 + 1px;
 }
 
 .seed-cover {
   height: 96px;
-  background: linear-gradient(135deg, t.$lc-brand 0%, t.$lc-brand-mid 100%);
+  background: linear-gradient(135deg, var(--lc-brand) 0%, var(--lc-brand-mid) 100%);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -70,12 +70,12 @@
   font-family: t.$lc-font-display;
   font-size: 17px;
   font-weight: 600;
-  color: t.$lc-text-primary;
+  color: var(--lc-text-primary);
 }
 
 .seed-meta {
   @include u.lc-font('xs');
-  color: t.$lc-text-secondary;
+  color: var(--lc-text-secondary);
   margin-top: 3px;
   display: flex;
   align-items: center;
@@ -83,8 +83,8 @@
 }
 
 .seed-pill {
-  background: t.$lc-brand-light;
-  color: t.$lc-brand;
+  background: var(--lc-brand-light);
+  color: var(--lc-brand);
   @include u.lc-font('xxs', 600);
   padding: 2px t.$lc-space-2;
   border-radius: t.$lc-radius-sm + 2px;
@@ -92,7 +92,7 @@
 
 .ob-cta {
   width: 100%;
-  background: t.$lc-brand;
+  background: var(--lc-brand);
   color: white;
   border: none;
   border-radius: t.$lc-radius-md + 2px;
@@ -113,7 +113,7 @@
 .ob-cta-secondary {
   width: 100%;
   background: none;
-  color: t.$lc-text-secondary;
+  color: var(--lc-text-secondary);
   border: none;
   padding: t.$lc-space-3;
   @include u.lc-font('sm', 600);
@@ -123,14 +123,14 @@
 
 .seed-error {
   @include u.lc-font('xs');
-  color: t.$lc-accent-dark;
+  color: var(--lc-accent-dark);
   margin-top: t.$lc-space-2;
   line-height: 1.4;
 }
 
 .seed-or {
   @include u.lc-font('xs');
-  color: t.$lc-text-hint;
+  color: var(--lc-text-hint);
   text-align: center;
   margin: t.$lc-space-4 0 t.$lc-space-3;
   position: relative;
@@ -142,7 +142,7 @@
     top: 50%;
     width: 36%;
     height: 1px;
-    background: t.$lc-border;
+    background: var(--lc-border);
   }
 
   &::before { left: 0; }
@@ -156,8 +156,8 @@
 
 .seed-alt-btn {
   flex: 1;
-  background: t.$lc-card;
-  border: 1.5px solid t.$lc-border;
+  background: var(--lc-card);
+  border: 1.5px solid var(--lc-border);
   border-radius: t.$lc-radius-md + 2px;
   padding: t.$lc-space-4 t.$lc-space-3;
   display: flex;
@@ -169,8 +169,8 @@
   transition: border-color 0.15s ease, background 0.15s ease;
 
   &:active {
-    background: t.$lc-brand-light;
-    border-color: t.$lc-brand;
+    background: var(--lc-brand-light);
+    border-color: var(--lc-brand);
   }
 }
 
@@ -181,13 +181,13 @@
 
 .seed-alt-label {
   @include u.lc-font('xs', 600);
-  color: t.$lc-text-primary;
+  color: var(--lc-text-primary);
   text-align: center;
   line-height: 1.3;
 }
 
 .seed-done {
-  background: t.$lc-brand-light;
+  background: var(--lc-brand-light);
   border-radius: t.$lc-radius-md + 2px;
   padding: t.$lc-space-3 + 1px t.$lc-space-4;
   display: flex;
@@ -199,7 +199,7 @@
   width: 34px;
   height: 34px;
   border-radius: t.$lc-radius-full;
-  background: t.$lc-brand;
+  background: var(--lc-brand);
   color: white;
   display: flex;
   align-items: center;
@@ -210,7 +210,7 @@
 
 .seed-done-text {
   @include u.lc-font('sm', 600);
-  color: t.$lc-brand-dark;
+  color: var(--lc-brand-dark);
   line-height: 1.3;
 }
 

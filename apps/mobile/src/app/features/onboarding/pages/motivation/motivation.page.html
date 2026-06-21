@@ -1,5 +1,5 @@
 <ion-content>
-  <lc-onboarding-shell [step]="store.step()" [total]="store.totalSteps()" (backClick)="onBack()" (skipClick)="onSkip()">
+  <lc-onboarding-shell [step]="store.step()" [total]="store.totalSteps()" (backClick)="onBack()" (skipClick)="onSkip()" (nextClick)="onNext()">
     <p class="ob-step">{{ 'onboarding.common.step' | translate:{ current: store.step() + 1, total: store.totalSteps() } }}</p>
     <h1 class="ob-title">{{ 'onboarding.motivation.title' | translate }}</h1>
     <p class="ob-sub">{{ 'onboarding.motivation.subtitle' | translate }}</p>
