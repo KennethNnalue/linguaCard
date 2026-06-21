@@ -8,7 +8,7 @@ import {
   withState,
 } from '@ngrx/signals';
 import { rxMethod } from '@ngrx/signals/rxjs-interop';
-import { EMPTY, pipe, switchMap, tap, catchError } from 'rxjs';
+import { EMPTY, pipe, switchMap, tap, catchError, firstValueFrom } from 'rxjs';
 import type {
   PlatformCollectionSummary,
   PlatformCollectionDetail,
@@ -210,6 +210,37 @@ export const PlatformCollectionStore = signalStore(
           ),
         ),
       ),
+
+      /**
+       * Promise-returning variant of `adopt` for imperative callers (e.g. the
+       * onboarding flow) that need to await the outcome. Applies the same state
+       * patches as `adopt` and resolves with the resulting `AdoptEvent`.
+       */
+      async adoptAndWait(id: string): Promise<AdoptEvent> {
+        patchState(store, { adoptingId: id, lastAdoptEvent: null });
+        try {
+          const result = await firstValueFrom(api.adopt(id));
+          const cache = store.detailCache();
+          const { [id]: _dropped, ...remainingCache } = cache;
+          const event: AdoptEvent = { type: 'success', result };
+          patchState(store, {
+            adoptingId: null,
+            lastAdoptEvent: event,
+            collections: store.collections().map(c =>
+              c.id === id
+                ? { ...c, adoptionStatus: 'adopted', adoptedCollectionId: result.collection.id }
+                : c,
+            ),
+            detailCache: remainingCache,
+          });
+          collectionStore.loadCollections();
+          return event;
+        } catch {
+          const event: AdoptEvent = { type: 'error' };
+          patchState(store, { adoptingId: null, lastAdoptEvent: event });
+          return event;
+        }
+      },
     };
   }),
 

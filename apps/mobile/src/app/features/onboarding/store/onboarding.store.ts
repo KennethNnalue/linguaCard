@@ -1,7 +1,5 @@
-import { computed, inject, Injector } from '@angular/core';
-import { toObservable } from '@angular/core/rxjs-interop';
+import { computed, inject } from '@angular/core';
 import { Router } from '@angular/router';
-import { filter, firstValueFrom, take, timeout } from 'rxjs';
 import { patchState, signalStore, withComputed, withMethods, withState } from '@ngrx/signals';
 import type { OnboardingMotivation, OnboardingLevel, PlatformCollectionSummary } from '@lingua-card/shared/domain';
 import { SUGGESTED_DAILY_GOAL } from '@lingua-card/shared/domain';
@@ -48,7 +46,6 @@ export const OnboardingStore = signalStore(
     const platformStore = inject(PlatformCollectionStore);
     const cardStore = inject(CardStore);
     const router = inject(Router);
-    const injector = inject(Injector);
 
     const persistStep = async (step: number): Promise<void> => {
       await settings.update({ onboardingStep: step });
@@ -95,27 +92,15 @@ export const OnboardingStore = signalStore(
 
       async adoptCollection(collectionId: string): Promise<void> {
         patchState(store, { isSeeding: true, seedError: null });
-        platformStore.adopt(collectionId);
 
-        const adoptingDone$ = toObservable(platformStore.adoptingId, { injector }).pipe(
-          filter(id => !id),
-          take(1),
-          timeout(30_000),
-        );
-
-        try {
-          await firstValueFrom(adoptingDone$);
-          const event = platformStore.lastAdoptEvent();
-          if (event?.type === 'success') {
-            patchState(store, {
-              isSeeding: false,
-              seededCount: event.result.addedCount,
-            });
-            cardStore.loadCards();
-          } else {
-            patchState(store, { isSeeding: false, seedError: 'adopt_failed' });
-          }
-        } catch {
+        const event = await platformStore.adoptAndWait(collectionId);
+        if (event.type === 'success') {
+          patchState(store, {
+            isSeeding: false,
+            seededCount: event.result.addedCount,
+          });
+          cardStore.loadCards();
+        } else {
           patchState(store, { isSeeding: false, seedError: 'adopt_failed' });
         }
       },

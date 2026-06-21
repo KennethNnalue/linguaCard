@@ -13,7 +13,7 @@ import { IonicRouteStrategy, provideIonicAngular } from '@ionic/angular/standalo
 import { provideServiceWorker } from '@angular/service-worker';
 import { Drivers } from '@ionic/storage';
 import { IonicStorageModule } from '@ionic/storage-angular';
-import { MissingTranslationHandler, MissingTranslationHandlerParams, provideTranslateService, provideMissingTranslationHandler } from '@ngx-translate/core';
+import { MissingTranslationHandlerParams, provideTranslateService, provideMissingTranslationHandler } from '@ngx-translate/core';
 import { provideTranslateHttpLoader } from '@ngx-translate/http-loader';
 import localeEs from '@angular/common/locales/es';
 import localeTr from '@angular/common/locales/tr';
@@ -35,13 +35,19 @@ registerLocaleData(localeUk, 'uk');
 registerLocaleData(localeRu, 'ru');
 registerLocaleData(localeAr, 'ar');
 
-class LcMissingTranslationHandler implements MissingTranslationHandler {
-  handle(params: MissingTranslationHandlerParams): string {
-    if (isDevMode()) {
-      console.warn(`[i18n] Missing translation: "${params.key}" (lang: ${params.translateService.currentLang})`);
-    }
-    return params.key;
-  }
+// Provided via useFactory (a plain object, not a DI-constructed class) so the
+// build never has to instantiate an inline class extending ngx-translate's
+// abstract MissingTranslationHandler — that useClass path was throwing
+// "Class constructor cannot be invoked without 'new'" in the prod bundle.
+function lcMissingTranslationHandlerFactory(): { handle(params: MissingTranslationHandlerParams): string } {
+  return {
+    handle(params: MissingTranslationHandlerParams): string {
+      if (isDevMode()) {
+        console.warn(`[i18n] Missing translation: "${params.key}" (lang: ${params.translateService.currentLang})`);
+      }
+      return params.key;
+    },
+  };
 }
 
 bootstrapApplication(AppComponent, {
@@ -64,7 +70,7 @@ bootstrapApplication(AppComponent, {
     ),
     provideTranslateService({ fallbackLang: 'en' }),
     provideTranslateHttpLoader({ prefix: './assets/i18n/', suffix: '.json' }),
-    provideMissingTranslationHandler(LcMissingTranslationHandler),
+    provideMissingTranslationHandler(lcMissingTranslationHandlerFactory),
     provideAi(),
     provideVault(),
     provideStories(),
