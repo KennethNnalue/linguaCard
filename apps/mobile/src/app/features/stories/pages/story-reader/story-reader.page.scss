@@ -344,7 +344,10 @@
   font-weight: t.$lc-font-weight-bold;
   font-family: t.$lc-font-body;
   cursor: pointer;
-  &:active { opacity: 0.8; }
+
+  &:active {
+    opacity: 0.8;
+  }
 }
 
 .ss-mini-play {
@@ -358,7 +361,6 @@
   justify-content: center;
   cursor: pointer;
   flex: none;
-  color: var(--lc-ss-pine);
 
   &.pulse {
     animation: ssMiniPulse 1.4s ease-in-out infinite;
@@ -612,7 +614,6 @@
   justify-content: center;
   cursor: pointer;
   flex: none;
-  color: var(--lc-ss-pine-deep);
 }
 
 .ss-xp-repeat-label {
@@ -655,7 +656,10 @@
     border-color: var(--lc-ss-sage);
     color: t.$lc-text-inverse;
   }
-  &:active { opacity: 0.8; }
+
+  &:active {
+    opacity: 0.8;
+  }
 }
 
 .ss-xp-complete {

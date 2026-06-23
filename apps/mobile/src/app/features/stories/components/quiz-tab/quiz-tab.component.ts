@@ -2,7 +2,6 @@ import {
   ChangeDetectionStrategy,
   Component,
   computed,
-  effect,
   inject,
   input,
   model,
@@ -53,20 +52,11 @@ export class QuizTabComponent {
   // Set to true while waiting for the user to tap "Next" after a wrong answer
   readonly waitingForNext = signal(false);
 
-  // Track which question IDs have already been auto-played so revisiting doesn't replay
-  private readonly playedQuestionIds = new Set<string>();
-
   readonly currentQuestion = computed(() => this.questions()[this.currentIdx()] ?? null);
 
-  constructor() {
-    // LC-332: auto-play sentence audio on question load (first visit only)
-    effect(() => {
-      const q = this.currentQuestion();
-      if (q && !this.playedQuestionIds.has(q.id)) {
-        this.playedQuestionIds.add(q.id);
-        void this.wordAudio.play(q.sentenceTemplate, 'de-DE');
-      }
-    });
+  /** The full sentence with the correct answer filled into the blank. */
+  private fullCorrectSentence(q: StoryQuizQuestion): string {
+    return q.sentenceTemplate.replace('___', q.correctAnswer);
   }
 
   readonly progressLabel = computed(
@@ -154,13 +144,13 @@ export class QuizTabComponent {
 
     if (wrong && this.pauseOnMistakes()) {
       // Stay on feedback — user must tap "Next" to continue.
-      // Still play audio so they hear the correct pronunciation.
+      // Play the full sentence with the correct answer so they hear the right version.
       this.waitingForNext.set(true);
       if (this.autoSpeak()) {
-        void this.wordAudio.playAsPromise(choice, 'de-DE');
+        void this.wordAudio.playAsPromise(this.fullCorrectSentence(q), 'de-DE');
       }
     } else {
-      void this.advanceAfterAudio(choice);
+      void this.advanceAfterAudio(q);
     }
   }
 
@@ -170,9 +160,9 @@ export class QuizTabComponent {
     this.currentIdx.update(i => i + 1);
   }
 
-  private async advanceAfterAudio(choice: string): Promise<void> {
+  private async advanceAfterAudio(q: StoryQuizQuestion): Promise<void> {
     if (this.autoSpeak()) {
-      await this.wordAudio.playAsPromise(choice, 'de-DE');
+      await this.wordAudio.playAsPromise(this.fullCorrectSentence(q), 'de-DE');
     } else {
       await new Promise<void>(r => setTimeout(r, 1500));
     }
@@ -185,14 +175,10 @@ export class QuizTabComponent {
   }
 
   retake(): void {
-    this.playedQuestionIds.clear();
     this.shuffledChoicesCache.clear();
     this.answered.set({});
     this.waitingForNext.set(false);
     this.showFeedback.set(false);
-    // Bounce through -1 so the effect re-fires even when already at index 0,
-    // ensuring auto-play triggers for question 0 after a retake.
-    this.currentIdx.set(-1);
     this.currentIdx.set(0);
   }
 }
