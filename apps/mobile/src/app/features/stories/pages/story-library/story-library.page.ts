@@ -13,12 +13,9 @@ import {
   ActionSheetController,
   AlertController,
   IonContent,
-  IonHeader,
   IonIcon,
   IonRefresher,
   IonRefresherContent,
-  IonSpinner,
-  IonToolbar,
   ModalController,
   ToastController,
 } from '@ionic/angular/standalone';
@@ -26,17 +23,13 @@ import { addIcons } from 'ionicons';
 import {
   bookOutline,
   addOutline,
+  play,
   playOutline,
-  timeOutline,
+  searchOutline,
   sparklesOutline,
-  trashOutline,
   chevronDownCircleOutline,
-  chevronBackOutline,
   chevronForwardOutline,
-  warningOutline,
-  addCircleOutline,
-  gridOutline,
-  ellipsisHorizontalOutline,
+  cloudOfflineOutline,
 } from 'ionicons/icons';
 import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import type { Story, PlatformStoryCard, StoryDifficulty, StoryCategory } from '@lingua-card/shared/domain';
@@ -62,8 +55,8 @@ const LEVEL_FILTERS: Array<{ value: StoryDifficulty | null; label: string }> = [
   styleUrls: ['./story-library.page.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [
-    IonContent, IonHeader, IonToolbar, IonIcon,
-    IonRefresher, IonRefresherContent, IonSpinner,
+    IonContent, IonIcon,
+    IonRefresher, IonRefresherContent,
     NgClass, TranslatePipe,
   ],
 })
@@ -106,11 +99,59 @@ export class StoryLibraryPage implements OnInit {
     });
   });
 
+  // ── Story Studio 2.0 redesign ────────────────────────────────────────────
+  /** Cover gradient pool — mirrors $lc-ss-grad-1..6 design tokens. */
+  private static readonly GRADIENTS = [
+    'linear-gradient(140deg,#2E5547,#6E9C88)',
+    'linear-gradient(140deg,#36544C,#86A99A)',
+    'linear-gradient(145deg,#7C4A2E,#C2703D)',
+    'linear-gradient(140deg,#22403A,#4E8C76)',
+    'linear-gradient(140deg,#566A4E,#9DB08C)',
+    'linear-gradient(145deg,#3E4F6B,#7D8FA8)',
+  ];
+
+  /** "See all" 2-column grid mode (replaces the Explore rail). */
+  readonly seeAll = signal(false);
+
+  /** Continue-reading hero: most recently listened story, else the newest. */
+  readonly continueStory = computed<Story | null>(() => {
+    const all = this.stories();
+    if (all.length === 0) return null;
+    const listened = all
+      .filter(s => s.lastListenedAt)
+      .sort((a, b) =>
+        new Date(b.lastListenedAt!).getTime() - new Date(a.lastListenedAt!).getTime()
+      );
+    return listened[0] ?? all[0];
+  });
+
+  /** Deterministic cover gradient for a story/platform id. */
+  gradientFor(id: string): string {
+    const code = id.split('').reduce((n, c) => n + c.charCodeAt(0), 0);
+    return StoryLibraryPage.GRADIENTS[code % StoryLibraryPage.GRADIENTS.length];
+  }
+
+  /** Serif initial letter for a My-Stories tile. */
+  initialFor(story: Story): string {
+    return (story.title.trim()[0] ?? '•').toUpperCase();
+  }
+
+  /** Rough progress % through a story based on listen activity (placeholder until
+   *  per-story progress lands). Returns 0 when never listened. */
+  continueProgressPct(story: Story | null): number {
+    if (!story || !story.lastListenedAt) return 0;
+    // Without granular progress we surface a modest "in progress" hint.
+    return 38;
+  }
+
+  toggleSeeAll(): void {
+    this.seeAll.update(v => !v);
+  }
+
   constructor() {
     addIcons({
-      bookOutline, addOutline, playOutline, timeOutline, sparklesOutline,
-      trashOutline, chevronDownCircleOutline, chevronBackOutline, chevronForwardOutline,
-      warningOutline, addCircleOutline, gridOutline, ellipsisHorizontalOutline,
+      bookOutline, addOutline, play, playOutline, searchOutline, sparklesOutline,
+      chevronDownCircleOutline, chevronForwardOutline, cloudOfflineOutline,
     });
 
     effect(async () => {
@@ -138,8 +179,24 @@ export class StoryLibraryPage implements OnInit {
     this.selectedLevel.set(this.selectedLevel() === level ? null : level);
   }
 
-  selectCategory(category: StoryCategory): void {
+  selectCategory(category: StoryCategory | null): void {
+    if (category === null) {
+      this.selectedCategory.set(null);
+      return;
+    }
     this.selectedCategory.set(this.selectedCategory() === category ? null : category);
+  }
+
+  /** Read minutes for the continue-reading hero (My-Stories use audio duration). */
+  continueMins(story: Story): number {
+    return Math.max(1, Math.ceil(story.audioDurationMs / 60000));
+  }
+
+  /** Best-effort category label for a generated story (uses source collection
+   *  topics when available, else a generic label). */
+  heroCategoryLabel(story: Story): string {
+    const cat = STORY_CATEGORIES.find(c => story.sourceCollectionIds?.includes(c.value));
+    return cat?.label ?? this.translate.instant('stories.length.' + story.lengthType);
   }
 
   navigateToPlatformStory(id: string): void {

@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable, Logger, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { randomUUID } from 'crypto';
@@ -7,6 +7,7 @@ import { PlatformCollectionWordEntity } from './platform-collection-word.entity'
 import { PlatformStoryEntity } from '../platform-stories/platform-story.entity';
 import { UserStoryProgressEntity } from '../platform-stories/user-story-progress.entity';
 import { WordDictionaryService } from '../word-dictionary/word-dictionary.service';
+import { StoryAudioService } from '../stories/story-audio.service';
 import type {
   AdminImportCollectionDto,
   AdminImportCollectionResult,
@@ -30,7 +31,10 @@ export class AdminService {
     @InjectRepository(UserStoryProgressEntity)
     private readonly storyProgressRepo: Repository<UserStoryProgressEntity>,
     private readonly dictionary: WordDictionaryService,
+    private readonly storyAudio: StoryAudioService,
   ) {}
+
+  private readonly logger = new Logger(AdminService.name);
 
   async importCollectionJson(dto: AdminImportCollectionJsonDto): Promise<AdminImportCollectionJsonResult> {
     const collectionId = crypto.randomUUID();
@@ -136,20 +140,37 @@ export class AdminService {
 
     const storyId = crypto.randomUUID();
     const totalWords = story.sentences.reduce((acc, s) => acc + s.german.split(/\s+/).length, 0);
+    const bodyDe = story.sentences.map(s => s.german).join(' ');
+
+    // Optionally generate narration audio + word timestamps via TTS at import time.
+    let audioUrl: string | null = null;
+    let audioDurationMs = 0;
+    let wordTimestamps: PlatformStoryEntity['wordTimestamps'] = [];
+    if (dto.generateAudio) {
+      try {
+        const result = await this.storyAudio.generateAudioWithTimestamps(bodyDe, storyId);
+        audioUrl = result.audioUrl;
+        audioDurationMs = result.durationMs;
+        wordTimestamps = result.timestamps;
+      } catch (err) {
+        this.logger.error(`Audio generation failed for platform story ${storyId} — saving without audio`, err);
+      }
+    }
+
     const entity = Object.assign(new PlatformStoryEntity(), {
       id: storyId,
       title: story.title,
       titleTranslation: story.titleTranslation,
-      bodyDe: story.sentences.map(s => s.german).join(' '),
+      bodyDe,
       bodyNative: story.sentences.map(s => s.native).join(' '),
       nativeLang: 'en',
       sentences,
       keywords,
-      wordTimestamps: [],
+      wordTimestamps,
       quizQuestions: [],
       grammarNotes: [],
-      audioUrl: null,
-      audioDurationMs: 0,
+      audioUrl,
+      audioDurationMs,
       coverImageUrl: null,
       level: story.level as string,
       category: story.topic as string,
@@ -169,6 +190,7 @@ export class AdminService {
       title: story.title,
       sentenceCount: story.sentences.length,
       keywordsResolved: keywordEntries.filter(e => e !== null).length,
+      audioGenerated: audioUrl !== null,
     };
   }
 

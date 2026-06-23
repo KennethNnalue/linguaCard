@@ -1,85 +1,39 @@
-<ion-header class="ion-no-border">
-  <ion-toolbar>
-    <div class="sc-nav">
-      <button class="sc-back-btn" (click)="goToLibrary()" [attr.aria-label]="'stories.complete.backAriaLabel' | translate">
-        <ion-icon name="arrow-back-outline"></ion-icon>
-      </button>
-      <span class="sc-nav-title">{{ 'stories.complete.pageTitle' | translate }}</span>
-      <div style="width: 32px;"></div>
-    </div>
-  </ion-toolbar>
-</ion-header>
-
-<ion-content>
+<ion-content class="ss-complete">
   @if (story(); as s) {
-
-    <!-- Completion banner -->
-    <div class="sc-banner">
-      <div class="sc-banner-icon">
-        <ion-icon name="checkmark-circle-outline"></ion-icon>
+    <div class="ss-complete-inner">
+      <div class="ss-complete-cover" [style.background]="coverGradient(s)">
+        <svg viewBox="0 0 24 24" width="46" height="46" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">
+          <polyline points="20,6 9,17 4,12"/>
+        </svg>
       </div>
-      <div class="sc-banner-title">{{ 'stories.complete.title' | translate }}</div>
-      <div class="sc-banner-sub">{{ 'stories.complete.finishedMsg' | translate: { title: s.title } }}</div>
-      <div class="sc-banner-stats">
-        <div class="sc-stat">
-          <span class="sc-stat-value">{{ s.vocabWords.length }}</span>
-          <span class="sc-stat-label">{{ 'stories.complete.vocabWordsLabel' | translate }}</span>
-        </div>
-        <div class="sc-stat-divider"></div>
-        <div class="sc-stat">
-          <span class="sc-stat-value">{{ s.sentences.length }}</span>
-          <span class="sc-stat-label">{{ 'stories.complete.sentencesLabel' | translate }}</span>
-        </div>
-        <div class="sc-stat-divider"></div>
-        <div class="sc-stat">
-          <span class="sc-stat-value">{{ s.listenCount }}</span>
-          <span class="sc-stat-label">{{ s.listenCount === 1 ? ('stories.complete.listenSingular' | translate) : ('stories.complete.listenPlural' | translate) }}</span>
-        </div>
-      </div>
-    </div>
 
-    <!-- Vocab words -->
-    <div class="sc-section-header">
-      <span class="sc-section-title">{{ 'stories.complete.wordsSection' | translate }}</span>
-    </div>
+      <div class="ss-complete-eyebrow">{{ 'stories.complete.eyebrow' | translate }}</div>
+      <div class="ss-complete-title">{{ s.title }}</div>
+      <div class="ss-complete-meta">{{ metaLine() }}</div>
 
-    <div class="sc-vocab-list">
-      @for (vw of s.vocabWords; track vw.cardId) {
-        <div class="sc-vocab-card">
-          <div class="sc-vocab-bar" [class]="'sc-vocab-bar--' + (vw.article ?? 'none')"></div>
-          <div class="sc-vocab-content">
-            <div class="sc-vocab-top">
-              @if (vw.article) {
-                <lc-article-badge [article]="vw.article" />
-              }
-              <span class="sc-vocab-word">{{ vw.german }}</span>
-            </div>
-            <div class="sc-vocab-mid">
-              <span class="sc-vocab-en">{{ vw.english }}</span>
-              @if (vw.germanBase && vw.germanBase !== vw.german) {
-                <span class="sc-vocab-base">{{ vw.germanBase }}</span>
-              }
-            </div>
-          </div>
+      @if (quizDone()) {
+        <div class="ss-complete-quiz">
+          <div class="ss-complete-quiz-label">{{ 'stories.complete.quizScoreLabel' | translate }}</div>
+          <div class="ss-complete-quiz-score">{{ quizScoreLabel() }}</div>
         </div>
       }
-    </div>
 
-    <!-- Actions -->
-    <div class="sc-actions">
-      <button class="sc-btn-replay" (click)="replayStory()">
-        <ion-icon name="play-outline"></ion-icon>
-        {{ 'stories.complete.readAgainBtn' | translate }}
+      <button class="ss-complete-primary" (click)="replayStory()">
+        <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <polyline points="1,4 1,10 7,10"/><path d="M3.5 15a9 9 0 1 0 .5-5"/>
+        </svg>
+        {{ 'stories.complete.replayBtn' | translate }}
       </button>
-      <button class="sc-btn-library" (click)="goToLibrary()">
-        <ion-icon name="sparkles-outline"></ion-icon>
-        {{ 'stories.complete.moreStoriesBtn' | translate }}
-      </button>
-    </div>
 
+      @if (nextStory(); as next) {
+        <button class="ss-complete-next" (click)="playNext()">
+          {{ 'stories.complete.playNextBtn' | translate:{ title: next.title } }}
+        </button>
+      }
+
+      <button class="ss-complete-back" (click)="goToLibrary()">{{ 'stories.complete.backToStories' | translate }}</button>
+    </div>
   } @else {
-    <div class="sc-loading">{{ 'stories.complete.loadingMsg' | translate }}</div>
+    <div class="ss-complete-loading">{{ 'stories.complete.loadingMsg' | translate }}</div>
   }
-
-  <div style="height: 32px;"></div>
 </ion-content>

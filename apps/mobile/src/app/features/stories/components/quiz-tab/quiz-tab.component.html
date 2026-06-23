@@ -1,124 +1,93 @@
 @if (loading() && questions().length === 0) {
-  <div class="quiz-empty">
-    <div class="tab-loading-spinner"></div>
-    <p class="tab-loading-text">{{ 'stories.quiz.generatingMsg' | translate }}</p>
+  <div class="ss-quiz-panel ss-quiz-state">
+    <div class="ss-quiz-spinner"></div>
+    <p class="ss-quiz-state-text">{{ 'stories.quiz.generatingMsg' | translate }}</p>
   </div>
 } @else if (questions().length === 0) {
-  <div class="quiz-empty">
-    <div class="quiz-empty-icon">📝</div>
-    <p>{{ 'stories.quiz.noQuizTitle' | translate }}</p>
-    <p class="quiz-empty-sub">{{ 'stories.quiz.noQuizDesc' | translate }}</p>
+  <div class="ss-quiz-panel ss-quiz-state">
+    <div class="ss-quiz-state-emoji">📝</div>
+    <p class="ss-quiz-state-text">{{ 'stories.quiz.noQuizTitle' | translate }}</p>
+    <p class="ss-quiz-state-sub">{{ 'stories.quiz.noQuizDesc' | translate }}</p>
   </div>
 
 } @else if (isComplete()) {
 
-  <!-- Completion screen -->
-  <div class="quiz-complete">
-    <div class="quiz-complete-emoji">
+  <!-- Completion summary -->
+  <div class="ss-quiz-panel ss-quiz-complete">
+    <div class="ss-quiz-emoji">
       {{ correctCount() === questions().length ? '🎉' : correctCount() >= questions().length / 2 ? '👍' : '💪' }}
     </div>
-    <div class="quiz-complete-score">
-      {{ correctCount() }} / {{ questions().length }}
-    </div>
-    <div class="quiz-complete-label">{{ 'stories.quiz.correctLabel' | translate }}</div>
-    <button class="quiz-retake-btn" (click)="retake()">{{ 'stories.quiz.retakeBtn' | translate }}</button>
+    <div class="ss-quiz-score">{{ correctCount() }} / {{ questions().length }}</div>
+    <div class="ss-quiz-score-label">{{ 'stories.quiz.correctAnswersLabel' | translate }}</div>
+    <button class="ss-quiz-retake" (click)="retake()">{{ 'stories.quiz.takeAgainBtn' | translate }}</button>
   </div>
 
 } @else {
 
-  <!-- Progress ring header + audio toggle -->
-  <div class="quiz-header">
-    <div class="quiz-blob">
-      <svg class="quiz-ring-svg" viewBox="0 0 72 72">
-        <circle
-          cx="36" cy="36" r="30"
-          fill="none"
-          stroke="rgba(255,255,255,0.2)"
-          stroke-width="3"
-          stroke-dasharray="188.5"
-        />
-        <circle
-          cx="36" cy="36" r="30"
-          fill="none"
-          stroke="white"
-          stroke-width="3"
-          stroke-linecap="round"
-          [attr.stroke-dasharray]="188.5"
-          [attr.stroke-dashoffset]="progressDashOffset()"
-          style="transform:rotate(-90deg); transform-origin:center"
-        />
-      </svg>
-      <span class="quiz-progress-label">{{ progressLabel() }}</span>
+  <div class="ss-quiz-panel">
+    <!-- Progress ring header -->
+    <div class="ss-quiz-prog">
+      <div class="ss-quiz-ring">
+        <svg viewBox="0 0 72 72" width="60" height="60">
+          <circle cx="36" cy="36" r="31" fill="none" stroke="rgba(255,255,255,0.18)" stroke-width="4"/>
+          <circle cx="36" cy="36" r="31" fill="none" stroke="#6EE7B7" stroke-width="4" stroke-linecap="round"
+                  stroke-dasharray="194.8" [attr.stroke-dashoffset]="progressDashOffset()"
+                  style="transform:rotate(-90deg); transform-origin:center; transition:stroke-dashoffset .4s" />
+        </svg>
+        <span class="ss-quiz-ring-label">{{ progressLabel() }}</span>
+      </div>
+      <button class="ss-quiz-speaker"
+              [class.muted]="!autoSpeak()"
+              (click)="toggleAutoSpeak()"
+              [attr.aria-label]="'stories.quiz.playSentenceAriaLabel' | translate">
+        @if (pronunciationLoading()) {
+          <div class="ss-quiz-speaker-spinner"></div>
+        } @else if (autoSpeak()) {
+          <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <polygon points="11,5 6,9 2,9 2,15 6,15 11,19"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14"/><path d="M15.54 8.46a5 5 0 0 1 0 7.07"/>
+          </svg>
+        } @else {
+          <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <polygon points="11,5 6,9 2,9 2,15 6,15 11,19"/><line x1="23" y1="9" x2="17" y2="15"/><line x1="17" y1="9" x2="23" y2="15"/>
+          </svg>
+        }
+      </button>
     </div>
 
-    <!-- Audio toggle -->
-    <button
-      class="quiz-audio-toggle"
-      [class.muted]="!autoSpeak()"
-      (click)="autoSpeak.update(v => !v)"
-      [attr.aria-label]="(autoSpeak() ? 'stories.quiz.muteAriaLabel' : 'stories.quiz.unmuteAriaLabel') | translate"
-    >
-      @if (pronunciationLoading()) {
-        <div class="quiz-audio-spinner"></div>
-      } @else if (autoSpeak()) {
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-          <polygon points="11,5 6,9 2,9 2,15 6,15 11,19 11,5"/>
-          <path d="M15.54,8.46a5,5,0,0,1,0,7.07"/>
-          <path d="M19.07,4.93a10,10,0,0,1,0,14.14"/>
-        </svg>
-      } @else {
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-          <polygon points="11,5 6,9 2,9 2,15 6,15 11,19 11,5"/>
-          <line x1="23" y1="9" x2="17" y2="15"/>
-          <line x1="17" y1="9" x2="23" y2="15"/>
-        </svg>
-      }
-    </button>
-  </div>
+    <!-- Body -->
+    <div class="ss-quiz-body">
+      <p class="ss-quiz-sentence">
+        {{ sentenceParts().before }}<span class="ss-quiz-blank" [class.filled]="!!getChosenAnswer()">{{ getChosenAnswer() ?? '' }}</span>{{ sentenceParts().after }}
+      </p>
 
-  <!-- Quiz content -->
-  <div class="quiz-content">
-
-    <!-- Question sentence -->
-    <p class="quiz-sentence">{{ currentQuestion().sentenceTemplate }}</p>
-
-    <!-- Answer choices -->
-    <div class="quiz-choices">
       @for (choice of choices(); track choice) {
         <button
-          class="choice-btn"
+          class="ss-quiz-choice"
           [ngClass]="choiceClass(choice)"
           [disabled]="!!getChosenAnswer()"
           (click)="selectAnswer(choice)"
-        >
-          {{ choice }}
+        >{{ choice }}</button>
+      }
+
+      @if (showFeedback() && isWrongAnswer() && currentQuestion(); as q) {
+        @if (q.hint) {
+          <div class="ss-quiz-hint">
+            <div class="ss-quiz-hint-label">{{ 'stories.quiz.hintLabel' | translate }}</div>
+            <div class="ss-quiz-hint-text">{{ q.hint }}</div>
+          </div>
+        }
+      }
+
+      @if (getChosenAnswer() && waitingForNext()) {
+        <button class="ss-quiz-next" (click)="next()">
+          {{ (isLastQuestion() ? 'stories.quiz.finishBtn' : 'stories.quiz.nextQuestionBtn') | translate }}
         </button>
       }
-    </div>
 
-    <!-- Wrong-answer feedback block (hint + Next button) -->
-    @if (showFeedback() && isWrongAnswer()) {
-      <div class="quiz-feedback-block">
-        @if (currentQuestion().hint) {
-          <p class="quiz-hint">💡 {{ currentQuestion().hint }}</p>
-        }
-        @if (waitingForNext()) {
-          <button class="quiz-next-btn" (click)="next()">
-            {{ 'stories.quiz.nextBtn' | translate }}
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" width="14" height="14">
-              <polyline points="9,18 15,12 9,6"/>
-            </svg>
-          </button>
-        }
-      </div>
-    }
-
-    <!-- Settings row -->
-    <div class="quiz-settings">
-      <div class="quiz-settings-row">
-        <div class="quiz-settings-label">
-          <span class="quiz-settings-title">{{ 'stories.quiz.pauseOnMistakesTitle' | translate }}</span>
-          <span class="quiz-settings-sub">{{ 'stories.quiz.pauseOnMistakesDesc' | translate }}</span>
+      <div class="ss-quiz-footer">
+        <div class="ss-quiz-footer-text">
+          <div class="ss-quiz-footer-title">{{ 'stories.quiz.pauseOnMistakesTitle' | translate }}</div>
+          <div class="ss-quiz-footer-sub">{{ 'stories.quiz.pauseOnMistakesDesc' | translate }}</div>
         </div>
         <ion-toggle
           [checked]="pauseOnMistakes()"
@@ -128,6 +97,5 @@
         />
       </div>
     </div>
-
   </div>
 }

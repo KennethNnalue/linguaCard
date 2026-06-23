@@ -938,7 +938,7 @@
       "playPronunciationAriaLabel": "Play pronunciation",
       "alreadyInVaultAriaLabel": "Already in vault",
       "addToVaultAriaLabel": "Add to vault",
-      "conjugateBtn": "Conjugate ▸",
+      "conjugateBtn": "Conjugate",
       "praesensHeader": "Präsens",
       "praeteritumHeader": "Präteritum",
       "perfektLabel": "Perfekt:",
@@ -953,6 +953,7 @@
       "finishedReadingHint": "Finished reading? You decide when it's done.",
       "markCompleteBtn": "Mark story complete",
       "nowPlaying": "NOW PLAYING",
+      "speedSection": "Speed",
       "upNext": "UP NEXT",
       "repeatOff": "Repeat off",
       "repeatQueue": "Repeat queue",
@@ -961,11 +962,13 @@
       "repeatAriaLabel": "Repeat",
       "prevAriaLabel": "Previous",
       "nextAriaLabel": "Next",
+      "audioUnavailableToast": "Audio unavailable — skipping to the next story",
       "expandPlayerAriaLabel": "Expand player",
       "collapsePlayerAriaLabel": "Collapse player",
       "neverFinishHint": "Stories never finish on their own — tap when you're ready.",
       "addedToVaultToast": "Added to your vault",
-      "alreadyInVaultToast": "Already in your vault"
+      "alreadyInVaultToast": "Already in your vault",
+      "saveFailedToast": "Failed to save word — please try again"
     },
     "complete": {
       "backAriaLabel": "Back to library",
@@ -979,7 +982,12 @@
       "wordsSection": "Words in this story",
       "readAgainBtn": "Read again",
       "moreStoriesBtn": "More stories",
-      "loadingMsg": "Loading…"
+      "loadingMsg": "Loading…",
+      "eyebrow": "STORY COMPLETE",
+      "quizScoreLabel": "QUIZ SCORE",
+      "replayBtn": "Replay story",
+      "playNextBtn": "Play next · {{title}}",
+      "backToStories": "Back to Stories"
     },
     "generate": {
       "pageTitle": "Generate Story",
@@ -1052,7 +1060,13 @@
       "unmuteAriaLabel": "Unmute answer audio",
       "nextBtn": "Next",
       "pauseOnMistakesTitle": "Pause on mistakes",
-      "pauseOnMistakesDesc": "Review the correct answer before continuing"
+      "pauseOnMistakesDesc": "Review the correct answer before continuing",
+      "correctAnswersLabel": "correct answers",
+      "takeAgainBtn": "Take it again",
+      "nextQuestionBtn": "Next question",
+      "finishBtn": "Finish quiz",
+      "hintLabel": "HINT",
+      "playSentenceAriaLabel": "Play sentence"
     }
   },
   "settings": {

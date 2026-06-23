@@ -973,6 +973,8 @@ export interface AdminImportStoryDto {
   platformCollectionId: string;
   story: GeneratedPlatformStory;
   isFiction?: boolean;
+  /** When true, generate narration audio + word timestamps via TTS at import time. */
+  generateAudio?: boolean;
 }
 
 export interface AdminImportStoryResult {
@@ -980,6 +982,8 @@ export interface AdminImportStoryResult {
   title: string;
   sentenceCount: number;
   keywordsResolved: number;
+  /** True when narration audio was successfully generated and attached. */
+  audioGenerated: boolean;
 }
 
 // Pre-enriched word — no AI call needed, audio resolved server-side

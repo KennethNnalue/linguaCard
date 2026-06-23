@@ -865,7 +865,7 @@
       "playPronunciationAriaLabel": "Відтворити вимову",
       "alreadyInVaultAriaLabel": "Вже в сховищі",
       "addToVaultAriaLabel": "Додати до сховища",
-      "conjugateBtn": "Відмінювати ▸",
+      "conjugateBtn": "Відмінювати",
       "praesensHeader": "Präsens",
       "praeteritumHeader": "Präteritum",
       "perfektLabel": "Perfekt:",
@@ -880,6 +880,7 @@
       "finishedReadingHint": "Закінчили читати? Ви вирішуєте, коли готово.",
       "markCompleteBtn": "Позначити історію завершеною",
       "nowPlaying": "ЗАРАЗ ГРАЄ",
+      "speedSection": "Швидкість",
       "upNext": "ДАЛІ",
       "repeatOff": "Повтор вимкнено",
       "repeatQueue": "Повторити чергу",
@@ -888,11 +889,13 @@
       "repeatAriaLabel": "Повтор",
       "prevAriaLabel": "Попередня",
       "nextAriaLabel": "Наступна",
+      "audioUnavailableToast": "Аудіо недоступне — переходимо до наступної історії",
       "expandPlayerAriaLabel": "Розгорнути плеєр",
       "collapsePlayerAriaLabel": "Згорнути плеєр",
       "neverFinishHint": "Історії ніколи не завершуються самі — торкніться, коли будете готові.",
       "addedToVaultToast": "Додано до сховища",
-      "alreadyInVaultToast": "Вже у сховищі"
+      "alreadyInVaultToast": "Вже у сховищі",
+      "saveFailedToast": "Не вдалося зберегти слово — спробуйте ще раз"
     },
     "complete": {
       "backAriaLabel": "Назад до бібліотеки",
@@ -906,7 +909,12 @@
       "wordsSection": "Слова в цій історії",
       "readAgainBtn": "Читати знову",
       "moreStoriesBtn": "Більше історій",
-      "loadingMsg": "Завантаження…"
+      "loadingMsg": "Завантаження…",
+      "eyebrow": "ІСТОРІЮ ЗАВЕРШЕНО",
+      "quizScoreLabel": "РЕЗУЛЬТАТ",
+      "replayBtn": "Повторити історію",
+      "playNextBtn": "Далі · {{title}}",
+      "backToStories": "Назад до Історій"
     },
     "generate": {
       "pageTitle": "Згенерувати історію",
@@ -950,7 +958,13 @@
       "unmuteAriaLabel": "Увімкнути звук відповіді",
       "nextBtn": "Далі",
       "pauseOnMistakesTitle": "Пауза на помилках",
-      "pauseOnMistakesDesc": "Перегляньте правильну відповідь перед продовженням"
+      "pauseOnMistakesDesc": "Перегляньте правильну відповідь перед продовженням",
+      "correctAnswersLabel": "правильних відповідей",
+      "takeAgainBtn": "Спробувати ще раз",
+      "nextQuestionBtn": "Наступне питання",
+      "finishBtn": "Завершити тест",
+      "hintLabel": "ПІДКАЗКА",
+      "playSentenceAriaLabel": "Відтворити речення"
     },
     "length": {
       "short": "Коротка",

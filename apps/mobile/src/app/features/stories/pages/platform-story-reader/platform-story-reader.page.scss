@@ -64,10 +64,20 @@
   &.level-B1              { background: #FEF3C7; color: #D97706; }
   &.level-B2              { background: #EAF2FC; color: #1A56A3; }
 }
-.sr2-icon-btn {
-  @include u.circle(28px); @include u.flex-center;
-  background: var(--lc-surface); border: 1px solid var(--lc-border);
-  cursor: pointer; color: var(--lc-text-hint);
+.sr2-story-toprow {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 0 16px 14px;
+}
+.sr2-tap-hint {
+  font-size: t.$lc-text-xs; color: var(--lc-text-hint);
+}
+.sr2-en-toggle {
+  display: flex; align-items: center; gap: 6px;
+  font-size: t.$lc-text-xs; font-weight: 600; font-family: inherit;
+  cursor: pointer; border-radius: 16px; padding: 6px 11px;
+  background: var(--lc-surface); color: var(--lc-text-hint);
+  border: 1px solid var(--lc-border);
+  transition: all t.$lc-duration-fast;
   &.active { background: var(--lc-brand-light); border-color: var(--lc-brand); color: var(--lc-brand); }
 }
 

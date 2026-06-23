@@ -154,6 +154,18 @@ export const StoryStore = signalStore(
         void firstValueFrom(api.recordListen(id)).catch(() => null);
       },
 
+      /**
+       * Flag a story's cached audio as missing (e.g. its file 404'd). Clears the
+       * local `audioUrl` so the next open re-generates it, and evicts any stale
+       * cached copy. Local-only — no server write (the file is already gone).
+       */
+      markAudioMissing(id: string): void {
+        patchState(store, {
+          stories: store.stories().map(s => (s.id === id ? { ...s, audioUrl: null } : s)),
+        });
+        void audioCache.evict(id);
+      },
+
       async generateAudio(id: string): Promise<Story | null> {
         try {
           const story = await firstValueFrom(api.generateAudio(id));

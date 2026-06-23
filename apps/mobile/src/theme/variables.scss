@@ -114,6 +114,60 @@
   --lc-transition-base:  #{t.$lc-duration-base} #{t.$lc-easing-standard};
   --lc-transition-slow:  #{t.$lc-duration-slow} #{t.$lc-easing-spring};
   --lc-flip-duration:    #{t.$lc-duration-flip};
+
+  // ─── STORY STUDIO 2.0 PALETTE (Epic 15) ───────────────────────────────────
+  // Light values mirror the $lc-ss-* SCSS tokens. Dark overrides live in the
+  // body.ion-palette-dark block. Components reference var(--lc-ss-*).
+  --lc-ss-pine:            #{t.$lc-ss-pine};
+  --lc-ss-pine-deep:       #{t.$lc-ss-pine-deep};
+  --lc-ss-ink:             #{t.$lc-ss-ink};
+  --lc-ss-sage:            #{t.$lc-ss-sage};
+  --lc-ss-sage-text:       #{t.$lc-ss-sage-text};
+  --lc-ss-mint:            #{t.$lc-ss-mint};
+  --lc-ss-karaoke-bg:      #{t.$lc-ss-karaoke-bg};
+  --lc-ss-karaoke-text:    #15302A;
+  --lc-ss-karaoke-vocab:   #{t.$lc-ss-karaoke-vocab};
+  --lc-ss-karaoke-plain:   #{t.$lc-ss-karaoke-plain};
+  --lc-ss-paper:           #{t.$lc-ss-paper};
+  --lc-ss-card:            #{t.$lc-ss-card};
+  --lc-ss-sand:            #{t.$lc-ss-sand};
+  --lc-ss-sand-progress:   #{t.$lc-ss-sand-progress};
+  --lc-ss-mint-chip-bg:     #{t.$lc-ss-mint-chip-bg};
+  --lc-ss-mint-chip-border: #{t.$lc-ss-mint-chip-border};
+  --lc-ss-mint-chip-text:   #{t.$lc-ss-mint-chip-text};
+  --lc-ss-muted:           #{t.$lc-ss-muted};
+  --lc-ss-muted-alt:       #{t.$lc-ss-muted-alt};
+  --lc-ss-muted-chip:      #{t.$lc-ss-muted-chip};
+  --lc-ss-muted-soft:      #5C6661;  // hero pct, finish hint
+  --lc-ss-play-bg:         #{t.$lc-ss-play-bg};
+  --lc-ss-translate-en:    #{t.$lc-ss-translate-en};
+  --lc-ss-hairline:        #{t.$lc-ss-hairline};
+  --lc-ss-hairline-soft:   #{t.$lc-ss-hairline-soft};
+  --lc-ss-hairline-strong: #{t.$lc-ss-hairline-strong};
+  --lc-ss-vocab-underline: #{t.$lc-ss-vocab-underline};
+  --lc-ss-premium-star:    #{t.$lc-ss-premium-star};
+  --lc-ss-verb-tag-bg:     #F3E7DC;
+  --lc-ss-verb-tag-text:   #A85C2E;
+  --lc-ss-vocab-chip-bg:     #EEF1EE;
+  --lc-ss-vocab-chip-text:   #5C6661;
+  --lc-ss-vocab-chip-border: #DBE1DC;
+  --lc-ss-vocab-more:      #B6BDB8;
+  --lc-ss-chevron:         #C2C8C3;
+  // Surfaces inside the always-dark sheets/panels (word sheet, quiz, expanded
+  // player) — these stay dark in both themes by design, but are tokenised so
+  // dark mode can deepen them slightly for contrast against the dark page.
+  --lc-ss-sheet-bg:        #{t.$lc-ss-ink};
+  --lc-ss-quiz-header:     #1F3D34;
+  --lc-ss-on-dark:         #FFFFFF;
+  --lc-ss-on-dark-70:      rgba(255, 255, 255, 0.7);
+  --lc-ss-on-dark-55:      rgba(255, 255, 255, 0.55);
+  --lc-ss-shadow-card:     #{t.$lc-ss-shadow-card};
+  --lc-ss-shadow-hero:     #{t.$lc-ss-shadow-hero};
+  --lc-ss-shadow-row:      #{t.$lc-ss-shadow-row};
+  --lc-ss-shadow-fab:      #{t.$lc-ss-shadow-fab};
+  // Skeleton shimmer stops (base → highlight → base)
+  --lc-ss-skeleton-base:   #EFEADC;
+  --lc-ss-skeleton-hi:     #F6F2E8;
 }
 
 // ─── IONIC CSS VARIABLE MAPPINGS ─────────────────────────────────────────────
@@ -228,6 +282,71 @@ body.ion-palette-dark {
   --ion-item-background:     var(--lc-card);
   --ion-toolbar-background:  var(--lc-card);
   --ion-tab-bar-background:  var(--lc-card);
+
+  // ─── STORY STUDIO 2.0 — DARK ──────────────────────────────────────────────
+  // Keep the green accent family; remap paper/card surfaces to the app's dark
+  // surfaces and lift text. The pine/mint accents stay bright for contrast.
+  --lc-ss-pine:            #5ABFA3;   // primary buttons/tabs read bright on dark
+  --lc-ss-pine-deep:       #16302A;   // always-dark panels stay deep
+  --lc-ss-ink:             #E4F0EC;   // primary text on dark
+  --lc-ss-sage:            #6FB89E;   // eyebrows / progress fill
+  --lc-ss-sage-text:       #7FCBAE;   // vocab words in reader
+  --lc-ss-mint:            #6EE7B7;   // unchanged — already bright
+
+  // Karaoke — current word: dark mint tint with light text
+  --lc-ss-karaoke-bg:      rgba(110, 231, 183, 0.22);
+  --lc-ss-karaoke-text:    #D6F5E8;
+  --lc-ss-karaoke-vocab:   #5E8478;   // already-read vocab, softened
+  --lc-ss-karaoke-plain:   #6B7570;   // already-read plain, softened
+
+  // Surfaces
+  --lc-ss-paper:           #111614;   // page bg (matches --lc-surface)
+  --lc-ss-card:            #1E2924;   // cards/rows (matches --lc-card)
+  --lc-ss-sand:            #232E29;   // segmented-control track
+  --lc-ss-sand-progress:   #2A3530;   // hero progress track
+
+  // Mint chips (active category / English toggle on)
+  --lc-ss-mint-chip-bg:     #16302A;
+  --lc-ss-mint-chip-border: #2A6B58;
+  --lc-ss-mint-chip-text:   #6EE7B7;
+
+  // Muted text
+  --lc-ss-muted:           #8FA8A0;
+  --lc-ss-muted-alt:       #80968F;
+  --lc-ss-muted-chip:      #8FA8A0;
+  --lc-ss-muted-soft:      #A6B8B2;
+
+  --lc-ss-play-bg:         #1E3830;
+  --lc-ss-translate-en:    #7FA89A;
+
+  // Hairlines — light-on-dark
+  --lc-ss-hairline:        rgba(228, 240, 236, 0.10);
+  --lc-ss-hairline-soft:   rgba(228, 240, 236, 0.07);
+  --lc-ss-hairline-strong: rgba(228, 240, 236, 0.16);
+  --lc-ss-vocab-underline: #4E7A6C;
+  --lc-ss-premium-star:    #F2C57C;
+
+  // Verb tag (keywords) — dark warm tint
+  --lc-ss-verb-tag-bg:     #2E1F12;
+  --lc-ss-verb-tag-text:   #E0A06A;
+
+  // Vocab chips (My Stories) — neutral dark tint (article colours override)
+  --lc-ss-vocab-chip-bg:     #232E29;
+  --lc-ss-vocab-chip-text:   #A6B8B2;
+  --lc-ss-vocab-chip-border: rgba(228, 240, 236, 0.12);
+  --lc-ss-vocab-more:      #6B7570;
+  --lc-ss-chevron:         #4F5B56;
+
+  // Always-dark sheets — deepen slightly so they still lift off the dark page
+  --lc-ss-sheet-bg:        #15201C;
+  --lc-ss-quiz-header:     #18352D;
+
+  --lc-ss-shadow-card:     0 2px 8px rgba(0, 0, 0, 0.45), 0 1px 2px rgba(0, 0, 0, 0.3);
+  --lc-ss-shadow-hero:     0 8px 24px rgba(0, 0, 0, 0.5), 0 2px 6px rgba(0, 0, 0, 0.3);
+  --lc-ss-shadow-row:      0 2px 10px rgba(0, 0, 0, 0.4), 0 1px 2px rgba(0, 0, 0, 0.3);
+  --lc-ss-shadow-fab:      0 6px 16px rgba(0, 0, 0, 0.5);
+  --lc-ss-skeleton-base:   #1B2520;
+  --lc-ss-skeleton-hi:     #243029;
 }
 
 // ─── UTILITY CLASSES ─────────────────────────────────────────────────────────

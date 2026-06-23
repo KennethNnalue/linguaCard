@@ -1,62 +1,26 @@
 @if (loading() && keywords().length === 0) {
-  <div class="kw-empty">
-    <div class="tab-loading-spinner"></div>
-    <p class="tab-loading-text">{{ 'stories.keywords.extractingMsg' | translate }}</p>
+  <div class="ss-kw-state">
+    <div class="ss-kw-spinner"></div>
+    <p class="ss-kw-state-text">{{ 'stories.keywords.extractingMsg' | translate }}</p>
   </div>
 } @else if (keywords().length === 0) {
-  <div class="kw-empty">
-    <div class="kw-empty-icon">📚</div>
-    <p>{{ 'stories.keywords.noKeywordsMsg' | translate }}</p>
+  <div class="ss-kw-state">
+    <div class="ss-kw-state-emoji">📚</div>
+    <p class="ss-kw-state-text">{{ 'stories.keywords.noKeywordsMsg' | translate }}</p>
   </div>
 } @else {
-
-  <!-- Memorize CTA -->
-  <button class="kw-memorize-btn" (click)="memorizeAll.emit()">
-    <span class="kw-memorize-icon">📋</span>
-    <span class="kw-memorize-text">{{ 'stories.keywords.memorizeBtn' | translate }}</span>
-    <span class="kw-memorize-arrow">→</span>
-  </button>
-
-  <!-- Keyword list -->
-  <div class="kw-list">
+  <div class="ss-kw-list">
     @for (kw of keywords(); track kw.germanBase) {
-      <div
-        class="kw-item"
-        [class.kw-item--tappable]="!!kw.cardId"
-        (click)="kw.cardId && cardClick.emit(kw)"
-      >
-        <span
-          class="kw-level-badge"
-          [style.background]="levelStyle(kw.level).background"
-          [style.color]="levelStyle(kw.level).color"
-        >{{ kw.level }}</span>
-
-        <div class="kw-body">
-          <div class="kw-word-row">
-            <span class="kw-word">{{ kw.german }}</span>
-            <span class="kw-type"> - {{ 'stories.wordType.' + kw.wordType | translate }}</span>
-          </div>
-          <div class="kw-translation">{{ kw.translation }}</div>
+      <div class="ss-kw-row" (click)="wordClick.emit(kw)" role="button"
+           [attr.aria-label]="kw.german">
+        <div class="ss-kw-info">
+          <div class="ss-kw-word">{{ kw.german }}</div>
+          <div class="ss-kw-gloss">{{ kw.translation }}</div>
         </div>
-
-        <div class="kw-actions">
-          <button
-            class="kw-action-btn"
-            [class.kw-playing]="isThisPlaying(kw)"
-            [disabled]="isThisPlaying(kw)"
-            (click)="$event.stopPropagation(); onPlayWord(kw)"
-            [title]="'stories.keywords.playPronunciationTitle' | translate"
-          >
-            @if (isThisPlaying(kw)) {
-              <div class="kw-btn-spinner"></div>
-            } @else {
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round">
-                <polygon points="11,5 6,9 2,9 2,15 6,15 11,19 11,5"/>
-                <path d="M15.54,8.46a5,5,0,0,1,0,7.07"/>
-              </svg>
-            }
-          </button>
-        </div>
+        <span class="ss-kw-type" [class.verb]="isVerb(kw)">{{ 'stories.wordType.' + kw.wordType | translate }}</span>
+        <svg class="ss-kw-chevron" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+          <polyline points="9,6 15,12 9,18"/>
+        </svg>
       </div>
     }
   </div>

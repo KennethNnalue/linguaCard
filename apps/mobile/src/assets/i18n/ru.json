@@ -865,7 +865,7 @@
       "playPronunciationAriaLabel": "Воспроизвести произношение",
       "alreadyInVaultAriaLabel": "Уже в хранилище",
       "addToVaultAriaLabel": "Добавить в хранилище",
-      "conjugateBtn": "Спряжение ▸",
+      "conjugateBtn": "Спряжение",
       "praesensHeader": "Präsens",
       "praeteritumHeader": "Präteritum",
       "perfektLabel": "Perfekt:",
@@ -880,6 +880,7 @@
       "finishedReadingHint": "Закончили читать? Вы сами решаете, когда готово.",
       "markCompleteBtn": "Отметить историю завершённой",
       "nowPlaying": "СЕЙЧАС ИГРАЕТ",
+      "speedSection": "Скорость",
       "upNext": "ДАЛЕЕ",
       "repeatOff": "Повтор выкл.",
       "repeatQueue": "Повторить очередь",
@@ -888,11 +889,13 @@
       "repeatAriaLabel": "Повтор",
       "prevAriaLabel": "Предыдущая",
       "nextAriaLabel": "Следующая",
+      "audioUnavailableToast": "Аудио недоступно — переходим к следующей истории",
       "expandPlayerAriaLabel": "Развернуть плеер",
       "collapsePlayerAriaLabel": "Свернуть плеер",
       "neverFinishHint": "Истории никогда не заканчиваются сами — нажмите, когда будете готовы.",
       "addedToVaultToast": "Добавлено в хранилище",
-      "alreadyInVaultToast": "Уже в хранилище"
+      "alreadyInVaultToast": "Уже в хранилище",
+      "saveFailedToast": "Не удалось сохранить слово — попробуйте ещё раз"
     },
     "complete": {
       "backAriaLabel": "Назад в библиотеку",
@@ -906,7 +909,12 @@
       "wordsSection": "Слова в этом рассказе",
       "readAgainBtn": "Прочитать ещё раз",
       "moreStoriesBtn": "Ещё рассказы",
-      "loadingMsg": "Загрузка…"
+      "loadingMsg": "Загрузка…",
+      "eyebrow": "ИСТОРИЯ ЗАВЕРШЕНА",
+      "quizScoreLabel": "РЕЗУЛЬТАТ",
+      "replayBtn": "Повторить историю",
+      "playNextBtn": "Далее · {{title}}",
+      "backToStories": "Назад к Историям"
     },
     "generate": {
       "pageTitle": "Создание рассказа",
@@ -950,7 +958,13 @@
       "unmuteAriaLabel": "Включить звук ответа",
       "nextBtn": "Далее",
       "pauseOnMistakesTitle": "Пауза при ошибках",
-      "pauseOnMistakesDesc": "Просмотрите правильный ответ перед продолжением"
+      "pauseOnMistakesDesc": "Просмотрите правильный ответ перед продолжением",
+      "correctAnswersLabel": "правильных ответов",
+      "takeAgainBtn": "Пройти заново",
+      "nextQuestionBtn": "Следующий вопрос",
+      "finishBtn": "Завершить тест",
+      "hintLabel": "ПОДСКАЗКА",
+      "playSentenceAriaLabel": "Воспроизвести предложение"
     },
     "length": {
       "short": "Короткая",

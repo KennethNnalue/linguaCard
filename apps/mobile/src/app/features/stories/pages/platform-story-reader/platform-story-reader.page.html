@@ -44,23 +44,23 @@
       <div class="sr2-story-meta">
         <div class="sr2-story-title">{{ s.title }}</div>
         <div class="sr2-meta-row">
-          <span class="sr2-level-pill" [ngClass]="'level-' + s.level">{{ s.level }}</span>
-          <button
-            class="sr2-icon-btn"
-            [class.active]="showTranslation()"
-            (click)="showTranslation.update(v => !v)"
-            aria-label="Toggle translation"
-          >
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="14" height="14">
-              <circle cx="12" cy="12" r="10"/>
-              <line x1="2" y1="12" x2="22" y2="12"/>
-              <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/>
-            </svg>
-          </button>
+          <span class="sr2-level-pill" [class]="'level-' + s.level">{{ s.level }}</span>
           @if (progress()?.isRead) {
             <span class="psr-read-badge">✓ Read</span>
           }
         </div>
+      </div>
+
+      <div class="sr2-story-toprow">
+        <span class="sr2-tap-hint">{{ 'stories.reader.tapHint' | translate }}</span>
+        <button class="sr2-en-toggle" [class.active]="showTranslation()"
+                (click)="toggleTranslation()">
+          <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/>
+            <path d="M12 2a15 15 0 0 1 4 10 15 15 0 0 1-4 10 15 15 0 0 1-4-10 15 15 0 0 1 4-10z"/>
+          </svg>
+          {{ 'stories.reader.englishToggle' | translate }}
+        </button>
       </div>
 
       <div class="sr2-text-block" (click)="dismissTappedWord()">
@@ -102,11 +102,7 @@
       <lc-keywords-tab
         [keywords]="s.keywords"
         [loading]="false"
-        [pronunciationLoading]="pronunciationLoading()"
-        (playWord)="onKeywordsPlayWord($event)"
-        (addToTraining)="onAddToTraining($event)"
-        (memorizeAll)="onMemorizeAll()"
-        (cardClick)="onKeywordCardClick($event)"
+        (wordClick)="openKeyword($event)"
       />
     }
 
@@ -169,7 +165,7 @@
           @if (wd.wordType === 'verb') {
             <button
               class="sr-word-conj-btn"
-              (click)="$event.stopPropagation(); showConjugations.update(v => !v)"
+              (click)="$event.stopPropagation(); toggleConjugations()"
             >Conjugate ▸</button>
           }
         </div>

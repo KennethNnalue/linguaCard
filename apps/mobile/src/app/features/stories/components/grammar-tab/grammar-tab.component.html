@@ -22,14 +22,14 @@
       <!-- Example section -->
       <div class="grammar-section">
         <div class="grammar-section-label">{{ 'stories.grammar.exampleSection' | translate }}</div>
-        <p class="grammar-example-de" [innerHTML]="boldKeywords(note.exampleDe)"></p>
+        <p class="grammar-example-de">@for (seg of boldSegments(note.exampleDe); track $index) {@if (seg.bold) {<strong>{{ seg.text }}</strong>} @else {{{ seg.text }}}}</p>
         <p class="grammar-example-en">{{ note.exampleNative }}</p>
       </div>
 
       <!-- Description section -->
       <div class="grammar-section">
         <div class="grammar-section-label">{{ 'stories.grammar.descriptionSection' | translate }}</div>
-        <p class="grammar-description" [innerHTML]="boldKeywords(note.description)"></p>
+        <p class="grammar-description">@for (seg of boldSegments(note.description); track $index) {@if (seg.bold) {<strong>{{ seg.text }}</strong>} @else {{{ seg.text }}}}</p>
 
         <!-- Conjugation table if present -->
         @if (note.conjugationTable && note.conjugationTable.length > 0) {
@@ -46,7 +46,7 @@
         <!-- Additional example sentences -->
         @for (ex of note.additionalExamples; track $index) {
           <div class="grammar-example-card">
-            <p class="grammar-ex-de" [innerHTML]="boldKeywords(ex.de)"></p>
+            <p class="grammar-ex-de">@for (seg of boldSegments(ex.de); track $index) {@if (seg.bold) {<strong>{{ seg.text }}</strong>} @else {{{ seg.text }}}}</p>
             <p class="grammar-ex-en">{{ ex.native }}</p>
           </div>
         }

@@ -47,6 +47,7 @@ export class AdminImportPage {
     platformCollectionId: new FormControl('', [Validators.required]),
     storyJson: new FormControl('', [Validators.required]),
     isFiction: new FormControl(true),
+    generateAudio: new FormControl(false),
   });
 
   readonly jsonForm = new FormGroup({
@@ -318,11 +319,12 @@ OUTPUT — valid JSON ONLY, no markdown fences, no commentary:
     this.importingStory.set(true);
     this.lastStoryResult.set(null);
 
-    this.adminApi.importStory({ platformCollectionId: v.platformCollectionId!.trim(), story, isFiction: v.isFiction ?? true }).pipe(takeUntilDestroyed(this._destroyRef)).subscribe({
+    this.adminApi.importStory({ platformCollectionId: v.platformCollectionId!.trim(), story, isFiction: v.isFiction ?? true, generateAudio: v.generateAudio ?? false }).pipe(takeUntilDestroyed(this._destroyRef)).subscribe({
       next: result => {
         this.importingStory.set(false);
         this.lastStoryResult.set(result);
-        void this._toast(`✓ Story "${result.title}" saved (${result.sentenceCount} sentences, ${result.keywordsResolved} keywords resolved)`, 'success');
+        const audioNote = v.generateAudio ? (result.audioGenerated ? ', audio ✓' : ', audio failed') : '';
+        void this._toast(`✓ Story "${result.title}" saved (${result.sentenceCount} sentences, ${result.keywordsResolved} keywords resolved${audioNote})`, 'success');
       },
       error: () => {
         this.importingStory.set(false);

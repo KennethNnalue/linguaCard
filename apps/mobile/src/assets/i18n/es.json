@@ -865,7 +865,7 @@
       "playPronunciationAriaLabel": "Reproducir pronunciación",
       "alreadyInVaultAriaLabel": "Ya está en la bóveda",
       "addToVaultAriaLabel": "Añadir a la bóveda",
-      "conjugateBtn": "Conjugar ▸",
+      "conjugateBtn": "Conjugar",
       "praesensHeader": "Präsens",
       "praeteritumHeader": "Präteritum",
       "perfektLabel": "Perfekt:",
@@ -880,6 +880,7 @@
       "finishedReadingHint": "Terminaste de leer? Tú decides cuándo está listo.",
       "markCompleteBtn": "Marcar historia completada",
       "nowPlaying": "REPRODUCIENDO",
+      "speedSection": "Velocidad",
       "upNext": "A CONTINUACIÓN",
       "repeatOff": "Repetición desactivada",
       "repeatQueue": "Repetir cola",
@@ -888,11 +889,13 @@
       "repeatAriaLabel": "Repetir",
       "prevAriaLabel": "Anterior",
       "nextAriaLabel": "Siguiente",
+      "audioUnavailableToast": "Audio no disponible: pasando a la siguiente historia",
       "expandPlayerAriaLabel": "Expandir reproductor",
       "collapsePlayerAriaLabel": "Contraer reproductor",
       "neverFinishHint": "Las historias nunca terminan solas: toca cuando estés listo.",
       "addedToVaultToast": "Añadido a tu bóveda",
-      "alreadyInVaultToast": "Ya está en tu bóveda"
+      "alreadyInVaultToast": "Ya está en tu bóveda",
+      "saveFailedToast": "No se pudo guardar la palabra — inténtalo de nuevo"
     },
     "complete": {
       "backAriaLabel": "Volver a la biblioteca",
@@ -906,7 +909,12 @@
       "wordsSection": "Palabras en esta historia",
       "readAgainBtn": "Leer de nuevo",
       "moreStoriesBtn": "Más historias",
-      "loadingMsg": "Cargando…"
+      "loadingMsg": "Cargando…",
+      "eyebrow": "HISTORIA COMPLETADA",
+      "quizScoreLabel": "PUNTUACIÓN",
+      "replayBtn": "Repetir historia",
+      "playNextBtn": "Siguiente · {{title}}",
+      "backToStories": "Volver a Historias"
     },
     "generate": {
       "pageTitle": "Generar historia",
@@ -950,7 +958,13 @@
       "unmuteAriaLabel": "Activar audio de respuesta",
       "nextBtn": "Siguiente",
       "pauseOnMistakesTitle": "Pausar en errores",
-      "pauseOnMistakesDesc": "Revisa la respuesta correcta antes de continuar"
+      "pauseOnMistakesDesc": "Revisa la respuesta correcta antes de continuar",
+      "correctAnswersLabel": "respuestas correctas",
+      "takeAgainBtn": "Intentar de nuevo",
+      "nextQuestionBtn": "Siguiente pregunta",
+      "finishBtn": "Finalizar",
+      "hintLabel": "PISTA",
+      "playSentenceAriaLabel": "Reproducir frase"
     },
     "length": {
       "short": "Corto",

@@ -205,6 +205,12 @@
           <span class="adm-hint">(uncheck for non-fiction, vocab-focused content)</span>
         </div>
 
+        <div class="adm-field adm-field--inline">
+          <input type="checkbox" id="adm-generate-audio" class="adm-checkbox" formControlName="generateAudio" />
+          <label class="adm-label adm-label--inline" for="adm-generate-audio">Generate narration audio</label>
+          <span class="adm-hint">(TTS + word timestamps — slower import, uses TTS quota)</span>
+        </div>
+
         <div class="adm-field">
           <label class="adm-label">{{ 'admin.import.fields.storyJson' | translate }}</label>
           <textarea

@@ -1,187 +1,90 @@
-// ── Memorize CTA ──────────────────────────────────────────────────
-.kw-memorize-btn {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  background: var(--lc-brand);
-  border: none;
-  border-radius: 12px;
-  padding: 12px 14px;
-  margin: 12px 14px 10px;
-  width: calc(100% - 28px);
-  cursor: pointer;
-  font-family: var(--lc-font-body);
-}
+@use 'theme/tokens' as t;
 
-.kw-memorize-icon {
-  font-size: 18px;
-}
+:host { display: block; }
 
-.kw-memorize-text {
-  flex: 1;
-  font-size: 13px;
-  font-weight: 600;
-  color: white;
-  text-align: start;
-}
-
-.kw-memorize-arrow {
-  color: rgba(255, 255, 255, 0.7);
-  font-size: 14px;
-}
-
-// ── Keyword list ──────────────────────────────────────────────────
-.kw-list {
+.ss-kw-list {
+  padding: 16px 16px 90px;
   display: flex;
   flex-direction: column;
-  gap: 8px;
-  padding: 0 14px 14px;
+  gap: 10px;
 }
 
-.kw-item {
+.ss-kw-row {
   display: flex;
   align-items: center;
-  gap: 10px;
-  background: var(--lc-card);
-  border: 1px solid var(--lc-border);
-  border-radius: 12px;
-  padding: 10px 12px;
-  box-shadow: var(--lc-shadow-card);
-
-  &--tappable {
-    cursor: pointer;
-    transition: background 0.15s, border-color 0.15s;
-
-    &:active {
-      background: var(--lc-surface);
-      border-color: var(--lc-brand);
-    }
-  }
+  gap: 12px;
+  background: var(--lc-ss-card);
+  border-radius: 16px;
+  padding: 13px 15px;
+  box-shadow: var(--lc-ss-shadow-card);
+  cursor: pointer;
 }
 
-.kw-level-badge {
-  font-size: 9px;
-  font-weight: 700;
-  padding: 2px 8px;
-  border-radius: 8px;
-  flex-shrink: 0;
-  font-family: var(--lc-font-body);
-}
-
-.kw-body {
+.ss-kw-info {
   flex: 1;
   min-width: 0;
 }
 
-.kw-word-row {
-  display: flex;
-  align-items: baseline;
-  gap: 2px;
-  margin-bottom: 2px;
+.ss-kw-word {
+  font-family: t.$lc-font-serif;
+  font-size: t.$lc-text-xl;
+  font-weight: t.$lc-font-weight-medium;
+  color: var(--lc-ss-ink);
 }
 
-.kw-word {
-  font-size: 13px;
-  font-weight: 600;
-  color: var(--lc-text-primary);
+.ss-kw-gloss {
+  font-size: 12px;
+  color: var(--lc-ss-muted-alt);
+  margin-top: 1px;
 }
 
-.kw-type {
-  font-size: 11px;
-  color: var(--lc-text-hint);
-}
+.ss-kw-type {
+  font-size: 9.5px;
+  font-weight: t.$lc-font-weight-bold;
+  letter-spacing: 0.4px;
+  padding: 3px 9px;
+  border-radius: 11px;
+  text-transform: capitalize;
+  background: var(--lc-ss-mint-chip-bg);
+  color: var(--lc-ss-mint-chip-text);
+  white-space: nowrap;
 
-.kw-translation {
-  font-size: 11px;
-  color: var(--lc-text-secondary);
-}
-
-// ── Action buttons ────────────────────────────────────────────────
-.kw-actions {
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-  align-items: center;
-}
-
-.kw-action-btn {
-  width: 28px;
-  height: 28px;
-  border-radius: 8px;
-  background: var(--lc-surface);
-  border: 1px solid var(--lc-border);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-  color: var(--lc-text-secondary);
-  transition: background 0.15s, border-color 0.15s;
-
-  svg {
-    width: 13px;
-    height: 13px;
-  }
-
-  &.kw-playing {
-    background: var(--lc-brand-light);
-    border-color: var(--lc-brand);
-    cursor: default;
-  }
-
-  &:disabled {
-    cursor: default;
+  &.verb {
+    background: var(--lc-ss-verb-tag-bg);
+    color: var(--lc-ss-verb-tag-text);
   }
 }
 
-.kw-btn-spinner {
-  width: 11px;
-  height: 11px;
-  border: 2px solid var(--lc-brand-light);
-  border-top-color: var(--lc-brand);
-  border-radius: 50%;
-  animation: tab-spin 0.7s linear infinite;
+.ss-kw-chevron {
+  color: var(--lc-ss-chevron);
+  flex: none;
 }
 
-// ── Loading state ─────────────────────────────────────────────────
-.tab-loading-spinner {
-  width: 36px;
-  height: 36px;
-  border: 3px solid var(--lc-brand-light);
-  border-top-color: var(--lc-brand);
-  border-radius: 50%;
-  animation: tab-spin 0.8s linear infinite;
-  margin-bottom: 12px;
-}
-
-.tab-loading-text {
-  font-size: 13px;
-  color: var(--lc-text-hint);
-  font-weight: 500;
-}
-
-@keyframes tab-spin {
-  to { transform: rotate(360deg); }
-}
-
-// ── Empty state ───────────────────────────────────────────────────
-.kw-empty {
-  flex: 1;
+// ─── States ──────────────────────────────────────────────────────────────
+.ss-kw-state {
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: center;
-  padding: 48px 24px;
   text-align: center;
-  gap: 8px;
+  gap: 10px;
+  padding: 48px 24px;
 }
 
-.kw-empty-icon {
-  font-size: 40px;
-  margin-bottom: 8px;
+.ss-kw-state-emoji { font-size: 32px; }
+
+.ss-kw-state-text {
+  font-size: t.$lc-text-md;
+  color: var(--lc-ss-muted);
+  margin: 0;
 }
 
-.kw-empty p {
-  font-size: 14px;
-  font-weight: 600;
-  color: var(--lc-text-hint);
+.ss-kw-spinner {
+  width: 26px;
+  height: 26px;
+  border: 3px solid var(--lc-ss-hairline-strong);
+  border-top-color: var(--lc-ss-sage);
+  border-radius: t.$lc-radius-full;
+  animation: ssKwSpin 0.7s linear infinite;
 }
+
+@keyframes ssKwSpin { to { transform: rotate(360deg); } }

@@ -865,7 +865,7 @@
       "playPronunciationAriaLabel": "Telaffuzu dinle",
       "alreadyInVaultAriaLabel": "Zaten kasada",
       "addToVaultAriaLabel": "Kasaya ekle",
-      "conjugateBtn": "Çekim ▸",
+      "conjugateBtn": "Çekim",
       "praesensHeader": "Präsens",
       "praeteritumHeader": "Präteritum",
       "perfektLabel": "Perfekt:",
@@ -880,6 +880,7 @@
       "finishedReadingHint": "Okumayı bitirdin mi? Ne zaman bittiğine sen karar verirsin.",
       "markCompleteBtn": "Hikayeyi tamamlandı olarak işaretle",
       "nowPlaying": "ŞİMDİ ÇALIYOR",
+      "speedSection": "Hız",
       "upNext": "SIRADAKİ",
       "repeatOff": "Tekrar kapalı",
       "repeatQueue": "Kuyruğu tekrarla",
@@ -888,11 +889,13 @@
       "repeatAriaLabel": "Tekrarla",
       "prevAriaLabel": "Önceki",
       "nextAriaLabel": "Sonraki",
+      "audioUnavailableToast": "Ses kullanılamıyor — sonraki hikâyeye geçiliyor",
       "expandPlayerAriaLabel": "Oynatıcıyı genişlet",
       "collapsePlayerAriaLabel": "Oynatıcıyı daralt",
       "neverFinishHint": "Hikayeler kendi kendine bitmez — hazır olduğunda dokun.",
       "addedToVaultToast": "Kasanıza eklendi",
-      "alreadyInVaultToast": "Zaten kasanızda"
+      "alreadyInVaultToast": "Zaten kasanızda",
+      "saveFailedToast": "Kelime kaydedilemedi — lütfen tekrar deneyin"
     },
     "complete": {
       "backAriaLabel": "Kütüphaneye dön",
@@ -906,7 +909,12 @@
       "wordsSection": "Bu hikayedeki kelimeler",
       "readAgainBtn": "Tekrar oku",
       "moreStoriesBtn": "Daha fazla hikaye",
-      "loadingMsg": "Yükleniyor…"
+      "loadingMsg": "Yükleniyor…",
+      "eyebrow": "HİKAYE TAMAMLANDI",
+      "quizScoreLabel": "QUIZ PUANI",
+      "replayBtn": "Hikayeyi tekrar oynat",
+      "playNextBtn": "Sıradaki · {{title}}",
+      "backToStories": "Hikayelere Dön"
     },
     "generate": {
       "pageTitle": "Hikaye Oluştur",
@@ -950,7 +958,13 @@
       "unmuteAriaLabel": "Cevap sesini aç",
       "nextBtn": "Sonraki",
       "pauseOnMistakesTitle": "Hatalarda duraklat",
-      "pauseOnMistakesDesc": "Devam etmeden önce doğru cevabı inceleyin"
+      "pauseOnMistakesDesc": "Devam etmeden önce doğru cevabı inceleyin",
+      "correctAnswersLabel": "doğru cevap",
+      "takeAgainBtn": "Tekrar dene",
+      "nextQuestionBtn": "Sonraki soru",
+      "finishBtn": "Testi bitir",
+      "hintLabel": "İPUCU",
+      "playSentenceAriaLabel": "Cümleyi oynat"
     },
     "length": {
       "short": "Kısa",

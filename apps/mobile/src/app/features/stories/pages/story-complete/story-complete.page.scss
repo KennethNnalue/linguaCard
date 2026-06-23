@@ -1,212 +1,128 @@
 @use 'theme/tokens' as t;
-@use 'theme/utils' as u;
 
-// ── Nav ────────────────────────────────────────────────────────────
-.sc-nav {
-  @include u.flex-between;
-  padding: t.$lc-space-1 t.$lc-space-4 t.$lc-space-2;
+.ss-complete {
+  --background: var(--lc-ss-paper);
 }
 
-.sc-back-btn {
-  @include u.circle(32px);
-  @include u.flex-center;
-  background: var(--lc-surface);
-  border: 1px solid var(--lc-border);
-  cursor: pointer;
-  @include u.touch-state;
-
-  ion-icon { font-size: t.$lc-text-xl; color: var(--lc-text-secondary); }
-}
-
-.sc-nav-title {
-  font-family: t.$lc-font-display;
-  @include u.lc-font('md', t.$lc-font-weight-semibold);
-  color: var(--lc-text-primary);
-}
-
-// ── Banner ─────────────────────────────────────────────────────────
-.sc-banner {
-  margin: 0 t.$lc-space-4 t.$lc-space-5;
-  background: linear-gradient(135deg, #1A3830 0%, #2D5A4E 60%, #3D7A66 100%);
-  border-radius: t.$lc-radius-lg;
-  padding: t.$lc-space-6 t.$lc-space-5 t.$lc-space-5;
+.ss-complete-inner {
+  min-height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 40px 26px calc(70px + env(safe-area-inset-bottom, 0px));
   text-align: center;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: t.$lc-space-1;
 }
 
-.sc-banner-icon {
-  color: #6EE7B7;
-  margin-bottom: t.$lc-space-1;
-  ion-icon { font-size: 48px; }
-}
-
-.sc-banner-title {
-  font-family: t.$lc-font-display;
-  @include u.lc-font('4xl', t.$lc-font-weight-bold);
-  font-size: 24px;
-  color: white;
-}
-
-.sc-banner-sub {
-  @include u.lc-font('sm');
-  color: rgba(255, 255, 255, 0.65);
-  margin-bottom: t.$lc-space-1;
-}
-
-.sc-banner-stats {
+.ss-complete-cover {
+  width: 118px;
+  height: 118px;
+  border-radius: 26px;
   display: flex;
   align-items: center;
-  gap: t.$lc-space-4;
-  margin-top: t.$lc-space-2 + 2px;
-  background: rgba(255, 255, 255, 0.1);
-  border-radius: t.$lc-radius-md;
-  padding: t.$lc-space-2 + 2px t.$lc-space-5;
+  justify-content: center;
+  margin-bottom: 24px;
+  box-shadow: var(--lc-ss-shadow-hero);
+  color: t.$lc-text-inverse;
 }
 
-.sc-stat {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 2px;
+.ss-complete-eyebrow {
+  font-size: t.$lc-text-xxs;
+  font-weight: t.$lc-font-weight-bold;
+  letter-spacing: 2.5px;
+  color: var(--lc-ss-sage);
+  margin-bottom: 9px;
 }
 
-.sc-stat-value {
-  font-family: t.$lc-font-display;
-  @include u.lc-font('3xl', t.$lc-font-weight-bold);
-  color: white;
-}
-
-.sc-stat-label {
-  @include u.lc-font('xxs');
-  color: rgba(255, 255, 255, 0.55);
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
-}
-
-.sc-stat-divider {
-  width: 1px;
-  height: 28px;
-  background: rgba(255, 255, 255, 0.2);
-}
-
-// ── Section header ─────────────────────────────────────────────────
-.sc-section-header {
-  padding: 0 t.$lc-space-4 t.$lc-space-2 + 2px;
-}
-
-.sc-section-title {
-  @include u.lc-font('xxs', t.$lc-font-weight-semibold);
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
-  color: var(--lc-text-hint);
-}
-
-// ── Vocab list (enriched card layout) ─────────────────────────────
-.sc-vocab-list {
-  padding: 0 t.$lc-space-4;
-  display: flex;
-  flex-direction: column;
-  gap: t.$lc-space-2;
-}
-
-.sc-vocab-card {
-  @include u.lc-card(t.$lc-radius-md);
-  overflow: hidden;
-  display: flex;
-  cursor: default;
-}
-
-.sc-vocab-bar {
-  width: t.$lc-space-1;
-  flex-shrink: 0;
-  border-radius: 2px 0 0 2px;
-
-  &--der { background: var(--lc-masc-text); }
-  &--die { background: var(--lc-fem-text); }
-  &--das { background: var(--lc-neut-text); }
-  &--none { background: var(--lc-mastery-0); }
-}
-
-.sc-vocab-content {
-  flex: 1;
-  padding: t.$lc-space-2 + 2px t.$lc-space-3;
-  min-width: 0;
-}
-
-.sc-vocab-top {
-  display: flex;
-  align-items: center;
-  gap: t.$lc-space-1 + 2px;
-  margin-bottom: 2px;
-}
-
-.sc-vocab-word {
-  font-family: t.$lc-font-display;
-  @include u.lc-font('md', t.$lc-font-weight-semibold);
-  color: var(--lc-text-primary);
+.ss-complete-title {
+  font-family: t.$lc-font-serif;
+  font-size: 26px;
+  font-weight: t.$lc-font-weight-medium;
+  color: var(--lc-ss-ink);
   line-height: 1.2;
+  margin-bottom: 6px;
 }
 
-.sc-vocab-mid {
+.ss-complete-meta {
+  font-size: 12px;
+  color: var(--lc-ss-muted);
+  margin-bottom: 24px;
+}
+
+.ss-complete-quiz {
+  background: var(--lc-ss-card);
+  border-radius: 16px;
+  padding: 13px 24px;
+  box-shadow: var(--lc-ss-shadow-card);
+  margin-bottom: 24px;
+}
+
+.ss-complete-quiz-label {
+  font-size: 9.5px;
+  font-weight: t.$lc-font-weight-bold;
+  letter-spacing: 1px;
+  color: var(--lc-ss-muted);
+  margin-bottom: 3px;
+}
+
+.ss-complete-quiz-score {
+  font-family: t.$lc-font-serif;
+  font-size: t.$lc-text-4xl;
+  font-weight: t.$lc-font-weight-semibold;
+  color: var(--lc-ss-pine);
+}
+
+.ss-complete-primary {
+  width: 100%;
+  max-width: 270px;
+  padding: 14px;
+  border-radius: 16px;
+  background: var(--lc-ss-pine);
+  border: none;
+  color: t.$lc-text-inverse;
+  font-family: inherit;
+  font-size: t.$lc-text-md;
+  font-weight: t.$lc-font-weight-semibold;
+  cursor: pointer;
   display: flex;
   align-items: center;
-  gap: t.$lc-space-2;
+  justify-content: center;
+  gap: 8px;
+  margin-bottom: 10px;
 }
 
-.sc-vocab-en {
-  @include u.lc-font('xs');
-  color: var(--lc-text-secondary);
-  flex: 1;
-  @include u.text-overflow;
-}
-
-.sc-vocab-base {
-  @include u.lc-font('xxs', t.$lc-font-weight-medium);
-  color: var(--lc-brand-mid);
-  flex-shrink: 0;
-}
-
-// ── Actions ────────────────────────────────────────────────────────
-.sc-actions {
-  display: flex;
-  gap: t.$lc-space-2 + 2px;
-  padding: t.$lc-space-5 t.$lc-space-4 0;
-}
-
-.sc-btn-replay,
-.sc-btn-library {
-  flex: 1;
-  @include u.flex-center;
-  gap: t.$lc-space-1 + 2px;
-  @include u.lc-font('sm', t.$lc-font-weight-semibold);
-  padding: t.$lc-space-3;
-  border-radius: t.$lc-radius-md;
+.ss-complete-next {
+  width: 100%;
+  max-width: 270px;
+  padding: 14px;
+  border-radius: 16px;
+  background: var(--lc-ss-play-bg);
   border: none;
+  color: var(--lc-ss-pine);
+  font-family: inherit;
+  font-size: 13.5px;
+  font-weight: t.$lc-font-weight-semibold;
   cursor: pointer;
-  font-family: t.$lc-font-body;
-  @include u.touch-state;
-
-  ion-icon { font-size: t.$lc-text-xl; }
+  margin-bottom: 12px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 270px;
 }
 
-.sc-btn-replay {
-  background: var(--lc-surface);
-  color: var(--lc-text-secondary);
-  border: 1px solid var(--lc-border);
+.ss-complete-back {
+  background: none;
+  border: none;
+  color: var(--lc-ss-muted);
+  font-family: inherit;
+  font-size: t.$lc-text-sm;
+  font-weight: t.$lc-font-weight-semibold;
+  cursor: pointer;
 }
 
-.sc-btn-library {
-  background: var(--lc-brand);
-  color: white;
-}
-
-// ── Loading ────────────────────────────────────────────────────────
-.sc-loading {
+.ss-complete-loading {
   padding: t.$lc-space-12 t.$lc-space-5;
   text-align: center;
-  @include u.lc-font('sm');
-  color: var(--lc-text-hint);
+  font-size: t.$lc-text-md;
+  color: var(--lc-ss-muted);
 }

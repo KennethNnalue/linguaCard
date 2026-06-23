@@ -107,6 +107,19 @@ export class QuizTabComponent {
     return this.questions().filter(q => ans[q.id] === q.correctAnswer).length;
   });
 
+  /** Sentence split around the ___ blank, for the fill-in rendering. */
+  readonly sentenceParts = computed(() => {
+    const q = this.currentQuestion();
+    if (!q) return { before: '', after: '' };
+    const [before, after = ''] = q.sentenceTemplate.split('___');
+    return { before, after };
+  });
+
+  /** Last question? → "Finish quiz", else "Next question". */
+  readonly isLastQuestion = computed(
+    () => this.currentIdx() === this.questions().length - 1,
+  );
+
   getChosenAnswer(): string | null {
     const q = this.currentQuestion();
     return q ? (this.answered()[q.id] ?? null) : null;
@@ -165,6 +178,10 @@ export class QuizTabComponent {
     }
     this.showFeedback.set(false);
     this.currentIdx.update(i => i + 1);
+  }
+
+  toggleAutoSpeak(): void {
+    this.autoSpeak.set(!this.autoSpeak());
   }
 
   retake(): void {

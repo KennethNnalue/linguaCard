@@ -1,146 +1,85 @@
-<ion-content [fullscreen]="true">
+<ion-content [fullscreen]="true" class="ss-reader">
   @if (story(); as s) {
 
-    <!-- ── Cover: default state (scrolls with content) ───────────── -->
-    @if (!tappedWord()) {
-      <div class="sr2-cover">
-        @if (s.coverImageUrl) {
-          <img [src]="s.coverImageUrl" class="sr2-cover-img" alt="" />
-        }
-        <div class="sr2-cover-overlay"></div>
-        <div class="sr2-top-bar">
-          <button class="sr2-back-btn" (click)="goBack()" [attr.aria-label]="'stories.reader.backAriaLabel' | translate">
-            <ion-icon name="arrow-back-outline"></ion-icon>
-          </button>
-          <div class="sr2-top-actions">
-            <button class="sr2-learned-btn" [class.active]="isLearned()" (click)="toggleLearned()">
-              <svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" width="10" height="10">
-                <polyline points="20,6 9,17 4,12"/>
-              </svg>
-              {{ isLearned() ? ('stories.reader.learnedLabel' | translate) : ('stories.reader.markAsLearnedLabel' | translate) }}
-            </button>
-          </div>
-        </div>
-      </div>
-    }
+    <!-- ── Cover header ─────────────────────────────────────────────── -->
+    <div class="ss-rcover" [style.background]="coverGradient(s)">
+      @if (s.coverImageUrl) {
+        <img [src]="s.coverImageUrl" class="ss-rcover-img" alt="" />
+      }
+      <div class="ss-rcover-overlay"></div>
 
-    <!-- Spacer holds the cover's vertical space when the fixed word panel is shown -->
-    @if (tappedWord()) {
-      <div class="sr-word-cover-spacer"></div>
-    }
+      <button class="ss-rback" (click)="goBack()" [attr.aria-label]="'stories.reader.backAriaLabel' | translate">
+        <ion-icon name="chevron-back-outline"></ion-icon>
+      </button>
 
-    <!-- ── Four-tab section navigation ───────────────────────────── -->
-    <div class="sr2-section-tabs">
-      <button
-        class="sr2-section-tab"
-        [class.active]="activeTab() === 'story'"
-        (click)="setTab('story')"
-      >{{ 'stories.reader.storyTab' | translate }}</button>
-      <button
-        class="sr2-section-tab"
-        [class.active]="activeTab() === 'quiz'"
-        (click)="setTab('quiz')"
-      >{{ 'stories.reader.quizTab' | translate }}</button>
-      <button
-        class="sr2-section-tab"
-        [class.active]="activeTab() === 'keywords'"
-        (click)="setTab('keywords')"
-      >{{ 'stories.reader.keywordsTab' | translate }}</button>
-      <button
-        class="sr2-section-tab"
-        [class.active]="activeTab() === 'grammar'"
-        (click)="setTab('grammar')"
-      >{{ 'stories.reader.grammarTab' | translate }}</button>
+      <button class="ss-rlearned" [class.active]="isLearned()" (click)="toggleLearned()">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" width="12" height="12">
+          <polyline points="20,6 9,17 4,12"/>
+        </svg>
+        {{ isLearned() ? ('stories.reader.learnedLabel' | translate) : ('stories.reader.markAsLearnedLabel' | translate) }}
+      </button>
+
+      <span class="ss-rlevel">{{ s.difficultyLevel }}</span>
+      <div class="ss-rtitle">{{ s.title }}</div>
+      <div class="ss-rmeta">{{ readerMetaLine(s) }}</div>
     </div>
 
-    <!-- ── TAB CONTENT ────────────────────────────────────────────── -->
+    <!-- ── Tabs ─────────────────────────────────────────────────────── -->
+    <div class="ss-rtabs">
+      <button class="ss-rtab" [class.active]="activeTab() === 'story'" (click)="setTab('story')">{{ 'stories.reader.storyTab' | translate }}</button>
+      <button class="ss-rtab" [class.active]="activeTab() === 'quiz'" (click)="setTab('quiz')">{{ 'stories.reader.quizTab' | translate }}</button>
+      <button class="ss-rtab" [class.active]="activeTab() === 'keywords'" (click)="setTab('keywords')">{{ 'stories.reader.keywordsTab' | translate }}</button>
+      <button class="ss-rtab" [class.active]="activeTab() === 'grammar'" (click)="setTab('grammar')">{{ 'stories.reader.grammarTab' | translate }}</button>
+    </div>
 
-    <!-- STORY TAB -->
+    <!-- ── STORY TAB ────────────────────────────────────────────────── -->
     @if (activeTab() === 'story') {
+      <div class="ss-story" (click)="dismissTappedWord()">
 
-      <div class="sr2-story-meta">
-        <div class="sr2-story-title">{{ s.title }}</div>
-        <div class="sr2-meta-row">
-          @if (s.difficultyLevel; as lvl) {
-            <span class="sr2-level-pill" [ngClass]="'level-' + lvl">{{ lvl }}</span>
-          }
-          <!-- Translation toggle — globe/translate icon -->
-          <button
-            class="sr2-icon-btn"
-            [class.active]="showTranslation()"
-            (click)="showTranslation.update(v => !v)"
-            [title]="'stories.reader.toggleTranslationTitle' | translate"
-            [attr.aria-label]="'stories.reader.toggleTranslationAriaLabel' | translate"
-          >
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="14" height="14">
-              <circle cx="12" cy="12" r="10"/>
-              <line x1="2" y1="12" x2="22" y2="12"/>
-              <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/>
+        <div class="ss-story-toprow">
+          <span class="ss-tap-hint">{{ 'stories.reader.tapHint' | translate }}</span>
+          <button class="ss-en-toggle" [class.active]="showTranslation()"
+                  (click)="$event.stopPropagation(); showTranslation.set(!showTranslation())">
+            <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/>
+              <path d="M12 2a15 15 0 0 1 4 10 15 15 0 0 1-4 10 15 15 0 0 1-4-10 15 15 0 0 1 4-10z"/>
             </svg>
+            {{ 'stories.reader.englishToggle' | translate }}
           </button>
         </div>
-      </div>
 
-      <!-- Audio generating/loading banner -->
-      @if (audioGenerating()) {
-        <div class="sr-audio-generating">
-          <div class="sr-generating-pulse"></div>
-          <span>{{ 'stories.reader.generatingAudio' | translate }}</span>
-        </div>
-      }
-      @if (audioLoading() && !audioGenerating()) {
-        <div class="sr-audio-generating">
-          <div class="sr-generating-pulse"></div>
-          <span>{{ 'stories.reader.preparingAudio' | translate }}</span>
-        </div>
-      }
-
-      <!-- Story text: sentence-by-sentence with tappable word spans -->
-      <div class="sr2-text-block" (click)="dismissTappedWord()">
-
-        @if (s.sentences.length) {
-          @for (sent of s.sentences; track sent.index; let si = $index) {
-            <div class="sr2-sent-block">
-              <p class="sr2-sent-de">
-                @for (token of sentenceTokens()[si]; track token.wordIdx) {
-                  <span
-                    class="sr-word-token"
-                    [class.vocab]="token.isVocab"
-                    [class.active]="isWordActive(si, token.wordIdx)"
-                    (click)="$event.stopPropagation(); tapWord(si, token)"
-                  >{{ token.text }}</span>&#8203;
-                }
-              </p>
-              @if (showTranslation()) {
-                <p class="sr2-sent-en">{{ sent.native }}</p>
-              }
-            </div>
-          }
-        } @else if (!audioGenerating()) {
-          <!-- Fallback: story has no sentences array yet — render bodyDe as karaoke -->
-          <div class="sr2-karaoke">
-            @for (wt of words(); track wt.idx) {
-              <span
-                class="sr-word"
-                [ngClass]="{
-                  active: wt.idx === activeWordIdx(),
-                  vocab: wt.isVocab,
-                  'vocab-active': isVocabActive(wt)
-                }"
-              >{{ wt.word }}</span><span class="sr-space"> </span>
-            }
-            @if (!words().length) {
-              <p class="sr-body-fallback">{{ s.bodyDe }}</p>
-            }
-          </div>
+        @if (audioGenerating()) {
+          <div class="ss-audio-banner"><div class="ss-audio-pulse"></div><span>{{ 'stories.reader.generatingAudio' | translate }}</span></div>
+        } @else if (audioLoading()) {
+          <div class="ss-audio-banner"><div class="ss-audio-pulse"></div><span>{{ 'stories.reader.preparingAudio' | translate }}</span></div>
         }
 
-      </div>
+        @if (s.sentences.length || !audioGenerating()) {
+          <lc-story-text
+            [story]="s"
+            [activeWordIdx]="activeWordIdx()"
+            [showTranslation]="showTranslation()"
+            [tappedWord]="tappedWord()"
+            (wordTap)="onWordTap($event)"
+          />
+        }
 
-      <div style="height: 140px;"></div>
+        <!-- Finished reading? card -->
+        <div class="ss-finish-card">
+          <div class="ss-finish-hint">{{ 'stories.reader.finishedReadingHint' | translate }}</div>
+          <button class="ss-finish-btn" (click)="$event.stopPropagation(); completeStory()">
+            <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">
+              <polyline points="20,6 9,17 4,12"/>
+            </svg>
+            {{ 'stories.reader.markCompleteBtn' | translate }}
+          </button>
+        </div>
+
+        <div class="ss-story-spacer"></div>
+      </div>
     }
 
-    <!-- QUIZ TAB -->
+    <!-- ── QUIZ TAB ─────────────────────────────────────────────────── -->
     @if (activeTab() === 'quiz') {
       <lc-quiz-tab
         [questions]="s.quizQuestions ?? []"
@@ -151,218 +90,230 @@
       />
     }
 
-    <!-- KEYWORDS TAB -->
+    <!-- ── KEYWORDS TAB ─────────────────────────────────────────────── -->
     @if (activeTab() === 'keywords') {
       <lc-keywords-tab
         [keywords]="s.keywords ?? []"
         [loading]="enriching()"
-        [pronunciationLoading]="pronunciationLoading()"
-        (playWord)="onKeywordsPlayWord($event)"
-        (addToTraining)="onAddToTraining($event)"
-        (memorizeAll)="onMemorizeAll()"
-        (cardClick)="onKeywordCardClick($event)"
+        (wordClick)="openKeyword($event)"
       />
     }
 
-    <!-- GRAMMAR TAB -->
+    <!-- ── GRAMMAR TAB ──────────────────────────────────────────────── -->
     @if (activeTab() === 'grammar') {
-      <lc-grammar-tab
-        [grammarNotes]="s.grammarNotes ?? []"
-        [loading]="enriching()"
-      />
+      <lc-grammar-tab [grammarNotes]="s.grammarNotes ?? []" [loading]="enriching()" />
     }
 
   } @else {
-    <div class="sr-loading">{{ 'stories.reader.loadingMsg' | translate }}</div>
+    <div class="ss-rloading">{{ 'stories.reader.loadingMsg' | translate }}</div>
   }
 </ion-content>
 
-<!-- ── Active word cover panel (fixed — stays at top when scrolled) -->
-@if (story(); as s) {
-  @if (tappedWord(); as tw) {
-    @if (tappedWordDetail(); as wd) {
-      <div class="sr-word-cover sr-word-cover--fixed" (click)="dismissTappedWord()">
-        @if (s.coverImageUrl) {
-          <img [src]="s.coverImageUrl" class="sr2-cover-img" alt="" />
-        }
-        <div class="sr2-cover-overlay"></div>
+<!-- ── Word bottom sheet ──────────────────────────────────────────── -->
+@if (story()) {
+  @if (tappedWordDetail(); as wd) {
+    <div class="ss-sheet-scrim" (click)="dismissTappedWord()"></div>
+    <div class="ss-word-sheet" (click)="$event.stopPropagation()">
+      <div class="ss-sheet-handle"><div></div></div>
 
-        <div class="sr2-top-bar">
-          <button class="sr2-back-btn" (click)="$event.stopPropagation(); dismissTappedWord()" [attr.aria-label]="'stories.reader.closeWordPanelAriaLabel' | translate">
-            <svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" width="14" height="14">
-              <polyline points="15,18 9,12 15,6"/>
-            </svg>
-          </button>
-          <div class="sr2-top-actions">
-            <button class="sr2-learned-btn" [class.active]="isLearned()" (click)="$event.stopPropagation(); toggleLearned()">
-              <svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" width="10" height="10">
-                <polyline points="20,6 9,17 4,12"/>
-              </svg>
-              {{ isLearned() ? ('stories.reader.learnedLabel' | translate) : ('stories.reader.markAsLearnedLabel' | translate) }}
-            </button>
-          </div>
-        </div>
-
-        <div class="sr-word-content" (click)="$event.stopPropagation()">
-          <div class="sr-word-main">{{ wd.display }}</div>
-
+      <div class="ss-word-head">
+        <div class="ss-word-info">
+          <div class="ss-word-display">{{ wd.display }}</div>
           @if (wd.wordType === 'noun' && wd.plural) {
-            <div class="sr-word-plural">
-              {{ wd.plural }}
-              <span class="sr-word-plural-badge">{{ 'stories.reader.pluralLabel' | translate }}</span>
+            <div class="ss-word-plural-row">
+              <span class="ss-word-plural">{{ wd.plural }}</span>
+              <span class="ss-word-plural-tag">{{ 'stories.reader.pluralLabel' | translate }}</span>
             </div>
           }
-
           @if (wd.english) {
-            <div class="sr-word-translation">{{ wd.english }}</div>
+            <div class="ss-word-en">{{ wd.english }}</div>
           }
-
           @if (wd.wordType && wd.wordType !== 'noun') {
-            <span class="sr-word-type-badge">{{ wd.wordType | titlecase }}</span>
-          }
-
-          @if (wd.wordType === 'verb') {
-            <button class="sr-word-conj-btn" (click)="$event.stopPropagation(); showConjugations.update(v => !v)">{{ 'stories.reader.conjugateBtn' | translate }}</button>
+            <span class="ss-word-type-tag">{{ wd.wordType | titlecase }}</span>
           }
         </div>
-
-        <div class="sr-word-actions" (click)="$event.stopPropagation()">
-          <button
-            class="sr-word-action-btn"
-            [class.sr-word-action-btn--loading]="pronunciationLoading()"
-            (click)="playTappedWord()"
-            [attr.aria-label]="'stories.reader.playPronunciationAriaLabel' | translate"
-          >
+        <div class="ss-word-actions">
+          <button class="ss-word-btn"
+                  [class.loading]="pronunciationLoading()"
+                  (click)="playTappedWord()"
+                  [attr.aria-label]="'stories.reader.playPronunciationAriaLabel' | translate">
             @if (pronunciationLoading()) {
-              <div class="sr-word-audio-spinner"></div>
+              <div class="ss-word-spinner"></div>
             } @else {
-              <svg viewBox="0 0 24 24" width="16" height="16" fill="white" stroke="none">
-                <polygon points="6,4 20,12 6,20"/>
-              </svg>
+              <svg viewBox="0 0 24 24" width="17" height="17" fill="currentColor" stroke="none"><polygon points="7,4 20,12 7,20"/></svg>
             }
           </button>
-          <button
-            class="sr-word-action-btn"
-            [class.sr-word-action-btn--in-vault]="tappedWordInVault()"
-            (click)="addToVault()"
-            [attr.aria-label]="tappedWordInVault() ? ('stories.reader.alreadyInVaultAriaLabel' | translate) : ('stories.reader.addToVaultAriaLabel' | translate)"
-          >
+          <button class="ss-word-btn"
+                  [class.in-vault]="tappedWordInVault()"
+                  (click)="addToVault()"
+                  [attr.aria-label]="tappedWordInVault() ? ('stories.reader.alreadyInVaultAriaLabel' | translate) : ('stories.reader.addToVaultAriaLabel' | translate)">
             @if (tappedWordInVault()) {
-              <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-                <polyline points="20,6 9,17 4,12"/>
-              </svg>
+              <svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><polyline points="20,6 9,17 4,12"/></svg>
             } @else {
-              <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="white" stroke-width="2" stroke-linecap="round">
-                <line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/>
-              </svg>
+              <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
             }
           </button>
         </div>
       </div>
-    }
+
+      @if (wd.wordType === 'verb') {
+        <button class="ss-conj-toggle" (click)="showConjugations.set(!showConjugations())">
+          {{ 'stories.reader.conjugateBtn' | translate }}
+          <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"
+               [class.flip]="showConjugations()"><polyline points="6,9 12,15 18,9"/></svg>
+        </button>
+
+        @if (showConjugations()) {
+          @if (wd.conjugations; as conj) {
+            <div class="ss-conj">
+              <div class="ss-conj-head">
+                <span></span>
+                <span>{{ 'stories.reader.praesensHeader' | translate }}</span>
+                <span>{{ 'stories.reader.praeteritumHeader' | translate }}</span>
+              </div>
+              @for (row of conj.praesens; track row.pronoun; let i = $index) {
+                <div class="ss-conj-row">
+                  <span class="ss-conj-pron">{{ row.pronoun }}</span>
+                  <span class="ss-conj-pres">{{ row.form }}</span>
+                  <span class="ss-conj-prat">{{ conj.praeteritum[i]?.form ?? '—' }}</span>
+                </div>
+              }
+              @if (conj.perfekt || conj.imperativ) {
+                <div class="ss-conj-extra">
+                  @if (conj.perfekt) { <span><span class="ss-conj-label">{{ 'stories.reader.perfektLabel' | translate }}</span> {{ conj.perfekt }}</span> }
+                  @if (conj.perfekt && conj.imperativ) { <span class="ss-conj-dot"> · </span> }
+                  @if (conj.imperativ) { <span><span class="ss-conj-label">{{ 'stories.reader.imperativLabel' | translate }}</span> {{ conj.imperativ }}</span> }
+                </div>
+              }
+            </div>
+          } @else {
+            <div class="ss-conj-empty">{{ 'stories.reader.noConjugationData' | translate }}</div>
+          }
+        }
+      }
+    </div>
   }
 }
 
-<!-- ── Conjugation bottom sheet ────────────────────────────────── -->
-@if (showConjugations() && tappedWordDetail(); as wd) {
-  <div class="sr-conj-backdrop" (click)="showConjugations.set(false)"></div>
-  <div class="sr-conj-sheet" (click)="$event.stopPropagation()">
-    <div class="sr-conj-handle"><div></div></div>
-    <div class="sr-conj-title">{{ wd.display }}</div>
-    @if (wd.english) {
-      <div class="sr-conj-sub">{{ wd.english }}</div>
-    }
-
-    @if (wd.conjugations; as conj) {
-      <table class="sr-conj-table">
-        <thead>
-          <tr>
-            <th></th>
-            <th>{{ 'stories.reader.praesensHeader' | translate }}</th>
-            <th>{{ 'stories.reader.praeteritumHeader' | translate }}</th>
-          </tr>
-        </thead>
-        <tbody>
-          @for (row of conj.praesens; track row.pronoun; let i = $index) {
-            <tr>
-              <td>{{ row.pronoun }}</td>
-              <td>{{ row.form }}</td>
-              <td>{{ conj.praeteritum[i]?.form ?? '—' }}</td>
-            </tr>
-          }
-        </tbody>
-      </table>
-
-      @if (conj.perfekt || conj.imperativ) {
-        <div class="sr-conj-extra">
-          @if (conj.perfekt) {
-            <span><strong>{{ 'stories.reader.perfektLabel' | translate }}</strong> {{ conj.perfekt }}</span>
-          }
-          @if (conj.imperativ) {
-            <span><strong>{{ 'stories.reader.imperativLabel' | translate }}</strong> {{ conj.imperativ }}</span>
-          }
-        </div>
-      }
-    } @else {
-      <div class="sr-conj-empty">{{ 'stories.reader.noConjugationData' | translate }}</div>
-    }
-  </div>
-}
-
-<!-- ── Floating audio pill — only on Story tab ─────────────────── -->
+<!-- ── Expanded player + queue ────────────────────────────────────── -->
 @if (story(); as s) {
-  @if (activeTab() === 'story') {
-    <div
-      class="sr-float-pill"
-      [class.sr-float-pill--disabled]="!s.audioUrl || audioGenerating() || audioLoading()"
-    >
-      <!-- Progress strip along the bottom edge of the pill -->
-      <div class="sr-pill-progress">
-        <div class="sr-pill-progress-fill" [style.width.%]="progressPct()"></div>
+  @if (playerExpanded()) {
+    <div class="ss-xp-scrim" (click)="collapsePlayer()"></div>
+    <div class="ss-xp">
+      <div class="ss-xp-top">
+        <span class="ss-xp-eyebrow">{{ 'stories.reader.nowPlaying' | translate }}</span>
+        <button class="ss-xp-collapse" (click)="collapsePlayer()" [attr.aria-label]="'stories.reader.collapsePlayerAriaLabel' | translate">
+          <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="6,9 12,15 18,9"/></svg>
+        </button>
       </div>
 
-      <!-- Play / Pause -->
-      <button
-        class="sr-pill-play"
-        [class.sr-pill-play--pulse]="autoPlayPending()"
-        (click)="togglePlay()"
-        [disabled]="!s.audioUrl || audioGenerating() || audioLoading()"
-        [attr.aria-label]="isPlaying() ? 'Pause' : 'Play'"
-      >
+      <div class="ss-xp-body">
+        <div class="ss-xp-cover" [style.background]="coverGradient(s)">
+          @if (s.coverImageUrl) { <img [src]="s.coverImageUrl" class="ss-xp-cover-img" alt="" /> }
+          <span class="ss-xp-level">{{ s.difficultyLevel }}</span>
+        </div>
+
+        <div class="ss-xp-title">{{ s.title }}</div>
+        <div class="ss-xp-meta">{{ readerMetaLine(s) }}</div>
+
+        <div class="ss-xp-track"><div class="ss-xp-track-fill" [style.width.%]="progressPct()"></div></div>
+        <div class="ss-xp-times"><span>{{ currentTimeLabel() }}</span><span>{{ durationLabel() }}</span></div>
+
+        <div class="ss-xp-transport">
+          <button class="ss-xp-icon" [class.active]="shuffle()" (click)="toggleShuffle()" [attr.aria-label]="'stories.reader.shuffleAriaLabel' | translate">
+            <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="16,3 21,3 21,8"/><line x1="4" y1="20" x2="21" y2="3"/><polyline points="21,16 21,21 16,21"/><line x1="15" y1="15" x2="21" y2="21"/><line x1="4" y1="4" x2="9" y2="9"/></svg>
+          </button>
+          <button class="ss-xp-prev" (click)="prevTrack()" [attr.aria-label]="'stories.reader.prevAriaLabel' | translate">
+            <svg viewBox="0 0 24 24" width="22" height="22" fill="currentColor" stroke="none"><polygon points="18,5 8,12 18,19"/><rect x="5" y="5" width="2.6" height="14" rx="1"/></svg>
+          </button>
+          <button class="ss-xp-play" (click)="togglePlay()"
+                  [attr.aria-label]="isPlaying() ? ('stories.reader.pauseAriaLabel' | translate) : ('stories.reader.playAriaLabel' | translate)">
+            @if (isPlaying()) {
+              <svg viewBox="0 0 24 24" width="22" height="22" fill="currentColor"><rect x="6" y="4" width="4.5" height="16" rx="1.2"/><rect x="13.5" y="4" width="4.5" height="16" rx="1.2"/></svg>
+            } @else {
+              <svg viewBox="0 0 24 24" width="24" height="24" fill="currentColor"><polygon points="7,4 20,12 7,20"/></svg>
+            }
+          </button>
+          <button class="ss-xp-next" (click)="nextTrack()" [attr.aria-label]="'stories.reader.nextAriaLabel' | translate">
+            <svg viewBox="0 0 24 24" width="22" height="22" fill="currentColor" stroke="none"><polygon points="6,5 16,12 6,19"/><rect x="16.4" y="5" width="2.6" height="14" rx="1"/></svg>
+          </button>
+          <button class="ss-xp-icon ss-xp-repeat" [class.active]="repeatMode() !== 'off'" (click)="cycleRepeat()" [attr.aria-label]="'stories.reader.repeatAriaLabel' | translate">
+            <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="17,1 21,5 17,9"/><path d="M3 11V9a4 4 0 0 1 4-4h14"/><polyline points="7,23 3,19 7,15"/><path d="M21 13v2a4 4 0 0 1-4 4H3"/></svg>
+            @if (repeatMode() === 'one') { <span class="ss-xp-repeat-badge">1</span> }
+          </button>
+        </div>
+
+        <div class="ss-xp-repeat-label">{{ repeatModeLabel() | translate }}</div>
+
+        <div class="ss-xp-speed-row">
+          <span class="ss-xp-speed-label">{{ 'stories.reader.speedSection' | translate }}</span>
+          @for (sp of speeds; track sp) {
+            <button class="ss-xp-speed-chip" [class.active]="speed() === sp" (click)="setSpeed(sp)">{{ sp }}×</button>
+          }
+        </div>
+
+        <button class="ss-xp-complete" (click)="completeStory()">
+          <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="20,6 9,17 4,12"/></svg>
+          {{ 'stories.reader.markCompleteBtn' | translate }}
+        </button>
+        <div class="ss-xp-complete-hint">{{ 'stories.reader.neverFinishHint' | translate }}</div>
+
+        <div class="ss-xp-upnext-hdr">{{ 'stories.reader.upNext' | translate }}</div>
+        <div class="ss-xp-queue">
+          @for (item of queueItems(); track item.id; let i = $index) {
+            <div class="ss-xp-qrow" [class.playing]="item.isCurrent" (click)="playQueueItem(i)">
+              @if (item.isCurrent) {
+                <div class="ss-xp-qicon"><svg viewBox="0 0 24 24" width="13" height="13" fill="currentColor"><polygon points="7,4 20,12 7,20"/></svg></div>
+              } @else {
+                <div class="ss-xp-qnum">{{ i + 1 }}</div>
+              }
+              <div class="ss-xp-qinfo">
+                <div class="ss-xp-qtitle">{{ item.title }}</div>
+                <div class="ss-xp-qmeta">{{ item.level }} · {{ item.dur }}</div>
+              </div>
+            </div>
+          }
+        </div>
+      </div>
+    </div>
+  }
+}
+
+<!-- ── Mini player (Story tab only, no sheet open) ────────────────── -->
+@if (story(); as s) {
+  @if (activeTab() === 'story' && !tappedWord() && !playerExpanded()) {
+    <div class="ss-mini" [class.disabled]="!s.audioUrl || audioGenerating() || audioLoading()">
+      <div class="ss-mini-progress" [style.width.%]="progressPct()"></div>
+
+      <button class="ss-mini-skip" (click)="prevTrack()" [attr.aria-label]="'stories.reader.prevAriaLabel' | translate">
+        <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor" stroke="none"><polygon points="18,5 8,12 18,19"/><rect x="5" y="5" width="2.4" height="14" rx="1"/></svg>
+      </button>
+
+      <button class="ss-mini-play" [class.pulse]="autoPlayPending()" (click)="togglePlay()"
+              [disabled]="!s.audioUrl || audioGenerating() || audioLoading()"
+              [attr.aria-label]="isPlaying() ? ('stories.reader.pauseAriaLabel' | translate) : ('stories.reader.playAriaLabel' | translate)">
         @if (audioGenerating() || audioLoading()) {
-          <div class="sr-pill-spinner"></div>
+          <div class="ss-mini-spinner"></div>
         } @else if (isPlaying()) {
-          <svg viewBox="0 0 24 24" width="12" height="12" fill="white" stroke="white" stroke-width="2" stroke-linecap="round">
-            <rect x="6" y="4" width="4" height="16"/><rect x="14" y="4" width="4" height="16"/>
-          </svg>
+          <svg viewBox="0 0 24 24" width="14" height="14" fill="currentColor"><rect x="6" y="4" width="4" height="16" rx="1"/><rect x="14" y="4" width="4" height="16" rx="1"/></svg>
         } @else {
-          <svg viewBox="0 0 24 24" width="12" height="12" fill="white" stroke="white" stroke-width="2.5" stroke-linecap="round">
-            <polygon points="6,4 20,12 6,20"/>
-          </svg>
+          <svg viewBox="0 0 24 24" width="15" height="15" fill="currentColor"><polygon points="7,4 20,12 7,20"/></svg>
         }
       </button>
 
-      <!-- Label -->
-      <span class="sr-pill-label">{{ currentTimeLabel() }} / {{ durationLabel() }}</span>
+      <div class="ss-mini-info" (click)="expandPlayer()">
+        <div class="ss-mini-title">{{ s.title }}</div>
+        <div class="ss-mini-time">{{ currentTimeLabel() }} / {{ durationLabel() }}</div>
+      </div>
 
-      <!-- Speed cycle -->
-      <button
-        class="sr-pill-speed"
-        (click)="cycleSpeed()"
-        [disabled]="!s.audioUrl || audioGenerating() || audioLoading()"
-      >{{ speedLabel() }}</button>
+      <button class="ss-mini-skip" (click)="nextTrack()" [attr.aria-label]="'stories.reader.nextAriaLabel' | translate">
+        <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor" stroke="none"><polygon points="6,5 16,12 6,19"/><rect x="16.6" y="5" width="2.4" height="14" rx="1"/></svg>
+      </button>
 
-      <!-- Restart -->
-      <button
-        class="sr-pill-repeat"
-        (click)="restart()"
-        [disabled]="!s.audioUrl || audioGenerating() || audioLoading()"
-        aria-label="Restart"
-      >
-        <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-          <polyline points="1,4 1,10 7,10"/>
-          <path d="M3.51 15a9 9 0 1 0 .49-4.95"/>
-        </svg>
+      <button class="ss-mini-speed" (click)="player.cycleSpeed()" [attr.aria-label]="'stories.reader.speedSection' | translate">{{ speed() }}×</button>
+
+      <button class="ss-mini-expand" (click)="expandPlayer()" [attr.aria-label]="'stories.reader.expandPlayerAriaLabel' | translate">
+        <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="18,15 12,9 6,15"/></svg>
       </button>
     </div>
   }

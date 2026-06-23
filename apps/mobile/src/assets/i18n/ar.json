@@ -865,7 +865,7 @@
       "playPronunciationAriaLabel": "تشغيل النطق",
       "alreadyInVaultAriaLabel": "موجودة بالفعل في الخزنة",
       "addToVaultAriaLabel": "إضافة إلى الخزنة",
-      "conjugateBtn": "تصريف ▸",
+      "conjugateBtn": "تصريف",
       "praesensHeader": "Präsens",
       "praeteritumHeader": "Präteritum",
       "perfektLabel": "Perfekt:",
@@ -880,6 +880,7 @@
       "finishedReadingHint": "هل انتهيت من القراءة؟ أنت تقرر متى تنتهي.",
       "markCompleteBtn": "وضع علامة اكتمال القصة",
       "nowPlaying": "قيد التشغيل الآن",
+      "speedSection": "السرعة",
       "upNext": "التالي",
       "repeatOff": "التكرار متوقف",
       "repeatQueue": "تكرار القائمة",
@@ -888,11 +889,13 @@
       "repeatAriaLabel": "تكرار",
       "prevAriaLabel": "السابق",
       "nextAriaLabel": "التالي",
+      "audioUnavailableToast": "الصوت غير متوفر — يتم الانتقال إلى القصة التالية",
       "expandPlayerAriaLabel": "توسيع المشغّل",
       "collapsePlayerAriaLabel": "طي المشغّل",
       "neverFinishHint": "القصص لا تنتهي من تلقاء نفسها — انقر عندما تكون مستعدًا.",
       "addedToVaultToast": "أُضيفت إلى مخزنك",
-      "alreadyInVaultToast": "موجودة بالفعل في مخزنك"
+      "alreadyInVaultToast": "موجودة بالفعل في مخزنك",
+      "saveFailedToast": "تعذّر حفظ الكلمة — حاول مرة أخرى"
     },
     "complete": {
       "backAriaLabel": "العودة للمكتبة",
@@ -906,7 +909,12 @@
       "wordsSection": "الكلمات في هذه القصة",
       "readAgainBtn": "إعادة القراءة",
       "moreStoriesBtn": "المزيد من القصص",
-      "loadingMsg": "جارٍ التحميل…"
+      "loadingMsg": "جارٍ التحميل…",
+      "eyebrow": "اكتملت القصة",
+      "quizScoreLabel": "نتيجة الاختبار",
+      "replayBtn": "إعادة تشغيل القصة",
+      "playNextBtn": "التالي · {{title}}",
+      "backToStories": "العودة إلى القصص"
     },
     "generate": {
       "pageTitle": "إنشاء قصة",
@@ -950,7 +958,13 @@
       "unmuteAriaLabel": "تشغيل صوت الإجابة",
       "nextBtn": "التالي",
       "pauseOnMistakesTitle": "التوقف عند الأخطاء",
-      "pauseOnMistakesDesc": "مراجعة الإجابة الصحيحة قبل المتابعة"
+      "pauseOnMistakesDesc": "مراجعة الإجابة الصحيحة قبل المتابعة",
+      "correctAnswersLabel": "إجابات صحيحة",
+      "takeAgainBtn": "حاول مرة أخرى",
+      "nextQuestionBtn": "السؤال التالي",
+      "finishBtn": "إنهاء الاختبار",
+      "hintLabel": "تلميح",
+      "playSentenceAriaLabel": "تشغيل الجملة"
     },
     "length": {
       "short": "قصير",

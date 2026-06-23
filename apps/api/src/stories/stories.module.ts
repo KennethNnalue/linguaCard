@@ -33,5 +33,6 @@ import { SettingsModule } from '../settings/settings.module';
     StoryVocabMapper,
     StorageService,
   ],
+  exports: [StoryAudioService],
 })
 export class StoriesModule {}
