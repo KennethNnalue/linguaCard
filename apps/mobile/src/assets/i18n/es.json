@@ -837,7 +837,16 @@
       "deleteAlertHeader": "Eliminar historia",
       "deleteAlertMsg": "¿Eliminar \"{{title}}\"? El audio también se eliminará.",
       "deleteActionBtn": "Eliminar",
-      "extensionFailedToast": "La extensión falló — por favor, inténtalo de nuevo."
+      "extensionFailedToast": "La extensión falló — por favor, inténtalo de nuevo.",
+      "eyebrow": "LINGUACARD",
+      "searchAriaLabel": "Buscar historias",
+      "continueReading": "Seguir leyendo",
+      "minReadMeta": "{{mins}} min de lectura · {{category}}",
+      "exploreSubtitle": "Seleccionado por LinguaCard",
+      "myStoriesSubtitle": "Creado por ti",
+      "backToStories": "Volver a Historias",
+      "levelAll": "Todos",
+      "playAriaLabel": "Reproducir historia"
     },
     "reader": {
       "backAriaLabel": "Atrás",
@@ -865,7 +874,25 @@
       "pauseAriaLabel": "Pausar",
       "playAriaLabel": "Reproducir",
       "restartAriaLabel": "Reiniciar",
-      "loadingMsg": "Cargando historia…"
+      "loadingMsg": "Cargando historia…",
+      "tapHint": "Toca cualquier palabra para buscarla",
+      "englishToggle": "Español",
+      "finishedReadingHint": "Terminaste de leer? Tú decides cuándo está listo.",
+      "markCompleteBtn": "Marcar historia completada",
+      "nowPlaying": "REPRODUCIENDO",
+      "upNext": "A CONTINUACIÓN",
+      "repeatOff": "Repetición desactivada",
+      "repeatQueue": "Repetir cola",
+      "repeatStory": "Repetir esta historia",
+      "shuffleAriaLabel": "Aleatorio",
+      "repeatAriaLabel": "Repetir",
+      "prevAriaLabel": "Anterior",
+      "nextAriaLabel": "Siguiente",
+      "expandPlayerAriaLabel": "Expandir reproductor",
+      "collapsePlayerAriaLabel": "Contraer reproductor",
+      "neverFinishHint": "Las historias nunca terminan solas: toca cuando estés listo.",
+      "addedToVaultToast": "Añadido a tu bóveda",
+      "alreadyInVaultToast": "Ya está en tu bóveda"
     },
     "complete": {
       "backAriaLabel": "Volver a la biblioteca",
@@ -1094,6 +1121,18 @@
       "benefit3": "Soporte prioritario",
       "requestBtn": "Solicitar acceso Pro",
       "dismissBtn": "Ahora no"
+    },
+    "redeem": {
+      "title": "Canjear un código",
+      "subtitle": "¿Tienes un código de descuento o de acceso? Introdúcelo para desbloquear Pro.",
+      "codeLabel": "Código de descuento",
+      "codePlaceholder": "p. ej. LAUNCH2026",
+      "submit": "Canjear",
+      "activated": "¡Ya eres Pro! Disfruta del acceso ilimitado.",
+      "invalid": "Este código no es válido.",
+      "error": "Algo salió mal. Inténtalo de nuevo.",
+      "haveCode": "¿Tienes un código?",
+      "menuLabel": "Canjear un código"
     }
   },
   "admin": {
@@ -1124,6 +1163,38 @@
         "loading": "Cargando…",
         "noCollections": "Aún no hay colecciones. Importa una primero."
       }
+    },
+    "discountCodes": {
+      "label": "Códigos de descuento",
+      "pageTitle": "Códigos de descuento",
+      "generateTitle": "Generar un código",
+      "codeLabel": "Código personalizado (opcional)",
+      "codePlaceholder": "Déjalo en blanco para generarlo automáticamente",
+      "percentLabel": "Descuento %",
+      "percentHint": "Solo los códigos del 100% activan Pro al instante. Valores menores van a la mejora manual.",
+      "maxRedemptionsLabel": "Canjes máximos",
+      "unlimited": "Ilimitado",
+      "lifetimeLabel": "Acceso de por vida",
+      "durationPlaceholder": "Duración en días",
+      "expiresLabel": "Fecha de caducidad (opcional)",
+      "labelLabel": "Etiqueta (opcional)",
+      "labelPlaceholder": "p. ej. Campaña de lanzamiento",
+      "generateBtn": "Generar código",
+      "generating": "Generando…",
+      "existingTitle": "Códigos existentes",
+      "empty": "Aún no hay códigos. Genera uno arriba.",
+      "usesShort": "Usos",
+      "expiresShort": "Caduca",
+      "deactivate": "Desactivar",
+      "activate": "Activar",
+      "lifetime": "De por vida",
+      "dayValue": "{{count}} día",
+      "daysValue": "{{count}} días",
+      "created": "Código {{code}} creado",
+      "createError": "No se pudo crear el código. Revisa los datos e inténtalo de nuevo.",
+      "loadError": "No se pudieron cargar los códigos.",
+      "updateError": "No se pudo actualizar el código.",
+      "copied": "Copiado {{code}}"
     }
   },
   "wordDetail": {

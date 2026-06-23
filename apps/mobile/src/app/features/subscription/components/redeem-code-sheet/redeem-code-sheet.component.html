@@ -1,0 +1,54 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-title>{{ 'subscription.redeem.title' | translate }}</ion-title>
+    <ion-icon
+      name="close-outline"
+      slot="end"
+      class="sheet-close"
+      [attr.aria-label]="'common.aria.close' | translate"
+      (click)="dismiss()"
+    ></ion-icon>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="sheet-content">
+  @if (activated()) {
+    <div class="success-state">
+      <ion-icon name="checkmark-circle-outline" class="success-icon"></ion-icon>
+      <p class="success-text">{{ 'subscription.redeem.activated' | translate }}</p>
+    </div>
+  } @else {
+    <form [formGroup]="form" class="redeem-form" (ngSubmit)="redeem()">
+      <div class="redeem-hero">
+        <ion-icon name="gift-outline" class="redeem-hero-icon"></ion-icon>
+        <p class="redeem-hero-text">{{ 'subscription.redeem.subtitle' | translate }}</p>
+      </div>
+
+      <div class="field">
+        <label class="field-label">{{ 'subscription.redeem.codeLabel' | translate }}</label>
+        <input
+          class="field-input"
+          type="text"
+          autocapitalize="characters"
+          autocomplete="off"
+          formControlName="code"
+          [placeholder]="'subscription.redeem.codePlaceholder' | translate"
+        />
+      </div>
+
+      @if (error()) {
+        <p class="error-text">{{ error() }}</p>
+      }
+
+      <lc-button
+        variant="filled-primary"
+        [fullWidth]="true"
+        [loading]="isSubmitting()"
+        [disabled]="form.invalid || isSubmitting()"
+        (click)="redeem()"
+      >
+        {{ 'subscription.redeem.submit' | translate }}
+      </lc-button>
+    </form>
+  }
+</ion-content>

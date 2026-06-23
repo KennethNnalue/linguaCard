@@ -1,0 +1,116 @@
+<ion-header class="ion-no-border">
+  <ion-toolbar>
+    <div class="adm-nav">
+      <button class="adm-back-btn" (click)="goBack()" [attr.aria-label]="'common.back' | translate">
+        <ion-icon name="arrow-back-outline"></ion-icon>
+      </button>
+      <span class="adm-title lc-display">{{ 'admin.discountCodes.pageTitle' | translate }}</span>
+      <div class="adm-nav-spacer"></div>
+    </div>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+  <div class="dc-content">
+
+    <!-- Generate form -->
+    <form class="dc-card" [formGroup]="form" (ngSubmit)="generate()">
+      <h2 class="dc-card-title">{{ 'admin.discountCodes.generateTitle' | translate }}</h2>
+
+      <div class="dc-field">
+        <label class="dc-label">{{ 'admin.discountCodes.codeLabel' | translate }}</label>
+        <input class="dc-input" type="text" formControlName="code"
+               autocapitalize="characters"
+               [placeholder]="'admin.discountCodes.codePlaceholder' | translate" />
+      </div>
+
+      <div class="dc-row">
+        <div class="dc-field">
+          <label class="dc-label">{{ 'admin.discountCodes.percentLabel' | translate }}</label>
+          <input class="dc-input" type="number" min="1" max="100" formControlName="percentOff" />
+          <p class="dc-hint">{{ 'admin.discountCodes.percentHint' | translate }}</p>
+        </div>
+        <div class="dc-field">
+          <label class="dc-label">{{ 'admin.discountCodes.maxRedemptionsLabel' | translate }}</label>
+          <input class="dc-input" type="number" min="1" formControlName="maxRedemptions"
+                 [placeholder]="'admin.discountCodes.unlimited' | translate" />
+        </div>
+      </div>
+
+      <div class="dc-field">
+        <label class="dc-check">
+          <input type="checkbox" formControlName="lifetime" />
+          {{ 'admin.discountCodes.lifetimeLabel' | translate }}
+        </label>
+        @if (!form.controls.lifetime.value) {
+          <input class="dc-input" type="number" min="1" formControlName="durationDays"
+                 [placeholder]="'admin.discountCodes.durationPlaceholder' | translate" />
+        }
+      </div>
+
+      <div class="dc-row">
+        <div class="dc-field">
+          <label class="dc-label">{{ 'admin.discountCodes.expiresLabel' | translate }}</label>
+          <input class="dc-input" type="date" formControlName="expiresAt" />
+        </div>
+        <div class="dc-field">
+          <label class="dc-label">{{ 'admin.discountCodes.labelLabel' | translate }}</label>
+          <input class="dc-input" type="text" formControlName="label"
+                 [placeholder]="'admin.discountCodes.labelPlaceholder' | translate" />
+        </div>
+      </div>
+
+      <button class="dc-generate-btn" type="submit" [disabled]="form.invalid || generating()">
+        {{ (generating() ? 'admin.discountCodes.generating' : 'admin.discountCodes.generateBtn') | translate }}
+      </button>
+    </form>
+
+    <!-- Existing codes -->
+    <div class="dc-card">
+      <h2 class="dc-card-title">{{ 'admin.discountCodes.existingTitle' | translate }}</h2>
+
+      @if (loading()) {
+        <p class="dc-empty">{{ 'common.loading' | translate }}</p>
+      } @else if (codes().length === 0) {
+        <p class="dc-empty">{{ 'admin.discountCodes.empty' | translate }}</p>
+      } @else {
+        <div class="dc-list">
+          @for (c of codes(); track c.id) {
+            <div class="dc-item" [class.dc-item--inactive]="!c.isActive">
+              <div class="dc-item-main">
+                <button class="dc-code" (click)="copyCode(c.code)">
+                  {{ c.code }}
+                  <ion-icon name="copy-outline"></ion-icon>
+                </button>
+                <span class="dc-percent">{{ c.percentOff }}%</span>
+              </div>
+              <div class="dc-meta">
+                <span>
+                  {{ 'admin.discountCodes.usesShort' | translate }}:
+                  {{ c.redeemedCount }} / {{ c.maxRedemptions ?? ('admin.discountCodes.unlimited' | translate) }}
+                </span>
+                <span>
+                  @if (c.durationDays === null) {
+                    {{ 'admin.discountCodes.lifetime' | translate }}
+                  } @else if (c.durationDays === 1) {
+                    {{ 'admin.discountCodes.dayValue' | translate:{ count: 1 } }}
+                  } @else {
+                    {{ 'admin.discountCodes.daysValue' | translate:{ count: c.durationDays } }}
+                  }
+                </span>
+                @if (c.expiresAt) {
+                  <span>{{ 'admin.discountCodes.expiresShort' | translate }}: {{ c.expiresAt | date:'mediumDate' }}</span>
+                }
+                @if (c.label) { <span class="dc-meta-label">{{ c.label }}</span> }
+              </div>
+              <button class="dc-toggle" (click)="toggleActive(c)">
+                {{ (c.isActive ? 'admin.discountCodes.deactivate' : 'admin.discountCodes.activate') | translate }}
+              </button>
+            </div>
+          }
+        </div>
+      }
+    </div>
+
+  </div>
+</ion-content>

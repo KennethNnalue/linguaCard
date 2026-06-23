@@ -33,6 +33,19 @@ export class PaywallModalComponent {
     await sheet.present();
   }
 
+  async openRedeemSheet(): Promise<void> {
+    const { RedeemCodeSheetComponent } = await import(
+      '../redeem-code-sheet/redeem-code-sheet.component'
+    );
+    await this.modalCtrl.dismiss();
+    const sheet = await this.modalCtrl.create({
+      component: RedeemCodeSheetComponent,
+      breakpoints: [0, 1],
+      initialBreakpoint: 1,
+    });
+    await sheet.present();
+  }
+
   dismiss(): void {
     void this.modalCtrl.dismiss();
   }

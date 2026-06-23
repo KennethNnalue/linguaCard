@@ -112,6 +112,56 @@ $lc-duration-flip:   300ms;
 $lc-easing-standard: cubic-bezier(0.4, 0, 0.2, 1);
 $lc-easing-spring:   cubic-bezier(0.34, 1.56, 0.64, 1);
 
+// ─── STORY STUDIO 2.0 PALETTE (Epic 15) ─────────────────────────────────────
+// Self-contained palette for the Story feature redesign. Scoped to stories/*
+// components — do not reuse app-wide without promoting to the brand palette.
+$lc-ss-pine:           #23463B;  // primary buttons, active tabs, mini-player
+$lc-ss-pine-deep:      #16302A;  // quiz panel bg, expanded player bg
+$lc-ss-pine-darkest:   #15211C;  // scrims base
+$lc-ss-ink:            #1C2622;  // primary text, dark sheet bg
+$lc-ss-sage:           #4E8C76;  // progress fill, eyebrow labels
+$lc-ss-sage-text:      #356151;  // vocab words in reader
+$lc-ss-mint:           #6EE7B7;  // player progress, karaoke/correct states
+$lc-ss-karaoke-bg:     #CFE3D9;  // current spoken word background
+$lc-ss-karaoke-vocab:  #8FB0A4;  // already-read vocab word
+$lc-ss-karaoke-plain:  #AAB2AC;  // already-read plain word
+$lc-ss-paper:          #F4F1E9;  // screen background
+$lc-ss-card:           #FFFFFF;  // cards, list rows
+$lc-ss-sand:           #ECE7DA;  // segmented-control track
+$lc-ss-sand-progress:  #EAE5D8;  // hero progress track
+$lc-ss-mint-chip-bg:     #E6EFEA;
+$lc-ss-mint-chip-border: #BFD8CC;
+$lc-ss-mint-chip-text:   #2F6B58;
+$lc-ss-muted:          #9AA39E;  // meta text
+$lc-ss-muted-alt:      #8A938E;  // inactive segment / meta text
+$lc-ss-muted-chip:     #7E877F;  // inactive category chip text
+$lc-ss-play-bg:        #EAF1ED;  // my-stories play button bg
+$lc-ss-translate-en:   #7C9A8E;  // per-sentence english translation
+$lc-ss-hairline:       rgba(28, 38, 34, 0.09);
+$lc-ss-hairline-soft:  rgba(28, 38, 34, 0.08);
+$lc-ss-hairline-strong:rgba(28, 38, 34, 0.12);
+$lc-ss-vocab-underline:#93BAAB;
+$lc-ss-premium-star:   #F2C57C;
+
+// Cover gradients (story covers g1–g6)
+$lc-ss-grad-1: linear-gradient(140deg, #2E5547, #6E9C88);
+$lc-ss-grad-2: linear-gradient(140deg, #36544C, #86A99A);
+$lc-ss-grad-3: linear-gradient(145deg, #7C4A2E, #C2703D);
+$lc-ss-grad-4: linear-gradient(140deg, #22403A, #4E8C76);
+$lc-ss-grad-5: linear-gradient(140deg, #566A4E, #9DB08C);
+$lc-ss-grad-6: linear-gradient(145deg, #3E4F6B, #7D8FA8);
+
+// Shadows specific to Story Studio
+$lc-ss-shadow-card:     0 6px 18px -10px rgba(22, 48, 42, 0.28), 0 1px 3px rgba(0, 0, 0, 0.04);
+$lc-ss-shadow-hero:     0 10px 30px -12px rgba(22, 48, 42, 0.30), 0 2px 6px rgba(0, 0, 0, 0.04);
+$lc-ss-shadow-row:      0 4px 14px -10px rgba(22, 48, 42, 0.30), 0 1px 2px rgba(0, 0, 0, 0.03);
+$lc-ss-shadow-pill:     0 12px 32px -8px rgba(22, 48, 42, 0.55);
+$lc-ss-shadow-sheet:    0 -12px 40px rgba(0, 0, 0, 0.35);
+$lc-ss-shadow-fab:      0 6px 16px rgba(35, 70, 59, 0.30);
+
+// Typography
+$lc-font-serif: 'Newsreader', Georgia, serif;
+
 // ─── Z-INDEX SCALE ──────────────────────────────────────────────────────────
 $lc-z-base:    0;
 $lc-z-raised:  10;

@@ -837,7 +837,16 @@
       "deleteAlertHeader": "حذف القصة",
       "deleteAlertMsg": "هل تريد إزالة \"{{title}}\"؟ سيتم حذف الصوت أيضًا.",
       "deleteActionBtn": "حذف",
-      "extensionFailedToast": "فشل التمديد — يرجى المحاولة مرة أخرى."
+      "extensionFailedToast": "فشل التمديد — يرجى المحاولة مرة أخرى.",
+      "eyebrow": "LINGUACARD",
+      "searchAriaLabel": "البحث في القصص",
+      "continueReading": "متابعة القراءة",
+      "minReadMeta": "{{mins}} دقيقة قراءة · {{category}}",
+      "exploreSubtitle": "منسّقة بواسطة LinguaCard",
+      "myStoriesSubtitle": "من إنشائك",
+      "backToStories": "العودة إلى القصص",
+      "levelAll": "الكل",
+      "playAriaLabel": "تشغيل القصة"
     },
     "reader": {
       "backAriaLabel": "رجوع",
@@ -865,7 +874,25 @@
       "pauseAriaLabel": "إيقاف مؤقت",
       "playAriaLabel": "تشغيل",
       "restartAriaLabel": "إعادة التشغيل",
-      "loadingMsg": "جارٍ تحميل القصة…"
+      "loadingMsg": "جارٍ تحميل القصة…",
+      "tapHint": "انقر على أي كلمة للبحث عنها",
+      "englishToggle": "العربية",
+      "finishedReadingHint": "هل انتهيت من القراءة؟ أنت تقرر متى تنتهي.",
+      "markCompleteBtn": "وضع علامة اكتمال القصة",
+      "nowPlaying": "قيد التشغيل الآن",
+      "upNext": "التالي",
+      "repeatOff": "التكرار متوقف",
+      "repeatQueue": "تكرار القائمة",
+      "repeatStory": "تكرار هذه القصة",
+      "shuffleAriaLabel": "عشوائي",
+      "repeatAriaLabel": "تكرار",
+      "prevAriaLabel": "السابق",
+      "nextAriaLabel": "التالي",
+      "expandPlayerAriaLabel": "توسيع المشغّل",
+      "collapsePlayerAriaLabel": "طي المشغّل",
+      "neverFinishHint": "القصص لا تنتهي من تلقاء نفسها — انقر عندما تكون مستعدًا.",
+      "addedToVaultToast": "أُضيفت إلى مخزنك",
+      "alreadyInVaultToast": "موجودة بالفعل في مخزنك"
     },
     "complete": {
       "backAriaLabel": "العودة للمكتبة",
@@ -1094,6 +1121,18 @@
       "benefit3": "دعم ذو أولوية",
       "requestBtn": "طلب الوصول إلى Pro",
       "dismissBtn": "ليس الآن"
+    },
+    "redeem": {
+      "title": "استبدال رمز",
+      "subtitle": "هل لديك رمز خصم أو وصول؟ أدخله أدناه لفتح Pro.",
+      "codeLabel": "رمز الخصم",
+      "codePlaceholder": "مثال: LAUNCH2026",
+      "submit": "استبدال",
+      "activated": "أصبحت Pro الآن! استمتع بوصول غير محدود.",
+      "invalid": "هذا الرمز غير صالح.",
+      "error": "حدث خطأ ما. يرجى المحاولة مرة أخرى.",
+      "haveCode": "هل لديك رمز؟",
+      "menuLabel": "استبدال رمز"
     }
   },
   "admin": {
@@ -1124,6 +1163,38 @@
         "loading": "جارٍ التحميل…",
         "noCollections": "لا توجد مجموعات بعد. قم باستيراد واحدة أولاً."
       }
+    },
+    "discountCodes": {
+      "label": "رموز الخصم",
+      "pageTitle": "رموز الخصم",
+      "generateTitle": "إنشاء رمز",
+      "codeLabel": "رمز مخصص (اختياري)",
+      "codePlaceholder": "اتركه فارغًا للإنشاء التلقائي",
+      "percentLabel": "نسبة الخصم %",
+      "percentHint": "رموز 100% فقط تفعّل Pro فورًا. القيم الأقل تنتقل إلى الترقية اليدوية.",
+      "maxRedemptionsLabel": "الحد الأقصى للاستبدالات",
+      "unlimited": "غير محدود",
+      "lifetimeLabel": "وصول مدى الحياة",
+      "durationPlaceholder": "المدة بالأيام",
+      "expiresLabel": "تاريخ الانتهاء (اختياري)",
+      "labelLabel": "تسمية (اختياري)",
+      "labelPlaceholder": "مثال: حملة الإطلاق",
+      "generateBtn": "إنشاء رمز",
+      "generating": "جارٍ الإنشاء…",
+      "existingTitle": "الرموز الحالية",
+      "empty": "لا توجد رموز بعد. أنشئ واحدًا أعلاه.",
+      "usesShort": "الاستخدامات",
+      "expiresShort": "ينتهي",
+      "deactivate": "إلغاء التفعيل",
+      "activate": "تفعيل",
+      "lifetime": "مدى الحياة",
+      "dayValue": "يوم واحد",
+      "daysValue": "{{count}} يوم",
+      "created": "تم إنشاء الرمز {{code}}",
+      "createError": "تعذّر إنشاء الرمز. تحقق من المدخلات وحاول مرة أخرى.",
+      "loadError": "تعذّر تحميل الرموز.",
+      "updateError": "تعذّر تحديث الرمز.",
+      "copied": "تم نسخ {{code}}"
     }
   },
   "wordDetail": {

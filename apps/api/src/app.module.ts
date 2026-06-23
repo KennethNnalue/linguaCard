@@ -25,6 +25,7 @@ import { PushModule } from './push/push.module';
 import { WordDictionaryModule } from './word-dictionary/word-dictionary.module';
 import { AdminModule } from './admin/admin.module';
 import { PlatformCollectionsModule } from './platform-collections/platform-collections.module';
+import { DiscountCodesModule } from './discount-codes/discount-codes.module';
 import databaseConfig from './config/database.config';
 import { aiConfig } from './config/ai.config';
 
@@ -64,6 +65,7 @@ import { aiConfig } from './config/ai.config';
     WordDictionaryModule,
     AdminModule,
     PlatformCollectionsModule,
+    DiscountCodesModule,
     SeedModule,
   ],
   providers: [

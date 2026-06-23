@@ -15,6 +15,8 @@ import { PushSubscriptionEntity } from '../push/push-subscription.entity';
 import { WordDictionaryEntity } from '../word-dictionary/word-dictionary.entity';
 import { PlatformCollectionEntity } from '../admin/platform-collection.entity';
 import { PlatformCollectionWordEntity } from '../admin/platform-collection-word.entity';
+import { DiscountCodeEntity } from '../discount-codes/discount-code.entity';
+import { DiscountRedemptionEntity } from '../discount-codes/discount-redemption.entity';
 
 export default registerAs('database', (): TypeOrmModuleOptions => ({
   type: 'postgres',
@@ -22,7 +24,7 @@ export default registerAs('database', (): TypeOrmModuleOptions => ({
   ssl: process.env['NODE_ENV'] === 'production'
     ? { rejectUnauthorized: false }
     : false,
-  entities: [UserEntity, CardEntity, CollectionEntity, CategoryEntity, StoryEntity, WordAudioEntity, SubscriptionEntity, ReviewSessionEntity, PlatformStoryEntity, UserStoryProgressEntity, UserSettingsEntity, PushSubscriptionEntity, WordDictionaryEntity, PlatformCollectionEntity, PlatformCollectionWordEntity],
+  entities: [UserEntity, CardEntity, CollectionEntity, CategoryEntity, StoryEntity, WordAudioEntity, SubscriptionEntity, ReviewSessionEntity, PlatformStoryEntity, UserStoryProgressEntity, UserSettingsEntity, PushSubscriptionEntity, WordDictionaryEntity, PlatformCollectionEntity, PlatformCollectionWordEntity, DiscountCodeEntity, DiscountRedemptionEntity],
   synchronize: true,
   logging: process.env['NODE_ENV'] !== 'production',
 }));

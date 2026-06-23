@@ -653,6 +653,56 @@ export interface UpgradeRequestDto {
   message: string;
 }
 
+// ─── DISCOUNT CODES ──────────────────────────────────────────────────────────
+
+/** Body for redeeming a discount code (user-facing). */
+export interface RedeemDiscountCodeDto {
+  code: string;
+}
+
+/**
+ * Result of a redeem attempt.
+ * - `activated`: a 100%-off code was applied and Pro is now active.
+ * - `partial`:   a <100% code is valid but there is no in-app checkout yet, so the
+ *                client routes the user to the manual upgrade flow with `percentOff` pre-filled.
+ * - `invalid`:   the code does not exist, is inactive/expired, exhausted, or already used by this user.
+ */
+export interface RedeemDiscountResult {
+  status:        'activated' | 'partial' | 'invalid';
+  percentOff?:   number;
+  message?:      string;
+  subscription?: SubscriptionStatus;
+}
+
+/** Admin: create a new discount code. `code` optional → auto-generated when omitted. */
+export interface AdminGenerateDiscountCodeDto {
+  code?:           string;
+  percentOff:      number;          // 1–100
+  durationDays:    number | null;   // null = lifetime
+  maxRedemptions:  number | null;   // null = unlimited
+  expiresAt:       string | null;   // ISO date, null = no expiry
+  label?:          string;
+}
+
+/** Admin: toggle a discount code on/off. */
+export interface AdminSetDiscountCodeActiveDto {
+  isActive: boolean;
+}
+
+/** Admin: discount code as shown in the management list. */
+export interface AdminDiscountCodeListItem {
+  id:             string;
+  code:           string;
+  percentOff:     number;
+  durationDays:   number | null;
+  maxRedemptions: number | null;
+  redeemedCount:  number;
+  expiresAt:      string | null;
+  isActive:       boolean;
+  label:          string | null;
+  createdAt:      string;
+}
+
 // ─── STORY STUDIO 2.0: PLATFORM STORIES ──────────────────────────────────────
 
 export type StoryCategory =

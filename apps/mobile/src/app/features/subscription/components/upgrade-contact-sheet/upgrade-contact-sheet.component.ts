@@ -1,4 +1,4 @@
-import { Component, ChangeDetectionStrategy, inject, signal } from '@angular/core';
+import { Component, ChangeDetectionStrategy, inject, OnInit, signal } from '@angular/core';
 import { ReactiveFormsModule, FormBuilder, Validators } from '@angular/forms';
 import { IonContent, IonHeader, IonToolbar, IonTitle, IonIcon, ModalController } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
@@ -14,10 +14,14 @@ import { ContactApiService } from '../../services/contact-api.service';
   standalone: true,
   imports: [IonContent, IonHeader, IonToolbar, IonTitle, IonIcon, ReactiveFormsModule, ButtonComponent],
 })
-export class UpgradeContactSheetComponent {
+export class UpgradeContactSheetComponent implements OnInit {
   private readonly modalCtrl  = inject(ModalController);
   private readonly contactApi = inject(ContactApiService);
   private readonly fb         = inject(FormBuilder);
+
+  /** Optional discount-code context passed via Ionic componentProps when arriving from the redeem flow. */
+  prefillCode: string | null = null;
+  prefillPercentOff: number | null = null;
 
   readonly isSubmitting = signal(false);
   readonly submitted    = signal(false);
@@ -31,6 +35,16 @@ export class UpgradeContactSheetComponent {
 
   constructor() {
     addIcons({ closeOutline, checkmarkCircleOutline });
+  }
+
+  ngOnInit(): void {
+    // When the user came from redeeming a partial code, seed the message so Kenneth sees the code/percent.
+    if (this.prefillCode) {
+      const pct = this.prefillPercentOff ? `${this.prefillPercentOff}% off` : 'discount';
+      this.form.patchValue({
+        message: `I have a discount code: ${this.prefillCode} (${pct}). Please apply it to my Pro upgrade.`,
+      });
+    }
   }
 
   send(): void {

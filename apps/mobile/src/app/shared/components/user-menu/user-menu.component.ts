@@ -1,15 +1,17 @@
 import { ChangeDetectionStrategy, Component, inject, output } from '@angular/core';
 import { Router, RouterLink } from '@angular/router';
-import { IonIcon, IonToggle } from '@ionic/angular/standalone';
+import { IonIcon, IonToggle, ModalController } from '@ionic/angular/standalone';
 import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { addIcons } from 'ionicons';
 import {
   chevronForwardOutline,
   cloudUploadOutline,
+  giftOutline,
   languageOutline,
   logOutOutline,
   moonOutline,
   notificationsOutline,
+  pricetagsOutline,
   rocketOutline,
   syncOutline,
   trashOutline,
@@ -36,12 +38,26 @@ export class UserMenuComponent {
   private readonly translate = inject(TranslateService);
   private readonly settingsStore = inject(SettingsStore);
   private readonly router = inject(Router);
+  private readonly modalCtrl = inject(ModalController);
 
   readonly closed = output<void>();
   readonly resetRequested = output<void>();
 
   constructor() {
-    addIcons({ moonOutline, syncOutline, trashOutline, logOutOutline, chevronForwardOutline, trophyOutline, notificationsOutline, cloudUploadOutline, languageOutline, rocketOutline });
+    addIcons({ moonOutline, syncOutline, trashOutline, logOutOutline, chevronForwardOutline, trophyOutline, notificationsOutline, cloudUploadOutline, languageOutline, rocketOutline, giftOutline, pricetagsOutline });
+  }
+
+  async openRedeemSheet(): Promise<void> {
+    this.closed.emit();
+    const { RedeemCodeSheetComponent } = await import(
+      '../../../features/subscription/components/redeem-code-sheet/redeem-code-sheet.component'
+    );
+    const sheet = await this.modalCtrl.create({
+      component: RedeemCodeSheetComponent,
+      breakpoints: [0, 1],
+      initialBreakpoint: 1,
+    });
+    await sheet.present();
   }
 
   get syncLabel(): string {

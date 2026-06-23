@@ -39,6 +39,15 @@
     <ion-icon name="chevron-forward-outline" class="ctx-chevron"></ion-icon>
   </a>
 
+  <!-- Redeem discount code -->
+  <button class="ctx-item" role="menuitem" (click)="openRedeemSheet()">
+    <div class="ctx-item-left">
+      <ion-icon name="gift-outline"></ion-icon>
+      {{ 'subscription.redeem.menuLabel' | translate }}
+    </div>
+    <ion-icon name="chevron-forward-outline" class="ctx-chevron"></ion-icon>
+  </button>
+
   <!-- Replay onboarding -->
   <button class="ctx-item" role="menuitem" (click)="replayOnboarding()">
     <div class="ctx-item-left">
@@ -84,6 +93,14 @@
       <div class="ctx-item-left">
         <ion-icon name="cloud-upload-outline"></ion-icon>
         {{ 'admin.import.label' | translate }}
+      </div>
+      <ion-icon name="chevron-forward-outline" class="ctx-chevron"></ion-icon>
+    </a>
+
+    <a class="ctx-item ctx-item--admin" role="menuitem" [routerLink]="['/admin/discount-codes']" (click)="closed.emit()">
+      <div class="ctx-item-left">
+        <ion-icon name="pricetags-outline"></ion-icon>
+        {{ 'admin.discountCodes.label' | translate }}
       </div>
       <ion-icon name="chevron-forward-outline" class="ctx-chevron"></ion-icon>
     </a>

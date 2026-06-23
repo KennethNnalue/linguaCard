@@ -837,7 +837,16 @@
       "deleteAlertHeader": "Hikayeyi sil",
       "deleteAlertMsg": "\"{{title}}\" silinsin mi? Ses dosyası da silinecektir.",
       "deleteActionBtn": "Sil",
-      "extensionFailedToast": "Uzatma başarısız oldu — lütfen tekrar deneyin."
+      "extensionFailedToast": "Uzatma başarısız oldu — lütfen tekrar deneyin.",
+      "eyebrow": "LINGUACARD",
+      "searchAriaLabel": "Hikaye ara",
+      "continueReading": "Okumaya devam et",
+      "minReadMeta": "{{mins}} dk okuma · {{category}}",
+      "exploreSubtitle": "LinguaCard tarafından seçildi",
+      "myStoriesSubtitle": "Senin oluşturduğun",
+      "backToStories": "Hikayelere Dön",
+      "levelAll": "Tümü",
+      "playAriaLabel": "Hikayeyi oynat"
     },
     "reader": {
       "backAriaLabel": "Geri",
@@ -865,7 +874,25 @@
       "pauseAriaLabel": "Duraklat",
       "playAriaLabel": "Oynat",
       "restartAriaLabel": "Yeniden başlat",
-      "loadingMsg": "Hikaye yükleniyor…"
+      "loadingMsg": "Hikaye yükleniyor…",
+      "tapHint": "Aramak için herhangi bir kelimeye dokun",
+      "englishToggle": "Türkçe",
+      "finishedReadingHint": "Okumayı bitirdin mi? Ne zaman bittiğine sen karar verirsin.",
+      "markCompleteBtn": "Hikayeyi tamamlandı olarak işaretle",
+      "nowPlaying": "ŞİMDİ ÇALIYOR",
+      "upNext": "SIRADAKİ",
+      "repeatOff": "Tekrar kapalı",
+      "repeatQueue": "Kuyruğu tekrarla",
+      "repeatStory": "Bu hikayeyi tekrarla",
+      "shuffleAriaLabel": "Karıştır",
+      "repeatAriaLabel": "Tekrarla",
+      "prevAriaLabel": "Önceki",
+      "nextAriaLabel": "Sonraki",
+      "expandPlayerAriaLabel": "Oynatıcıyı genişlet",
+      "collapsePlayerAriaLabel": "Oynatıcıyı daralt",
+      "neverFinishHint": "Hikayeler kendi kendine bitmez — hazır olduğunda dokun.",
+      "addedToVaultToast": "Kasanıza eklendi",
+      "alreadyInVaultToast": "Zaten kasanızda"
     },
     "complete": {
       "backAriaLabel": "Kütüphaneye dön",
@@ -1094,6 +1121,18 @@
       "benefit3": "Öncelikli destek",
       "requestBtn": "Pro Erişim Talep Et",
       "dismissBtn": "Şimdi değil"
+    },
+    "redeem": {
+      "title": "Kod Kullan",
+      "subtitle": "İndirim veya erişim kodun mu var? Pro'yu açmak için aşağıya gir.",
+      "codeLabel": "İndirim kodu",
+      "codePlaceholder": "örn. LAUNCH2026",
+      "submit": "Kullan",
+      "activated": "Artık Pro'sun! Sınırsız erişimin keyfini çıkar.",
+      "invalid": "Bu kod geçerli değil.",
+      "error": "Bir şeyler ters gitti. Lütfen tekrar dene.",
+      "haveCode": "Kodun mu var?",
+      "menuLabel": "Kod kullan"
     }
   },
   "admin": {
@@ -1124,6 +1163,38 @@
         "loading": "Yükleniyor…",
         "noCollections": "Henüz koleksiyon yok. Önce bir tane içe aktarın."
       }
+    },
+    "discountCodes": {
+      "label": "İndirim Kodları",
+      "pageTitle": "İndirim Kodları",
+      "generateTitle": "Kod oluştur",
+      "codeLabel": "Özel kod (isteğe bağlı)",
+      "codePlaceholder": "Otomatik oluşturmak için boş bırak",
+      "percentLabel": "İndirim %",
+      "percentHint": "Yalnızca %100 kodlar Pro'yu anında etkinleştirir. Daha düşük değerler manuel yükseltmeye yönlendirir.",
+      "maxRedemptionsLabel": "Maksimum kullanım",
+      "unlimited": "Sınırsız",
+      "lifetimeLabel": "Ömür boyu erişim",
+      "durationPlaceholder": "Gün cinsinden süre",
+      "expiresLabel": "Son kullanma tarihi (isteğe bağlı)",
+      "labelLabel": "Etiket (isteğe bağlı)",
+      "labelPlaceholder": "örn. Lansman kampanyası",
+      "generateBtn": "Kod oluştur",
+      "generating": "Oluşturuluyor…",
+      "existingTitle": "Mevcut kodlar",
+      "empty": "Henüz kod yok. Yukarıdan bir tane oluştur.",
+      "usesShort": "Kullanım",
+      "expiresShort": "Bitiş",
+      "deactivate": "Devre dışı bırak",
+      "activate": "Etkinleştir",
+      "lifetime": "Ömür boyu",
+      "dayValue": "{{count}} gün",
+      "daysValue": "{{count}} gün",
+      "created": "{{code}} kodu oluşturuldu",
+      "createError": "Kod oluşturulamadı. Girişleri kontrol edip tekrar dene.",
+      "loadError": "Kodlar yüklenemedi.",
+      "updateError": "Kod güncellenemedi.",
+      "copied": "{{code}} kopyalandı"
     }
   },
   "wordDetail": {

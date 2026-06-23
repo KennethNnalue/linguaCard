@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { IsNull, Not, Repository } from 'typeorm';
+import { EntityManager, IsNull, Not, Repository } from 'typeorm';
 import { SubscriptionEntity } from './subscription.entity';
 import { StoryEntity } from '../stories/story.entity';
 import { CollectionEntity } from '../collections/collection.entity';
@@ -20,14 +20,20 @@ export class SubscriptionService {
     private readonly collectionRepo: Repository<CollectionEntity>,
   ) {}
 
-  async createFree(userId: string): Promise<SubscriptionEntity> {
-    const entity = this.subRepo.create({ userId, tier: 'free' });
-    return this.subRepo.save(entity);
+  /** Resolve the repository to use — the transaction-scoped one when a manager is supplied. */
+  private repo(manager?: EntityManager): Repository<SubscriptionEntity> {
+    return manager ? manager.getRepository(SubscriptionEntity) : this.subRepo;
   }
 
-  async getOrCreateForUser(userId: string): Promise<SubscriptionEntity> {
-    let sub = await this.subRepo.findOneBy({ userId });
-    if (!sub) sub = await this.createFree(userId);
+  async createFree(userId: string, manager?: EntityManager): Promise<SubscriptionEntity> {
+    const repo = this.repo(manager);
+    const entity = repo.create({ userId, tier: 'free' });
+    return repo.save(entity);
+  }
+
+  async getOrCreateForUser(userId: string, manager?: EntityManager): Promise<SubscriptionEntity> {
+    let sub = await this.repo(manager).findOneBy({ userId });
+    if (!sub) sub = await this.createFree(userId, manager);
     return sub;
   }
 
@@ -59,6 +65,22 @@ export class SubscriptionService {
       imageImportsRemaining,
       freeImageImportLimit: FREE_IMAGE_IMPORT_LIMIT,
     };
+  }
+
+  /**
+   * Self-service Pro grant — used by discount-code redemption (replaces the manual SQL flow).
+   * `expiresAt` null = lifetime. Pass `manager` to run inside a caller's transaction.
+   */
+  async activatePro(
+    userId: string,
+    opts: { expiresAt: Date | null; notes?: string; manager?: EntityManager },
+  ): Promise<SubscriptionEntity> {
+    const sub = await this.getOrCreateForUser(userId, opts.manager);
+    sub.tier        = 'pro';
+    sub.activatedAt = new Date();
+    sub.expiresAt   = opts.expiresAt;
+    if (opts.notes) sub.notes = opts.notes;
+    return this.repo(opts.manager).save(sub);
   }
 
   async getEffectiveTier(userId: string): Promise<SubscriptionTier> {

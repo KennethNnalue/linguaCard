@@ -910,7 +910,16 @@
       "deleteAlertHeader": "Delete story",
       "deleteAlertMsg": "Remove \"{{title}}\"? The audio will also be deleted.",
       "deleteActionBtn": "Delete",
-      "extensionFailedToast": "Extension failed — please try again."
+      "extensionFailedToast": "Extension failed — please try again.",
+      "eyebrow": "LINGUACARD",
+      "searchAriaLabel": "Search stories",
+      "continueReading": "Continue reading",
+      "minReadMeta": "{{mins}} min read · {{category}}",
+      "exploreSubtitle": "Curated by LinguaCard",
+      "myStoriesSubtitle": "Made by you",
+      "backToStories": "Back to Stories",
+      "levelAll": "All",
+      "playAriaLabel": "Play story"
     },
     "reader": {
       "backAriaLabel": "Back",
@@ -938,7 +947,25 @@
       "pauseAriaLabel": "Pause",
       "playAriaLabel": "Play",
       "restartAriaLabel": "Restart",
-      "loadingMsg": "Loading story…"
+      "loadingMsg": "Loading story…",
+      "tapHint": "Tap any word to look it up",
+      "englishToggle": "English",
+      "finishedReadingHint": "Finished reading? You decide when it's done.",
+      "markCompleteBtn": "Mark story complete",
+      "nowPlaying": "NOW PLAYING",
+      "upNext": "UP NEXT",
+      "repeatOff": "Repeat off",
+      "repeatQueue": "Repeat queue",
+      "repeatStory": "Repeat this story",
+      "shuffleAriaLabel": "Shuffle",
+      "repeatAriaLabel": "Repeat",
+      "prevAriaLabel": "Previous",
+      "nextAriaLabel": "Next",
+      "expandPlayerAriaLabel": "Expand player",
+      "collapsePlayerAriaLabel": "Collapse player",
+      "neverFinishHint": "Stories never finish on their own — tap when you're ready.",
+      "addedToVaultToast": "Added to your vault",
+      "alreadyInVaultToast": "Already in your vault"
     },
     "complete": {
       "backAriaLabel": "Back to library",
@@ -1167,6 +1194,18 @@
       "benefit3": "Priority support",
       "requestBtn": "Request Pro Access",
       "dismissBtn": "Not now"
+    },
+    "redeem": {
+      "title": "Redeem a Code",
+      "subtitle": "Have a discount or access code? Enter it below to unlock Pro.",
+      "codeLabel": "Discount code",
+      "codePlaceholder": "e.g. LAUNCH2026",
+      "submit": "Redeem",
+      "activated": "You're Pro! Enjoy unlimited access.",
+      "invalid": "This code isn't valid.",
+      "error": "Something went wrong. Please try again.",
+      "haveCode": "Have a code?",
+      "menuLabel": "Redeem a code"
     }
   },
   "admin": {
@@ -1197,6 +1236,38 @@
         "loading": "Loading…",
         "noCollections": "No collections yet. Import one first."
       }
+    },
+    "discountCodes": {
+      "label": "Discount Codes",
+      "pageTitle": "Discount Codes",
+      "generateTitle": "Generate a code",
+      "codeLabel": "Custom code (optional)",
+      "codePlaceholder": "Leave blank to auto-generate",
+      "percentLabel": "Discount %",
+      "percentHint": "Only 100% codes activate Pro instantly. Lower values route to manual upgrade.",
+      "maxRedemptionsLabel": "Max redemptions",
+      "unlimited": "Unlimited",
+      "lifetimeLabel": "Lifetime access",
+      "durationPlaceholder": "Duration in days",
+      "expiresLabel": "Expiry date (optional)",
+      "labelLabel": "Label (optional)",
+      "labelPlaceholder": "e.g. Launch campaign",
+      "generateBtn": "Generate code",
+      "generating": "Generating…",
+      "existingTitle": "Existing codes",
+      "empty": "No codes yet. Generate one above.",
+      "usesShort": "Uses",
+      "expiresShort": "Expires",
+      "deactivate": "Deactivate",
+      "activate": "Activate",
+      "lifetime": "Lifetime",
+      "dayValue": "{{count}} day",
+      "daysValue": "{{count}} days",
+      "created": "Code {{code}} created",
+      "createError": "Could not create code. Check inputs and try again.",
+      "loadError": "Could not load codes.",
+      "updateError": "Could not update code.",
+      "copied": "Copied {{code}}"
     }
   },
   "wordDetail": {

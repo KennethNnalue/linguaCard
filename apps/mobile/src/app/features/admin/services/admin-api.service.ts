@@ -11,6 +11,9 @@ import type {
   AdminPlatformCollectionListItem,
   AdminPlatformStoryListItem,
   AdminSetStoryCategoryDto,
+  AdminDiscountCodeListItem,
+  AdminGenerateDiscountCodeDto,
+  AdminSetDiscountCodeActiveDto,
 } from '@lingua-card/shared/domain';
 import { environment } from '../../../../environments/environment';
 
@@ -54,5 +57,20 @@ export class AdminApiService {
 
   importStory(dto: AdminImportStoryDto): Observable<AdminImportStoryResult> {
     return this.http.post<AdminImportStoryResult>(`${this.apiUrl}/platform-stories/import`, dto);
+  }
+
+  // ── Discount codes ─────────────────────────────────────────────────────────
+
+  listDiscountCodes(): Observable<AdminDiscountCodeListItem[]> {
+    return this.http.get<AdminDiscountCodeListItem[]>(`${this.apiUrl}/discount-codes`);
+  }
+
+  generateDiscountCode(dto: AdminGenerateDiscountCodeDto): Observable<AdminDiscountCodeListItem> {
+    return this.http.post<AdminDiscountCodeListItem>(`${this.apiUrl}/discount-codes`, dto);
+  }
+
+  setDiscountCodeActive(id: string, isActive: boolean): Observable<void> {
+    const dto: AdminSetDiscountCodeActiveDto = { isActive };
+    return this.http.patch<void>(`${this.apiUrl}/discount-codes/${id}`, dto);
   }
 }

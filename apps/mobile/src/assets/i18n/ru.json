@@ -837,7 +837,16 @@
       "deleteAlertHeader": "Удалить рассказ",
       "deleteAlertMsg": "Удалить «{{title}}»? Аудио тоже будет удалено.",
       "deleteActionBtn": "Удалить",
-      "extensionFailedToast": "Продолжение не удалось — попробуйте ещё раз."
+      "extensionFailedToast": "Продолжение не удалось — попробуйте ещё раз.",
+      "eyebrow": "LINGUACARD",
+      "searchAriaLabel": "Искать истории",
+      "continueReading": "Продолжить чтение",
+      "minReadMeta": "{{mins}} мин чтения · {{category}}",
+      "exploreSubtitle": "Подобрано LinguaCard",
+      "myStoriesSubtitle": "Создано вами",
+      "backToStories": "Назад к Историям",
+      "levelAll": "Все",
+      "playAriaLabel": "Воспроизвести историю"
     },
     "reader": {
       "backAriaLabel": "Назад",
@@ -865,7 +874,25 @@
       "pauseAriaLabel": "Пауза",
       "playAriaLabel": "Воспроизвести",
       "restartAriaLabel": "Начать сначала",
-      "loadingMsg": "Загрузка рассказа…"
+      "loadingMsg": "Загрузка рассказа…",
+      "tapHint": "Нажмите на любое слово, чтобы посмотреть",
+      "englishToggle": "Русский",
+      "finishedReadingHint": "Закончили читать? Вы сами решаете, когда готово.",
+      "markCompleteBtn": "Отметить историю завершённой",
+      "nowPlaying": "СЕЙЧАС ИГРАЕТ",
+      "upNext": "ДАЛЕЕ",
+      "repeatOff": "Повтор выкл.",
+      "repeatQueue": "Повторить очередь",
+      "repeatStory": "Повторить эту историю",
+      "shuffleAriaLabel": "Перемешать",
+      "repeatAriaLabel": "Повтор",
+      "prevAriaLabel": "Предыдущая",
+      "nextAriaLabel": "Следующая",
+      "expandPlayerAriaLabel": "Развернуть плеер",
+      "collapsePlayerAriaLabel": "Свернуть плеер",
+      "neverFinishHint": "Истории никогда не заканчиваются сами — нажмите, когда будете готовы.",
+      "addedToVaultToast": "Добавлено в хранилище",
+      "alreadyInVaultToast": "Уже в хранилище"
     },
     "complete": {
       "backAriaLabel": "Назад в библиотеку",
@@ -1094,6 +1121,18 @@
       "benefit3": "Приоритетная поддержка",
       "requestBtn": "Запросить Pro-доступ",
       "dismissBtn": "Не сейчас"
+    },
+    "redeem": {
+      "title": "Активировать код",
+      "subtitle": "Есть код скидки или доступа? Введите его, чтобы открыть Pro.",
+      "codeLabel": "Код скидки",
+      "codePlaceholder": "напр. LAUNCH2026",
+      "submit": "Активировать",
+      "activated": "Теперь вы Pro! Наслаждайтесь безлимитным доступом.",
+      "invalid": "Этот код недействителен.",
+      "error": "Что-то пошло не так. Попробуйте ещё раз.",
+      "haveCode": "Есть код?",
+      "menuLabel": "Активировать код"
     }
   },
   "admin": {
@@ -1124,6 +1163,38 @@
         "loading": "Загрузка…",
         "noCollections": "Коллекций пока нет. Сначала импортируйте одну."
       }
+    },
+    "discountCodes": {
+      "label": "Коды скидок",
+      "pageTitle": "Коды скидок",
+      "generateTitle": "Создать код",
+      "codeLabel": "Свой код (необязательно)",
+      "codePlaceholder": "Оставьте пустым для автогенерации",
+      "percentLabel": "Скидка %",
+      "percentHint": "Только коды на 100% активируют Pro мгновенно. Меньшие значения ведут к ручному обновлению.",
+      "maxRedemptionsLabel": "Макс. активаций",
+      "unlimited": "Без ограничений",
+      "lifetimeLabel": "Пожизненный доступ",
+      "durationPlaceholder": "Длительность в днях",
+      "expiresLabel": "Дата окончания (необязательно)",
+      "labelLabel": "Метка (необязательно)",
+      "labelPlaceholder": "напр. Кампания запуска",
+      "generateBtn": "Создать код",
+      "generating": "Создание…",
+      "existingTitle": "Существующие коды",
+      "empty": "Кодов пока нет. Создайте выше.",
+      "usesShort": "Активаций",
+      "expiresShort": "Истекает",
+      "deactivate": "Деактивировать",
+      "activate": "Активировать",
+      "lifetime": "Пожизненно",
+      "dayValue": "{{count}} день",
+      "daysValue": "{{count}} дн.",
+      "created": "Код {{code}} создан",
+      "createError": "Не удалось создать код. Проверьте данные и попробуйте снова.",
+      "loadError": "Не удалось загрузить коды.",
+      "updateError": "Не удалось обновить код.",
+      "copied": "Скопировано {{code}}"
     }
   },
   "wordDetail": {
