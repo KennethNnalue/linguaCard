@@ -1,0 +1,866 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<template id="__bundler_thumbnail" data-bg-color="#23463B">
+  <svg viewBox="0 0 1200 800" xmlns="http://www.w3.org/2000/svg">
+    <rect width="1200" height="800" fill="#23463B"/>
+    <rect x="470" y="250" width="260" height="300" rx="22" fill="#F4F1E9"/>
+    <rect x="470" y="250" width="130" height="300" rx="22" fill="#E6EFEA"/>
+    <line x1="600" y1="250" x2="600" y2="550" stroke="#23463B" stroke-width="6"/>
+    <polygon points="660,360 740,400 660,440" fill="#23463B"/>
+    <circle cx="600" cy="630" r="30" fill="#6EE7B7"/>
+    <polygon points="590,615 615,630 590,645" fill="#16302A"/>
+  </svg>
+</template>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;0,6..72,600;1,6..72,400;1,6..72,500&family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,600;9..40,700&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0;}
+::-webkit-scrollbar{width:0;height:0;display:none;}
+@keyframes sheetUp{from{transform:translateY(100%);}to{transform:translateY(0);}}
+@keyframes fadeIn{from{opacity:0;}to{opacity:1;}}
+@keyframes toastIn{from{opacity:0;transform:translate(-50%,8px);}to{opacity:1;transform:translate(-50%,0);}}
+@keyframes pillPulse{0%,100%{box-shadow:0 8px 28px rgba(22,48,42,.28);}50%{box-shadow:0 8px 36px rgba(78,140,118,.5);}}
+</style>
+</helmet>
+
+<div style="min-height:100vh;width:100%;display:flex;align-items:center;justify-content:center;padding:40px 20px;font-family:'DM Sans',system-ui,sans-serif;background:radial-gradient(120% 120% at 50% 0%,#EFEADC 0%,#E2DBCB 60%,#D8D0BD 100%);">
+  <div style="position:relative;width:392px;height:844px;border-radius:50px;background:#F4F1E9;border:11px solid #15211C;box-shadow:0 2px 0 1px #2a3a33 inset,0 40px 90px -20px rgba(22,48,42,.45),0 12px 30px rgba(0,0,0,.18);overflow:hidden;">
+
+    <!-- status bar -->
+    <div style="position:relative;z-index:5;display:flex;align-items:center;justify-content:space-between;padding:14px 26px 6px;font-size:13px;font-weight:600;color:#1C2622;">
+      <span>9:41</span>
+      <span style="display:flex;gap:5px;align-items:center;font-size:11px;letter-spacing:1px;">●●● ▮▮</span>
+    </div>
+
+    <!-- screen -->
+    <div style="position:absolute;top:38px;left:0;right:0;bottom:72px;overflow-y:auto;overflow-x:hidden;">
+
+      <!-- ════════ HOME ════════ -->
+      <sc-if value="{{ isHome }}" hint-placeholder-val="{{ true }}">
+      <div style="padding:8px 18px 28px;">
+
+        <!-- header -->
+        <div style="display:flex;align-items:flex-end;justify-content:space-between;padding:6px 0 18px;">
+          <div>
+            <div style="font-size:10px;font-weight:700;letter-spacing:2.5px;color:#4E8C76;margin-bottom:3px;">LINGUACARD</div>
+            <div style="font-family:'Newsreader',serif;font-size:32px;font-weight:500;color:#1C2622;line-height:1;">Stories</div>
+          </div>
+          <div style="display:flex;gap:9px;">
+            <button onClick="{{ noop }}" style="width:40px;height:40px;border-radius:50%;border:1px solid rgba(28,38,34,.12);background:#fff;display:flex;align-items:center;justify-content:center;cursor:pointer;color:#3A4742;">
+              <svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.5" y2="16.5"/></svg>
+            </button>
+            <button onClick="{{ noop }}" style="width:40px;height:40px;border-radius:50%;border:none;background:#23463B;display:flex;align-items:center;justify-content:center;cursor:pointer;color:#fff;box-shadow:0 6px 16px rgba(35,70,59,.3);">
+              <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+            </button>
+          </div>
+        </div>
+
+        <!-- continue hero -->
+        <div onClick="{{ continueStory.open }}" style="display:flex;border-radius:24px;overflow:hidden;background:#fff;box-shadow:0 10px 30px -12px rgba(22,48,42,.3),0 2px 6px rgba(0,0,0,.04);cursor:pointer;margin-bottom:26px;">
+          <div style="position:relative;width:104px;flex:none;background:{{ continueStory.grad }};display:flex;align-items:flex-start;padding:10px;">
+            <span style="font-size:10px;font-weight:700;letter-spacing:.5px;background:rgba(21,33,28,.55);color:#fff;padding:3px 9px;border-radius:20px;backdrop-filter:blur(4px);">{{ continueStory.level }}</span>
+          </div>
+          <div style="flex:1;min-width:0;padding:14px 16px 13px;">
+            <div style="font-size:9px;font-weight:700;letter-spacing:2px;color:#4E8C76;margin-bottom:5px;">CONTINUE READING</div>
+            <div style="font-family:'Newsreader',serif;font-size:18px;font-weight:500;color:#1C2622;line-height:1.2;margin-bottom:3px;">{{ continueStory.title }}</div>
+            <div style="font-size:11px;color:#9AA39E;margin-bottom:11px;">{{ continueStory.metaLine }}</div>
+            <div style="display:flex;align-items:center;gap:9px;">
+              <div style="flex:1;height:5px;border-radius:3px;background:#EAE5D8;overflow:hidden;"><div style="height:100%;width:{{ continueStory.pct }}%;background:#4E8C76;border-radius:3px;"></div></div>
+              <span style="font-size:10px;font-weight:600;color:#5C6661;">{{ continueStory.pct }}%</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- explore header -->
+        <div style="display:flex;align-items:flex-end;justify-content:space-between;margin-bottom:13px;">
+          <div>
+            <div style="font-family:'Newsreader',serif;font-size:20px;font-weight:500;color:#1C2622;line-height:1;">Explore</div>
+            <div style="font-size:11px;color:#9AA39E;margin-top:3px;">Curated by LinguaCard</div>
+          </div>
+          <button onClick="{{ openSeeAll }}" style="font-size:12px;font-weight:600;color:#4E8C76;background:none;border:none;cursor:pointer;display:flex;align-items:center;gap:3px;font-family:inherit;">See all
+            <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><polyline points="9,6 15,12 9,18"/></svg>
+          </button>
+        </div>
+
+        <!-- level segmented control -->
+        <div style="display:flex;gap:2px;background:#ECE7DA;border-radius:22px;padding:4px;margin-bottom:11px;">
+          <sc-for list="{{ levels }}" as="lv" hint-placeholder-count="5">
+            <button onClick="{{ lv.tap }}" style="{{ lv.style }}">{{ lv.label }}</button>
+          </sc-for>
+        </div>
+
+        <!-- category chips -->
+        <div style="display:flex;gap:7px;overflow-x:auto;padding-bottom:4px;margin:0 -18px 16px;padding-left:18px;padding-right:18px;">
+          <sc-for list="{{ cats }}" as="c" hint-placeholder-count="6">
+            <button onClick="{{ c.tap }}" style="{{ c.style }}">{{ c.label }}</button>
+          </sc-for>
+        </div>
+
+        <!-- explore rail / grid -->
+        <sc-if value="{{ showRail }}" hint-placeholder-val="{{ true }}">
+          <div style="display:flex;gap:14px;overflow-x:auto;margin:0 -18px;padding:2px 18px 8px;">
+            <sc-for list="{{ exploreCards }}" as="s" hint-placeholder-count="4">
+              <div onClick="{{ s.open }}" style="flex:none;width:170px;border-radius:18px;background:#fff;box-shadow:0 6px 18px -10px rgba(22,48,42,.28),0 1px 3px rgba(0,0,0,.04);overflow:hidden;cursor:pointer;">
+                <div style="position:relative;height:114px;background:{{ s.grad }};display:flex;justify-content:space-between;align-items:flex-start;padding:9px;">
+                  <span style="font-size:10px;font-weight:700;background:rgba(21,33,28,.5);color:#fff;padding:3px 9px;border-radius:20px;backdrop-filter:blur(4px);">{{ s.level }}</span>
+                  <sc-if value="{{ s.premium }}" hint-placeholder-val="{{ true }}"><span style="font-size:11px;color:#F2C57C;">★</span></sc-if>
+                </div>
+                <div style="padding:11px 12px 13px;">
+                  <div style="font-family:'Newsreader',serif;font-size:15px;font-weight:500;color:#1C2622;line-height:1.25;margin-bottom:5px;min-height:38px;">{{ s.title }}</div>
+                  <div style="font-size:10.5px;color:#9AA39E;">{{ s.meta }}</div>
+                </div>
+              </div>
+            </sc-for>
+          </div>
+        </sc-if>
+        <sc-if value="{{ showGrid }}" hint-placeholder-val="{{ true }}">
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:13px;">
+            <sc-for list="{{ exploreCards }}" as="s" hint-placeholder-count="4">
+              <div onClick="{{ s.open }}" style="border-radius:18px;background:#fff;box-shadow:0 6px 18px -10px rgba(22,48,42,.28),0 1px 3px rgba(0,0,0,.04);overflow:hidden;cursor:pointer;">
+                <div style="position:relative;height:104px;background:{{ s.grad }};display:flex;justify-content:space-between;align-items:flex-start;padding:9px;">
+                  <span style="font-size:10px;font-weight:700;background:rgba(21,33,28,.5);color:#fff;padding:3px 9px;border-radius:20px;">{{ s.level }}</span>
+                  <sc-if value="{{ s.premium }}" hint-placeholder-val="{{ true }}"><span style="font-size:11px;color:#F2C57C;">★</span></sc-if>
+                </div>
+                <div style="padding:10px 11px 12px;">
+                  <div style="font-family:'Newsreader',serif;font-size:14.5px;font-weight:500;color:#1C2622;line-height:1.25;margin-bottom:5px;min-height:36px;">{{ s.title }}</div>
+                  <div style="font-size:10px;color:#9AA39E;">{{ s.meta }}</div>
+                </div>
+              </div>
+            </sc-for>
+          </div>
+        </sc-if>
+
+        <!-- my stories (hidden in see-all) -->
+        <sc-if value="{{ showRail }}" hint-placeholder-val="{{ true }}">
+          <div style="height:1px;background:rgba(28,38,34,.09);margin:24px 0 20px;"></div>
+          <div style="display:flex;align-items:flex-end;justify-content:space-between;margin-bottom:14px;">
+            <div>
+              <div style="font-family:'Newsreader',serif;font-size:20px;font-weight:500;color:#1C2622;line-height:1;">My Stories</div>
+              <div style="font-size:11px;color:#9AA39E;margin-top:3px;">Made by you</div>
+            </div>
+            <span style="font-size:11px;font-weight:600;color:#9AA39E;">{{ mineCount }} saved</span>
+          </div>
+          <div style="display:flex;flex-direction:column;gap:11px;">
+            <sc-for list="{{ mine }}" as="m" hint-placeholder-count="3">
+              <div onClick="{{ m.open }}" style="display:flex;align-items:center;gap:13px;background:#fff;border-radius:18px;padding:12px 13px;box-shadow:0 4px 14px -10px rgba(22,48,42,.3),0 1px 2px rgba(0,0,0,.03);cursor:pointer;">
+                <div style="width:48px;height:48px;flex:none;border-radius:13px;background:{{ m.grad }};display:flex;align-items:center;justify-content:center;font-family:'Newsreader',serif;font-size:22px;font-weight:500;color:#fff;">{{ m.initial }}</div>
+                <div style="flex:1;min-width:0;">
+                  <div style="font-family:'Newsreader',serif;font-size:15.5px;font-weight:500;color:#1C2622;line-height:1.2;margin-bottom:3px;">{{ m.title }}</div>
+                  <div style="font-size:11px;color:#9AA39E;margin-bottom:7px;">{{ m.meta }}</div>
+                  <div style="display:flex;gap:5px;align-items:center;">
+                    <sc-for list="{{ m.chips }}" as="ch" hint-placeholder-count="2">
+                      <span style="{{ ch.style }}">{{ ch.w }}</span>
+                    </sc-for>
+                    <sc-if value="{{ m.moreLabel }}" hint-placeholder-val="x"><span style="font-size:10px;color:#B6BDB8;">{{ m.moreLabel }}</span></sc-if>
+                  </div>
+                </div>
+                <button onClick="{{ m.play }}" style="width:40px;height:40px;flex:none;border-radius:50%;background:#EAF1ED;border:none;display:flex;align-items:center;justify-content:center;cursor:pointer;color:#23463B;">
+                  <svg viewBox="0 0 24 24" width="15" height="15" fill="currentColor" stroke="none"><polygon points="7,5 19,12 7,19"/></svg>
+                </button>
+              </div>
+            </sc-for>
+          </div>
+        </sc-if>
+
+        <!-- see-all back row -->
+        <sc-if value="{{ showGrid }}" hint-placeholder-val="{{ true }}">
+          <div style="margin-top:18px;text-align:center;">
+            <button onClick="{{ closeSeeAll }}" style="font-size:12px;font-weight:600;color:#5C6661;background:none;border:1px solid rgba(28,38,34,.14);border-radius:18px;padding:8px 18px;cursor:pointer;font-family:inherit;">Back to Stories</button>
+          </div>
+        </sc-if>
+
+      </div>
+      </sc-if>
+
+      <!-- ════════ READER ════════ -->
+      <sc-if value="{{ isReader }}" hint-placeholder-val="x">
+      <div>
+        <!-- cover -->
+        <div style="position:relative;height:152px;background:{{ readerGrad }};padding:14px 16px;display:flex;flex-direction:column;justify-content:flex-end;color:#fff;overflow:hidden;">
+          <div style="position:absolute;inset:0;background:linear-gradient(180deg,rgba(21,33,28,.05),rgba(21,33,28,.55));"></div>
+          <button onClick="{{ back }}" style="position:absolute;top:14px;left:14px;width:34px;height:34px;border-radius:50%;background:rgba(21,33,28,.32);backdrop-filter:blur(4px);border:none;display:flex;align-items:center;justify-content:center;cursor:pointer;color:#fff;z-index:2;">
+            <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="15,18 9,12 15,6"/></svg>
+          </button>
+          <button onClick="{{ toggleLearned }}" style="position:absolute;top:16px;right:14px;display:flex;align-items:center;gap:5px;font-size:11px;font-weight:600;color:#fff;background:{{ learnedBtnBg }};border:1px solid rgba(255,255,255,.4);border-radius:18px;padding:6px 11px;cursor:pointer;font-family:inherit;z-index:2;">
+            <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><polyline points="20,6 9,17 4,12"/></svg>
+            {{ learnedLabel }}
+          </button>
+          <span style="position:relative;z-index:2;font-size:10px;font-weight:700;letter-spacing:.5px;background:rgba(21,33,28,.45);align-self:flex-start;padding:3px 9px;border-radius:20px;margin-bottom:8px;">{{ readerLevel }}</span>
+          <div style="position:relative;z-index:2;font-family:'Newsreader',serif;font-size:24px;font-weight:500;line-height:1.15;">{{ readerTitle }}</div>
+          <div style="position:relative;z-index:2;font-size:11.5px;opacity:.85;margin-top:4px;">{{ readerMetaLine }}</div>
+        </div>
+
+        <!-- tabs -->
+        <div style="display:flex;gap:2px;background:#ECE7DA;border-radius:18px;padding:4px;margin:14px 16px 0;">
+          <sc-for list="{{ tabs }}" as="t" hint-placeholder-count="4">
+            <button onClick="{{ t.tap }}" style="{{ t.style }}">{{ t.label }}</button>
+          </sc-for>
+        </div>
+
+        <!-- STORY TAB -->
+        <sc-if value="{{ isStoryTab }}" hint-placeholder-val="x">
+        <div onClick="{{ closeWord }}" style="padding:14px 18px 150px;">
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;">
+            <span style="font-size:11px;color:#9AA39E;">Tap any word to look it up</span>
+            <button onClick="{{ toggleTranslate }}" style="display:flex;align-items:center;gap:6px;font-size:11px;font-weight:600;font-family:inherit;cursor:pointer;border-radius:16px;padding:6px 11px;{{ translateBtnStyle }}">
+              <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15 15 0 0 1 4 10 15 15 0 0 1-4 10 15 15 0 0 1-4-10 15 15 0 0 1 4-10z"/></svg>
+              English
+            </button>
+          </div>
+          <sc-for list="{{ sentences }}" as="sent" hint-placeholder-count="4">
+            <div style="margin-bottom:18px;">
+              <p style="font-family:'Newsreader',serif;font-size:19px;line-height:1.62;color:#1C2622;">
+                <sc-for list="{{ sent.tokens }}" as="tok" hint-placeholder-count="6"><span onClick="{{ tok.tap }}" style="{{ tok.style }}">{{ tok.t }}</span> </sc-for>
+              </p>
+              <sc-if value="{{ sent.showEn }}" hint-placeholder-val="x"><p style="font-size:13px;color:#7C9A8E;line-height:1.5;margin-top:5px;font-style:italic;">{{ sent.en }}</p></sc-if>
+            </div>
+          </sc-for>
+          <div style="margin-top:14px;padding:18px 16px;border-radius:18px;background:#fff;box-shadow:0 3px 12px -8px rgba(22,48,42,.3);text-align:center;">
+            <div style="font-size:13px;color:#5C6661;margin-bottom:12px;">Finished reading? You decide when it's done.</div>
+            <button onClick="{{ completeStory }}" style="display:inline-flex;align-items:center;gap:7px;padding:12px 24px;border-radius:14px;background:#23463B;border:none;color:#fff;font-family:inherit;font-size:13px;font-weight:600;cursor:pointer;">
+              <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="#fff" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="20,6 9,17 4,12"/></svg>
+              Mark story complete
+            </button>
+          </div>
+        </div>
+        </sc-if>
+
+        <!-- QUIZ TAB -->
+        <sc-if value="{{ isQuizTab }}" hint-placeholder-val="x">
+        <div style="margin:14px 16px 90px;border-radius:22px;background:#16302A;overflow:hidden;min-height:520px;display:flex;flex-direction:column;">
+          <sc-if value="{{ quiz.complete }}" hint-placeholder-val="x">
+            <div style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:40px 24px;text-align:center;">
+              <div style="font-size:52px;margin-bottom:14px;">{{ quiz.scoreEmoji }}</div>
+              <div style="font-family:'Newsreader',serif;font-size:44px;font-weight:500;color:#fff;">{{ quiz.score }} / {{ quiz.total }}</div>
+              <div style="font-size:13px;color:rgba(255,255,255,.6);margin-top:6px;margin-bottom:28px;">correct answers</div>
+              <button onClick="{{ quiz.retake }}" style="background:#4E8C76;border:none;color:#fff;font-family:inherit;font-size:14px;font-weight:600;padding:13px 30px;border-radius:18px;cursor:pointer;">Take it again</button>
+            </div>
+          </sc-if>
+          <sc-if value="{{ quizActive }}" hint-placeholder-val="x">
+            <!-- progress -->
+            <div style="position:relative;background:#1F3D34;padding:22px 0;display:flex;align-items:center;justify-content:center;">
+              <div style="position:relative;width:60px;height:60px;display:flex;align-items:center;justify-content:center;">
+                <svg viewBox="0 0 72 72" width="60" height="60" style="position:absolute;inset:0;transform:rotate(-90deg);">
+                  <circle cx="36" cy="36" r="31" fill="none" stroke="rgba(255,255,255,.18)" stroke-width="4"/>
+                  <circle cx="36" cy="36" r="31" fill="none" stroke="#6EE7B7" stroke-width="4" stroke-linecap="round" stroke-dasharray="194.8" stroke-dashoffset="{{ quiz.ringOffset }}" style="transition:stroke-dashoffset .4s;"/>
+                </svg>
+                <span style="font-size:14px;font-weight:700;color:#fff;">{{ quiz.label }}</span>
+              </div>
+              <button onClick="{{ playWordNoop }}" style="position:absolute;right:20px;top:50%;transform:translateY(-50%);width:38px;height:38px;border-radius:50%;border:1px solid rgba(255,255,255,.3);background:transparent;display:flex;align-items:center;justify-content:center;cursor:pointer;color:#fff;">
+                <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="11,5 6,9 2,9 2,15 6,15 11,19"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14"/><path d="M15.54 8.46a5 5 0 0 1 0 7.07"/></svg>
+              </button>
+            </div>
+            <!-- content -->
+            <div style="flex:1;padding:26px 20px 18px;display:flex;flex-direction:column;gap:13px;">
+              <p style="font-family:'Newsreader',serif;font-size:20px;line-height:1.5;color:#fff;text-align:center;margin-bottom:6px;">{{ quiz.before }}<span style="{{ quiz.fillStyle }}">{{ quiz.fill }}</span>{{ quiz.after }}</p>
+              <sc-for list="{{ quiz.choices }}" as="ch" hint-placeholder-count="3">
+                <button onClick="{{ ch.tap }}" style="{{ ch.style }}">{{ ch.label }}</button>
+              </sc-for>
+              <sc-if value="{{ quiz.wrong }}" hint-placeholder-val="x">
+                <div style="background:rgba(255,255,255,.07);border-radius:14px;padding:13px 14px;margin-top:2px;">
+                  <div style="font-size:11px;font-weight:700;color:#6EE7B7;margin-bottom:4px;letter-spacing:.3px;">HINT</div>
+                  <div style="font-size:12.5px;color:rgba(255,255,255,.82);line-height:1.5;">{{ quiz.hint }}</div>
+                </div>
+              </sc-if>
+              <sc-if value="{{ quiz.answered }}" hint-placeholder-val="x">
+                <button onClick="{{ quiz.next }}" style="width:100%;padding:14px;border-radius:15px;background:#4E8C76;border:none;color:#fff;font-family:inherit;font-size:14px;font-weight:600;cursor:pointer;margin-top:4px;">{{ quiz.nextLabel }}</button>
+              </sc-if>
+              <div style="margin-top:auto;display:flex;align-items:center;justify-content:space-between;padding-top:14px;border-top:1px solid rgba(255,255,255,.1);">
+                <div>
+                  <div style="font-size:12.5px;font-weight:600;color:#fff;">Pause on mistakes</div>
+                  <div style="font-size:10.5px;color:rgba(255,255,255,.5);margin-top:1px;">Review the answer before continuing</div>
+                </div>
+                <div style="width:44px;height:26px;border-radius:14px;background:#6EE7B7;position:relative;flex:none;"><div style="position:absolute;top:3px;left:21px;width:20px;height:20px;border-radius:50%;background:#fff;box-shadow:0 1px 3px rgba(0,0,0,.25);"></div></div>
+              </div>
+            </div>
+          </sc-if>
+        </div>
+        </sc-if>
+
+        <!-- KEYWORDS TAB -->
+        <sc-if value="{{ isKeywordsTab }}" hint-placeholder-val="x">
+        <div style="padding:16px 16px 90px;display:flex;flex-direction:column;gap:10px;">
+          <sc-for list="{{ keywords }}" as="k" hint-placeholder-count="6">
+            <div onClick="{{ k.tap }}" style="display:flex;align-items:center;gap:12px;background:#fff;border-radius:16px;padding:13px 15px;box-shadow:0 3px 12px -8px rgba(22,48,42,.3),0 1px 2px rgba(0,0,0,.03);cursor:pointer;">
+              <div style="flex:1;min-width:0;">
+                <div style="font-family:'Newsreader',serif;font-size:16px;font-weight:500;color:#1C2622;">{{ k.display }}</div>
+                <div style="font-size:12px;color:#8A938E;margin-top:1px;">{{ k.en }}</div>
+              </div>
+              <span style="font-size:9.5px;font-weight:700;letter-spacing:.4px;padding:3px 9px;border-radius:11px;{{ k.typeStyle }}">{{ k.type }}</span>
+              <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="#C2C8C3" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9,6 15,12 9,18"/></svg>
+            </div>
+          </sc-for>
+        </div>
+        </sc-if>
+
+        <!-- GRAMMAR TAB -->
+        <sc-if value="{{ isGrammarTab }}" hint-placeholder-val="x">
+        <div style="padding:16px 16px 90px;display:flex;flex-direction:column;gap:12px;">
+          <sc-for list="{{ grammar }}" as="g" hint-placeholder-count="3">
+            <div style="background:#fff;border-radius:16px;padding:15px 16px;box-shadow:0 3px 12px -8px rgba(22,48,42,.3),0 1px 2px rgba(0,0,0,.03);border-left:3px solid #4E8C76;">
+              <div style="font-family:'Newsreader',serif;font-size:16px;font-weight:600;color:#1C2622;margin-bottom:5px;">{{ g.title }}</div>
+              <div style="font-size:13px;color:#5C6661;line-height:1.55;">{{ g.body }}</div>
+            </div>
+          </sc-for>
+        </div>
+        </sc-if>
+
+      </div>
+      </sc-if>
+
+      <!-- ════════ STORY COMPLETE ════════ -->
+      <sc-if value="{{ isComplete }}" hint-placeholder-val="x">
+      <div style="min-height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:40px 26px 70px;text-align:center;">
+        <div style="width:118px;height:118px;border-radius:26px;background:{{ completeGrad }};display:flex;align-items:center;justify-content:center;margin-bottom:24px;box-shadow:0 16px 40px -12px rgba(22,48,42,.5);">
+          <svg viewBox="0 0 24 24" width="46" height="46" fill="none" stroke="#fff" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="20,6 9,17 4,12"/></svg>
+        </div>
+        <div style="font-size:10px;font-weight:700;letter-spacing:2.5px;color:#4E8C76;margin-bottom:9px;">STORY COMPLETE</div>
+        <div style="font-family:'Newsreader',serif;font-size:26px;font-weight:500;color:#1C2622;line-height:1.2;margin-bottom:6px;">{{ completeTitle }}</div>
+        <div style="font-size:12px;color:#9AA39E;margin-bottom:24px;">{{ completeMeta }}</div>
+        <sc-if value="{{ completeQuizDone }}" hint-placeholder-val="x">
+          <div style="background:#fff;border-radius:16px;padding:13px 24px;box-shadow:0 4px 14px -8px rgba(22,48,42,.3);margin-bottom:24px;">
+            <div style="font-size:9.5px;font-weight:700;letter-spacing:1px;color:#9AA39E;margin-bottom:3px;">QUIZ SCORE</div>
+            <div style="font-family:'Newsreader',serif;font-size:24px;font-weight:600;color:#23463B;">{{ completeQuizScore }}</div>
+          </div>
+        </sc-if>
+        <button onClick="{{ replayStory }}" style="width:100%;max-width:270px;padding:14px;border-radius:16px;background:#23463B;border:none;color:#fff;font-family:inherit;font-size:14px;font-weight:600;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;margin-bottom:10px;">
+          <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="1,4 1,10 7,10"/><path d="M3.5 15a9 9 0 1 0 .5-5"/></svg>
+          Replay story
+        </button>
+        <button onClick="{{ playNext }}" style="width:100%;max-width:270px;padding:14px;border-radius:16px;background:#EAF1ED;border:none;color:#23463B;font-family:inherit;font-size:13.5px;font-weight:600;cursor:pointer;margin-bottom:12px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">Play next · {{ nextTitle }}</button>
+        <button onClick="{{ back }}" style="background:none;border:none;color:#9AA39E;font-family:inherit;font-size:13px;font-weight:600;cursor:pointer;">Back to Stories</button>
+      </div>
+      </sc-if>
+
+    </div>
+
+    <!-- bottom nav -->
+    <div style="position:absolute;left:0;right:0;bottom:0;height:72px;background:rgba(255,255,255,.92);backdrop-filter:blur(12px);border-top:1px solid rgba(28,38,34,.08);display:flex;align-items:flex-start;justify-content:space-around;padding:11px 6px 0;z-index:6;">
+      <sc-for list="{{ nav }}" as="n" hint-placeholder-count="5">
+        <div style="display:flex;flex-direction:column;align-items:center;gap:4px;{{ n.style }}">
+          <div style="width:22px;height:22px;" innerHTML="{{ n.icon }}"></div>
+          <span style="font-size:9.5px;font-weight:600;">{{ n.label }}</span>
+        </div>
+      </sc-for>
+    </div>
+
+    <!-- mini player (reader story tab) -->
+    <sc-if value="{{ showPill }}" hint-placeholder-val="x">
+    <div style="position:absolute;left:16px;right:16px;bottom:84px;z-index:14;background:#23463B;color:#fff;border-radius:22px;padding:9px 11px;display:flex;align-items:center;gap:5px;box-shadow:0 12px 32px -8px rgba(22,48,42,.55);overflow:hidden;">
+      <div style="position:absolute;left:0;bottom:0;height:3px;background:#6EE7B7;width:{{ pillPct }}%;transition:width .25s;"></div>
+      <button onClick="{{ prevTrack }}" style="width:32px;height:32px;border-radius:50%;background:transparent;border:none;display:flex;align-items:center;justify-content:center;cursor:pointer;color:rgba(255,255,255,.85);flex:none;">
+        <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor" stroke="none"><polygon points="18,5 8,12 18,19"/><rect x="5" y="5" width="2.4" height="14" rx="1"/></svg>
+      </button>
+      <button onClick="{{ togglePlay }}" style="width:40px;height:40px;border-radius:50%;background:#fff;border:none;display:flex;align-items:center;justify-content:center;cursor:pointer;flex:none;">
+        <sc-if value="{{ playing }}" hint-placeholder-val="x"><svg viewBox="0 0 24 24" width="14" height="14" fill="#23463B"><rect x="6" y="4" width="4" height="16" rx="1"/><rect x="14" y="4" width="4" height="16" rx="1"/></svg></sc-if>
+        <sc-if value="{{ paused }}" hint-placeholder-val="x"><svg viewBox="0 0 24 24" width="15" height="15" fill="#23463B"><polygon points="7,4 20,12 7,20"/></svg></sc-if>
+      </button>
+      <div onClick="{{ expandPlayer }}" style="flex:1;min-width:0;cursor:pointer;padding:0 3px;">
+        <div style="font-size:12.5px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">{{ pillTitle }}</div>
+        <div style="font-size:10px;color:rgba(255,255,255,.6);">{{ pillTime }}</div>
+      </div>
+      <button onClick="{{ nextTrack }}" style="width:32px;height:32px;border-radius:50%;background:transparent;border:none;display:flex;align-items:center;justify-content:center;cursor:pointer;color:rgba(255,255,255,.85);flex:none;">
+        <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor" stroke="none"><polygon points="6,5 16,12 6,19"/><rect x="16.6" y="5" width="2.4" height="14" rx="1"/></svg>
+      </button>
+      <button onClick="{{ expandPlayer }}" style="width:30px;height:30px;border-radius:50%;background:rgba(255,255,255,.12);border:none;display:flex;align-items:center;justify-content:center;cursor:pointer;color:#fff;flex:none;">
+        <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="18,15 12,9 6,15"/></svg>
+      </button>
+    </div>
+    </sc-if>
+
+    <!-- expanded player + queue -->
+    <sc-if value="{{ playerExpanded }}" hint-placeholder-val="x">
+    <div onClick="{{ collapsePlayer }}" style="position:absolute;inset:0;z-index:24;background:rgba(21,33,28,.5);animation:fadeIn .18s ease;"></div>
+    <div style="position:absolute;left:0;right:0;bottom:0;z-index:25;max-height:97%;display:flex;flex-direction:column;background:#16302A;border-radius:26px 26px 0 0;box-shadow:0 -12px 40px rgba(0,0,0,.4);animation:sheetUp .28s cubic-bezier(.2,.8,.2,1);color:#fff;">
+      <div style="display:flex;align-items:center;justify-content:space-between;padding:13px 18px 4px;flex:none;">
+        <span style="font-size:11px;font-weight:700;letter-spacing:1.5px;color:rgba(255,255,255,.5);">NOW PLAYING</span>
+        <button onClick="{{ collapsePlayer }}" style="width:30px;height:30px;border-radius:50%;background:rgba(255,255,255,.1);border:none;display:flex;align-items:center;justify-content:center;cursor:pointer;color:#fff;">
+          <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="6,9 12,15 18,9"/></svg>
+        </button>
+      </div>
+      <div style="overflow-y:auto;padding:6px 18px 20px;">
+        <div style="height:128px;border-radius:18px;background:{{ pGrad }};display:flex;align-items:flex-end;padding:12px;margin-bottom:14px;">
+          <span style="font-size:10px;font-weight:700;background:rgba(21,33,28,.45);padding:3px 9px;border-radius:20px;">{{ pLevel }}</span>
+        </div>
+        <div style="font-family:'Newsreader',serif;font-size:22px;font-weight:500;text-align:center;line-height:1.2;">{{ pTitle }}</div>
+        <div style="font-size:11.5px;color:rgba(255,255,255,.55);text-align:center;margin-top:4px;">{{ pMetaLine }}</div>
+        <div style="margin:16px 0 5px;height:5px;border-radius:3px;background:rgba(255,255,255,.14);overflow:hidden;"><div style="height:100%;width:{{ pPct }}%;background:#6EE7B7;border-radius:3px;transition:width .25s;"></div></div>
+        <div style="display:flex;justify-content:space-between;font-size:10.5px;color:rgba(255,255,255,.5);"><span>{{ pCurTime }}</span><span>{{ pTotalTime }}</span></div>
+        <div style="display:flex;align-items:center;justify-content:space-between;margin:18px 2px 4px;">
+          <button onClick="{{ toggleShuffle }}" style="{{ shuffleBtnStyle }}">
+            <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="16,3 21,3 21,8"/><line x1="4" y1="20" x2="21" y2="3"/><polyline points="21,16 21,21 16,21"/><line x1="15" y1="15" x2="21" y2="21"/><line x1="4" y1="4" x2="9" y2="9"/></svg>
+          </button>
+          <button onClick="{{ prevTrack }}" style="width:48px;height:48px;border-radius:50%;background:transparent;border:none;display:flex;align-items:center;justify-content:center;cursor:pointer;color:#fff;">
+            <svg viewBox="0 0 24 24" width="22" height="22" fill="currentColor" stroke="none"><polygon points="18,5 8,12 18,19"/><rect x="5" y="5" width="2.6" height="14" rx="1"/></svg>
+          </button>
+          <button onClick="{{ togglePlay }}" style="width:64px;height:64px;border-radius:50%;background:#fff;border:none;display:flex;align-items:center;justify-content:center;cursor:pointer;flex:none;">
+            <sc-if value="{{ playing }}" hint-placeholder-val="x"><svg viewBox="0 0 24 24" width="22" height="22" fill="#16302A"><rect x="6" y="4" width="4.5" height="16" rx="1.2"/><rect x="13.5" y="4" width="4.5" height="16" rx="1.2"/></svg></sc-if>
+            <sc-if value="{{ paused }}" hint-placeholder-val="x"><svg viewBox="0 0 24 24" width="24" height="24" fill="#16302A"><polygon points="7,4 20,12 7,20"/></svg></sc-if>
+          </button>
+          <button onClick="{{ nextTrack }}" style="width:48px;height:48px;border-radius:50%;background:transparent;border:none;display:flex;align-items:center;justify-content:center;cursor:pointer;color:#fff;">
+            <svg viewBox="0 0 24 24" width="22" height="22" fill="currentColor" stroke="none"><polygon points="6,5 16,12 6,19"/><rect x="16.4" y="5" width="2.6" height="14" rx="1"/></svg>
+          </button>
+          <button onClick="{{ cycleRepeat }}" style="{{ repeatBtnStyle }}">
+            <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="17,1 21,5 17,9"/><path d="M3 11V9a4 4 0 0 1 4-4h14"/><polyline points="7,23 3,19 7,15"/><path d="M21 13v2a4 4 0 0 1-4 4H3"/></svg>
+            <sc-if value="{{ repeatOne }}" hint-placeholder-val="x"><span style="position:absolute;top:-1px;right:-1px;width:15px;height:15px;border-radius:50%;background:#6EE7B7;color:#16302A;font-size:9px;font-weight:800;display:flex;align-items:center;justify-content:center;">1</span></sc-if>
+          </button>
+        </div>
+        <div style="text-align:center;font-size:10.5px;color:rgba(255,255,255,.42);margin-bottom:16px;">{{ repeatModeLabel }}</div>
+        <button onClick="{{ completeStory }}" style="width:100%;padding:14px;border-radius:16px;background:#4E8C76;border:none;color:#fff;font-family:inherit;font-size:14px;font-weight:600;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:7px;">
+          <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="#fff" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="20,6 9,17 4,12"/></svg>
+          Mark story complete
+        </button>
+        <div style="text-align:center;font-size:10.5px;color:rgba(255,255,255,.42);margin-top:8px;line-height:1.5;">Stories never finish on their own — tap when you're ready.</div>
+        <div style="margin:20px 0 10px;font-size:11px;font-weight:700;letter-spacing:1px;color:rgba(255,255,255,.5);">UP NEXT</div>
+        <div style="display:flex;flex-direction:column;gap:2px;">
+          <sc-for list="{{ queue }}" as="q" hint-placeholder-count="4">
+            <div onClick="{{ q.tap }}" style="display:flex;align-items:center;gap:12px;padding:10px;border-radius:12px;cursor:pointer;{{ q.rowStyle }}">
+              <sc-if value="{{ q.playing }}" hint-placeholder-val="x"><div style="width:22px;display:flex;justify-content:center;"><svg viewBox="0 0 24 24" width="13" height="13" fill="#6EE7B7"><polygon points="7,4 20,12 7,20"/></svg></div></sc-if>
+              <sc-if value="{{ q.notPlaying }}" hint-placeholder-val="x"><div style="width:22px;text-align:center;font-size:12px;color:rgba(255,255,255,.38);">{{ q.num }}</div></sc-if>
+              <div style="flex:1;min-width:0;">
+                <div style="font-size:13.5px;font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;{{ q.titleStyle }}">{{ q.title }}</div>
+                <div style="font-size:10.5px;color:rgba(255,255,255,.4);">{{ q.level }} · {{ q.dur }}</div>
+              </div>
+            </div>
+          </sc-for>
+        </div>
+      </div>
+    </div>
+    </sc-if>
+
+    <!-- word bottom sheet -->
+    <sc-if value="{{ wordOpen }}" hint-placeholder-val="x">
+    <div onClick="{{ closeWord }}" style="position:absolute;inset:0;z-index:20;background:rgba(21,33,28,.4);animation:fadeIn .18s ease;"></div>
+    <div style="position:absolute;left:0;right:0;bottom:0;z-index:21;background:#1C2622;border-radius:26px 26px 0 0;padding:18px 20px 26px;box-shadow:0 -12px 40px rgba(0,0,0,.35);animation:sheetUp .26s cubic-bezier(.2,.8,.2,1);color:#fff;">
+      <div style="display:flex;justify-content:center;margin-bottom:14px;"><div style="width:38px;height:4px;border-radius:2px;background:rgba(255,255,255,.25);"></div></div>
+      <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:14px;">
+        <div style="flex:1;min-width:0;">
+          <div style="font-family:'Newsreader',serif;font-size:27px;font-weight:500;line-height:1.1;">{{ word.display }}</div>
+          <sc-if value="{{ word.plural }}" hint-placeholder-val="x">
+            <div style="display:flex;align-items:center;gap:8px;margin-top:6px;">
+              <span style="font-size:14px;color:rgba(255,255,255,.7);">{{ word.plural }}</span>
+              <span style="font-size:9px;font-weight:700;letter-spacing:.4px;background:#4E8C76;color:#fff;padding:2px 8px;border-radius:9px;">PLURAL</span>
+            </div>
+          </sc-if>
+          <div style="font-size:14px;color:rgba(255,255,255,.62);margin-top:6px;">{{ word.en }}</div>
+          <sc-if value="{{ word.isVerb }}" hint-placeholder-val="x">
+            <span style="display:inline-block;font-size:9.5px;font-weight:700;letter-spacing:.5px;background:rgba(255,255,255,.16);padding:3px 9px;border-radius:9px;margin-top:11px;">VERB</span>
+          </sc-if>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:9px;flex:none;">
+          <button onClick="{{ word.play }}" style="width:42px;height:42px;border-radius:50%;background:rgba(255,255,255,.14);border:none;display:flex;align-items:center;justify-content:center;cursor:pointer;color:#fff;">
+            <svg viewBox="0 0 24 24" width="17" height="17" fill="#fff" stroke="none"><polygon points="7,4 20,12 7,20"/></svg>
+          </button>
+          <button onClick="{{ word.add }}" style="width:42px;height:42px;border-radius:50%;border:none;display:flex;align-items:center;justify-content:center;cursor:pointer;{{ word.addStyle }}">
+            <sc-if value="{{ word.inVault }}" hint-placeholder-val="x"><svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="#fff" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><polyline points="20,6 9,17 4,12"/></svg></sc-if>
+            <sc-if value="{{ word.notInVault }}" hint-placeholder-val="x"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="#fff" stroke-width="2.2" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg></sc-if>
+          </button>
+        </div>
+      </div>
+      <sc-if value="{{ word.isVerb }}" hint-placeholder-val="x">
+        <button onClick="{{ toggleConj }}" style="margin-top:16px;width:100%;display:flex;align-items:center;justify-content:center;gap:6px;font-family:inherit;font-size:13px;font-weight:600;color:#fff;background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.2);border-radius:14px;padding:11px;cursor:pointer;">
+          {{ conjBtnLabel }}
+          <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" style="{{ conjChevStyle }}"><polyline points="6,9 12,15 18,9"/></svg>
+        </button>
+        <sc-if value="{{ showConj }}" hint-placeholder-val="x">
+          <div style="margin-top:14px;border-top:1px solid rgba(255,255,255,.12);padding-top:12px;">
+            <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:0 10px;font-size:10px;font-weight:700;letter-spacing:.4px;color:#6EE7B7;padding-bottom:7px;">
+              <span></span><span>PRÄSENS</span><span>PRÄTERITUM</span>
+            </div>
+            <sc-for list="{{ conjRows }}" as="r" hint-placeholder-count="6">
+              <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:0 10px;font-size:13px;padding:4px 0;border-bottom:1px solid rgba(255,255,255,.06);">
+                <span style="color:rgba(255,255,255,.55);">{{ r.p }}</span><span style="color:#fff;">{{ r.pres }}</span><span style="color:rgba(255,255,255,.8);">{{ r.prat }}</span>
+              </div>
+            </sc-for>
+            <div style="font-size:12px;color:rgba(255,255,255,.7);margin-top:10px;line-height:1.7;">
+              <span style="color:#6EE7B7;font-weight:600;">Perfekt:</span> {{ conjPerfekt }} &nbsp;·&nbsp; <span style="color:#6EE7B7;font-weight:600;">Imperativ:</span> {{ conjImperativ }}
+            </div>
+          </div>
+        </sc-if>
+      </sc-if>
+    </div>
+    </sc-if>
+
+    <!-- toast -->
+    <sc-if value="{{ toastMsg }}" hint-placeholder-val="x">
+      <div style="position:absolute;left:50%;bottom:150px;z-index:40;transform:translateX(-50%);background:#1C2622;color:#fff;font-size:12.5px;font-weight:500;padding:11px 18px;border-radius:20px;box-shadow:0 8px 24px rgba(0,0,0,.3);white-space:nowrap;animation:toastIn .22s ease;">{{ toastMsg }}</div>
+    </sc-if>
+
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:472,&quot;height&quot;:924}}">
+class Component extends DCLogic {
+  state = {
+    screen: 'home', tab: 'story', wordId: null, showConj: false,
+    level: 'all', cat: 'all', seeAll: false,
+    translate: true, playing: false,
+    quizIdx: 0, quizChosen: null, quizScore: 0,
+    learned: false, vault: { menschen: true }, toast: null,
+    currentId: 'p1', queueIdx: 0, karaokeIdx: -1, ended: false,
+    repeatMode: 'off', shuffle: false, playerExpanded: false,
+  };
+
+  QUEUE = ['p1','p6','p2','p4'];
+
+  G = {
+    g1:'linear-gradient(140deg,#2E5547,#6E9C88)', g2:'linear-gradient(140deg,#36544C,#86A99A)',
+    g3:'linear-gradient(145deg,#7C4A2E,#C2703D)', g4:'linear-gradient(140deg,#22403A,#4E8C76)',
+    g5:'linear-gradient(140deg,#566A4E,#9DB08C)', g6:'linear-gradient(145deg,#3E4F6B,#7D8FA8)',
+  };
+
+  CATS = [
+    { v:'all', label:'All' }, { v:'travel', label:'Travel' }, { v:'daily', label:'Daily Life' },
+    { v:'food', label:'Food' }, { v:'work', label:'Work' }, { v:'fiction', label:'Fiction' },
+  ];
+  LEVELS = ['all','A1','A2','B1','B2'];
+
+  PLATFORM = null; MINE = null; STORY = null; WORDS = null; QUIZ = null; KEYWORDS = null; GRAMMAR = null;
+
+  constructor(...a){
+    super(...a);
+    const G=this.G;
+    this.PLATFORM = [
+      {id:'p1',title:'Nachtzüge durch Europa',level:'B1',cat:'travel',catLabel:'Travel',mins:4,grad:G.g1},
+      {id:'p2',title:'Im Café bestellen',level:'A1',cat:'food',catLabel:'Food',mins:2,grad:G.g3},
+      {id:'p3',title:'Mein erster Arbeitstag',level:'A2',cat:'work',catLabel:'Work',mins:3,grad:G.g4},
+      {id:'p4',title:'Ein Tag in Berlin',level:'A1',cat:'daily',catLabel:'Daily Life',mins:2,grad:G.g5},
+      {id:'p5',title:'Die geheimnisvolle Tür',level:'A2',cat:'fiction',catLabel:'Fiction',mins:5,grad:G.g6,premium:true},
+      {id:'p6',title:'Am Flughafen',level:'A1',cat:'travel',catLabel:'Travel',mins:3,grad:G.g2},
+    ];
+    this.MINE = [
+      {id:'m1',title:'Ein gesundes neues Leben',mins:2,words:68,level:'A1',length:'Medium',grad:G.g4,initial:'E',chips:[{w:'die Serviette',art:'die'},{w:'hoffentlich',art:''}],more:65},
+      {id:'m2',title:'Ein Wochenende voller Pläne',mins:1,words:177,level:'A1',length:'Long',grad:G.g3,initial:'E',chips:[{w:'Ski fahren',art:''}],more:174},
+      {id:'m3',title:'Ein Mittwoch mit Mia',mins:1,words:82,level:'A1',length:'Medium',grad:G.g5,initial:'E',chips:[{w:'der Kalender',art:'der'}],more:40},
+    ];
+    this.STORIES = {
+      p1:[
+        {de:[['Nachtzüge','nachtzuege',1],['helfen'],['Menschen,','menschen',1],['in'],['der'],['Nacht'],['zu'],['reisen.','reisen',1]],en:'Night trains help people travel at night.'},
+        {de:[['Man'],['schläft','schlafen',1],['im'],['Zug,','zug'],['und'],['wacht','wachen',1],['am'],['neuen'],['Ort'],['auf.']],en:'You sleep on the train and wake up in a new place.'},
+        {de:[['Es'],['gibt'],['viele'],['neue'],['Züge','zug',1],['in'],['Europa.']],en:'There are many new trains in Europe.'},
+        {de:[['Ein'],['Zug'],['fährt','fahren',1],['zwischen'],['Brüssel'],['und'],['Berlin.']],en:'One train runs between Brussels and Berlin.'},
+      ],
+      p6:[
+        {de:[['Anna'],['fährt','fahren',1],['zum'],['Flughafen.','flughafen',1]],en:'Anna goes to the airport.'},
+        {de:[['Sie'],['hat'],['einen'],['großen'],['Koffer.','koffer',1]],en:'She has a big suitcase.'},
+        {de:[['Das'],['Flugzeug'],['fliegt'],['nach'],['Berlin.']],en:'The plane flies to Berlin.'},
+      ],
+      p2:[
+        {de:[['Im'],['Café'],['bestellen','bestellen',1],['wir'],['Kaffee.','kaffee',1]],en:'At the café we order coffee.'},
+        {de:[['Der'],['Kaffee','kaffee',1],['ist'],['heiß'],['und'],['gut.']],en:'The coffee is hot and good.'},
+        {de:[['Wir'],['bezahlen'],['und'],['gehen.']],en:'We pay and leave.'},
+      ],
+      p4:[
+        {de:[['Heute'],['besuchen','besuchen',1],['wir'],['die'],['Stadt.','stadt',1]],en:'Today we visit the city.'},
+        {de:[['Berlin'],['ist'],['groß'],['und'],['schön.']],en:'Berlin is big and beautiful.'},
+        {de:[['Am'],['Abend'],['fahren','fahren',1],['wir'],['zurück.']],en:'In the evening we travel back.'},
+      ],
+    };
+    const PR=['ich','du','er/sie','wir','ihr','sie/Sie'];
+    const mk=(pres,prat,perf,imp)=>({praesens:PR.map((p,i)=>({p,form:pres[i]})),praeteritum:PR.map((p,i)=>({p,form:prat[i]})),perfekt:perf,imperativ:imp});
+    this.WORDS = {
+      nachtzuege:{display:'der Nachtzug',article:'der',plural:'die Nachtzüge',en:'night train',type:'Noun'},
+      menschen:{display:'der Mensch',article:'der',plural:'die Menschen',en:'person, human',type:'Noun'},
+      zug:{display:'der Zug',article:'der',plural:'die Züge',en:'train',type:'Noun'},
+      reisen:{display:'reisen',en:'to travel',type:'Verb',conj:mk(['reise','reist','reist','reisen','reist','reisen'],['reiste','reistest','reiste','reisten','reistet','reisten'],'ist gereist','reise! reist!')},
+      schlafen:{display:'schlafen',en:'to sleep',type:'Verb',conj:mk(['schlafe','schläfst','schläft','schlafen','schlaft','schlafen'],['schlief','schliefst','schlief','schliefen','schlieft','schliefen'],'hat geschlafen','schlaf! schlaft!')},
+      fahren:{display:'fahren',en:'to drive, to go',type:'Verb',conj:mk(['fahre','fährst','fährt','fahren','fahrt','fahren'],['fuhr','fuhrst','fuhr','fuhren','fuhrt','fuhren'],'ist gefahren','fahr! fahrt!')},
+      wachen:{display:'aufwachen',en:'to wake up',type:'Verb',conj:mk(['wache auf','wachst auf','wacht auf','wachen auf','wacht auf','wachen auf'],['wachte auf','wachtest auf','wachte auf','wachten auf','wachtet auf','wachten auf'],'ist aufgewacht','wach auf! wacht auf!')},
+      flughafen:{display:'der Flughafen',article:'der',plural:'die Flughäfen',en:'airport',type:'Noun'},
+      koffer:{display:'der Koffer',article:'der',plural:'die Koffer',en:'suitcase',type:'Noun'},
+      kaffee:{display:'der Kaffee',article:'der',plural:'die Kaffees',en:'coffee',type:'Noun'},
+      stadt:{display:'die Stadt',article:'die',plural:'die Städte',en:'city, town',type:'Noun'},
+      bestellen:{display:'bestellen',en:'to order',type:'Verb',conj:mk(['bestelle','bestellst','bestellt','bestellen','bestellt','bestellen'],['bestellte','bestelltest','bestellte','bestellten','bestelltet','bestellten'],'hat bestellt','bestell! bestellt!')},
+      besuchen:{display:'besuchen',en:'to visit',type:'Verb',conj:mk(['besuche','besuchst','besucht','besuchen','besucht','besuchen'],['besuchte','besuchtest','besuchte','besuchten','besuchtet','besuchten'],'hat besucht','besuch! besucht!')},
+    };
+    this.KEYWORDS = ['nachtzuege','menschen','reisen','schlafen','zug','fahren'].map(wid=>({wid,...this.WORDS[wid]}));
+    this.GRAMMAR = [
+      {title:'Separable verbs',body:'“aufwachen” splits apart: the prefix “auf” jumps to the end of the clause — “Man wacht … auf.”'},
+      {title:'Dative after “in”',body:'When describing location (no movement), “in” takes the dative case: “in der Nacht”, “im Zug”.'},
+      {title:'Plural of der-nouns',body:'Many masculine nouns form the plural with an umlaut: der Zug → die Züge, der Nachtzug → die Nachtzüge.'},
+    ];
+    this.QUIZ = [
+      {template:'Nachtzüge helfen Menschen, in der Nacht zu ___.',choices:['reisen','reist','reiste'],answer:'reisen',hint:'After “zu”, German uses the infinitive — “zu reisen”.'},
+      {template:'Man ___ im Zug und wacht am neuen Ort auf.',choices:['schläft','schlafen','schlief'],answer:'schläft',hint:'3rd person singular of “schlafen” → “schläft” (a → ä).'},
+      {template:'Es gibt viele neue ___ in Europa.',choices:['Züge','Zug','Zugs'],answer:'Züge',hint:'Plural of “der Zug” is “die Züge”.'},
+      {template:'Ein Zug ___ zwischen Brüssel und Berlin.',choices:['fährt','fahren','fuhr'],answer:'fährt',hint:'3rd person singular present of “fahren” → “fährt”.'},
+      {template:'Man schläft im Zug und ___ am neuen Ort auf.',choices:['wacht','wachen','wachte'],answer:'wacht',hint:'Separable verb “aufwachen” → “wacht … auf”.'},
+    ];
+    this.readerMeta = this.PLATFORM[0];
+    this._kt = null;
+  }
+
+  componentWillUnmount(){ this._stopTimer(); }
+
+  artStyle(art){
+    const m={der:['#E9F1FA','#2E6FB0','#BBD4EE'],die:['#FBECEF','#C0506A','#EEC2CC'],das:['#F1EDE4','#7A7468','#D8D2C4']};
+    const c=m[art]||['#EEF1EE','#5C6661','#DBE1DC'];
+    return `font-size:10px;font-weight:500;padding:2px 8px;border-radius:11px;white-space:nowrap;background:${c[0]};color:${c[1]};border:1px solid ${c[2]};`;
+  }
+
+  go(s){ this.setState({screen:s}); }
+  curSents(){ return this.STORIES[this.state.currentId] || this.STORIES.p1; }
+  flatLen(){ let n=0; this.curSents().forEach(s=>n+=s.de.length); return n; }
+  cardById(id){ return this.PLATFORM.find(p=>p.id===id) || this.MINE.find(m=>m.id===id) || this.PLATFORM[0]; }
+
+  openReader(card){
+    this.readerMeta=card;
+    const qi=this.QUEUE.indexOf(card.id);
+    this._stopTimer();
+    this.setState({screen:'reader',tab:'story',wordId:null,showConj:false,quizIdx:0,quizChosen:null,quizScore:0,
+      playing:false,karaokeIdx:-1,ended:false,playerExpanded:false,
+      currentId:(this.STORIES[card.id]?card.id:'p1'),queueIdx:qi>=0?qi:0});
+  }
+  backHome(){ this._stopTimer(); this.setState({screen:'home',seeAll:false,playing:false,playerExpanded:false}); }
+  setTab(t){ this.setState({tab:t,wordId:null,showConj:false}); }
+
+  _startTimer(){ this._stopTimer(); this._kt=setInterval(()=>this._tick(),360); }
+  _stopTimer(){ if(this._kt){ clearInterval(this._kt); this._kt=null; } }
+  _tick(){
+    const S=this.state;
+    if(S.screen!=='reader'){ this._stopTimer(); return; }
+    const len=this.flatLen(); const ni=S.karaokeIdx+1;
+    if(ni<len){ this.setState({karaokeIdx:ni}); return; }
+    // reached the end of this story
+    if(S.repeatMode==='one'){ this.setState({karaokeIdx:0}); return; }
+    // otherwise autoplay the next story in the queue (never auto-complete)
+    this.nextTrack(true);
+  }
+  loadQueueItem(idx,keepPlaying){
+    const id=this.QUEUE[idx]; const card=this.cardById(id); this.readerMeta=card;
+    this.setState({queueIdx:idx,currentId:id,karaokeIdx:keepPlaying?0:-1,ended:false,
+      playing:!!keepPlaying,wordId:null,showConj:false,tab:'story'});
+    if(keepPlaying) this._startTimer(); else this._stopTimer();
+  }
+  nextTrack(keepPlaying){
+    const S=this.state, len=this.QUEUE.length; let idx=S.queueIdx, nidx;
+    if(S.shuffle && len>1){ do{ nidx=Math.floor(Math.random()*len); }while(nidx===idx); }
+    else nidx=idx+1;
+    if(nidx>=len){
+      if(S.repeatMode==='all'){ nidx=0; }
+      else { this._stopTimer(); this.setState({playing:false,ended:true,karaokeIdx:this.flatLen()-1}); return; }
+    }
+    this.loadQueueItem(nidx,keepPlaying);
+  }
+  prevTrack(){
+    const S=this.state;
+    if(S.karaokeIdx>4){ this.loadQueueItem(S.queueIdx,S.playing); return; }
+    let nidx=S.queueIdx-1;
+    if(nidx<0) nidx = S.repeatMode==='all' ? this.QUEUE.length-1 : 0;
+    this.loadQueueItem(nidx,S.playing);
+  }
+  togglePlay(){
+    if(this.state.playing){ this._stopTimer(); this.setState({playing:false}); return; }
+    let ki=this.state.karaokeIdx;
+    if(this.state.ended || ki>=this.flatLen()) ki=0;
+    this.setState({playing:true,ended:false,karaokeIdx:ki}); this._startTimer();
+  }
+  replayStory(){ this.setState({screen:'reader',tab:'story',karaokeIdx:0,ended:false,playing:true,playerExpanded:false}); this._startTimer(); }
+  cycleRepeat(){ this.setState(s=>({repeatMode: s.repeatMode==='off'?'all':s.repeatMode==='all'?'one':'off'})); }
+  toggleShuffle(){ this.setState(s=>({shuffle:!s.shuffle})); }
+  toggleExpand(){ this.setState(s=>({playerExpanded:!s.playerExpanded,wordId:null})); }
+  completeStory(){ this._stopTimer(); this.setState({screen:'complete',playing:false,playerExpanded:false}); }
+  closeWord(){ if(this.state.wordId) this.setState({wordId:null,showConj:false}); }
+  toggleConj(){ this.setState(s=>({showConj:!s.showConj})); }
+  tapWord(wid){ if(!wid){ this.closeWord(); return; } this.setState(s=>({wordId:s.wordId===wid?null:wid,showConj:false})); }
+  setLevel(l){ this.setState({level:l}); }
+  setCat(c){ this.setState(s=>({cat:s.cat===c?'all':c})); }
+  toggleTranslate(){ this.setState(s=>({translate:!s.translate})); }
+  toast(msg){ this.setState({toast:msg}); clearTimeout(this._t); this._t=setTimeout(()=>this.setState({toast:null}),1700); }
+  addVault(wid){ if(this.state.vault[wid]){ this.toast('Already in your vault'); return; } this.setState(s=>({vault:{...s.vault,[wid]:true}})); this.toast('Added to your vault'); }
+  answer(c){ if(this.state.quizChosen) return; const Q=this.QUIZ[this.state.quizIdx]; const ok=c===Q.answer; this.setState(s=>({quizChosen:c,quizScore:s.quizScore+(ok?1:0)})); }
+  nextQuiz(){ this.setState(s=>({quizIdx:s.quizIdx+1,quizChosen:null})); }
+  retake(){ this.setState({quizIdx:0,quizChosen:null,quizScore:0}); }
+  openSeeAll(){ this.setState({seeAll:true}); }
+  closeSeeAll(){ this.setState({seeAll:false}); }
+
+  navIcon(name){
+    const I={
+      home:'<path d="M3 10l9-7 9 7v10a1 1 0 0 1-1 1h-5v-7H9v7H4a1 1 0 0 1-1-1z"/>',
+      vault:'<rect x="3" y="4" width="18" height="13" rx="2"/><line x1="9" y1="20" x2="15" y2="20"/>',
+      review:'<circle cx="12" cy="12" r="9"/><polygon points="10,8 16,12 10,16"/>',
+      stories:'<path d="M5 4h13a1 1 0 0 1 1 1v15l-7-3-7 3V5a1 1 0 0 1 0-1z"/>',
+      progress:'<line x1="6" y1="20" x2="6" y2="13"/><line x1="12" y1="20" x2="12" y2="5"/><line x1="18" y1="20" x2="18" y2="9"/>',
+    };
+    return `<svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round">${I[name]}</svg>`;
+  }
+
+  renderVals(){
+    const S=this.state;
+    const isHome=S.screen==='home', isReader=S.screen==='reader', isComplete=S.screen==='complete';
+    const showGrid=isHome&&S.seeAll, showRail=isHome&&!S.seeAll;
+
+    const levels=this.LEVELS.map(l=>{
+      const on=S.level===l;
+      return { label:l==='all'?'All':l, tap:()=>this.setLevel(l),
+        style:`flex:1;border:none;cursor:pointer;font-family:inherit;font-size:12px;font-weight:600;padding:7px 0;border-radius:18px;transition:all .15s;`+
+          (on?'background:#fff;color:#1C2622;box-shadow:0 2px 6px rgba(22,48,42,.12);':'background:transparent;color:#8A938E;') };
+    });
+    const cats=this.CATS.map(c=>{
+      const on=S.cat===c.v;
+      return { label:c.label, tap:()=>this.setCat(c.v),
+        style:`flex:none;border-radius:18px;cursor:pointer;font-family:inherit;font-size:11.5px;font-weight:600;padding:7px 14px;white-space:nowrap;transition:all .15s;`+
+          (on?'background:#E6EFEA;color:#2F6B58;border:1px solid #BFD8CC;':'background:#fff;color:#7E877F;border:1px solid rgba(28,38,34,.1);') };
+    });
+
+    let ex=this.PLATFORM;
+    if(S.level!=='all') ex=ex.filter(s=>s.level===S.level);
+    if(S.cat!=='all') ex=ex.filter(s=>s.cat===S.cat);
+    const exploreCards=ex.map(s=>({...s,meta:`${s.mins} min · ${s.catLabel}`,open:()=>this.openReader(s)}));
+
+    const cont=this.PLATFORM[0];
+    const continueStory={...cont,pct:38,metaLine:`${cont.mins} min read · ${cont.catLabel}`,open:()=>this.openReader(cont)};
+
+    const mine=this.MINE.map(m=>({
+      ...m, meta:`${m.mins} min · ${m.words} words · ${m.level}`,
+      moreLabel:m.more?`+${m.more} more`:'',
+      chips:m.chips.map(ch=>({w:ch.w,style:this.artStyle(ch.art)})),
+      open:()=>this.openReader(m), play:(e)=>{ e&&e.stopPropagation&&e.stopPropagation(); this.openReader(m); },
+    }));
+
+    const nav=[['home','Home'],['vault','Vault'],['review','Review'],['stories','Stories'],['progress','Progress']]
+      .map(([k,l])=>({label:l,icon:this.navIcon(k),style:k==='stories'?'color:#23463B;':'color:#AEB5AF;'}));
+
+    // reader
+    const meta=this.readerMeta||this.PLATFORM[0];
+    let gi=0;
+    const sentences=this.curSents().map((sent,si)=>({
+      key:si, en:sent.en, showEn:S.translate,
+      tokens:sent.de.map((tk,wi)=>{
+        const t=tk[0], wid=tk[1], v=tk[2];
+        const cur=gi; gi++;
+        const tapped=wid&&S.wordId===wid;
+        const isKar=cur===S.karaokeIdx && S.karaokeIdx>=0;
+        const isRead=S.karaokeIdx>=0 && cur<S.karaokeIdx;
+        let st='cursor:pointer;border-radius:5px;padding:1px 3px;transition:background .15s,color .15s;-webkit-tap-highlight-color:transparent;';
+        if(tapped) st+='background:#23463B;color:#fff;font-weight:500;';
+        else if(isKar) st+='background:#CFE3D9;color:#15302A;font-weight:600;padding:2px 4px;';
+        else if(v) st+=(isRead?'color:#8FB0A4;':'color:#356151;')+'font-weight:500;border-bottom:1.5px dotted #93BAAB;';
+        else if(isRead) st+='color:#AAB2AC;';
+        return { key:si+'-'+wi, t, style:st, tap:(e)=>{ e&&e.stopPropagation&&e.stopPropagation(); this.tapWord(wid); } };
+      }),
+    }));
+
+    const tabs=['story','quiz','keywords','grammar'].map(t=>({
+      key:t, label:t.charAt(0).toUpperCase()+t.slice(1), tap:()=>this.setTab(t),
+      style:`flex:1;border:none;cursor:pointer;font-family:inherit;font-size:12.5px;font-weight:600;padding:9px 0;border-radius:16px;transition:all .15s;`+
+        (S.tab===t?'background:#23463B;color:#fff;':'background:transparent;color:#7E877F;'),
+    }));
+
+    // word sheet
+    let word=null;
+    if(S.wordId&&this.WORDS[S.wordId]){
+      const w=this.WORDS[S.wordId];
+      const inV=!!S.vault[S.wordId];
+      word={...w, wid:S.wordId, inVault:inV, notInVault:!inV, isVerb:w.type==='Verb', isNoun:w.type==='Noun',
+        addStyle:inV?'background:#4E8C76;':'background:rgba(255,255,255,.14);',
+        play:()=>this.toast('▶ Playing pronunciation'),
+        add:()=>this.addVault(S.wordId), conj:w.conj||null };
+    }
+    const conjRows=(word&&word.conj)?word.conj.praesens.map((r,i)=>({p:r.p,pres:r.form,prat:word.conj.praeteritum[i].form})):[];
+
+    // keywords
+    const keywords=this.KEYWORDS.map(k=>({
+      display:k.display, en:k.en, type:k.type,
+      typeStyle:k.type==='Verb'?'background:#F3E7DC;color:#A85C2E;':'background:#E6EFEA;color:#2F6B58;',
+      tap:()=>{ this.setState({wordId:k.wid,showConj:false}); },
+    }));
+
+    // quiz
+    const qi=S.quizIdx, total=this.QUIZ.length, qComplete=qi>=total;
+    const C=194.8, prog=Math.min(qi+(S.quizChosen?1:0),total)/total;
+    let quiz={complete:qComplete,score:S.quizScore,total,label:`${Math.min(qi+1,total)}/${total}`,ringOffset:C*(1-prog)};
+    if(qComplete){
+      quiz.scoreEmoji=S.quizScore===total?'🎉':S.quizScore>=Math.ceil(total/2)?'👍':'💪';
+    } else {
+      const Q=this.QUIZ[qi], chosen=S.quizChosen, answered=!!chosen, wrong=answered&&chosen!==Q.answer;
+      const parts=Q.template.split('___');
+      quiz.before=parts[0]; quiz.after=parts[1]||''; quiz.fill=answered?Q.answer:'';
+      quiz.fillStyle=answered?'border-bottom:2px solid #6EE7B7;color:#fff;padding:0 5px;':'border-bottom:2px solid rgba(255,255,255,.5);min-width:46px;display:inline-block;';
+      quiz.answered=answered; quiz.wrong=wrong; quiz.hint=Q.hint; quiz.last=qi===total-1;
+      quiz.nextLabel=qi===total-1?'Finish quiz':'Next question';
+      quiz.choices=Q.choices.map(c=>{
+        let st='width:100%;padding:15px;border-radius:15px;font-family:inherit;font-size:15.5px;font-weight:500;cursor:pointer;transition:all .15s;text-align:center;';
+        if(!answered) st+='background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.18);color:#fff;';
+        else if(c===Q.answer) st+='background:rgba(110,231,183,.26);border:1px solid #6EE7B7;color:#fff;';
+        else if(c===chosen) st+='background:rgba(244,150,150,.24);border:1px solid #F49696;color:#fff;';
+        else st+='background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);color:rgba(255,255,255,.4);';
+        return { label:c, style:st, tap:()=>this.answer(c), mark:answered&&c===Q.answer };
+      });
+      quiz.next=()=>this.nextQuiz();
+    }
+    quiz.retake=()=>this.retake();
+
+    // ── player / queue / completion ──
+    const flen=this.flatLen();
+    const playedIdx=S.karaokeIdx<0?0:Math.min(S.karaokeIdx+1,flen);
+    const pPct=S.ended?100:Math.round((playedIdx/flen)*100);
+    const durSec=(meta.mins||3)*60;
+    const fmt=(sec)=>{ const m=Math.floor(sec/60), s=Math.floor(sec%60); return m+':'+(s<10?'0'+s:s); };
+    const pCurTime=fmt(S.ended?durSec:(pPct/100)*durSec), pTotalTime=fmt(durSec);
+    const queue=this.QUEUE.map((id,i)=>{ const c=this.cardById(id); return {
+      title:c.title, level:c.level, dur:`${c.mins} min`, num:String(i+1), playing:i===S.queueIdx, notPlaying:i!==S.queueIdx,
+      rowStyle:i===S.queueIdx?'background:rgba(110,231,183,.13);':'background:transparent;',
+      titleStyle:i===S.queueIdx?'color:#fff;':'color:rgba(255,255,255,.82);',
+      tap:()=>this.loadQueueItem(i,true),
+    };});
+    const nextCard=this.cardById(this.QUEUE[(S.queueIdx+1)%this.QUEUE.length]);
+    const repAccent='#6EE7B7';
+    const repeatBtnStyle=`width:42px;height:42px;border-radius:50%;border:none;display:flex;align-items:center;justify-content:center;cursor:pointer;position:relative;`+(S.repeatMode!=='off'?`background:rgba(110,231,183,.16);color:${repAccent};`:'background:transparent;color:rgba(255,255,255,.55);');
+    const shuffleBtnStyle=`width:42px;height:42px;border-radius:50%;border:none;display:flex;align-items:center;justify-content:center;cursor:pointer;`+(S.shuffle?`background:rgba(110,231,183,.16);color:${repAccent};`:'background:transparent;color:rgba(255,255,255,.55);');
+
+    return {
+      isHome, isReader, isComplete, showGrid, showRail,
+      levels, cats, exploreCards, continueStory, mine, mineCount:this.MINE.length, nav,
+      openSeeAll:()=>this.openSeeAll(), closeSeeAll:()=>this.closeSeeAll(), noop:()=>{},
+      readerTitle:meta.title, readerLevel:meta.level, readerGrad:meta.grad,
+      readerMetaLine:`${meta.mins} min · ${meta.catLabel||meta.length||''}`,
+      quizActive:!qComplete, playWordNoop:()=>this.toast('▶ Playing sentence'),
+      learnedLabel:S.learned?'Learned':'Mark as learned',
+      learnedBtnBg:S.learned?'rgba(110,231,183,.3)':'rgba(21,33,28,.32)',
+      translateBtnStyle:S.translate?'background:#E6EFEA;color:#2F6B58;border:1px solid #BFD8CC;':'background:#fff;color:#8A938E;border:1px solid rgba(28,38,34,.12);',
+      sentences, tabs, translate:S.translate, learned:S.learned,
+      toggleTranslate:()=>this.toggleTranslate(), toggleLearned:()=>this.setState(s=>({learned:!s.learned})),
+      back:()=>this.backHome(),
+      isStoryTab:S.tab==='story', isQuizTab:S.tab==='quiz', isKeywordsTab:S.tab==='keywords', isGrammarTab:S.tab==='grammar',
+      showPill:isReader&&S.tab==='story'&&!S.wordId&&!S.playerExpanded,
+      playing:S.playing, paused:!S.playing, togglePlay:()=>this.togglePlay(),
+      nextTrack:()=>this.nextTrack(S.playing), prevTrack:()=>this.prevTrack(),
+      expandPlayer:()=>this.toggleExpand(), collapsePlayer:()=>this.toggleExpand(),
+      playerExpanded:S.playerExpanded, pillTitle:meta.title, pillTime:`${pCurTime} / ${pTotalTime}`,
+      pillPct:pPct, upNext:`Up next · ${nextCard.title}`,
+      pGrad:meta.grad, pTitle:meta.title, pLevel:meta.level, pMetaLine:`${meta.catLabel||meta.length||''} · ${pTotalTime}`,
+      pPct, pCurTime, pTotalTime, queue,
+      repeatBtnStyle, shuffleBtnStyle, repeatOne:S.repeatMode==='one',
+      cycleRepeat:()=>this.cycleRepeat(), toggleShuffle:()=>this.toggleShuffle(),
+      ended:S.ended, completeStory:()=>this.completeStory(), replayStory:()=>this.replayStory(),
+      repeatModeLabel:S.repeatMode==='off'?'Repeat off':S.repeatMode==='all'?'Repeat queue':'Repeat this story',
+      isComplete,
+      completeTitle:meta.title, completeLevel:meta.level, completeGrad:meta.grad,
+      completeMeta:`${meta.catLabel||meta.length||''} · ${pTotalTime}`,
+      completeQuizDone:qComplete, completeQuizScore:`${S.quizScore} / ${this.QUIZ.length}`,
+      nextTitle:nextCard.title,
+      playNext:()=>{ const ni=(this.state.queueIdx+1)%this.QUEUE.length; this.setState({screen:'reader'}); this.loadQueueItem(ni,true); },
+      pillLabel:S.playing?'Listening…':'Listen',
+      conjBtnLabel:S.showConj?'Hide conjugation':'Conjugate',
+      conjChevStyle:S.showConj?'transform:rotate(180deg);transition:transform .2s;':'transition:transform .2s;',
+      word, wordOpen:!!word, closeWord:()=>this.closeWord(),
+      showConj:S.showConj&&!!(word&&word.conj), toggleConj:()=>this.toggleConj(), conjRows,
+      conjPerfekt:word&&word.conj?word.conj.perfekt:'', conjImperativ:word&&word.conj?word.conj.imperativ:'',
+      keywords, grammar:this.GRAMMAR, quiz, toastMsg:S.toast,
+    };
+  }
+}
+Component.prototype.QUIZ_INIT=true;
+</script>
+</body>
+</html>

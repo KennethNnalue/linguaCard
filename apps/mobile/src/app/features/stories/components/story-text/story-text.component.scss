@@ -1,0 +1,77 @@
+@use 'theme/tokens' as t;
+@use 'theme/utils' as u;
+
+:host {
+  display: block;
+}
+
+.ss-sent {
+  margin-bottom: 18px;
+}
+
+.ss-sent-de {
+  font-family: t.$lc-font-serif;
+  font-size: 19px;
+  line-height: 1.62;
+  color: var(--lc-ss-ink);
+  margin: 0;
+}
+
+.ss-sent-en {
+  font-size: t.$lc-text-sm;
+  color: var(--lc-ss-translate-en);
+  line-height: 1.5;
+  margin: 5px 0 0;
+  font-style: italic;
+}
+
+.ss-tok {
+  cursor: pointer;
+  border-radius: 5px;
+  padding: 1px 3px;
+  transition: background t.$lc-duration-fast, color t.$lc-duration-fast;
+  -webkit-tap-highlight-color: transparent;
+
+  &.vocab {
+    color: var(--lc-ss-sage-text);
+    font-weight: t.$lc-font-weight-medium;
+    border-bottom: 1.5px dotted var(--lc-ss-vocab-underline);
+  }
+
+  // already-read softening
+  &.read {
+    color: var(--lc-ss-karaoke-plain);
+
+    &.vocab {
+      color: var(--lc-ss-karaoke-vocab);
+    }
+  }
+
+  // currently-spoken word
+  &.karaoke {
+    background: var(--lc-ss-karaoke-bg);
+    color: var(--lc-ss-karaoke-text);
+    font-weight: t.$lc-font-weight-semibold;
+    padding: 2px 4px;
+    border-bottom-color: transparent;
+  }
+
+  // tapped (open in sheet) overrides everything
+  &.tapped {
+    background: var(--lc-ss-pine);
+    color: t.$lc-text-inverse;
+    font-weight: t.$lc-font-weight-medium;
+    border-bottom-color: transparent;
+  }
+}
+
+.ss-sp {
+  display: inline;
+}
+
+.ss-body-fallback {
+  font-family: t.$lc-font-serif;
+  font-size: 18px;
+  line-height: 1.7;
+  color: t.$lc-text-secondary;
+}

@@ -1,0 +1,23 @@
+@if (story().sentences.length) {
+  @for (sent of story().sentences; track sent.index; let si = $index) {
+    <div class="ss-sent">
+      <p class="ss-sent-de">
+        @for (token of sentenceTokens()[si]; track token.wordIdx) {
+          <span
+            class="ss-tok"
+            [class.vocab]="token.isVocab"
+            [class.karaoke]="isKaraoke(si, token.wordIdx)"
+            [class.read]="isRead(si, token.wordIdx)"
+            [class.tapped]="isTapped(si, token.wordIdx)"
+            (click)="$event.stopPropagation(); onWordTap(si, token)"
+          >{{ token.text }}</span><span class="ss-sp"> </span>
+        }
+      </p>
+      @if (showTranslation()) {
+        <p class="ss-sent-en">{{ sent.native }}</p>
+      }
+    </div>
+  }
+} @else {
+  <p class="ss-body-fallback">{{ story().bodyDe }}</p>
+}
