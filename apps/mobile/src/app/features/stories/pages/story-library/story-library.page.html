@@ -68,10 +68,10 @@
             {{ 'stories.library.minReadMeta' | translate:{ mins: continueMins(cont), category: heroCategoryLabel(cont) } }}
           </div>
           <div class="ss-hero-progress">
-            <div class="ss-progress-track">
-              <div class="ss-progress-fill" [style.width.%]="continueProgressPct(cont)"></div>
+            <div class="ss-progress-track" [class]="'ss-progress-track--' + heroStatus(cont)">
+              <div class="ss-progress-fill"></div>
             </div>
-            <span class="ss-progress-label">{{ continueProgressPct(cont) }}%</span>
+            <span class="ss-progress-label">{{ heroStatusLabel(cont) }}</span>
           </div>
         </div>
       </div>

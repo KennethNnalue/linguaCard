@@ -143,12 +143,25 @@ export class StoryLibraryPage implements OnInit {
     return (story.title.trim()[0] ?? '•').toUpperCase();
   }
 
-  /** Rough progress % through a story based on listen activity (placeholder until
-   *  per-story progress lands). Returns 0 when never listened. */
-  continueProgressPct(story: Story | null): number {
-    if (!story || !story.lastListenedAt) return 0;
-    // Without granular progress we surface a modest "in progress" hint.
-    return 38;
+  /** Honest reading status for the continue hero.
+   *  We don't persist a per-story read position, so we only surface states we can
+   *  actually back with data: 'done' (marked learned), 'in-progress' (listened at
+   *  least once) or 'new'. No fabricated percentage. */
+  heroStatus(story: Story | null): 'done' | 'in-progress' | 'new' {
+    if (!story) return 'new';
+    if (story.isLearned) return 'done';
+    if (story.lastListenedAt || story.listenCount > 0) return 'in-progress';
+    return 'new';
+  }
+
+  /** Translated label shown next to the hero progress bar. */
+  heroStatusLabel(story: Story | null): string {
+    const keyMap: Record<ReturnType<StoryLibraryPage['heroStatus']>, string> = {
+      'done': 'stories.library.progressDone',
+      'in-progress': 'stories.library.progressInProgress',
+      'new': 'stories.library.progressNew',
+    };
+    return this.translate.instant(keyMap[this.heroStatus(story)]);
   }
 
   toggleSeeAll(): void {

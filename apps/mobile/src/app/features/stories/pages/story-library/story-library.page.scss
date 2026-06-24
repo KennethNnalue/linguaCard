@@ -9,7 +9,7 @@
 }
 
 .ss-page {
-  padding: t.$lc-space-2 18px 28px;
+  padding: calc(#{t.$lc-space-2} + env(safe-area-inset-top, 0px)) 18px 28px;
 }
 
 .ss-refresh-bar {
@@ -218,6 +218,23 @@
   height: 100%;
   background: var(--lc-ss-sage);
   border-radius: 3px;
+  width: 0;
+}
+
+// Completed: full bar.
+.ss-progress-track--done .ss-progress-fill {
+  width: 100%;
+}
+
+// Started but no stored position: indeterminate sliding indicator (no fake %).
+.ss-progress-track--in-progress .ss-progress-fill {
+  width: 40%;
+  animation: ssProgressIndeterminate 1.6s ease-in-out infinite;
+}
+
+@keyframes ssProgressIndeterminate {
+  0%   { margin-left: -40%; }
+  100% { margin-left: 100%; }
 }
 
 .ss-progress-label {
