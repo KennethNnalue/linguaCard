@@ -52,7 +52,9 @@
 .ss-rcover {
   position: relative;
   min-height: 152px;
-  padding: calc(14px + env(safe-area-inset-top, 0px)) 16px 14px;
+  // Top padding clears the absolutely-positioned back / "mark as learned"
+  // buttons (top ≈ 14px + 34px tall) so flow content never overlaps them.
+  padding: calc(60px + env(safe-area-inset-top, 0px)) 16px 14px;
   display: flex;
   flex-direction: column;
   justify-content: flex-end;
@@ -354,13 +356,16 @@
   width: 40px;
   height: 40px;
   border-radius: t.$lc-radius-full;
-  background: var(--lc-ss-card);
+  background: t.$lc-ss-card;
+  color: t.$lc-ss-pine;
   border: none;
   display: flex;
   align-items: center;
   justify-content: center;
   cursor: pointer;
   flex: none;
+  -webkit-appearance: none;
+  appearance: none;
 
   &.pulse {
     animation: ssMiniPulse 1.4s ease-in-out infinite;
@@ -607,13 +612,16 @@
   width: 64px;
   height: 64px;
   border-radius: t.$lc-radius-full;
-  background: var(--lc-ss-card);
+  background: t.$lc-ss-card;
+  color: t.$lc-ss-pine;
   border: none;
   display: flex;
   align-items: center;
   justify-content: center;
   cursor: pointer;
   flex: none;
+  -webkit-appearance: none;
+  appearance: none;
 }
 
 .ss-xp-repeat-label {
