@@ -69,7 +69,10 @@ bootstrapApplication(AppComponent, {
       })
     ),
     provideTranslateService({ fallbackLang: 'en' }),
-    provideTranslateHttpLoader({ prefix: './assets/i18n/', suffix: '.json' }),
+    // Absolute path (not './') — a relative prefix resolves against the current
+    // route (e.g. /stories/assets/i18n/en.json on deep links), which the SPA
+    // rewrite then serves as index.html, breaking JSON parsing in production.
+    provideTranslateHttpLoader({ prefix: '/assets/i18n/', suffix: '.json' }),
     provideMissingTranslationHandler(lcMissingTranslationHandlerFactory),
     provideAi(),
     provideVault(),
