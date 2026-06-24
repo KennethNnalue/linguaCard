@@ -29,8 +29,32 @@ export class GoogleCloudTTSAdapter implements OnModuleInit {
 
   constructor(private readonly config: ConfigService) {
     const ai = this.config.get<AiConfig>('ai')!;
-    this.defaultVoice    = ai.googleCloudTtsVoice    || 'de-DE-Wavenet-B';
+    this.defaultVoice    = ai.googleCloudTtsVoice    || 'de-DE-Chirp3-HD-Charon';
     this.defaultLanguage = ai.googleCloudTtsLanguage || 'de-DE';
+  }
+
+  /** Chirp 3: HD voices (`<lang>-Chirp3-HD-<Name>`) reject SSML but accept `speakingRate`. */
+  private isChirp3Voice(voice: string): boolean {
+    return voice.toLowerCase().includes('chirp3');
+  }
+
+  /**
+   * Chirp 3: HD does not accept SSML, so convert our `<prosody rate>` SSML to the
+   * equivalent plain text + `speakingRate`. Returns the stripped text and the rate
+   * pulled from the prosody tag (or null when none is present).
+   */
+  private ssmlToChirpInput(ssml: string): { text: string; rate: number | null } {
+    const rateMatch = ssml.match(/<prosody[^>]*\brate="([\d.]+)"/i);
+    const rate = rateMatch ? Number.parseFloat(rateMatch[1]) : null;
+    const text = ssml
+      .replace(/<[^>]+>/g, '')
+      .replace(/&apos;/g, "'")
+      .replace(/&quot;/g, '"')
+      .replace(/&lt;/g,   '<')
+      .replace(/&gt;/g,   '>')
+      .replace(/&amp;/g,  '&')   // must be last to avoid double-unescaping
+      .trim();
+    return { text, rate: Number.isFinite(rate) ? rate : null };
   }
 
   onModuleInit(): void {
@@ -48,11 +72,12 @@ export class GoogleCloudTTSAdapter implements OnModuleInit {
 
     // Gemini-family voice names inside Cloud TTS API have NO free tier — billed
     // from character 0. Refuse to configure rather than generate surprise bills.
+    // (Chirp 3: HD voices contain "Chirp3", not "gemini", so they pass this guard.)
     if (this.defaultVoice.toLowerCase().includes('gemini')) {
       this.logger.error(
         `GOOGLE_CLOUD_TTS_VOICE is set to "${this.defaultVoice}" which is a Gemini-family ` +
         `voice. Gemini voices inside Cloud TTS API have no free tier and are billed from ` +
-        `character 0. Set GOOGLE_CLOUD_TTS_VOICE=de-DE-Wavenet-B instead.`,
+        `character 0. Set GOOGLE_CLOUD_TTS_VOICE=de-DE-Chirp3-HD-Charon instead.`,
       );
       return;  // isConfigured stays false — no audio generated, no surprise bills
     }
@@ -84,13 +109,31 @@ export class GoogleCloudTTSAdapter implements OnModuleInit {
 
     const voiceName    = request.voice    ?? this.defaultVoice;
     const languageCode = request.language ?? this.defaultLanguage;
-    const speakingRate = request.speed    ?? 1.0;
 
-    const input: protos.google.cloud.texttospeech.v1.ISynthesisInput = request.ssml
-      ? { ssml: request.text }
-      : { text: request.text };
+    let synthText    = request.text;
+    let useSsml      = request.ssml ?? false;
+    let speakingRate = request.speed ?? 1.0;
 
-    const characterCount = request.text.length;
+    // Chirp 3: HD rejects SSML but supports `speakingRate`. Strip our prosody SSML to
+    // plain text and carry its rate over to `speakingRate`, preserving slow learner-
+    // paced narration. An explicit request.speed still wins over the SSML rate.
+    if (useSsml && this.isChirp3Voice(voiceName)) {
+      const { text, rate } = this.ssmlToChirpInput(request.text);
+      synthText = text;
+      useSsml   = false;
+      if (request.speed === undefined && rate !== null) {
+        speakingRate = rate;
+      }
+      // Cloud TTS only accepts speakingRate in [0.25, 2.0]; clamp so an unexpected
+      // SSML rate value can never produce an INVALID_ARGUMENT from the API.
+      speakingRate = Math.min(2.0, Math.max(0.25, speakingRate));
+    }
+
+    const input: protos.google.cloud.texttospeech.v1.ISynthesisInput = useSsml
+      ? { ssml: synthText }
+      : { text: synthText };
+
+    const characterCount = synthText.length;
 
     let response: protos.google.cloud.texttospeech.v1.ISynthesizeSpeechResponse;
     try {

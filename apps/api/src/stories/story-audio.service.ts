@@ -5,6 +5,7 @@ import { GeminiAdapter } from '../ai/providers/gemini.adapter';
 import { GroqWhisperAdapter } from '../ai/providers/groq-whisper.adapter';
 import { StorageService } from '../storage/storage.service';
 import { buildStorySsml } from '../word-audio/ssml-builder';
+import { audioContentTypeFor, audioExtFor } from '../common/audio/audio-format';
 
 @Injectable()
 export class StoryAudioService {
@@ -75,8 +76,8 @@ export class StoryAudioService {
       return { audioUrl: null, timestamps: [], durationMs: 0 };
     }
 
-    const ext         = mimeType.includes('mp3') ? 'mp3' : 'wav';
-    const contentType = mimeType.includes('mp3') ? 'audio/mpeg' : 'audio/wav';
+    const ext         = audioExtFor(mimeType);
+    const contentType = audioContentTypeFor(mimeType);
 
     const audioUrl = await this.storage.upload(
       Buffer.from(audioBuffer),

@@ -601,7 +601,7 @@ Rating 1–4 maps to: Again / Hard / Good / Easy.
 | Word enrichment | `OpenRouterAdapter` | `anthropic/claude-haiku-4-5` | `ENRICHMENT_MODEL` |
 | Story — Pro tier | `OpenRouterAdapter` | `anthropic/claude-sonnet-4-6` | `STORY_MODEL_PRO` |
 | Story — Free tier | `OpenRouterAdapter` | `google/gemini-2.5-flash` | `STORY_MODEL_FREE` |
-| TTS (word audio) | `GoogleCloudTtsAdapter` | `de-DE-Wavenet-B` | `GOOGLE_CLOUD_TTS_*` |
+| TTS (word audio) | `GoogleCloudTtsAdapter` | `de-DE-Chirp3-HD-Charon` | `GOOGLE_CLOUD_TTS_*` |
 | Whisper timestamps | `GroqWhisperAdapter` | `whisper-large-v3-turbo` | `GROQ_API_KEY` |
 
 Tier routing in `StoryGenerationService` is live — resolved per-request via `SubscriptionService.getStatusForUser()`. Pro users get Claude Sonnet 4.6; free users get Gemini 2.5 Flash. See `apps/mobile/epic-subscription-paywall.md`.

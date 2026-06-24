@@ -2,6 +2,7 @@ import { Injectable, Logger } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import type { WordTimestamp } from '@lingua-card/shared/domain';
 import type { AiConfig } from '../../config/ai.config';
+import { audioExtFor } from '../../common/audio/audio-format';
 
 const GROQ_STT_URL = 'https://api.groq.com/openai/v1/audio/transcriptions';
 const GROQ_MODEL   = 'whisper-large-v3-turbo';
@@ -35,7 +36,7 @@ export class GroqWhisperAdapter {
       return [];
     }
 
-    const ext  = mimeType.includes('mp3') ? 'audio.mp3' : 'audio.wav';
+    const ext  = `audio.${audioExtFor(mimeType)}`;
     const blob = new Blob([audioBuffer], { type: mimeType });
 
     const form = new FormData();

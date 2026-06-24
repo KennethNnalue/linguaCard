@@ -4,6 +4,7 @@ import { GoogleCloudTTSAdapter } from './providers/google-cloud-tts.adapter';
 import { GeminiAdapter } from './providers/gemini.adapter';
 import { StorageService } from '../storage/storage.service';
 import { WordAudioService } from '../word-audio/word-audio.service';
+import { audioExtFor } from '../common/audio/audio-format';
 
 interface TtsRequestDto {
   text: string;
@@ -63,7 +64,7 @@ export class AiController {
         mimeType    = speech.mimeType;
       }
 
-      const ext = mimeType.includes('mp3') ? 'mp3' : 'wav';
+      const ext = audioExtFor(mimeType);
       res.set({
         'Content-Type':        mimeType,
         'Content-Disposition': `inline; filename="tts.${ext}"`,

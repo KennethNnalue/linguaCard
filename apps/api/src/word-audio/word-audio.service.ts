@@ -13,6 +13,7 @@ import { WordAudioRepository } from './word-audio.repository';
 import { WordAudioEntity } from './word-audio.entity';
 import { normalizeForAudio, audioStorageHash } from './normalize';
 import { buildWordSsml } from './ssml-builder';
+import { audioContentTypeFor, audioExtFor } from '../common/audio/audio-format';
 
 const BATCH_CONCURRENCY = 5;
 
@@ -283,12 +284,12 @@ export class WordAudioService {
 
     try {
       const speech = await this.generateSpeechWithFallback(buildWordSsml(displayText), language, true);
-      const ext        = speech.mimeType.includes('mp3') ? 'mp3' : 'wav';
+      const ext        = audioExtFor(speech.mimeType);
       const actualPath = `word-audio/${hash}.${ext}`;
       const audioUrl   = await this.storage.upload(
         Buffer.from(speech.audioBuffer),
         actualPath,
-        speech.mimeType.includes('mp3') ? 'audio/mpeg' : 'audio/wav',
+        audioContentTypeFor(speech.mimeType),
       );
 
       entity.audioUrl    = audioUrl;

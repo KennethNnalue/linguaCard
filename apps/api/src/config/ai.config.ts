@@ -32,7 +32,7 @@ export const aiConfig = (): { ai: AiConfig } => ({
     defaultProvider: (process.env['AI_DEFAULT_PROVIDER'] ?? 'gemini') as AiConfig['defaultProvider'],
     storageBucket:        process.env['AI_STORAGE_BUCKET']        ?? 'lingua-card-audio-dev',
     googleCloudTtsKeyBase64: process.env['GOOGLE_CLOUD_TTS_KEY_BASE64'] ?? '',
-    googleCloudTtsVoice:     process.env['GOOGLE_CLOUD_TTS_VOICE']      ?? 'de-DE-Wavenet-B',
+    googleCloudTtsVoice:     process.env['GOOGLE_CLOUD_TTS_VOICE']      ?? 'de-DE-Chirp3-HD-Charon',
     googleCloudTtsLanguage:  process.env['GOOGLE_CLOUD_TTS_LANGUAGE']   ?? 'de-DE',
   },
 });
