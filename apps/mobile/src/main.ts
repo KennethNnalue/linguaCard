@@ -1,4 +1,4 @@
-import { importProvidersFrom, isDevMode, provideZoneChangeDetection } from '@angular/core';
+import { importProvidersFrom, inject, isDevMode, provideAppInitializer, provideZoneChangeDetection } from '@angular/core';
 import { registerLocaleData } from '@angular/common';
 import { bootstrapApplication } from '@angular/platform-browser';
 import { provideAnimations } from '@angular/platform-browser/animations';
@@ -23,6 +23,7 @@ import localeAr from '@angular/common/locales/ar';
 import { routes } from './app/app.routes';
 import { AppComponent } from './app/app.component';
 import { authInterceptor } from './app/core/interceptors/auth.interceptor';
+import { LanguageService } from './app/core/services/language.service';
 import { provideAi } from './app/features/ai/ai.providers';
 import { provideVault } from './app/features/vault/vault.providers';
 import { provideStories } from './app/features/stories/stories.providers';
@@ -74,6 +75,10 @@ bootstrapApplication(AppComponent, {
     // rewrite then serves as index.html, breaking JSON parsing in production.
     provideTranslateHttpLoader({ prefix: '/assets/i18n/', suffix: '.json' }),
     provideMissingTranslationHandler(lcMissingTranslationHandlerFactory),
+    // Load the startup language bundle BEFORE first paint, so no `| translate`
+    // pipe ever renders against an empty store (which would stick on raw keys
+    // in production where the JSON arrives after the first render).
+    provideAppInitializer(() => inject(LanguageService).initialize()),
     provideAi(),
     provideVault(),
     provideStories(),

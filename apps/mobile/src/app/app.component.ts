@@ -37,7 +37,8 @@ export class AppComponent implements OnInit {
 
   constructor() {
     this.themeService.initialize();
-    this.languageService.initialize();
+    // Language is loaded before first paint via an app initializer (see main.ts);
+    // initializing it here too would double-trigger the bundle load.
   }
 
   async ngOnInit(): Promise<void> {
