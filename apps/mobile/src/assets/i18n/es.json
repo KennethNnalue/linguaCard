@@ -837,6 +837,10 @@
       "deleteAlertHeader": "Eliminar historia",
       "deleteAlertMsg": "¿Eliminar \"{{title}}\"? El audio también se eliminará.",
       "deleteActionBtn": "Eliminar",
+      "removeAction": "Quitar de mis historias",
+      "removeAlertHeader": "Quitar historia",
+      "removeAlertMsg": "¿Quitar \"{{title}}\" de tus historias? Seguirá disponible en Explorar.",
+      "removeActionBtn": "Quitar",
       "extensionFailedToast": "La extensión falló — por favor, inténtalo de nuevo.",
       "eyebrow": "LINGUACARD",
       "searchAriaLabel": "Buscar historias",
@@ -999,6 +1003,13 @@
       "words": "palabras",
       "min": "min",
       "more": "+{{count}} más"
+    },
+    "adopt": {
+      "addToMyStories": "Añadir a mis historias",
+      "openInMyStories": "Abrir en mis historias",
+      "addedBadge": "Añadida",
+      "successMessage": "Añadida a tus historias",
+      "errorMessage": "No se pudo añadir la historia. Inténtalo de nuevo."
     }
   },
   "settings": {

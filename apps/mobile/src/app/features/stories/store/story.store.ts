@@ -9,6 +9,7 @@ import {
 import { firstValueFrom } from 'rxjs';
 import type { GenerateStoryDto, Story } from '@lingua-card/shared/domain';
 import { StoryApiService } from '../services/story-api.service';
+import { PlatformStoryApiService } from '../services/platform-story-api.service';
 import { AiAudioCacheService } from '../../ai/audio/ai-audio-cache.service';
 import { SyncService } from '../../../core/services/sync.service';
 import { LocalDataService } from '../../../core/services/local-data.service';
@@ -71,6 +72,7 @@ export const StoryStore = signalStore(
 
   withMethods((store) => {
     const api = inject(StoryApiService);
+    const platformApi = inject(PlatformStoryApiService);
     const audioCache = inject(AiAudioCacheService);
     const syncService = inject(SyncService);
     const localData = inject(LocalDataService);
@@ -177,6 +179,27 @@ export const StoryStore = signalStore(
 
       addStory(story: Story): void {
         patchState(store, { stories: [story, ...store.stories()] });
+      },
+
+      /**
+       * Adopt a platform story into the user's own stories ("Add to my stories").
+       * Idempotent server-side; locally we upsert the returned story so it appears
+       * in My Stories and becomes queueable in the StoryPlayerService playlist.
+       * Returns the adopted Story, or null on failure.
+       */
+      async adoptPlatformStory(platformStoryId: string): Promise<Story | null> {
+        try {
+          const result = await firstValueFrom(platformApi.adopt(platformStoryId));
+          const story = result.story;
+          const without = store.stories().filter(s => s.id !== story.id);
+          const next = [story, ...without];
+          patchState(store, { stories: next });
+          const userId = uid();
+          if (userId) await localData.setStories(userId, next);
+          return story;
+        } catch {
+          return null;
+        }
       },
 
       getById(id: string): Story | null {

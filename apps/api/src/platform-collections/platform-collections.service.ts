@@ -10,6 +10,8 @@ import type {
   AdoptPlatformCollectionResult,
   CefrLevel,
   Collection,
+  StoryDifficulty,
+  StoryCategory,
 } from '@lingua-card/shared/domain';
 import { PlatformCollectionEntity } from '../admin/platform-collection.entity';
 import { PlatformCollectionWordEntity } from '../admin/platform-collection-word.entity';
@@ -144,9 +146,9 @@ export class PlatformCollectionsService {
     // Related stories via storyCategory
     const relatedStories =
       collection.storyCategory
-        ? (await this.storiesService.findAll({
-            level: collection.level as any,
-            category: collection.storyCategory as any,
+        ? (await this.storiesService.findAll(userId, {
+            level: collection.level as StoryDifficulty,
+            category: collection.storyCategory as StoryCategory,
             limit: 6,
           })).stories
         : [];

@@ -837,6 +837,10 @@
       "deleteAlertHeader": "Hikayeyi sil",
       "deleteAlertMsg": "\"{{title}}\" silinsin mi? Ses dosyası da silinecektir.",
       "deleteActionBtn": "Sil",
+      "removeAction": "Hikâyelerimden kaldır",
+      "removeAlertHeader": "Hikâyeyi kaldır",
+      "removeAlertMsg": "\"{{title}}\" hikâyeni kaldırmak istiyor musun? Keşfet'te erişilebilir kalır.",
+      "removeActionBtn": "Kaldır",
       "extensionFailedToast": "Uzatma başarısız oldu — lütfen tekrar deneyin.",
       "eyebrow": "LINGUACARD",
       "searchAriaLabel": "Hikaye ara",
@@ -999,6 +1003,13 @@
       "words": "kelime",
       "min": "dk",
       "more": "+{{count}} daha"
+    },
+    "adopt": {
+      "addToMyStories": "Hikayelerime ekle",
+      "openInMyStories": "Hikayelerimde aç",
+      "addedBadge": "Eklendi",
+      "successMessage": "Hikayelerinize eklendi",
+      "errorMessage": "Hikaye eklenemedi. Tekrar deneyin."
     }
   },
   "settings": {

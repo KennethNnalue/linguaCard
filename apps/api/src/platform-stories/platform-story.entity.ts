@@ -4,7 +4,7 @@ import {
 import type {
   StorySentence, WordTimestamp, StoryKeyword,
   StoryQuizQuestion, StoryGrammarNote,
-  StoryDifficulty, StoryCategory,
+  StoryDifficulty, StoryCategory, StoryLength,
 } from '@lingua-card/shared/domain';
 
 @Entity('platform_stories')
@@ -70,6 +70,9 @@ export class PlatformStoryEntity {
 
   @Column({ default: 0 })
   wordCount!: number;
+
+  @Column({ type: 'varchar', length: 20, default: 'short' })
+  lengthType!: StoryLength;
 
   @Column({ default: 0 })
   estimatedReadMinutes!: number;

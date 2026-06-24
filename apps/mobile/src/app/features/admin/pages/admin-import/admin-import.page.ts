@@ -4,7 +4,7 @@ import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angula
 import { Router } from '@angular/router';
 import { AlertController, IonContent, IonHeader, IonIcon, IonToolbar, ToastController } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
-import { arrowBackOutline, cloudUploadOutline, eyeOutline, eyeOffOutline, sparklesOutline, trashOutline } from 'ionicons/icons';
+import { arrowBackOutline, cloudUploadOutline, eyeOutline, eyeOffOutline, sparklesOutline, trashOutline, volumeHighOutline } from 'ionicons/icons';
 import type {
   AdminImportCollectionResult,
   AdminImportCollectionJsonDto,
@@ -105,30 +105,40 @@ WORD LIST:
 
   readonly storyPrompt = `ROLE: You are a German-language curriculum writer producing a CANONICAL platform story for a vocabulary app. This story will be shown to MANY learners, so it must be correct, natural, and tightly scoped to the supplied word list.
 
-TARGET CEFR LEVEL: {{LEVEL}}      // one of A1, A2, B1, B2, C1
-TOPIC: {{TOPIC}}                   // e.g. "Food & Drink"
+TARGET CEFR LEVEL: {{LEVEL}}            // one of A1, A2, B1, B2, C1
+TOPIC: {{TOPIC}}                         // e.g. "Food & Drink"
+NATIVE LANGUAGE: {{NATIVE_LANGUAGE}}     // language of all translations, e.g. "English", "Spanish", "Arabic"
+NATIVE LANGUAGE CODE: {{NATIVE_LANG_CODE}} // ISO code, e.g. "en", "es", "ar"
 WORD LIST (use these exact words; do not invent vocabulary beyond what this level needs):
-{{WORD_LIST}}                      // newline list: "der Apfel = apple", "bestellen = to order", ...
+{{WORD_LIST}}                            // newline list: "der Apfel = apple", "bestellen = to order", ...
 
 HARD RULES
 1. Use AT LEAST 80% of the WORD LIST. Every listed word that appears must be in a NATURAL, everyday context — never a dictionary-style filler sentence.
 2. Stay strictly at CEFR {{LEVEL}}. For A1/A2: short main clauses, present and simple past, no subjunctive, no passive. Higher levels may add subordinate clauses/tenses as the level allows.
 3. Words must appear in CORRECT grammatical form — right article, case, and conjugation.
 4. Write a COMPLETE arc (beginning → middle → end) of 8–16 sentences for short, 16–28 for medium. Include natural dialogue where it fits.
-5. Provide an English ("native") translation for every sentence and a title translation.
+5. Provide a {{NATIVE_LANGUAGE}} translation (the "native" field) for every sentence, the title, every keyword, and every grammar note. The German ("german") text is never translated away — only the "native"/"translation" fields are in {{NATIVE_LANGUAGE}}.
 6. Do NOT add words to hit a quota — only natural usage counts toward the 80%.
+7. Write 4–6 quiz questions (fill-in-the-blank from the story) and 1–3 grammar notes that fit the level.
 
 OUTPUT — valid JSON ONLY, no markdown fences, no commentary:
 {
   "title": "German title",
-  "titleTranslation": "English title",
+  "titleTranslation": "Title in {{NATIVE_LANGUAGE}}",
   "level": "{{LEVEL}}",
   "topic": "{{TOPIC}}",
+  "nativeLang": "{{NATIVE_LANG_CODE}}",
   "sentences": [
-    { "german": "...", "native": "...", "wordsUsed": ["Apfel", "bestellen"] }
+    { "german": "...", "native": "... ({{NATIVE_LANGUAGE}})", "wordsUsed": ["Apfel", "bestellen"] }
   ],
   "keywords": [
-    { "germanBase": "Apfel", "article": "der", "translation": "apple", "wordType": "noun", "level": "A1" }
+    { "germanBase": "Apfel", "article": "der", "translation": "apple ({{NATIVE_LANGUAGE}})", "wordType": "noun", "level": "A1" }
+  ],
+  "quizQuestions": [
+    { "sentenceTemplate": "Im Café bestellt Lena ___ Apfelsaft.", "correctAnswer": "einen", "distractors": ["ein", "eine"], "audioSentence": "Im Café bestellt Lena einen Apfelsaft.", "hint": "Akkusativ, masculine" }
+  ],
+  "grammarNotes": [
+    { "title": "Accusative article", "exampleDe": "...", "exampleNative": "... ({{NATIVE_LANGUAGE}})", "description": "Explain in {{NATIVE_LANGUAGE}}.", "conjugationTable": [{ "pronoun": "der", "form": "den" }], "additionalExamples": [{ "de": "...", "native": "... ({{NATIVE_LANGUAGE}})" }] }
   ]
 }`;
 
@@ -151,11 +161,12 @@ OUTPUT — valid JSON ONLY, no markdown fences, no commentary:
   readonly stories = signal<AdminPlatformStoryListItem[]>([]);
   readonly storiesLoading = signal(false);
   readonly deletingStoryId = signal<string | null>(null);
+  readonly regeneratingAudioId = signal<string | null>(null);
 
   readonly storyCategories = STORY_CATEGORIES;
 
   constructor() {
-    addIcons({ arrowBackOutline, cloudUploadOutline, sparklesOutline, eyeOutline, eyeOffOutline, trashOutline });
+    addIcons({ arrowBackOutline, cloudUploadOutline, sparklesOutline, eyeOutline, eyeOffOutline, trashOutline, volumeHighOutline });
   }
 
   loadCollections(): void {
@@ -260,6 +271,23 @@ OUTPUT — valid JSON ONLY, no markdown fences, no commentary:
       ],
     });
     await alert.present();
+  }
+
+  regenerateStoryAudio(item: AdminPlatformStoryListItem): void {
+    if (this.regeneratingAudioId()) return;
+    this.regeneratingAudioId.set(item.id);
+    this.adminApi.regenerateStoryAudio(item.id).pipe(takeUntilDestroyed(this._destroyRef)).subscribe({
+      next: result => {
+        this.regeneratingAudioId.set(null);
+        void this._toast(
+          result.audioGenerated
+            ? `✓ Audio generated for "${result.title}"`
+            : `Audio generation failed for "${result.title}" — try again`,
+          result.audioGenerated ? 'success' : 'warning',
+        );
+      },
+      error: () => { this.regeneratingAudioId.set(null); void this._toast('Audio generation failed', 'danger'); },
+    });
   }
 
   switchTab(tab: 'collection' | 'json' | 'story' | 'manage'): void {

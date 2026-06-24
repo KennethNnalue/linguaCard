@@ -153,6 +153,7 @@ export class StoriesService {
       keywords: e.keywords ?? [],
       isLearned: e.isLearned ?? false,
       generationStatus: (e.generationStatus ?? 'complete'),
+      sourcePlatformStoryId: e.sourcePlatformStoryId ?? null,
     };
   }
 }

@@ -59,6 +59,10 @@ export class AdminApiService {
     return this.http.post<AdminImportStoryResult>(`${this.apiUrl}/platform-stories/import`, dto);
   }
 
+  regenerateStoryAudio(id: string): Observable<AdminImportStoryResult> {
+    return this.http.post<AdminImportStoryResult>(`${this.apiUrl}/platform-stories/${id}/generate-audio`, {});
+  }
+
   // ── Discount codes ─────────────────────────────────────────────────────────
 
   listDiscountCodes(): Observable<AdminDiscountCodeListItem[]> {

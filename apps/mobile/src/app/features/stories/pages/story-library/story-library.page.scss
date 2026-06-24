@@ -587,6 +587,22 @@
   ion-icon { font-size: 15px; }
 }
 
+.ss-mine-more {
+  width: 36px;
+  height: 36px;
+  flex: none;
+  border-radius: t.$lc-radius-full;
+  background: transparent;
+  border: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  color: var(--lc-ss-muted);
+
+  ion-icon { font-size: 18px; }
+}
+
 .ss-mine-empty {
   display: flex;
   flex-direction: column;

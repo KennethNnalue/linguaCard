@@ -337,13 +337,17 @@ json-server runs at `http://localhost:3000` with no prefix.
 | Dictionary batch lookup | — | `POST /api/v1/word-dictionary/batch-lookup` |
 | Dictionary stats (admin) | — | `GET /api/v1/word-dictionary/stats` |
 | Admin: import collection | — | `POST /api/v1/admin/platform-collections/import` |
-| Admin: import story | — | `POST /api/v1/admin/platform-stories/import` |
+| Admin: import story | — | `POST /api/v1/admin/platform-stories/import` (story JSON carries `nativeLang`, optional `quizQuestions`/`grammarNotes`) |
+| Admin: re-enrich story audio | — | `POST /api/v1/admin/platform-stories/:id/generate-audio` → `AdminImportStoryResult` (retry TTS for a story imported without audio) |
 | Admin: list platform collections | — | `GET /api/v1/admin/platform-collections` |
 | Admin: publish toggle | — | `PATCH /api/v1/admin/platform-collections/:id/publish` (body: `AdminPublishToggleDto`) |
 | Admin: set story category | — | `PATCH /api/v1/admin/platform-collections/:id/story-category` (body: `AdminSetStoryCategoryDto`) |
 | Platform collections list | — | `GET /api/v1/platform-collections` → `PlatformCollectionListResponse` (auth required) |
 | Platform collection detail | — | `GET /api/v1/platform-collections/:id` → `PlatformCollectionDetail` (auth required) |
 | Adopt platform collection | — | `POST /api/v1/platform-collections/:id/adopt` → `AdoptPlatformCollectionResult` (auth required; idempotent) |
+| Platform stories list | — | `GET /api/v1/platform-stories?nativeLang=&level=&category=` → `{ stories: PlatformStoryCard[]; total }` (each card has `adoptionStatus`/`adoptedStoryId`; auth required) |
+| Platform story detail | — | `GET /api/v1/platform-stories/:id` → `PlatformStory` (auth required) |
+| Adopt platform story | — | `POST /api/v1/platform-stories/:id/adopt` → `AdoptPlatformStoryResult` (auth required; idempotent — copies into the user's `stories` table with `sourcePlatformStoryId`) |
 
 **json-server filtering:**
 ```

@@ -10,6 +10,12 @@ import type {
 } from '@lingua-card/shared/domain';
 
 @Entity('stories')
+// A user can adopt a given platform story at most once. Partial index so the many
+// user-generated rows (source_platform_story_id IS NULL) are not constrained.
+@Index('uq_stories_user_source_platform', ['userId', 'sourcePlatformStoryId'], {
+  unique: true,
+  where: '"source_platform_story_id" IS NOT NULL',
+})
 export class StoryEntity {
   @PrimaryColumn()
   id!: string;
@@ -83,6 +89,11 @@ export class StoryEntity {
 
   @Column({ name: 'generation_status', type: 'varchar', length: 20, default: 'complete' })
   generationStatus!: StoryGenerationStatus;
+
+  /** Set when this story was adopted from a platform story; null = user-generated. */
+  @Index('idx_stories_source_platform_story')
+  @Column({ name: 'source_platform_story_id', type: 'varchar', nullable: true, default: null })
+  sourcePlatformStoryId!: string | null;
 
   @CreateDateColumn()
   generatedAt!: Date;

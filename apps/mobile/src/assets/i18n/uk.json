@@ -837,6 +837,10 @@
       "deleteAlertHeader": "Видалити історію",
       "deleteAlertMsg": "Видалити «{{title}}»? Аудіо також буде видалено.",
       "deleteActionBtn": "Видалити",
+      "removeAction": "Прибрати з моїх історій",
+      "removeAlertHeader": "Прибрати історію",
+      "removeAlertMsg": "Прибрати \"{{title}}\" з ваших історій? Вона залишиться доступною в Огляді.",
+      "removeActionBtn": "Прибрати",
       "extensionFailedToast": "Продовження не вдалося — спробуйте ще раз.",
       "eyebrow": "LINGUACARD",
       "searchAriaLabel": "Шукати історії",
@@ -999,6 +1003,13 @@
       "words": "слів",
       "min": "хв",
       "more": "+{{count}} ще"
+    },
+    "adopt": {
+      "addToMyStories": "Додати до моїх історій",
+      "openInMyStories": "Відкрити в моїх історіях",
+      "addedBadge": "Додано",
+      "successMessage": "Додано до ваших історій",
+      "errorMessage": "Не вдалося додати історію. Спробуйте ще раз."
     }
   },
   "settings": {

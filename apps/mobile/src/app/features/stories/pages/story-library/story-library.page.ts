@@ -31,6 +31,7 @@ import {
   chevronForwardOutline,
   cloudOfflineOutline,
   closeOutline,
+  ellipsisHorizontal,
 } from 'ionicons/icons';
 import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import type { Story, PlatformStoryCard, StoryDifficulty, StoryCategory } from '@lingua-card/shared/domain';
@@ -41,6 +42,7 @@ import { GenerateStorySheetComponent } from '../../components/generate-story-she
 import { SubscriptionStore } from '../../../subscription/store/subscription.store';
 import { PaywallModalComponent } from '../../../subscription/components/paywall-modal/paywall-modal.component';
 import { PlatformStoryApiService } from '../../services/platform-story-api.service';
+import { LanguageService } from '../../../../core/services/language.service';
 
 const LEVEL_FILTERS: Array<{ value: StoryDifficulty | null; label: string }> = [
   { value: null, label: 'All' },
@@ -72,6 +74,7 @@ export class StoryLibraryPage implements OnInit {
   private readonly platformApi         = inject(PlatformStoryApiService);
   private readonly actionSheetCtrl     = inject(ActionSheetController);
   private readonly translate           = inject(TranslateService);
+  private readonly languageService     = inject(LanguageService);
 
   // ── My Stories (user-generated) ──────────────────────────────────────────
   readonly stories       = this.storyStore.sortedStories;
@@ -94,11 +97,24 @@ export class StoryLibraryPage implements OnInit {
   readonly levelFilters    = LEVEL_FILTERS;
   readonly categoryFilters = STORY_CATEGORIES;
 
+  /** Platform-story ids the user already adopted, derived live from My Stories so
+   *  adopting one hides it from Explore immediately (no refetch needed). */
+  private readonly adoptedPlatformIds = computed(() => {
+    const ids = new Set<string>();
+    for (const s of this.stories()) {
+      if (s.sourcePlatformStoryId) ids.add(s.sourcePlatformStoryId);
+    }
+    return ids;
+  });
+
   readonly filteredPlatformStories = computed(() => {
     const level    = this.selectedLevel();
     const category = this.selectedCategory();
     const query    = this.searchQuery().trim().toLowerCase();
+    const adopted  = this.adoptedPlatformIds();
     return this.platformStories().filter(s => {
+      // Already-added platform stories live under "My Stories" — hide them from Explore.
+      if (s.adoptionStatus === 'adopted' || adopted.has(s.id)) return false;
       if (level    && s.level    !== level)    return false;
       if (category && s.category !== category) return false;
       if (query    && !s.title.toLowerCase().includes(query)) return false;
@@ -180,6 +196,7 @@ export class StoryLibraryPage implements OnInit {
     addIcons({
       bookOutline, addOutline, play, playOutline, searchOutline, sparklesOutline,
       chevronDownCircleOutline, chevronForwardOutline, cloudOfflineOutline, closeOutline,
+      ellipsisHorizontal,
     });
 
     effect(async () => {
@@ -303,10 +320,16 @@ export class StoryLibraryPage implements OnInit {
 
   async openMoreSheet(event: Event, story: Story): Promise<void> {
     event.stopPropagation();
+    // Adopted platform stories are "removed from my stories" (the platform copy is
+    // untouched); user-generated stories are "deleted" outright. Both just drop the
+    // user's own Story row, but the wording differs so the action reads correctly.
+    const adopted = !!story.sourcePlatformStoryId;
     const sheet = await this.actionSheetCtrl.create({
       buttons: [
         {
-          text: this.translate.instant('stories.library.deleteAction'),
+          text: this.translate.instant(
+            adopted ? 'stories.library.removeAction' : 'stories.library.deleteAction',
+          ),
           role: 'destructive',
           handler: () => this.confirmDelete(story),
         },
@@ -317,13 +340,21 @@ export class StoryLibraryPage implements OnInit {
   }
 
   private async confirmDelete(story: Story): Promise<void> {
+    const adopted = !!story.sourcePlatformStoryId;
     const alert = await this.alertCtrl.create({
-      header: this.translate.instant('stories.library.deleteAlertHeader'),
-      message: this.translate.instant('stories.library.deleteAlertMsg', { title: story.title }),
+      header: this.translate.instant(
+        adopted ? 'stories.library.removeAlertHeader' : 'stories.library.deleteAlertHeader',
+      ),
+      message: this.translate.instant(
+        adopted ? 'stories.library.removeAlertMsg' : 'stories.library.deleteAlertMsg',
+        { title: story.title },
+      ),
       buttons: [
         { text: this.translate.instant('common.cancel'), role: 'cancel' },
         {
-          text: this.translate.instant('stories.library.deleteActionBtn'),
+          text: this.translate.instant(
+            adopted ? 'stories.library.removeActionBtn' : 'stories.library.deleteActionBtn',
+          ),
           role: 'destructive',
           handler: () => this.storyStore.deleteStory(story.id),
         },
@@ -383,7 +414,7 @@ export class StoryLibraryPage implements OnInit {
   private loadPlatformStories(): void {
     this.isLoadingExplore.set(true);
     this.exploreError.set(false);
-    this.platformApi.getAll({ limit: 20 }).subscribe({
+    this.platformApi.getAll({ limit: 20, nativeLang: this.languageService.current() }).subscribe({
       next: res => {
         this.platformStories.set(res.stories);
         this.isLoadingExplore.set(false);

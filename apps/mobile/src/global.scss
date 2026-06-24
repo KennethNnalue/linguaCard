@@ -72,3 +72,25 @@ lc-import-review ion-content::part(scroll) {
   --height: auto;
   --max-height: 80vh;
 }
+
+/* Confirmation / alert dialogs.
+ * Bind the surface and text to LDS tokens so the title and message keep readable
+ * contrast in BOTH themes. Ionic's defaults render the message at a near-invisible
+ * grey (~#737373) and let the wrapper background drift from the app surface, which
+ * left dark-mode alerts with light-on-light text.
+ *
+ * Ionic's own scoped rules (`.sc-ion-alert-*`, the `:host` scope class) out-rank a
+ * plain `ion-alert` selector, so the `.hydrated` qualifier and the doubled class
+ * names below exist purely to win the specificity match without `!important`. */
+ion-alert.hydrated {
+  --background: var(--lc-card-elevated);
+
+  .alert-title.alert-title {
+    color: var(--lc-text-primary);
+  }
+
+  .alert-sub-title.alert-sub-title,
+  .alert-message.alert-message {
+    color: var(--lc-text-secondary);
+  }
+}

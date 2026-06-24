@@ -910,6 +910,10 @@
       "deleteAlertHeader": "Delete story",
       "deleteAlertMsg": "Remove \"{{title}}\"? The audio will also be deleted.",
       "deleteActionBtn": "Delete",
+      "removeAction": "Remove from my stories",
+      "removeAlertHeader": "Remove story",
+      "removeAlertMsg": "Remove \"{{title}}\" from your stories? It stays available in Explore.",
+      "removeActionBtn": "Remove",
       "extensionFailedToast": "Extension failed — please try again.",
       "eyebrow": "LINGUACARD",
       "searchAriaLabel": "Search stories",
@@ -1072,6 +1076,13 @@
       "finishBtn": "Finish quiz",
       "hintLabel": "HINT",
       "playSentenceAriaLabel": "Play sentence"
+    },
+    "adopt": {
+      "addToMyStories": "Add to my stories",
+      "openInMyStories": "Open in my stories",
+      "addedBadge": "Added",
+      "successMessage": "Added to your stories",
+      "errorMessage": "Couldn't add this story. Try again."
     }
   },
   "settings": {

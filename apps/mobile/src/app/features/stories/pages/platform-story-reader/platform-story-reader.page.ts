@@ -11,11 +11,12 @@ import {
   viewChildren,
 } from '@angular/core';
 import { TitleCasePipe } from '@angular/common';
-import { TranslatePipe } from '@ngx-translate/core';
+import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import {
   IonContent,
   IonIcon,
+  ToastController,
   ViewWillLeave,
 } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
@@ -26,6 +27,7 @@ import type {
   UserStoryProgress,
 } from '@lingua-card/shared/domain';
 import { STORY_CATEGORIES } from '@lingua-card/shared/domain';
+import { StoryStore } from '../../store/story.store';
 import { PlatformStoryLoaderService } from '../../services/platform-story-loader.service';
 import { StoryAudioEngine } from '../../services/story-audio-engine.service';
 import { StoryReaderInteractionService } from '../../services/story-reader-interaction.service';
@@ -33,6 +35,7 @@ import { WordAudioService } from '../../../../shared/audio/word-audio.service';
 import { QuizTabComponent } from '../../components/quiz-tab/quiz-tab.component';
 import { KeywordsTabComponent } from '../../components/keywords-tab/keywords-tab.component';
 import { GrammarTabComponent } from '../../components/grammar-tab/grammar-tab.component';
+import { ButtonComponent } from '../../../../shared/ui/button/button.component';
 import { StoryWordSheetService } from '../../services/story-word-sheet.service';
 import { StoryTokenizerService } from '../../services/story-tokenizer.service';
 import type { ReaderTab, WordDetail, WordToken } from '../../models/reader.model';
@@ -53,6 +56,7 @@ const PLATFORM_SPEEDS = [0.75, 0.95, 1.0, 1.25, 1.5];
     QuizTabComponent,
     KeywordsTabComponent,
     GrammarTabComponent,
+    ButtonComponent,
   ],
 })
 export class PlatformStoryReaderPage implements OnInit, ViewWillLeave {
@@ -65,10 +69,21 @@ export class PlatformStoryReaderPage implements OnInit, ViewWillLeave {
   private readonly wordAudio = inject(WordAudioService);
   private readonly wordSheet = inject(StoryWordSheetService);
   private readonly tokenizer = inject(StoryTokenizerService);
+  private readonly storyStore = inject(StoryStore);
+  private readonly toastCtrl = inject(ToastController);
+  private readonly translate = inject(TranslateService);
 
   readonly story = signal<PlatformStory | null>(null);
   readonly progress = signal<UserStoryProgress | null>(null);
   readonly isLoading = signal(false);
+  readonly adopting = signal(false);
+
+  /** The user's adopted copy of this platform story (if any) — drives the CTA state. */
+  readonly adoptedStoryId = computed<string | null>(() => {
+    const s = this.story();
+    if (!s) return null;
+    return this.storyStore.stories().find(st => st.sourcePlatformStoryId === s.id)?.id ?? null;
+  });
 
   readonly activeTab = signal<ReaderTab>('story');
   readonly showTranslation = signal(false);
@@ -148,6 +163,9 @@ export class PlatformStoryReaderPage implements OnInit, ViewWillLeave {
 
     this.story.set(result.story);
     this.progress.set(result.progress);
+
+    // Load the user's stories so we can tell whether this one was already adopted.
+    void this.storyStore.ensureLoaded();
 
     const { audioUrl, wordTimestamps, audioDurationMs, sentences } = result.story;
     if (audioUrl) {
@@ -245,6 +263,39 @@ export class PlatformStoryReaderPage implements OnInit, ViewWillLeave {
   /** Sentence-level karaoke: the sentence currently being spoken. */
   isSentenceActive(sentenceIdx: number): boolean {
     return this.activeSentenceIdx() === sentenceIdx;
+  }
+
+  /**
+   * "Add to my stories": adopt this platform story into the user's library, then
+   * open the user-story reader (which has the cross-story player/playlist). If it
+   * was already adopted, just open the existing copy.
+   */
+  async addToMyStories(): Promise<void> {
+    const existing = this.adoptedStoryId();
+    if (existing) {
+      void this.router.navigate(['/stories', existing]);
+      return;
+    }
+
+    const s = this.story();
+    if (!s || this.adopting()) return;
+
+    this.adopting.set(true);
+    const adopted = await this.storyStore.adoptPlatformStory(s.id);
+    this.adopting.set(false);
+
+    if (!adopted) {
+      void this._toast(this.translate.instant('stories.adopt.errorMessage'), 'danger');
+      return;
+    }
+    this.engine.pause();
+    void this._toast(this.translate.instant('stories.adopt.successMessage'), 'success');
+    void this.router.navigate(['/stories', adopted.id]);
+  }
+
+  private async _toast(message: string, color: 'success' | 'danger'): Promise<void> {
+    const t = await this.toastCtrl.create({ message, duration: 3000, color, position: 'bottom' });
+    await t.present();
   }
 
   goBack(): void {

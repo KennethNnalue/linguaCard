@@ -77,4 +77,10 @@ export class AdminController {
   importStory(@Body() dto: AdminImportStoryDto): Promise<AdminImportStoryResult> {
     return this.adminService.importStory(dto);
   }
+
+  @Post('platform-stories/:id/generate-audio')
+  @HttpCode(200)
+  regenerateStoryAudio(@Param('id') id: string): Promise<AdminImportStoryResult> {
+    return this.adminService.regenerateStoryAudio(id);
+  }
 }

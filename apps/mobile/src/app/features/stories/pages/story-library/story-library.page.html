@@ -209,6 +209,10 @@
                       [attr.aria-label]="'stories.library.playAriaLabel' | translate">
                 <ion-icon name="play"></ion-icon>
               </button>
+              <button class="ss-mine-more" (click)="openMoreSheet($event, story)"
+                      [attr.aria-label]="'stories.library.moreOptionsAriaLabel' | translate">
+                <ion-icon name="ellipsis-horizontal"></ion-icon>
+              </button>
             </div>
           }
         </div>

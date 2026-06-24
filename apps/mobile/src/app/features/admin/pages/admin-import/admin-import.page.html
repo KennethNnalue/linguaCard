@@ -341,6 +341,13 @@
                 {{ story.isPublished ? 'Live' : 'Draft' }}
               </span>
               <button
+                class="adm-icon-btn"
+                [disabled]="regeneratingAudioId() === story.id"
+                (click)="regenerateStoryAudio(story)"
+                [attr.aria-label]="'Generate audio for ' + story.title">
+                <ion-icon name="volume-high-outline"></ion-icon>
+              </button>
+              <button
                 class="adm-delete-btn"
                 [disabled]="deletingStoryId() === story.id"
                 (click)="deleteStory(story)"

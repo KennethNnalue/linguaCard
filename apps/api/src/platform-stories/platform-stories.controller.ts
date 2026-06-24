@@ -1,6 +1,6 @@
 import {
   Controller, Get, Post, Param, Body, Query, ParseIntPipe,
-  DefaultValuePipe,
+  DefaultValuePipe, HttpCode,
 } from '@nestjs/common';
 import { PlatformStoriesService } from './platform-stories.service';
 import { CurrentUser } from '../common/decorators/current-user.decorator';
@@ -10,21 +10,24 @@ import type { StoryDifficulty, StoryCategory } from '@lingua-card/shared/domain'
 export class PlatformStoriesController {
   constructor(private readonly service: PlatformStoriesService) {}
 
-  /** GET /platform-stories?level=A1&category=travel&limit=20&offset=0 */
+  /** GET /platform-stories?level=A1&category=travel&nativeLang=en&limit=20&offset=0 */
   @Get()
   findAll(
+    @CurrentUser() userId: string,
     @Query('level') level?: StoryDifficulty,
     @Query('category') category?: StoryCategory,
     @Query('isFiction') isFiction?: string,
     @Query('isPremium') isPremium?: string,
+    @Query('nativeLang') nativeLang?: string,
     @Query('limit', new DefaultValuePipe(20), ParseIntPipe) limit?: number,
     @Query('offset', new DefaultValuePipe(0), ParseIntPipe) offset?: number,
   ) {
-    return this.service.findAll({
+    return this.service.findAll(userId, {
       level,
       category,
       isFiction:  isFiction  !== undefined ? isFiction  === 'true' : undefined,
       isPremium:  isPremium  !== undefined ? isPremium  === 'true' : undefined,
+      nativeLang,
       limit,
       offset,
     });
@@ -49,6 +52,16 @@ export class PlatformStoriesController {
     @Param('id') id: string,
   ) {
     return this.service.getUserProgress(userId, id);
+  }
+
+  /** POST /platform-stories/:id/adopt — copy into the user's own stories (idempotent) */
+  @Post(':id/adopt')
+  @HttpCode(200)
+  adopt(
+    @CurrentUser() userId: string,
+    @Param('id') id: string,
+  ) {
+    return this.service.adopt(userId, id);
   }
 
   /** POST /platform-stories/:id/read */

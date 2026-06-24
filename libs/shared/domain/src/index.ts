@@ -491,6 +491,34 @@ export type StoryDifficulty = 'A1' | 'A2' | 'B1' | 'B2';
 export type StoryLength = 'short' | 'medium' | 'long' | 'very-long' | 'extra-long';
 export type AIProviderType = 'anthropic' | 'openai' | 'gemini' | 'openrouter';
 
+/**
+ * Canonical word-count range per story length band — the single source of truth
+ * shared by story generation (prompt word targets) and length inference for
+ * legacy rows that predate the stored `lengthType`. Keep bands ordered shortest
+ * → longest; {@link storyLengthFromWordCount} relies on that order.
+ */
+export const STORY_LENGTH_WORD_RANGES: Record<StoryLength, { min: number; max: number }> = {
+  'short':      { min: 80,   max: 150 },
+  'medium':     { min: 200,  max: 320 },
+  'long':       { min: 400,  max: 520 },
+  'very-long':  { min: 700,  max: 900 },
+  'extra-long': { min: 1100, max: 1400 },
+};
+
+const STORY_LENGTH_ORDER: StoryLength[] = ['short', 'medium', 'long', 'very-long', 'extra-long'];
+
+/**
+ * Infer the length band for a story from its word count. Used as a fallback when a
+ * row has no stored `lengthType`. Bucketed by each band's upper bound so it stays
+ * consistent with the word targets fed to the generation prompt.
+ */
+export function storyLengthFromWordCount(words: number): StoryLength {
+  for (const band of STORY_LENGTH_ORDER) {
+    if (words <= STORY_LENGTH_WORD_RANGES[band].max) return band;
+  }
+  return 'extra-long';
+}
+
 // ─── RESILIENT STORY GENERATION ──────────────────────────────────────────────
 
 /**
@@ -535,6 +563,12 @@ export interface Story {
   isLearned?: boolean;
   modelUsed?: string | null;
   generationStatus: StoryGenerationStatus;
+  /**
+   * Set when this story was adopted ("Added to my stories") from a platform
+   * story. null/absent = user-generated. Used to dedup adoption and to filter
+   * already-adopted stories out of the Explore catalogue.
+   */
+  sourcePlatformStoryId?: string | null;
 }
 
 export interface GenerateStoryDto {
@@ -754,7 +788,11 @@ export interface PlatformStory {
   estimatedReadMinutes: number;
   publishedAt: string;
   readCount: number;
+  /** Story length band. Falls back to a word-count-derived value for older rows. */
+  lengthType: StoryLength;
 }
+
+export type StoryAdoptionStatus = 'not-adopted' | 'adopted';
 
 /** Lightweight card for browse/list views — no body text or full data */
 export interface PlatformStoryCard {
@@ -771,6 +809,19 @@ export interface PlatformStoryCard {
   estimatedReadMinutes: number;
   keywordCount: number;
   quizCount: number;
+  /** Story length band. Falls back to a word-count-derived value for older rows. */
+  lengthType: StoryLength;
+  /** Whether the current user has already added this platform story to their stories. */
+  adoptionStatus: StoryAdoptionStatus;
+  /** ID of the user's Story entity if already adopted, null otherwise. */
+  adoptedStoryId: string | null;
+}
+
+/** Result of POST /platform-stories/:id/adopt — the copied user-owned Story. */
+export interface AdoptPlatformStoryResult {
+  story: Story;
+  /** False when the story was already adopted (idempotent no-op). */
+  created: boolean;
 }
 
 /** User's reading progress on a platform story */
@@ -960,13 +1011,40 @@ export interface GeneratedPlatformStoryKeyword {
   level: CefrLevel;
 }
 
+/** Quiz question as supplied in the import JSON (id is assigned server-side). */
+export interface GeneratedPlatformStoryQuiz {
+  sentenceTemplate: string;
+  correctAnswer: string;
+  distractors: string[];
+  audioSentence?: string;
+  hint?: string;
+}
+
+/** Grammar note as supplied in the import JSON (id is assigned server-side). */
+export interface GeneratedPlatformStoryGrammar {
+  title: string;
+  exampleDe: string;
+  exampleNative: string;
+  description: string;
+  conjugationTable?: Array<{ pronoun: string; form: string }>;
+  additionalExamples: Array<{ de: string; native: string }>;
+}
+
 export interface GeneratedPlatformStory {
   title: string;
   titleTranslation: string;
   level: CefrLevel;
   topic: CollectionTopic;
+  /** ISO code of the translation language used in `sentences[].native`. Defaults to 'en' when omitted. */
+  nativeLang?: LanguageCode;
+  /** Story length band. Defaults to 'short' for A1/A2 and 'medium' otherwise when omitted. */
+  length?: StoryLength;
   sentences: GeneratedPlatformStorySentence[];
   keywords: GeneratedPlatformStoryKeyword[];
+  /** Optional — when present, imported with the story so it aligns with user-generated stories. */
+  quizQuestions?: GeneratedPlatformStoryQuiz[];
+  /** Optional — when present, imported with the story so it aligns with user-generated stories. */
+  grammarNotes?: GeneratedPlatformStoryGrammar[];
 }
 
 export interface AdminImportStoryDto {

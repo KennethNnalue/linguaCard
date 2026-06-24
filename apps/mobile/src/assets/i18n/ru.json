@@ -837,6 +837,10 @@
       "deleteAlertHeader": "Удалить рассказ",
       "deleteAlertMsg": "Удалить «{{title}}»? Аудио тоже будет удалено.",
       "deleteActionBtn": "Удалить",
+      "removeAction": "Убрать из моих историй",
+      "removeAlertHeader": "Убрать историю",
+      "removeAlertMsg": "Убрать \"{{title}}\" из ваших историй? Она останется доступной в Обзоре.",
+      "removeActionBtn": "Убрать",
       "extensionFailedToast": "Продолжение не удалось — попробуйте ещё раз.",
       "eyebrow": "LINGUACARD",
       "searchAriaLabel": "Искать истории",
@@ -999,6 +1003,13 @@
       "words": "слов",
       "min": "мин",
       "more": "+{{count}} ещё"
+    },
+    "adopt": {
+      "addToMyStories": "Добавить в мои истории",
+      "openInMyStories": "Открыть в моих историях",
+      "addedBadge": "Добавлено",
+      "successMessage": "Добавлено в ваши истории",
+      "errorMessage": "Не удалось добавить историю. Попробуйте снова."
     }
   },
   "settings": {

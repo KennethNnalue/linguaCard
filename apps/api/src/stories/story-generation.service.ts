@@ -36,6 +36,37 @@ const LANGUAGE_NAMES: Record<string, string> = {
 
 const MIN_RECOVERABLE_SENTENCES = 5;
 
+/**
+ * Loosely-typed object parsed from an LLM JSON response. Every field is `unknown`
+ * and must be validated before use — the `parseEnrichmentSections` validators do
+ * exactly that. Listing the fields explicitly (rather than an index signature)
+ * keeps `noPropertyAccessFromIndexSignature` happy while staying type-safe.
+ */
+interface RawRecord {
+  id?: unknown;
+  sentenceTemplate?: unknown;
+  correctAnswer?: unknown;
+  distractors?: unknown;
+  audioSentence?: unknown;
+  hint?: unknown;
+  title?: unknown;
+  description?: unknown;
+  exampleDe?: unknown;
+  exampleNative?: unknown;
+  conjugationTable?: unknown;
+  additionalExamples?: unknown;
+  pronoun?: unknown;
+  form?: unknown;
+  de?: unknown;
+  native?: unknown;
+  german?: unknown;
+  germanBase?: unknown;
+  translation?: unknown;
+  article?: unknown;
+  wordType?: unknown;
+  level?: unknown;
+}
+
 interface GeneratedSentence {
   german: string;
   native: string;
@@ -104,7 +135,8 @@ export class StoryGenerationService {
 
     this.logger.log(`Generating story for userId=${userId} tier=${tier} model=${model} nativeLang=${nativeLangName}`);
 
-    const { content, isPartial } = await this.generateTextWithModel(dto, cards, model, nativeLangName);
+    const generated = await this.generateStoryWithEnrichment(dto, cards, model, nativeLangName);
+    const { content, isPartial } = generated;
 
     const vocabWords: StoryVocabWord[] = cards.map(card => ({
       cardId: card.id,
@@ -138,11 +170,19 @@ export class StoryGenerationService {
         .map(v => v.cardId),
     }));
 
-    // Generate quiz, grammar, and keywords concurrently — failures don't block save
+    // The combined call usually returns quiz/grammar/keywords inline (no extra LLM
+    // calls). Only generate a section separately when the combined response omitted
+    // it (empty), or for the extra-long path which generates story text only.
     const [quizQuestions, grammarNotes, aiKeywords] = await Promise.all([
-      this.generateQuizQuestions(sentences, dto.difficulty, model, nativeLangName),
-      this.generateGrammarNotes(sentences, dto.difficulty, model, nativeLangName),
-      this.generateKeywords(sentences, dto.difficulty, model, nativeLangName),
+      generated.quizQuestions.length
+        ? Promise.resolve(generated.quizQuestions)
+        : this.generateQuizQuestions(sentences, dto.difficulty, model, nativeLangName),
+      generated.grammarNotes.length
+        ? Promise.resolve(generated.grammarNotes)
+        : this.generateGrammarNotes(sentences, dto.difficulty, model, nativeLangName),
+      generated.keywords.length
+        ? Promise.resolve(generated.keywords)
+        : this.generateKeywords(sentences, dto.difficulty, model, nativeLangName),
     ]);
 
     // Merge AI keywords with vault words; enrich known words from dictionary
@@ -353,6 +393,170 @@ export class StoryGenerationService {
     return settled.map((r, i) => r.status === 'fulfilled' ? r.value : keywords[i]);
   }
 
+  /**
+   * Single-call story generation. Asks the model for the story plus its quiz,
+   * grammar notes, and keywords in one JSON payload — cutting four LLM calls down
+   * to one. Returns the parsed sections (possibly empty, in which case
+   * {@link generateAndSave} falls back to the per-section generators). The
+   * 'extra-long' podcast format keeps its dedicated story-only prompt and lets the
+   * enrichment sections fall back.
+   */
+  private async generateStoryWithEnrichment(
+    dto: GenerateStoryDto,
+    cards: CardEntity[],
+    model: string,
+    nativeLanguage = 'English',
+  ): Promise<{
+    content: GeneratedStoryContent;
+    quizQuestions: StoryQuizQuestion[];
+    grammarNotes: StoryGrammarNote[];
+    keywords: StoryKeyword[];
+    isPartial: boolean;
+  }> {
+    if (dto.length === 'extra-long') {
+      const { content, isPartial } = await this.generateTextWithModel(dto, cards, model, nativeLanguage);
+      return { content, quizQuestions: [], grammarNotes: [], keywords: [], isPartial };
+    }
+
+    const prompt = this.promptBuilder.buildCombined(dto, cards, nativeLanguage);
+
+    let rawText: string;
+    try {
+      const response = await this.openRouter.generateText({
+        messages:  [{ role: 'user', content: prompt }],
+        maxTokens: 12288,
+        model,
+      });
+      rawText = response.text;
+      this.logger.log(`Story (combined) generated | model=${response.model} | ${response.inputTokens}in/${response.outputTokens}out tokens`);
+    } catch (err) {
+      this.logger.error('AI text generation error', err);
+      throw new InternalServerErrorException('Story generation failed. Please try again.');
+    }
+
+    const { content, sentenceCount, wasRecovered } = recoverStoryContent(rawText);
+
+    if (!content || sentenceCount < MIN_RECOVERABLE_SENTENCES) {
+      this.logger.error('Story parse failed — recovery found < MIN sentences. Raw response:', rawText);
+      throw new InternalServerErrorException('Story generation returned invalid data.');
+    }
+
+    const sections = this.parseEnrichmentSections(rawText);
+
+    if (wasRecovered) {
+      this.logger.warn(
+        `Combined story parse recovered ${sentenceCount} sentences — enrichment sections may fall back.`,
+        { sentenceCount },
+      );
+    }
+
+    return { content, isPartial: wasRecovered, ...sections };
+  }
+
+  /**
+   * Extracts the quiz/grammar/keywords arrays from a combined-generation payload.
+   * Each item is validated and normalized — malformed items are dropped rather than
+   * persisted, and a section that ends up empty makes the caller fall back to the
+   * per-section generators. Keywords get `cardId: null` (mergeKeywords stamps it later).
+   */
+  private parseEnrichmentSections(rawText: string): {
+    quizQuestions: StoryQuizQuestion[];
+    grammarNotes: StoryGrammarNote[];
+    keywords: StoryKeyword[];
+  } {
+    try {
+      const fenced = rawText.match(/```(?:json)?\s*([\s\S]*?)\s*```/i)?.[1] ?? rawText;
+      const cleaned = fenced.trim();
+      const first = cleaned.indexOf('{');
+      const last = cleaned.lastIndexOf('}');
+      const json = first !== -1 && last > first ? cleaned.slice(first, last + 1) : cleaned;
+      const parsed = JSON.parse(json) as {
+        quizQuestions?: unknown; grammarNotes?: unknown; keywords?: unknown;
+      };
+      return {
+        quizQuestions: this.coerceArray(parsed.quizQuestions, q => this.toQuizQuestion(q)),
+        grammarNotes:  this.coerceArray(parsed.grammarNotes,  g => this.toGrammarNote(g)),
+        keywords:      this.coerceArray(parsed.keywords,      k => this.toKeyword(k)),
+      };
+    } catch {
+      return { quizQuestions: [], grammarNotes: [], keywords: [] };
+    }
+  }
+
+  /** Map an unknown array through a validator, dropping items it rejects (null). */
+  private coerceArray<T>(value: unknown, map: (item: RawRecord) => T | null): T[] {
+    if (!Array.isArray(value)) return [];
+    const out: T[] = [];
+    for (const item of value) {
+      if (!this.isRecord(item)) continue;
+      const mapped = map(item);
+      if (mapped !== null) out.push(mapped);
+    }
+    return out;
+  }
+
+  private isRecord(v: unknown): v is RawRecord {
+    return typeof v === 'object' && v !== null && !Array.isArray(v);
+  }
+
+  private isNonEmptyString(v: unknown): v is string {
+    return typeof v === 'string' && v.trim().length > 0;
+  }
+
+  private toQuizQuestion(q: RawRecord): StoryQuizQuestion | null {
+    if (!this.isNonEmptyString(q.sentenceTemplate) || !this.isNonEmptyString(q.correctAnswer)) return null;
+    const distractors = Array.isArray(q.distractors) ? q.distractors.filter(this.isNonEmptyString) : [];
+    if (distractors.length < 2) return null;
+    return {
+      id: this.isNonEmptyString(q.id) ? q.id : randomUUID(),
+      sentenceTemplate: q.sentenceTemplate,
+      correctAnswer: q.correctAnswer,
+      distractors,
+      audioSentence: this.isNonEmptyString(q.audioSentence) ? q.audioSentence : undefined,
+      hint: this.isNonEmptyString(q.hint) ? q.hint : undefined,
+    };
+  }
+
+  private toGrammarNote(g: RawRecord): StoryGrammarNote | null {
+    if (!this.isNonEmptyString(g.title) || !this.isNonEmptyString(g.description)) return null;
+    const conjugationTable = Array.isArray(g.conjugationTable)
+      ? g.conjugationTable.filter((r): r is RawRecord => this.isRecord(r))
+          .filter(r => this.isNonEmptyString(r.pronoun) && this.isNonEmptyString(r.form))
+          .map(r => ({ pronoun: r.pronoun as string, form: r.form as string }))
+      : undefined;
+    const additionalExamples = Array.isArray(g.additionalExamples)
+      ? g.additionalExamples.filter((r): r is RawRecord => this.isRecord(r))
+          .filter(r => this.isNonEmptyString(r.de) && this.isNonEmptyString(r.native))
+          .map(r => ({ de: r.de as string, native: r.native as string }))
+      : [];
+    return {
+      id: this.isNonEmptyString(g.id) ? g.id : randomUUID(),
+      title: g.title,
+      exampleDe: this.isNonEmptyString(g.exampleDe) ? g.exampleDe : '',
+      exampleNative: this.isNonEmptyString(g.exampleNative) ? g.exampleNative : '',
+      description: g.description,
+      conjugationTable,
+      additionalExamples,
+    };
+  }
+
+  private toKeyword(k: RawRecord): StoryKeyword | null {
+    if (!this.isNonEmptyString(k.germanBase) || !this.isNonEmptyString(k.translation)) return null;
+    const articles: StoryKeyword['article'][] = ['der', 'die', 'das', null];
+    const wordTypes: StoryKeyword['wordType'][] = ['noun', 'verb', 'adjective', 'adverb', 'other'];
+    const levels: StoryKeyword['level'][] = ['A1', 'A2', 'B1', 'B2', 'C1', 'C2'];
+    const article = (articles as unknown[]).includes(k.article) ? k.article as StoryKeyword['article'] : null;
+    return {
+      cardId: null,
+      german: this.isNonEmptyString(k.german) ? k.german : k.germanBase,
+      germanBase: k.germanBase,
+      translation: k.translation,
+      article,
+      wordType: wordTypes.includes(k.wordType as StoryKeyword['wordType']) ? k.wordType as StoryKeyword['wordType'] : 'other',
+      level: levels.includes(k.level as StoryKeyword['level']) ? k.level as StoryKeyword['level'] : 'A1',
+    };
+  }
+
   private async generateTextWithModel(
     dto: GenerateStoryDto,
     cards: CardEntity[],
@@ -415,7 +619,7 @@ export class StoryGenerationService {
       throw new InternalServerErrorException('Story extension failed. Please try again.');
     }
 
-    const { content, sentenceCount } = recoverStoryContent(rawText);
+    const { content, sentenceCount, wasRecovered } = recoverStoryContent(rawText);
 
     if (!content || sentenceCount === 0) {
       this.logger.warn('Story extension returned no usable sentences — story remains partial.');
@@ -432,13 +636,25 @@ export class StoryGenerationService {
     }));
 
     entity.sentences = [...existingSentences, ...newSentences];
-    entity.generationStatus = 'complete';
+
+    // Mark complete only once the story reaches its length target AND this pass
+    // wasn't itself truncated. Otherwise keep it 'partial' so it can be extended
+    // again. This lets a partial story of ANY length (short → extra-long) be
+    // finished across one or more passes, instead of force-completing after a
+    // single pass — which previously left longer stories permanently short.
+    const target = this.promptBuilder.targetCountForLength(entity.lengthType);
+    const isComplete = !wasRecovered && entity.sentences.length >= target;
+    entity.generationStatus = isComplete ? 'complete' : 'partial';
     entity.bodyDe = entity.sentences.map(s => s.german).join(' ');
     entity.bodyNative = entity.sentences.map(s => s.native).join(' ');
 
     const saved = await this.storyRepo.save(entity);
 
-    void this.regenerateAudioForExtended(saved);
+    // Only (re)generate narration once the story is actually finished — avoids a
+    // TTS call on every intermediate extension pass (keeps AI/TTS usage minimal).
+    if (isComplete) {
+      void this.regenerateAudioForExtended(saved);
+    }
 
     return this.toModel(saved);
   }

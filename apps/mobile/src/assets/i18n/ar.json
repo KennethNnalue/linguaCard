@@ -837,6 +837,10 @@
       "deleteAlertHeader": "حذف القصة",
       "deleteAlertMsg": "هل تريد إزالة \"{{title}}\"؟ سيتم حذف الصوت أيضًا.",
       "deleteActionBtn": "حذف",
+      "removeAction": "إزالة من قصصي",
+      "removeAlertHeader": "إزالة القصة",
+      "removeAlertMsg": "إزالة \"{{title}}\" من قصصك؟ ستظل متاحة في الاستكشاف.",
+      "removeActionBtn": "إزالة",
       "extensionFailedToast": "فشل التمديد — يرجى المحاولة مرة أخرى.",
       "eyebrow": "LINGUACARD",
       "searchAriaLabel": "البحث في القصص",
@@ -999,6 +1003,13 @@
       "words": "كلمات",
       "min": "دقيقة",
       "more": "+{{count}} أخرى"
+    },
+    "adopt": {
+      "addToMyStories": "أضف إلى قصصي",
+      "openInMyStories": "افتح في قصصي",
+      "addedBadge": "تمت الإضافة",
+      "successMessage": "تمت الإضافة إلى قصصك",
+      "errorMessage": "تعذّر إضافة القصة. حاول مرة أخرى."
     }
   },
   "settings": {

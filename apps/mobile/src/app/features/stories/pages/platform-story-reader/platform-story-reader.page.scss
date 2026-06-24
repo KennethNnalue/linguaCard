@@ -304,6 +304,10 @@
   border-radius: t.$lc-space-3;
 }
 
+.psr-adopt-cta {
+  margin-top: t.$lc-space-3;
+}
+
 // ── Loading / error states ─────────────────────────────────────────────────
 .psr-loading {
   display: flex; align-items: center; justify-content: center; min-height: 60vh;

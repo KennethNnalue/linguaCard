@@ -1,18 +1,17 @@
 import { Injectable } from '@nestjs/common';
 import type { GenerateStoryDto, StoryDifficulty, StoryLength, StorySentence } from '@lingua-card/shared/domain';
-import { calculateQuizCount } from '@lingua-card/shared/domain';
+import { calculateQuizCount, STORY_LENGTH_WORD_RANGES } from '@lingua-card/shared/domain';
 import type { CardEntity } from '../cards/card.entity';
 import type { StoryEntity } from './story.entity';
 
 @Injectable()
 export class StoryPromptBuilder {
-  private readonly wordTargets: Record<StoryLength, string> = {
-    'short': '80–150',
-    'medium': '200–320',
-    'long': '400–520',
-    'very-long': '700–900',
-    'extra-long': '1100–1400',
-  };
+  /** "min–max" word-count target per length band, derived from the canonical
+   *  ranges so the prompt and length inference never drift apart. */
+  private readonly wordTargets: Record<StoryLength, string> = Object.fromEntries(
+    (Object.entries(STORY_LENGTH_WORD_RANGES) as Array<[StoryLength, { min: number; max: number }]>)
+      .map(([band, { min, max }]) => [band, `${min}–${max}`]),
+  ) as Record<StoryLength, string>;
 
   private readonly cefrDescriptions: Record<StoryDifficulty, string> = {
     'A1': 'extremely simple, present tense only, 3–5 word sentences, most basic vocabulary',
@@ -26,6 +25,67 @@ export class StoryPromptBuilder {
       return this.buildExtraLongPrompt(dto, cards, nativeLanguage);
     }
     return this.buildStandardPrompt(dto, cards, nativeLanguage);
+  }
+
+  /**
+   * Single-call generation: produces the story AND its quiz, grammar notes, and
+   * keywords in one JSON payload — replacing four separate LLM calls. Used for all
+   * lengths except 'extra-long' (which stays on the dedicated podcast path).
+   * The generation service falls back to the per-section builders below for any
+   * section the combined response omits or leaves empty.
+   */
+  buildCombined(dto: GenerateStoryDto, cards: CardEntity[], nativeLanguage = 'English'): string {
+    const vocabList = this.buildVocabList(cards);
+    const cefrDesc = this.cefrDescriptions[dto.difficulty];
+    const wordTarget = this.wordTargets[dto.length];
+
+    return `You are a German language teacher creating a personalised story for an adult learner, plus the study aids that go with it. The learner's native language is ${nativeLanguage}.
+
+TASK: Write a ${wordTarget}-word German story that naturally incorporates the learner's vocabulary, then derive a quiz, grammar notes, and a keyword list FROM THAT STORY.
+
+VOCABULARY LIST (use these words in the story — format: German = English):
+${vocabList}
+
+STORY RULES:
+1. Difficulty level: ${dto.difficulty} — ${cefrDesc}
+2. Use at least 70% of the vocabulary words from the list above
+3. Every vocabulary word must appear in a natural, everyday context — never artificially inserted
+4. Write a complete narrative with a clear beginning, middle, and end
+5. Include natural dialogue where it fits the story
+6. Vocabulary words must appear in their correct grammatical form (correct article, conjugation, case)
+7. Do NOT add words outside the vocabulary list to meet a quota — only use them naturally
+
+QUIZ RULES (field "quizQuestions"):
+- 4–6 fill-in-the-blank questions drawn from the story sentences.
+- The blank ("___") replaces ONE word that demonstrates a grammar rule (article case, modal verb form, preposition, adjective ending, verb conjugation).
+- "correctAnswer" must be the word from the actual sentence; provide exactly 2 plausible-but-wrong "distractors" testing the SAME grammatical dimension.
+- "audioSentence" is the full sentence with the blank filled in. "hint" is a 1-sentence ${nativeLanguage} explanation. Generate a unique "id" per question.
+
+GRAMMAR RULES (field "grammarNotes"):
+- 2–3 grammar topics ACTUALLY USED in the story and appropriate for ${dto.difficulty}.
+- Each: a clear "title"; "exampleDe" copied exactly from the story; a 2–3 paragraph "description" in plain ${nativeLanguage}; for verbs a 6-row present-tense "conjugationTable" (ich/du/er-sie-es/wir/ihr/sie); exactly 2 "additionalExamples" (German + ${nativeLanguage}) different from the story. Generate a unique "id" per note.
+
+KEYWORDS RULES (field "keywords"):
+- 8–15 important vocabulary words from the story (nouns, verbs, adjectives).
+- "german" = word with article if a noun (e.g. "der Biergarten") or base form otherwise; "germanBase" = without article; "translation" in ${nativeLanguage}; "article" = der/die/das or null; "wordType" = noun/verb/adjective/adverb/other; "level" = CEFR (A1–C2). Sort by level ascending.
+
+OUTPUT FORMAT — respond with valid JSON only, no markdown fences, no other text:
+{
+  "title": "Story title in German",
+  "titleTranslation": "${nativeLanguage} translation of title",
+  "sentences": [
+    { "german": "German sentence.", "native": "${nativeLanguage} translation.", "vocabWordsUsed": ["word1"] }
+  ],
+  "quizQuestions": [
+    { "id": "uuid", "sentenceTemplate": "Man kann unter ___ Himmel schlafen.", "audioSentence": "Man kann unter dem Himmel schlafen.", "correctAnswer": "dem", "distractors": ["das", "den"], "hint": "${nativeLanguage} hint." }
+  ],
+  "grammarNotes": [
+    { "id": "uuid", "title": "Modal verb \\"können\\"", "exampleDe": "Man kann hier wandern.", "exampleNative": "${nativeLanguage} translation.", "description": "${nativeLanguage} explanation...", "conjugationTable": [{ "pronoun": "ich", "form": "kann" }], "additionalExamples": [{ "de": "Ich kann schwimmen.", "native": "${nativeLanguage}." }] }
+  ],
+  "keywords": [
+    { "german": "wandern", "germanBase": "wandern", "translation": "${nativeLanguage} translation", "article": null, "wordType": "verb", "level": "A1" }
+  ]
+}`;
   }
 
   buildQuizPrompt(sentences: StorySentence[], difficulty: StoryDifficulty, nativeLanguage = 'English'): string {
@@ -165,7 +225,9 @@ OUTPUT — valid JSON only, no markdown fences, no preamble:
 }`;
   }
 
-  private targetCountForLength(length: StoryLength): number {
+  /** Target sentence count per length band — used by the extension flow to decide
+   *  when a partial story has reached its full length. */
+  targetCountForLength(length: StoryLength): number {
     const map: Record<StoryLength, number> = {
       'short':      12,
       'medium':     22,

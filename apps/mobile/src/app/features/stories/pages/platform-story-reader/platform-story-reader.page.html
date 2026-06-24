@@ -48,6 +48,20 @@
           @if (progress()?.isRead) {
             <span class="psr-read-badge">✓ Read</span>
           }
+          @if (adoptedStoryId()) {
+            <span class="psr-read-badge">{{ 'stories.adopt.addedBadge' | translate }}</span>
+          }
+        </div>
+
+        <div class="psr-adopt-cta">
+          <lc-button
+            variant="filled-primary"
+            size="md"
+            [fullWidth]="true"
+            [loading]="adopting()"
+            (click)="addToMyStories()">
+            {{ (adoptedStoryId() ? 'stories.adopt.openInMyStories' : 'stories.adopt.addToMyStories') | translate }}
+          </lc-button>
         </div>
       </div>
 

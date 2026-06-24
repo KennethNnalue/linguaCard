@@ -2,10 +2,11 @@ import { inject, Injectable } from '@angular/core';
 import { ModalController, ToastController } from '@ionic/angular/standalone';
 import { TranslateService } from '@ngx-translate/core';
 import { firstValueFrom } from 'rxjs';
-import type { StoryKeyword, StoryVocabWord } from '@lingua-card/shared/domain';
+import type { StoryKeyword, StoryVocabWord, WordDictionaryEntry } from '@lingua-card/shared/domain';
 import type { TappedWord, WordDetail } from '../models/reader.model';
 import { CardStore } from '../../vault/store/card.store';
 import { CardDedupService } from '../../../shared/dedup/card-dedup.service';
+import { DictionaryApiService } from '../../vault/services/dictionary-api.service';
 import { WordAudioService } from '../../../shared/audio/word-audio.service';
 import { AuthService } from '../../../core/services/auth.service';
 import { AssignCollectionSheetComponent } from '../../vault/components/assign-collection-sheet/assign-collection-sheet.component';
@@ -29,6 +30,7 @@ const GENDER_MAP: Record<string, 'masculine' | 'feminine' | 'neuter'> = {
 export class StoryWordSheetService {
   private readonly cardStore = inject(CardStore);
   private readonly dedup = inject(CardDedupService);
+  private readonly dictionary = inject(DictionaryApiService);
   private readonly wordAudio = inject(WordAudioService);
   private readonly authService = inject(AuthService);
   private readonly modalCtrl = inject(ModalController);
@@ -129,9 +131,20 @@ export class StoryWordSheetService {
     const { data } = await modal.onWillDismiss<{ collectionId: string | null }>();
     if (!data?.collectionId) return; // user cancelled
 
+    // Reuse the global word library: a pure DB lookup (no AI cost) so the saved
+    // card inherits canonical examples/synonyms/phonetic/plural/audio when the
+    // word already exists. On a miss, fall back to the bare tapped-word detail.
+    let entry: WordDictionaryEntry | null = null;
+    try {
+      entry = (await firstValueFrom(this.dictionary.lookup(detail.base, detail.article))).entry;
+    } catch {
+      entry = null;
+    }
+
     const userId = this.authService.currentUser()?.id ?? '';
     const now = new Date().toISOString();
-    const gender = detail.article ? (GENDER_MAP[detail.article] ?? null) : null;
+    const article = entry?.article ?? detail.article;
+    const gender = article ? (GENDER_MAP[article] ?? null) : null;
 
     this.cardStore
       .createCard({
@@ -141,15 +154,16 @@ export class StoryWordSheetService {
         contextId: 'german-vocab',
         content: {
           front: detail.display,
-          back: detail.english || detail.display,
-          article: detail.article,
+          back: entry?.translation || detail.english || detail.display,
+          article,
           gender,
-          plural: detail.plural,
-          examples: [],
-          synonyms: [],
+          plural: entry?.plurals?.[0] ?? detail.plural,
+          examples: entry?.examples ?? [],
+          synonyms: entry?.synonyms ?? [],
           notes: '',
           imageUrl: null,
-          phonetic: null,
+          phonetic: entry?.phonetic ?? null,
+          dictionaryWordId: entry?.id ?? null,
         },
         categoryIds: [],
         tags: [],

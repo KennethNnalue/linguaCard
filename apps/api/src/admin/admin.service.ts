@@ -17,6 +17,7 @@ import type {
   AdminImportStoryResult,
   AdminPlatformCollectionListItem,
   AdminPlatformStoryListItem,
+  StoryKeyword,
 } from '@lingua-card/shared/domain';
 
 @Injectable()
@@ -114,33 +115,67 @@ export class AdminService {
 
   async importStory(dto: AdminImportStoryDto): Promise<AdminImportStoryResult> {
     const { story } = dto;
+    const nativeLang = story.nativeLang ?? 'en';
 
-    // Map story keywords through dictionary (lookup only — no enrichment for admin import)
+    // Map story keywords through dictionary (lookup only — no enrichment for admin import).
+    // Index-aligned with story.keywords; null = dictionary miss (keep the JSON-supplied values).
     const keywordEntries = await Promise.all(
       story.keywords.map(kw =>
-        this.dictionary.lookup(kw.germanBase, kw.article, 'de-DE', 'en'),
+        this.dictionary.lookup(kw.germanBase, kw.article, 'de-DE', nativeLang),
       ),
     );
 
-    const sentences = story.sentences.map((s, i) => ({
-      id: `s-${i}`,
+    // Store in the same domain shapes as user-generated stories so the reader,
+    // player and adopt-copy all work unchanged on platform stories.
+    const sentences: PlatformStoryEntity['sentences'] = story.sentences.map((s, i) => ({
+      index: i,
       german: s.german,
       native: s.native,
-      position: i,
+      vocabWordIds: [],
     }));
 
-    const keywords = story.keywords.map((kw, i) => ({
-      id: `kw-${i}`,
-      word: kw.germanBase,
-      article: kw.article,
-      translation: kw.translation,
-      wordType: kw.wordType,
-      dictionaryWordId: keywordEntries[i]?.id ?? null,
+    // Prefer canonical dictionary values (translation/article/wordType) so platform
+    // keywords share entries + audio with collections and user cards; fall back to
+    // the JSON-supplied keyword on a dictionary miss.
+    const keywords: PlatformStoryEntity['keywords'] = story.keywords.map((kw, i) => {
+      const entry = keywordEntries[i];
+      return {
+        cardId: null,
+        german: kw.article ? `${kw.article} ${kw.germanBase}` : kw.germanBase,
+        germanBase: kw.germanBase,
+        translation: entry?.translation ?? kw.translation,
+        article: (entry?.article ?? kw.article) as StoryKeyword['article'],
+        wordType: (entry?.wordType as StoryKeyword['wordType']) ?? kw.wordType,
+        level: kw.level,
+      };
+    });
+
+    const quizQuestions: PlatformStoryEntity['quizQuestions'] = (story.quizQuestions ?? []).map((q, i) => ({
+      id: `q-${i}`,
+      sentenceTemplate: q.sentenceTemplate,
+      correctAnswer: q.correctAnswer,
+      distractors: q.distractors,
+      audioSentence: q.audioSentence,
+      hint: q.hint,
+    }));
+
+    const grammarNotes: PlatformStoryEntity['grammarNotes'] = (story.grammarNotes ?? []).map((g, i) => ({
+      id: `g-${i}`,
+      title: g.title,
+      exampleDe: g.exampleDe,
+      exampleNative: g.exampleNative,
+      description: g.description,
+      conjugationTable: g.conjugationTable,
+      additionalExamples: g.additionalExamples ?? [],
     }));
 
     const storyId = crypto.randomUUID();
     const totalWords = story.sentences.reduce((acc, s) => acc + s.german.split(/\s+/).length, 0);
     const bodyDe = story.sentences.map(s => s.german).join(' ');
+
+    // Length is independent of CEFR level. Preserve historical behavior when the
+    // import JSON omits it: short for A1/A2, medium otherwise.
+    const lengthType = story.length ?? (story.level === 'A1' || story.level === 'A2' ? 'short' : 'medium');
 
     // Optionally generate narration audio + word timestamps via TTS at import time.
     let audioUrl: string | null = null;
@@ -163,12 +198,12 @@ export class AdminService {
       titleTranslation: story.titleTranslation,
       bodyDe,
       bodyNative: story.sentences.map(s => s.native).join(' '),
-      nativeLang: 'en',
+      nativeLang,
       sentences,
       keywords,
       wordTimestamps,
-      quizQuestions: [],
-      grammarNotes: [],
+      quizQuestions,
+      grammarNotes,
       audioUrl,
       audioDurationMs,
       coverImageUrl: null,
@@ -178,6 +213,7 @@ export class AdminService {
       isFiction: dto.isFiction ?? true,
       isPremium: false,
       wordCount: totalWords,
+      lengthType,
       estimatedReadMinutes: Math.max(1, Math.round(totalWords / 80)),
       readCount: 0,
       isPublished: false,
@@ -191,6 +227,38 @@ export class AdminService {
       sentenceCount: story.sentences.length,
       keywordsResolved: keywordEntries.filter(e => e !== null).length,
       audioGenerated: audioUrl !== null,
+    };
+  }
+
+  /**
+   * Re-generate (or first-time generate) narration audio + word timestamps for an
+   * already-imported platform story. Used when audio was skipped at import time or
+   * the original TTS attempt failed.
+   */
+  async regenerateStoryAudio(id: string): Promise<AdminImportStoryResult> {
+    const entity = await this.storyRepo.findOneBy({ id });
+    if (!entity) throw new NotFoundException(`Platform story ${id} not found`);
+
+    // Track the outcome explicitly: a story that already had audio keeps its old
+    // URL on failure, so `entity.audioUrl !== null` would falsely report success.
+    let regenerated = false;
+    try {
+      const result = await this.storyAudio.generateAudioWithTimestamps(entity.bodyDe, entity.id);
+      entity.audioUrl = result.audioUrl;
+      entity.audioDurationMs = result.durationMs;
+      entity.wordTimestamps = result.timestamps;
+      await this.storyRepo.save(entity);
+      regenerated = true;
+    } catch (err) {
+      this.logger.error(`Audio re-generation failed for platform story ${id}`, err);
+    }
+
+    return {
+      storyId: entity.id,
+      title: entity.title,
+      sentenceCount: entity.sentences?.length ?? 0,
+      keywordsResolved: entity.keywords?.length ?? 0,
+      audioGenerated: regenerated,
     };
   }
 
