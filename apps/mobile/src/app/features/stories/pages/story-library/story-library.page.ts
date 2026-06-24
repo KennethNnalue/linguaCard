@@ -120,16 +120,24 @@ export class StoryLibraryPage implements OnInit {
   /** "See all" 2-column grid mode (replaces the Explore rail). */
   readonly seeAll = signal(false);
 
-  /** Continue-reading hero: most recently listened story, else the newest. */
+  /** Continue-reading hero: the story the user most recently engaged with.
+   *  Priority: last opened in the reader → last listened → newest. */
   readonly continueStory = computed<Story | null>(() => {
     const all = this.stories();
     if (all.length === 0) return null;
-    const listened = all
-      .filter(s => s.lastListenedAt)
-      .sort((a, b) =>
-        new Date(b.lastListenedAt!).getTime() - new Date(a.lastListenedAt!).getTime()
-      );
-    return listened[0] ?? all[0];
+
+    const opened = this.storyStore.lastOpenedAt();
+    const recencyOf = (s: Story): number => {
+      const openedAt = opened[s.id] ? new Date(opened[s.id]).getTime() : 0;
+      const listenedAt = s.lastListenedAt ? new Date(s.lastListenedAt).getTime() : 0;
+      return Math.max(openedAt, listenedAt);
+    };
+
+    const engaged = all
+      .filter(s => recencyOf(s) > 0)
+      .sort((a, b) => recencyOf(b) - recencyOf(a));
+
+    return engaged[0] ?? all[0];
   });
 
   /** Deterministic cover gradient for a story/platform id. */

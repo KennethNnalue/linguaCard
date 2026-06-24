@@ -24,6 +24,20 @@ interface StoryState {
   hasEverLoaded: boolean;
   extendingId: string | null;
   extendError: string | null;
+  /** Client-only: storyId → ISO timestamp of when it was last opened in the
+   *  reader. Powers the "Continue reading" hero (reading isn't a server event). */
+  lastOpenedAt: Record<string, string>;
+}
+
+const LAST_OPENED_KEY = 'lc-story-last-opened';
+
+function loadLastOpened(): Record<string, string> {
+  try {
+    const raw = localStorage.getItem(LAST_OPENED_KEY);
+    return raw ? (JSON.parse(raw) as Record<string, string>) : {};
+  } catch {
+    return {};
+  }
 }
 
 const initialState: StoryState = {
@@ -36,6 +50,7 @@ const initialState: StoryState = {
   hasEverLoaded: false,
   extendingId: null,
   extendError: null,
+  lastOpenedAt: loadLastOpened(),
 };
 
 export const StoryStore = signalStore(
@@ -166,6 +181,18 @@ export const StoryStore = signalStore(
 
       getById(id: string): Story | null {
         return store.stories().find(s => s.id === id) ?? null;
+      },
+
+      /** Stamp a story as the most recently opened (for the Continue-reading hero).
+       *  Local-only — reading a story is not a server-tracked event. */
+      recordStoryOpened(id: string): void {
+        const next = { ...store.lastOpenedAt(), [id]: new Date().toISOString() };
+        patchState(store, { lastOpenedAt: next });
+        try {
+          localStorage.setItem(LAST_OPENED_KEY, JSON.stringify(next));
+        } catch {
+          /* storage full / unavailable — hero just falls back to other signals */
+        }
       },
 
       incrementListenCount(id: string): void {

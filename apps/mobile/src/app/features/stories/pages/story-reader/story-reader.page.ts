@@ -173,6 +173,10 @@ export class StoryReaderPage implements OnInit, ViewWillEnter, ViewWillLeave {
     this.story.set(story);
     this.isLearned.set(story.isLearned ?? false);
 
+    // Mark as most-recently-opened so the library's Continue-reading hero
+    // surfaces the last story the user actually read (not just newest).
+    this.storyStore.recordStoryOpened(story.id);
+
     // Build the cross-story queue and hand the resolved audio to the player.
     // Set the current track first so playback is ready immediately; the queue
     // (used for next/prev/autoplay-next) fills in once the story list resolves.
