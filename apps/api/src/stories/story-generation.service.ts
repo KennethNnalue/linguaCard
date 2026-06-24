@@ -373,15 +373,16 @@ export class StoryGenerationService {
     targetLang = 'de-DE',
     nativeLang = 'en',
   ): Promise<StoryKeyword[]> {
+    // Lookup-only (pure DB read, no AI). When the word is already in the global
+    // dictionary we adopt its canonical translation/article/wordType; on a miss we
+    // keep the keyword the generation call already produced. We deliberately do NOT
+    // enrich misses here — that previously fired one AI call per missing keyword
+    // (a flood of per-word LLM calls on long stories). Unknown words are enriched
+    // lazily elsewhere (e.g. when the user saves one to their vault).
     const settled = await Promise.allSettled(
       keywords.map(async kw => {
-        // Try DB lookup first (no AI cost). On a miss, resolve() enriches and caches.
-        const raw = { back: kw.germanBase, article: (kw.article as 'der' | 'die' | 'das' | null) ?? null };
-        let entry = await this.dictionary.lookup(kw.germanBase, kw.article ?? null, targetLang, nativeLang);
-        if (!entry) {
-          const resolved = await this.dictionary.resolve(raw, targetLang, nativeLang);
-          entry = resolved.entry;
-        }
+        const entry = await this.dictionary.lookup(kw.germanBase, kw.article ?? null, targetLang, nativeLang);
+        if (!entry) return kw;
         return {
           ...kw,
           translation: entry.translation,

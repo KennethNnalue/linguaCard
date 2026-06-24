@@ -15,6 +15,9 @@ const APP_TITLE       = 'LinguaCard';
 
 const MAX_RETRIES   = 3;
 const BASE_DELAY_MS = 1000;
+// Hard ceiling per HTTP attempt. Without this a hung socket waits for the OS-level
+// TCP timeout (tens of seconds) before failing — abort fast so we can retry instead.
+const REQUEST_TIMEOUT_MS = 90_000;
 
 @Injectable()
 export class OpenRouterAdapter {
@@ -86,7 +89,7 @@ export class OpenRouterAdapter {
 
     let res: Response;
     try {
-      res = await fetch(url, {
+      res = await this.fetchWithTimeout(url, {
         method:  'POST',
         headers: {
           'Authorization': `Bearer ${this.apiKey}`,
@@ -97,7 +100,18 @@ export class OpenRouterAdapter {
         body: JSON.stringify(body),
       });
     } catch (networkErr) {
-      this.logger.error('OpenRouter network error', networkErr);
+      // Transient connectivity failures (ETIMEDOUT, ECONNRESET, ENETUNREACH, abort)
+      // are retryable — a single blip between us and OpenRouter must not fail the
+      // whole generation. Back off and retry before giving up.
+      if (attempt < MAX_RETRIES) {
+        const delayMs = BASE_DELAY_MS * Math.pow(2, attempt);
+        this.logger.warn(
+          `OpenRouter network error — retrying in ${delayMs}ms (attempt ${attempt + 1}/${MAX_RETRIES})`,
+        );
+        await this.sleep(delayMs);
+        return this.callWithRetry(path, body, attempt + 1);
+      }
+      this.logger.error('OpenRouter network error — max retries reached', networkErr);
       throw new HttpException('AI service unreachable', HttpStatus.SERVICE_UNAVAILABLE);
     }
 
@@ -128,6 +142,22 @@ export class OpenRouterAdapter {
 
     // eslint-disable-next-line @typescript-eslint/no-unsafe-return
     return res.json();
+  }
+
+  /** fetch() with a hard per-attempt timeout via AbortController. A timeout aborts
+   *  the request, surfacing as a network error that callWithRetry then retries. */
+  private async fetchWithTimeout(
+    url: string,
+    init: RequestInit,
+    timeoutMs = REQUEST_TIMEOUT_MS,
+  ): Promise<Response> {
+    const controller = new AbortController();
+    const timer = setTimeout(() => controller.abort(), timeoutMs);
+    try {
+      return await fetch(url, { ...init, signal: controller.signal });
+    } finally {
+      clearTimeout(timer);
+    }
   }
 
   private sleep(ms: number): Promise<void> {
