@@ -30,6 +30,7 @@ import {
   chevronDownCircleOutline,
   chevronForwardOutline,
   cloudOfflineOutline,
+  closeOutline,
 } from 'ionicons/icons';
 import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import type { Story, PlatformStoryCard, StoryDifficulty, StoryCategory } from '@lingua-card/shared/domain';
@@ -86,15 +87,21 @@ export class StoryLibraryPage implements OnInit {
   readonly selectedLevel       = signal<StoryDifficulty | null>(null);
   readonly selectedCategory    = signal<StoryCategory | null>(null);
 
+  // ── Inline search ─────────────────────────────────────────────────────────
+  readonly searchOpen  = signal(false);
+  readonly searchQuery = signal('');
+
   readonly levelFilters    = LEVEL_FILTERS;
   readonly categoryFilters = STORY_CATEGORIES;
 
   readonly filteredPlatformStories = computed(() => {
     const level    = this.selectedLevel();
     const category = this.selectedCategory();
+    const query    = this.searchQuery().trim().toLowerCase();
     return this.platformStories().filter(s => {
       if (level    && s.level    !== level)    return false;
       if (category && s.category !== category) return false;
+      if (query    && !s.title.toLowerCase().includes(query)) return false;
       return true;
     });
   });
@@ -151,7 +158,7 @@ export class StoryLibraryPage implements OnInit {
   constructor() {
     addIcons({
       bookOutline, addOutline, play, playOutline, searchOutline, sparklesOutline,
-      chevronDownCircleOutline, chevronForwardOutline, cloudOfflineOutline,
+      chevronDownCircleOutline, chevronForwardOutline, cloudOfflineOutline, closeOutline,
     });
 
     effect(async () => {
@@ -203,8 +210,20 @@ export class StoryLibraryPage implements OnInit {
     this.router.navigate(['/stories/platform', id]);
   }
 
-  navigateToExplore(): void {
-    this.router.navigate(['/stories/explore']);
+  toggleSearch(): void {
+    const next = !this.searchOpen();
+    this.searchOpen.set(next);
+    if (!next) {
+      this.searchQuery.set('');
+    }
+  }
+
+  onSearchInput(event: Event): void {
+    this.searchQuery.set((event.target as HTMLInputElement).value ?? '');
+  }
+
+  clearSearch(): void {
+    this.searchQuery.set('');
   }
 
   // ── My Stories actions ────────────────────────────────────────────────────

@@ -3,9 +3,12 @@ import {
   Component,
   computed,
   DestroyRef,
+  effect,
+  ElementRef,
   inject,
   OnInit,
   signal,
+  viewChildren,
 } from '@angular/core';
 import { TitleCasePipe } from '@angular/common';
 import { TranslatePipe } from '@ngx-translate/core';
@@ -101,6 +104,7 @@ export class PlatformStoryReaderPage implements OnInit, ViewWillLeave {
   // ── Audio player (delegated to StoryAudioEngine) ─────────────────
   readonly isPlaying = this.engine.playing;
   readonly activeWordIdx = this.engine.activeWordIdx;
+  readonly activeSentenceIdx = this.engine.activeSentenceIdx;
   readonly progressPct = this.engine.progressPct;
   readonly speed = signal(0.95);
 
@@ -113,10 +117,21 @@ export class PlatformStoryReaderPage implements OnInit, ViewWillLeave {
     return STORY_CATEGORIES.find(c => c.value === s.category)?.label ?? s.category;
   });
 
+  /** Rendered sentence blocks, used to scroll the active one into view. */
+  private readonly sentenceEls = viewChildren<ElementRef<HTMLElement>>('sentence');
+
   constructor() {
     addIcons({ arrowBackOutline });
     this.engine.setSpeed(this.speed());
     this.destroyRef.onDestroy(() => this.engine.teardown());
+
+    // Keep the spoken sentence centred during playback (follow-along scroll).
+    effect(() => {
+      const idx = this.activeSentenceIdx();
+      if (idx < 0) return;
+      const el = this.sentenceEls()[idx]?.nativeElement;
+      el?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    });
   }
 
   async ngOnInit(): Promise<void> {
@@ -134,9 +149,18 @@ export class PlatformStoryReaderPage implements OnInit, ViewWillLeave {
     this.story.set(result.story);
     this.progress.set(result.progress);
 
-    const { audioUrl, wordTimestamps, audioDurationMs } = result.story;
+    const { audioUrl, wordTimestamps, audioDurationMs, sentences } = result.story;
     if (audioUrl) {
-      this.engine.load({ url: audioUrl, timestamps: wordTimestamps, durationMs: audioDurationMs });
+      this.engine.load({
+        url: audioUrl,
+        timestamps: wordTimestamps,
+        sentencePlan: this.tokenizer.computeSentencePlan(
+          sentences,
+          audioDurationMs,
+          wordTimestamps,
+        ),
+        durationMs: audioDurationMs,
+      });
       if (autoPlay) {
         // Native webviews allow this; strict browsers reject play() outside a
         // gesture — ignore the rejection (the user can tap the play pill).
@@ -216,6 +240,11 @@ export class PlatformStoryReaderPage implements OnInit, ViewWillLeave {
 
   isWordActive(sentenceIdx: number, wordIdx: number): boolean {
     return this.interaction.isWordActive(sentenceIdx, wordIdx);
+  }
+
+  /** Sentence-level karaoke: the sentence currently being spoken. */
+  isSentenceActive(sentenceIdx: number): boolean {
+    return this.activeSentenceIdx() === sentenceIdx;
   }
 
   goBack(): void {

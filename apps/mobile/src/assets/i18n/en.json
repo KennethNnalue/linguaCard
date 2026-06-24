@@ -913,6 +913,8 @@
       "extensionFailedToast": "Extension failed — please try again.",
       "eyebrow": "LINGUACARD",
       "searchAriaLabel": "Search stories",
+      "searchPlaceholder": "Search stories…",
+      "searchClearAriaLabel": "Clear search",
       "continueReading": "Continue reading",
       "minReadMeta": "{{mins}} min read · {{category}}",
       "exploreSubtitle": "Curated by LinguaCard",

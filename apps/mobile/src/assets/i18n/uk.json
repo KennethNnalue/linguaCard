@@ -840,6 +840,8 @@
       "extensionFailedToast": "Продовження не вдалося — спробуйте ще раз.",
       "eyebrow": "LINGUACARD",
       "searchAriaLabel": "Шукати історії",
+      "searchPlaceholder": "Пошук історій…",
+      "searchClearAriaLabel": "Очистити пошук",
       "continueReading": "Продовжити читання",
       "minReadMeta": "{{mins}} хв читання · {{category}}",
       "exploreSubtitle": "Підібрано LinguaCard",

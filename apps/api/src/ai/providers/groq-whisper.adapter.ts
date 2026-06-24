@@ -6,6 +6,17 @@ import type { AiConfig } from '../../config/ai.config';
 const GROQ_STT_URL = 'https://api.groq.com/openai/v1/audio/transcriptions';
 const GROQ_MODEL   = 'whisper-large-v3-turbo';
 
+/**
+ * DORMANT — Whisper word-level timestamps are not yet integrated in production.
+ *
+ * `GROQ_API_KEY` is currently unset, so `transcribeWithTimestamps` returns `[]`
+ * (see the guard below) and stories ship with empty `wordTimestamps`. Karaoke is
+ * driven at SENTENCE granularity from estimated per-sentence time slices
+ * (StoryTokenizerService.computeSentencePlan on the client), so it works
+ * without this adapter. When Whisper is enabled later, that same tokenizer will
+ * automatically refine sentence boundaries from real word timestamps — keep this
+ * adapter and its wiring intact for that.
+ */
 @Injectable()
 export class GroqWhisperAdapter {
   private readonly logger = new Logger(GroqWhisperAdapter.name);

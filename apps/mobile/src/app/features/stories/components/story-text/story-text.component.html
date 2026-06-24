@@ -1,6 +1,10 @@
 @if (story().sentences.length) {
   @for (sent of story().sentences; track sent.index; let si = $index) {
-    <div class="ss-sent">
+    <div
+      #sentence
+      class="ss-sent"
+      [class.sent-active]="isSentenceActive(si)"
+    >
       <p class="ss-sent-de">
         @for (token of sentenceTokens()[si]; track token.wordIdx) {
           <span

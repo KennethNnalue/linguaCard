@@ -84,7 +84,11 @@ export class StoryAudioService {
       contentType,
     );
 
-    // Word-level timestamps via Groq Whisper (free tier, replaces paid OpenAI Whisper)
+    // Word-level timestamps via Groq Whisper (free tier, replaces paid OpenAI Whisper).
+    // DORMANT: GROQ_API_KEY is currently unset in production, so this returns [] and
+    // stories ship with no word timestamps. Karaoke runs at SENTENCE granularity on
+    // the client (estimated from audioDurationMs) and does not depend on this. When
+    // Whisper is enabled later, the client refines sentence boundaries automatically.
     let timestamps: WordTimestamp[];
     try {
       timestamps = await this.groqWhisper.transcribeWithTimestamps(audioBuffer, mimeType);

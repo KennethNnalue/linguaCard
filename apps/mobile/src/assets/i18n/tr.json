@@ -840,6 +840,8 @@
       "extensionFailedToast": "Uzatma başarısız oldu — lütfen tekrar deneyin.",
       "eyebrow": "LINGUACARD",
       "searchAriaLabel": "Hikaye ara",
+      "searchPlaceholder": "Hikaye ara…",
+      "searchClearAriaLabel": "Aramayı temizle",
       "continueReading": "Okumaya devam et",
       "minReadMeta": "{{mins}} dk okuma · {{category}}",
       "exploreSubtitle": "LinguaCard tarafından seçildi",

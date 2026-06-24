@@ -85,7 +85,19 @@
 .sr2-text-block {
   display: block; width: 100%; box-sizing: border-box; padding: t.$lc-space-2 20px t.$lc-space-4;
 }
-.sr2-sent-block { display: block; width: 100%; box-sizing: border-box; margin-bottom: t.$lc-space-4; }
+.sr2-sent-block {
+  display: block; width: 100%; box-sizing: border-box; margin-bottom: t.$lc-space-4;
+  border-radius: t.$lc-radius-md;
+  padding: t.$lc-space-2 t.$lc-space-3;
+  margin-inline: calc(-1 * #{t.$lc-space-3});
+  transition: background t.$lc-duration-base;
+
+  // Sentence currently being spoken — gentle highlight band (sentence karaoke).
+  // Text colour is left untouched so sentences read the same as before.
+  &.sent-active {
+    background: var(--lc-brand-light);
+  }
+}
 .sr2-sent-de {
   display: block; width: 100%; box-sizing: border-box;
   font-family: var(--lc-font-display);

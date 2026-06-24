@@ -5,6 +5,7 @@ import { StoryStore } from '../store/story.store';
 import { StoryApiService } from './story-api.service';
 import { AiAudioCacheService } from '../../ai/audio/ai-audio-cache.service';
 import { StoryAudioEngine } from './story-audio-engine.service';
+import { StoryTokenizerService } from './story-tokenizer.service';
 
 export type RepeatMode = 'off' | 'all' | 'one';
 
@@ -35,6 +36,7 @@ export class StoryPlayerService {
   private readonly storyStore = inject(StoryStore);
   private readonly api = inject(StoryApiService);
   private readonly audioCache = inject(AiAudioCacheService);
+  private readonly tokenizer = inject(StoryTokenizerService);
 
   /** This service owns a dedicated engine instance (not shared with other readers). */
   private readonly engine = new StoryAudioEngine();
@@ -51,6 +53,8 @@ export class StoryPlayerService {
   readonly playing = this.engine.playing;
   /** Index of the currently-spoken word across the whole story (-1 = not started). */
   readonly activeWordIdx = this.engine.activeWordIdx;
+  /** Index of the currently-spoken sentence (-1 = not started). */
+  readonly activeSentenceIdx = this.engine.activeSentenceIdx;
   readonly progressPct = this.engine.progressPct;
   readonly currentTimeMs = this.engine.currentTimeMs;
   readonly durationMs = this.engine.durationMs;
@@ -98,8 +102,13 @@ export class StoryPlayerService {
    * Initialise the queue around a starting story. Builds the queue from the
    * user's stories (newest first); if the starting story isn't among them
    * (e.g. a platform story) it is prepended so it can still play.
+   *
+   * Ensures the store's story list is loaded first so the queue spans every story
+   * — opening a reader via deep link (without visiting the library) would
+   * otherwise leave the list empty and produce a single-item queue.
    */
-  initQueue(startId: string): void {
+  async initQueue(startId: string): Promise<void> {
+    await this.storyStore.ensureLoaded();
     const mine = this.storyStore.sortedStories().map(s => s.id);
     let q = mine.includes(startId) ? mine : [startId, ...mine];
     // De-dupe while preserving order.
@@ -114,6 +123,11 @@ export class StoryPlayerService {
     this.engine.load({
       url: audioUrl,
       timestamps: story.wordTimestamps,
+      sentencePlan: this.tokenizer.computeSentencePlan(
+        story.sentences,
+        story.audioDurationMs,
+        story.wordTimestamps,
+      ),
       durationMs: story.audioDurationMs,
     });
   }
@@ -175,10 +189,13 @@ export class StoryPlayerService {
       if (this.repeatMode() === 'all') {
         nidx = 0;
       } else {
-        // End of queue with repeat off — park on the final word, never complete.
+        // End of queue with repeat off — park on the final word/sentence, never complete.
         this.pause();
-        const wordCount = this.current()?.wordTimestamps.length ?? 0;
+        const cur = this.current();
+        const wordCount = cur?.wordTimestamps.length ?? 0;
         this.activeWordIdx.set(wordCount ? wordCount - 1 : -1);
+        const sentCount = cur?.sentences.length ?? 0;
+        this.activeSentenceIdx.set(sentCount ? sentCount - 1 : -1);
         return;
       }
     }

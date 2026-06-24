@@ -109,6 +109,31 @@ export const StoryStore = signalStore(
         patchState(store, { stories, hasEverLoaded: true });
       },
 
+      /**
+       * Resolve once the user's story list is available, fetching it if the store
+       * was never populated (e.g. the reader was opened via deep link without first
+       * visiting the library). Needed so the player can build a full cross-story
+       * queue instead of a single-item one. No-op if stories are already loaded.
+       */
+      async ensureLoaded(): Promise<void> {
+        if (store.hasEverLoaded() || store.stories().length > 0) return;
+        const userId = uid();
+        if (userId) {
+          const cached = await localData.getStories(userId);
+          if (cached.length > 0) {
+            patchState(store, { stories: cached, hasEverLoaded: true });
+            return;
+          }
+        }
+        try {
+          const stories = await firstValueFrom(api.getAll());
+          patchState(store, { stories, hasEverLoaded: true });
+          if (userId) await localData.setStories(userId, stories);
+        } catch {
+          // Leave the store empty — caller falls back to a single-item queue.
+        }
+      },
+
       async generateStory(dto: GenerateStoryDto): Promise<Story | null> {
         patchState(store, { isGenerating: true, generateError: null });
         try {

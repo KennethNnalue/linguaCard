@@ -840,6 +840,8 @@
       "extensionFailedToast": "La extensión falló — por favor, inténtalo de nuevo.",
       "eyebrow": "LINGUACARD",
       "searchAriaLabel": "Buscar historias",
+      "searchPlaceholder": "Buscar historias…",
+      "searchClearAriaLabel": "Borrar búsqueda",
       "continueReading": "Seguir leyendo",
       "minReadMeta": "{{mins}} min de lectura · {{category}}",
       "exploreSubtitle": "Seleccionado por LinguaCard",

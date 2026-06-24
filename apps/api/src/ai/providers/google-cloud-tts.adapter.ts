@@ -2,6 +2,7 @@ import { Injectable, Logger, OnModuleInit, ServiceUnavailableException } from '@
 import { ConfigService } from '@nestjs/config';
 import { TextToSpeechClient, protos } from '@google-cloud/text-to-speech';
 import type { AiConfig } from '../../config/ai.config';
+import { getMp3DurationMs } from '../../common/audio/mp3-duration';
 
 export interface TTSSpeechRequest {
   text:      string;
@@ -121,8 +122,18 @@ export class GoogleCloudTTSAdapter implements OnModuleInit {
       buf.byteOffset + buf.byteLength,
     ) as ArrayBuffer;
 
-    // 32kbps MP3 = 4000 bytes/sec
-    const durationMs = Math.round((audioBuffer.byteLength / 4000) * 1000);
+    // Duration must be accurate — it drives story-reader karaoke pacing. Google
+    // chooses the MP3 bitrate (often variable), so a byte-length estimate is
+    // unreliable; parse the real duration from the MP3 frame headers and only fall
+    // back to the rough estimate if parsing fails.
+    const parsedMs = getMp3DurationMs(buf);
+    if (parsedMs === null) {
+      this.logger.warn(
+        `Could not parse MP3 duration for ${characterCount}-char clip — ` +
+        'falling back to byte-length estimate (may desync karaoke).',
+      );
+    }
+    const durationMs = parsedMs ?? Math.round((audioBuffer.byteLength / 4000) * 1000);
 
     this.logger.debug(
       `GCTTS generated ${characterCount} chars → ${audioBuffer.byteLength} bytes ` +

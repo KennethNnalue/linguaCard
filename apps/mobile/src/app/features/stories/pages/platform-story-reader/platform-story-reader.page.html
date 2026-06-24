@@ -65,7 +65,11 @@
 
       <div class="sr2-text-block" (click)="dismissTappedWord()">
         @for (sent of s.sentences; track sent.index; let si = $index) {
-          <div class="sr2-sent-block">
+          <div
+            #sentence
+            class="sr2-sent-block"
+            [class.sent-active]="isSentenceActive(si)"
+          >
             <p class="sr2-sent-de">
               @for (token of sentenceTokens()[si]; track token.wordIdx) {
                 <span

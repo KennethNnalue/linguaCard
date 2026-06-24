@@ -7,6 +7,17 @@
 
 .ss-sent {
   margin-bottom: 18px;
+  border-radius: t.$lc-radius-md;
+  padding: t.$lc-space-2 t.$lc-space-3;
+  margin-inline: calc(-1 * #{t.$lc-space-3});
+  transition: background t.$lc-duration-base, opacity t.$lc-duration-base;
+
+  // The sentence currently being spoken — gentle highlight band so the reader
+  // can follow along at sentence granularity (works without word timestamps).
+  // Text colour is left untouched so sentences read the same as before.
+  &.sent-active {
+    background: var(--lc-ss-karaoke-bg);
+  }
 }
 
 .ss-sent-de {

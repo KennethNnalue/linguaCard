@@ -840,6 +840,8 @@
       "extensionFailedToast": "فشل التمديد — يرجى المحاولة مرة أخرى.",
       "eyebrow": "LINGUACARD",
       "searchAriaLabel": "البحث في القصص",
+      "searchPlaceholder": "البحث في القصص…",
+      "searchClearAriaLabel": "مسح البحث",
       "continueReading": "متابعة القراءة",
       "minReadMeta": "{{mins}} دقيقة قراءة · {{category}}",
       "exploreSubtitle": "منسّقة بواسطة LinguaCard",

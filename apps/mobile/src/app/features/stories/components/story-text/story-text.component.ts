@@ -2,9 +2,12 @@ import {
   ChangeDetectionStrategy,
   Component,
   computed,
+  effect,
+  ElementRef,
   inject,
   input,
   output,
+  viewChildren,
 } from '@angular/core';
 import type { Story } from '@lingua-card/shared/domain';
 import type { TappedWord, WordToken } from '../../models/reader.model';
@@ -34,10 +37,27 @@ export class StoryTextComponent {
 
   readonly story = input.required<Story>();
   readonly activeWordIdx = input(-1);
+  /** Currently-spoken sentence index (-1 = not started). Drives sentence karaoke. */
+  readonly activeSentenceIdx = input(-1);
   readonly showTranslation = input(false);
   readonly tappedWord = input<TappedWord | null>(null);
 
   readonly wordTap = output<StoryWordTap>();
+
+  /** The rendered sentence elements, used to scroll the active one into view. */
+  private readonly sentenceEls = viewChildren<ElementRef<HTMLElement>>('sentence');
+
+  constructor() {
+    // Keep the spoken sentence in view during playback. Centring the active
+    // sentence gives a stable "follow-along" feel as karaoke advances. Skips when
+    // nothing is active (-1) so opening/pausing doesn't yank the scroll position.
+    effect(() => {
+      const idx = this.activeSentenceIdx();
+      if (idx < 0) return;
+      const el = this.sentenceEls()[idx]?.nativeElement;
+      el?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    });
+  }
 
   readonly sentenceTokens = computed<WordToken[][]>(() => {
     const s = this.story();
@@ -54,6 +74,11 @@ export class StoryTextComponent {
       this.story().wordTimestamps.length,
     ),
   );
+
+  /** The sentence currently being spoken (sentence-level karaoke highlight). */
+  isSentenceActive(sentenceIdx: number): boolean {
+    return this.activeSentenceIdx() === sentenceIdx;
+  }
 
   isKaraoke(sentenceIdx: number, wordIdx: number): boolean {
     const active = this.activeWordIdx();

@@ -93,6 +93,7 @@ export class StoryReaderPage implements OnInit, ViewWillEnter, ViewWillLeave {
   // ── Audio player (delegated to StoryPlayerService) ───────────────
   readonly isPlaying = this.player.playing;
   readonly activeWordIdx = this.player.activeWordIdx;
+  readonly activeSentenceIdx = this.player.activeSentenceIdx;
   readonly progressPct = this.player.progressPct;
   readonly repeatMode = this.player.repeatMode;
   readonly shuffle = this.player.shuffle;
@@ -173,11 +174,13 @@ export class StoryReaderPage implements OnInit, ViewWillEnter, ViewWillLeave {
     this.isLearned.set(story.isLearned ?? false);
 
     // Build the cross-story queue and hand the resolved audio to the player.
-    this.player.initQueue(story.id);
+    // Set the current track first so playback is ready immediately; the queue
+    // (used for next/prev/autoplay-next) fills in once the story list resolves.
     if (hasAudio && story.audioUrl) {
       this.player.setCurrent(story, story.audioUrl);
       if (autoPlay) await this.tryAutoPlay();
     }
+    void this.player.initQueue(story.id);
 
     if (needsEnrichment) {
       void this.triggerEnrichment(story.id);

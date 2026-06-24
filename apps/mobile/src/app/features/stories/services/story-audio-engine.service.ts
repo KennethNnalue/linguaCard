@@ -1,10 +1,17 @@
 import { Injectable, signal } from '@angular/core';
 import type { WordTimestamp } from '@lingua-card/shared/domain';
+import type { SentencePlan } from '../models/reader.model';
 
 /** A single resolved track handed to the engine. */
 export interface AudioTrack {
   url: string;
   timestamps: readonly WordTimestamp[];
+  /**
+   * How to map playback time → active sentence for karaoke highlighting.
+   * `fraction` plans are resolved against the element's *real* duration each tick,
+   * so they stay in sync even when the stored `durationMs` is inaccurate.
+   */
+  sentencePlan: SentencePlan;
   /** Fallback duration (ms) used until the element reports its own. */
   durationMs: number;
 }
@@ -25,6 +32,8 @@ export class StoryAudioEngine {
   readonly playing = signal(false);
   /** Index of the currently-spoken word (-1 = not started / between words). */
   readonly activeWordIdx = signal(-1);
+  /** Index of the currently-spoken sentence (-1 = not started). */
+  readonly activeSentenceIdx = signal(-1);
   readonly progressPct = signal(0);
   readonly currentTimeMs = signal(0);
   readonly durationMs = signal(0);
@@ -56,6 +65,7 @@ export class StoryAudioEngine {
     this.durationMs.set(track.durationMs || 0);
 
     const timestamps = track.timestamps;
+    const plan = track.sentencePlan;
     this.timeupdateHandler = () => {
       if (!this.hasPlayedData) {
         this.hasPlayedData = true;
@@ -67,6 +77,11 @@ export class StoryAudioEngine {
       this.durationMs.set(dur);
       this.progressPct.set(Math.min(100, (ms / dur) * 100));
       this.activeWordIdx.set(timestamps.findIndex(w => ms >= w.startMs && ms < w.endMs));
+
+      // Sentence-level karaoke: the last sentence whose start we've passed.
+      // `fraction` plans are scaled by the *real* duration here, so highlighting
+      // tracks the actual audio clock (not the possibly-inaccurate stored duration).
+      this.activeSentenceIdx.set(this.resolveSentenceIdx(plan, ms, dur));
     };
     this.endedHandler = () => {
       this.playing.set(false);
@@ -88,6 +103,27 @@ export class StoryAudioEngine {
     audio.addEventListener('timeupdate', this.timeupdateHandler);
     audio.addEventListener('ended', this.endedHandler);
     audio.addEventListener('error', this.errorHandler);
+  }
+
+  /**
+   * Resolve which sentence is playing at time `ms` (with real total `dur`): the
+   * last sentence whose start the playhead has passed. `absolute` plans compare
+   * against fixed ms ranges; `fraction` plans scale their 0–1 bounds by `dur`.
+   */
+  private resolveSentenceIdx(plan: SentencePlan, ms: number, dur: number): number {
+    let idx = -1;
+    if (plan.kind === 'absolute') {
+      for (let i = 0; i < plan.ranges.length; i++) {
+        if (ms >= plan.ranges[i].startMs) idx = i;
+        else break;
+      }
+    } else {
+      for (let i = 0; i < plan.bounds.length; i++) {
+        if (ms >= plan.bounds[i].startFrac * dur) idx = i;
+        else break;
+      }
+    }
+    return idx;
   }
 
   /** Register a callback invoked when the current track ends (after `playing` is cleared). */
@@ -119,6 +155,7 @@ export class StoryAudioEngine {
     if (audio.ended || audio.currentTime >= (audio.duration || Infinity)) {
       audio.currentTime = 0;
       this.activeWordIdx.set(-1);
+      this.activeSentenceIdx.set(-1);
     }
     try {
       await audio.play();
@@ -156,6 +193,7 @@ export class StoryAudioEngine {
     if (!this.audio) return;
     this.audio.currentTime = 0;
     this.activeWordIdx.set(-1);
+    this.activeSentenceIdx.set(-1);
     this.progressPct.set(0);
     if (this.playing()) void this.audio.play();
   }
@@ -181,6 +219,7 @@ export class StoryAudioEngine {
     this.hasPlayedData = false;
     this.playing.set(false);
     this.activeWordIdx.set(-1);
+    this.activeSentenceIdx.set(-1);
   }
 
   formatTime(ms: number): string {

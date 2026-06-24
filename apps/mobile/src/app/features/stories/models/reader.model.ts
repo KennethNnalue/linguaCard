@@ -37,6 +37,31 @@ export interface SentenceWordRange {
   end: number;
 }
 
+/** Half-open [startMs, endMs) playback-time range for a sentence. */
+export interface SentenceTimeRange {
+  startMs: number;
+  endMs: number;
+}
+
+/**
+ * How to derive sentence-boundary playback times for karaoke.
+ *
+ * - `absolute`: exact [startMs, endMs) ranges (from real word timestamps).
+ * - `fraction`: cumulative [startFrac, endFrac) of total duration (the estimate
+ *   path, with no timestamps) — resolved against the audio element's *real*
+ *   duration at playback time, so it stays in sync regardless of any inaccurate
+ *   stored `audioDurationMs`.
+ */
+export type SentencePlan =
+  | { kind: 'absolute'; ranges: SentenceTimeRange[] }
+  | { kind: 'fraction'; bounds: SentenceFractionBound[] };
+
+/** Half-open [startFrac, endFrac) fraction (0–1) of total duration for a sentence. */
+export interface SentenceFractionBound {
+  startFrac: number;
+  endFrac: number;
+}
+
 /** Result of scoring a quiz given the user's answers. */
 export interface QuizScore {
   correct: number;
