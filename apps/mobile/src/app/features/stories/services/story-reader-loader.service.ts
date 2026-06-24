@@ -65,9 +65,11 @@ export class StoryReaderLoaderService {
     };
   }
 
-  /** Auto-enrich when the story has sentences but is missing quiz/grammar/keywords. */
+  /** Auto-enrich when a COMPLETE story has sentences but is missing quiz/grammar/keywords.
+   *  Partial stories are skipped — they enrich only after being completed via extend. */
   private needsEnrichment(s: Story): boolean {
     return (
+      s.generationStatus !== 'partial' &&
       s.sentences?.length > 0 &&
       (
         (s.quizQuestions ?? []).length === 0 ||

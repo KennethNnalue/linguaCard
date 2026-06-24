@@ -12,6 +12,7 @@ import type {
   StoryQuizQuestion,
   StoryGrammarNote,
   StoryKeyword,
+  WordTimestamp,
   SubscriptionTier,
 } from '@lingua-card/shared/domain';
 import { recoverStoryContent } from './story-json-recovery.util';
@@ -156,11 +157,6 @@ export class StoryGenerationService {
     const bodyNative = content.sentences.map(s => s.native).join(' ');
     const storyId = randomUUID();
 
-    const { audioUrl, timestamps, durationMs } =
-      await this.audioService.generateAudioWithTimestamps(bodyDe, storyId);
-
-    const markedTimestamps = this.vocabMapper.markVocabWords(timestamps, vocabWords);
-
     const sentences: StorySentence[] = content.sentences.map((s, i) => ({
       index: i,
       german: s.german,
@@ -170,24 +166,44 @@ export class StoryGenerationService {
         .map(v => v.cardId),
     }));
 
-    // The combined call usually returns quiz/grammar/keywords inline (no extra LLM
-    // calls). Only generate a section separately when the combined response omitted
-    // it (empty), or for the extra-long path which generates story text only.
-    const [quizQuestions, grammarNotes, aiKeywords] = await Promise.all([
-      generated.quizQuestions.length
-        ? Promise.resolve(generated.quizQuestions)
-        : this.generateQuizQuestions(sentences, dto.difficulty, model, nativeLangName),
-      generated.grammarNotes.length
-        ? Promise.resolve(generated.grammarNotes)
-        : this.generateGrammarNotes(sentences, dto.difficulty, model, nativeLangName),
-      generated.keywords.length
-        ? Promise.resolve(generated.keywords)
-        : this.generateKeywords(sentences, dto.difficulty, model, nativeLangName),
-    ]);
+    // When the generation call truncated, we keep the recovered sentences (the AI
+    // call is never wasted) but spend NO further AI on incomplete content:
+    //   • narration audio is generated when the story is completed via extend()
+    //   • quiz/grammar/keywords are filled lazily on first open, but only once the
+    //     story is complete (enrichExisting refuses partial stories).
+    // A complete story enriches inline here as before.
+    let audioUrl: string | null = null;
+    let durationMs = 0;
+    let markedTimestamps: WordTimestamp[] = [];
+    let quizQuestions: StoryQuizQuestion[] = [];
+    let grammarNotes: StoryGrammarNote[] = [];
+    let keywords: StoryKeyword[] = [];
 
-    // Merge AI keywords with vault words; enrich known words from dictionary
-    const merged = this.mergeKeywords(aiKeywords, vocabWords);
-    const keywords: StoryKeyword[] = await this.enrichKeywordsFromDictionary(merged);
+    if (!isPartial) {
+      const audio = await this.audioService.generateAudioWithTimestamps(bodyDe, storyId);
+      audioUrl = audio.audioUrl;
+      durationMs = audio.durationMs;
+      markedTimestamps = this.vocabMapper.markVocabWords(audio.timestamps, vocabWords);
+
+      // The combined call usually returns quiz/grammar/keywords inline (no extra LLM
+      // calls). Only generate a section separately when the combined response omitted
+      // it (empty), or for the extra-long path which generates story text only.
+      const [quiz, grammar, aiKeywords] = await Promise.all([
+        generated.quizQuestions.length
+          ? Promise.resolve(generated.quizQuestions)
+          : this.generateQuizQuestions(sentences, dto.difficulty, model, nativeLangName),
+        generated.grammarNotes.length
+          ? Promise.resolve(generated.grammarNotes)
+          : this.generateGrammarNotes(sentences, dto.difficulty, model, nativeLangName),
+        generated.keywords.length
+          ? Promise.resolve(generated.keywords)
+          : this.generateKeywords(sentences, dto.difficulty, model, nativeLangName),
+      ]);
+      quizQuestions = quiz;
+      grammarNotes = grammar;
+      // Merge AI keywords with vault words; enrich known words from dictionary (lookup-only)
+      keywords = await this.enrichKeywordsFromDictionary(this.mergeKeywords(aiKeywords, vocabWords));
+    }
 
     const entity = this.storyRepo.create({
       id: storyId,
@@ -295,6 +311,13 @@ export class StoryGenerationService {
     const entity = await this.storyRepo.findOneBy({ id, userId });
     if (!entity) {
       throw new Error(`Story ${id} not found`);
+    }
+
+    // Never enrich an incomplete story — its sentences aren't final yet, so quiz/
+    // grammar/keywords would be derived from a fragment. Enrichment happens once the
+    // story is completed via extend().
+    if (entity.generationStatus === 'partial') {
+      return this.toModel(entity);
     }
 
     // Only enrich if at least one section is empty
