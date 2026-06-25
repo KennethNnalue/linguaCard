@@ -37,6 +37,16 @@ export class SubscriptionService {
     return sub;
   }
 
+  /**
+   * Lightweight Pro check (one query) for hot paths like audio resolution,
+   * where the full getStatusForUser() (which also counts stories + imports)
+   * would be unnecessarily heavy.
+   */
+  async isProUser(userId: string): Promise<boolean> {
+    const sub = await this.getOrCreateForUser(userId);
+    return sub.tier === 'pro' && (sub.expiresAt === null || sub.expiresAt > new Date());
+  }
+
   async getStatusForUser(userId: string): Promise<SubscriptionStatus> {
     const sub = await this.getOrCreateForUser(userId);
 

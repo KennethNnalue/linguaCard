@@ -4,7 +4,9 @@ import { PlatformCollectionEntity } from './platform-collection.entity';
 import { PlatformCollectionWordEntity } from './platform-collection-word.entity';
 import { PlatformStoryEntity } from '../platform-stories/platform-story.entity';
 import { UserStoryProgressEntity } from '../platform-stories/user-story-progress.entity';
+import { WordDictionaryEntity } from '../word-dictionary/word-dictionary.entity';
 import { WordDictionaryModule } from '../word-dictionary/word-dictionary.module';
+import { WordAudioModule } from '../word-audio/word-audio.module';
 import { StoriesModule } from '../stories/stories.module';
 import { AuthModule } from '../auth/auth.module';
 import { AdminService } from './admin.service';
@@ -17,8 +19,10 @@ import { AdminController } from './admin.controller';
       PlatformCollectionWordEntity,
       PlatformStoryEntity,
       UserStoryProgressEntity,
+      WordDictionaryEntity,
     ]),
     WordDictionaryModule,
+    WordAudioModule,
     StoriesModule,
     forwardRef(() => AuthModule),
   ],

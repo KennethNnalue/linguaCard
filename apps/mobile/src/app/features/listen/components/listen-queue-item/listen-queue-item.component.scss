@@ -72,6 +72,21 @@
   text-transform: capitalize;
 }
 
+.hd {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  font-size: 8px;
+  font-weight: t.$lc-font-weight-bold;
+  letter-spacing: 0.04em;
+  color: var(--lc-brand-mid);
+}
+
+.hd-dot {
+  @include u.circle(5px);
+  background: var(--lc-ss-mint);
+}
+
 .audio {
   @include u.flex-center;
   @include u.square(32px);

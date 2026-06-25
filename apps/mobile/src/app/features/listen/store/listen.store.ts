@@ -15,6 +15,7 @@ import { ScriptCompilerService } from '../services/script-compiler.service';
 import {
   DEFAULT_LISTEN_SETTINGS,
   ListenSource,
+  LISTEN_PREFETCH_WINDOW,
   LISTEN_SESSION_KEY,
   LISTEN_SETTINGS_KEY,
   ListenSourceLabel,
@@ -65,6 +66,7 @@ const initialState: ListenState = {
   errorMessage: null,
   settings: DEFAULT_LISTEN_SETTINGS,
   sessionStartedAt: 0,
+  downloadStatus: 'idle',
 };
 
 export const ListenStore = signalStore(
@@ -193,6 +195,46 @@ export const ListenStore = signalStore(
       return copy;
     }
 
+    // ── Windowed audio prefetch ───────────────────────────────────────────────
+    // Pre-warm TARGET-language audio (word + first example) for a sliding window
+    // of upcoming cards only — not the whole queue — so we never generate audio
+    // for cards the user never reaches. Native audio is Web Speech, so it is not
+    // prefetched. Cleared whenever the queue is rebuilt.
+    const prefetchedIndices = new Set<number>();
+
+    function resetPrefetch(): void {
+      prefetchedIndices.clear();
+    }
+
+    /**
+     * Target-language audio items actually played for a card under the current
+     * mode: the headword always; the first example only in examples/deepDive (in
+     * compact mode the example is never spoken, so warming it would waste TTS).
+     */
+    function targetItemsForCard(c: Card): { text: string; language: string }[] {
+      const word = c.content.article ? `${c.content.article} ${c.content.back}` : c.content.back;
+      const items = [{ text: word, language: 'de-DE' }];
+      if (store.settings().playMode !== 'compact') {
+        const ex = c.content.examples?.[0];
+        if (ex?.target) items.push({ text: ex.target, language: 'de-DE' });
+      }
+      return items;
+    }
+
+    function prefetchWindow(startIdx: number): void {
+      const queue = store.queue();
+      const end = Math.min(queue.length, Math.max(0, startIdx) + LISTEN_PREFETCH_WINDOW);
+      const items: { text: string; language: string }[] = [];
+      for (let i = Math.max(0, startIdx); i < end; i++) {
+        if (prefetchedIndices.has(i)) continue;
+        prefetchedIndices.add(i);
+        const c = queue[i];
+        if (!c) continue;
+        items.push(...targetItemsForCard(c));
+      }
+      if (items.length) void wordAudio.preWarm(items);
+    }
+
     /** Wire up the concatMap runner to a given subject. Called once on init and
      *  re-called each time the pipeline is reset (so the new subject gets a subscriber). */
     function subscribeRunner(subject$: Subject<TaggedSegment>): void {
@@ -211,11 +253,16 @@ export const ListenStore = signalStore(
               map(() => generation),
             );
           }
-          const lang = segment.lang === 'de' ? 'de-DE' : 'en-US';
           // Apply the user-selected playback speed. Read live so a speed change
           // mid-session takes effect from the next segment.
           const rate = store.settings().speed;
-          return from(wordAudio.playAsPromise(segment.text, lang, rate)).pipe(
+          // Target language → cache-first HD pipeline.
+          // Native language (translations, grammar tips) → Web Speech only:
+          // free, instant, and avoids paid TTS for the secondary audio.
+          const playback = segment.lang === 'de'
+            ? wordAudio.playAsPromise(segment.text, 'de-DE', rate)
+            : wordAudio.playNative(segment.text, 'en-US', rate);
+          return from(playback).pipe(
             map(() => generation),
           );
         }),
@@ -251,6 +298,7 @@ export const ListenStore = signalStore(
             } else {
               patchState(store, { cardIndex: cardIdx + 1, segmentIndex: 0 });
               saveSession();
+              prefetchWindow(cardIdx + 1);
               emitNextSegment(gen);
             }
           }
@@ -287,23 +335,14 @@ export const ListenStore = signalStore(
           segmentIndex: 0,
           status: 'idle',
           errorMessage: null,
+          downloadStatus: 'idle',
         });
         localStorage.removeItem(LISTEN_SESSION_KEY);
 
-        const toWarm = queue.flatMap(c => {
-          const word = c.content.article ? `${c.content.article} ${c.content.back}` : c.content.back;
-          const items = [
-            { text: word, language: 'de-DE' },
-            { text: c.content.front, language: 'en-US' },
-          ];
-          const ex = c.content.examples?.[0];
-          if (ex) {
-            items.push({ text: ex.target, language: 'de-DE' });
-            items.push({ text: ex.native, language: 'en-US' });
-          }
-          return items;
-        });
-        void wordAudio.preWarm(toWarm);
+        // Warm only the first window of target-language audio. The window slides
+        // forward as playback advances (see prefetchWindow callers).
+        resetPrefetch();
+        prefetchWindow(0);
       },
 
       loadDueCards(): void {
@@ -341,6 +380,33 @@ export const ListenStore = signalStore(
         patchState(store, { sourceLabel });
       },
 
+      /**
+       * Download the whole queue's TARGET-language audio to the device so the
+       * playlist plays offline. Reuses the cache-first preWarm (which persists to
+       * the device filesystem/IndexedDB). Native audio stays Web Speech, which is
+       * already offline-capable. Cache-read for free users, generates for Pro
+       * (enforced server-side); either way whatever HD exists is downloaded.
+       */
+      async downloadQueueForOffline(): Promise<void> {
+        if (store.downloadStatus() === 'downloading') return;
+        const queue = store.queue();
+        if (!queue.length) return;
+
+        patchState(store, { downloadStatus: 'downloading' });
+        // Download exactly what the current mode plays (compact = headwords only),
+        // so we never fetch/generate example audio the user won't hear offline.
+        const items = queue.flatMap(c => targetItemsForCard(c));
+
+        try {
+          await wordAudio.preWarm(items);
+          // The whole queue is now warm — keep the sliding prefetch from redoing it.
+          for (let i = 0; i < queue.length; i++) prefetchedIndices.add(i);
+          patchState(store, { downloadStatus: 'done' });
+        } catch {
+          patchState(store, { downloadStatus: 'idle' });
+        }
+      },
+
       start(opts: { shuffle?: boolean } = {}): void {
         if (opts.shuffle !== undefined) {
           const settings = { ...store.settings(), shuffle: opts.shuffle };
@@ -354,6 +420,8 @@ export const ListenStore = signalStore(
           queue, scripts, cardIndex: 0, segmentIndex: 0, status: 'playing',
           errorMessage: null, sessionStartedAt: Date.now(),
         });
+        resetPrefetch();
+        prefetchWindow(0);
         resetPipeline(subscribeRunner);
         emitNextSegment(gen);
       },
@@ -380,6 +448,7 @@ export const ListenStore = signalStore(
         const gen = abortAndAdvance();
         patchState(store, { cardIndex: idx + 1, segmentIndex: 0 });
         saveSession();
+        prefetchWindow(idx + 1);
         if (wasPlaying) {
           resetPipeline(subscribeRunner);
           emitNextSegment(gen);
@@ -393,6 +462,7 @@ export const ListenStore = signalStore(
         const gen = abortAndAdvance();
         patchState(store, { cardIndex: idx - 1, segmentIndex: 0 });
         saveSession();
+        prefetchWindow(idx - 1);
         if (wasPlaying) {
           resetPipeline(subscribeRunner);
           emitNextSegment(gen);
@@ -416,6 +486,7 @@ export const ListenStore = signalStore(
         }
         const gen = abortAndAdvance();
         patchState(store, { cardIndex: idx + 1, segmentIndex: 0, status: 'playing', errorMessage: null });
+        prefetchWindow(idx + 1);
         resetPipeline(subscribeRunner);
         emitNextSegment(gen);
       },
@@ -431,6 +502,17 @@ export const ListenStore = signalStore(
           const recompiled = compileQueue(remaining, settings.playMode);
           const newScripts = [...store.scripts().slice(0, playedIdx + 1), ...recompiled];
           patchState(store, { scripts: newScripts });
+
+          // The set of audio items per card depends on the mode (examples/deepDive
+          // add the example clip). Re-warm the current window so a switch into an
+          // example mode prefetches the newly-needed example audio instead of
+          // leaving it to a cache-miss fallback. Also reset the offline-download
+          // badge since a prior download may not cover the new mode's example audio.
+          resetPrefetch();
+          prefetchWindow(store.cardIndex());
+          if (store.downloadStatus() === 'done') {
+            patchState(store, { downloadStatus: 'idle' });
+          }
         }
       },
 
@@ -446,6 +528,8 @@ export const ListenStore = signalStore(
           queue, scripts, cardIndex: 0, segmentIndex: 0, status: 'playing',
           errorMessage: null, sessionStartedAt: Date.now(),
         });
+        resetPrefetch();
+        prefetchWindow(0);
         resetPipeline(subscribeRunner);
         emitNextSegment(gen);
       },

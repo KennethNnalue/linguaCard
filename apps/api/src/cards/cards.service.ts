@@ -7,6 +7,7 @@ import type { CreateCardDto, UpdateCardDto, CardQueryParams } from '@lingua-card
 import { computeFSRS, freshFsrsState } from '@lingua-card/shared/utils';
 import { CardEntity } from './card.entity';
 import { WordAudioService } from '../word-audio/word-audio.service';
+import { SubscriptionService } from '../subscriptions/subscription.service';
 
 export interface PendingSrsRating {
   cardId: string;
@@ -23,6 +24,7 @@ export class CardsService {
     @InjectRepository(CardEntity)
     private readonly repo: Repository<CardEntity>,
     @Optional() private readonly wordAudioService?: WordAudioService,
+    @Optional() private readonly subscriptions?: SubscriptionService,
   ) {}
 
   async findAll(userId: string, query: CardQueryParams): Promise<Card[]> {
@@ -90,10 +92,16 @@ export class CardsService {
     });
     const saved = await this.repo.save(entity);
 
-    // Fire-and-forget: pre-generate audio for the new word so it's ready before user taps play
+    // Fire-and-forget: pre-generate audio for the new word so it's ready before
+    // the user taps play — but ONLY for Pro users. Free users' custom-card audio
+    // is lazy (cache-first at play, Web Speech otherwise). If the subscription
+    // service isn't wired (e.g. tests), skip eager generation to stay cost-safe.
     if (this.wordAudioService) {
       const text = (dto.content.article ? `${dto.content.article} ` : '') + dto.content.back;
-      this.wordAudioService.resolve(text, 'de-DE').catch(err => {
+      void (async () => {
+        if (!this.subscriptions || !(await this.subscriptions.isProUser(userId))) return;
+        await this.wordAudioService!.resolve(text, 'de-DE');
+      })().catch(err => {
         this.logger.warn(`Pre-generation failed for "${text}":`, err);
       });
     }

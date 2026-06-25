@@ -60,6 +60,13 @@ export class AdminController {
     await this.adminService.setStoryCategory(id, dto.storyCategory ?? null);
   }
 
+  @Post('platform-collections/backfill-audio')
+  @HttpCode(202)
+  backfillCollectionAudio(): { started: boolean } {
+    // Runs in the background (large libraries can take minutes) — returns 202 now.
+    return this.adminService.startBackfillPublishedCollectionAudio();
+  }
+
   @Post('platform-collections/import')
   @HttpCode(200)
   importCollection(@Body() dto: AdminImportCollectionDto): Promise<AdminImportCollectionResult> {

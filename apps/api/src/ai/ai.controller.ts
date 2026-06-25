@@ -4,6 +4,8 @@ import { GoogleCloudTTSAdapter } from './providers/google-cloud-tts.adapter';
 import { GeminiAdapter } from './providers/gemini.adapter';
 import { StorageService } from '../storage/storage.service';
 import { WordAudioService } from '../word-audio/word-audio.service';
+import { SubscriptionService } from '../subscriptions/subscription.service';
+import { CurrentUser } from '../common/decorators/current-user.decorator';
 import { audioExtFor } from '../common/audio/audio-format';
 
 interface TtsRequestDto {
@@ -29,6 +31,7 @@ export class AiController {
     private readonly storage: StorageService,
     @Inject(forwardRef(() => WordAudioService))
     private readonly wordAudio: WordAudioService,
+    private readonly subscriptions: SubscriptionService,
   ) {}
 
   @Post('tts')
@@ -86,11 +89,14 @@ export class AiController {
    */
   @Post('pronunciation')
   async pronunciation(
+    @CurrentUser() userId: string,
     @Body() dto: PronunciationRequestDto,
     @Res() res: Response,
   ): Promise<void> {
     try {
-      const result = await this.wordAudio.resolve(dto.text, dto.language ?? 'de-DE');
+      // Only Pro can trigger new HD generation; everyone reads the cache.
+      const generate = await this.subscriptions.isProUser(userId);
+      const result = await this.wordAudio.resolve(dto.text, dto.language ?? 'de-DE', { generate });
       res.json({
         audioUrl: result.wordAudio.audioUrl,
         durationMs: result.wordAudio.durationMs,

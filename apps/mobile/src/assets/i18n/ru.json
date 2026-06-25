@@ -1,6 +1,11 @@
 {
   "common": {
     "appName": "LinguaCard",
+    "update": {
+      "available": "Доступна новая версия",
+      "reload": "Обновить",
+      "updating": "Обновление…"
+    },
     "cancel": "Отмена",
     "close": "Закрыть",
     "save": "Сохранить",
@@ -775,7 +780,11 @@
       "headerLabel": "Очередь",
       "emptyTitle": "Нет слов в очереди",
       "emptyDesc": "Нажмите на источник выше, чтобы выбрать плейлист",
-      "previewAriaLabel": "Предпрослушивание"
+      "previewAriaLabel": "Предпрослушивание",
+      "hdReadyTitle": "HD-аудио доступно офлайн",
+      "download": "Скачать",
+      "downloading": "Загрузка…",
+      "downloaded": "Сохранено офлайн"
     },
     "sourceSheet": {
       "title": "Выберите источник плейлиста"

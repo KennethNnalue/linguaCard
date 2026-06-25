@@ -1,6 +1,11 @@
 {
   "common": {
     "appName": "LinguaCard",
+    "update": {
+      "available": "Доступна нова версія",
+      "reload": "Перезавантажити",
+      "updating": "Оновлення…"
+    },
     "cancel": "Скасувати",
     "close": "Закрити",
     "save": "Зберегти",
@@ -775,7 +780,11 @@
       "headerLabel": "Черга",
       "emptyTitle": "Немає слів у черзі",
       "emptyDesc": "Натисніть на джерело вище, щоб обрати плейлист",
-      "previewAriaLabel": "Попередній перегляд аудіо"
+      "previewAriaLabel": "Попередній перегляд аудіо",
+      "hdReadyTitle": "HD-аудіо доступне офлайн",
+      "download": "Завантажити",
+      "downloading": "Завантаження…",
+      "downloaded": "Збережено офлайн"
     },
     "sourceSheet": {
       "title": "Оберіть джерело плейлиста"

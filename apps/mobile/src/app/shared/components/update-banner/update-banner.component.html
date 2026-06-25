@@ -1,0 +1,9 @@
+@if (isVisible()) {
+  <div class="update-banner" [@slideDown] role="status" aria-live="polite">
+    <ion-icon name="sparkles-outline"></ion-icon>
+    <span>{{ 'common.update.available' | translate }}</span>
+    <button type="button" class="reload-btn" (click)="reload()" [disabled]="isReloading()">
+      {{ (isReloading() ? 'common.update.updating' : 'common.update.reload') | translate }}
+    </button>
+  </div>
+}

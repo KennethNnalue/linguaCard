@@ -8,9 +8,10 @@ import { GoogleCloudTTSAdapter } from './providers/google-cloud-tts.adapter';
 import { AiController } from './ai.controller';
 import { StorageService } from '../storage/storage.service';
 import { WordAudioModule } from '../word-audio/word-audio.module';
+import { SubscriptionsModule } from '../subscriptions/subscriptions.module';
 
 @Module({
-  imports: [forwardRef(() => WordAudioModule)],
+  imports: [forwardRef(() => WordAudioModule), SubscriptionsModule],
   controllers: [AiController],
   providers: [AnthropicAdapter, OpenAIAdapter, GeminiAdapter, OpenRouterAdapter, GroqWhisperAdapter, GoogleCloudTTSAdapter, StorageService],
   exports: [AnthropicAdapter, OpenAIAdapter, GeminiAdapter, OpenRouterAdapter, GroqWhisperAdapter, GoogleCloudTTSAdapter, StorageService],

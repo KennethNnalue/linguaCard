@@ -1,6 +1,11 @@
 {
   "common": {
     "appName": "LinguaCard",
+    "update": {
+      "available": "A new version is available",
+      "reload": "Reload",
+      "updating": "Updating…"
+    },
     "cancel": "Cancel",
     "close": "Close",
     "save": "Save",
@@ -890,7 +895,11 @@
       "headerLabel": "Queue",
       "emptyTitle": "No words in queue",
       "emptyDesc": "Tap the source above to choose a playlist",
-      "previewAriaLabel": "Preview audio"
+      "previewAriaLabel": "Preview audio",
+      "hdReadyTitle": "HD audio ready offline",
+      "download": "Download",
+      "downloading": "Downloading…",
+      "downloaded": "Saved offline"
     },
     "sourceSheet": {
       "title": "Choose a playlist source"

@@ -1,6 +1,11 @@
 {
   "common": {
     "appName": "LinguaCard",
+    "update": {
+      "available": "يتوفر إصدار جديد",
+      "reload": "إعادة التحميل",
+      "updating": "جارٍ التحديث…"
+    },
     "cancel": "إلغاء",
     "close": "إغلاق",
     "save": "حفظ",
@@ -775,7 +780,11 @@
       "headerLabel": "قائمة الانتظار",
       "emptyTitle": "لا توجد كلمات في قائمة الانتظار",
       "emptyDesc": "اضغط على المصدر أعلاه لاختيار قائمة تشغيل",
-      "previewAriaLabel": "معاينة الصوت"
+      "previewAriaLabel": "معاينة الصوت",
+      "hdReadyTitle": "صوت عالي الجودة متاح دون اتصال",
+      "download": "تنزيل",
+      "downloading": "جارٍ التنزيل…",
+      "downloaded": "محفوظ دون اتصال"
     },
     "sourceSheet": {
       "title": "اختر مصدر قائمة التشغيل"

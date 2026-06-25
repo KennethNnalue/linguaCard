@@ -1,12 +1,14 @@
 import { Injectable, Logger, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { In, Repository } from 'typeorm';
 import { randomUUID } from 'crypto';
 import { PlatformCollectionEntity } from './platform-collection.entity';
 import { PlatformCollectionWordEntity } from './platform-collection-word.entity';
 import { PlatformStoryEntity } from '../platform-stories/platform-story.entity';
 import { UserStoryProgressEntity } from '../platform-stories/user-story-progress.entity';
+import { WordDictionaryEntity } from '../word-dictionary/word-dictionary.entity';
 import { WordDictionaryService } from '../word-dictionary/word-dictionary.service';
+import { WordAudioService } from '../word-audio/word-audio.service';
 import { StoryAudioService } from '../stories/story-audio.service';
 import type {
   AdminImportCollectionDto,
@@ -31,11 +33,86 @@ export class AdminService {
     private readonly storyRepo: Repository<PlatformStoryEntity>,
     @InjectRepository(UserStoryProgressEntity)
     private readonly storyProgressRepo: Repository<UserStoryProgressEntity>,
+    @InjectRepository(WordDictionaryEntity)
+    private readonly dictRepo: Repository<WordDictionaryEntity>,
     private readonly dictionary: WordDictionaryService,
+    private readonly wordAudio: WordAudioService,
     private readonly storyAudio: StoryAudioService,
   ) {}
 
   private readonly logger = new Logger(AdminService.name);
+
+  /** Guard so two admins can't kick off overlapping backfills (wasted TTS spend). */
+  private backfillRunning = false;
+
+  /**
+   * Kick off the published-collection audio backfill in the background and return
+   * immediately, so the request never times out behind a proxy on a large library.
+   * Progress + the final summary are logged. Returns `{ started: false }` if a
+   * backfill is already in flight.
+   */
+  startBackfillPublishedCollectionAudio(): { started: boolean } {
+    if (this.backfillRunning) return { started: false };
+    this.backfillRunning = true;
+    void this.backfillPublishedCollectionAudio()
+      .then(r => this.logger.log(
+        `Backfill complete: ${r.collections} collection(s), ${r.words} clips, ` +
+        `${r.generated} generated, ${r.reused} reused.`,
+      ))
+      .catch(err => this.logger.error('Backfill failed', err))
+      .finally(() => { this.backfillRunning = false; });
+    return { started: true };
+  }
+
+  /**
+   * Backfill: generate (and cache) HD audio for every word in every PUBLISHED
+   * platform collection that doesn't already have it. New imports already seed
+   * audio at import time ([collection-complete.service.ts]); this covers
+   * collections published before that, or where generation previously failed.
+   * Internal path → ungated (always generates), so the global cache is seeded for
+   * all users (incl. free) to reuse. Idempotent: already-cached words are reused.
+   */
+  async backfillPublishedCollectionAudio(): Promise<{
+    collections: number;
+    words: number;
+    generated: number;
+    reused: number;
+  }> {
+    const collections = await this.collectionRepo.find({ where: { isPublished: true } });
+    if (!collections.length) return { collections: 0, words: 0, generated: 0, reused: 0 };
+
+    const wordRows = await this.wordRepo.find({
+      where: { platformCollectionId: In(collections.map(c => c.id)) },
+    });
+    const dictIds = [...new Set(wordRows.map(w => w.dictionaryWordId))];
+    if (!dictIds.length) return { collections: collections.length, words: 0, generated: 0, reused: 0 };
+
+    const dictEntries = await this.dictRepo.findBy({ id: In(dictIds) });
+
+    // Build deduped target-language audio items (headword + first example).
+    const seen = new Set<string>();
+    const items: { text: string; language: string }[] = [];
+    for (const e of dictEntries) {
+      if (!e.displayText?.trim()) continue;
+      const word = (e.article ? `${e.article} ` : '') + e.displayText;
+      for (const text of [word, e.examples?.[0]?.target]) {
+        if (!text?.trim() || seen.has(text)) continue;
+        seen.add(text);
+        items.push({ text, language: 'de-DE' });
+      }
+    }
+
+    this.logger.log(
+      `Backfilling audio for ${collections.length} published collection(s), ${items.length} unique clips…`,
+    );
+    const result = await this.wordAudio.batchResolve(items);
+    return {
+      collections: collections.length,
+      words: items.length,
+      generated: result.generated,
+      reused: result.reused,
+    };
+  }
 
   async importCollectionJson(dto: AdminImportCollectionJsonDto): Promise<AdminImportCollectionJsonResult> {
     const collectionId = crypto.randomUUID();

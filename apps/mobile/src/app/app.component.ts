@@ -16,11 +16,13 @@ import {SubscriptionStore} from './features/subscription/store/subscription.stor
 import {AuthService} from './core/services/auth.service';
 import {PwaInstallBannerComponent} from './shared/components/pwa-install-banner/pwa-install-banner.component';
 import {OfflineBannerComponent} from './shared/components/offline-banner/offline-banner.component';
+import {UpdateBannerComponent} from './shared/components/update-banner/update-banner.component';
+import {PwaUpdateService} from './core/services/pwa-update.service';
 
 @Component({
   selector: 'lc-root',
   templateUrl: 'app.component.html',
-  imports: [IonApp, IonRouterOutlet, PwaInstallBannerComponent, OfflineBannerComponent],
+  imports: [IonApp, IonRouterOutlet, PwaInstallBannerComponent, OfflineBannerComponent, UpdateBannerComponent],
 })
 export class AppComponent implements OnInit {
   private readonly themeService = inject(ThemeService);
@@ -34,9 +36,11 @@ export class AppComponent implements OnInit {
   private readonly settingsStore = inject(SettingsStore);
   private readonly subscriptionStore = inject(SubscriptionStore);
   private readonly authService = inject(AuthService);
+  private readonly pwaUpdate = inject(PwaUpdateService);
 
   constructor() {
     this.themeService.initialize();
+    this.pwaUpdate.initialize();
     // Language is loaded before first paint via an app initializer (see main.ts);
     // initializing it here too would double-trigger the bundle load.
   }

@@ -1,6 +1,11 @@
 {
   "common": {
     "appName": "LinguaCard",
+    "update": {
+      "available": "Yeni bir sürüm mevcut",
+      "reload": "Yeniden yükle",
+      "updating": "Güncelleniyor…"
+    },
     "cancel": "İptal",
     "close": "Kapat",
     "save": "Kaydet",
@@ -775,7 +780,11 @@
       "headerLabel": "Sıra",
       "emptyTitle": "Sırada kelime yok",
       "emptyDesc": "Çalma listesi seçmek için yukarıdaki kaynağa dokunun",
-      "previewAriaLabel": "Sesi önizle"
+      "previewAriaLabel": "Sesi önizle",
+      "hdReadyTitle": "HD ses çevrimdışı hazır",
+      "download": "İndir",
+      "downloading": "İndiriliyor…",
+      "downloaded": "Çevrimdışı kaydedildi"
     },
     "sourceSheet": {
       "title": "Çalma listesi kaynağı seçin"

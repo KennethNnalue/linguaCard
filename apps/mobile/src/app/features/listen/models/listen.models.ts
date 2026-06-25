@@ -67,6 +67,13 @@ export const SilenceDuration = {
 
 export const MAX_FALLBACK_QUEUE_SIZE = 20;
 
+// ─── Audio Prefetch ───────────────────────────────────────────────────────────
+
+// How many cards ahead (incl. the current one) to pre-warm target-language audio
+// for. Replaces whole-queue pre-warm so we don't generate audio for cards the
+// user never reaches. Window slides forward as playback advances.
+export const LISTEN_PREFETCH_WINDOW = 3;
+
 // ─── Mastery Threshold ────────────────────────────────────────────────────────
 
 export const STRUGGLING_MASTERY_THRESHOLD = 2;
@@ -107,7 +114,11 @@ export interface ListenState {
   /** Epoch ms when the current playback session started — used to compute
    *  real elapsed time on the Session Complete screen. 0 when no session. */
   sessionStartedAt: number;
+  /** Offline-download state for the whole current queue's target audio. */
+  downloadStatus: OfflineDownloadStatus;
 }
+
+export type OfflineDownloadStatus = 'idle' | 'downloading' | 'done';
 
 // ─── Teleprompter ─────────────────────────────────────────────────────────────
 

@@ -1,17 +1,15 @@
 import { Injectable, computed, inject, signal } from '@angular/core';
 import { type Card, type WordAudioResolveRequest } from '@lingua-card/shared/domain';
 import { AiAudioCacheService } from '../../features/ai/audio/ai-audio-cache.service';
-import { GeminiAdapter } from '../../features/ai/providers/gemini.adapter';
 import { AudioService } from './audio.service';
 import { WordAudioApiService } from './word-audio-api.service';
-import { AudioReadinessStore } from './audio-readiness.store';
+import { AudioReadinessStore, AudioReadinessStatus } from './audio-readiness.store';
 import { normalizeForAudio } from './normalize';
 
 @Injectable({ providedIn: 'root' })
 export class WordAudioService {
   private readonly api = inject(WordAudioApiService);
   private readonly cache = inject(AiAudioCacheService);
-  private readonly gemini = inject(GeminiAdapter);
   private readonly fallback = inject(AudioService);
   private readonly audioReadiness = inject(AudioReadinessStore);
 
@@ -107,12 +105,20 @@ export class WordAudioService {
    * and the next word in the playlist will benefit from the cache.
    *
    * `rate` is the playback speed (1 = normal). It is applied to the
-   * HTMLAudioElement's playbackRate for cached/ephemeral audio and to the
-   * Web-Speech utterance rate for the fallback path. Defaults to 1 so callers
-   * outside the listen playlist (e.g. Stories) are unaffected.
+   * HTMLAudioElement's playbackRate for cached audio and to the Web-Speech
+   * utterance rate for the fallback path. Defaults to 1 so callers outside the
+   * listen playlist (e.g. Stories) are unaffected.
+   *
+   * Cost note: on a cache miss we fall straight to Web Speech and let the
+   * background resolveUrl() persist the HD asset for next time. We deliberately
+   * do NOT generate a throwaway one-shot clip here — that double-paid for audio
+   * that was never cached.
    */
   async playAsPromise(text: string, language = 'de-DE', rate = 1): Promise<void> {
-    const RESOLVE_TIMEOUT_MS = 1500;
+    // Short timeout: windowed prefetch means the word is usually already a
+    // memory-cache hit (resolves instantly). On a genuine miss, fall back to
+    // Web Speech quickly rather than stalling the playlist.
+    const RESOLVE_TIMEOUT_MS = 700;
 
     const url = await Promise.race([
       this.resolveUrl(text, language),
@@ -123,14 +129,27 @@ export class WordAudioService {
       return this._playAndWait(url, false, rate);
     }
 
-    if (!this._isRateLimited()) {
-      const ephemeralUrl = await this._ephemeralTts(text, language);
-      if (ephemeralUrl) {
-        // ephemeral = true: this blob was never stored in _urlMap, revoke after play.
-        return this._playAndWait(ephemeralUrl, true, rate);
-      }
-    }
+    // Miss → instant Web Speech. resolveUrl() keeps running in the background
+    // (deduplicated via _inflight) so the HD asset is ready next time.
+    return this._speakFallback(text, language, rate);
+  }
 
+  /**
+   * Native-language audio policy for the listen playlist.
+   *
+   * Today: browser Web Speech — free, instant, offline, and works for any
+   * native language without per-language TTS voices. The product value is
+   * hearing the *target* language; the translation is secondary.
+   *
+   * Future (cost/quality option 2): route single native words (not sentences)
+   * through the cached HD pipeline here — the call site does not change.
+   */
+  playNative(text: string, language = 'en-US', rate = 1): Promise<void> {
+    return this._speakFallback(text, language, rate);
+  }
+
+  /** Speak via the Web Speech fallback, resolving when it ends (or errors). */
+  private _speakFallback(text: string, language: string, rate: number): Promise<void> {
     return new Promise(resolve => {
       this.fallback.speak(text, language, rate).subscribe({
         next: () => resolve(), error: () => resolve(), complete: () => resolve(),
@@ -146,6 +165,19 @@ export class WordAudioService {
   hasCached(text: string, language = 'de-DE'): boolean {
     const cacheKey = this._cacheKey(normalizeForAudio(text, language), language);
     return this._urlMap.has(cacheKey);
+  }
+
+  /**
+   * Readiness of the HD asset for a word, for UI hints (e.g. queue "HD ready"
+   * dots). 'ready' once the asset is cached, 'pending' while resolving, 'failed',
+   * or 'unknown'. Reactive: reads the AudioReadinessStore signal, so callers can
+   * wrap it in a computed() and it re-evaluates as words become ready.
+   */
+  readinessFor(text: string, language = 'de-DE'): AudioReadinessStatus | 'unknown' {
+    const cacheKey = this._cacheKey(normalizeForAudio(text, language), language);
+    const status = this.audioReadiness.statusFor(cacheKey);
+    if (status !== 'unknown') return status;
+    return this._urlMap.has(cacheKey) ? 'ready' : 'unknown';
   }
 
   /**
@@ -259,31 +291,6 @@ export class WordAudioService {
       return null;
     } finally {
       this._loadingKeys.update(s => { s.delete(cacheKey); return new Set(s); });
-    }
-  }
-
-  private _isRateLimited(): boolean {
-    return Date.now() < this._rateLimitedUntil;
-  }
-
-  /** Calls /ai/tts for a one-shot object URL. Returns null if the call fails.
-   *  Propagates 429 responses into the shared rate-limit clock so subsequent
-   *  resolve() calls are also gated — both paths share the same Gemini quota.
-   */
-  private async _ephemeralTts(text: string, language: string): Promise<string | null> {
-    try {
-      const speech = await this.gemini.generateSpeech({ text, language });
-      return URL.createObjectURL(new Blob([speech.audioBuffer], { type: 'audio/wav' }));
-    } catch (err: any) {
-      if (err?.status === 429) {
-        const headerSecs = err?.headers?.get?.('Retry-After');
-        const bodyMs = err?.error?.retryAfterMs;
-        const retryAfterMs = headerSecs != null
-          ? parseInt(String(headerSecs), 10) * 1000
-          : (typeof bodyMs === 'number' ? bodyMs : 30_000);
-        this._rateLimitedUntil = Date.now() + retryAfterMs;
-      }
-      return null;
     }
   }
 

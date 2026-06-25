@@ -83,7 +83,36 @@
   <!-- Queue header -->
   <div class="queue-hdr">
     <span class="queue-hdr-title">{{ 'listen.queue.headerLabel' | translate }} ({{ queueCount() }})</span>
-    <span class="queue-hdr-time">~{{ listenStore.estimatedMinutes() }} {{ 'listen.queue.durationUnit' | translate }}</span>
+    @if (queueCount()) {
+      @let dl = listenStore.downloadStatus();
+      <button
+        type="button"
+        class="download-btn"
+        [class.done]="dl === 'done'"
+        [disabled]="dl !== 'idle'"
+        (click)="downloadOffline()">
+        @switch (dl) {
+          @case ('downloading') {
+            <svg class="spin" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+              <path d="M21 12a9 9 0 1 1-6.2-8.5"/>
+            </svg>
+            {{ 'listen.queue.downloading' | translate }}
+          }
+          @case ('done') {
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+              <polyline points="20,6 9,17 4,12"/>
+            </svg>
+            {{ 'listen.queue.downloaded' | translate }}
+          }
+          @default {
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M12 3v12"/><polyline points="7,10 12,15 17,10"/><path d="M5 21h14"/>
+            </svg>
+            {{ 'listen.queue.download' | translate }}
+          }
+        }
+      </button>
+    }
   </div>
 
   <!-- Queue list -->

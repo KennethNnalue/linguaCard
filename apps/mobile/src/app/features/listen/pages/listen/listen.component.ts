@@ -115,4 +115,8 @@ export class ListenComponent implements ViewWillEnter {
   playCardAudio(card: Card): void {
     void this.wordAudio.playCard(card);
   }
+
+  downloadOffline(): void {
+    void this.listenStore.downloadQueueForOffline();
+  }
 }

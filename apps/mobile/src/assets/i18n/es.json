@@ -1,6 +1,11 @@
 {
   "common": {
     "appName": "LinguaCard",
+    "update": {
+      "available": "Hay una nueva versión disponible",
+      "reload": "Recargar",
+      "updating": "Actualizando…"
+    },
     "cancel": "Cancelar",
     "close": "Cerrar",
     "save": "Guardar",
@@ -775,7 +780,11 @@
       "headerLabel": "Cola",
       "emptyTitle": "No hay palabras en la cola",
       "emptyDesc": "Toca la fuente de arriba para elegir una lista de reproducción",
-      "previewAriaLabel": "Vista previa de audio"
+      "previewAriaLabel": "Vista previa de audio",
+      "hdReadyTitle": "Audio HD disponible sin conexión",
+      "download": "Descargar",
+      "downloading": "Descargando…",
+      "downloaded": "Guardado sin conexión"
     },
     "sourceSheet": {
       "title": "Elige una fuente de lista de reproducción"

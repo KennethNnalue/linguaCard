@@ -35,7 +35,12 @@ export class WordAudioService {
     private readonly storage: StorageService,
   ) {}
 
-  async resolve(text: string, language = 'de-DE'): Promise<WordAudioResolveResponse> {
+  async resolve(
+    text: string,
+    language = 'de-DE',
+    opts: { generate?: boolean } = {},
+  ): Promise<WordAudioResolveResponse> {
+    const generate = opts.generate ?? true;
     const normalizedText = normalizeForAudio(text, language);
     const inflightKey    = `${language}:${normalizedText}`;
 
@@ -51,6 +56,17 @@ export class WordAudioService {
 
     if (existing?.status === 'ready') {
       return { wordAudio: this.toModel(existing), cached: true };
+    }
+
+    // Cache-read-only mode (non-Pro callers): never trigger generation. Return the
+    // ready asset if it exists (handled above); otherwise an empty model so the
+    // client falls back to Web Speech. Do NOT create a row or mark it failed — a
+    // Pro user (or a server seed) must still be able to generate it later.
+    if (!generate) {
+      return {
+        wordAudio: this.toModel(existing ?? this._emptyModel(normalizedText, text, language)),
+        cached: false,
+      };
     }
 
     // If the last generation failed recently, return the failed record with a
@@ -107,14 +123,18 @@ export class WordAudioService {
   // Large collections are chunked here so the service — not callers — controls batch size.
   private static readonly BATCH_MAX = 100;
 
-  async batchResolve(words: WordAudioResolveRequest[]): Promise<WordAudioBatchResolveResponse> {
+  async batchResolve(
+    words: WordAudioResolveRequest[],
+    opts: { generate?: boolean } = {},
+  ): Promise<WordAudioBatchResolveResponse> {
+    const generate = opts.generate ?? true;
     // If callers send more than BATCH_MAX words, process them in sequential passes
     // and merge the results, so no words are silently dropped.
     if (words.length > WordAudioService.BATCH_MAX) {
       const merged: WordAudioBatchResolveResponse = { results: [], generated: 0, reused: 0 };
       for (let i = 0; i < words.length; i += WordAudioService.BATCH_MAX) {
         const chunk = words.slice(i, i + WordAudioService.BATCH_MAX);
-        const part  = await this.batchResolve(chunk);
+        const part  = await this.batchResolve(chunk, opts);
         merged.results.push(...part.results);
         merged.generated += part.generated;
         merged.reused    += part.reused;
@@ -150,6 +170,26 @@ export class WordAudioService {
     let generated = 0;
     let reused = 0;
 
+    // Cache-read-only mode (non-Pro): resolve everything from the existing rows we
+    // already fetched — no per-word resolve() calls, no generation. Ready rows are
+    // returned as cached; everything else gets an empty model (audioUrl null) so the
+    // client falls back to Web Speech.
+    if (!generate) {
+      for (const n of normalized) {
+        const e = existingMap.get(`${n.language}:${n.normalizedText}`);
+        if (e?.status === 'ready') {
+          results.push({ wordAudio: this.toModel(e), cached: true });
+          reused++;
+        } else {
+          results.push({
+            wordAudio: this.toModel(e ?? this._emptyModel(n.normalizedText, n.original.text, n.language)),
+            cached: false,
+          });
+        }
+      }
+      return { results, generated: 0, reused };
+    }
+
     // 'ready'   → return immediately, no generation needed
     // 'pending' → generation is already in-flight (another process or prior call);
     //             return the entity as-is so the client gets the audioUrl once it's ready.
@@ -174,7 +214,7 @@ export class WordAudioService {
     for (let i = 0; i < needsGeneration.length; i += BATCH_CONCURRENCY) {
       const chunk = needsGeneration.slice(i, i + BATCH_CONCURRENCY);
       const settled = await Promise.allSettled(
-        chunk.map(n => this.resolve(n.original.text, n.language)),
+        chunk.map(n => this.resolve(n.original.text, n.language, opts)),
       );
       for (const result of settled) {
         if (result.status === 'fulfilled') {
