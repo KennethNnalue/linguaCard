@@ -1,0 +1,70 @@
+@use 'theme/tokens' as t;
+@use 'theme/utils' as u;
+
+:host {
+  display: block;
+}
+
+.row {
+  position: relative;
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: t.$lc-space-3;
+  padding: t.$lc-space-3;
+  background: var(--lc-card);
+  border: 1px solid var(--lc-border);
+  border-radius: t.$lc-radius-md;
+  box-shadow: var(--lc-shadow-card);
+  text-align: start;
+  cursor: pointer;
+  @include u.touch-state;
+}
+
+.strip {
+  align-self: stretch;
+  width: 4px;
+  border-radius: t.$lc-radius-full;
+  flex-shrink: 0;
+}
+
+.body {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+}
+
+.headword {
+  font-family: t.$lc-font-display;
+  @include u.lc-font('lg', t.$lc-font-weight-medium);
+  color: var(--lc-text-primary);
+  line-height: 1.15;
+  @include u.text-overflow;
+}
+
+.translation {
+  @include u.lc-font('xs', t.$lc-font-weight-medium);
+  color: var(--lc-text-secondary);
+  @include u.text-overflow;
+}
+
+.due-pill {
+  flex-shrink: 0;
+  font-family: t.$lc-font-mono;
+  @include u.lc-font('xxs', t.$lc-font-weight-semibold);
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: var(--lc-accent);
+  background: var(--lc-accent-light);
+  border: 1px solid var(--lc-accent);
+  padding: 3px t.$lc-space-2;
+  border-radius: t.$lc-radius-full;
+}
+
+.mastery-label {
+  flex-shrink: 0;
+  @include u.lc-font('xs', t.$lc-font-weight-semibold);
+  color: var(--lc-text-hint);
+}

@@ -61,21 +61,19 @@ export const routes: Routes = [
         loadComponent: () =>
           import('./features/vault/import/pages/image-import-review/image-import-review.page').then(m => m.ImageImportReviewPage),
       },
+      // The standalone Collections list + Explore-topic pages are retired — the
+      // Vault home now owns personal collections (shelves) and the in-page Explore.
+      // /vault/collections redirects to the Vault for any lingering deep links.
       {
         path: 'vault/collections',
-        loadComponent: () =>
-          import('./features/vault/pages/collections/collections.page').then(m => m.CollectionsPage),
+        redirectTo: 'vault',
+        pathMatch: 'full',
       },
       {
         path: 'vault/collections/platform/:id',
         loadComponent: () =>
           import('./features/vault/pages/platform-collection-detail/platform-collection-detail.page')
             .then(m => m.PlatformCollectionDetailPage),
-      },
-      {
-        path: 'vault/explore/topic/:topic',
-        loadComponent: () =>
-          import('./features/vault/pages/explore-topic/explore-topic.page').then(m => m.ExploreTopicPage),
       },
       {
         path: 'vault/collections/:id',

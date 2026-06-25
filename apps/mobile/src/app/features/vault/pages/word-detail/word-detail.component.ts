@@ -2,14 +2,12 @@ import {Component, computed, inject, signal} from '@angular/core';
 import {ActivatedRoute, Router} from '@angular/router';
 import {toSignal} from '@angular/core/rxjs-interop';
 import {map} from 'rxjs/operators';
-import {AlertController, IonContent, IonHeader, IonIcon, IonToolbar, ModalController, NavController,} from '@ionic/angular/standalone';
+import {AlertController, IonContent, IonIcon, ModalController, NavController,} from '@ionic/angular/standalone';
 import {TranslatePipe, TranslateService} from '@ngx-translate/core';
 import {addIcons} from 'ionicons';
 import {
-  chevronBackOutline,
   chevronDownOutline,
   createOutline,
-  ellipsisHorizontalOutline,
   playOutline,
   trashOutline,
   volumeHighOutline,
@@ -31,7 +29,7 @@ import {normalizeForAudio} from '../../../../shared/audio/normalize';
   selector: 'lc-word-detail',
   templateUrl: './word-detail.component.html',
   styleUrls: ['./word-detail.component.scss'],
-  imports: [IonHeader, IonToolbar, IonContent, IonIcon, ArticleBadgeComponent, TranslatePipe],
+  imports: [IonContent, IonIcon, ArticleBadgeComponent, TranslatePipe],
 })
 export class WordDetailComponent {
   private readonly cardStore = inject(CardStore);
@@ -50,9 +48,7 @@ export class WordDetailComponent {
 
   constructor() {
     addIcons({
-      chevronBackOutline,
       chevronDownOutline,
-      ellipsisHorizontalOutline,
       volumeHighOutline,
       playOutline,
       createOutline,

@@ -3,21 +3,9 @@ import {ActivatedRoute, Router} from '@angular/router';
 import {
   AlertController,
   IonContent,
-  IonHeader,
-  IonIcon,
-  IonToolbar,
   ModalController,
   ToastController,
 } from '@ionic/angular/standalone';
-import {addIcons} from 'ionicons';
-import {
-  chevronBackOutline,
-  chevronForwardOutline,
-  ellipsisHorizontalOutline,
-  playOutline,
-  timeOutline,
-  volumeHighOutline,
-} from 'ionicons/icons';
 import {TranslateService, TranslatePipe} from '@ngx-translate/core';
 import {Card, Collection} from '@lingua-card/shared/domain';
 import {isDue, isMastered} from '../../../../shared/srs/srs-status';
@@ -32,7 +20,7 @@ import {FabButtonComponent} from '../../../../shared/components/fab-button/fab-b
 import {ReviewFilterService} from '../../../review/services/review-filter.service';
 import {ReviewStore} from '../../../review/store/review.store';
 import {ReviewLimit, ReviewRoute, ReviewSortOrder} from '../../../review/models/review.model';
-import {WordCardComponent} from '../../../../shared/ui/word-card/word-card.component';
+import {WordRowComponent} from '../../components/word-row/word-row.component';
 import {WordAudioService} from '../../../../shared/audio/word-audio.service';
 import {AudioReadinessStore} from '../../../../shared/audio/audio-readiness.store';
 import {CollectionAudioPrefetchService} from '../../../../shared/audio/collection-audio-prefetch.service';
@@ -44,7 +32,7 @@ import {ImageImportApiService} from '../../import/services/image-import-api.serv
   standalone: true,
   templateUrl: './collection-detail.page.html',
   styleUrls: ['./collection-detail.page.scss'],
-  imports: [IonHeader, IonToolbar, IonContent, IonIcon, FabButtonComponent, WordCardComponent, TranslatePipe],
+  imports: [IonContent, FabButtonComponent, WordRowComponent, TranslatePipe],
 })
 export class CollectionDetailPage implements OnInit {
   private readonly route = inject(ActivatedRoute);
@@ -149,20 +137,28 @@ export class CollectionDetailPage implements OnInit {
     return Math.round((this.masteredCount() / total) * 100);
   });
 
+  /** Cover gradient — hashed from the id so it matches the Vault shelf exactly,
+   *  regardless of list order or filtering. */
+  readonly coverClass = computed(() => {
+    const id = this.collectionId() ?? '';
+    let hash = 0;
+    for (let i = 0; i < id.length; i++) hash = (hash * 31 + id.charCodeAt(i)) | 0;
+    return `cover-${(Math.abs(hash) % 6) + 1}`;
+  });
+
+  /** Topical eyebrow over the collection name (first category, else a generic label). */
+  readonly eyebrow = computed(() => {
+    const first = this.categoryIds()[0];
+    return first
+      ? getCategoryName(first, this.categories())
+      : this.translate.instant('vault.lexicon.collectionEyebrow');
+  });
+
   protected readonly getCategoryName = getCategoryName;
 
   private _audioPrefetched = false;
 
   constructor() {
-    addIcons({
-      chevronBackOutline,
-      chevronForwardOutline,
-      playOutline,
-      volumeHighOutline,
-      ellipsisHorizontalOutline,
-      timeOutline,
-    });
-
     // Trigger audio prefetch once, the first time cards for this collection are
     // available in the store. Runs in the injection context so effect() is valid.
     effect(() => {
@@ -247,7 +243,7 @@ export class CollectionDetailPage implements OnInit {
   }
 
   goBack(): void {
-    this.router.navigate(['/vault'], {queryParams: {tab: 'collections'}});
+    this.router.navigate(['/vault']);
   }
 
   startReview(): void {
@@ -360,7 +356,7 @@ export class CollectionDetailPage implements OnInit {
           role: 'destructive',
           handler: () => {
             this.collectionStore.deleteCollection(col.id).subscribe();
-            this.router.navigate(['/vault'], {queryParams: {tab: 'collections'}});
+            this.router.navigate(['/vault']);
           },
         },
         {text: this.translate.instant('common.cancel'), role: 'cancel'},

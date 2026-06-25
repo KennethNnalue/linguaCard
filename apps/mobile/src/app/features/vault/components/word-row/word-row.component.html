@@ -1,0 +1,16 @@
+<button class="row" (click)="rowClick.emit()">
+  <span class="strip" [style.background]="masteryColor()"></span>
+
+  <lc-article-badge [article]="card().content.article" />
+
+  <span class="body">
+    <span class="headword">{{ card().content.back }}</span>
+    <span class="translation">{{ card().content.front }}</span>
+  </span>
+
+  @if (isDue()) {
+    <span class="due-pill">{{ 'vault.lexicon.dueTag' | translate }}</span>
+  } @else {
+    <span class="mastery-label">{{ masteryLabel() }}</span>
+  }
+</button>

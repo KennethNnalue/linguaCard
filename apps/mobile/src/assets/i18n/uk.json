@@ -58,7 +58,8 @@
     "refresh": "Оновити",
     "yesterday": "Вчора",
     "daysAgoLabel": "{{count}} днів тому",
-    "todayCapital": "Сьогодні"
+    "todayCapital": "Сьогодні",
+    "edit": "Редагувати"
   },
   "auth": {
     "login": {
@@ -223,6 +224,32 @@
       "dueTodayLabel": "На сьогодні",
       "emptyTitle": "Колекцій ще немає",
       "emptySubtitle": "Натисніть + Нова колекція, щоб почати"
+    },
+    "lexicon": {
+      "eyebrow": "Ваш лексикон",
+      "readyToReview": "Готово до повторення",
+      "streakChip": "Серія {{count}} днів",
+      "wordsDue": "слів до повторення",
+      "acrossCollections": "У {{count}} колекціях · найкраще вчити зараз",
+      "masteredOf": "{{mastered}} опановано з {{total}}",
+      "startReview": "Почати повторення",
+      "listen": "Слухати",
+      "allWords": "Усі слова",
+      "allWordsSub": "Перегляд і пошук у повному покажчику",
+      "collections": "Колекції",
+      "shelves": "{{count}} полиць",
+      "indexSearchPlaceholder": "Пошук німецькою або українською…",
+      "dueTag": "Час",
+      "collectionEyebrow": "Колекція",
+      "reviewCount": "Повторити {{count}}"
+    },
+    "explore": {
+      "title": "Огляд",
+      "subtitle": "Дібрано LinguaCard",
+      "seeAll": "Усі",
+      "searchAria": "Пошук колекцій",
+      "empty": "Колекцій не знайдено",
+      "searchPlaceholder": "Пошук наборів і тем…"
     }
   },
   "collections": {
@@ -335,26 +362,12 @@
       "breadcrumb": "Огляд",
       "backAria": "Назад"
     },
-    "hero": {
-      "descriptionSuffix": "слів · з аудіо"
-    },
-    "progressBanner": {
-      "knowPrefix": "Ви вже знаєте",
-      "wordsSuffix": "слів тут.",
-      "addingPrefix": "Додавання цього набору додасть",
-      "newCardsSuffix": "нових карток",
-      "instantlySuffix": "— миттєво.",
-      "allNewForYouSuffix": "усі нові для вас."
-    },
     "adoptedBanner": {
-      "inSetsLabel": "У ваших наборах",
-      "wordsKnownSuffix": "слів відомо"
+      "inSetsLabel": "У ваших наборах"
     },
     "wordGroups": {
       "newHereLabel": "Нові тут",
       "alreadyYoursLabel": "Вже ваші",
-      "expandLabel": "натисніть, щоб розгорнути",
-      "collapseLabel": "натисніть, щоб згорнути",
       "yoursChip": "✓ ВАШЕ"
     },
     "shelf": {
@@ -375,7 +388,11 @@
       "successMessage": "{{count}} слів додано — аудіо включено ✓",
       "alreadyInMessage": "Вже у ваших наборах",
       "errorMessage": "Не вдалося додати колекцію. Спробуйте ще раз."
-    }
+    },
+    "stats": {
+      "known": "Відомі"
+    },
+    "playWordAria": "Відтворити вимову"
   },
   "exploreTopic": {
     "nav": {

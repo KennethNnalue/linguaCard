@@ -58,7 +58,8 @@
     "refresh": "Yenile",
     "yesterday": "Dün",
     "daysAgoLabel": "{{count}} gün önce",
-    "todayCapital": "Bugün"
+    "todayCapital": "Bugün",
+    "edit": "Düzenle"
   },
   "auth": {
     "login": {
@@ -223,6 +224,32 @@
       "dueTodayLabel": "Bugün bekleyen",
       "emptyTitle": "Henüz koleksiyon yok",
       "emptySubtitle": "Başlamak için + Yeni Koleksiyon'a dokunun"
+    },
+    "lexicon": {
+      "eyebrow": "Sözlüğün",
+      "readyToReview": "Tekrara hazır",
+      "streakChip": "{{count}} günlük seri",
+      "wordsDue": "kelime bekliyor",
+      "acrossCollections": "{{count}} koleksiyonda · şimdi çalışmak en iyisi",
+      "masteredOf": "{{total}} kelimeden {{mastered}} öğrenildi",
+      "startReview": "Tekrara başla",
+      "listen": "Dinle",
+      "allWords": "Tüm Kelimeler",
+      "allWordsSub": "Tüm dizinde gözat ve ara",
+      "collections": "Koleksiyonlar",
+      "shelves": "{{count}} raf",
+      "indexSearchPlaceholder": "Almanca veya Türkçe ara…",
+      "dueTag": "Zamanı",
+      "collectionEyebrow": "Koleksiyon",
+      "reviewCount": "{{count}} tekrar"
+    },
+    "explore": {
+      "title": "Keşfet",
+      "subtitle": "LinguaCard seçkisi",
+      "seeAll": "Tümünü gör",
+      "searchAria": "Koleksiyonlarda ara",
+      "empty": "Koleksiyon bulunamadı",
+      "searchPlaceholder": "Setlerinde ve konularda ara…"
     }
   },
   "collections": {
@@ -335,26 +362,12 @@
       "breadcrumb": "Keşfet",
       "backAria": "Geri"
     },
-    "hero": {
-      "descriptionSuffix": "kelime · sesli"
-    },
-    "progressBanner": {
-      "knowPrefix": "Zaten bildiğiniz",
-      "wordsSuffix": "kelime var.",
-      "addingPrefix": "Bu seti almak",
-      "newCardsSuffix": "yeni kart ekler",
-      "instantlySuffix": "— anında.",
-      "allNewForYouSuffix": "hepsi sizin için yeni."
-    },
     "adoptedBanner": {
-      "inSetsLabel": "Setlerinizde",
-      "wordsKnownSuffix": "bilinen kelime"
+      "inSetsLabel": "Setlerinizde"
     },
     "wordGroups": {
       "newHereLabel": "Burada yeni",
       "alreadyYoursLabel": "Zaten sizde",
-      "expandLabel": "genişletmek için dokunun",
-      "collapseLabel": "daraltmak için dokunun",
       "yoursChip": "✓ SİZDE"
     },
     "shelf": {
@@ -375,7 +388,11 @@
       "successMessage": "{{count}} kelime eklendi — ses dahil ✓",
       "alreadyInMessage": "Zaten setlerinizde",
       "errorMessage": "Koleksiyon eklenemedi. Tekrar deneyin."
-    }
+    },
+    "stats": {
+      "known": "Bilinen"
+    },
+    "playWordAria": "Telaffuzu oynat"
   },
   "exploreTopic": {
     "nav": {

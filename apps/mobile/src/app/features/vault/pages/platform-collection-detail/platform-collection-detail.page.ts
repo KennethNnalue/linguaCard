@@ -2,21 +2,20 @@ import { ChangeDetectionStrategy, Component, computed, effect, inject, signal } 
 import { ActivatedRoute, Router } from '@angular/router';
 import {
   IonContent,
-  IonFooter,
-  IonHeader,
   IonIcon,
-  IonToolbar,
   ModalController,
   ToastController,
 } from '@ionic/angular/standalone';
 import { TranslateService, TranslatePipe } from '@ngx-translate/core';
 import { addIcons } from 'ionicons';
-import { chevronBackOutline, volumeHighOutline } from 'ionicons/icons';
+import { volumeHighOutline } from 'ionicons/icons';
 import type {
   PlatformCollectionDetail,
   PlatformCollectionWordView,
 } from '@lingua-card/shared/domain';
-import { PlatformCollectionStore, ringStyle } from '../../store/platform-collection.store';
+import { PlatformCollectionStore } from '../../store/platform-collection.store';
+import { ArticleBadgeComponent } from '../../../../shared/components/article-badge/article-badge.component';
+import { WordAudioService } from '../../../../shared/audio/word-audio.service';
 import { GenerateStorySheetComponent } from '../../../stories/components/generate-story-sheet/generate-story-sheet.component';
 
 @Component({
@@ -24,7 +23,7 @@ import { GenerateStorySheetComponent } from '../../../stories/components/generat
   templateUrl: './platform-collection-detail.page.html',
   styleUrls: ['./platform-collection-detail.page.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [IonHeader, IonToolbar, IonContent, IonFooter, IonIcon, TranslatePipe],
+  imports: [IonContent, IonIcon, ArticleBadgeComponent, TranslatePipe],
 })
 export class PlatformCollectionDetailPage {
   private readonly router = inject(Router);
@@ -32,6 +31,7 @@ export class PlatformCollectionDetailPage {
   private readonly toastCtrl = inject(ToastController);
   private readonly translate = inject(TranslateService);
   private readonly platformStore = inject(PlatformCollectionStore);
+  private readonly wordAudio = inject(WordAudioService);
 
   readonly alreadyKnownExpanded = signal(false);
 
@@ -56,8 +56,21 @@ export class PlatformCollectionDetailPage {
   readonly newCount = computed(() => this.newWords().length);
   readonly knownCount = computed(() => this.knownWords().length);
 
+  /** Cover gradient — deterministic per id, matching the Vault Explore cards. */
+  readonly coverClass = computed(() => {
+    const id = this.collectionId;
+    let hash = 0;
+    for (let i = 0; i < id.length; i++) hash = (hash * 31 + id.charCodeAt(i)) | 0;
+    return `cover-${(Math.abs(hash) % 6) + 1}`;
+  });
+
+  playWord(w: PlatformCollectionWordView): void {
+    const text = (w.article ? `${w.article} ` : '') + w.displayText;
+    void this.wordAudio.play(text, 'de-DE');
+  }
+
   constructor() {
-    addIcons({ chevronBackOutline, volumeHighOutline });
+    addIcons({ volumeHighOutline });
     if (!this.platformStore.detailCache()[this.collectionId]) {
       this.platformStore.loadDetail(this.collectionId);
     }
@@ -82,7 +95,7 @@ export class PlatformCollectionDetailPage {
     });
   }
 
-  goBack(): void { this.router.navigate(['/vault/collections'], { queryParams: { segment: 'explore' } }); }
+  goBack(): void { this.router.navigate(['/vault'], { queryParams: { view: 'explore' } }); }
 
   openStory(storyId: string): void {
     this.router.navigate(['/stories/platform', storyId]);
@@ -125,8 +138,6 @@ export class PlatformCollectionDetailPage {
     });
     await modal.present();
   }
-
-  readonly ringStyle = ringStyle;
 
   private async _toast(message: string, color: 'success' | 'danger'): Promise<void> {
     const t = await this.toastCtrl.create({ message, duration: 3500, color, position: 'bottom' });

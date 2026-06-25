@@ -58,7 +58,8 @@
     "refresh": "Обновить",
     "yesterday": "Вчера",
     "daysAgoLabel": "{{count}} дней назад",
-    "todayCapital": "Сегодня"
+    "todayCapital": "Сегодня",
+    "edit": "Редактировать"
   },
   "auth": {
     "login": {
@@ -223,6 +224,32 @@
       "dueTodayLabel": "К повторению сегодня",
       "emptyTitle": "Коллекций пока нет",
       "emptySubtitle": "Нажмите + Новая коллекция, чтобы начать"
+    },
+    "lexicon": {
+      "eyebrow": "Ваш лексикон",
+      "readyToReview": "Готово к повторению",
+      "streakChip": "Серия {{count}} дней",
+      "wordsDue": "слов к повторению",
+      "acrossCollections": "В {{count}} коллекциях · лучше учить сейчас",
+      "masteredOf": "{{mastered}} освоено из {{total}}",
+      "startReview": "Начать повторение",
+      "listen": "Слушать",
+      "allWords": "Все слова",
+      "allWordsSub": "Просмотр и поиск по полному указателю",
+      "collections": "Коллекции",
+      "shelves": "{{count}} полок",
+      "indexSearchPlaceholder": "Поиск на немецком или русском…",
+      "dueTag": "Пора",
+      "collectionEyebrow": "Коллекция",
+      "reviewCount": "Повторить {{count}}"
+    },
+    "explore": {
+      "title": "Обзор",
+      "subtitle": "Подборка LinguaCard",
+      "seeAll": "Все",
+      "searchAria": "Поиск коллекций",
+      "empty": "Коллекции не найдены",
+      "searchPlaceholder": "Поиск наборов и тем…"
     }
   },
   "collections": {
@@ -335,26 +362,12 @@
       "breadcrumb": "Обзор",
       "backAria": "Назад"
     },
-    "hero": {
-      "descriptionSuffix": "слов · с аудио"
-    },
-    "progressBanner": {
-      "knowPrefix": "Вы уже знаете",
-      "wordsSuffix": "слов отсюда.",
-      "addingPrefix": "Добавление этого набора принесёт",
-      "newCardsSuffix": "новых карточек",
-      "instantlySuffix": "— мгновенно.",
-      "allNewForYouSuffix": "все новые для вас."
-    },
     "adoptedBanner": {
-      "inSetsLabel": "В ваших наборах",
-      "wordsKnownSuffix": "слов изучено"
+      "inSetsLabel": "В ваших наборах"
     },
     "wordGroups": {
       "newHereLabel": "Новые здесь",
       "alreadyYoursLabel": "Уже у вас",
-      "expandLabel": "нажмите, чтобы развернуть",
-      "collapseLabel": "нажмите, чтобы свернуть",
       "yoursChip": "✓ ВАШЕ"
     },
     "shelf": {
@@ -375,7 +388,11 @@
       "successMessage": "{{count}} слов добавлено — аудио включено ✓",
       "alreadyInMessage": "Уже в ваших наборах",
       "errorMessage": "Не удалось добавить коллекцию. Попробуйте ещё раз."
-    }
+    },
+    "stats": {
+      "known": "Известно"
+    },
+    "playWordAria": "Воспроизвести произношение"
   },
   "exploreTopic": {
     "nav": {

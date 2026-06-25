@@ -58,7 +58,8 @@
     "refresh": "تحديث",
     "yesterday": "أمس",
     "daysAgoLabel": "قبل {{count}} أيام",
-    "todayCapital": "اليوم"
+    "todayCapital": "اليوم",
+    "edit": "تعديل"
   },
   "auth": {
     "login": {
@@ -223,6 +224,32 @@
       "dueTodayLabel": "مستحقة اليوم",
       "emptyTitle": "لا توجد مجموعات بعد",
       "emptySubtitle": "اضغط + مجموعة جديدة للبدء"
+    },
+    "lexicon": {
+      "eyebrow": "معجمك",
+      "readyToReview": "جاهز للمراجعة",
+      "streakChip": "سلسلة {{count}} يوم",
+      "wordsDue": "كلمات مستحقة",
+      "acrossCollections": "في {{count}} مجموعات · الأفضل المذاكرة الآن",
+      "masteredOf": "{{mastered}} مُتقنة من {{total}}",
+      "startReview": "ابدأ المراجعة",
+      "listen": "استمع",
+      "allWords": "كل الكلمات",
+      "allWordsSub": "تصفّح وابحث في فهرسك الكامل",
+      "collections": "المجموعات",
+      "shelves": "{{count}} رفوف",
+      "indexSearchPlaceholder": "ابحث بالألمانية أو العربية…",
+      "dueTag": "مستحقة",
+      "collectionEyebrow": "مجموعة",
+      "reviewCount": "راجع {{count}}"
+    },
+    "explore": {
+      "title": "استكشف",
+      "subtitle": "مختارات LinguaCard",
+      "seeAll": "عرض الكل",
+      "searchAria": "ابحث في المجموعات",
+      "empty": "لا توجد مجموعات",
+      "searchPlaceholder": "ابحث في مجموعاتك والمواضيع…"
     }
   },
   "collections": {
@@ -335,26 +362,12 @@
       "breadcrumb": "استكشاف",
       "backAria": "رجوع"
     },
-    "hero": {
-      "descriptionSuffix": "كلمات · مع صوت"
-    },
-    "progressBanner": {
-      "knowPrefix": "أنت تعرف بالفعل",
-      "wordsSuffix": "كلمات هنا.",
-      "addingPrefix": "إضافة هذه المجموعة ستضيف",
-      "newCardsSuffix": "بطاقات جديدة",
-      "instantlySuffix": "— فورًا.",
-      "allNewForYouSuffix": "كلها جديدة بالنسبة لك."
-    },
     "adoptedBanner": {
-      "inSetsLabel": "في مجموعاتك",
-      "wordsKnownSuffix": "كلمات معروفة"
+      "inSetsLabel": "في مجموعاتك"
     },
     "wordGroups": {
       "newHereLabel": "جديدة هنا",
       "alreadyYoursLabel": "لديك بالفعل",
-      "expandLabel": "اضغط للتوسيع",
-      "collapseLabel": "اضغط للطي",
       "yoursChip": "✓ لديك"
     },
     "shelf": {
@@ -375,7 +388,11 @@
       "successMessage": "تمت إضافة {{count}} كلمات — مع الصوت ✓",
       "alreadyInMessage": "موجودة بالفعل في مجموعاتك",
       "errorMessage": "تعذرت إضافة المجموعة. حاول مرة أخرى."
-    }
+    },
+    "stats": {
+      "known": "معروفة"
+    },
+    "playWordAria": "تشغيل النطق"
   },
   "exploreTopic": {
     "nav": {

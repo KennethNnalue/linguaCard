@@ -1,181 +1,141 @@
-<ion-header class="ion-no-border">
-  <ion-toolbar>
-    <div class="cd-nav">
-      <button class="lc-back-btn" (click)="goBack()" [attr.aria-label]="'collectionDetail.nav.backAria' | translate">
-        <ion-icon name="chevron-back-outline"></ion-icon>
+<ion-content [fullscreen]="true" class="cd-content">
+
+  <!-- Cover hero -->
+  <header class="cover" [class]="coverClass()">
+    <span class="cover-glow"></span>
+    <div class="cover-nav">
+      <button class="cover-btn" (click)="goBack()" [attr.aria-label]="'collectionDetail.nav.backAria' | translate">
+        <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><polyline points="15,18 9,12 15,6"/></svg>
       </button>
-      <h1 class="cd-nav-title lc-display" [class.cd-nav-title--completed]="justCompleted()">
-        {{ collection()?.name ?? '' }}
-      </h1>
-      <button class="cd-menu-btn" (click)="showMenu()" [attr.aria-label]="'collectionDetail.nav.optionsAria' | translate">
-        <ion-icon name="ellipsis-horizontal-outline"></ion-icon>
+      <button class="cover-btn" (click)="showMenu()" [attr.aria-label]="'collectionDetail.nav.optionsAria' | translate">
+        <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="5" cy="12" r="1.4"/><circle cx="12" cy="12" r="1.4"/><circle cx="19" cy="12" r="1.4"/></svg>
       </button>
     </div>
-  </ion-toolbar>
-</ion-header>
+    <div class="cover-id">
+      <span class="cover-emoji">{{ collection()?.emoji ?? '📚' }}</span>
+      <div>
+        <div class="cover-eyebrow">{{ eyebrow() }}</div>
+        <h1 class="cover-name" [class.cover-name--completed]="justCompleted()">{{ collection()?.name ?? '' }}</h1>
+      </div>
+    </div>
+  </header>
 
-<ion-content>
+  <!-- Overlapping stats + actions -->
+  <section class="stats-card">
+    <div class="stats-row">
+      <div class="stat">
+        <span class="stat-num">{{ wordCount() }}</span>
+        <span class="stat-lbl">{{ 'common.words' | translate }}</span>
+      </div>
+      <span class="stat-div"></span>
+      <div class="stat">
+        <span class="stat-num stat-num--due">{{ dueCount() }}</span>
+        <span class="stat-lbl">{{ 'collections.card.dueLabel' | translate }}</span>
+      </div>
+      <span class="stat-div"></span>
+      <div class="stat">
+        <span class="stat-num stat-num--mastered">{{ progressPercent() }}%</span>
+        <span class="stat-lbl">{{ 'collections.card.masteredLabel' | translate }}</span>
+      </div>
+    </div>
+    <div class="stats-actions">
+      <button class="btn-review" (click)="startReview()" [disabled]="wordCount() === 0">
+        <svg viewBox="0 0 24 24" width="14" height="14" fill="currentColor"><polygon points="6,4 20,12 6,20"/></svg>
+        @if (dueCount() > 0) {
+          {{ 'vault.lexicon.reviewCount' | translate:{ count: dueCount() } }}
+        } @else {
+          {{ 'collectionDetail.actions.reviewAllLabel' | translate }}
+        }
+      </button>
+      <button class="btn-sand" (click)="startListen()" [disabled]="wordCount() === 0">
+        <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><polygon points="11,5 6,9 2,9 2,15 6,15 11,19 11,5"/><path d="M15.5,8.5a5,5,0,0,1,0,7"/></svg>
+        {{ 'collectionDetail.actions.listenLabel' | translate }}
+      </button>
+    </div>
+  </section>
 
   <!-- Incomplete import banner -->
   @if (collection()?.importStatus === 'incomplete') {
-    <div class="cd-incomplete-banner">
-      <div class="cd-incomplete-banner__icon">
-        <ion-icon name="time-outline"></ion-icon>
+    <div class="banner">
+      <span class="banner-icon">
+        <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><polyline points="12,7 12,12 15,14"/></svg>
+      </span>
+      <div class="banner-body">
+        <p class="banner-title">{{ 'collectionDetail.incompleteImport.title' | translate }}</p>
+        <p class="banner-sub">{{ collection()!.pendingWords.length }} {{ 'collectionDetail.incompleteImport.subtitle' | translate }}</p>
       </div>
-      <div class="cd-incomplete-banner__body">
-        <p class="cd-incomplete-banner__title">{{ 'collectionDetail.incompleteImport.title' | translate }}</p>
-        <p class="cd-incomplete-banner__sub">
-          {{ collection()!.pendingWords.length }} {{ 'collectionDetail.incompleteImport.subtitle' | translate }}
-        </p>
-      </div>
-      <button
-        class="cd-incomplete-banner__btn"
-        [class.cd-incomplete-banner__btn--loading]="completing()"
-        (click)="completeImport()"
-        [disabled]="completing()">
-        @if (completing()) {
-          <span class="cd-spinner"></span>
-        } @else {
-          {{ 'collectionDetail.incompleteImport.completeButton' | translate }}
-        }
+      <button class="banner-btn" (click)="completeImport()" [disabled]="completing()">
+        @if (completing()) { <span class="spinner"></span> } @else { {{ 'collectionDetail.incompleteImport.completeButton' | translate }} }
       </button>
     </div>
   }
 
-  <!-- Audio pre-generation progress bar -->
+  <!-- Audio pre-generation progress -->
   @if (audioPrefetchActive() && wordCount() > 0) {
-    <div class="cd-audio-progress">
-      <span class="cd-audio-progress__icon">♫</span>
-      <div class="cd-audio-progress__body">
-        <span class="cd-audio-progress__label">
-          {{ 'collectionDetail.audio.preparingLabel' | translate }} {{ audioReadyCount() }} / {{ wordCount() }} {{ 'collectionDetail.audio.readyUnit' | translate }}
+    <div class="audio-progress">
+      <span class="audio-icon">♫</span>
+      <div class="audio-body">
+        <span class="audio-label">{{ 'collectionDetail.audio.preparingLabel' | translate }} {{ audioReadyCount() }} / {{ wordCount() }} {{ 'collectionDetail.audio.readyUnit' | translate }}</span>
+        <span class="audio-track">
+          <span class="audio-fill" [style.width.%]="wordCount() > 0 ? (audioReadyCount() / wordCount()) * 100 : 0"></span>
         </span>
-        <div class="cd-audio-progress__track">
-          <div
-            class="cd-audio-progress__fill"
-            [style.width.%]="wordCount() > 0 ? (audioReadyCount() / wordCount()) * 100 : 0">
-          </div>
-        </div>
       </div>
     </div>
   }
 
-  <!-- Hero strip -->
-  <div class="cd-hero">
-    <div class="cd-hero-top">
-      <span class="cd-hero-emoji">{{ collection()?.emoji ?? '📚' }}</span>
-      <div class="cd-hero-stats">
-        <div class="cd-hero-stat">
-          <span class="cd-hero-stat-num">{{ wordCount() }}</span>
-          <span class="cd-hero-stat-lbl">{{ 'collectionDetail.hero.wordsLabel' | translate }}</span>
-        </div>
-        <div class="cd-hero-divider"></div>
-        <div class="cd-hero-stat">
-          <span class="cd-hero-stat-num cd-hero-stat-num--due">{{ dueCount() }}</span>
-          <span class="cd-hero-stat-lbl">{{ 'collectionDetail.hero.dueLabel' | translate }}</span>
-        </div>
-        <div class="cd-hero-divider"></div>
-        <div class="cd-hero-stat">
-          <span class="cd-hero-stat-num">{{ progressPercent() }}%</span>
-          <span class="cd-hero-stat-lbl">{{ 'collectionDetail.hero.masteredLabel' | translate }}</span>
-        </div>
-      </div>
-    </div>
-
-    @if (wordCount() > 0) {
-      <div class="cd-hero-progress">
-        <div class="cd-hero-progress-fill" [style.width.%]="progressPercent()"></div>
-      </div>
-    }
-  </div>
-
-  <!-- Action buttons -->
-  <div class="cd-actions">
-    <button class="cd-action-btn cd-action-btn--primary" (click)="startReview()"
-            [disabled]="wordCount() === 0">
-      <ion-icon name="play-outline"></ion-icon>
-      {{ dueCount() > 0 ? ('collectionDetail.actions.reviewLabel' | translate) + ' (' + dueCount() + ')' : ('collectionDetail.actions.reviewAllLabel' | translate) }}
-    </button>
-    <button class="cd-action-btn cd-action-btn--secondary" (click)="startListen()"
-            [disabled]="wordCount() === 0">
-      <ion-icon name="volume-high-outline"></ion-icon>
-      {{ 'collectionDetail.actions.listenLabel' | translate }}
-    </button>
-  </div>
-
-  <!-- Category chips with scroll arrows -->
+  <!-- Category chips -->
   @if (categoryIds().length > 0) {
-    <div class="cd-cat-row">
-      <div class="cd-cat-scroll">
-        <button
-          class="lc-cat-chip"
-          [class.lc-cat-chip--active]="!activeCategoryId()"
-          [class.lc-cat-chip--inactive]="!!activeCategoryId()"
-          (click)="setCategory(null)">
-          {{ 'collectionDetail.categories.allLabel' | translate }} ({{ allCards().length }})
+    <div class="chips">
+      <button class="chip" [class.chip--active]="!activeCategoryId()" (click)="setCategory(null)">
+        {{ 'vault.filter.allLabel' | translate }} {{ allCards().length }}
+      </button>
+      @for (catId of categoryIds(); track catId) {
+        <button class="chip" [class.chip--active]="activeCategoryId() === catId" (click)="setCategory(catId)">
+          {{ getCategoryName(catId, categories()) }}
         </button>
-        @for (catId of categoryIds(); track catId) {
-          <button
-            class="lc-cat-chip"
-            [class.lc-cat-chip--active]="activeCategoryId() === catId"
-            [class.lc-cat-chip--inactive]="activeCategoryId() !== catId"
-            (click)="setCategory(catId)">
-            {{ getCategoryName(catId, categories()) }}
-          </button>
-        }
-      </div>
-      <div class="cd-cat-arrow">
-        <ion-icon name="chevron-forward-outline"></ion-icon>
-      </div>
+      }
     </div>
   }
 
   <!-- Word list -->
-  <div class="cd-word-list">
+  <div class="word-list">
     @if (loading()) {
       @for (i of [1, 2, 3, 4, 5]; track i) {
-        <div class="cd-skeleton"></div>
+        <div class="row-skeleton"></div>
       }
     } @else {
       @for (card of filteredCards(); track card.id) {
-        <lc-word-card
-          [card]="card"
-          [categoryName]="getCategoryName(card.categoryIds[0], categories())"
-          [audioStatus]="getAudioStatus(card)"
-          (cardClick)="openDetail(card)"
-          (playAudio)="playAudio(card)"
-        />
+        <lc-word-row [card]="card" (rowClick)="openDetail(card)" />
       } @empty {
-        <div class="lc-empty-state">
-          <span class="lc-empty-icon">📖</span>
-          <p class="lc-empty-title">{{ 'collectionDetail.emptyState.title' | translate }}</p>
-          <p class="lc-empty-sub">{{ 'collectionDetail.emptyState.subtitle' | translate }}</p>
+        <div class="empty">
+          <span class="empty-icon">📖</span>
+          <p class="empty-title">{{ 'collectionDetail.emptyState.title' | translate }}</p>
+          <p class="empty-sub">{{ 'collectionDetail.emptyState.subtitle' | translate }}</p>
         </div>
       }
     }
   </div>
 
-  <!-- Pending ghost rows (only when collection is incomplete) -->
+  <!-- Pending ghost rows -->
   @if (!loading() && collection()?.importStatus === 'incomplete' && collection()!.pendingWords.length > 0) {
-    <div class="cd-pending-section">
-      <div class="cd-pending-label">
-        <div class="cd-pending-dot"></div>
+    <div class="pending">
+      <div class="pending-label">
+        <span class="pending-dot"></span>
         {{ 'collectionDetail.pending.label' | translate }} ({{ collection()!.pendingWords.length }}) {{ 'collectionDetail.pending.instruction' | translate }}
       </div>
       @for (i of pendingGhosts(); track i) {
-        <div class="cd-ghost-row">
-          <div class="cd-ghost-art"></div>
-          <div class="cd-ghost-body">
-            <div class="cd-ghost-line" [style.width]="ghostWidths[i % 3][0]"></div>
-            <div class="cd-ghost-line cd-ghost-line--short" [style.width]="ghostWidths[i % 3][1]"></div>
+        <div class="ghost-row">
+          <span class="ghost-art"></span>
+          <div class="ghost-body">
+            <span class="ghost-line" [style.width]="ghostWidths[i % 3][0]"></span>
+            <span class="ghost-line ghost-line--short" [style.width]="ghostWidths[i % 3][1]"></span>
           </div>
         </div>
       }
     </div>
   }
 
-  <div style="height: 100px;"></div>
-
+  <div class="tail-space"></div>
 </ion-content>
 
 <lc-fab-button (clickButton)="openAddWord()"/>

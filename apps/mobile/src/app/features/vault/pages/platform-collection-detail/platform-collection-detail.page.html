@@ -1,172 +1,156 @@
-<ion-header class="ion-no-border">
-  <ion-toolbar>
-    <div class="pcd-nav">
-      <button class="lc-back-btn" (click)="goBack()" [attr.aria-label]="'platformCollectionDetail.nav.backAria' | translate">
-        <ion-icon name="chevron-back-outline"></ion-icon>
-      </button>
-      <span class="pcd-nav-crumb">{{ 'platformCollectionDetail.nav.breadcrumb' | translate }}</span>
-      <div style="width:30px;"></div>
-    </div>
-  </ion-toolbar>
-</ion-header>
-
-<ion-content>
+<ion-content [fullscreen]="true" class="pcd-content">
 
   @if (isLoading() && !detail()) {
-    <!-- Loading skeleton -->
-    <div class="pcd-skeleton">
-      <div class="pcd-skel-hero"></div>
-      <div class="pcd-skel-banner"></div>
-      @for (i of [1, 2, 3]; track i) {
-        <div class="pcd-skel-word"></div>
+    <div class="skeleton">
+      <div class="skel-hero"></div>
+      <div class="skel-card"></div>
+      @for (i of [1, 2, 3, 4]; track i) {
+        <div class="skel-row"></div>
       }
     </div>
   }
 
   @if (detail(); as d) {
 
-    <!-- Hero -->
-    <div class="pcd-hero">
-      <div class="pcd-emoji">{{ d.emoji ?? '📚' }}</div>
-      <div>
-        <h1 class="pcd-title lc-display">{{ d.title }}</h1>
-        <div class="pcd-meta">
-          <span class="pcd-lvl-pill pcd-lvl-{{ d.level.toLowerCase() }}">{{ d.level }}</span>
-          <span>{{ d.wordCount }} {{ 'platformCollectionDetail.hero.descriptionSuffix' | translate }}</span>
+    <!-- Cover hero -->
+    <header class="cover" [class]="coverClass()">
+      <span class="cover-glow"></span>
+      <div class="cover-nav">
+        <button class="cover-btn" (click)="goBack()" [attr.aria-label]="'platformCollectionDetail.nav.backAria' | translate">
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><polyline points="15,18 9,12 15,6"/></svg>
+        </button>
+        <span class="cover-crumb">{{ 'platformCollectionDetail.nav.breadcrumb' | translate }}</span>
+        <span class="cover-btn-spacer"></span>
+      </div>
+      <div class="cover-id">
+        <span class="cover-emoji">{{ d.emoji ?? '📚' }}</span>
+        <div>
+          <div class="cover-eyebrow">{{ d.level }} · {{ d.topic }}</div>
+          <h1 class="cover-name">{{ d.title }}</h1>
         </div>
       </div>
-    </div>
+    </header>
 
-    <!-- Progress banner -->
-    @if (d.adoptionStatus !== 'adopted') {
-      <div class="pcd-prog-banner">
-        <div class="pcd-bigring" [style]="ringStyle(d.knownCount, d.wordCount)">
-          <div class="pcd-bigring-inner">{{ d.knownCount }}/{{ d.wordCount }}</div>
+    <!-- Overlapping stats + actions -->
+    <section class="stats-card">
+      <div class="stats-row">
+        <div class="stat">
+          <span class="stat-num">{{ d.wordCount }}</span>
+          <span class="stat-lbl">{{ 'common.words' | translate }}</span>
         </div>
-        <div class="pcd-prog-txt">
-          @if (d.knownCount > 0) {
-            {{ 'platformCollectionDetail.progressBanner.knowPrefix' | translate }} <b>{{ d.knownCount }} of {{ d.wordCount }}</b> {{ 'platformCollectionDetail.progressBanner.wordsSuffix' | translate }}<br>
-            {{ 'platformCollectionDetail.progressBanner.addingPrefix' | translate }} <b>{{ newCount() }} {{ 'platformCollectionDetail.progressBanner.newCardsSuffix' | translate }}</b> {{ 'platformCollectionDetail.progressBanner.instantlySuffix' | translate }}
-          } @else {
-            <b>{{ d.wordCount }} words</b> · {{ 'platformCollectionDetail.progressBanner.allNewForYouSuffix' | translate }}
-          }
+        <span class="stat-div"></span>
+        <div class="stat">
+          <span class="stat-num stat-num--new">{{ newCount() }}</span>
+          <span class="stat-lbl">{{ 'vault.filter.newLabel' | translate }}</span>
+        </div>
+        <span class="stat-div"></span>
+        <div class="stat">
+          <span class="stat-num stat-num--known">{{ knownCount() }}</span>
+          <span class="stat-lbl">{{ 'platformCollectionDetail.stats.known' | translate }}</span>
         </div>
       </div>
-    } @else {
-      <div class="pcd-adopted-banner">
-        <span>✓</span>
-        <span>{{ 'platformCollectionDetail.adoptedBanner.inSetsLabel' | translate }} · {{ d.knownCount }} of {{ d.wordCount }} {{ 'platformCollectionDetail.adoptedBanner.wordsKnownSuffix' | translate }}</span>
-      </div>
-    }
 
-    <!-- Words: New here -->
-    @if (newWords().length > 0) {
-      <div class="pcd-grp-hd">
-        {{ 'platformCollectionDetail.wordGroups.newHereLabel' | translate }} <span class="pcd-grp-n">{{ newCount() }}</span>
-      </div>
-      @for (w of newWords(); track w.dictionaryWordId) {
-        <div class="pcd-word-row">
-          @if (w.article) {
-            <span class="pcd-art pcd-art-{{ w.article }}">{{ w.article }}</span>
-          } @else {
-            <span class="pcd-art-spacer"></span>
-          }
-          <div class="pcd-word-body">
-            <div class="pcd-word-de">{{ w.displayText }}</div>
-            <div class="pcd-word-en">{{ w.translation }}</div>
-            @if (w.exampleTarget) {
-              <div class="pcd-word-example">{{ w.exampleTarget }}</div>
+      <div class="stats-actions">
+        @if (d.adoptionStatus === 'adopted') {
+          <button class="btn-primary" (click)="openAdoptedCollection(d.adoptedCollectionId!)">
+            {{ 'platformCollectionDetail.footer.openButton' | translate }}
+          </button>
+        } @else {
+          <button class="btn-primary" [disabled]="adoptingId() === d.id" (click)="adoptCollection()">
+            @if (adoptingId() === d.id) {
+              <span class="spinner"></span>
+              {{ 'platformCollectionDetail.footer.addingLabel' | translate }}
+            } @else if (newCount() > 0) {
+              {{ 'platformCollectionDetail.footer.getNewButton' | translate:{ count: newCount() } }}
+            } @else {
+              {{ 'platformCollectionDetail.footer.getButton' | translate }}
             }
-          </div>
-          <div class="pcd-spk">
-            <ion-icon name="volume-high-outline"></ion-icon>
-          </div>
-        </div>
-      }
-    }
-
-    <!-- Words: Already yours -->
-    @if (knownWords().length > 0) {
-      <div class="pcd-grp-hd pcd-grp-hd--known">
-        {{ 'platformCollectionDetail.wordGroups.alreadyYoursLabel' | translate }} <span class="pcd-grp-n pcd-grp-n--known">{{ knownCount() }}</span>
-        <span class="pcd-grp-tap">&nbsp;· {{ alreadyKnownExpanded() ? ('platformCollectionDetail.wordGroups.collapseLabel' | translate) : ('platformCollectionDetail.wordGroups.expandLabel' | translate) }}</span>
-        <button class="pcd-expand-btn" (click)="alreadyKnownExpanded.set(!alreadyKnownExpanded())">
-          {{ alreadyKnownExpanded() ? '▲' : '▼' }}
+          </button>
+        }
+        <button class="btn-sand" (click)="generateStory()">
+          {{ 'platformCollectionDetail.footer.generateStoryButton' | translate }}
         </button>
       </div>
-      @if (alreadyKnownExpanded()) {
-        @for (w of knownWords(); track w.dictionaryWordId) {
-          <div class="pcd-word-row pcd-word-row--known">
-            @if (w.article) {
-              <span class="pcd-art pcd-art-{{ w.article }}">{{ w.article }}</span>
-            } @else {
-              <span class="pcd-art-spacer"></span>
-            }
-            <div class="pcd-word-body">
-              <div class="pcd-word-de">{{ w.displayText }}</div>
-              <div class="pcd-word-en">{{ w.translation }}</div>
-            </div>
-            <span class="pcd-known-chip">{{ 'platformCollectionDetail.wordGroups.yoursChip' | translate }}</span>
+
+      @if (d.adoptionStatus !== 'adopted') {
+        <p class="stats-note">{{ 'platformCollectionDetail.footer.instantNote' | translate }}</p>
+      } @else {
+        <p class="stats-note stats-note--owned">✓ {{ 'platformCollectionDetail.adoptedBanner.inSetsLabel' | translate }}</p>
+      }
+    </section>
+
+    <!-- New here -->
+    @if (newWords().length > 0) {
+      <div class="group-head">
+        {{ 'platformCollectionDetail.wordGroups.newHereLabel' | translate }}
+        <span class="group-count">{{ newCount() }}</span>
+      </div>
+      <div class="word-list">
+        @for (w of newWords(); track w.dictionaryWordId) {
+          <div class="row">
+            <span class="strip"></span>
+            <lc-article-badge [article]="w.article" />
+            <span class="row-body">
+              <span class="headword">{{ w.displayText }}</span>
+              <span class="translation">{{ w.translation }}</span>
+              @if (w.exampleTarget) {
+                <span class="example">{{ w.exampleTarget }}</span>
+              }
+            </span>
+            <button class="mini-play" (click)="playWord(w)" [attr.aria-label]="'platformCollectionDetail.playWordAria' | translate">
+              <ion-icon name="volume-high-outline"></ion-icon>
+            </button>
           </div>
         }
+      </div>
+    }
+
+    <!-- Already yours -->
+    @if (knownWords().length > 0) {
+      <button class="group-head group-head--toggle" (click)="alreadyKnownExpanded.set(!alreadyKnownExpanded())">
+        {{ 'platformCollectionDetail.wordGroups.alreadyYoursLabel' | translate }}
+        <span class="group-count group-count--known">{{ knownCount() }}</span>
+        <svg class="group-chev" [class.group-chev--open]="alreadyKnownExpanded()" viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><polyline points="6,9 12,15 18,9"/></svg>
+      </button>
+      @if (alreadyKnownExpanded()) {
+        <div class="word-list">
+          @for (w of knownWords(); track w.dictionaryWordId) {
+            <div class="row row--known">
+              <span class="strip strip--known"></span>
+              <lc-article-badge [article]="w.article" />
+              <span class="row-body">
+                <span class="headword">{{ w.displayText }}</span>
+                <span class="translation">{{ w.translation }}</span>
+              </span>
+              <span class="owned-chip">{{ 'platformCollectionDetail.wordGroups.yoursChip' | translate }}</span>
+            </div>
+          }
+        </div>
       }
     }
 
-    <!-- Related stories shelf -->
+    <!-- Related stories -->
     @if (d.relatedStories.length > 0) {
-      <div class="pcd-shelf-hd">
-        <span class="pcd-shelf-icon">📖</span>
-        <span class="pcd-shelf-name">{{ 'platformCollectionDetail.shelf.title' | translate }}</span>
+      <div class="section-head">
+        <h2 class="section-title">{{ 'platformCollectionDetail.shelf.title' | translate }}</h2>
       </div>
-      <div class="pcd-stories-shelf">
+      <div class="rail">
         @for (story of d.relatedStories; track story.id) {
-          <div class="pcd-story-card" (click)="openStory(story.id)">
-            <div class="pcd-story-cover">
-              <span class="pcd-story-lvl">{{ story.level }}</span>
-              <span class="pcd-story-em">📖</span>
-            </div>
-            <div class="pcd-story-body">
-              <div class="pcd-story-title">{{ story.title }}</div>
-              <div class="pcd-story-meta">~{{ story.estimatedReadMinutes }} {{ 'platformCollectionDetail.story.minLabel' | translate }}</div>
-            </div>
-          </div>
+          <button class="cover-card" (click)="openStory(story.id)">
+            <span class="cover-art" [class]="coverClass()">
+              <span class="cover-level">{{ story.level }}</span>
+              <span class="cover-emoji-art">📖</span>
+            </span>
+            <span class="cover-body">
+              <span class="cover-title">{{ story.title }}</span>
+              <span class="cover-meta">~{{ story.estimatedReadMinutes }} {{ 'platformCollectionDetail.story.minLabel' | translate }}</span>
+            </span>
+          </button>
         }
       </div>
     }
 
+    <div class="tail-space"></div>
   }
 
 </ion-content>
-
-<ion-footer class="ion-no-border">
-  @if (detail(); as d) {
-    <div class="pcd-footer">
-      @if (d.adoptionStatus === 'adopted') {
-        <button
-          class="pcd-btn-primary"
-          (click)="openAdoptedCollection(d.adoptedCollectionId!)">
-          {{ 'platformCollectionDetail.footer.openButton' | translate }}
-        </button>
-      } @else {
-        <button
-          class="pcd-btn-primary"
-          [disabled]="adoptingId() === d.id"
-          (click)="adoptCollection()">
-          @if (adoptingId() === d.id) {
-            {{ 'platformCollectionDetail.footer.addingLabel' | translate }}
-          } @else if (newCount() > 0) {
-            {{ 'platformCollectionDetail.footer.getNewButton' | translate:{ count: newCount() } }}
-          } @else {
-            {{ 'platformCollectionDetail.footer.getButton' | translate }}
-          }
-        </button>
-      }
-      <button class="pcd-btn-secondary" (click)="generateStory()">
-        {{ 'platformCollectionDetail.footer.generateStoryButton' | translate }}
-      </button>
-      @if (d.adoptionStatus !== 'adopted') {
-        <p class="pcd-footer-note">{{ 'platformCollectionDetail.footer.instantNote' | translate }}</p>
-      }
-    </div>
-  }
-</ion-footer>

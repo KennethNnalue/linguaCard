@@ -58,7 +58,8 @@
       "syncStatus": "Sync status",
       "playPronunciation": "Play pronunciation",
       "share": "Share"
-    }
+    },
+    "edit": "Edit"
   },
   "tabs": {
     "home": "Home",
@@ -230,6 +231,32 @@
       "dueTodayLabel": "Due today",
       "emptyTitle": "No collections yet",
       "emptySubtitle": "Tap + New Collection to get started"
+    },
+    "lexicon": {
+      "eyebrow": "Your Lexicon",
+      "readyToReview": "Ready to review",
+      "streakChip": "{{count}}-day streak",
+      "wordsDue": "words due",
+      "acrossCollections": "Across {{count}} collections · best studied now",
+      "masteredOf": "{{mastered}} mastered of {{total}}",
+      "startReview": "Start review",
+      "listen": "Listen",
+      "allWords": "All Words",
+      "allWordsSub": "Browse & search your full index",
+      "collections": "Collections",
+      "shelves": "{{count}} shelves",
+      "indexSearchPlaceholder": "Search German or English…",
+      "dueTag": "Due",
+      "collectionEyebrow": "Collection",
+      "reviewCount": "Review {{count}}"
+    },
+    "explore": {
+      "title": "Explore",
+      "subtitle": "Curated by LinguaCard",
+      "seeAll": "See all",
+      "searchAria": "Search collections",
+      "empty": "No collections found",
+      "searchPlaceholder": "Search your sets & topics…"
     }
   },
   "collections": {
@@ -342,26 +369,12 @@
       "breadcrumb": "Explore",
       "backAria": "Back"
     },
-    "hero": {
-      "descriptionSuffix": "words · with audio"
-    },
-    "progressBanner": {
-      "knowPrefix": "You already know",
-      "wordsSuffix": "words here.",
-      "addingPrefix": "Getting this set adds",
-      "newCardsSuffix": "new cards",
-      "instantlySuffix": "— instantly.",
-      "allNewForYouSuffix": "all new for you."
-    },
     "adoptedBanner": {
-      "inSetsLabel": "In your sets",
-      "wordsKnownSuffix": "words known"
+      "inSetsLabel": "In your sets"
     },
     "wordGroups": {
       "newHereLabel": "New here",
       "alreadyYoursLabel": "Already yours",
-      "expandLabel": "tap to expand",
-      "collapseLabel": "tap to collapse",
       "yoursChip": "✓ YOURS"
     },
     "shelf": {
@@ -382,7 +395,11 @@
       "successMessage": "{{count}} words added — audio included ✓",
       "alreadyInMessage": "Already in your sets",
       "errorMessage": "Could not add collection. Try again."
-    }
+    },
+    "stats": {
+      "known": "Known"
+    },
+    "playWordAria": "Play pronunciation"
   },
   "exploreTopic": {
     "nav": {

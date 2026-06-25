@@ -58,7 +58,8 @@
     "refresh": "Actualizar",
     "yesterday": "Ayer",
     "daysAgoLabel": "Hace {{count}} días",
-    "todayCapital": "Hoy"
+    "todayCapital": "Hoy",
+    "edit": "Editar"
   },
   "auth": {
     "login": {
@@ -223,6 +224,32 @@
       "dueTodayLabel": "Pendientes hoy",
       "emptyTitle": "Aún no hay colecciones",
       "emptySubtitle": "Toca + Nueva colección para empezar"
+    },
+    "lexicon": {
+      "eyebrow": "Tu léxico",
+      "readyToReview": "Listo para repasar",
+      "streakChip": "Racha de {{count}} días",
+      "wordsDue": "palabras pendientes",
+      "acrossCollections": "En {{count}} colecciones · mejor estudiar ahora",
+      "masteredOf": "{{mastered}} dominadas de {{total}}",
+      "startReview": "Empezar repaso",
+      "listen": "Escuchar",
+      "allWords": "Todas las palabras",
+      "allWordsSub": "Explora y busca en tu índice completo",
+      "collections": "Colecciones",
+      "shelves": "{{count}} estantes",
+      "indexSearchPlaceholder": "Busca en alemán o español…",
+      "dueTag": "Pendiente",
+      "collectionEyebrow": "Colección",
+      "reviewCount": "Repasar {{count}}"
+    },
+    "explore": {
+      "title": "Explorar",
+      "subtitle": "Seleccionado por LinguaCard",
+      "seeAll": "Ver todo",
+      "searchAria": "Buscar colecciones",
+      "empty": "No se encontraron colecciones",
+      "searchPlaceholder": "Busca tus colecciones y temas…"
     }
   },
   "collections": {
@@ -335,26 +362,12 @@
       "breadcrumb": "Explorar",
       "backAria": "Atrás"
     },
-    "hero": {
-      "descriptionSuffix": "palabras · con audio"
-    },
-    "progressBanner": {
-      "knowPrefix": "Ya conoces",
-      "wordsSuffix": "palabras de aquí.",
-      "addingPrefix": "Obtener este set añade",
-      "newCardsSuffix": "tarjetas nuevas",
-      "instantlySuffix": "— al instante.",
-      "allNewForYouSuffix": "todas nuevas para ti."
-    },
     "adoptedBanner": {
-      "inSetsLabel": "En tus sets",
-      "wordsKnownSuffix": "palabras conocidas"
+      "inSetsLabel": "En tus sets"
     },
     "wordGroups": {
       "newHereLabel": "Nuevas aquí",
       "alreadyYoursLabel": "Ya son tuyas",
-      "expandLabel": "toca para expandir",
-      "collapseLabel": "toca para contraer",
       "yoursChip": "✓ TUYA"
     },
     "shelf": {
@@ -375,7 +388,11 @@
       "successMessage": "{{count}} palabras añadidas — audio incluido ✓",
       "alreadyInMessage": "Ya está en tus sets",
       "errorMessage": "No se pudo añadir la colección. Inténtalo de nuevo."
-    }
+    },
+    "stats": {
+      "known": "Conocidas"
+    },
+    "playWordAria": "Reproducir pronunciación"
   },
   "exploreTopic": {
     "nav": {

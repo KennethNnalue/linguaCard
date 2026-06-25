@@ -162,6 +162,31 @@ $lc-ss-shadow-fab:      0 6px 16px rgba(35, 70, 59, 0.30);
 // Typography
 $lc-font-serif: 'Newsreader', Georgia, serif;
 
+// ─── VAULT (LEXICON) — Epic Vault redesign ──────────────────────────────────
+// The Lexicon identity maps onto the app-wide platform tokens for all themeable
+// surfaces/text/accents (so light + dark switch for free via var(--lc-*)).
+// Only the few values below are intentionally theme-independent: the dark
+// "focus hero" and the decorative collection cover gradients read well on both
+// light and dark backgrounds, so they stay fixed (mirrors the Story Studio
+// `$lc-ss-grad-*` precedent). Everything else uses var(--lc-*) platform tokens.
+$lc-vx-hero-grad:      linear-gradient(155deg, #1F4034 0%, #15281F 100%);
+$lc-vx-hero-glow:      radial-gradient(circle, rgba(224, 123, 63, 0.22), transparent 68%);
+$lc-vx-hero-glow-soft: radial-gradient(circle, rgba(110, 160, 140, 0.14), transparent 70%);
+$lc-vx-on-hero:        #F6F1E6;                    // primary text on dark hero
+$lc-vx-on-hero-soft:   rgba(246, 241, 230, 0.7);   // "words due" / sub
+$lc-vx-on-hero-faint:  rgba(246, 241, 230, 0.5);   // meta on hero
+$lc-vx-hero-accent:    #D8B981;                     // brass eyebrow + streak on hero
+$lc-vx-hero-ghost-bg:  rgba(255, 255, 255, 0.07);   // ghost button on hero
+$lc-vx-hero-ghost-bd:  rgba(216, 185, 129, 0.3);    // ghost button border on hero
+
+// Collection cover gradients (cycled by index)
+$lc-vx-cover-1: linear-gradient(150deg, #1F4034, #3E6B5A);
+$lc-vx-cover-2: linear-gradient(150deg, #7C4A2E, #B07A45);
+$lc-vx-cover-3: linear-gradient(150deg, #2E3A54, #5A6E8C);
+$lc-vx-cover-4: linear-gradient(150deg, #4A5640, #7E8C6A);
+$lc-vx-cover-5: linear-gradient(150deg, #5A3A52, #8C6A84);
+$lc-vx-cover-6: linear-gradient(150deg, #36544C, #86A99A);
+
 // ─── Z-INDEX SCALE ──────────────────────────────────────────────────────────
 $lc-z-base:    0;
 $lc-z-raised:  10;
