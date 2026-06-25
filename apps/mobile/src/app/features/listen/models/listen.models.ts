@@ -46,10 +46,11 @@ export const PLAY_MODE_OPTIONS: PlayModeOption[] = [
   { value: 'deepDive', labelKey: 'listen.playlistMode.deepDiveLabel', descKey: 'listen.playlistMode.deepDiveDesc' },
 ];
 
-export const PlayModeLabel: Record<PlayMode, string> = {
-  compact:  'Compact mode',
-  examples: 'Examples mode',
-  deepDive: 'Deep Dive mode',
+/** i18n keys for the mode badge shown on the Session Complete screen. */
+export const PlayModeLabelKey: Record<PlayMode, string> = {
+  compact:  'listen.playlistMode.compactModeBadge',
+  examples: 'listen.playlistMode.examplesModeBadge',
+  deepDive: 'listen.playlistMode.deepDiveModeBadge',
 };
 
 // ─── Silence Durations (ms) ───────────────────────────────────────────────────
@@ -103,6 +104,18 @@ export interface ListenState {
   status: PlayerStatus;
   errorMessage: string | null;
   settings: PlayerSettings;
+  /** Epoch ms when the current playback session started — used to compute
+   *  real elapsed time on the Session Complete screen. 0 when no session. */
+  sessionStartedAt: number;
+}
+
+// ─── Teleprompter ─────────────────────────────────────────────────────────────
+
+/** A single visible playback segment row in the Now Playing teleprompter. */
+export interface SegmentViewModel {
+  text: string;
+  langLabel: string;
+  cls: '' | 'played' | 'playing';
 }
 
 // ─── Modal CSS Class ──────────────────────────────────────────────────────────

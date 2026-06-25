@@ -1,186 +1,104 @@
 <ion-header class="ion-no-border">
   <ion-toolbar>
-    <div class="np-nav">
-      <button class="np-back" (click)="goBack()" [attr.aria-label]="'common.back' | translate">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round">
+    <div class="nav">
+      <button
+        type="button"
+        class="nav-btn"
+        (click)="goBack()"
+        [attr.aria-label]="'common.back' | translate">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
           <polyline points="15,18 9,12 15,6"/>
         </svg>
       </button>
-      <span class="np-nav-title">{{ 'listen.nowPlaying.pageTitle' | translate }}</span>
-      <button class="np-more" aria-label="More options">
-        <svg viewBox="0 0 24 24" fill="currentColor">
-          <circle cx="12" cy="5" r="1.5"/>
-          <circle cx="12" cy="12" r="1.5"/>
-          <circle cx="12" cy="19" r="1.5"/>
-        </svg>
-      </button>
+
+      <div class="nav-center">
+        <lc-listen-equalizer variant="nav" [active]="isPlaying()" />
+        <span class="nav-title">{{ 'listen.nowPlaying.pageTitle' | translate }}</span>
+      </div>
+
+      <span class="nav-spacer"></span>
     </div>
   </ion-toolbar>
 </ion-header>
 
-<ion-content>
+<ion-content [scrollY]="false">
+  <div class="player">
 
-  @if (listenStore.status() === 'complete') {
-    <div class="np-complete-redirect">
-      <div class="np-checkmark">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-          <polyline points="20,6 9,17 4,12"/>
-        </svg>
-      </div>
-      <p class="np-complete-msg">{{ 'listen.nowPlaying.sessionComplete' | translate }}</p>
-      <button class="np-complete-btn" (click)="goComplete()">{{ 'listen.nowPlaying.seeSummary' | translate }}</button>
-    </div>
-  } @else {
+    <lc-listen-word-card
+      class="word-card"
+      [card]="listenStore.currentCard()"
+      [index]="listenStore.cardIndex()"
+      [total]="listenStore.queue().length" />
 
-    <!-- ── Card panel ─────────────────────────────────────────────────── -->
-    <div class="np-card-area" [class.error]="isError()">
+    <div class="stage">
+      <lc-listen-teleprompter
+        [prev]="teleprompter().prev"
+        [current]="teleprompter().current"
+        [next]="teleprompter().next"
+        [playing]="isPlaying()" />
 
-      <!-- Hero: article + word + translation -->
-      <div class="np-hero">
-        @if (listenStore.currentCard()?.content?.article) {
-          <div class="np-article-row">
-            <lc-article-badge [article]="listenStore.currentCard()!.content.article" />
-          </div>
-        }
-        <div class="np-word">{{ listenStore.currentCard()?.content?.back }}</div>
-        <div class="np-translation">{{ listenStore.currentCard()?.content?.front }}</div>
-      </div>
-
-      <!-- Divider -->
-      <div class="np-divider"></div>
-
-      <!-- Segment list -->
-      @if (segmentViewModels().length > 0) {
-        <div class="np-segment-track">
-          @for (vm of segmentViewModels(); track vm.text) {
-            <div
-              class="np-segment"
-              [class.played]="vm.cls === 'played'"
-              [class.playing]="vm.cls === 'playing'">
-              <div class="np-segment-dot"></div>
-              <div class="np-segment-text">{{ vm.text }}</div>
-              <div class="np-segment-lang">{{ vm.langLabel }}</div>
-            </div>
-          }
-        </div>
-      }
-
-      <!-- Grammar pill (deep dive mode) -->
       @if (grammarNote()) {
-        <div class="np-grammar-pill">
-          <span class="np-grammar-icon">💡</span>
-          <div class="np-grammar-text">
+        <div class="grammar">
+          <svg class="bulb" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+            <path d="M9 21h6v-1H9v1zm3-19a7 7 0 0 0-4 12.74V17a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1v-2.26A7 7 0 0 0 12 2z"/>
+          </svg>
+          <span class="grammar-text">
             <strong>{{ 'listen.nowPlaying.grammarTipLabel' | translate }}:</strong> {{ grammarNote() }}
-          </div>
+          </span>
         </div>
       }
 
-      <!-- Error state -->
       @if (isError()) {
-        <div class="np-error-pill">
+        <div class="error-pill">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
             <circle cx="12" cy="12" r="10"/>
             <line x1="12" y1="8" x2="12" y2="12"/>
             <line x1="12" y1="16" x2="12.01" y2="16"/>
           </svg>
-          <span class="np-error-text">{{ 'listen.nowPlaying.audioUnavailable' | translate }}</span>
-          <button class="np-error-retry" (click)="retry()">{{ 'listen.nowPlaying.retryBtn' | translate }}</button>
+          <span class="error-text">{{ 'listen.nowPlaying.audioUnavailable' | translate }}</span>
+          <button type="button" class="error-retry" (click)="retry()">{{ 'listen.nowPlaying.retryBtn' | translate }}</button>
         </div>
-        <button class="np-skip-link" (click)="skipCard()">{{ 'listen.nowPlaying.skipCard' | translate }}</button>
+        <button type="button" class="skip-link" (click)="skipCard()">{{ 'listen.nowPlaying.skipCard' | translate }}</button>
       }
     </div>
 
-    <!-- ── Progress ───────────────────────────────────────────────────── -->
-    <div class="np-progress-wrap">
-      <div class="np-progress-bar">
-        <div class="np-progress-fill" [style.width.%]="progressPercent()"></div>
+    <!-- Progress -->
+    <div class="progress">
+      <div class="progress-track">
+        <div class="progress-fill" [style.width.%]="progressPercent()"></div>
       </div>
-      <div class="np-progress-labels">
+      <div class="progress-labels">
         <span>{{ listenStore.cardIndex() + 1 }} / {{ listenStore.queue().length }}</span>
-        <span>~{{ listenStore.estimatedMinutes() }} {{ 'listen.queue.durationUnit' | translate }}</span>
+        <span>{{ 'listen.nowPlaying.minLeft' | translate:{ mins: listenStore.estimatedMinutes() } }}</span>
       </div>
     </div>
 
-    <!-- ── Mode selector ──────────────────────────────────────────────── -->
-    <div class="np-mode-row">
-      @for (m of MODES; track m.value) {
-        <button
-          class="np-mode-btn"
-          [class.active]="listenStore.playMode() === m.value"
-          (click)="setMode(m.value)">
-          <div class="np-mode-title">{{ m.labelKey | translate }}</div>
-          <div class="np-mode-sub">{{ m.descKey | translate }}</div>
-        </button>
-      }
-    </div>
+    <!-- Mode tabs -->
+    <lc-listen-mode-selector
+      class="mode-tabs"
+      variant="tabs"
+      [modes]="MODES"
+      [active]="listenStore.playMode()"
+      (modeChange)="setMode($event)" />
 
-    <!-- ── Speed ──────────────────────────────────────────────────────── -->
-    <div class="np-speed-row">
-      <span class="np-speed-label">{{ 'listen.controls.speedSection' | translate }}</span>
-      @for (s of SPEEDS; track s) {
-        <button
-          class="np-speed-chip"
-          [class.active]="listenStore.speed() === s"
-          (click)="setSpeed(s)">
-          {{ s }}×
-        </button>
-      }
-    </div>
+    <!-- Speed -->
+    <lc-listen-speed-chips
+      class="speed"
+      [speeds]="SPEEDS"
+      [active]="listenStore.speed()"
+      (speedChange)="setSpeed($event)" />
 
-    <!-- ── Transport ──────────────────────────────────────────────────── -->
-    <div class="np-transport">
-      <button class="np-ctrl" [class.active]="listenStore.isShuffled()" (click)="toggleShuffle()" aria-label="Shuffle">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
-          <polyline points="16,3 21,3 21,8"/>
-          <line x1="4" y1="20" x2="21" y2="3"/>
-          <polyline points="21,16 21,21 16,21"/>
-          <line x1="4" y1="4" x2="9" y2="9"/>
-        </svg>
-      </button>
-
-      <button class="np-ctrl" (click)="previous()" aria-label="Previous">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
-          <line x1="5" y1="5" x2="5" y2="19"/>
-          <polyline points="19,5 10,12 19,19"/>
-        </svg>
-      </button>
-
-      <button class="np-ctrl-play" [class.error]="isError()" (click)="togglePlay()" aria-label="Play / Pause">
-        @if (isError()) {
-          <svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.2" stroke-linecap="round">
-            <circle cx="12" cy="12" r="10"/>
-            <line x1="12" y1="8" x2="12" y2="12"/>
-            <line x1="12" y1="16" x2="12.01" y2="16"/>
-          </svg>
-        } @else if (isPlaying()) {
-          <svg viewBox="0 0 24 24" fill="white">
-            <rect x="6" y="4" width="4" height="16" rx="1"/>
-            <rect x="14" y="4" width="4" height="16" rx="1"/>
-          </svg>
-        } @else {
-          <svg viewBox="0 0 24 24">
-            <polygon points="7,3 21,12 7,21" fill="white"/>
-          </svg>
-        }
-      </button>
-
-      <button class="np-ctrl" (click)="next()" aria-label="Next">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
-          <line x1="19" y1="5" x2="19" y2="19"/>
-          <polyline points="5,5 14,12 5,19"/>
-        </svg>
-      </button>
-
-      <button class="np-ctrl" [class.active]="listenStore.isRepeat()" (click)="toggleRepeat()" aria-label="Repeat">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
-          <polyline points="17,1 21,5 17,9"/>
-          <path d="M3,11V9a4,4,0,0,1,4-4h14"/>
-          <polyline points="7,23 3,19 7,15"/>
-          <path d="M21,13v2a4,4,0,0,1-4,4H3"/>
-        </svg>
-      </button>
-    </div>
-
-  }
-
+    <!-- Transport -->
+    <lc-listen-transport
+      class="transport"
+      [playing]="isPlaying()"
+      [error]="isError()"
+      [shuffled]="listenStore.isShuffled()"
+      [repeat]="listenStore.isRepeat()"
+      (togglePlay)="togglePlay()"
+      (next)="next()"
+      (previous)="previous()"
+      (toggleShuffle)="toggleShuffle()"
+      (toggleRepeat)="toggleRepeat()" />
+  </div>
 </ion-content>

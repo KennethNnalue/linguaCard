@@ -64,6 +64,7 @@ const initialState: ListenState = {
   status: 'idle',
   errorMessage: null,
   settings: DEFAULT_LISTEN_SETTINGS,
+  sessionStartedAt: 0,
 };
 
 export const ListenStore = signalStore(
@@ -211,7 +212,10 @@ export const ListenStore = signalStore(
             );
           }
           const lang = segment.lang === 'de' ? 'de-DE' : 'en-US';
-          return from(wordAudio.playAsPromise(segment.text, lang)).pipe(
+          // Apply the user-selected playback speed. Read live so a speed change
+          // mid-session takes effect from the next segment.
+          const rate = store.settings().speed;
+          return from(wordAudio.playAsPromise(segment.text, lang, rate)).pipe(
             map(() => generation),
           );
         }),
@@ -346,7 +350,10 @@ export const ListenStore = signalStore(
         const gen = abortAndAdvance();
         const queue = store.settings().shuffle ? shuffleArray(store.rawQueue()) : [...store.rawQueue()];
         const scripts = compileQueue(queue, store.settings().playMode);
-        patchState(store, { queue, scripts, cardIndex: 0, segmentIndex: 0, status: 'playing', errorMessage: null });
+        patchState(store, {
+          queue, scripts, cardIndex: 0, segmentIndex: 0, status: 'playing',
+          errorMessage: null, sessionStartedAt: Date.now(),
+        });
         resetPipeline(subscribeRunner);
         emitNextSegment(gen);
       },
@@ -435,7 +442,10 @@ export const ListenStore = signalStore(
         const gen = abortAndAdvance();
         const queue = shuffleArray(store.rawQueue());
         const scripts = compileQueue(queue, settings.playMode);
-        patchState(store, { queue, scripts, cardIndex: 0, segmentIndex: 0, status: 'playing', errorMessage: null });
+        patchState(store, {
+          queue, scripts, cardIndex: 0, segmentIndex: 0, status: 'playing',
+          errorMessage: null, sessionStartedAt: Date.now(),
+        });
         resetPipeline(subscribeRunner);
         emitNextSegment(gen);
       },

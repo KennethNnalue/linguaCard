@@ -1,124 +1,161 @@
 @use 'theme/tokens' as t;
+@use 'theme/utils' as u;
 
-ion-content { --background: var(--lc-card); }
-
-.pss-wrap { padding: 0; }
-
-.pss-handle-wrap {
-  padding: 10px 0 6px;
-  display: flex; justify-content: center;
+ion-content {
+  --background: var(--lc-card);
 }
 
-.pss-handle {
-  width: 36px; height: 4px;
-  border-radius: 4px;
-  background: var(--lc-border);
-}
-
-.pss-title {
-  font-family: t.$lc-font-display;
-  font-size: 16px; font-weight: t.$lc-font-weight-semibold;
-  color: var(--lc-text-primary);
-  padding: 4px 16px 14px;
-  text-align: center;
-}
-
-.pss-options {
-  padding: 0 14px 24px;
-  display: flex; flex-direction: column; gap: 8px;
-}
-
-// ── Option row ────────────────────────────────────────────────────────────────
-.pss-opt {
-  display: flex; align-items: center; gap: 12px;
-  padding: 12px 14px;
+.sheet {
+  border-radius: 26px 26px 0 0;
   background: var(--lc-card);
+}
+
+.handle-wrap {
+  @include u.flex-center;
+  padding: t.$lc-space-3 + 1px 0 6px;
+}
+
+.handle {
+  width: 38px;
+  height: 4px;
+  border-radius: 4px;
+  background: var(--lc-border-strong);
+}
+
+.title {
+  margin: t.$lc-space-1 0 t.$lc-space-4 + 2px;
+  font-family: t.$lc-font-display;
+  @include u.lc-font('2xl', t.$lc-font-weight-semibold);
+  text-align: center;
+  color: var(--lc-text-primary);
+}
+
+.options {
+  display: flex;
+  flex-direction: column;
+  gap: 9px;
+  padding: 0 t.$lc-space-4 t.$lc-space-8 + 4px;
+}
+
+// ─── SOURCE ROW ─────────────────────────────────────────────────────────────
+.opt {
+  display: flex;
+  align-items: center;
+  gap: t.$lc-space-3 + 1px;
+  padding: t.$lc-space-3 + 2px t.$lc-space-4;
+  border-radius: t.$lc-radius-lg - 2px;
   border: 1.5px solid var(--lc-border);
-  border-radius: 14px;
+  background: var(--lc-card);
+  text-align: left;
   cursor: pointer;
-  transition: all 0.15s;
+  @include u.touch-state;
 
   &.active {
     border-color: var(--lc-brand);
     background: var(--lc-brand-light);
-    .pss-opt-title { color: var(--lc-brand); }
-    .pss-opt-count { color: var(--lc-brand); }
   }
-  &:active { opacity: 0.85; }
 }
 
-.pss-opt-icon {
-  width: 38px; height: 38px;
-  border-radius: 10px;
-  display: flex; align-items: center; justify-content: center;
-  flex-shrink: 0;
-  svg { width: 18px; height: 18px; }
+.icon {
+  @include u.flex-center;
+  @include u.square(46px);
+  border-radius: 13px;
+
+  svg { width: 22px; height: 22px; }
 }
 
-.pss-icon-due        { background: var(--lc-brand-light); svg { stroke: var(--lc-brand); } }
-.pss-icon-col        { background: #F1EFE8;               svg { stroke: #5F5E5A; } }
-.pss-icon-all        { background: #EAF2FC;               svg { stroke: #1A56A3; } }
-.pss-icon-struggling { background: #FEF2F2;               svg { stroke: #B91C1C; } }
+.icon-due { background: var(--lc-brand-light); color: var(--lc-brand-mid); }
+.icon-all { background: var(--lc-masc-bg); color: var(--lc-masc-text); }
+.icon-struggling { background: var(--lc-fem-bg); color: var(--lc-fem-text); }
+.icon-col { background: var(--lc-neut-bg); color: var(--lc-neut-text); }
 
-.pss-opt-body { flex: 1; min-width: 0; }
-
-.pss-opt-title {
-  font-size: 13px; font-weight: t.$lc-font-weight-semibold;
-  color: var(--lc-text-primary); margin-bottom: 1px;
+.opt-body {
+  flex: 1;
+  min-width: 0;
 }
 
-.pss-opt-sub { font-size: 11px; color: var(--lc-text-hint); }
+.opt-title {
+  display: block;
+  @include u.lc-font('md', t.$lc-font-weight-semibold);
+  color: var(--lc-text-primary);
+  margin-bottom: 2px;
+}
 
-.pss-opt-count {
+.opt.active .opt-title { color: var(--lc-brand); }
+
+.opt-sub {
+  display: block;
+  @include u.lc-font('xs');
+  color: var(--lc-text-hint);
+}
+
+.count {
   font-family: t.$lc-font-display;
-  font-size: 16px; font-weight: t.$lc-font-weight-semibold;
-  color: var(--lc-text-primary); flex-shrink: 0;
+  @include u.lc-font('2xl', t.$lc-font-weight-semibold);
+  color: var(--lc-text-primary);
+
+  &.count-red { color: var(--lc-fem-text); }
 }
 
-.pss-count-hint { color: var(--lc-text-hint); }
-.pss-count-red  { color: #B91C1C; }
+.opt.active .count:not(.count-red) { color: var(--lc-brand); }
 
-.pss-opt-check {
-  width: 18px; height: 18px; border-radius: 50%;
-  background: var(--lc-brand);
-  display: flex; align-items: center; justify-content: center;
-  flex-shrink: 0;
-  svg { width: 10px; height: 10px; }
-}
+.chevron {
+  width: 18px;
+  height: 18px;
+  color: var(--lc-text-hint);
+  transition: transform var(--lc-transition-fast);
 
-.pss-check-sm {
-  width: 16px; height: 16px;
-  svg { width: 9px; height: 9px; }
-}
-
-.pss-chevron {
-  width: 16px; height: 16px; stroke: var(--lc-text-hint);
-  transition: transform 0.2s; flex-shrink: 0;
   &.open { transform: rotate(180deg); }
 }
 
-// ── Collection sub-list ───────────────────────────────────────────────────────
-.pss-collection-list {
-  border: 1px solid var(--lc-border);
+.check {
+  @include u.flex-center;
+  @include u.circle(22px);
+  background: var(--lc-brand);
+  color: var(--lc-text-inverse);
+
+  svg { width: 11px; height: 11px; }
+
+  &.check-sm {
+    @include u.circle(18px);
+    svg { width: 10px; height: 10px; }
+  }
+}
+
+// ─── COLLECTION SUB-LIST ────────────────────────────────────────────────────
+.col-list {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 2px t.$lc-space-2 0;
+}
+
+.col-row {
+  display: flex;
+  align-items: center;
+  gap: t.$lc-space-2;
+  padding: t.$lc-space-3 t.$lc-space-3 + 2px;
   border-radius: t.$lc-radius-md;
-  overflow: hidden;
+  border: 1px solid var(--lc-border);
   background: var(--lc-card);
-  margin-top: -4px;
-}
-
-.pss-col-row {
-  display: flex; align-items: center; gap: t.$lc-space-3;
-  padding: 12px 14px;
   cursor: pointer;
-  border-bottom: 1px solid var(--lc-border);
-  &:last-child { border-bottom: none; }
-  &.active { background: var(--lc-brand-light); }
-  &:active { opacity: 0.8; }
+  @include u.touch-state;
+
+  &.active {
+    border-color: var(--lc-brand);
+    background: var(--lc-brand-light);
+  }
 }
 
-.pss-col-name {
-  flex: 1; font-size: 13px; font-weight: 500;
+.col-name {
+  flex: 1;
+  min-width: 0;
+  @include u.lc-font('sm', t.$lc-font-weight-medium);
   color: var(--lc-text-primary);
+  @include u.text-overflow;
 }
 
-.pss-col-count { font-size: 12px; color: var(--lc-text-hint); }
+.col-count {
+  @include u.lc-font('sm', t.$lc-font-weight-semibold);
+  color: var(--lc-text-hint);
+}

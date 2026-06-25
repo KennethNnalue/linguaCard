@@ -2,13 +2,17 @@ import { ChangeDetectionStrategy, Component, computed, effect, inject } from '@a
 import { ActivatedRoute, Router } from '@angular/router';
 import { IonContent, IonHeader, IonToolbar, ModalController, ViewWillEnter } from '@ionic/angular/standalone';
 import { Card, PlayMode } from '@lingua-card/shared/domain';
+import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { CategoryStore } from '../../../vault/store/category.store';
 import { CollectionStore } from '../../../vault/store/collection.store';
 import { ListenStore } from '../../store/listen.store';
-import { TranslatePipe, TranslateService } from '@ngx-translate/core';
-import { ArticleBadgeComponent } from '../../../../shared/components/article-badge/article-badge.component';
 import { WordAudioService } from '../../../../shared/audio/word-audio.service';
+import { EmptyStateComponent } from '../../../../shared/ui/empty-state/empty-state.component';
 import { PlaylistSourceSheetComponent } from '../../components/playlist-source-sheet/playlist-source-sheet.component';
+import { ListenEqualizerComponent } from '../../components/listen-equalizer/listen-equalizer.component';
+import { ListenSpeedChipsComponent } from '../../components/listen-speed-chips/listen-speed-chips.component';
+import { ListenModeSelectorComponent } from '../../components/listen-mode-selector/listen-mode-selector.component';
+import { ListenQueueItemComponent } from '../../components/listen-queue-item/listen-queue-item.component';
 import {
   LISTEN_SPEEDS_EXTENDED,
   PLAY_MODE_OPTIONS,
@@ -21,11 +25,18 @@ import {
   templateUrl: './listen.component.html',
   styleUrl: './listen.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [IonContent, IonHeader, IonToolbar, ArticleBadgeComponent, TranslatePipe],
+  imports: [
+    IonContent, IonHeader, IonToolbar, TranslatePipe,
+    EmptyStateComponent,
+    ListenEqualizerComponent,
+    ListenSpeedChipsComponent,
+    ListenModeSelectorComponent,
+    ListenQueueItemComponent,
+  ],
 })
 export class ListenComponent implements ViewWillEnter {
   protected readonly listenStore = inject(ListenStore);
-  protected readonly categoryStore = inject(CategoryStore);
+  private readonly categoryStore = inject(CategoryStore);
   private readonly collectionStore = inject(CollectionStore);
   private readonly modalCtrl = inject(ModalController);
   private readonly router = inject(Router);
@@ -38,17 +49,19 @@ export class ListenComponent implements ViewWillEnter {
 
   readonly queueCount = computed(() => this.listenStore.queue().length);
 
+  /** i18n key of the active mode's label — used in the hero sub-line. */
+  readonly modeLabelKey = computed(
+    () => this.MODES.find(m => m.value === this.listenStore.playMode())?.labelKey ?? '',
+  );
+
   constructor() {
-    // Fix any untranslated collection labels from restored sessions
+    // Fix any untranslated collection labels from restored sessions.
     effect(() => {
       const sourceLabel = this.listenStore.sourceLabel();
       if (sourceLabel?.startsWith('Collection:') && !sourceLabel.includes(this.translate.instant('listen.card.collectionPrefix'))) {
-        // This is an old-style untranslated label, update it
         const collectionName = sourceLabel.substring('Collection:'.length).trim();
         const prefix = this.translate.instant('listen.card.collectionPrefix');
-        const newLabel = `${prefix} ${collectionName}`;
-        // Update the label through the store's method (signalStore state is not writable from outside)
-        this.listenStore.setSourceLabel(newLabel);
+        this.listenStore.setSourceLabel(`${prefix} ${collectionName}`);
       }
     });
   }
@@ -65,8 +78,7 @@ export class ListenComponent implements ViewWillEnter {
         ?? this.collectionStore.collections().find(c => c.id === collectionId)?.name
         ?? 'Collection';
       const prefix = this.translate.instant('listen.card.collectionPrefix');
-      const label = `${prefix} ${colName}`;
-      this.listenStore.loadCollectionCards(collectionId, label);
+      this.listenStore.loadCollectionCards(collectionId, `${prefix} ${colName}`);
       this.router.navigate([], { replaceUrl: true, queryParams: {} });
     }
   }

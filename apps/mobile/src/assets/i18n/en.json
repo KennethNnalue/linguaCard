@@ -838,7 +838,10 @@
       "examplesLabel": "Examples",
       "examplesDesc": "Full sentences",
       "deepDiveLabel": "Deep Dive",
-      "deepDiveDesc": "+ grammar tip"
+      "deepDiveDesc": "+ grammar tip",
+      "compactModeBadge": "Compact mode",
+      "examplesModeBadge": "Examples mode",
+      "deepDiveModeBadge": "Deep Dive mode"
     },
     "card": {
       "collectionPrefix": "Collection:"
@@ -850,14 +853,34 @@
       "audioUnavailable": "Audio unavailable",
       "retryBtn": "Retry",
       "skipCard": "Skip this card",
-      "grammarTipLabel": "Grammar tip"
+      "grammarTipLabel": "Grammar tip",
+      "minLeft": "~{{mins}} min left"
+    },
+    "transport": {
+      "shuffleAriaLabel": "Shuffle",
+      "previousAriaLabel": "Previous",
+      "playPauseAriaLabel": "Play or pause",
+      "nextAriaLabel": "Next",
+      "repeatAriaLabel": "Repeat"
+    },
+    "complete": {
+      "eyebrow": "Session complete",
+      "title": "All done!",
+      "subtitle": "You listened through {{count}} words",
+      "wordsListened": "Words listened",
+      "timeSpent": "Time spent",
+      "playbackSpeed": "Playback speed",
+      "srsChanges": "SRS changes",
+      "listenAgain": "Listen again (reshuffled)",
+      "backHome": "Back to home"
     },
     "hero": {
       "playingFromLabel": "Playing from",
       "queueCountLabel": "{{count}} words in queue",
       "playBtn": "Play",
       "shuffleBtn": "Shuffle",
-      "playlistTypeSection": "Playlist type"
+      "playlistTypeSection": "Playlist type",
+      "subline": "~{{mins}} min · {{mode}} mode"
     },
     "controls": {
       "speedSection": "Speed"
@@ -944,6 +967,7 @@
       "preparingAudio": "Preparing audio…",
       "closeWordPanelAriaLabel": "Close word panel",
       "pluralLabel": "Plural",
+      "translationUnavailable": "Translation unavailable",
       "playPronunciationAriaLabel": "Play pronunciation",
       "alreadyInVaultAriaLabel": "Already in vault",
       "addToVaultAriaLabel": "Add to vault",

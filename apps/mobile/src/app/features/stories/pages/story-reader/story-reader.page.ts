@@ -110,12 +110,13 @@ export class StoryReaderPage implements OnInit, ViewWillEnter, ViewWillLeave {
   // ── Tap-on-word (delegated to StoryReaderInteractionService) ─────
   readonly tappedWord = this.interaction.tappedWord;
   readonly showConjugations = this.interaction.showConjugations;
+  readonly dictLoading = this.interaction.dictLoading;
 
   readonly tappedWordDetail = computed<WordDetail | null>(() => {
     const tw = this.tappedWord();
     const s = this.story();
     if (!tw || !s) return null;
-    return this.wordSheet.resolveDetail(tw, s.keywords ?? [], s.vocabWords);
+    return this.wordSheet.resolveDetail(tw, s.keywords ?? [], s.vocabWords, this.interaction.dictEntry());
   });
 
   readonly tappedWordInVault = computed(() => {

@@ -46,6 +46,7 @@ export class StoryWordSheetService {
     tapped: TappedWord,
     keywords: readonly StoryKeyword[],
     vocabWords: readonly StoryVocabWord[] = [],
+    dictEntry: WordDictionaryEntry | null = null,
   ): WordDetail {
     const base = tapped.base.toLowerCase();
 
@@ -73,6 +74,20 @@ export class StoryWordSheetService {
         wordType: null,
         plural: this.pluralFor(vocab.cardId),
         cardId: vocab.cardId,
+        conjugations: null,
+      };
+    }
+
+    // Plain (non-vocab) word: use the dictionary DB entry when one was found.
+    if (dictEntry) {
+      return {
+        display: dictEntry.article ? `${dictEntry.article} ${dictEntry.displayText}` : dictEntry.displayText,
+        base: dictEntry.displayText,
+        english: dictEntry.translation,
+        article: dictEntry.article,
+        wordType: dictEntry.wordType,
+        plural: dictEntry.plurals?.[0] ?? null,
+        cardId: null,
         conjugations: null,
       };
     }
@@ -131,12 +146,16 @@ export class StoryWordSheetService {
     const { data } = await modal.onWillDismiss<{ collectionId: string | null }>();
     if (!data?.collectionId) return; // user cancelled
 
-    // Reuse the global word library: a pure DB lookup (no AI cost) so the saved
-    // card inherits canonical examples/synonyms/phonetic/plural/audio when the
-    // word already exists. On a miss, fall back to the bare tapped-word detail.
+    // Reuse the global word library so the saved card inherits canonical
+    // examples/synonyms/phonetic/plural/audio. batchLookup returns the existing
+    // entry for free (DB hit) and only spends AI to enrich a genuine miss — which
+    // is exactly when the user has chosen to save a word we don't yet have.
     let entry: WordDictionaryEntry | null = null;
     try {
-      entry = (await firstValueFrom(this.dictionary.lookup(detail.base, detail.article))).entry;
+      const result = await firstValueFrom(
+        this.dictionary.batchLookup([{ back: detail.base, article: detail.article }]),
+      );
+      entry = result.entries[0] ?? null;
     } catch {
       entry = null;
     }

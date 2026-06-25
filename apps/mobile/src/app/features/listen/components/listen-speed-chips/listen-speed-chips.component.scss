@@ -1,0 +1,36 @@
+@use 'theme/tokens' as t;
+@use 'theme/utils' as u;
+
+:host {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  flex-wrap: wrap;
+}
+
+.label {
+  @include u.lc-font('xxs', t.$lc-font-weight-bold);
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+  color: var(--lc-text-hint);
+}
+
+.chip {
+  @include u.lc-font('xxs', t.$lc-font-weight-bold);
+  font-family: t.$lc-font-body;
+  padding: 5px 13px;
+  border-radius: t.$lc-radius-full;
+  border: 1px solid var(--lc-border);
+  background: var(--lc-card);
+  color: var(--lc-text-secondary);
+  cursor: pointer;
+  transition: background var(--lc-transition-fast), color var(--lc-transition-fast),
+    border-color var(--lc-transition-fast);
+  @include u.touch-state;
+
+  &.active {
+    border-color: var(--lc-brand);
+    background: var(--lc-brand);
+    color: var(--lc-text-inverse);
+  }
+}

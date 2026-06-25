@@ -1,0 +1,10 @@
+<span class="label">{{ 'listen.controls.speedSection' | translate }}</span>
+@for (s of speeds(); track s) {
+  <button
+    type="button"
+    class="chip"
+    [class.active]="active() === s"
+    (click)="speedChange.emit(s)">
+    {{ s }}×
+  </button>
+}

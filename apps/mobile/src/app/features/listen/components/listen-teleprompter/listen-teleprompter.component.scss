@@ -1,0 +1,91 @@
+@use 'theme/tokens' as t;
+@use 'theme/utils' as u;
+
+:host {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  flex: 1;
+}
+
+.row {
+  transition: opacity 0.3s ease;
+}
+
+// ─── Previous (played) line ─────────────────────────────────────────────────
+.prev {
+  text-align: center;
+  padding: t.$lc-space-2 t.$lc-space-3;
+  font-size: 13px;
+  font-style: italic;
+  line-height: 1.55;
+  color: var(--lc-text-hint);
+  opacity: 0.6;
+
+  &.empty { opacity: 0; }
+}
+
+// ─── Current (playing) line ─────────────────────────────────────────────────
+.current {
+  display: flex;
+  align-items: flex-start;
+  gap: 11px;
+  margin: t.$lc-space-1 0;
+  padding: t.$lc-space-3 + 2px t.$lc-space-4;
+  border-radius: 16px;
+  background: var(--lc-card);
+  border: 1px solid var(--lc-border);
+
+  &.empty {
+    opacity: 0;
+    background: transparent;
+    border-color: transparent;
+  }
+}
+
+.dot {
+  @include u.circle(9px);
+  margin-top: 6px;
+  background: var(--lc-ss-mint);
+}
+
+:host(.playing) .current:not(.empty) .dot {
+  animation: pulse-dot 1.1s ease-in-out infinite;
+}
+
+.col { flex: 1; }
+
+.text {
+  @include u.lc-font('xl', t.$lc-font-weight-medium);
+  line-height: 1.55;
+  color: var(--lc-text-primary);
+  margin-bottom: t.$lc-space-1;
+}
+
+.lang {
+  font-size: 9px;
+  font-weight: t.$lc-font-weight-bold;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--lc-brand-mid);
+}
+
+// ─── Next (upcoming) line ───────────────────────────────────────────────────
+.next {
+  text-align: center;
+  padding: t.$lc-space-2 t.$lc-space-3;
+  font-size: 13px;
+  line-height: 1.55;
+  color: var(--lc-text-secondary);
+
+  &.empty { opacity: 0; }
+}
+
+@keyframes pulse-dot {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.5; transform: scale(0.75); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  :host(.playing) .current:not(.empty) .dot { animation: none; }
+}

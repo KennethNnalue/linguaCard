@@ -764,7 +764,8 @@
       "queueCountLabel": "{{count}} слів у черзі",
       "playBtn": "Відтворити",
       "shuffleBtn": "Перемішати",
-      "playlistTypeSection": "Тип плейлиста"
+      "playlistTypeSection": "Тип плейлиста",
+      "subline": "~{{mins}} хв · режим {{mode}}"
     },
     "controls": {
       "speedSection": "Швидкість"
@@ -796,7 +797,8 @@
       "audioUnavailable": "Аудіо недоступне",
       "retryBtn": "Спробувати знову",
       "skipCard": "Пропустити цю картку",
-      "grammarTipLabel": "Поради з граматики"
+      "grammarTipLabel": "Поради з граматики",
+      "minLeft": "~{{mins}} хв залишилось"
     },
     "playlistMode": {
       "compactLabel": "Компактно",
@@ -804,10 +806,31 @@
       "examplesLabel": "Приклади",
       "examplesDesc": "Повні речення",
       "deepDiveLabel": "Поглиблено",
-      "deepDiveDesc": "+ граматична порада"
+      "deepDiveDesc": "+ граматична порада",
+      "compactModeBadge": "Компактний режим",
+      "examplesModeBadge": "Режим прикладів",
+      "deepDiveModeBadge": "Поглиблений режим"
     },
     "card": {
       "collectionPrefix": "Колекція:"
+    },
+    "transport": {
+      "shuffleAriaLabel": "Перемішати",
+      "previousAriaLabel": "Назад",
+      "playPauseAriaLabel": "Відтворити або призупинити",
+      "nextAriaLabel": "Далі",
+      "repeatAriaLabel": "Повторити"
+    },
+    "complete": {
+      "eyebrow": "Сесію завершено",
+      "title": "Готово!",
+      "subtitle": "Ви прослухали {{count}} слів",
+      "wordsListened": "Прослухано слів",
+      "timeSpent": "Витрачено часу",
+      "playbackSpeed": "Швидкість відтворення",
+      "srsChanges": "Зміни SRS",
+      "listenAgain": "Слухати знову (перемішано)",
+      "backHome": "На головну"
     }
   },
   "stories": {
@@ -871,6 +894,7 @@
       "preparingAudio": "Підготовка аудіо…",
       "closeWordPanelAriaLabel": "Закрити панель слова",
       "pluralLabel": "Множина",
+      "translationUnavailable": "Переклад недоступний",
       "playPronunciationAriaLabel": "Відтворити вимову",
       "alreadyInVaultAriaLabel": "Вже в сховищі",
       "addToVaultAriaLabel": "Додати до сховища",

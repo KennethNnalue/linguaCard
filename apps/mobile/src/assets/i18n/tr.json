@@ -764,7 +764,8 @@
       "queueCountLabel": "{{count}} kelime sırada",
       "playBtn": "Oynat",
       "shuffleBtn": "Karıştır",
-      "playlistTypeSection": "Çalma listesi türü"
+      "playlistTypeSection": "Çalma listesi türü",
+      "subline": "~{{mins}} dk · {{mode}} modu"
     },
     "controls": {
       "speedSection": "Hız"
@@ -796,7 +797,8 @@
       "audioUnavailable": "Ses mevcut değil",
       "retryBtn": "Tekrar dene",
       "skipCard": "Bu kartı atla",
-      "grammarTipLabel": "Gramer ipucu"
+      "grammarTipLabel": "Gramer ipucu",
+      "minLeft": "~{{mins}} dk kaldı"
     },
     "playlistMode": {
       "compactLabel": "Kompakt",
@@ -804,10 +806,31 @@
       "examplesLabel": "Örnekler",
       "examplesDesc": "Tam cümleler",
       "deepDiveLabel": "Derinlemesine",
-      "deepDiveDesc": "+ dilbilgisi ipucu"
+      "deepDiveDesc": "+ dilbilgisi ipucu",
+      "compactModeBadge": "Kompakt mod",
+      "examplesModeBadge": "Örnekler modu",
+      "deepDiveModeBadge": "Derinlemesine mod"
     },
     "card": {
       "collectionPrefix": "Koleksiyon:"
+    },
+    "transport": {
+      "shuffleAriaLabel": "Karıştır",
+      "previousAriaLabel": "Önceki",
+      "playPauseAriaLabel": "Oynat veya duraklat",
+      "nextAriaLabel": "Sonraki",
+      "repeatAriaLabel": "Tekrarla"
+    },
+    "complete": {
+      "eyebrow": "Oturum tamamlandı",
+      "title": "Tamamlandı!",
+      "subtitle": "{{count}} kelime dinledin",
+      "wordsListened": "Dinlenen kelime",
+      "timeSpent": "Geçen süre",
+      "playbackSpeed": "Oynatma hızı",
+      "srsChanges": "SRS değişiklikleri",
+      "listenAgain": "Tekrar dinle (karıştırılmış)",
+      "backHome": "Ana sayfaya dön"
     }
   },
   "stories": {
@@ -871,6 +894,7 @@
       "preparingAudio": "Ses hazırlanıyor…",
       "closeWordPanelAriaLabel": "Kelime panelini kapat",
       "pluralLabel": "Çoğul",
+      "translationUnavailable": "Çeviri mevcut değil",
       "playPronunciationAriaLabel": "Telaffuzu dinle",
       "alreadyInVaultAriaLabel": "Zaten kasada",
       "addToVaultAriaLabel": "Kasaya ekle",

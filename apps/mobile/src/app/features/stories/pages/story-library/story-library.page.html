@@ -194,16 +194,6 @@
               <div class="ss-mine-info">
                 <div class="ss-mine-title">{{ story.title }}</div>
                 <div class="ss-mine-meta">{{ readingTime(story) }} · {{ storyWordCount(story) }} {{ 'stories.cardMeta.words' | translate }} · {{ story.difficultyLevel }}</div>
-                @if (story.vocabWords.length > 0) {
-                  <div class="ss-mine-chips">
-                    @for (vw of story.vocabWords.slice(0, 2); track $index) {
-                      <span class="ss-vocab-chip" [ngClass]="articleClass(vw.article)">{{ vw.german }}</span>
-                    }
-                    @if (story.vocabWords.length > 2) {
-                      <span class="ss-vocab-more">{{ 'stories.cardMeta.more' | translate:{ count: story.vocabWords.length - 2 } }}</span>
-                    }
-                  </div>
-                }
               </div>
               <button class="ss-mine-play" (click)="listenStory($event, story)"
                       [attr.aria-label]="'stories.library.playAriaLabel' | translate">

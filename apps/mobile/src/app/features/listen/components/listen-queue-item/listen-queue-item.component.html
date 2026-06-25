@@ -1,0 +1,46 @@
+<div class="body">
+  <div class="word-row">
+    @if (card().content.article) {
+      <lc-article-badge [article]="card().content.article" />
+    }
+    <span class="word">{{ card().content.back }}</span>
+  </div>
+
+  <div class="translation">{{ card().content.front }}</div>
+
+  @if (playMode() === 'deepDive') {
+    @let plural = card().content.plural;
+    @let syn = card().content.synonyms?.[0];
+    @if (plural || syn) {
+      <div class="extra">
+        @if (plural) {
+          <span><strong>Pl.</strong> {{ plural }}</span>
+        }
+        @if (syn) {
+          @if (plural) { <span class="sep">·</span> }
+          <span><strong>syn.</strong> {{ syn.article ? syn.article + ' ' : '' }}{{ syn.word }}</span>
+        }
+      </div>
+    }
+  }
+
+  <div class="meta">
+    @if (categoryLabel()) {
+      <span class="cat">{{ categoryLabel() }}</span>
+    }
+    @if (card().srsState?.state) {
+      <span class="status">{{ card().srsState!.state }}</span>
+    }
+  </div>
+</div>
+
+<button
+  type="button"
+  class="audio"
+  (click)="preview.emit()"
+  [attr.aria-label]="'listen.queue.previewAriaLabel' | translate">
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+    <polygon points="11,5 6,9 2,9 2,15 6,15 11,19"/>
+    <path d="M15.54,8.46a5,5,0,0,1,0,7.07"/>
+  </svg>
+</button>

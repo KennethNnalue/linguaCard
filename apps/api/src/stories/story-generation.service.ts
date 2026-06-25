@@ -449,6 +449,9 @@ export class StoryGenerationService {
       const response = await this.openRouter.generateText({
         messages:  [{ role: 'user', content: prompt }],
         maxTokens: 12288,
+        // Extra variance so the same vocabulary list doesn't yield near-identical
+        // stories/titles each time. Quiz/grammar/keyword calls keep the default.
+        temperature: 0.9,
         model,
       });
       rawText = response.text;
@@ -594,6 +597,9 @@ export class StoryGenerationService {
       const response = await this.openRouter.generateText({
         messages:  [{ role: 'user', content: prompt }],
         maxTokens: 8192,
+        // Extra variance so the same vocabulary list doesn't yield near-identical
+        // stories/titles each time.
+        temperature: 0.9,
         model,
       });
       rawText = response.text;

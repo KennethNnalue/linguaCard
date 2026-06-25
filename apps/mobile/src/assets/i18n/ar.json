@@ -764,7 +764,8 @@
       "queueCountLabel": "{{count}} كلمات في قائمة الانتظار",
       "playBtn": "تشغيل",
       "shuffleBtn": "خلط",
-      "playlistTypeSection": "نوع قائمة التشغيل"
+      "playlistTypeSection": "نوع قائمة التشغيل",
+      "subline": "~{{mins}} دقيقة · وضع {{mode}}"
     },
     "controls": {
       "speedSection": "السرعة"
@@ -796,7 +797,8 @@
       "audioUnavailable": "الصوت غير متاح",
       "retryBtn": "إعادة المحاولة",
       "skipCard": "تخطي هذه البطاقة",
-      "grammarTipLabel": "نصيحة النحو"
+      "grammarTipLabel": "نصيحة النحو",
+      "minLeft": "~{{mins}} دقيقة متبقية"
     },
     "playlistMode": {
       "compactLabel": "مختصر",
@@ -804,10 +806,31 @@
       "examplesLabel": "أمثلة",
       "examplesDesc": "جمل كاملة",
       "deepDiveLabel": "تعمق",
-      "deepDiveDesc": "+ نصيحة نحوية"
+      "deepDiveDesc": "+ نصيحة نحوية",
+      "compactModeBadge": "الوضع المختصر",
+      "examplesModeBadge": "وضع الأمثلة",
+      "deepDiveModeBadge": "الوضع المتعمق"
     },
     "card": {
       "collectionPrefix": "المجموعة:"
+    },
+    "transport": {
+      "shuffleAriaLabel": "خلط",
+      "previousAriaLabel": "السابق",
+      "playPauseAriaLabel": "تشغيل أو إيقاف مؤقت",
+      "nextAriaLabel": "التالي",
+      "repeatAriaLabel": "تكرار"
+    },
+    "complete": {
+      "eyebrow": "اكتملت الجلسة",
+      "title": "تم الانتهاء!",
+      "subtitle": "استمعت إلى {{count}} كلمة",
+      "wordsListened": "الكلمات المسموعة",
+      "timeSpent": "الوقت المستغرق",
+      "playbackSpeed": "سرعة التشغيل",
+      "srsChanges": "تغييرات SRS",
+      "listenAgain": "استمع مرة أخرى (مع الخلط)",
+      "backHome": "العودة إلى الرئيسية"
     }
   },
   "stories": {
@@ -871,6 +894,7 @@
       "preparingAudio": "جارٍ تحضير الصوت…",
       "closeWordPanelAriaLabel": "إغلاق لوحة الكلمة",
       "pluralLabel": "الجمع",
+      "translationUnavailable": "الترجمة غير متوفرة",
       "playPronunciationAriaLabel": "تشغيل النطق",
       "alreadyInVaultAriaLabel": "موجودة بالفعل في الخزنة",
       "addToVaultAriaLabel": "إضافة إلى الخزنة",

@@ -20,6 +20,47 @@ export class StoryPromptBuilder {
     'B2': 'complex sentences, passive voice, nuanced vocabulary, varied register, subjunctive mood',
   };
 
+  /**
+   * A pool of creative "angles" — a setting, genre, narrative voice, tone or
+   * format. One is chosen at random per generation and injected into the prompt so
+   * the SAME vocabulary list no longer maps to the same story/title every time.
+   * Without this, stories from one collection drift toward identical "Eine Reise…"
+   * premises and titles.
+   */
+  private readonly creativeAngles: readonly string[] = [
+    'a small everyday mystery the main character slowly solves',
+    'told as a series of text messages or chat between two friends',
+    'a humorous slice-of-life mishap that goes comically wrong',
+    'a warm, nostalgic memory looking back on a past event',
+    'narrated from the unusual perspective of an animal or an object',
+    'a slightly suspenseful moment where something unexpected happens',
+    'a cosy story set during a specific season or holiday',
+    'written as a personal letter or diary entry to a friend',
+    'a chance encounter between two strangers that changes the day',
+    'a behind-the-scenes day in an unusual job or workplace',
+    'a gentle adventure or short journey with a surprise at the end',
+    'a story built around a misunderstanding that gets cleared up',
+    'a quiet, reflective moment of everyday beauty or kindness',
+    'an overheard conversation in a café, market or on a train',
+    'a playful competition or friendly challenge between characters',
+    'a "first time" experience (a new city, hobby, recipe or friendship)',
+    'a story told backwards, starting from the ending',
+    'an interview or dialogue where a character reveals something surprising',
+  ];
+
+  /** Pick one creative angle at random for this generation. */
+  private pickCreativeAngle(): string {
+    return this.creativeAngles[Math.floor(Math.random() * this.creativeAngles.length)];
+  }
+
+  /** Shared creativity directive injected into every story prompt. */
+  private creativeBlock(angle: string): string {
+    return `CREATIVE DIRECTION (make this story distinct):
+- Build the story's premise around this angle: ${angle}.
+- Invent fresh characters, setting and situation — do NOT default to a generic trip, day-in-the-life or shopping errand unless the angle calls for it.
+- The TITLE must be specific, original and intriguing — never a bland summary. Good: "Der Schlüssel unter dem Kaktus", "Was Frau Bauer im Zug vergaß". Bad: "Ein Tag in der Stadt", "Eine Reise mit dem Zug", "Mein Wochenende".`;
+  }
+
   build(dto: GenerateStoryDto, cards: CardEntity[], nativeLanguage = 'English'): string {
     if (dto.length === 'extra-long') {
       return this.buildExtraLongPrompt(dto, cards, nativeLanguage);
@@ -42,6 +83,8 @@ export class StoryPromptBuilder {
     return `You are a German language teacher creating a personalised story for an adult learner, plus the study aids that go with it. The learner's native language is ${nativeLanguage}.
 
 TASK: Write a ${wordTarget}-word German story that naturally incorporates the learner's vocabulary, then derive a quiz, grammar notes, and a keyword list FROM THAT STORY.
+
+${this.creativeBlock(this.pickCreativeAngle())}
 
 VOCABULARY LIST (use these words in the story — format: German = English):
 ${vocabList}
@@ -253,6 +296,8 @@ OUTPUT — valid JSON only, no markdown fences, no preamble:
 
 TASK: Write a ${wordTarget}-word German story that naturally incorporates the learner's vocabulary.
 
+${this.creativeBlock(this.pickCreativeAngle())}
+
 VOCABULARY LIST (use these words in the story — format: German = English):
 ${vocabList}
 
@@ -285,6 +330,8 @@ OUTPUT FORMAT — respond with valid JSON only, no markdown fences, no other tex
     const cefrDesc = this.cefrDescriptions[dto.difficulty];
 
     return `You are writing a German learning podcast episode for an adult learner.
+
+${this.creativeBlock(this.pickCreativeAngle())}
 
 FORMAT: Write a 1100–1400 word German podcast-style narrative with:
 - A brief introduction paragraph that sets the scene and welcomes the listener

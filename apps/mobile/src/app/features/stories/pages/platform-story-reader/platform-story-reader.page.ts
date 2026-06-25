@@ -96,6 +96,7 @@ export class PlatformStoryReaderPage implements OnInit, ViewWillLeave {
   // ── Tap-on-word (delegated to StoryReaderInteractionService) ─────
   readonly tappedWord = this.interaction.tappedWord;
   readonly showConjugations = this.interaction.showConjugations;
+  readonly dictLoading = this.interaction.dictLoading;
 
   readonly sentenceTokens = computed<WordToken[][]>(() => {
     const s = this.story();
@@ -108,7 +109,7 @@ export class PlatformStoryReaderPage implements OnInit, ViewWillLeave {
     const tw = this.tappedWord();
     const s = this.story();
     if (!tw || !s) return null;
-    return this.wordSheet.resolveDetail(tw, s.keywords);
+    return this.wordSheet.resolveDetail(tw, s.keywords, [], this.interaction.dictEntry());
   });
 
   readonly tappedWordInVault = computed(() => {

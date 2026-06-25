@@ -1,41 +1,61 @@
 <ion-header class="ion-no-border">
   <ion-toolbar>
-    <div class="lh-nav">
-      <div class="lh-nav-spacer"></div>
-      <span class="lh-nav-title">{{ 'listen.main.pageTitle' | translate }}</span>
-      <div class="lh-nav-spacer"></div>
+    <div class="nav">
+      <span class="nav-spacer"></span>
+      <span class="nav-title">{{ 'listen.main.pageTitle' | translate }}</span>
+      <button
+        type="button"
+        class="nav-more"
+        (click)="openSourceSheet()"
+        [attr.aria-label]="'listen.sourceSheet.title' | translate">
+        <svg viewBox="0 0 24 24" fill="currentColor">
+          <circle cx="12" cy="5" r="1.6"/>
+          <circle cx="12" cy="12" r="1.6"/>
+          <circle cx="12" cy="19" r="1.6"/>
+        </svg>
+      </button>
     </div>
   </ion-toolbar>
 </ion-header>
 
 <ion-content>
-
   <!-- Source row -->
-  <div class="lh-source-row">
-    <button class="lh-source-pill" (click)="openSourceSheet()">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round">
-        <path d="M8 6h13M8 12h13M8 18h13M3 6h.01M3 12h.01M3 18h.01"/>
+  <div class="source-row">
+    <button type="button" class="source-pill" (click)="openSourceSheet()">
+      <svg class="clock" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round">
+        <circle cx="12" cy="12" r="9"/>
+        <polyline points="12,7 12,12 16,14"/>
       </svg>
-      <span class="lh-source-label">{{ listenStore.sourceLabel() }}</span>
-      <svg class="lh-source-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+      <span class="source-label">{{ listenStore.sourceLabel() }}</span>
+      <svg class="chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
         <polyline points="6,9 12,15 18,9"/>
       </svg>
     </button>
-    <span class="lh-queue-meta">~{{ listenStore.estimatedMinutes() }} {{ 'listen.queue.durationUnit' | translate }}</span>
+    <span class="est">~{{ listenStore.estimatedMinutes() }} {{ 'listen.queue.durationUnit' | translate }}</span>
   </div>
 
   <!-- Hero -->
-  <div class="lh-hero">
-    <div class="lh-hero-label">{{ 'listen.hero.playingFromLabel' | translate }}</div>
-    <div class="lh-hero-title">{{ listenStore.sourceLabel() }}</div>
-    <div class="lh-hero-sub">{{ 'listen.hero.queueCountLabel' | translate:{ count: queueCount() } }}</div>
-    <div class="lh-hero-btns">
-      <button class="lh-btn-play" (click)="play()" [disabled]="!queueCount()">
-        <svg viewBox="0 0 24 24"><polygon points="5,3 19,12 5,21" fill="currentColor"/></svg>
+  <div class="hero">
+    <span class="hero-circle hero-circle-tr" aria-hidden="true"></span>
+    <span class="hero-circle hero-circle-br" aria-hidden="true"></span>
+
+    <div class="hero-eq-row">
+      <lc-listen-equalizer variant="hero" />
+      <span class="hero-eq-label">{{ listenStore.sourceLabel() }}</span>
+    </div>
+
+    <div class="hero-count">{{ queueCount() }} {{ 'common.words' | translate }}</div>
+    <div class="hero-sub">
+      {{ 'listen.hero.subline' | translate:{ mins: listenStore.estimatedMinutes(), mode: (modeLabelKey() | translate) } }}
+    </div>
+
+    <div class="hero-btns">
+      <button type="button" class="btn-play" (click)="play()" [disabled]="!queueCount()">
+        <svg viewBox="0 0 24 24" fill="currentColor"><polygon points="6,3 20,12 6,21"/></svg>
         {{ 'listen.hero.playBtn' | translate }}
       </button>
-      <button class="lh-btn-shuffle" (click)="shuffle()" [disabled]="!queueCount()">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round">
+      <button type="button" class="btn-shuffle" (click)="shuffle()" [disabled]="!queueCount()">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round">
           <polyline points="16,3 21,3 21,8"/><line x1="4" y1="20" x2="21" y2="3"/>
           <polyline points="21,16 21,21 16,21"/><line x1="4" y1="4" x2="9" y2="9"/>
         </svg>
@@ -45,95 +65,44 @@
   </div>
 
   <!-- Playlist type -->
-  <div class="lh-section-lbl">{{ 'listen.hero.playlistTypeSection' | translate }}</div>
-  <div class="lh-mode-toggle">
-    @for (m of MODES; track m.value) {
-      <button
-        class="lh-mode-btn"
-        [class.active]="listenStore.playMode() === m.value"
-        (click)="setMode(m.value)">
-        <div class="lh-mode-title">{{ m.labelKey | translate }}</div>
-        <div class="lh-mode-sub">{{ m.descKey | translate }}</div>
-      </button>
-    }
-  </div>
+  <div class="section-lbl">{{ 'listen.hero.playlistTypeSection' | translate }}</div>
+  <lc-listen-mode-selector
+    class="mode-grid"
+    variant="grid"
+    [modes]="MODES"
+    [active]="listenStore.playMode()"
+    (modeChange)="setMode($event)" />
 
   <!-- Speed -->
-  <div class="lh-speed-row">
-    <span class="lh-speed-label">{{ 'listen.controls.speedSection' | translate }}</span>
-    @for (s of SPEEDS; track s) {
-      <button
-        class="lh-speed-chip"
-        [class.active]="listenStore.speed() === s"
-        (click)="setSpeed(s)">
-        {{ s }}×
-      </button>
-    }
-  </div>
+  <lc-listen-speed-chips
+    class="speed"
+    [speeds]="SPEEDS"
+    [active]="listenStore.speed()"
+    (speedChange)="setSpeed($event)" />
 
   <!-- Queue header -->
-  <div class="lh-queue-hdr">
-    <span class="lh-queue-hdr-title">{{ 'listen.queue.headerLabel' | translate }} ({{ queueCount() }} {{ 'common.words' | translate }})</span>
-    <span class="lh-queue-hdr-time">~{{ listenStore.estimatedMinutes() }} {{ 'listen.queue.durationUnit' | translate }}</span>
+  <div class="queue-hdr">
+    <span class="queue-hdr-title">{{ 'listen.queue.headerLabel' | translate }} ({{ queueCount() }})</span>
+    <span class="queue-hdr-time">~{{ listenStore.estimatedMinutes() }} {{ 'listen.queue.durationUnit' | translate }}</span>
   </div>
 
   <!-- Queue list -->
-  <div class="lh-queue">
+  <div class="queue">
     @if (!queueCount()) {
-      <div class="lh-empty">
-        <span class="lh-empty-icon">🎧</span>
-        <p class="lh-empty-title">{{ 'listen.queue.emptyTitle' | translate }}</p>
-        <p class="lh-empty-sub">{{ 'listen.queue.emptyDesc' | translate }}</p>
-      </div>
+      <lc-empty-state
+        icon="🎧"
+        [title]="'listen.queue.emptyTitle' | translate"
+        [subtitle]="'listen.queue.emptyDesc' | translate" />
     } @else {
       @for (card of listenStore.queue(); track card.id) {
-        <div class="lh-card">
-          <div class="lh-card-body">
-            <div class="lh-card-word-row">
-              @if (card.content.article) {
-                <lc-article-badge [article]="card.content.article" />
-              }
-              <span class="lh-card-word">{{ card.content.back }}</span>
-            </div>
-            <div class="lh-card-trans">{{ card.content.front }}</div>
-            @if (listenStore.playMode() === 'deepDive') {
-              @let hasPluralOrSyn = card.content.plural || (card.content.synonyms && card.content.synonyms.length > 0);
-              @if (hasPluralOrSyn) {
-                <div class="lh-card-extra">
-                  @if (card.content.plural) {
-                    <span><strong>Pl.</strong> {{ card.content.plural }}</span>
-                  }
-                  @if (card.content.synonyms && card.content.synonyms.length > 0) {
-                    @if (card.content.plural) { <span class="lh-card-extra-sep">·</span> }
-                    <span><strong>syn.</strong> {{ card.content.synonyms[0].article ? card.content.synonyms[0].article + ' ' : '' }}{{ card.content.synonyms[0].word }}</span>
-                  }
-                </div>
-              }
-            }
-            <div class="lh-card-meta">
-              @if (card.srsState?.state) {
-                <span class="lh-card-status">{{ card.srsState!.state }}</span>
-              }
-              @if (card.srsState?.nextDueAt) {
-                <span class="lh-card-due">{{ 'srs.status.due' | translate }}</span>
-              }
-              @let categoryLabel = getCategoryLabel(card);
-              @if (categoryLabel) {
-                <span class="lh-card-cat">{{ categoryLabel }}</span>
-              }
-            </div>
-          </div>
-          <button class="lh-card-audio" (click)="playCardAudio(card)" [attr.aria-label]="'listen.queue.previewAriaLabel' | translate">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round">
-              <polygon points="11,5 6,9 2,9 2,15 6,15 11,19"/>
-              <path d="M15.54,8.46a5,5,0,0,1,0,7.07"/>
-            </svg>
-          </button>
-        </div>
+        <lc-listen-queue-item
+          [card]="card"
+          [categoryLabel]="getCategoryLabel(card)"
+          [playMode]="listenStore.playMode()"
+          (preview)="playCardAudio(card)" />
       }
     }
   </div>
 
-  <div class="lh-bottom-spacer"></div>
-
+  <div class="bottom-spacer"></div>
 </ion-content>

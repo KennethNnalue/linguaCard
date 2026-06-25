@@ -105,8 +105,13 @@ export class WordAudioService {
    * Timeout strategy: if resolveUrl() takes longer than RESOLVE_TIMEOUT_MS,
    * fall through to Web Speech immediately. The background resolve continues
    * and the next word in the playlist will benefit from the cache.
+   *
+   * `rate` is the playback speed (1 = normal). It is applied to the
+   * HTMLAudioElement's playbackRate for cached/ephemeral audio and to the
+   * Web-Speech utterance rate for the fallback path. Defaults to 1 so callers
+   * outside the listen playlist (e.g. Stories) are unaffected.
    */
-  async playAsPromise(text: string, language = 'de-DE'): Promise<void> {
+  async playAsPromise(text: string, language = 'de-DE', rate = 1): Promise<void> {
     const RESOLVE_TIMEOUT_MS = 1500;
 
     const url = await Promise.race([
@@ -115,19 +120,19 @@ export class WordAudioService {
     ]);
 
     if (url) {
-      return this._playAndWait(url);
+      return this._playAndWait(url, false, rate);
     }
 
     if (!this._isRateLimited()) {
       const ephemeralUrl = await this._ephemeralTts(text, language);
       if (ephemeralUrl) {
         // ephemeral = true: this blob was never stored in _urlMap, revoke after play.
-        return this._playAndWait(ephemeralUrl, true);
+        return this._playAndWait(ephemeralUrl, true, rate);
       }
     }
 
     return new Promise(resolve => {
-      this.fallback.speak(text, language, 0.85).subscribe({
+      this.fallback.speak(text, language, rate).subscribe({
         next: () => resolve(), error: () => resolve(), complete: () => resolve(),
       });
     });
@@ -282,9 +287,10 @@ export class WordAudioService {
     }
   }
 
-  private _playAndWait(url: string, ephemeral = false): Promise<void> {
+  private _playAndWait(url: string, ephemeral = false, rate = 1): Promise<void> {
     return new Promise(resolve => {
       const audio = new Audio(url);
+      audio.playbackRate = rate;
       this._activeAudio = audio;
 
       const cleanup = () => {

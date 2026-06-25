@@ -1,0 +1,56 @@
+@use 'theme/tokens' as t;
+
+:host {
+  display: inline-flex;
+  align-items: flex-end;
+  gap: 2px;
+}
+
+.bar {
+  width: 3px;
+  border-radius: 2px;
+  background: var(--lc-ss-mint);
+  transform-origin: bottom;
+}
+
+// ─── HERO — static decorative bars ──────────────────────────────────────────
+:host(.hero) {
+  height: 16px;
+  opacity: 0.65;
+}
+:host(.hero) .bar:nth-child(1) { height: 10px; }
+:host(.hero) .bar:nth-child(2) { height: 16px; }
+:host(.hero) .bar:nth-child(3) { height: 8px; }
+:host(.hero) .bar:nth-child(4) { height: 14px; }
+:host(.hero) .bar:nth-child(5) { height: 6px; }
+
+// ─── NAV — idle base heights ────────────────────────────────────────────────
+:host(.nav) { height: 14px; }
+:host(.nav) .bar {
+  width: 2.5px;
+  border-radius: 1.5px;
+}
+:host(.nav) .bar:nth-child(1) { height: 8px; }
+:host(.nav) .bar:nth-child(2) { height: 14px; }
+:host(.nav) .bar:nth-child(3) { height: 6px; }
+:host(.nav) .bar:nth-child(4) { height: 12px; }
+
+// ─── NAV + playing — animate ────────────────────────────────────────────────
+:host(.nav.active) .bar {
+  height: 14px;
+  animation-iteration-count: infinite;
+  animation-timing-function: ease-in-out;
+}
+:host(.nav.active) .bar:nth-child(1) { animation-name: bars1; animation-duration: 0.70s; }
+:host(.nav.active) .bar:nth-child(2) { animation-name: bars2; animation-duration: 0.65s; animation-delay: 0.10s; }
+:host(.nav.active) .bar:nth-child(3) { animation-name: bars3; animation-duration: 0.80s; animation-delay: 0.05s; }
+:host(.nav.active) .bar:nth-child(4) { animation-name: bars4; animation-duration: 0.72s; animation-delay: 0.18s; }
+
+@keyframes bars1 { 0%, 100% { transform: scaleY(0.35); } 45% { transform: scaleY(1); } }
+@keyframes bars2 { 0%, 100% { transform: scaleY(0.55); } 35% { transform: scaleY(1); } }
+@keyframes bars3 { 0%, 100% { transform: scaleY(0.25); } 55% { transform: scaleY(1); } }
+@keyframes bars4 { 0%, 100% { transform: scaleY(0.65); } 40% { transform: scaleY(1); } }
+
+@media (prefers-reduced-motion: reduce) {
+  :host(.nav.active) .bar { animation: none; }
+}

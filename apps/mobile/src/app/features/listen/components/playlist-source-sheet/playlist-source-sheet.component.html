@@ -1,112 +1,115 @@
 <ion-content>
-  <div class="pss-wrap">
+  <div class="sheet">
+    <div class="handle-wrap"><span class="handle"></span></div>
+    <h2 class="title">{{ 'listen.sourceSheet.title' | translate }}</h2>
 
-    <div class="pss-handle-wrap"><div class="pss-handle"></div></div>
-    <div class="pss-title">{{ 'listen.sourceSheet.title' | translate }}</div>
-
-    <div class="pss-options">
+    <div class="options">
 
       <!-- Today's due words -->
-      <!-- H2 fix: [class.active] now binds to the activeSource() computed, not a plain method -->
-      <div class="pss-opt" [class.active]="activeSource() === 'due'" (click)="selectDue()">
-        <div class="pss-opt-icon pss-icon-due">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round">
-            <circle cx="12" cy="12" r="10"/><polyline points="12,6 12,12 16,14"/>
+      <button type="button" class="opt" [class.active]="activeSource() === 'due'" (click)="selectDue()">
+        <span class="icon icon-due">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="9"/><polyline points="12,7 12,12 16,14"/>
           </svg>
-        </div>
-        <div class="pss-opt-body">
-          <div class="pss-opt-title">{{ 'listen.source.todaysDueLabel' | translate }}</div>
-          <div class="pss-opt-sub">{{ 'listen.source.todaysDueDesc' | translate }}</div>
-        </div>
-        <div class="pss-opt-count">{{ listenStore.dueCount() }}</div>
+        </span>
+        <span class="opt-body">
+          <span class="opt-title">{{ 'listen.source.todaysDueLabel' | translate }}</span>
+          <span class="opt-sub">{{ 'listen.source.todaysDueDesc' | translate }}</span>
+        </span>
+        <span class="count">{{ listenStore.dueCount() }}</span>
         @if (activeSource() === 'due') {
-          <div class="pss-opt-check">
-            <svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round">
+          <span class="check">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round">
               <polyline points="20,6 9,17 4,12"/>
             </svg>
-          </div>
+          </span>
         }
-      </div>
+      </button>
+
+      <!-- All cards -->
+      <button type="button" class="opt" [class.active]="activeSource() === 'all'" (click)="selectAll()">
+        <span class="icon icon-all">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M4 6h16M4 12h16M4 18h16"/>
+          </svg>
+        </span>
+        <span class="opt-body">
+          <span class="opt-title">{{ 'listen.source.allCardsLabel' | translate }}</span>
+          <span class="opt-sub">{{ 'listen.source.allCardsDesc' | translate }}</span>
+        </span>
+        <span class="count">{{ listenStore.allCount() }}</span>
+        @if (activeSource() === 'all') {
+          <span class="check">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round">
+              <polyline points="20,6 9,17 4,12"/>
+            </svg>
+          </span>
+        }
+      </button>
+
+      <!-- Struggling words -->
+      <button type="button" class="opt" [class.active]="activeSource() === 'struggling'" (click)="selectStruggling()">
+        <span class="icon icon-struggling">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+          </svg>
+        </span>
+        <span class="opt-body">
+          <span class="opt-title">{{ 'listen.source.strugglingLabel' | translate }}</span>
+          <span class="opt-sub">{{ 'listen.source.strugglingDesc' | translate }}</span>
+        </span>
+        <span class="count count-red">{{ listenStore.strugglingCount() }}</span>
+        @if (activeSource() === 'struggling') {
+          <span class="check">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round">
+              <polyline points="20,6 9,17 4,12"/>
+            </svg>
+          </span>
+        }
+      </button>
 
       <!-- A collection (expandable) -->
-      <div class="pss-opt" [class.active]="activeSource().startsWith('collection:')" (click)="toggleCollections()">
-        <div class="pss-opt-icon pss-icon-col">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round">
+      <button
+        type="button"
+        class="opt"
+        [class.active]="activeSource().startsWith('collection:')"
+        [attr.aria-expanded]="showCollections()"
+        (click)="toggleCollections()">
+        <span class="icon icon-col">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round">
             <rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18"/><path d="M9 21V9"/>
           </svg>
-        </div>
-        <div class="pss-opt-body">
-          <div class="pss-opt-title">{{ 'listen.source.collectionLabel' | translate }}</div>
-          <div class="pss-opt-sub">{{ 'listen.source.collectionDesc' | translate }}</div>
-        </div>
-        <div class="pss-opt-count pss-count-hint">—</div>
-        <svg class="pss-chevron" [class.open]="showCollections()" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+        </span>
+        <span class="opt-body">
+          <span class="opt-title">{{ 'listen.source.collectionLabel' | translate }}</span>
+          <span class="opt-sub">{{ 'listen.source.collectionDesc' | translate }}</span>
+        </span>
+        <svg class="chevron" [class.open]="showCollections()" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
           <polyline points="6,9 12,15 18,9"/>
         </svg>
-      </div>
+      </button>
 
       @if (showCollections()) {
-        <div class="pss-collection-list">
+        <div class="col-list">
           @for (col of collectionStore.collections(); track col.id) {
-            <div
-              class="pss-col-row"
+            <button
+              type="button"
+              class="col-row"
               [class.active]="activeSource() === 'collection:' + col.id"
               (click)="selectCollection(col.id)">
-              <span class="pss-col-name">{{ col.name }}</span>
-              <span class="pss-col-count">{{ listenStore.collectionCounts().get(col.id) ?? 0 }}</span>
+              <span class="col-name">{{ col.name }}</span>
+              <span class="col-count">{{ listenStore.collectionCounts().get(col.id) ?? 0 }}</span>
               @if (activeSource() === 'collection:' + col.id) {
-                <div class="pss-opt-check pss-check-sm">
-                  <svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round">
+                <span class="check check-sm">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round">
                     <polyline points="20,6 9,17 4,12"/>
                   </svg>
-                </div>
+                </span>
               }
-            </div>
+            </button>
           }
         </div>
       }
-
-      <!-- All cards -->
-      <div class="pss-opt" [class.active]="activeSource() === 'all'" (click)="selectAll()">
-        <div class="pss-opt-icon pss-icon-all">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round">
-            <path d="M4 6h16M4 12h16M4 18h16"/>
-          </svg>
-        </div>
-        <div class="pss-opt-body">
-          <div class="pss-opt-title">{{ 'listen.source.allCardsLabel' | translate }}</div>
-          <div class="pss-opt-sub">{{ 'listen.source.allCardsDesc' | translate }}</div>
-        </div>
-        <div class="pss-opt-count pss-count-hint">{{ listenStore.allCount() }}</div>
-        @if (activeSource() === 'all') {
-          <div class="pss-opt-check">
-            <svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round">
-              <polyline points="20,6 9,17 4,12"/>
-            </svg>
-          </div>
-        }
-      </div>
-
-      <!-- Struggling words -->
-      <div class="pss-opt" [class.active]="activeSource() === 'struggling'" (click)="selectStruggling()">
-        <div class="pss-opt-icon pss-icon-struggling">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round">
-            <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
-          </svg>
-        </div>
-        <div class="pss-opt-body">
-          <div class="pss-opt-title">{{ 'listen.source.strugglingLabel' | translate }}</div>
-          <div class="pss-opt-sub">{{ 'listen.source.strugglingDesc' | translate }}</div>
-        </div>
-        <div class="pss-opt-count pss-count-red">{{ listenStore.strugglingCount() }}</div>
-        @if (activeSource() === 'struggling') {
-          <div class="pss-opt-check">
-            <svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round">
-              <polyline points="20,6 9,17 4,12"/>
-            </svg>
-          </div>
-        }
-      </div>
 
     </div>
   </div>

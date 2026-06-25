@@ -764,7 +764,8 @@
       "queueCountLabel": "{{count}} слов в очереди",
       "playBtn": "Воспроизвести",
       "shuffleBtn": "Перемешать",
-      "playlistTypeSection": "Тип плейлиста"
+      "playlistTypeSection": "Тип плейлиста",
+      "subline": "~{{mins}} мин · режим {{mode}}"
     },
     "controls": {
       "speedSection": "Скорость"
@@ -796,7 +797,8 @@
       "audioUnavailable": "Аудио недоступно",
       "retryBtn": "Повторить",
       "skipCard": "Пропустить эту карточку",
-      "grammarTipLabel": "Совет по грамматике"
+      "grammarTipLabel": "Совет по грамматике",
+      "minLeft": "~{{mins}} мин осталось"
     },
     "playlistMode": {
       "compactLabel": "Компактно",
@@ -804,10 +806,31 @@
       "examplesLabel": "Примеры",
       "examplesDesc": "Полные предложения",
       "deepDiveLabel": "Углублённо",
-      "deepDiveDesc": "+ грамматическая подсказка"
+      "deepDiveDesc": "+ грамматическая подсказка",
+      "compactModeBadge": "Компактный режим",
+      "examplesModeBadge": "Режим примеров",
+      "deepDiveModeBadge": "Углублённый режим"
     },
     "card": {
       "collectionPrefix": "Коллекция:"
+    },
+    "transport": {
+      "shuffleAriaLabel": "Перемешать",
+      "previousAriaLabel": "Назад",
+      "playPauseAriaLabel": "Воспроизвести или пауза",
+      "nextAriaLabel": "Далее",
+      "repeatAriaLabel": "Повторить"
+    },
+    "complete": {
+      "eyebrow": "Сессия завершена",
+      "title": "Готово!",
+      "subtitle": "Вы прослушали {{count}} слов",
+      "wordsListened": "Прослушано слов",
+      "timeSpent": "Затрачено времени",
+      "playbackSpeed": "Скорость воспроизведения",
+      "srsChanges": "Изменения SRS",
+      "listenAgain": "Слушать снова (перемешано)",
+      "backHome": "На главную"
     }
   },
   "stories": {
@@ -871,6 +894,7 @@
       "preparingAudio": "Подготовка аудио…",
       "closeWordPanelAriaLabel": "Закрыть панель слова",
       "pluralLabel": "Множественное число",
+      "translationUnavailable": "Перевод недоступен",
       "playPronunciationAriaLabel": "Воспроизвести произношение",
       "alreadyInVaultAriaLabel": "Уже в хранилище",
       "addToVaultAriaLabel": "Добавить в хранилище",

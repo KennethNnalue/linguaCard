@@ -1,60 +1,59 @@
 <ion-header class="ion-no-border">
   <ion-toolbar>
-    <div class="lc-nav">
-      <div class="lc-nav-spacer"></div>
-      <span class="lc-nav-title">Session Complete</span>
-      <div class="lc-nav-spacer"></div>
+    <div class="nav">
+      <span class="nav-title">{{ 'listen.complete.eyebrow' | translate }}</span>
     </div>
   </ion-toolbar>
 </ion-header>
 
 <ion-content>
-  <div class="lc-body">
-
-    <div class="lc-checkmark">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+  <div class="body">
+    <div class="check">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
         <polyline points="20,6 9,17 4,12"/>
       </svg>
     </div>
 
-    <div class="lc-complete-title">All done!</div>
-    <div class="lc-complete-sub">You listened to all {{ queueCount() }} words</div>
+    <h1 class="headline">{{ 'listen.complete.title' | translate }}</h1>
+    <p class="subline">{{ 'listen.complete.subtitle' | translate:{ count: queueCount() } }}</p>
 
-    <div class="lc-mode-badge">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round">
-        <polygon points="11,5 6,9 2,9 2,15 6,15 11,19 11,5"/>
+    <div class="mode-badge">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round">
+        <polygon points="11,5 6,9 2,9 2,15 6,15 11,19"/>
         <path d="M15.54,8.46a5,5,0,0,1,0,7.07"/>
       </svg>
-      <span class="lc-mode-label">{{ playModeLabel() }}</span>
+      <span>{{ playModeLabelKey() | translate }}</span>
     </div>
 
-    <div class="lc-stats-grid">
-      <div class="lc-stat-cell">
-        <div class="lc-stat-val">{{ queueCount() }}</div>
-        <div class="lc-stat-lbl">Words listened</div>
+    <div class="stats">
+      <div class="stat">
+        <div class="stat-num">{{ queueCount() }}</div>
+        <div class="stat-lbl">{{ 'listen.complete.wordsListened' | translate }}</div>
       </div>
-      <div class="lc-stat-cell">
-        <div class="lc-stat-val">{{ elapsedMinutes() }} min</div>
-        <div class="lc-stat-lbl">Time spent</div>
+      <div class="stat">
+        <div class="stat-num">{{ elapsedMinutes() }}m</div>
+        <div class="stat-lbl">{{ 'listen.complete.timeSpent' | translate }}</div>
       </div>
-      <div class="lc-stat-cell">
-        <div class="lc-stat-val">{{ listenStore.speed() }}×</div>
-        <div class="lc-stat-lbl">Playback speed</div>
+      <div class="stat">
+        <div class="stat-num accent">{{ listenStore.speed() }}×</div>
+        <div class="stat-lbl">{{ 'listen.complete.playbackSpeed' | translate }}</div>
       </div>
-      <div class="lc-stat-cell">
-        <div class="lc-stat-val">Today</div>
-        <div class="lc-stat-lbl">Due words cleared</div>
+      <div class="stat">
+        <div class="stat-num">0</div>
+        <div class="stat-lbl">{{ 'listen.complete.srsChanges' | translate }}</div>
       </div>
     </div>
 
-    <button class="lc-cta-primary" (click)="listenAgain()">
-      <svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round">
+    <button type="button" class="cta-primary" (click)="listenAgain()">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round">
         <polyline points="16,3 21,3 21,8"/><line x1="4" y1="20" x2="21" y2="3"/>
         <polyline points="21,16 21,21 16,21"/><line x1="4" y1="4" x2="9" y2="9"/>
       </svg>
-      Listen again (reshuffled)
+      {{ 'listen.complete.listenAgain' | translate }}
     </button>
-    <button class="lc-cta-secondary" (click)="goBack()">Back to Listen</button>
 
+    <button type="button" class="cta-secondary" (click)="goBack()">
+      {{ 'listen.complete.backHome' | translate }}
+    </button>
   </div>
 </ion-content>

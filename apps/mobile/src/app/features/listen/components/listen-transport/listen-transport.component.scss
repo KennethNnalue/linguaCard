@@ -1,0 +1,49 @@
+@use 'theme/tokens' as t;
+@use 'theme/utils' as u;
+
+:host {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+button {
+  @include u.flex-center;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  @include u.touch-state;
+}
+
+// Shuffle / repeat
+.ctrl {
+  @include u.circle(46px);
+  color: var(--lc-text-hint);
+  transition: color var(--lc-transition-fast);
+
+  svg { width: 22px; height: 22px; }
+
+  &.active { color: var(--lc-brand); }
+}
+
+// Previous / next
+.nav-btn {
+  @include u.circle(50px);
+  background: var(--lc-card);
+  border: 1px solid var(--lc-border);
+  color: var(--lc-text-primary);
+
+  svg { width: 19px; height: 19px; }
+}
+
+// Play / pause
+.play {
+  @include u.circle(66px);
+  background: var(--lc-brand);
+  color: var(--lc-text-inverse);
+  box-shadow: var(--lc-shadow-float);
+
+  svg { width: 24px; height: 24px; }
+
+  &.error { background: var(--lc-fem-text); }
+}

@@ -1,0 +1,75 @@
+<button
+  type="button"
+  class="ctrl"
+  [class.active]="shuffled()"
+  (click)="toggleShuffle.emit()"
+  [attr.aria-pressed]="shuffled()"
+  [attr.aria-label]="'listen.transport.shuffleAriaLabel' | translate">
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+    <polyline points="16,3 21,3 21,8"/>
+    <line x1="4" y1="20" x2="21" y2="3"/>
+    <polyline points="21,16 21,21 16,21"/>
+    <line x1="4" y1="4" x2="9" y2="9"/>
+  </svg>
+</button>
+
+<button
+  type="button"
+  class="nav-btn"
+  (click)="previous.emit()"
+  [attr.aria-label]="'listen.transport.previousAriaLabel' | translate">
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+    <line x1="5" y1="5" x2="5" y2="19"/>
+    <polyline points="19,5 10,12 19,19"/>
+  </svg>
+</button>
+
+<button
+  type="button"
+  class="play"
+  [class.error]="error()"
+  (click)="togglePlay.emit()"
+  [attr.aria-label]="'listen.transport.playPauseAriaLabel' | translate">
+  @if (error()) {
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round">
+      <circle cx="12" cy="12" r="10"/>
+      <line x1="12" y1="8" x2="12" y2="12"/>
+      <line x1="12" y1="16" x2="12.01" y2="16"/>
+    </svg>
+  } @else if (playing()) {
+    <svg viewBox="0 0 24 24" fill="currentColor">
+      <rect x="6" y="4" width="4" height="16" rx="1"/>
+      <rect x="14" y="4" width="4" height="16" rx="1"/>
+    </svg>
+  } @else {
+    <svg viewBox="0 0 24 24" fill="currentColor">
+      <polygon points="7,3 21,12 7,21"/>
+    </svg>
+  }
+</button>
+
+<button
+  type="button"
+  class="nav-btn"
+  (click)="next.emit()"
+  [attr.aria-label]="'listen.transport.nextAriaLabel' | translate">
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+    <line x1="19" y1="5" x2="19" y2="19"/>
+    <polyline points="5,5 14,12 5,19"/>
+  </svg>
+</button>
+
+<button
+  type="button"
+  class="ctrl"
+  [class.active]="repeat()"
+  (click)="toggleRepeat.emit()"
+  [attr.aria-pressed]="repeat()"
+  [attr.aria-label]="'listen.transport.repeatAriaLabel' | translate">
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+    <polyline points="17,1 21,5 17,9"/>
+    <path d="M3,11V9a4,4,0,0,1,4-4h14"/>
+    <polyline points="7,23 3,19 7,15"/>
+    <path d="M21,13v2a4,4,0,0,1-4,4H3"/>
+  </svg>
+</button>

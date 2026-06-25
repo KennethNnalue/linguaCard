@@ -1,40 +1,37 @@
-import { ChangeDetectionStrategy, Component, computed, inject, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, inject } from '@angular/core';
 import { Router } from '@angular/router';
 import { NavController } from '@ionic/angular';
-import { IonContent, IonHeader, IonToolbar, ViewWillEnter } from '@ionic/angular/standalone';
+import { IonContent, IonHeader, IonToolbar } from '@ionic/angular/standalone';
+import { TranslatePipe } from '@ngx-translate/core';
 import { ListenStore } from '../../store/listen.store';
-import { MIN_ESTIMATED_MINUTES, PlayModeLabel } from '../../models/listen.models';
+import { MIN_ESTIMATED_MINUTES, PlayModeLabelKey } from '../../models/listen.models';
 
 @Component({
   selector: 'lc-listen-complete',
   templateUrl: './listen-complete.page.html',
   styleUrl: './listen-complete.page.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [IonContent, IonHeader, IonToolbar],
+  imports: [IonContent, IonHeader, IonToolbar, TranslatePipe],
 })
-export class ListenCompletePage implements ViewWillEnter {
+export class ListenCompletePage {
   protected readonly listenStore = inject(ListenStore);
   private readonly router = inject(Router);
   private readonly navCtrl = inject(NavController);
 
   readonly queueCount = computed(() => this.listenStore.queue().length);
 
-  // C4 fix: store the elapsed value as a snapshot signal, not a live Date.now() computation.
-  // ionViewWillEnter fires when the session genuinely just ended, giving us the elapsed time
-  // for that session — not a perpetually-stale computed.
-  private readonly _sessionEnteredAt = signal(Date.now());
-  readonly elapsedMinutes = signal(MIN_ESTIMATED_MINUTES);
+  /** Real session duration, derived from the start timestamp stamped by the store.
+   *  Snapshotted on first read (when this page renders, i.e. just after the
+   *  session ended) — not a perpetually-live clock. */
+  readonly elapsedMinutes = computed(() => {
+    const start = this.listenStore.sessionStartedAt();
+    if (!start) return MIN_ESTIMATED_MINUTES;
+    return Math.max(MIN_ESTIMATED_MINUTES, Math.round((Date.now() - start) / 60000));
+  });
 
-  readonly playModeLabel = computed(() =>
-    PlayModeLabel[this.listenStore.playMode()] ?? PlayModeLabel.examples
+  readonly playModeLabelKey = computed(
+    () => PlayModeLabelKey[this.listenStore.playMode()] ?? PlayModeLabelKey.examples,
   );
-
-  ionViewWillEnter(): void {
-    const now = Date.now();
-    const elapsed = Math.max(MIN_ESTIMATED_MINUTES, Math.round((now - this._sessionEnteredAt()) / 60000));
-    this.elapsedMinutes.set(elapsed);
-    this._sessionEnteredAt.set(now);
-  }
 
   listenAgain(): void {
     this.listenStore.restartWithShuffle();

@@ -7,7 +7,6 @@ import {
   OnInit,
   signal,
 } from '@angular/core';
-import { NgClass } from '@angular/common';
 import { Router } from '@angular/router';
 import {
   ActionSheetController,
@@ -60,7 +59,7 @@ const LEVEL_FILTERS: Array<{ value: StoryDifficulty | null; label: string }> = [
   imports: [
     IonContent, IonIcon,
     IonRefresher, IonRefresherContent,
-    NgClass, TranslatePipe,
+    TranslatePipe,
   ],
 })
 export class StoryLibraryPage implements OnInit {
@@ -400,13 +399,6 @@ export class StoryLibraryPage implements OnInit {
 
   categoryIcon(value: StoryCategory): string {
     return STORY_CATEGORIES.find(c => c.value === value)?.icon ?? '📖';
-  }
-
-  articleClass(article: string | null): string {
-    if (article === 'der') return 'art-der';
-    if (article === 'die') return 'art-die';
-    if (article === 'das') return 'art-das';
-    return '';
   }
 
   // ── Private ───────────────────────────────────────────────────────────────

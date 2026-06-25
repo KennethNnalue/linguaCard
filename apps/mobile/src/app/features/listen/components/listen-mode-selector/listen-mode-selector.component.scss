@@ -1,0 +1,96 @@
+@use 'theme/tokens' as t;
+@use 'theme/utils' as u;
+
+:host(.grid) {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: t.$lc-space-2;
+}
+
+:host(.tabs) {
+  display: flex;
+  gap: 6px;
+}
+
+// ─── GRID CARDS (hub) ───────────────────────────────────────────────────────
+:host(.grid) .mode {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 7px;
+  padding: t.$lc-space-3 t.$lc-space-2;
+  border-radius: 16px;
+  border: 1.5px solid var(--lc-border);
+  background: var(--lc-card);
+  cursor: pointer;
+  transition: border-color var(--lc-transition-fast), background var(--lc-transition-fast);
+  @include u.touch-state;
+
+  &.active {
+    border-color: var(--lc-brand);
+    background: var(--lc-brand-light);
+  }
+}
+
+.icon {
+  @include u.flex-center;
+  @include u.square(34px);
+  border-radius: 11px;
+  background: var(--lc-brand-light);
+  color: var(--lc-brand-mid);
+
+  svg {
+    width: 16px;
+    height: 16px;
+  }
+}
+
+:host(.grid) .mode.active .icon {
+  background: var(--lc-brand);
+  color: var(--lc-text-inverse);
+}
+
+.title {
+  font-size: 12px;
+  font-weight: t.$lc-font-weight-semibold;
+  color: var(--lc-text-primary);
+  text-align: center;
+}
+
+.sub {
+  font-size: 9px;
+  font-weight: t.$lc-font-weight-regular;
+  line-height: 1.3;
+  color: var(--lc-text-hint);
+  text-align: center;
+}
+
+:host(.grid) .mode.active {
+  .title { color: var(--lc-brand); }
+  .sub { color: var(--lc-brand-mid); }
+}
+
+// ─── TABS (player) ──────────────────────────────────────────────────────────
+:host(.tabs) .mode {
+  flex: 1;
+  padding: t.$lc-space-2;
+  border-radius: 11px;
+  text-align: center;
+  border: 1px solid var(--lc-border);
+  background: transparent;
+  color: var(--lc-text-hint);
+  cursor: pointer;
+  transition: border-color var(--lc-transition-fast), background var(--lc-transition-fast),
+    color var(--lc-transition-fast);
+  @include u.touch-state;
+
+  &.active {
+    border-color: var(--lc-brand);
+    background: var(--lc-brand-light);
+    color: var(--lc-brand);
+  }
+}
+
+.tab-label {
+  @include u.lc-font('xxs', t.$lc-font-weight-semibold);
+}

@@ -1,0 +1,12 @@
+<span class="glow" aria-hidden="true"></span>
+
+@if (total() > 0) {
+  <span class="position">{{ index() + 1 }} / {{ total() }}</span>
+}
+
+@if (card()?.content?.article) {
+  <lc-article-badge [article]="card()!.content.article" />
+}
+
+<div class="word">{{ card()?.content?.back }}</div>
+<div class="translation">{{ card()?.content?.front }}</div>

@@ -1,0 +1,17 @@
+<div class="row prev" [class.empty]="!prev()">
+  @if (prev(); as p) { {{ p.text }} }
+</div>
+
+<div class="row current" [class.empty]="!current()">
+  @if (current(); as c) {
+    <span class="dot" aria-hidden="true"></span>
+    <div class="col">
+      <div class="text">{{ c.text }}</div>
+      <div class="lang">{{ c.langLabel }}</div>
+    </div>
+  }
+</div>
+
+<div class="row next" [class.empty]="!next()">
+  @if (next(); as n) { {{ n.text }} }
+</div>

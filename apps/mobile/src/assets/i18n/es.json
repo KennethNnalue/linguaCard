@@ -764,7 +764,8 @@
       "queueCountLabel": "{{count}} palabras en cola",
       "playBtn": "Reproducir",
       "shuffleBtn": "Aleatorio",
-      "playlistTypeSection": "Tipo de lista"
+      "playlistTypeSection": "Tipo de lista",
+      "subline": "~{{mins}} min · modo {{mode}}"
     },
     "controls": {
       "speedSection": "Velocidad"
@@ -796,7 +797,8 @@
       "audioUnavailable": "Audio no disponible",
       "retryBtn": "Reintentar",
       "skipCard": "Saltar esta tarjeta",
-      "grammarTipLabel": "Consejo de gramática"
+      "grammarTipLabel": "Consejo de gramática",
+      "minLeft": "~{{mins}} min restantes"
     },
     "playlistMode": {
       "compactLabel": "Compacto",
@@ -804,10 +806,31 @@
       "examplesLabel": "Ejemplos",
       "examplesDesc": "Oraciones completas",
       "deepDiveLabel": "Profundizar",
-      "deepDiveDesc": "+ consejo gramatical"
+      "deepDiveDesc": "+ consejo gramatical",
+      "compactModeBadge": "Modo compacto",
+      "examplesModeBadge": "Modo ejemplos",
+      "deepDiveModeBadge": "Modo análisis"
     },
     "card": {
       "collectionPrefix": "Colección:"
+    },
+    "transport": {
+      "shuffleAriaLabel": "Aleatorio",
+      "previousAriaLabel": "Anterior",
+      "playPauseAriaLabel": "Reproducir o pausar",
+      "nextAriaLabel": "Siguiente",
+      "repeatAriaLabel": "Repetir"
+    },
+    "complete": {
+      "eyebrow": "Sesión completada",
+      "title": "¡Listo!",
+      "subtitle": "Escuchaste {{count}} palabras",
+      "wordsListened": "Palabras escuchadas",
+      "timeSpent": "Tiempo dedicado",
+      "playbackSpeed": "Velocidad de reproducción",
+      "srsChanges": "Cambios SRS",
+      "listenAgain": "Escuchar de nuevo (mezclado)",
+      "backHome": "Volver al inicio"
     }
   },
   "stories": {
@@ -871,6 +894,7 @@
       "preparingAudio": "Preparando audio…",
       "closeWordPanelAriaLabel": "Cerrar panel de palabra",
       "pluralLabel": "Plural",
+      "translationUnavailable": "Traducción no disponible",
       "playPronunciationAriaLabel": "Reproducir pronunciación",
       "alreadyInVaultAriaLabel": "Ya está en la bóveda",
       "addToVaultAriaLabel": "Añadir a la bóveda",

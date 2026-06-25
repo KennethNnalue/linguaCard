@@ -841,6 +841,11 @@
   font-size: t.$lc-text-md;
   color: rgba(255, 255, 255, 0.62);
   margin-top: 6px;
+
+  &--muted {
+    color: rgba(255, 255, 255, 0.38);
+    font-style: italic;
+  }
 }
 
 .ss-word-type-tag {

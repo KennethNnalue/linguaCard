@@ -214,6 +214,8 @@
 .sr-word-translation {
   font-size: 13px; color: rgba(255,255,255,0.75);
   font-family: var(--lc-font-body); font-style: italic;
+
+  &--muted { color: rgba(255,255,255,0.45); }
 }
 .sr-word-type-badge {
   display: inline-block; font-size: 9px; font-weight: 700;

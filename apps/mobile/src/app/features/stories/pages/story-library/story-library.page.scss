@@ -528,47 +528,6 @@
 .ss-mine-meta {
   font-size: t.$lc-text-xs;
   color: var(--lc-ss-muted);
-  margin-bottom: 7px;
-}
-
-.ss-mine-chips {
-  display: flex;
-  gap: 5px;
-  align-items: center;
-}
-
-.ss-vocab-chip {
-  font-size: t.$lc-text-xxs;
-  font-weight: t.$lc-font-weight-medium;
-  padding: 2px 8px;
-  border-radius: 11px;
-  white-space: nowrap;
-  background: var(--lc-ss-vocab-chip-bg);
-  color: var(--lc-ss-muted-soft);
-  border: 1px solid var(--lc-ss-vocab-chip-border);
-
-  &.art-der {
-    background: t.$lc-masc-bg;
-    color: t.$lc-masc-text;
-    border-color: t.$lc-masc-border;
-  }
-
-  &.art-die {
-    background: t.$lc-fem-bg;
-    color: t.$lc-fem-text;
-    border-color: t.$lc-fem-border;
-  }
-
-  &.art-das {
-    background: t.$lc-neut-bg;
-    color: t.$lc-neut-text;
-    border-color: t.$lc-neut-border;
-  }
-}
-
-.ss-vocab-more {
-  font-size: t.$lc-text-xxs;
-  color: var(--lc-ss-vocab-more);
 }
 
 .ss-mine-play {
