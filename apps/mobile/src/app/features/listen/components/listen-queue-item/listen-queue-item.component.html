@@ -10,7 +10,7 @@
 
   @if (playMode() === 'deepDive') {
     @let plural = card().content.plural;
-    @let syn = card().content.synonyms?.[0];
+    @let syn = card().content.synonyms[0];
     @if (plural || syn) {
       <div class="extra">
         @if (plural) {
