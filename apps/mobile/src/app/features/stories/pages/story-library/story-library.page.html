@@ -13,6 +13,8 @@
 
   <div class="ss-page">
 
+    <!-- Header + inline search — pinned to the top while searching so results lead. -->
+    <div class="ss-top" [class.ss-top--stuck]="searchOpen()">
     <!-- ═══════════════ HEADER ═══════════════ -->
     <div class="ss-header">
       <div class="ss-header-titles">
@@ -53,9 +55,11 @@
         }
       </div>
     }
+    </div>
+    <!-- /ss-top -->
 
-    <!-- ═══════════════ CONTINUE READING HERO ═══════════════ -->
-    @if (continueStory(); as cont) {
+    <!-- ═══════════════ CONTINUE READING HERO (hidden while searching) ═══════════════ -->
+    @if (!searchOpen() && continueStory(); as cont) {
       <div class="ss-hero" (click)="openStory(null, cont)" role="button"
            [attr.aria-label]="'Continue: ' + cont.title">
         <div class="ss-hero-cover" [style.background]="gradientFor(cont.id)">

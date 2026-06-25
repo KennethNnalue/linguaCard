@@ -42,6 +42,7 @@ import { SubscriptionStore } from '../../../subscription/store/subscription.stor
 import { PaywallModalComponent } from '../../../subscription/components/paywall-modal/paywall-modal.component';
 import { PlatformStoryApiService } from '../../services/platform-story-api.service';
 import { LanguageService } from '../../../../core/services/language.service';
+import { LocalDataService } from '../../../../core/services/local-data.service';
 
 const LEVEL_FILTERS: Array<{ value: StoryDifficulty | null; label: string }> = [
   { value: null, label: 'All' },
@@ -74,6 +75,7 @@ export class StoryLibraryPage implements OnInit {
   private readonly actionSheetCtrl     = inject(ActionSheetController);
   private readonly translate           = inject(TranslateService);
   private readonly languageService     = inject(LanguageService);
+  private readonly localData           = inject(LocalDataService);
 
   // ── My Stories (user-generated) ──────────────────────────────────────────
   readonly stories       = this.storyStore.sortedStories;
@@ -404,16 +406,30 @@ export class StoryLibraryPage implements OnInit {
   // ── Private ───────────────────────────────────────────────────────────────
 
   private loadPlatformStories(): void {
-    this.isLoadingExplore.set(true);
+    const nativeLang = this.languageService.current();
     this.exploreError.set(false);
-    this.platformApi.getAll({ limit: 20, nativeLang: this.languageService.current() }).subscribe({
+
+    // 1. Cache-first — render the Explore catalogue instantly and keep it
+    //    available offline. Only show the loading skeleton when nothing is cached.
+    void this.localData.getPlatformStoriesList(nativeLang).then(cached => {
+      if (cached.length > 0 && this.platformStories().length === 0) {
+        this.platformStories.set(cached);
+      } else if (cached.length === 0) {
+        this.isLoadingExplore.set(true);
+      }
+    });
+
+    // 2. Background network refresh — persist on success, keep the cache on failure.
+    this.platformApi.getAll({ limit: 20, nativeLang }).subscribe({
       next: res => {
         this.platformStories.set(res.stories);
         this.isLoadingExplore.set(false);
+        void this.localData.setPlatformStoriesList(nativeLang, res.stories);
       },
       error: () => {
         this.isLoadingExplore.set(false);
-        this.exploreError.set(true);
+        // Only surface an error when there's nothing cached to fall back on.
+        if (this.platformStories().length === 0) this.exploreError.set(true);
       },
     });
   }

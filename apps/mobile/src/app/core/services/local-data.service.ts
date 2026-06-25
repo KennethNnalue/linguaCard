@@ -1,6 +1,6 @@
 import { inject, Injectable } from '@angular/core';
 import { Storage } from '@ionic/storage-angular';
-import { Card, Category, Collection, PlatformStory, Story } from '@lingua-card/shared/domain';
+import { Card, Category, Collection, PlatformStory, PlatformStoryCard, Story } from '@lingua-card/shared/domain';
 import type { UpsertSessionDto } from '../../features/review/services/review-session-api.service';
 
 export interface PendingSrsRating {
@@ -83,6 +83,17 @@ export class LocalDataService {
   async setPlatformStory(story: PlatformStory): Promise<void> {
     await this.init();
     await this.storage.set(`platform_story:${story.id}`, story);
+  }
+
+  // ── Platform stories list (Explore catalogue — keyed by native language) ──────
+  async getPlatformStoriesList(nativeLang: string): Promise<PlatformStoryCard[]> {
+    await this.init();
+    return (await this.storage.get(`platform_stories_list:${nativeLang}`)) ?? [];
+  }
+
+  async setPlatformStoriesList(nativeLang: string, stories: PlatformStoryCard[]): Promise<void> {
+    await this.init();
+    await this.storage.set(`platform_stories_list:${nativeLang}`, stories);
   }
 
   // ── Review session history ────────────────────────────────────
