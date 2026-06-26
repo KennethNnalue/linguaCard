@@ -11,103 +11,137 @@
 
         <!-- Header + inline search — pinned to the top while searching -->
         <div class="home-top" [class.home-top--stuck]="searchOpen()">
-        <!-- Header -->
-        <header class="page-head">
-          <div>
-            <div class="eyebrow eyebrow--brass">{{ 'vault.lexicon.eyebrow' | translate }}</div>
-            <h1 class="page-title">{{ 'vault.title' | translate }}</h1>
-          </div>
-          <button class="icon-btn" [class.icon-btn--active]="searchOpen()" (click)="toggleSearch()"
-                  [attr.aria-label]="'vault.explore.searchAria' | translate">
-            @if (searchOpen()) {
-              <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><line x1="6" y1="6" x2="18" y2="18"/><line x1="18" y1="6" x2="6" y2="18"/></svg>
-            } @else {
-              <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.5" y2="16.5"/></svg>
-            }
-          </button>
-        </header>
+          <!-- Header -->
+          <header class="page-head">
+            <div>
+              <h1 class="page-title">{{ 'vault.title' | translate }}</h1>
+            </div>
+            <button class="icon-btn" [class.icon-btn--active]="searchOpen()" (click)="toggleSearch()"
+                    [attr.aria-label]="'vault.explore.searchAria' | translate">
+              @if (searchOpen()) {
+                <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.2"
+                     stroke-linecap="round">
+                  <line x1="6" y1="6" x2="18" y2="18"/>
+                  <line x1="18" y1="6" x2="6" y2="18"/>
+                </svg>
+              } @else {
+                <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2"
+                     stroke-linecap="round">
+                  <circle cx="11" cy="11" r="7"/>
+                  <line x1="21" y1="21" x2="16.5" y2="16.5"/>
+                </svg>
+              }
+            </button>
+          </header>
 
-        <!-- Inline collection search (personal + platform) -->
-        @if (searchOpen()) {
-          <div class="search search--home">
-            <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.5" y2="16.5"/></svg>
-            <input
-              class="search-input"
-              type="search"
-              [value]="collectionQuery()"
-              [placeholder]="'vault.explore.searchPlaceholder' | translate"
-              (input)="onCollectionSearch($event)"
-              [attr.aria-label]="'vault.explore.searchAria' | translate"
-            />
-            @if (collectionQuery()) {
-              <button class="search-clear" (click)="clearSearch()" [attr.aria-label]="'common.close' | translate">
-                <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><line x1="6" y1="6" x2="18" y2="18"/><line x1="18" y1="6" x2="6" y2="18"/></svg>
-              </button>
-            }
-          </div>
-        }
+          <!-- Inline collection search (personal + platform) -->
+          @if (searchOpen()) {
+            <div class="search search--home">
+              <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"
+                   stroke-linecap="round">
+                <circle cx="11" cy="11" r="7"/>
+                <line x1="21" y1="21" x2="16.5" y2="16.5"/>
+              </svg>
+              <input
+                class="search-input"
+                type="search"
+                [value]="collectionQuery()"
+                [placeholder]="'vault.explore.searchPlaceholder' | translate"
+                (input)="onCollectionSearch($event)"
+                [attr.aria-label]="'vault.explore.searchAria' | translate"
+              />
+              @if (collectionQuery()) {
+                <button class="search-clear" (click)="clearSearch()" [attr.aria-label]="'common.close' | translate">
+                  <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.2"
+                       stroke-linecap="round">
+                    <line x1="6" y1="6" x2="18" y2="18"/>
+                    <line x1="18" y1="6" x2="6" y2="18"/>
+                  </svg>
+                </button>
+              }
+            </div>
+          }
         </div>
         <!-- /home-top -->
 
         <!-- Hero + All Words are hidden while searching so results lead. -->
         @if (!searchOpen()) {
-        <!-- Focus hero -->
-        <section class="hero">
-          <span class="hero-glow"></span>
-          <span class="hero-glow hero-glow--soft"></span>
+          <!-- Focus hero -->
+          <section class="hero">
+            <span class="hero-glow"></span>
+            <span class="hero-glow hero-glow--soft"></span>
 
-          <div class="hero-top">
-            <span class="eyebrow eyebrow--hero">{{ 'vault.lexicon.readyToReview' | translate }}</span>
-            <span class="streak-chip">
+            <div class="hero-top">
+              <span class="eyebrow eyebrow--hero">{{ 'vault.lexicon.readyToReview' | translate }}</span>
+              <span class="streak-chip">
               <span class="streak-dot"></span>
-              {{ 'vault.lexicon.streakChip' | translate:{ count: dayStreak() } }}
+                {{ 'vault.lexicon.streakChip' | translate:{count: dayStreak()} }}
             </span>
-          </div>
-
-          <div class="hero-due">
-            <span class="hero-number">{{ dueCount() }}</span>
-            <span class="hero-due-label">{{ 'vault.lexicon.wordsDue' | translate }}</span>
-          </div>
-          <p class="hero-sub">{{ 'vault.lexicon.acrossCollections' | translate:{ count: collectionCount() } }}</p>
-
-          <div class="hero-dist">
-            <div class="dist-bar">
-              @for (seg of distSegments(); track seg.level) {
-                <span class="dist-seg" [style.width.%]="seg.width" [style.background]="seg.color"></span>
-              }
             </div>
-            <div class="dist-meta">
-              <span>{{ 'vault.lexicon.masteredOf' | translate:{ mastered: masteredCount(), total: totalCount() } }}</span>
-              <span class="dist-pct">{{ masteryPct() }}%</span>
+
+            <div class="hero-due">
+              <span class="hero-number">{{ dueCount() }}</span>
+              <span class="hero-due-label">{{ 'vault.lexicon.wordsDue' | translate }}</span>
             </div>
-          </div>
+            <p class="hero-sub">{{ 'vault.lexicon.acrossCollections' | translate:{count: collectionCount()} }}</p>
 
-          <div class="hero-actions">
-            <button class="btn-paper" (click)="startReview()">
-              <svg viewBox="0 0 24 24" width="15" height="15" fill="currentColor"><polygon points="6,4 20,12 6,20"/></svg>
-              {{ 'vault.lexicon.startReview' | translate }}
-            </button>
-            <button class="btn-ghost" (click)="startListen()">
-              <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><polygon points="11,5 6,9 2,9 2,15 6,15 11,19 11,5"/><path d="M15.5,8.5a5,5,0,0,1,0,7"/></svg>
-              {{ 'vault.lexicon.listen' | translate }}
-            </button>
-          </div>
-        </section>
+            <div class="hero-dist">
+              <div class="dist-bar">
+                @for (seg of distSegments(); track seg.level) {
+                  <span class="dist-seg" [style.width.%]="seg.width" [style.background]="seg.color"></span>
+                }
+              </div>
+              <div class="dist-meta">
+                <span>{{
+                    'vault.lexicon.masteredOf' | translate:{
+                      mastered: masteredCount(),
+                      total: totalCount()
+                    }
+                  }}</span>
+                <span class="dist-pct">{{ masteryPct() }}%</span>
+              </div>
+            </div>
 
-        <!-- All Words index card -->
-        <button class="all-words" (click)="openIndex()">
+            <div class="hero-actions">
+              <button class="btn-paper" (click)="startReview()">
+                <svg viewBox="0 0 24 24" width="15" height="15" fill="currentColor">
+                  <polygon points="6,4 20,12 6,20"/>
+                </svg>
+                {{ 'vault.lexicon.startReview' | translate }}
+              </button>
+              <button class="btn-ghost" (click)="startListen()">
+                <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"
+                     stroke-linecap="round">
+                  <polygon points="11,5 6,9 2,9 2,15 6,15 11,19 11,5"/>
+                  <path d="M15.5,8.5a5,5,0,0,1,0,7"/>
+                </svg>
+                {{ 'vault.lexicon.listen' | translate }}
+              </button>
+            </div>
+          </section>
+
+          <!-- All Words index card -->
+          <button class="all-words" (click)="openIndex()">
           <span class="all-words-icon">
-            <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg>
+            <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8"
+                 stroke-linecap="round" stroke-linejoin="round"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12"
+                                                                                                          x2="21"
+                                                                                                          y2="12"/><line
+              x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01"
+                                                                                          y2="12"/><line x1="3" y1="18"
+                                                                                                         x2="3.01"
+                                                                                                         y2="18"/></svg>
           </span>
-          <span class="all-words-body">
+            <span class="all-words-body">
             <span class="all-words-title">{{ 'vault.lexicon.allWords' | translate }}</span>
             <span class="all-words-sub">{{ 'vault.lexicon.allWordsSub' | translate }}</span>
           </span>
-          <span class="all-words-trail">
+            <span class="all-words-trail">
             <span class="all-words-count">{{ totalCount() }}</span>
-            <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><polyline points="9,6 15,12 9,18"/></svg>
+            <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2.2"
+                 stroke-linecap="round"><polyline points="9,6 15,12 9,18"/></svg>
           </span>
-        </button>
+          </button>
         }
         <!-- /hero + all-words -->
 
@@ -120,13 +154,17 @@
             </div>
             <button class="see-all" (click)="openExploreAll()">
               {{ 'vault.explore.seeAll' | translate }}
-              <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><polyline points="9,6 15,12 9,18"/></svg>
+              <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.4"
+                   stroke-linecap="round">
+                <polyline points="9,6 15,12 9,18"/>
+              </svg>
             </button>
           </div>
 
           <div class="segment">
             @for (f of levelFilters; track f.value) {
-              <button class="segment-btn" [class.segment-btn--active]="exploreLevel() === f.value" (click)="setExploreLevel(f.value)">
+              <button class="segment-btn" [class.segment-btn--active]="exploreLevel() === f.value"
+                      (click)="setExploreLevel(f.value)">
                 {{ f.value === 'all' ? ('vault.filter.allLabel' | translate) : f.label }}
               </button>
             }
@@ -155,8 +193,12 @@
                 <button class="cover-card" (click)="openPlatformDetail(c)">
                   <span class="cover-art" [class]="coverClassFor(c.id)">
                     <span class="cover-level">{{ c.level }}</span>
-                    @if (c.emoji) { <span class="cover-emoji-art">{{ c.emoji }}</span> }
-                    @if (c.adoptionStatus === 'adopted') { <span class="cover-owned">✓</span> }
+                    @if (c.emoji) {
+                      <span class="cover-emoji-art">{{ c.emoji }}</span>
+                    }
+                    @if (c.adoptionStatus === 'adopted') {
+                      <span class="cover-owned">✓</span>
+                    }
                   </span>
                   <span class="cover-body">
                     <span class="cover-title">{{ c.title }}</span>
@@ -171,9 +213,21 @@
         }
 
         <!-- Collections (personal) -->
-        <div class="section-head">
-          <h2 class="section-title">{{ 'vault.lexicon.collections' | translate }}</h2>
-          <span class="eyebrow eyebrow--muted">{{ 'vault.lexicon.shelves' | translate:{ count: filteredCollections().length } }}</span>
+        <div class="section-head section-head--explore">
+          <div>
+            <h2 class="section-title">{{ 'vault.lexicon.collections' | translate }}</h2>
+            <span
+              class="section-sub">{{ 'vault.lexicon.shelves' | translate:{count: filteredCollections().length} }}</span>
+          </div>
+          @if (filteredCollections().length > 0) {
+            <button class="see-all" (click)="openCollectionsAll()">
+              {{ 'vault.explore.seeAll' | translate }}
+              <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.4"
+                   stroke-linecap="round">
+                <polyline points="9,6 15,12 9,18"/>
+              </svg>
+            </button>
+          }
         </div>
 
         <div class="collections">
@@ -215,29 +269,37 @@
             } @empty {
               <div class="empty">
                 <span class="empty-icon">{{ collectionQuery() ? '🔍' : '📚' }}</span>
-                <p class="empty-title">{{ (collectionQuery() ? 'vault.emptyState.title' : 'vault.collections.emptyTitle') | translate }}</p>
-                <p class="empty-sub">{{ (collectionQuery() ? 'vault.emptyState.subtitle' : 'vault.collections.emptySubtitle') | translate }}</p>
+                <p
+                  class="empty-title">{{ (collectionQuery() ? 'vault.emptyState.title' : 'vault.collections.emptyTitle') | translate }}</p>
+                <p
+                  class="empty-sub">{{ (collectionQuery() ? 'vault.emptyState.subtitle' : 'vault.collections.emptySubtitle') | translate }}</p>
               </div>
             }
           }
         </div>
       </div>
     }
-
     @case ('index') {
       <!-- ═══════════ WORD INDEX ═══════════ -->
       <div class="index">
         <div class="index-sticky">
           <div class="index-head">
             <button class="icon-btn" (click)="goHome()" [attr.aria-label]="'common.back' | translate">
-              <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><polyline points="15,18 9,12 15,6"/></svg>
+              <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.2"
+                   stroke-linecap="round">
+                <polyline points="15,18 9,12 15,6"/>
+              </svg>
             </button>
             <h1 class="index-title">{{ 'vault.lexicon.allWords' | translate }}</h1>
             <span class="index-count">{{ indexCards().length }}</span>
           </div>
 
           <div class="search">
-            <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.5" y2="16.5"/></svg>
+            <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"
+                 stroke-linecap="round">
+              <circle cx="11" cy="11" r="7"/>
+              <line x1="21" y1="21" x2="16.5" y2="16.5"/>
+            </svg>
             <input
               class="search-input"
               type="search"
@@ -257,7 +319,8 @@
             <button class="chip" [class.chip--active]="masteryFilter() === 'new'" (click)="setMasteryFilter('new')">
               {{ 'vault.filter.newLabel' | translate }} <span class="chip-badge">{{ newCount() }}</span>
             </button>
-            <button class="chip" [class.chip--active]="masteryFilter() === 'mastered'" (click)="setMasteryFilter('mastered')">
+            <button class="chip" [class.chip--active]="masteryFilter() === 'mastered'"
+                    (click)="setMasteryFilter('mastered')">
               {{ 'vault.filter.masteredLabel' | translate }} <span class="chip-badge">{{ masteredCount() }}</span>
             </button>
           </div>
@@ -270,7 +333,7 @@
             }
           } @else {
             @for (card of indexCards(); track card.id) {
-              <lc-word-row [card]="card" (rowClick)="openDetail(card)" />
+              <lc-word-row [card]="card" (rowClick)="openDetail(card)"/>
             } @empty {
               <div class="empty">
                 <span class="empty-icon">🔍</span>
@@ -282,21 +345,27 @@
         </div>
       </div>
     }
-
     @case ('explore') {
       <!-- ═══════════ EXPLORE (FULL PLATFORM GRID) ═══════════ -->
       <div class="index">
         <div class="index-sticky">
           <div class="index-head">
             <button class="icon-btn" (click)="backFromExplore()" [attr.aria-label]="'common.back' | translate">
-              <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><polyline points="15,18 9,12 15,6"/></svg>
+              <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.2"
+                   stroke-linecap="round">
+                <polyline points="15,18 9,12 15,6"/>
+              </svg>
             </button>
             <h1 class="index-title">{{ 'vault.explore.title' | translate }}</h1>
             <span class="index-count">{{ exploreAll().length }}</span>
           </div>
 
           <div class="search">
-            <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.5" y2="16.5"/></svg>
+            <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"
+                 stroke-linecap="round">
+              <circle cx="11" cy="11" r="7"/>
+              <line x1="21" y1="21" x2="16.5" y2="16.5"/>
+            </svg>
             <input
               class="search-input"
               type="search"
@@ -309,7 +378,8 @@
 
           <div class="segment segment--flush">
             @for (f of levelFilters; track f.value) {
-              <button class="segment-btn" [class.segment-btn--active]="exploreLevel() === f.value" (click)="setExploreLevel(f.value)">
+              <button class="segment-btn" [class.segment-btn--active]="exploreLevel() === f.value"
+                      (click)="setExploreLevel(f.value)">
                 {{ f.value === 'all' ? ('vault.filter.allLabel' | translate) : f.label }}
               </button>
             }
@@ -339,8 +409,12 @@
               <button class="cover-card cover-card--grid" (click)="openPlatformDetail(c)">
                 <span class="cover-art" [class]="coverClassFor(c.id)">
                   <span class="cover-level">{{ c.level }}</span>
-                  @if (c.emoji) { <span class="cover-emoji-art">{{ c.emoji }}</span> }
-                  @if (c.adoptionStatus === 'adopted') { <span class="cover-owned">✓</span> }
+                  @if (c.emoji) {
+                    <span class="cover-emoji-art">{{ c.emoji }}</span>
+                  }
+                  @if (c.adoptionStatus === 'adopted') {
+                    <span class="cover-owned">✓</span>
+                  }
                 </span>
                 <span class="cover-body">
                   <span class="cover-title">{{ c.title }}</span>
@@ -357,10 +431,54 @@
         </div>
       </div>
     }
+    @case ('collections') {
+      <!-- ═══════════ COLLECTIONS (FULL GRID) ═══════════ -->
+      <div class="index">
+        <div class="index-sticky">
+          <div class="index-head">
+            <button class="icon-btn" (click)="backFromCollections()" [attr.aria-label]="'common.back' | translate">
+              <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.2"
+                   stroke-linecap="round">
+                <polyline points="15,18 9,12 15,6"/>
+              </svg>
+            </button>
+            <h1 class="index-title">{{ 'vault.lexicon.collections' | translate }}</h1>
+            <span class="index-count">{{ collections().length }}</span>
+          </div>
+        </div>
+
+        <div class="grid">
+          @for (col of collections(); track col.id) {
+            @let s = statsFor(col.id);
+            <button class="cover-card cover-card--grid" (click)="openCollectionDetail(col)">
+              <span class="cover-art" [class]="coverClassFor(col.id)">
+                @if (col.emoji) {
+                  <span class="cover-emoji-art">{{ col.emoji }}</span>
+                }
+                @if (s.dueCount > 0) {
+                  <span class="cover-due-badge">{{ s.dueCount }} {{ 'common.due' | translate }}</span>
+                }
+              </span>
+              <span class="cover-body">
+                <span class="cover-title">{{ col.name }}</span>
+                <span class="cover-meta">{{ s.cardCount }} {{ 'common.words' | translate }}
+                  · {{ s.masteredCount }} {{ 'collections.card.masteredLabel' | translate }}</span>
+              </span>
+            </button>
+          } @empty {
+            <div class="empty empty--grid">
+              <span class="empty-icon">📚</span>
+              <p class="empty-title">{{ 'vault.collections.emptyTitle' | translate }}</p>
+              <p class="empty-sub">{{ 'vault.collections.emptySubtitle' | translate }}</p>
+            </div>
+          }
+        </div>
+      </div>
+    }
   }
 </ion-content>
 
-@if (view() !== 'explore') {
+@if (view() !== 'explore' && view() !== 'collections') {
   <lc-speed-dial-fab
     (addCard)="openAddWord()"
     (newCollection)="openCreateCollection()"

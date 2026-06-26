@@ -16,7 +16,7 @@ import {SpeedDialFabComponent} from '../../../../shared/components/speed-dial-fa
 import {BottomSheetService} from '../../../../shared/components/bottom-sheet/bottom-sheet.service';
 import {ImportPage} from '../import/import.page';
 
-type VaultView = 'home' | 'index' | 'explore';
+type VaultView = 'home' | 'index' | 'explore' | 'collections';
 type MasteryFilter = 'all' | 'due' | 'new' | 'mastered';
 
 interface MasterySegment {
@@ -244,6 +244,14 @@ export class VaultPage implements OnInit, OnDestroy {
   }
 
   backFromExplore(): void {
+    this.view.set('home');
+  }
+
+  openCollectionsAll(): void {
+    this.view.set('collections');
+  }
+
+  backFromCollections(): void {
     this.view.set('home');
   }
 

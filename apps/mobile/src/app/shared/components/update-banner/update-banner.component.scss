@@ -1,11 +1,9 @@
-// Mirrors offline-banner layout. Uses an accent (vs. the offline amber) so the
-// "new version" prompt reads as a positive, actionable notice.
 .update-banner {
   position: fixed;
-  top: 0;
+  bottom: calc(56px + env(safe-area-inset-bottom, 0px));
   left: 0;
   right: 0;
-  z-index: 900; // below modals, above content
+  z-index: 900;
   min-height: 36px;
   display: flex;
   align-items: center;
