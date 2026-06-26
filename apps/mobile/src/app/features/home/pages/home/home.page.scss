@@ -13,6 +13,42 @@
   color: var(--lc-text-primary);
 }
 
+.home-nav-actions {
+  display: flex;
+  align-items: center;
+  gap: t.$lc-space-3;
+}
+
+.home-bell {
+  @include u.circle(30px);
+  position: relative;
+  border: none;
+  background: transparent;
+  color: var(--lc-text-primary);
+  @include u.flex-center;
+  cursor: pointer;
+  @include u.touch-state;
+
+  ion-icon {
+    font-size: t.$lc-space-5;
+  }
+}
+
+.home-bell-badge {
+  position: absolute;
+  top: -2px;
+  right: -2px;
+  min-width: t.$lc-space-4;
+  height: t.$lc-space-4;
+  padding: 0 t.$lc-space-1;
+  border-radius: t.$lc-radius-full;
+  background: var(--ion-color-danger);
+  color: t.$lc-text-inverse;
+  @include u.lc-font('xxs', t.$lc-font-weight-bold);
+  @include u.flex-center;
+  line-height: 1;
+}
+
 .home-avatar {
   @include u.circle(30px);
   border: none;

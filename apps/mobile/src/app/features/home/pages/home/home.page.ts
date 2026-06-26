@@ -11,7 +11,7 @@ import {
 } from '@ionic/angular/standalone';
 import {TranslatePipe, TranslateService} from '@ngx-translate/core';
 import {addIcons} from 'ionicons';
-import {libraryOutline, playOutline} from 'ionicons/icons';
+import {libraryOutline, notificationsOutline, playOutline} from 'ionicons/icons';
 import {AuthService} from '../../../../core/services/auth.service';
 import {LanguageService} from '../../../../core/services/language.service';
 import {CardStore} from '../../../vault/store/card.store';
@@ -34,6 +34,7 @@ import {WordCardComponent} from '../../../../shared/ui/word-card/word-card.compo
 import {WordAudioService} from '../../../../shared/audio/word-audio.service';
 import {ReviewStatsStore} from '../../../../shared/srs/review-stats.store';
 import {SettingsStore} from '../../../settings/store/settings.store';
+import {ShareStore} from '../../../sharing/store/share.store';
 import {StreakMilestoneComponent} from '../../components/streak-milestone/streak-milestone.component';
 import {GettingStartedChecklistComponent} from '../../components/getting-started-checklist/getting-started-checklist.component';
 import {StudyGoalsPromptComponent} from '../../../settings/components/study-goals-prompt/study-goals-prompt.component';
@@ -66,6 +67,7 @@ export class HomePage {
   private readonly collectionStore = inject(CollectionStore);
   private readonly reviewStats = inject(ReviewStatsStore);
   private readonly settingsStore = inject(SettingsStore);
+  readonly shareStore = inject(ShareStore);
   private readonly wordAudio = inject(WordAudioService);
   private readonly modalCtrl = inject(ModalController);
   private readonly bottomSheet = inject(BottomSheetService);
@@ -79,7 +81,7 @@ export class HomePage {
   private readonly goalPromptShown = signal(false);
 
   constructor() {
-    addIcons({playOutline, libraryOutline});
+    addIcons({playOutline, libraryOutline, notificationsOutline});
     effect(() => {
       const current = this.streak().current;
       if (StreakMilestoneComponent.shouldShow(current)) {

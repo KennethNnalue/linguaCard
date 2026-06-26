@@ -6,6 +6,7 @@ import { rxMethod } from '@ngrx/signals/rxjs-interop';
 import { pipe, switchMap, tap, catchError, EMPTY } from 'rxjs';
 import type { ShareNotification, ShareRecord } from '@lingua-card/shared/domain';
 import { ShareApiService } from '../services/share-api.service';
+import { AuthService } from '../../../core/services/auth.service';
 
 interface ShareState {
   pendingShares: ShareNotification[];
@@ -21,6 +22,9 @@ const initialState: ShareState = {
   isLoading: false,
 };
 
+// How often to poll for newly received shares while the app is foregrounded.
+const POLL_INTERVAL_MS = 45_000;
+
 export const ShareStore = signalStore(
   { providedIn: 'root' },
   withState(initialState),
@@ -31,8 +35,21 @@ export const ShareStore = signalStore(
 
   withMethods((store) => {
     const api = inject(ShareApiService);
+    const auth = inject(AuthService);
+    let autoRefreshStarted = false;
+
+    const refreshCount = rxMethod<void>(
+      pipe(
+        switchMap(() => api.getPendingCount().pipe(
+          tap(({ count }) => patchState(store, { pendingCount: count })),
+          catchError(() => EMPTY),
+        )),
+      ),
+    );
 
     return {
+      refreshCount,
+
       loadPending: rxMethod<void>(
         pipe(
           tap(() => patchState(store, { isLoading: true })),
@@ -47,15 +64,6 @@ export const ShareStore = signalStore(
         ),
       ),
 
-      refreshCount: rxMethod<void>(
-        pipe(
-          switchMap(() => api.getPendingCount().pipe(
-            tap(({ count }) => patchState(store, { pendingCount: count })),
-            catchError(() => EMPTY),
-          )),
-        ),
-      ),
-
       loadSent: rxMethod<void>(
         pipe(
           tap(() => patchState(store, { isLoading: true })),
@@ -65,6 +73,28 @@ export const ShareStore = signalStore(
           )),
         ),
       ),
+
+      /**
+       * Keeps the pending-share badge live without the user having to relaunch
+       * the app: polls while foregrounded and re-checks whenever the tab/app
+       * returns to the foreground. Idempotent — safe to call more than once.
+       */
+      startAutoRefresh(): void {
+        if (autoRefreshStarted) return;
+        autoRefreshStarted = true;
+
+        const canPoll = () => navigator.onLine && !document.hidden && auth.isAuthenticated();
+
+        refreshCount();
+
+        setInterval(() => {
+          if (canPoll()) refreshCount();
+        }, POLL_INTERVAL_MS);
+
+        document.addEventListener('visibilitychange', () => {
+          if (canPoll()) refreshCount();
+        });
+      },
     };
   }),
 

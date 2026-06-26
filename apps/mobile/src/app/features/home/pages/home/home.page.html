@@ -2,14 +2,26 @@
   <ion-toolbar>
     <div class="home-nav">
       <span class="home-logo">{{ 'common.appName' | translate }}</span>
-      <button
-        class="home-avatar"
-        (click)="toggleMenu($event)"
-        [attr.aria-expanded]="menuOpen()"
-        aria-label="Open account menu"
-      >
-        {{ user()?.avatarInitials ?? '?' }}
-      </button>
+      <div class="home-nav-actions">
+        <button
+          class="home-bell"
+          routerLink="/notifications"
+          [attr.aria-label]="'sharing.notifications.title' | translate"
+        >
+          <ion-icon name="notifications-outline" aria-hidden="true"></ion-icon>
+          @if (shareStore.hasPending()) {
+            <span class="home-bell-badge">{{ shareStore.pendingCount() }}</span>
+          }
+        </button>
+        <button
+          class="home-avatar"
+          (click)="toggleMenu($event)"
+          [attr.aria-expanded]="menuOpen()"
+          aria-label="Open account menu"
+        >
+          {{ user()?.avatarInitials ?? '?' }}
+        </button>
+      </div>
     </div>
   </ion-toolbar>
 </ion-header>

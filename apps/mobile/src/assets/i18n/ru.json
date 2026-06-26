@@ -1517,7 +1517,22 @@
       "rejectedToast": "Общий доступ отклонён",
       "rejectConfirmHeader": "Отклонить?",
       "rejectConfirmMessage": "\"{{name}}\" не будет добавлено в вашу библиотеку.",
-      "rejectConfirmButton": "Отклонить"
+      "rejectConfirmButton": "Отклонить",
+      "receivedTab": "Полученные",
+      "sentTab": "Отправленные",
+      "toLabel": "Кому: {{email}}",
+      "sentEmptyTitle": "Вы ещё ничем не поделились",
+      "sentEmptySubtitle": "Коллекции и истории, которыми вы поделитесь, появятся здесь",
+      "statusPending": "Ожидает",
+      "statusAccepted": "Принято",
+      "statusRejected": "Отклонено",
+      "statusExpired": "Истёк срок",
+      "cancelButton": "Отменить",
+      "cancelKeepButton": "Оставить",
+      "cancelConfirmHeader": "Отменить отправку?",
+      "cancelConfirmMessage": "«{{name}}» больше не будет доступен для {{email}}.",
+      "cancelConfirmButton": "Отменить отправку",
+      "cancelledToast": "Отправка отменена"
     },
     "badge": {
       "ariaLabel": "{{count}} ожидающих уведомлений"

@@ -1517,7 +1517,22 @@
       "rejectedToast": "Share declined",
       "rejectConfirmHeader": "Decline share?",
       "rejectConfirmMessage": "\"{{name}}\" won't be added to your library.",
-      "rejectConfirmButton": "Decline"
+      "rejectConfirmButton": "Decline",
+      "receivedTab": "Received",
+      "sentTab": "Sent",
+      "toLabel": "To {{email}}",
+      "sentEmptyTitle": "Nothing shared yet",
+      "sentEmptySubtitle": "Collections and stories you share will appear here",
+      "statusPending": "Pending",
+      "statusAccepted": "Accepted",
+      "statusRejected": "Declined",
+      "statusExpired": "Expired",
+      "cancelButton": "Cancel",
+      "cancelKeepButton": "Keep sharing",
+      "cancelConfirmHeader": "Cancel share?",
+      "cancelConfirmMessage": "\"{{name}}\" will no longer be available to {{email}}.",
+      "cancelConfirmButton": "Cancel share",
+      "cancelledToast": "Share cancelled"
     },
     "badge": {
       "ariaLabel": "{{count}} pending notifications"

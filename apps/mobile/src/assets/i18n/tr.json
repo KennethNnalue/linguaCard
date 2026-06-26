@@ -1517,7 +1517,22 @@
       "rejectedToast": "Paylaşım reddedildi",
       "rejectConfirmHeader": "Paylaşımı reddet?",
       "rejectConfirmMessage": "\"{{name}}\" kütüphanenize eklenmeyecek.",
-      "rejectConfirmButton": "Reddet"
+      "rejectConfirmButton": "Reddet",
+      "receivedTab": "Gelen",
+      "sentTab": "Gönderilen",
+      "toLabel": "{{email}} adresine",
+      "sentEmptyTitle": "Henüz bir şey paylaşmadın",
+      "sentEmptySubtitle": "Paylaştığın koleksiyonlar ve hikâyeler burada görünecek",
+      "statusPending": "Bekliyor",
+      "statusAccepted": "Kabul edildi",
+      "statusRejected": "Reddedildi",
+      "statusExpired": "Süresi doldu",
+      "cancelButton": "İptal",
+      "cancelKeepButton": "Paylaşmaya devam et",
+      "cancelConfirmHeader": "Paylaşım iptal edilsin mi?",
+      "cancelConfirmMessage": "\"{{name}}\" artık {{email}} için erişilebilir olmayacak.",
+      "cancelConfirmButton": "Paylaşımı iptal et",
+      "cancelledToast": "Paylaşım iptal edildi"
     },
     "badge": {
       "ariaLabel": "{{count}} bekleyen bildirim"

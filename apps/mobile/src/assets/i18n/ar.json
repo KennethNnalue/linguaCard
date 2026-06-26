@@ -1517,7 +1517,22 @@
       "rejectedToast": "تم رفض المشاركة",
       "rejectConfirmHeader": "رفض المشاركة؟",
       "rejectConfirmMessage": "لن تتم إضافة \"{{name}}\" إلى مكتبتك.",
-      "rejectConfirmButton": "رفض"
+      "rejectConfirmButton": "رفض",
+      "receivedTab": "الواردة",
+      "sentTab": "المُرسَلة",
+      "toLabel": "إلى {{email}}",
+      "sentEmptyTitle": "لم تشارك أي شيء بعد",
+      "sentEmptySubtitle": "ستظهر هنا المجموعات والقصص التي تشاركها",
+      "statusPending": "قيد الانتظار",
+      "statusAccepted": "مقبول",
+      "statusRejected": "مرفوض",
+      "statusExpired": "منتهي الصلاحية",
+      "cancelButton": "إلغاء",
+      "cancelKeepButton": "متابعة المشاركة",
+      "cancelConfirmHeader": "إلغاء المشاركة؟",
+      "cancelConfirmMessage": "لن يعود \"{{name}}\" متاحًا لـ {{email}}.",
+      "cancelConfirmButton": "إلغاء المشاركة",
+      "cancelledToast": "تم إلغاء المشاركة"
     },
     "badge": {
       "ariaLabel": "{{count}} إشعارات معلقة"

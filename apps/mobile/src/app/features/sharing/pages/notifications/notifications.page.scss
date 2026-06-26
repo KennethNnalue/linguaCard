@@ -60,6 +60,35 @@
       border-radius: t.$lc-radius-full;
       font-weight: t.$lc-font-weight-semibold;
     }
+
+    .status-pill {
+      font-size: t.$lc-text-xs;
+      padding: t.$lc-space-1 t.$lc-space-2;
+      border-radius: t.$lc-radius-full;
+      font-weight: t.$lc-font-weight-semibold;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+
+      &--pending {
+        background: t.$lc-amber-bg;
+        color: t.$lc-flame;
+      }
+
+      &--accepted {
+        background: t.$lc-brand-light;
+        color: t.$lc-brand;
+      }
+
+      &--rejected {
+        background: t.$lc-fem-bg;
+        color: t.$lc-text-secondary;
+      }
+
+      &--expired {
+        background: t.$lc-surface;
+        color: t.$lc-text-hint;
+      }
+    }
   }
 }
 
@@ -68,24 +97,4 @@
   flex-direction: column;
   gap: t.$lc-space-2;
   flex-shrink: 0;
-
-  button {
-    border: none;
-    border-radius: t.$lc-radius-md;
-    padding: t.$lc-space-2 t.$lc-space-4;
-    font-size: t.$lc-text-sm;
-    font-weight: t.$lc-font-weight-semibold;
-    cursor: pointer;
-  }
-
-  .accept-btn {
-    background: t.$lc-accent;
-    color: t.$lc-text-inverse;
-  }
-
-  .reject-btn {
-    background: transparent;
-    color: t.$lc-text-secondary;
-    border: 1px solid t.$lc-border;
-  }
 }

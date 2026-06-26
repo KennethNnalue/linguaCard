@@ -1517,7 +1517,22 @@
       "rejectedToast": "Compartido rechazado",
       "rejectConfirmHeader": "¿Rechazar compartido?",
       "rejectConfirmMessage": "\"{{name}}\" no se añadirá a tu biblioteca.",
-      "rejectConfirmButton": "Rechazar"
+      "rejectConfirmButton": "Rechazar",
+      "receivedTab": "Recibidos",
+      "sentTab": "Enviados",
+      "toLabel": "Para {{email}}",
+      "sentEmptyTitle": "Aún no has compartido nada",
+      "sentEmptySubtitle": "Las colecciones e historias que compartas aparecerán aquí",
+      "statusPending": "Pendiente",
+      "statusAccepted": "Aceptado",
+      "statusRejected": "Rechazado",
+      "statusExpired": "Expirado",
+      "cancelButton": "Cancelar",
+      "cancelKeepButton": "Seguir compartiendo",
+      "cancelConfirmHeader": "¿Cancelar lo compartido?",
+      "cancelConfirmMessage": "\"{{name}}\" ya no estará disponible para {{email}}.",
+      "cancelConfirmButton": "Cancelar",
+      "cancelledToast": "Compartido cancelado"
     },
     "badge": {
       "ariaLabel": "{{count}} notificaciones pendientes"

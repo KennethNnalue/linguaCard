@@ -13,6 +13,7 @@ import {ReviewStore} from './features/review/store/review.store';
 import {ReviewStatsStore} from './shared/srs/review-stats.store';
 import {SettingsStore} from './features/settings/store/settings.store';
 import {SubscriptionStore} from './features/subscription/store/subscription.store';
+import {ShareStore} from './features/sharing/store/share.store';
 import {AuthService} from './core/services/auth.service';
 import {PwaInstallBannerComponent} from './shared/components/pwa-install-banner/pwa-install-banner.component';
 import {OfflineBannerComponent} from './shared/components/offline-banner/offline-banner.component';
@@ -35,6 +36,7 @@ export class AppComponent implements OnInit {
   private readonly reviewStats = inject(ReviewStatsStore);
   private readonly settingsStore = inject(SettingsStore);
   private readonly subscriptionStore = inject(SubscriptionStore);
+  private readonly shareStore = inject(ShareStore);
   private readonly authService = inject(AuthService);
   private readonly pwaUpdate = inject(PwaUpdateService);
 
@@ -57,6 +59,7 @@ export class AppComponent implements OnInit {
       this.languageService.reconcileFromServer(this.settingsStore.settings()?.uiLanguage);
       void this.reviewStats.refreshStreak();
       void this.reviewStats.refreshGoalProgress();
+      this.shareStore.startAutoRefresh();
     }
 
     await this.syncService.init();
@@ -75,6 +78,7 @@ export class AppComponent implements OnInit {
     if (Capacitor.isNativePlatform()) {
       App.addListener('appStateChange', async ({isActive}) => {
         if (isActive && navigator.onLine) {
+          this.shareStore.refreshCount();
           await this.syncService.forceSync();
         }
       });

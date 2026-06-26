@@ -1517,7 +1517,22 @@
       "rejectedToast": "Поділення відхилено",
       "rejectConfirmHeader": "Відхилити поділення?",
       "rejectConfirmMessage": "\"{{name}}\" не буде додано до вашої бібліотеки.",
-      "rejectConfirmButton": "Відхилити"
+      "rejectConfirmButton": "Відхилити",
+      "receivedTab": "Отримані",
+      "sentTab": "Надіслані",
+      "toLabel": "Кому: {{email}}",
+      "sentEmptyTitle": "Ще нічого не надіслано",
+      "sentEmptySubtitle": "Колекції та історії, якими ви поділитеся, з'являться тут",
+      "statusPending": "Очікує",
+      "statusAccepted": "Прийнято",
+      "statusRejected": "Відхилено",
+      "statusExpired": "Протерміновано",
+      "cancelButton": "Скасувати",
+      "cancelKeepButton": "Залишити",
+      "cancelConfirmHeader": "Скасувати надсилання?",
+      "cancelConfirmMessage": "«{{name}}» більше не буде доступний для {{email}}.",
+      "cancelConfirmButton": "Скасувати надсилання",
+      "cancelledToast": "Надсилання скасовано"
     },
     "badge": {
       "ariaLabel": "{{count}} очікуючих сповіщень"
