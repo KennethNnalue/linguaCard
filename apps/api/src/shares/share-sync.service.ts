@@ -1,6 +1,6 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { Repository, EntityManager } from 'typeorm';
 import { randomUUID } from 'crypto';
 import { ShareSyncLinkEntity } from './share-sync-link.entity';
 import { CardEntity } from '../cards/card.entity';
@@ -24,8 +24,10 @@ export class ShareSyncService {
     sourceResourceId: string,
     targetResourceId: string,
     resourceType: 'collection' | 'story',
+    manager?: EntityManager,
   ): Promise<void> {
-    await this.linkRepo.save(this.linkRepo.create({
+    const repo = manager ? manager.getRepository(ShareSyncLinkEntity) : this.linkRepo;
+    await repo.save(repo.create({
       id: randomUUID(),
       shareId,
       sourceResourceId,
@@ -38,6 +40,18 @@ export class ShareSyncService {
   async deactivateBySource(sourceResourceId: string): Promise<void> {
     await this.linkRepo.update(
       { sourceResourceId, isActive: true },
+      { isActive: false },
+    );
+  }
+
+  /**
+   * Deactivates links pointing at a resource that is being deleted (the
+   * recipient's cloned copy). Prevents dangling active links that would log
+   * "not found" warnings on every subsequent sender edit.
+   */
+  async deactivateByTarget(targetResourceId: string): Promise<void> {
+    await this.linkRepo.update(
+      { targetResourceId, isActive: true },
       { isActive: false },
     );
   }

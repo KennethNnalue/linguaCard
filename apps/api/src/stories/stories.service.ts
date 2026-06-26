@@ -71,6 +71,8 @@ export class StoriesService {
 
     void this.syncService?.deactivateBySource(id).catch(err =>
       this.logger.warn(`Sync deactivateBySource failed: ${err.message}`));
+    void this.syncService?.deactivateByTarget(id).catch(err =>
+      this.logger.warn(`Sync deactivateByTarget failed: ${err.message}`));
   }
 
   // Extracts the relative storage key from a full URL.

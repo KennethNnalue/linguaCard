@@ -33,7 +33,8 @@ export class AuthService {
   ) {}
 
   async register(dto: RegisterDto): Promise<AuthResponse> {
-    const existing = await this.userRepo.findOneBy({ email: dto.email });
+    const email = dto.email.trim().toLowerCase();
+    const existing = await this.findByEmailCaseInsensitive(email);
     if (existing) throw new ConflictException('Email already registered');
 
     const parts = dto.name.trim().split(' ');
@@ -44,7 +45,7 @@ export class AuthService {
 
     const entity = this.userRepo.create({
       id: randomUUID(),
-      email: dto.email,
+      email,
       name: dto.name,
       passwordHash: await bcrypt.hash(dto.password, 12),
       avatarInitials,
@@ -56,16 +57,28 @@ export class AuthService {
   }
 
   async login(dto: LoginDto): Promise<AuthResponse> {
-    const user = await this.userRepo.findOneBy({ email: dto.email });
+    const user = await this.findByEmailCaseInsensitive(dto.email);
     const valid = user && (await bcrypt.compare(dto.password, user.passwordHash));
     if (!valid) throw new UnauthorizedException('Invalid email or password');
     return this.buildResponse(user);
   }
 
   async verifyPassword(email: string, password: string): Promise<boolean> {
-    const user = await this.userRepo.findOneBy({ email });
+    const user = await this.findByEmailCaseInsensitive(email);
     if (!user) return false;
     return bcrypt.compare(password, user.passwordHash);
+  }
+
+  /**
+   * Looks up a user by email regardless of stored casing. Existing rows may
+   * have mixed-case emails (legacy), while new registrations are normalised to
+   * lowercase — this keeps both findable without a data migration.
+   */
+  private findByEmailCaseInsensitive(email: string): Promise<UserEntity | null> {
+    return this.userRepo
+      .createQueryBuilder('user')
+      .where('LOWER(user.email) = :email', { email: email.trim().toLowerCase() })
+      .getOne();
   }
 
   private buildResponse(user: UserEntity): AuthResponse {

@@ -88,6 +88,7 @@ export class NotificationsPage implements OnInit {
     try {
       await firstValueFrom(this.shareApi.respondToShare(share.id, { accept: true }));
       this.store.loadPending();
+      this.store.refreshCount();
       const typeLabel = this.translate.instant(
         share.resourceType === 'collection' ? 'sharing.notifications.collectionLabel' : 'sharing.notifications.storyLabel',
       );
@@ -116,16 +117,30 @@ export class NotificationsPage implements OnInit {
         {
           text: this.translate.instant('sharing.notifications.rejectConfirmButton'),
           role: 'destructive',
-          handler: () => {
-            this.store.rejectShare(share.id);
-            void this.toastCtrl.create({
-              message: this.translate.instant('sharing.notifications.rejectedToast'),
-              duration: 2000,
-            }).then(t => t.present());
-          },
+          handler: () => { void this.reject(share); },
         },
       ],
     });
     await alert.present();
+  }
+
+  private async reject(share: ShareNotification): Promise<void> {
+    try {
+      await firstValueFrom(this.shareApi.respondToShare(share.id, { accept: false }));
+      this.store.loadPending();
+      this.store.refreshCount();
+      const toast = await this.toastCtrl.create({
+        message: this.translate.instant('sharing.notifications.rejectedToast'),
+        duration: 2000,
+      });
+      await toast.present();
+    } catch {
+      const toast = await this.toastCtrl.create({
+        message: this.translate.instant('sharing.sheet.errorGeneric'),
+        duration: 3000,
+        color: 'danger',
+      });
+      await toast.present();
+    }
   }
 }

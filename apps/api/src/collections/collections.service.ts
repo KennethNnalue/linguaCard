@@ -99,6 +99,8 @@ export class CollectionsService {
 
     void this.syncService?.deactivateBySource(id).catch(err =>
       this.logger.warn(`Sync deactivateBySource failed: ${err.message}`));
+    void this.syncService?.deactivateByTarget(id).catch(err =>
+      this.logger.warn(`Sync deactivateByTarget failed: ${err.message}`));
   }
 
   /** Assign an existing card to a collection without creating a new card. */

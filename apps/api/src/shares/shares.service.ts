@@ -1,8 +1,10 @@
 import {
-  Injectable, NotFoundException, BadRequestException, ForbiddenException, Logger,
+  Injectable, NotFoundException, BadRequestException, ForbiddenException,
+  ConflictException, HttpException, HttpStatus, Logger,
 } from '@nestjs/common';
+import { Cron, CronExpression } from '@nestjs/schedule';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { Repository, EntityManager, LessThan } from 'typeorm';
 import { randomUUID } from 'crypto';
 import type {
   ShareRecord, CreateShareDto, ShareNotificationList,
@@ -35,9 +37,17 @@ const SHARE_PUSH_BODY: Record<string, string> = {
   ar: '{{name}} شارك معك {{type}} "{{resource}}"',
 };
 
+// Pending shares older than this are swept to 'expired' by the daily cron.
+const SHARE_TTL_DAYS = 30;
+// Lightweight per-user create throttle (single-instance, in-memory). Backstop
+// against accidental loops / abuse; the duplicate guard handles the common case.
+const RATE_LIMIT_MAX = 20;
+const RATE_LIMIT_WINDOW_MS = 60_000;
+
 @Injectable()
 export class SharesService {
   private readonly logger = new Logger(SharesService.name);
+  private readonly createTimestamps = new Map<string, number[]>();
 
   constructor(
     @InjectRepository(ShareEntity)
@@ -57,17 +67,32 @@ export class SharesService {
   ) {}
 
   async create(senderId: string, dto: CreateShareDto): Promise<ShareRecord> {
+    this.enforceRateLimit(senderId);
+
+    const recipientEmail = dto.recipientEmail.trim().toLowerCase();
+
     const sender = await this.userRepo.findOneBy({ id: senderId });
     if (!sender) throw new NotFoundException('Sender not found');
 
-    if (sender.email.toLowerCase() === dto.recipientEmail.toLowerCase()) {
+    if (sender.email.toLowerCase() === recipientEmail) {
       throw new BadRequestException('Cannot share with yourself');
     }
 
-    const recipient = await this.userRepo.findOneBy({
-      email: dto.recipientEmail.toLowerCase(),
-    });
+    const recipient = await this.findUserByEmail(recipientEmail);
     if (!recipient) throw new NotFoundException('No user found with that email');
+
+    // Prevent flooding the recipient with duplicate pending notifications for
+    // the same resource. An already-pending share blocks re-sharing until it is
+    // accepted/rejected.
+    const duplicate = await this.shareRepo.findOneBy({
+      senderUserId: senderId,
+      recipientUserId: recipient.id,
+      resourceId: dto.resourceId,
+      status: 'pending',
+    });
+    if (duplicate) {
+      throw new ConflictException('You already have a pending share for this with that person');
+    }
 
     let resourceName = '';
     let resourceEmoji: string | null = null;
@@ -102,18 +127,62 @@ export class SharesService {
 
     const saved = await this.shareRepo.save(entity);
 
-    const settings = await this.settingsRepo.findOneBy({ userId: recipient.id });
-    const lang = settings?.uiLanguage ?? 'en';
-    const title = SHARE_PUSH_TITLES[lang] ?? SHARE_PUSH_TITLES['en'];
-    const bodyTpl = SHARE_PUSH_BODY[lang] ?? SHARE_PUSH_BODY['en'];
-    const body = bodyTpl
-      .replace('{{name}}', sender.name)
-      .replace('{{type}}', dto.resourceType)
-      .replace('{{resource}}', resourceName);
+    // Push is best-effort — a notification failure must never fail the share
+    // that was already persisted above.
+    try {
+      const settings = await this.settingsRepo.findOneBy({ userId: recipient.id });
+      const lang = settings?.uiLanguage ?? 'en';
+      const title = SHARE_PUSH_TITLES[lang] ?? SHARE_PUSH_TITLES['en'];
+      const bodyTpl = SHARE_PUSH_BODY[lang] ?? SHARE_PUSH_BODY['en'];
+      const body = bodyTpl
+        .replace('{{name}}', sender.name)
+        .replace('{{type}}', dto.resourceType)
+        .replace('{{resource}}', resourceName);
 
-    await this.pushService.sendToUser(recipient.id, { title, body, url: '/notifications' });
+      await this.pushService.sendToUser(recipient.id, { title, body, url: '/notifications' });
+    } catch (err) {
+      this.logger.warn(`Share push notification failed: ${(err as Error).message}`);
+    }
 
     return this.toRecord(saved);
+  }
+
+  // ── Rate limiting ──────────────────────────────────────────────────────
+
+  private enforceRateLimit(userId: string): void {
+    const now = Date.now();
+    const recent = (this.createTimestamps.get(userId) ?? [])
+      .filter(t => now - t < RATE_LIMIT_WINDOW_MS);
+    if (recent.length >= RATE_LIMIT_MAX) {
+      throw new HttpException(
+        'Too many shares in a short time — please slow down',
+        HttpStatus.TOO_MANY_REQUESTS,
+      );
+    }
+    recent.push(now);
+    this.createTimestamps.set(userId, recent);
+  }
+
+  private findUserByEmail(email: string) {
+    return this.userRepo
+      .createQueryBuilder('user')
+      .where('LOWER(user.email) = :email', { email })
+      .getOne();
+  }
+
+  // ── Expiry sweep ───────────────────────────────────────────────────────
+
+  /** Marks pending shares older than SHARE_TTL_DAYS as expired (runs daily). */
+  @Cron(CronExpression.EVERY_DAY_AT_3AM)
+  async expireStaleShares(): Promise<void> {
+    const cutoff = new Date(Date.now() - SHARE_TTL_DAYS * 24 * 60 * 60 * 1000);
+    const result = await this.shareRepo.update(
+      { status: 'pending', createdAt: LessThan(cutoff) },
+      { status: 'expired' },
+    );
+    if (result.affected) {
+      this.logger.log(`Expired ${result.affected} stale pending share(s)`);
+    }
   }
 
   async findPending(userId: string): Promise<ShareNotificationList> {
@@ -147,23 +216,27 @@ export class SharesService {
       return this.toRecord(await this.shareRepo.save(share));
     }
 
-    let clonedId: string;
-    if (share.resourceType === 'collection') {
-      clonedId = await this.cloneCollection(share.senderUserId, share.resourceId, userId);
-    } else {
-      clonedId = await this.cloneStory(share.resourceId, userId);
-    }
+    // Accept: clone the resource, flip the share to accepted, and (for sync
+    // mode) create the link — all atomically so we never end up with a clone
+    // and no sync link, or an accepted share with no clone.
+    const saved = await this.shareRepo.manager.transaction(async (manager) => {
+      const clonedId = share.resourceType === 'collection'
+        ? await this.cloneCollection(manager, share.senderUserId, share.resourceId, userId)
+        : await this.cloneStory(manager, share.resourceId, userId);
 
-    share.status = 'accepted';
-    share.clonedResourceId = clonedId;
-    share.respondedAt = new Date();
-    const saved = await this.shareRepo.save(share);
+      share.status = 'accepted';
+      share.clonedResourceId = clonedId;
+      share.respondedAt = new Date();
+      const persisted = await manager.save(share);
 
-    if (share.syncMode === 'sync') {
-      await this.syncService.createLink(
-        share.id, share.resourceId, clonedId, share.resourceType,
-      );
-    }
+      if (share.syncMode === 'sync') {
+        await this.syncService.createLink(
+          share.id, share.resourceId, clonedId, share.resourceType, manager,
+        );
+      }
+
+      return persisted;
+    });
 
     return this.toRecord(saved);
   }
@@ -185,66 +258,67 @@ export class SharesService {
     await this.shareRepo.remove(share);
   }
 
-  private async cloneCollection(senderUserId: string, collectionId: string, recipientUserId: string): Promise<string> {
-    const source = await this.collectionRepo.findOneBy({ id: collectionId });
+  private async cloneCollection(manager: EntityManager, senderUserId: string, collectionId: string, recipientUserId: string): Promise<string> {
+    const collectionRepo = manager.getRepository(CollectionEntity);
+    const cardRepo = manager.getRepository(CardEntity);
+
+    const source = await collectionRepo.findOneBy({ id: collectionId });
     if (!source) throw new NotFoundException('Source collection no longer exists');
 
-    const sourceCards = await this.cardRepo.find({ where: { collectionId, userId: senderUserId } });
+    const sourceCards = await cardRepo.find({ where: { collectionId, userId: senderUserId } });
 
     const newColId = randomUUID();
-    return this.collectionRepo.manager.transaction(async manager => {
-      const col = manager.create(CollectionEntity, {
-        id: newColId,
-        userId: recipientUserId,
-        name: source.name,
-        description: source.description,
-        emoji: source.emoji,
-        colour: source.colour,
-        contextId: source.contextId,
-        cardCount: 0,
-        masteredCount: 0,
-        dueCount: 0,
-        isDefault: false,
-        importStatus: 'complete',
-        pendingWords: [],
-        sourcePlatformCollectionId: source.sourcePlatformCollectionId,
-        level: source.level,
-        topic: source.topic,
-      });
-      await manager.save(col);
-
-      const newCards = sourceCards.map(c =>
-        manager.create(CardEntity, {
-          id: randomUUID(),
-          userId: recipientUserId,
-          collectionId: newColId,
-          deckId: c.deckId,
-          contextId: c.contextId,
-          dictionaryWordId: c.dictionaryWordId,
-          content: { ...c.content },
-          categoryIds: [...c.categoryIds],
-          tags: [...c.tags],
-          version: 1,
-          srsState: null,
-        }),
-      );
-
-      if (newCards.length) {
-        await manager.save(newCards);
-        col.cardCount = newCards.length;
-        await manager.save(col);
-      }
-
-      return newColId;
+    const col = manager.create(CollectionEntity, {
+      id: newColId,
+      userId: recipientUserId,
+      name: source.name,
+      description: source.description,
+      emoji: source.emoji,
+      colour: source.colour,
+      contextId: source.contextId,
+      cardCount: 0,
+      masteredCount: 0,
+      dueCount: 0,
+      isDefault: false,
+      importStatus: 'complete',
+      pendingWords: [],
+      sourcePlatformCollectionId: source.sourcePlatformCollectionId,
+      level: source.level,
+      topic: source.topic,
     });
+    await manager.save(col);
+
+    const newCards = sourceCards.map(c =>
+      manager.create(CardEntity, {
+        id: randomUUID(),
+        userId: recipientUserId,
+        collectionId: newColId,
+        deckId: c.deckId,
+        contextId: c.contextId,
+        dictionaryWordId: c.dictionaryWordId,
+        content: { ...c.content },
+        categoryIds: [...c.categoryIds],
+        tags: [...c.tags],
+        version: 1,
+        srsState: null,
+      }),
+    );
+
+    if (newCards.length) {
+      await manager.save(newCards);
+      col.cardCount = newCards.length;
+      await manager.save(col);
+    }
+
+    return newColId;
   }
 
-  private async cloneStory(storyId: string, recipientUserId: string): Promise<string> {
-    const source = await this.storyRepo.findOneBy({ id: storyId });
+  private async cloneStory(manager: EntityManager, storyId: string, recipientUserId: string): Promise<string> {
+    const source = await manager.getRepository(StoryEntity).findOneBy({ id: storyId });
     if (!source) throw new NotFoundException('Source story no longer exists');
 
     const newId = randomUUID();
-    const entity = this.storyRepo.create({
+    const entity = manager.create(StoryEntity, {
       id: newId,
       userId: recipientUserId,
       title: source.title,
@@ -272,7 +346,7 @@ export class SharesService {
       sourcePlatformStoryId: source.sourcePlatformStoryId,
     });
 
-    await this.storyRepo.save(entity);
+    await manager.save(entity);
     return newId;
   }
 

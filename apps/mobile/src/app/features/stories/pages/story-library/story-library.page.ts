@@ -419,8 +419,8 @@ export class StoryLibraryPage implements OnInit {
   private async openShareSheet(story: Story): Promise<void> {
     const modal = await this.modalCtrl.create({
       component: ShareSheetComponent,
-      breakpoints: [0, 0.5, 0.75],
-      initialBreakpoint: 0.5,
+      breakpoints: [0, 0.75, 1],
+      initialBreakpoint: 1,
       handleBehavior: 'cycle',
       componentProps: { resourceType: 'story', resourceId: story.id },
     });

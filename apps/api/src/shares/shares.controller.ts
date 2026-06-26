@@ -1,7 +1,8 @@
 import {
-  Controller, Post, Get, Delete, Patch, Body, Param, Req,
+  Controller, Post, Get, Delete, Patch, Body, Param,
 } from '@nestjs/common';
-import type { CreateShareDto, RespondToShareDto } from '@lingua-card/shared/domain';
+import { CreateShareDto, RespondToShareDto } from '@lingua-card/shared/dto';
+import { CurrentUser } from '../common/decorators/current-user.decorator';
 import { SharesService } from './shares.service';
 import { ShareSyncService } from './share-sync.service';
 
@@ -13,55 +14,55 @@ export class SharesController {
   ) {}
 
   @Post()
-  create(@Req() req: { user: { sub: string } }, @Body() dto: CreateShareDto) {
-    return this.sharesService.create(req.user.sub, dto);
+  create(@CurrentUser() userId: string, @Body() dto: CreateShareDto) {
+    return this.sharesService.create(userId, dto);
   }
 
   @Get('pending')
-  findPending(@Req() req: { user: { sub: string } }) {
-    return this.sharesService.findPending(req.user.sub);
+  findPending(@CurrentUser() userId: string) {
+    return this.sharesService.findPending(userId);
   }
 
   @Get('pending/count')
-  async pendingCount(@Req() req: { user: { sub: string } }) {
-    const count = await this.sharesService.pendingCount(req.user.sub);
+  async pendingCount(@CurrentUser() userId: string) {
+    const count = await this.sharesService.pendingCount(userId);
     return { count };
   }
 
   @Post(':id/respond')
   respond(
-    @Req() req: { user: { sub: string } },
+    @CurrentUser() userId: string,
     @Param('id') id: string,
     @Body() dto: RespondToShareDto,
   ) {
-    return this.sharesService.respond(req.user.sub, id, dto.accept);
+    return this.sharesService.respond(userId, id, dto.accept);
   }
 
   @Get('sent')
-  findSent(@Req() req: { user: { sub: string } }) {
-    return this.sharesService.findSent(req.user.sub);
+  findSent(@CurrentUser() userId: string) {
+    return this.sharesService.findSent(userId);
   }
 
   @Delete(':id')
-  cancel(@Req() req: { user: { sub: string } }, @Param('id') id: string) {
-    return this.sharesService.cancel(req.user.sub, id);
+  cancel(@CurrentUser() userId: string, @Param('id') id: string) {
+    return this.sharesService.cancel(userId, id);
   }
 
   @Get('sync-links/:resourceId/status')
   async syncStatus(
-    @Req() req: { user: { sub: string } },
+    @CurrentUser() userId: string,
     @Param('resourceId') resourceId: string,
   ) {
-    const link = await this.syncService.findActiveLinkByTarget(resourceId, req.user.sub);
+    const link = await this.syncService.findActiveLinkByTarget(resourceId, userId);
     return { synced: !!link };
   }
 
   @Patch('sync-links/:resourceId/unsync')
   async unsync(
-    @Req() req: { user: { sub: string } },
+    @CurrentUser() userId: string,
     @Param('resourceId') resourceId: string,
   ) {
-    const link = await this.syncService.findActiveLinkByTarget(resourceId, req.user.sub);
+    const link = await this.syncService.findActiveLinkByTarget(resourceId, userId);
     if (link) await this.syncService.deactivateLink(link.id);
     return { unsynced: !!link };
   }

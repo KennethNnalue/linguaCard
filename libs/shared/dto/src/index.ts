@@ -1,6 +1,6 @@
-import { IsString, IsOptional, IsArray, IsBoolean, IsNumber, IsIn, MaxLength, MinLength, ValidateNested } from 'class-validator';
+import { IsString, IsOptional, IsArray, IsBoolean, IsNumber, IsIn, IsEmail, MaxLength, MinLength, ValidateNested } from 'class-validator';
 import { Type } from 'class-transformer';
-import type { ArticleType, LanguageCode } from '@lingua-card/shared/domain';
+import type { ArticleType, LanguageCode, ShareResourceType, ShareSyncMode } from '@lingua-card/shared/domain';
 
 // ─── CARD DTOs ────────────────────────────────────────────────────────────────
 
@@ -104,6 +104,19 @@ export class RegisterDto {
 export class LoginDto {
   @IsString() email!: string;
   @IsString() password!: string;
+}
+
+// ─── SHARING DTOs ─────────────────────────────────────────────────────────────
+
+export class CreateShareDto {
+  @IsEmail() recipientEmail!: string;
+  @IsIn(['collection', 'story']) resourceType!: ShareResourceType;
+  @IsString() @MinLength(1) resourceId!: string;
+  @IsIn(['copy', 'sync']) syncMode!: ShareSyncMode;
+}
+
+export class RespondToShareDto {
+  @IsBoolean() accept!: boolean;
 }
 
 // ─── SRS DTOs ────────────────────────────────────────────────────────────────

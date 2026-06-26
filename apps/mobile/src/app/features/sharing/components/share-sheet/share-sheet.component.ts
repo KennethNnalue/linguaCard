@@ -120,13 +120,22 @@ export class ShareSheetComponent {
       await toast.present();
       await this.modalCtrl.dismiss({ shared: true });
     } catch (err: unknown) {
-      const status = (err as { status?: number }).status;
-      let msgKey = 'sharing.sheet.errorGeneric';
-      if (status === 404) msgKey = 'sharing.sheet.errorNotFound';
-      if (status === 400) msgKey = 'sharing.sheet.errorSelf';
+      const e = err as { status?: number; error?: { message?: string | string[] } };
+      const serverMsg = Array.isArray(e.error?.message) ? e.error?.message[0] : e.error?.message;
+
+      let message: string;
+      if (e.status === 404) {
+        message = this.translate.instant('sharing.sheet.errorNotFound');
+      } else if (e.status === 400 && serverMsg?.toLowerCase().includes('yourself')) {
+        message = this.translate.instant('sharing.sheet.errorSelf');
+      } else {
+        // Conflict (duplicate), throttle, validation, etc. — show the server's
+        // own message rather than guessing from the status code.
+        message = serverMsg || this.translate.instant('sharing.sheet.errorGeneric');
+      }
 
       const toast = await this.toastCtrl.create({
-        message: this.translate.instant(msgKey),
+        message,
         duration: 3000,
         color: 'danger',
       });

@@ -65,34 +65,6 @@ export const ShareStore = signalStore(
           )),
         ),
       ),
-
-      acceptShare: rxMethod<string>(
-        pipe(
-          switchMap(id => api.respondToShare(id, { accept: true }).pipe(
-            tap(() => {
-              patchState(store, {
-                pendingShares: store.pendingShares().filter(s => s.id !== id),
-                pendingCount: Math.max(0, store.pendingCount() - 1),
-              });
-            }),
-            catchError(() => EMPTY),
-          )),
-        ),
-      ),
-
-      rejectShare: rxMethod<string>(
-        pipe(
-          switchMap(id => api.respondToShare(id, { accept: false }).pipe(
-            tap(() => {
-              patchState(store, {
-                pendingShares: store.pendingShares().filter(s => s.id !== id),
-                pendingCount: Math.max(0, store.pendingCount() - 1),
-              });
-            }),
-            catchError(() => EMPTY),
-          )),
-        ),
-      ),
     };
   }),
 
