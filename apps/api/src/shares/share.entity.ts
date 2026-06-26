@@ -20,7 +20,7 @@ export class ShareEntity {
   senderEmail!: string;
 
   @Index('idx_shares_recipient_status')
-  @Column({ nullable: true })
+  @Column({ type: 'varchar', nullable: true })
   recipientUserId!: string | null;
 
   @Column()
