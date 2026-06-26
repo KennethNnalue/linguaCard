@@ -334,6 +334,7 @@
       "instruction": "— toca Completar arriba"
     },
     "menu": {
+      "shareOption": "Compartir",
       "clearAllOption": "Borrar todas las palabras",
       "deleteOption": "Eliminar colección",
       "cancelOption": "Cancelar"
@@ -881,6 +882,7 @@
       "listenBtn": "Escuchar",
       "readBtn": "Leer",
       "moreOptionsAriaLabel": "Más opciones",
+      "shareAction": "Compartir",
       "deleteAction": "Eliminar historia",
       "cancelAction": "Cancelar",
       "deleteAlertHeader": "Eliminar historia",
@@ -1485,6 +1487,48 @@
     },
     "tour": {
       "takeTour": "Repetir configuración"
+    }
+  },
+  "sharing": {
+    "sheet": {
+      "title": "Compartir",
+      "emailLabel": "Correo del destinatario",
+      "emailPlaceholder": "Ingresa la dirección de correo",
+      "syncToggleLabel": "Mantener sincronizado",
+      "syncToggleDescription": "El destinatario recibirá tus actualizaciones futuras",
+      "shareButton": "Compartir",
+      "sharingButton": "Compartiendo...",
+      "successToast": "¡Compartido exitosamente!",
+      "errorNotFound": "No se encontró un usuario con ese correo",
+      "errorSelf": "No puedes compartir contigo mismo",
+      "errorGeneric": "Error al compartir. Inténtalo de nuevo."
+    },
+    "notifications": {
+      "title": "Notificaciones",
+      "emptyIcon": "📬",
+      "emptyTitle": "Sin notificaciones",
+      "emptySubtitle": "Las colecciones e historias compartidas aparecerán aquí",
+      "fromLabel": "De {{name}}",
+      "collectionLabel": "Colección",
+      "storyLabel": "Historia",
+      "syncBadge": "Sincronizado",
+      "acceptButton": "Aceptar",
+      "rejectButton": "Rechazar",
+      "acceptedToast": "¡Añadido a tus {{type}}!",
+      "rejectedToast": "Compartido rechazado",
+      "rejectConfirmHeader": "¿Rechazar compartido?",
+      "rejectConfirmMessage": "\"{{name}}\" no se añadirá a tu biblioteca.",
+      "rejectConfirmButton": "Rechazar"
+    },
+    "badge": {
+      "ariaLabel": "{{count}} notificaciones pendientes"
+    },
+    "unsync": {
+      "menuOption": "Dejar de sincronizar",
+      "successToast": "Sincronización detenida. Conservarás el contenido actual.",
+      "confirmHeader": "¿Dejar de sincronizar?",
+      "confirmMessage": "Conservarás el contenido actual pero no recibirás futuras actualizaciones.",
+      "confirmButton": "Dejar de sincronizar"
     }
   }
 }

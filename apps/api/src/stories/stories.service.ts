@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable, Logger, NotFoundException, Optional } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { randomUUID } from 'crypto';
@@ -8,11 +8,14 @@ import { StoryGenerationService } from './story-generation.service';
 import { StoryAudioService } from './story-audio.service';
 import { StoryVocabMapper } from './story-vocab.mapper';
 import { StorageService } from '../storage/storage.service';
+import { ShareSyncService } from '../shares/share-sync.service';
 import { SEED_STORY } from './seed/seed-story';
 import { normalizeStorySentences, resolveBodyNative } from './story-sentence.util';
 
 @Injectable()
 export class StoriesService {
+  private readonly logger = new Logger(StoriesService.name);
+
   constructor(
     @InjectRepository(StoryEntity)
     private readonly repo: Repository<StoryEntity>,
@@ -20,6 +23,7 @@ export class StoriesService {
     private readonly audioService: StoryAudioService,
     private readonly vocabMapper: StoryVocabMapper,
     private readonly storage: StorageService,
+    @Optional() private readonly syncService?: ShareSyncService,
   ) {}
 
   async findAll(userId: string): Promise<Story[]> {
@@ -64,6 +68,9 @@ export class StoriesService {
     }
 
     await this.repo.delete({ id, userId });
+
+    void this.syncService?.deactivateBySource(id).catch(err =>
+      this.logger.warn(`Sync deactivateBySource failed: ${err.message}`));
   }
 
   // Extracts the relative storage key from a full URL.
@@ -94,6 +101,10 @@ export class StoriesService {
     entity.wordTimestamps = markedTimestamps;
 
     const saved = await this.repo.save(entity);
+
+    void this.syncService?.onStoryUpdated(saved).catch(err =>
+      this.logger.warn(`Sync onStoryUpdated failed: ${err.message}`));
+
     return this.toModel(saved);
   }
 

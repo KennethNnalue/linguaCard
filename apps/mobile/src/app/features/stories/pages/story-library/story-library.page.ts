@@ -9,6 +9,7 @@ import {
 } from '@angular/core';
 import { Router } from '@angular/router';
 import {
+  ActionSheetButton,
   ActionSheetController,
   AlertController,
   IonContent,
@@ -31,6 +32,8 @@ import {
   cloudOfflineOutline,
   closeOutline,
   ellipsisHorizontal,
+  shareOutline,
+  syncOutline,
 } from 'ionicons/icons';
 import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import type { Story, PlatformStoryCard, StoryDifficulty, StoryCategory } from '@lingua-card/shared/domain';
@@ -43,6 +46,9 @@ import { PaywallModalComponent } from '../../../subscription/components/paywall-
 import { PlatformStoryApiService } from '../../services/platform-story-api.service';
 import { LanguageService } from '../../../../core/services/language.service';
 import { LocalDataService } from '../../../../core/services/local-data.service';
+import { firstValueFrom } from 'rxjs';
+import { ShareSheetComponent } from '../../../sharing/components/share-sheet/share-sheet.component';
+import { ShareApiService } from '../../../sharing/services/share-api.service';
 
 const LEVEL_FILTERS: Array<{ value: StoryDifficulty | null; label: string }> = [
   { value: null, label: 'All' },
@@ -76,6 +82,7 @@ export class StoryLibraryPage implements OnInit {
   private readonly translate           = inject(TranslateService);
   private readonly languageService     = inject(LanguageService);
   private readonly localData           = inject(LocalDataService);
+  private readonly shareApi            = inject(ShareApiService);
 
   // ── My Stories (user-generated) ──────────────────────────────────────────
   readonly stories       = this.storyStore.sortedStories;
@@ -197,7 +204,7 @@ export class StoryLibraryPage implements OnInit {
     addIcons({
       bookOutline, addOutline, play, playOutline, searchOutline, sparklesOutline,
       chevronDownCircleOutline, chevronForwardOutline, cloudOfflineOutline, closeOutline,
-      ellipsisHorizontal,
+      ellipsisHorizontal, shareOutline, syncOutline,
     });
 
     effect(async () => {
@@ -319,25 +326,70 @@ export class StoryLibraryPage implements OnInit {
     this.storyStore.extendStory(id);
   }
 
+  private readonly syncStatusCache = new Map<string, boolean>();
+
   async openMoreSheet(event: Event, story: Story): Promise<void> {
     event.stopPropagation();
-    // Adopted platform stories are "removed from my stories" (the platform copy is
-    // untouched); user-generated stories are "deleted" outright. Both just drop the
-    // user's own Story row, but the wording differs so the action reads correctly.
     const adopted = !!story.sourcePlatformStoryId;
-    const sheet = await this.actionSheetCtrl.create({
+    const isSynced = this.syncStatusCache.get(story.id) ?? false;
+
+    // Pre-fetch for next open (fire-and-forget)
+    this.shareApi.checkSyncStatus(story.id).subscribe({
+      next: ({ synced }) => this.syncStatusCache.set(story.id, synced),
+      error: () => {},
+    });
+
+    const buttons: ActionSheetButton[] = [
+      {
+        text: this.translate.instant('stories.library.shareAction'),
+        icon: 'share-outline',
+        handler: () => this.openShareSheet(story),
+      },
+    ];
+
+    if (isSynced) {
+      buttons.push({
+        text: this.translate.instant('sharing.unsync.menuOption'),
+        icon: 'sync-outline',
+        handler: () => this.confirmUnsync(story.id),
+      });
+    }
+
+    buttons.push(
+      {
+        text: this.translate.instant(
+          adopted ? 'stories.library.removeAction' : 'stories.library.deleteAction',
+        ),
+        role: 'destructive',
+        handler: () => this.confirmDelete(story),
+      },
+      { text: this.translate.instant('stories.library.cancelAction'), role: 'cancel' },
+    );
+
+    const sheet = await this.actionSheetCtrl.create({ buttons });
+    await sheet.present();
+  }
+
+  private async confirmUnsync(resourceId: string): Promise<void> {
+    const alert = await this.alertCtrl.create({
+      header: this.translate.instant('sharing.unsync.confirmHeader'),
+      message: this.translate.instant('sharing.unsync.confirmMessage'),
       buttons: [
+        {text: this.translate.instant('common.cancel'), role: 'cancel'},
         {
-          text: this.translate.instant(
-            adopted ? 'stories.library.removeAction' : 'stories.library.deleteAction',
-          ),
-          role: 'destructive',
-          handler: () => this.confirmDelete(story),
+          text: this.translate.instant('sharing.unsync.confirmButton'),
+          handler: async () => {
+            await firstValueFrom(this.shareApi.unsync(resourceId));
+            const toast = await this.toastCtrl.create({
+              message: this.translate.instant('sharing.unsync.successToast'),
+              duration: 2500,
+            });
+            await toast.present();
+          },
         },
-        { text: this.translate.instant('stories.library.cancelAction'), role: 'cancel' },
       ],
     });
-    await sheet.present();
+    await alert.present();
   }
 
   private async confirmDelete(story: Story): Promise<void> {
@@ -362,6 +414,17 @@ export class StoryLibraryPage implements OnInit {
       ],
     });
     await alert.present();
+  }
+
+  private async openShareSheet(story: Story): Promise<void> {
+    const modal = await this.modalCtrl.create({
+      component: ShareSheetComponent,
+      breakpoints: [0, 0.5, 0.75],
+      initialBreakpoint: 0.5,
+      handleBehavior: 'cycle',
+      componentProps: { resourceType: 'story', resourceId: story.id },
+    });
+    await modal.present();
   }
 
   // ── Helpers ───────────────────────────────────────────────────────────────

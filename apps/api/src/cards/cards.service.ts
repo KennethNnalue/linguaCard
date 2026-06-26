@@ -8,6 +8,7 @@ import { computeFSRS, freshFsrsState } from '@lingua-card/shared/utils';
 import { CardEntity } from './card.entity';
 import { WordAudioService } from '../word-audio/word-audio.service';
 import { SubscriptionService } from '../subscriptions/subscription.service';
+import { ShareSyncService } from '../shares/share-sync.service';
 
 export interface PendingSrsRating {
   cardId: string;
@@ -25,6 +26,7 @@ export class CardsService {
     private readonly repo: Repository<CardEntity>,
     @Optional() private readonly wordAudioService?: WordAudioService,
     @Optional() private readonly subscriptions?: SubscriptionService,
+    @Optional() private readonly syncService?: ShareSyncService,
   ) {}
 
   async findAll(userId: string, query: CardQueryParams): Promise<Card[]> {
@@ -106,6 +108,9 @@ export class CardsService {
       });
     }
 
+    void this.syncService?.onCardCreated(saved).catch(err =>
+      this.logger.warn(`Sync onCardCreated failed: ${err.message}`));
+
     return this.toModel(saved);
   }
 
@@ -118,16 +123,28 @@ export class CardsService {
     if (dto.collectionId !== undefined) entity.collectionId = dto.collectionId ?? null;
     if (dto.srsState !== undefined) entity.srsState = dto.srsState as unknown as SRSStateData;
     const saved = await this.repo.save(entity);
+
+    void this.syncService?.onCardUpdated(saved).catch(err =>
+      this.logger.warn(`Sync onCardUpdated failed: ${err.message}`));
+
     return this.toModel(saved);
   }
 
   async remove(userId: string, id: string): Promise<void> {
-    const result = await this.repo.delete({ id, userId });
-    if (!result.affected) throw new NotFoundException(`Card ${id} not found`);
+    const entity = await this.repo.findOneBy({ id, userId });
+    if (!entity) throw new NotFoundException(`Card ${id} not found`);
+    await this.repo.delete({ id, userId });
+
+    void this.syncService?.onCardDeleted(entity).catch(err =>
+      this.logger.warn(`Sync onCardDeleted failed: ${err.message}`));
   }
 
   async clearByCollection(userId: string, collectionId: string): Promise<{ deleted: number }> {
     const result = await this.repo.delete({ collectionId, userId });
+
+    void this.syncService?.onCollectionCleared(collectionId).catch(err =>
+      this.logger.warn(`Sync onCollectionCleared failed: ${err.message}`));
+
     return { deleted: result.affected ?? 0 };
   }
 

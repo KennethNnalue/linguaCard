@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable, Logger, NotFoundException, Optional } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { randomUUID } from 'crypto';
@@ -6,16 +6,20 @@ import type { Collection, CollectionImportStatus, RawExtractedWord } from '@ling
 import { CreateCollectionDto, UpdateCollectionDto } from '@lingua-card/shared/dto';
 import { CollectionEntity } from './collection.entity';
 import { CardEntity } from '../cards/card.entity';
+import { ShareSyncService } from '../shares/share-sync.service';
 
 interface LiveCounts { cardCount: number; masteredCount: number; dueCount: number; }
 
 @Injectable()
 export class CollectionsService {
+  private readonly logger = new Logger(CollectionsService.name);
+
   constructor(
     @InjectRepository(CollectionEntity)
     private readonly repo: Repository<CollectionEntity>,
     @InjectRepository(CardEntity)
     private readonly cardRepo: Repository<CardEntity>,
+    @Optional() private readonly syncService?: ShareSyncService,
   ) {}
 
   async findAll(userId: string): Promise<Collection[]> {
@@ -92,6 +96,9 @@ export class CollectionsService {
   async remove(userId: string, id: string): Promise<void> {
     const result = await this.repo.delete({ id, userId });
     if (!result.affected) throw new NotFoundException(`Collection ${id} not found`);
+
+    void this.syncService?.deactivateBySource(id).catch(err =>
+      this.logger.warn(`Sync deactivateBySource failed: ${err.message}`));
   }
 
   /** Assign an existing card to a collection without creating a new card. */

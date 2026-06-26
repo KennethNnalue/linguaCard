@@ -237,6 +237,7 @@ export const CardStore = signalStore(
 | `SettingsStore` | `settings/store/` | home, settings, `ReviewStatsStore` (for `dailyGoal`) |
 | `ReviewStatsStore` | `shared/srs/` | home (streak/progress display); depends on `SettingsStore` for goal threshold |
 | `OnboardingStore` | `onboarding/store/` | onboarding flow only; reuses `SettingsStore`, `PlatformCollectionStore`, `CardStore` |
+| `ShareStore` | `sharing/store/` | sharing (notifications page), tabs (badge count) |
 
 **Dictionary service (not a store — stateless API wrapper):**
 
@@ -348,6 +349,14 @@ json-server runs at `http://localhost:3000` with no prefix.
 | Platform stories list | — | `GET /api/v1/platform-stories?nativeLang=&level=&category=` → `{ stories: PlatformStoryCard[]; total }` (each card has `adoptionStatus`/`adoptedStoryId`; auth required) |
 | Platform story detail | — | `GET /api/v1/platform-stories/:id` → `PlatformStory` (auth required) |
 | Adopt platform story | — | `POST /api/v1/platform-stories/:id/adopt` → `AdoptPlatformStoryResult` (auth required; idempotent — copies into the user's `stories` table with `sourcePlatformStoryId`) |
+| Create share | — | `POST /api/v1/shares` (body: `CreateShareDto`) → `ShareRecord` (auth required) |
+| Pending shares | — | `GET /api/v1/shares/pending` → `ShareNotificationList` (auth required) |
+| Pending count | — | `GET /api/v1/shares/pending/count` → `{ count }` (auth required) |
+| Respond to share | — | `POST /api/v1/shares/:id/respond` (body: `RespondToShareDto`) → `ShareRecord` (auth required) |
+| Sent shares | — | `GET /api/v1/shares/sent` → `ShareRecord[]` (auth required) |
+| Cancel share | — | `DELETE /api/v1/shares/:id` (auth required; sender only, pending only) |
+| Sync status | — | `GET /api/v1/shares/sync-links/:resourceId/status` → `{ synced }` (auth required) |
+| Unsync | — | `PATCH /api/v1/shares/sync-links/:resourceId/unsync` → `{ unsynced }` (auth required) |
 
 **json-server filtering:**
 ```
@@ -546,6 +555,7 @@ Rating 1–4 maps to: Again / Hard / Good / Easy.
 | 18 | Platform Vocabulary Collections | ✅ Implemented | `apps/api/src/platform-collections/`, `vault/store/platform-collection.store.ts`, `vault/services/platform-collection-api.service.ts`, `vault/pages/platform-collection-detail/`, `vault/pages/collections/` (Explore segment), `vault/pages/explore-topic/` (See All), `apps/mobile/epics/epic-platform-collections-refined.md` |
 | 19 | Multi-Language Support (i18n) | 🔄 In progress | `apps/mobile/epics/epic-multi-language-support.md` — ngx-translate UI + native-language learning content (en/ar/uk/tr/es/ru); LC-I18N-01 to LC-I18N-62. Phases 1–3 (foundation, string extraction, language selection UX) complete. Phases 4–7 (RTL, content localization, QA) remaining. |
 | 20 | User Onboarding | ✅ Implemented | `features/onboarding/`, `apps/mobile/epics/epic-user-onboarding.md` — 6-step guided first-run flow (language → welcome → motivation → level → seed vault → goal), Home activation checklist, empty-state CTAs. Language picker on auth pages (login, register, forgot-password). LC-ONB-01 to LC-ONB-18. |
+| 21 | Social Sharing | ✅ Implemented | `features/sharing/`, `apps/api/src/shares/`, `apps/mobile/epics/epic-social-sharing.md` — share collections/stories via email, accept/reject notifications, optional sync mode with unsync. LC-SH-01 to LC-SH-21. All 5 phases complete. |
 
 ### Implemented page inventory
 
@@ -560,6 +570,8 @@ Rating 1–4 maps to: Again / Hard / Good / Easy.
 **Auth:** login (+ language picker), register (+ language picker), forgot password (+ language picker), reset-data sheet
 
 **Onboarding:** language, welcome, motivation, level, seed vault, goal & finish, getting-started checklist (Home)
+
+**Sharing:** notifications (pending shares list with accept/reject), share-sheet (email input + sync toggle modal)
 
 **Shared:** home/dashboard, user menu, sync-status indicator, fab button
 
@@ -647,6 +659,7 @@ These are **known deviations** from the architecture. Do not "fix" them without 
 | `apps/mobile/epics/epic-global-word-dictionary.md` | Global Word Dictionary & Admin epic — LC-WD01 to LC-WD17 |
 | `apps/mobile/epics/epic-multi-language-support.md` | Multi-Language Support (i18n) epic — ngx-translate UI + native-language content; LC-I18N-01 to LC-I18N-62 |
 | `apps/mobile/epics/epic-user-onboarding.md` | User Onboarding epic — 6-step guided first-run flow (language step first); LC-ONB-01 to LC-ONB-18 |
+| `apps/mobile/epics/epic-social-sharing.md` | Social Sharing epic — share collections/stories via email, notifications, sync mode; LC-SH-01 to LC-SH-21 |
 | `apps/mobile/epics/design-user-onboarding.html` | Design reference for onboarding screens |
 | `apps/api/src/word-dictionary/` | Global word dictionary module (entity, service, repository, controller) |
 | `apps/api/src/admin/` | Admin module — platform-collections import, platform-stories import, prompts |

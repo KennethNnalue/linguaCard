@@ -334,6 +334,7 @@
       "instruction": "— اضغط إكمال أعلاه"
     },
     "menu": {
+      "shareOption": "مشاركة",
       "clearAllOption": "مسح جميع الكلمات",
       "deleteOption": "حذف المجموعة",
       "cancelOption": "إلغاء"
@@ -881,6 +882,7 @@
       "listenBtn": "استماع",
       "readBtn": "قراءة",
       "moreOptionsAriaLabel": "خيارات إضافية",
+      "shareAction": "مشاركة",
       "deleteAction": "حذف القصة",
       "cancelAction": "إلغاء",
       "deleteAlertHeader": "حذف القصة",
@@ -1485,6 +1487,48 @@
     },
     "tour": {
       "takeTour": "إعادة الإعداد"
+    }
+  },
+  "sharing": {
+    "sheet": {
+      "title": "مشاركة",
+      "emailLabel": "بريد المستلم",
+      "emailPlaceholder": "أدخل عنوان البريد الإلكتروني",
+      "syncToggleLabel": "البقاء متزامنًا",
+      "syncToggleDescription": "سيتلقى المستلم تحديثاتك المستقبلية",
+      "shareButton": "مشاركة",
+      "sharingButton": "جارٍ المشاركة...",
+      "successToast": "تمت المشاركة بنجاح!",
+      "errorNotFound": "لم يتم العثور على مستخدم بهذا البريد",
+      "errorSelf": "لا يمكنك المشاركة مع نفسك",
+      "errorGeneric": "فشلت المشاركة. حاول مرة أخرى."
+    },
+    "notifications": {
+      "title": "الإشعارات",
+      "emptyIcon": "📬",
+      "emptyTitle": "لا توجد إشعارات",
+      "emptySubtitle": "ستظهر المجموعات والقصص المشتركة هنا",
+      "fromLabel": "من {{name}}",
+      "collectionLabel": "مجموعة",
+      "storyLabel": "قصة",
+      "syncBadge": "متزامن",
+      "acceptButton": "قبول",
+      "rejectButton": "رفض",
+      "acceptedToast": "تمت الإضافة إلى {{type}} الخاصة بك!",
+      "rejectedToast": "تم رفض المشاركة",
+      "rejectConfirmHeader": "رفض المشاركة؟",
+      "rejectConfirmMessage": "لن تتم إضافة \"{{name}}\" إلى مكتبتك.",
+      "rejectConfirmButton": "رفض"
+    },
+    "badge": {
+      "ariaLabel": "{{count}} إشعارات معلقة"
+    },
+    "unsync": {
+      "menuOption": "إيقاف المزامنة",
+      "successToast": "تم إيقاف المزامنة. ستحتفظ بالمحتوى الحالي.",
+      "confirmHeader": "إيقاف المزامنة؟",
+      "confirmMessage": "ستحتفظ بالمحتوى الحالي لكن لن تتلقى التحديثات المستقبلية.",
+      "confirmButton": "إيقاف المزامنة"
     }
   }
 }

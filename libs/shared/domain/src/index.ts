@@ -1183,3 +1183,53 @@ export interface AdoptPlatformCollectionResult {
   addedCount: number;
   skippedCount: number;
 }
+
+// ─── SOCIAL SHARING ─────────────────────────────────────────────────────────
+
+export type ShareResourceType = 'collection' | 'story';
+export type ShareStatus = 'pending' | 'accepted' | 'rejected' | 'expired';
+export type ShareSyncMode = 'copy' | 'sync';
+
+export interface ShareRecord {
+  id: string;
+  senderUserId: string;
+  senderName: string;
+  senderEmail: string;
+  recipientUserId: string;
+  recipientEmail: string;
+  resourceType: ShareResourceType;
+  resourceId: string;
+  resourceName: string;
+  resourceEmoji: string | null;
+  syncMode: ShareSyncMode;
+  status: ShareStatus;
+  clonedResourceId: string | null;
+  createdAt: string;
+  respondedAt: string | null;
+}
+
+export interface CreateShareDto {
+  recipientEmail: string;
+  resourceType: ShareResourceType;
+  resourceId: string;
+  syncMode: ShareSyncMode;
+}
+
+export interface RespondToShareDto {
+  accept: boolean;
+}
+
+export interface ShareNotification {
+  id: string;
+  senderName: string;
+  resourceType: ShareResourceType;
+  resourceName: string;
+  resourceEmoji: string | null;
+  syncMode: ShareSyncMode;
+  createdAt: string;
+}
+
+export interface ShareNotificationList {
+  pending: ShareNotification[];
+  total: number;
+}

@@ -2,6 +2,9 @@
   <ion-tab-bar slot="bottom" [class.hide]="hideTabBar()">
     <ion-tab-button tab="home" href="/home">
       <ion-icon aria-hidden="true" name="home-outline"></ion-icon>
+      @if (shareStore.hasPending()) {
+        <ion-badge color="danger">{{ shareStore.pendingCount() }}</ion-badge>
+      }
       <ion-label>{{ 'tabs.home' | translate }}</ion-label>
     </ion-tab-button>
 

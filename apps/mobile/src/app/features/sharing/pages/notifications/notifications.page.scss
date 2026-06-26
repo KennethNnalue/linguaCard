@@ -1,0 +1,91 @@
+@use 'theme/tokens' as t;
+@use 'theme/utils' as u;
+
+.notification-list {
+  display: flex;
+  flex-direction: column;
+  gap: t.$lc-space-3;
+  padding: t.$lc-space-3 t.$lc-space-4;
+}
+
+.notification-card {
+  display: flex;
+  align-items: flex-start;
+  gap: t.$lc-space-3;
+  padding: t.$lc-space-4;
+  background: t.$lc-surface;
+  border-radius: t.$lc-radius-lg;
+  box-shadow: t.$lc-shadow-card;
+}
+
+.notification-icon {
+  font-size: t.$lc-text-2xl;
+  flex-shrink: 0;
+}
+
+.notification-body {
+  flex: 1;
+  min-width: 0;
+
+  .notification-from {
+    font-size: t.$lc-text-sm;
+    color: t.$lc-text-secondary;
+    margin: 0 0 t.$lc-space-1;
+  }
+
+  .notification-resource {
+    font-size: t.$lc-text-md;
+    font-weight: t.$lc-font-weight-semibold;
+    color: t.$lc-text-primary;
+    margin: 0 0 t.$lc-space-2;
+  }
+
+  .notification-meta {
+    display: flex;
+    gap: t.$lc-space-2;
+    align-items: center;
+
+    .resource-type {
+      font-size: t.$lc-text-xs;
+      color: t.$lc-text-hint;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    .sync-badge {
+      font-size: t.$lc-text-xs;
+      padding: t.$lc-space-1 t.$lc-space-2;
+      background: t.$lc-accent;
+      color: t.$lc-text-inverse;
+      border-radius: t.$lc-radius-full;
+      font-weight: t.$lc-font-weight-semibold;
+    }
+  }
+}
+
+.notification-actions {
+  display: flex;
+  flex-direction: column;
+  gap: t.$lc-space-2;
+  flex-shrink: 0;
+
+  button {
+    border: none;
+    border-radius: t.$lc-radius-md;
+    padding: t.$lc-space-2 t.$lc-space-4;
+    font-size: t.$lc-text-sm;
+    font-weight: t.$lc-font-weight-semibold;
+    cursor: pointer;
+  }
+
+  .accept-btn {
+    background: t.$lc-accent;
+    color: t.$lc-text-inverse;
+  }
+
+  .reject-btn {
+    background: transparent;
+    color: t.$lc-text-secondary;
+    border: 1px solid t.$lc-border;
+  }
+}

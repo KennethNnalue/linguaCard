@@ -341,6 +341,7 @@
       "instruction": "— tap Complete above"
     },
     "menu": {
+      "shareOption": "Share",
       "clearAllOption": "Clear all words",
       "deleteOption": "Delete collection",
       "cancelOption": "Cancel"
@@ -954,6 +955,7 @@
       "listenBtn": "Listen",
       "readBtn": "Read",
       "moreOptionsAriaLabel": "More options",
+      "shareAction": "Share",
       "deleteAction": "Delete story",
       "cancelAction": "Cancel",
       "deleteAlertHeader": "Delete story",
@@ -1485,6 +1487,48 @@
     },
     "tour": {
       "takeTour": "Replay setup"
+    }
+  },
+  "sharing": {
+    "sheet": {
+      "title": "Share",
+      "emailLabel": "Recipient email",
+      "emailPlaceholder": "Enter email address",
+      "syncToggleLabel": "Stay synced",
+      "syncToggleDescription": "Recipient will receive your future updates",
+      "shareButton": "Share",
+      "sharingButton": "Sharing...",
+      "successToast": "Shared successfully!",
+      "errorNotFound": "No user found with that email",
+      "errorSelf": "Cannot share with yourself",
+      "errorGeneric": "Failed to share. Please try again."
+    },
+    "notifications": {
+      "title": "Notifications",
+      "emptyIcon": "📬",
+      "emptyTitle": "No notifications",
+      "emptySubtitle": "Shared collections and stories will appear here",
+      "fromLabel": "From {{name}}",
+      "collectionLabel": "Collection",
+      "storyLabel": "Story",
+      "syncBadge": "Synced",
+      "acceptButton": "Accept",
+      "rejectButton": "Reject",
+      "acceptedToast": "Added to your {{type}}!",
+      "rejectedToast": "Share declined",
+      "rejectConfirmHeader": "Decline share?",
+      "rejectConfirmMessage": "\"{{name}}\" won't be added to your library.",
+      "rejectConfirmButton": "Decline"
+    },
+    "badge": {
+      "ariaLabel": "{{count}} pending notifications"
+    },
+    "unsync": {
+      "menuOption": "Stop syncing",
+      "successToast": "Syncing stopped. You'll keep the current content.",
+      "confirmHeader": "Stop syncing?",
+      "confirmMessage": "You'll keep the current content but won't receive future updates.",
+      "confirmButton": "Stop syncing"
     }
   }
 }

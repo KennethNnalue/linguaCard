@@ -1,6 +1,8 @@
 import {Component, computed, effect, inject, OnInit, signal} from '@angular/core';
 import {ActivatedRoute, Router} from '@angular/router';
 import {
+  ActionSheetButton,
+  ActionSheetController,
   AlertController,
   IonContent,
   ModalController,
@@ -26,6 +28,10 @@ import {AudioReadinessStore} from '../../../../shared/audio/audio-readiness.stor
 import {CollectionAudioPrefetchService} from '../../../../shared/audio/collection-audio-prefetch.service';
 import {normalizeForAudio} from '../../../../shared/audio/normalize';
 import {ImageImportApiService} from '../../import/services/image-import-api.service';
+import {addIcons} from 'ionicons';
+import {shareOutline, trashOutline, closeCircleOutline, syncOutline} from 'ionicons/icons';
+import {ShareSheetComponent} from '../../../sharing/components/share-sheet/share-sheet.component';
+import {ShareApiService} from '../../../sharing/services/share-api.service';
 
 @Component({
   selector: 'lc-collection-detail',
@@ -42,6 +48,7 @@ export class CollectionDetailPage implements OnInit {
   private readonly categoryStore = inject(CategoryStore);
   private readonly modalCtrl = inject(ModalController);
   private readonly alertCtrl = inject(AlertController);
+  private readonly actionSheetCtrl = inject(ActionSheetController);
   private readonly toastCtrl = inject(ToastController);
   private readonly filterService = inject(ReviewFilterService);
   private readonly reviewStore = inject(ReviewStore);
@@ -51,6 +58,7 @@ export class CollectionDetailPage implements OnInit {
   private readonly importApi = inject(ImageImportApiService);
   private readonly translate = inject(TranslateService);
   private readonly cardStore = inject(CardStore);
+  private readonly shareApi = inject(ShareApiService);
 
   // Derived from the global CardStore — automatically reflects edits and deletes
   // made from word-detail without any manual reload.
@@ -66,6 +74,7 @@ export class CollectionDetailPage implements OnInit {
   });
   readonly activeCategoryId = signal<string | null>(null);
   readonly loading = signal(true);
+  readonly isSynced = signal(false);
 
   readonly categories = this.categoryStore.categories;
 
@@ -159,6 +168,8 @@ export class CollectionDetailPage implements OnInit {
   private _audioPrefetched = false;
 
   constructor() {
+    addIcons({shareOutline, trashOutline, closeCircleOutline, syncOutline});
+
     // Trigger audio prefetch once, the first time cards for this collection are
     // available in the store. Runs in the injection context so effect() is valid.
     effect(() => {
@@ -186,6 +197,11 @@ export class CollectionDetailPage implements OnInit {
         error: () => this.goBack(),
       });
     }
+
+    this.shareApi.checkSyncStatus(id).subscribe({
+      next: ({ synced }) => this.isSynced.set(synced),
+      error: () => {},
+    });
   }
 
   async completeImport(): Promise<void> {
@@ -289,23 +305,79 @@ export class CollectionDetailPage implements OnInit {
   async showMenu(): Promise<void> {
     const col = this.collection();
     if (!col) return;
+
+    const buttons: ActionSheetButton[] = [
+      {
+        text: this.translate.instant('collectionDetail.menu.shareOption'),
+        icon: 'share-outline',
+        handler: () => this.openShareSheet(),
+      },
+    ];
+
+    if (this.isSynced()) {
+      buttons.push({
+        text: this.translate.instant('sharing.unsync.menuOption'),
+        icon: 'sync-outline',
+        handler: () => this.confirmUnsync(col.id),
+      });
+    }
+
+    if (this.wordCount() > 0) {
+      buttons.push({
+        text: this.translate.instant('collectionDetail.menu.clearAllOption'),
+        role: 'destructive',
+        icon: 'trash-outline',
+        handler: () => this.confirmClearWords(),
+      });
+    }
+
+    buttons.push(
+      {
+        text: this.translate.instant('collectionDetail.menu.deleteOption'),
+        role: 'destructive',
+        icon: 'close-circle-outline',
+        handler: () => this.confirmDelete(),
+      },
+      {text: this.translate.instant('collectionDetail.menu.cancelOption'), role: 'cancel'},
+    );
+
+    const sheet = await this.actionSheetCtrl.create({ header: col.name, buttons });
+    await sheet.present();
+  }
+
+  private async confirmUnsync(resourceId: string): Promise<void> {
     const alert = await this.alertCtrl.create({
-      header: col.name,
+      header: this.translate.instant('sharing.unsync.confirmHeader'),
+      message: this.translate.instant('sharing.unsync.confirmMessage'),
       buttons: [
-        ...(this.wordCount() > 0 ? [{
-          text: this.translate.instant('collectionDetail.menu.clearAllOption'),
-          role: 'destructive',
-          handler: () => this.confirmClearWords(),
-        }] : []),
+        {text: this.translate.instant('common.cancel'), role: 'cancel'},
         {
-          text: this.translate.instant('collectionDetail.menu.deleteOption'),
-          role: 'destructive',
-          handler: () => this.confirmDelete(),
+          text: this.translate.instant('sharing.unsync.confirmButton'),
+          handler: async () => {
+            await firstValueFrom(this.shareApi.unsync(resourceId));
+            const toast = await this.toastCtrl.create({
+              message: this.translate.instant('sharing.unsync.successToast'),
+              duration: 2500,
+            });
+            await toast.present();
+          },
         },
-        {text: this.translate.instant('collectionDetail.menu.cancelOption'), role: 'cancel'},
       ],
     });
     await alert.present();
+  }
+
+  private async openShareSheet(): Promise<void> {
+    const col = this.collection();
+    if (!col) return;
+    const modal = await this.modalCtrl.create({
+      component: ShareSheetComponent,
+      breakpoints: [0, 0.5, 0.75],
+      initialBreakpoint: 0.5,
+      handleBehavior: 'cycle',
+      componentProps: { resourceType: 'collection', resourceId: col.id },
+    });
+    await modal.present();
   }
 
   private async confirmClearWords(): Promise<void> {

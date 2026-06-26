@@ -334,6 +334,7 @@
       "instruction": "— натисніть «Завершити» вище"
     },
     "menu": {
+      "shareOption": "Поділитися",
       "clearAllOption": "Видалити всі слова",
       "deleteOption": "Видалити колекцію",
       "cancelOption": "Скасувати"
@@ -881,6 +882,7 @@
       "listenBtn": "Слухати",
       "readBtn": "Читати",
       "moreOptionsAriaLabel": "Більше опцій",
+      "shareAction": "Поділитися",
       "deleteAction": "Видалити історію",
       "cancelAction": "Скасувати",
       "deleteAlertHeader": "Видалити історію",
@@ -1485,6 +1487,48 @@
     },
     "tour": {
       "takeTour": "Повторити налаштування"
+    }
+  },
+  "sharing": {
+    "sheet": {
+      "title": "Поділитися",
+      "emailLabel": "Email отримувача",
+      "emailPlaceholder": "Введіть адресу електронної пошти",
+      "syncToggleLabel": "Залишатися синхронізованим",
+      "syncToggleDescription": "Отримувач отримуватиме ваші майбутні оновлення",
+      "shareButton": "Поділитися",
+      "sharingButton": "Надсилання...",
+      "successToast": "Успішно поділено!",
+      "errorNotFound": "Користувача з такою поштою не знайдено",
+      "errorSelf": "Не можна поділитися з собою",
+      "errorGeneric": "Не вдалося поділитися. Спробуйте ще раз."
+    },
+    "notifications": {
+      "title": "Сповіщення",
+      "emptyIcon": "📬",
+      "emptyTitle": "Немає сповіщень",
+      "emptySubtitle": "Спільні колекції та історії з'являться тут",
+      "fromLabel": "Від {{name}}",
+      "collectionLabel": "Колекція",
+      "storyLabel": "Історія",
+      "syncBadge": "Синхронізовано",
+      "acceptButton": "Прийняти",
+      "rejectButton": "Відхилити",
+      "acceptedToast": "Додано до ваших {{type}}!",
+      "rejectedToast": "Поділення відхилено",
+      "rejectConfirmHeader": "Відхилити поділення?",
+      "rejectConfirmMessage": "\"{{name}}\" не буде додано до вашої бібліотеки.",
+      "rejectConfirmButton": "Відхилити"
+    },
+    "badge": {
+      "ariaLabel": "{{count}} очікуючих сповіщень"
+    },
+    "unsync": {
+      "menuOption": "Припинити синхронізацію",
+      "successToast": "Синхронізацію зупинено. Поточний вміст збережеться.",
+      "confirmHeader": "Припинити синхронізацію?",
+      "confirmMessage": "Поточний вміст збережеться, але ви не отримуватимете майбутніх оновлень.",
+      "confirmButton": "Припинити синхронізацію"
     }
   }
 }

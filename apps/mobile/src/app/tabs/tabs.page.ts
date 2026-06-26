@@ -1,7 +1,8 @@
 import {Component, computed, EnvironmentInjector, inject, signal} from '@angular/core';
 import {NavigationEnd, Router} from '@angular/router';
-import {IonIcon, IonLabel, IonTabBar, IonTabButton, IonTabs} from '@ionic/angular/standalone';
+import {IonBadge, IonIcon, IonLabel, IonTabBar, IonTabButton, IonTabs} from '@ionic/angular/standalone';
 import {TranslatePipe} from '@ngx-translate/core';
+import {ShareStore} from '../features/sharing/store/share.store';
 import {addIcons} from 'ionicons';
 import {
   analyticsOutline,
@@ -24,11 +25,12 @@ const HIDE_TAB_BAR_ROUTES = [
   selector: 'lc-tabs',
   templateUrl: 'tabs.page.html',
   styleUrls: ['tabs.page.scss'],
-  imports: [IonTabs, IonTabBar, IonTabButton, IonIcon, IonLabel, TranslatePipe],
+  imports: [IonTabs, IonTabBar, IonTabButton, IonIcon, IonLabel, IonBadge, TranslatePipe],
 })
 export class TabsPage {
   public environmentInjector = inject(EnvironmentInjector);
   private readonly router = inject(Router);
+  readonly shareStore = inject(ShareStore);
 
   private readonly currentUrl = signal('');
   readonly hideTabBar = computed(() =>

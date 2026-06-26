@@ -334,6 +334,7 @@
       "instruction": "— yukarıdaki Tamamla'ya dokunun"
     },
     "menu": {
+      "shareOption": "Paylaş",
       "clearAllOption": "Tüm kelimeleri temizle",
       "deleteOption": "Koleksiyonu sil",
       "cancelOption": "İptal"
@@ -881,6 +882,7 @@
       "listenBtn": "Dinle",
       "readBtn": "Oku",
       "moreOptionsAriaLabel": "Daha fazla seçenek",
+      "shareAction": "Paylaş",
       "deleteAction": "Hikayeyi sil",
       "cancelAction": "İptal",
       "deleteAlertHeader": "Hikayeyi sil",
@@ -1485,6 +1487,48 @@
     },
     "tour": {
       "takeTour": "Kurulumu tekrarla"
+    }
+  },
+  "sharing": {
+    "sheet": {
+      "title": "Paylaş",
+      "emailLabel": "Alıcı e-postası",
+      "emailPlaceholder": "E-posta adresini girin",
+      "syncToggleLabel": "Senkronize kal",
+      "syncToggleDescription": "Alıcı gelecekteki güncellemelerinizi alacak",
+      "shareButton": "Paylaş",
+      "sharingButton": "Paylaşılıyor...",
+      "successToast": "Başarıyla paylaşıldı!",
+      "errorNotFound": "Bu e-posta ile kullanıcı bulunamadı",
+      "errorSelf": "Kendinizle paylaşamazsınız",
+      "errorGeneric": "Paylaşım başarısız. Tekrar deneyin."
+    },
+    "notifications": {
+      "title": "Bildirimler",
+      "emptyIcon": "📬",
+      "emptyTitle": "Bildirim yok",
+      "emptySubtitle": "Paylaşılan koleksiyonlar ve hikayeler burada görünecek",
+      "fromLabel": "{{name}} tarafından",
+      "collectionLabel": "Koleksiyon",
+      "storyLabel": "Hikaye",
+      "syncBadge": "Senkronize",
+      "acceptButton": "Kabul et",
+      "rejectButton": "Reddet",
+      "acceptedToast": "{{type}} eklendi!",
+      "rejectedToast": "Paylaşım reddedildi",
+      "rejectConfirmHeader": "Paylaşımı reddet?",
+      "rejectConfirmMessage": "\"{{name}}\" kütüphanenize eklenmeyecek.",
+      "rejectConfirmButton": "Reddet"
+    },
+    "badge": {
+      "ariaLabel": "{{count}} bekleyen bildirim"
+    },
+    "unsync": {
+      "menuOption": "Senkronizasyonu durdur",
+      "successToast": "Senkronizasyon durduruldu. Mevcut içerik kalacak.",
+      "confirmHeader": "Senkronizasyonu durdur?",
+      "confirmMessage": "Mevcut içerik kalacak ama gelecek güncellemeleri almayacaksınız.",
+      "confirmButton": "Senkronizasyonu durdur"
     }
   }
 }

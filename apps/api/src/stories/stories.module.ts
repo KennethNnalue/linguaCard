@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+import { forwardRef, Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { StoriesController } from './stories.controller';
 import { StoriesService } from './stories.service';
@@ -14,6 +14,7 @@ import { StorageService } from '../storage/storage.service';
 import { SubscriptionsModule } from '../subscriptions/subscriptions.module';
 import { WordDictionaryModule } from '../word-dictionary/word-dictionary.module';
 import { SettingsModule } from '../settings/settings.module';
+import { SharesModule } from '../shares/shares.module';
 
 @Module({
   imports: [
@@ -23,6 +24,7 @@ import { SettingsModule } from '../settings/settings.module';
     SubscriptionsModule,
     WordDictionaryModule,
     SettingsModule,
+    forwardRef(() => SharesModule),
   ],
   controllers: [StoriesController],
   providers: [

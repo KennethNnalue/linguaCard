@@ -188,6 +188,11 @@ export const routes: Routes = [
         loadComponent: () =>
           import('./features/admin/pages/admin-discount-codes/admin-discount-codes.page').then(m => m.AdminDiscountCodesPage),
       },
+      {
+        path: 'notifications',
+        loadChildren: () =>
+          import('./features/sharing/sharing.routes').then(m => m.sharingRoutes),
+      },
     ],
   },
   {

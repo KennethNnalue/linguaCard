@@ -334,6 +334,7 @@
       "instruction": "— нажмите «Завершить» выше"
     },
     "menu": {
+      "shareOption": "Поделиться",
       "clearAllOption": "Удалить все слова",
       "deleteOption": "Удалить коллекцию",
       "cancelOption": "Отмена"
@@ -881,6 +882,7 @@
       "listenBtn": "Слушать",
       "readBtn": "Читать",
       "moreOptionsAriaLabel": "Ещё",
+      "shareAction": "Поделиться",
       "deleteAction": "Удалить рассказ",
       "cancelAction": "Отмена",
       "deleteAlertHeader": "Удалить рассказ",
@@ -1485,6 +1487,48 @@
     },
     "tour": {
       "takeTour": "Повторить настройку"
+    }
+  },
+  "sharing": {
+    "sheet": {
+      "title": "Поделиться",
+      "emailLabel": "Email получателя",
+      "emailPlaceholder": "Введите адрес электронной почты",
+      "syncToggleLabel": "Синхронизировать",
+      "syncToggleDescription": "Получатель будет получать ваши будущие обновления",
+      "shareButton": "Поделиться",
+      "sharingButton": "Отправка...",
+      "successToast": "Успешно отправлено!",
+      "errorNotFound": "Пользователь с таким email не найден",
+      "errorSelf": "Нельзя поделиться с собой",
+      "errorGeneric": "Не удалось поделиться. Попробуйте ещё раз."
+    },
+    "notifications": {
+      "title": "Уведомления",
+      "emptyIcon": "📬",
+      "emptyTitle": "Нет уведомлений",
+      "emptySubtitle": "Общие коллекции и истории появятся здесь",
+      "fromLabel": "От {{name}}",
+      "collectionLabel": "Коллекция",
+      "storyLabel": "История",
+      "syncBadge": "Синхронизировано",
+      "acceptButton": "Принять",
+      "rejectButton": "Отклонить",
+      "acceptedToast": "Добавлено в ваши {{type}}!",
+      "rejectedToast": "Общий доступ отклонён",
+      "rejectConfirmHeader": "Отклонить?",
+      "rejectConfirmMessage": "\"{{name}}\" не будет добавлено в вашу библиотеку.",
+      "rejectConfirmButton": "Отклонить"
+    },
+    "badge": {
+      "ariaLabel": "{{count}} ожидающих уведомлений"
+    },
+    "unsync": {
+      "menuOption": "Прекратить синхронизацию",
+      "successToast": "Синхронизация остановлена. Текущее содержимое сохранится.",
+      "confirmHeader": "Прекратить синхронизацию?",
+      "confirmMessage": "Текущее содержимое сохранится, но вы не будете получать будущие обновления.",
+      "confirmButton": "Прекратить синхронизацию"
     }
   }
 }
