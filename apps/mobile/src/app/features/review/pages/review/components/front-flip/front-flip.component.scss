@@ -1,0 +1,97 @@
+@use 'theme/tokens' as t;
+@use 'theme/utils' as u;
+
+:host {
+  display: flex;
+  flex: 1;
+  min-height: 0;
+}
+
+.ff-card {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  background: var(--lc-rv-card);
+  border-radius: t.$lc-radius-xl;
+  box-shadow: t.$lc-rv-shadow-flashcard;
+  padding: t.$lc-space-5;
+}
+
+.ff-hdr {
+  @include u.flex-between;
+}
+
+.ff-side-lbl {
+  @include u.lc-font('xxs', t.$lc-font-weight-semibold);
+  font-family: t.$lc-font-rv-mono;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--lc-rv-hint);
+}
+
+.ff-lang-chip {
+  @include u.lc-font('xs', t.$lc-font-weight-semibold);
+  font-family: t.$lc-font-rv-body;
+  background: var(--lc-masc-bg);
+  color: var(--lc-masc-text);
+  border-radius: t.$lc-radius-full;
+  padding: t.$lc-space-1 t.$lc-space-3;
+}
+
+.ff-body {
+  flex: 1;
+  @include u.flex-center;
+  flex-direction: column;
+  gap: t.$lc-space-3;
+  text-align: center;
+  padding: t.$lc-space-4 0;
+}
+
+.ff-cue {
+  @include u.lc-font('xxs', t.$lc-font-weight-semibold);
+  font-family: t.$lc-font-rv-mono;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--lc-rv-hint);
+}
+
+.ff-prompt {
+  @include u.lc-font('9xl', t.$lc-font-weight-semibold);
+  font-family: t.$lc-font-rv-display;
+  color: var(--lc-rv-text);
+  line-height: 1.08;
+}
+
+.ff-hint {
+  @include u.lc-font('sm');
+  font-family: t.$lc-font-rv-display;
+  font-style: italic;
+  color: var(--lc-rv-muted);
+}
+
+.ff-cta {
+  @include u.flex-center;
+  @include u.touch-state;
+  gap: t.$lc-space-2;
+  padding: t.$lc-space-4;
+  border-radius: t.$lc-radius-md;
+  background: t.$lc-rv-easy-bg;
+  color: t.$lc-rv-easy-text;
+  font-family: t.$lc-font-rv-body;
+  @include u.lc-font('lg', t.$lc-font-weight-bold);
+  animation: ffPulse 2.4s infinite;
+
+  ion-icon {
+    font-size: t.$lc-text-xl;
+  }
+}
+
+@keyframes ffPulse {
+  0% {
+    box-shadow: 0 0 0 0 t.$lc-rv-pulse;
+  }
+  70%,
+  100% {
+    box-shadow: 0 0 0 14px transparent;
+  }
+}

@@ -1,0 +1,30 @@
+<div class="rf-secondary">
+  <button class="rf-sec-btn" [disabled]="!canGoPrevious()" (click)="previous.emit()">
+    <ion-icon name="chevron-back-outline"></ion-icon>
+    {{ 'review.session.previousBtn' | translate }}
+  </button>
+  <button class="rf-sec-btn" (click)="skip.emit()">
+    {{ 'review.session.skipBtn' | translate }}
+    <ion-icon name="chevron-forward-outline"></ion-icon>
+  </button>
+</div>
+
+@if (flipped()) {
+  <p class="rf-prompt">{{ 'review.session.ratingPrompt' | translate }}</p>
+  <div class="rf-row">
+    @for (r of options(); track r.value) {
+      <button
+        class="rf-btn rf-btn--{{ ratingClass(r.value) }}"
+        [class.rf-btn--suggested]="suggested() === r.value"
+        (click)="rate.emit(r.value)">
+        <span class="rf-lbl">{{ ratingKey(r.value) | translate }}</span>
+        <span class="rf-interval">{{ r.previewLabel ?? '—' }}</span>
+      </button>
+    }
+  </div>
+} @else {
+  <div class="rf-locked">
+    <ion-icon name="lock-closed-outline"></ion-icon>
+    {{ 'review.session.ratingLocked' | translate }}
+  </div>
+}

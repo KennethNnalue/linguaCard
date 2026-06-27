@@ -1,0 +1,34 @@
+<div class="ft-card">
+  <div class="ft-hdr">
+    <span class="ft-side-lbl">{{ 'review.session.writeFromMemory' | translate }}</span>
+    <span class="ft-chip">{{ 'review.session.typeChip' | translate }}</span>
+  </div>
+
+  <div class="ft-body">
+    <span class="ft-cue">{{ 'review.session.typeGermanFor' | translate }}</span>
+    <p class="ft-prompt">{{ prompt() }}</p>
+
+    <input
+      class="ft-input"
+      type="text"
+      [value]="typed()"
+      (input)="onInput($event)"
+      (keydown.enter)="onEnter($event)"
+      autocapitalize="off"
+      autocorrect="off"
+      autocomplete="off"
+      spellcheck="false"
+      [attr.placeholder]="'review.session.typePlaceholder' | translate" />
+
+    <div class="ft-accents">
+      @for (a of accents; track a) {
+        <button class="ft-accent" type="button" (click)="append(a)">{{ a }}</button>
+      }
+    </div>
+  </div>
+
+  <button class="ft-cta" (click)="check.emit()">
+    <ion-icon name="checkmark-outline"></ion-icon>
+    {{ 'review.session.checkAnswer' | translate }}
+  </button>
+</div>

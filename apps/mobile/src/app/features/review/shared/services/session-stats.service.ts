@@ -2,6 +2,7 @@ import { Injectable } from '@angular/core';
 import {
   RATING_GOOD_THRESHOLD,
   RATING_OK_THRESHOLD,
+  MASTERY_THRESHOLD,
   RatingPillClass,
   SECONDS_PER_MINUTE,
   SESSION_COLOUR_BAD,
@@ -44,6 +45,23 @@ export class SessionStatsService {
       struggled: ratings.filter(r => r <= 2).length,
       nailed: ratings.filter(r => r === 4).length,
     };
+  }
+
+  /** Cards recalled well (rated Good or Easy) — the "Nailed" stat. */
+  nailed(session: LocalReviewSession): number {
+    return (Object.values(session.ratings) as number[]).filter(r => r >= MASTERY_THRESHOLD).length;
+  }
+
+  /** Cards failed (rated Again or Hard) — the "Struggled" stat. */
+  struggled(session: LocalReviewSession): number {
+    return (Object.values(session.ratings) as number[]).filter(r => r < MASTERY_THRESHOLD).length;
+  }
+
+  /** Recall rate 0–100 across a session (recalled / rated). */
+  recallRate(session: LocalReviewSession): number {
+    const total = Object.values(session.ratings).length;
+    if (!total) return 0;
+    return Math.round((this.nailed(session) / total) * 100);
   }
 
   /** Duration in human-readable "Xm Ys" format (used on hub / summary). */

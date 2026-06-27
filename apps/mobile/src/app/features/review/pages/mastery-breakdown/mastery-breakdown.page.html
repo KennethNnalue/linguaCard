@@ -1,55 +1,92 @@
 <ion-header class="ion-no-border">
   <ion-toolbar>
     <div class="mb-nav">
-      <button class="mb-back-btn" (click)="goBack()" [attr.aria-label]="'review.mastery.backAriaLabel' | translate">
+      <button class="mb-back" (click)="goBack()" [attr.aria-label]="'common.back' | translate">
         <ion-icon name="chevron-back-outline"></ion-icon>
       </button>
-      <span class="mb-nav-title">{{ 'review.mastery.pageTitle' | translate }}</span>
-      <div class="mb-nav-spacer"></div>
+      <div class="mb-nav-heading">
+        <span class="mb-kicker">{{ 'review.mastery.kicker' | translate }}</span>
+        <span class="mb-title">{{ 'review.mastery.title' | translate }}</span>
+      </div>
     </div>
   </ion-toolbar>
 </ion-header>
 
 <ion-content>
   <div class="mb-content">
-
-    <!-- Source selector -->
-    <div class="mb-source-wrap">
-      <button class="mb-source-btn" (click)="openSourcePicker()">
-        <span>{{ sourceLabel() }}</span>
-        <ion-icon name="chevron-down-outline"></ion-icon>
-      </button>
+    <!-- Hero ring -->
+    <div class="mb-hero">
+      <div class="mb-hero-glow"></div>
+      <div class="mb-ring">
+        <svg viewBox="0 0 96 96">
+          <circle class="mb-ring-track" cx="48" cy="48" r="42"/>
+          <circle
+            class="mb-ring-fill"
+            cx="48" cy="48" r="42"
+            [attr.stroke-dasharray]="heroCircumference"
+            [attr.stroke-dashoffset]="heroRingOffset()"
+          />
+        </svg>
+        <span class="mb-ring-pct">{{ overallPct() }}%</span>
+      </div>
+      <span class="mb-hero-kicker">{{ 'review.mastery.overallMastery' | translate }}</span>
+      <p class="mb-hero-sub">{{ 'review.mastery.lockedIntoMemory' | translate:{ mastered: masteredCount(), total: totalCount() } }}</p>
     </div>
 
-    <!-- Bars -->
-    <div class="mb-bars">
-      <p class="mb-bars-label">{{ 'review.mastery.barsLabel' | translate }}</p>
+    <!-- Stacked distribution -->
+    <p class="mb-section-label">{{ 'review.mastery.whereWordsStand' | translate }}</p>
+    <div class="mb-stack">
+      @for (b of buckets(); track b.state) {
+        @if (b.count > 0) {
+          <div class="mb-stack-seg" [style.flex]="b.count" [style.background]="b.colour"></div>
+        }
+      }
+    </div>
 
-      @for (row of masteryRows; track row.level) {
-        <div class="mb-bar-row" (click)="reviewLevel(row.level)">
-          <div class="mb-bar-dot" [style.background]="row.colour"></div>
-          <span class="mb-bar-lbl">{{ translatedMasteryLabel(row.level) }}</span>
-          <div class="mb-bar-track">
-            <div
-              class="mb-bar-fill"
-              [style.width.%]="barWidth(row.level)"
-              [style.background]="row.colour">
-            </div>
+    <div class="mb-legend">
+      @for (b of buckets(); track b.state) {
+        <div class="mb-legend-row">
+          <span class="mb-legend-chip" [style.background]="b.colour"></span>
+          <div class="mb-legend-info">
+            <span class="mb-legend-label">{{ b.labelKey | translate }}</span>
+            <span class="mb-legend-sub">{{ b.subKey | translate }}</span>
           </div>
-          <span class="mb-bar-count">{{ count(row.level) }}</span>
-          <button class="mb-play-btn" (click)="$event.stopPropagation(); reviewLevel(row.level)"
-                  [disabled]="count(row.level) === 0" [attr.aria-label]="'review.mastery.reviewLevelAriaLabel' | translate">
-            <ion-icon name="play-outline"></ion-icon>
-          </button>
+          <span class="mb-legend-count">{{ b.count }}</span>
+          <span class="mb-legend-pct">{{ b.pct }}%</span>
         </div>
       }
     </div>
 
-    <!-- Tip -->
-    <div class="mb-tip">
-      <span class="mb-tip-icon">💡</span>
-      <p class="mb-tip-text" [innerHTML]="'review.mastery.tipText' | translate"></p>
-    </div>
+    <!-- Struggling callout -->
+    @if (strugglingCount() > 0) {
+      <div class="mb-struggle">
+        <div class="mb-struggle-tile">
+          <ion-icon name="warning-outline"></ion-icon>
+        </div>
+        <div class="mb-struggle-info">
+          <p class="mb-struggle-title">{{ 'review.mastery.needAttention' | translate:{ count: strugglingCount() } }}</p>
+          <p class="mb-struggle-sub">{{ 'review.mastery.repeatedlySlipping' | translate }}</p>
+        </div>
+        <button class="mb-struggle-btn" (click)="drillStruggling()">{{ 'review.mastery.drill' | translate }}</button>
+      </div>
+    }
 
+    <!-- By collection -->
+    @if (masteryByCollection().length > 0) {
+      <p class="mb-section-label">{{ 'review.mastery.byCollection' | translate }}</p>
+      @for (col of masteryByCollection(); track col.id) {
+        <div class="mb-col-row">
+          <div class="mb-col-head">
+            <span class="mb-col-name">{{ col.name }}</span>
+            <span class="mb-col-stat">{{ col.mastered }} / {{ col.total }} · {{ col.pct }}%</span>
+          </div>
+          <div class="mb-col-track">
+            <div class="mb-col-fill" [style.width.%]="col.pct"></div>
+          </div>
+        </div>
+      }
+    }
+
+    <div class="mb-bottom-spacer"></div>
   </div>
 </ion-content>

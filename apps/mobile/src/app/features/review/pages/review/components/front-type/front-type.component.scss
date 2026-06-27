@@ -1,0 +1,122 @@
+@use 'theme/tokens' as t;
+@use 'theme/utils' as u;
+
+:host {
+  display: flex;
+  flex: 1;
+  min-height: 0;
+}
+
+.ft-card {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  background: var(--lc-rv-card);
+  border-radius: t.$lc-radius-xl;
+  box-shadow: t.$lc-rv-shadow-flashcard;
+  padding: t.$lc-space-5;
+}
+
+.ft-hdr {
+  @include u.flex-between;
+}
+
+.ft-side-lbl {
+  @include u.lc-font('xxs', t.$lc-font-weight-semibold);
+  font-family: t.$lc-font-rv-mono;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--lc-rv-hint);
+}
+
+.ft-chip {
+  @include u.lc-font('xs', t.$lc-font-weight-semibold);
+  font-family: t.$lc-font-rv-body;
+  background: var(--lc-rv-inset);
+  color: var(--lc-rv-text-soft);
+  border-radius: t.$lc-radius-full;
+  padding: t.$lc-space-1 t.$lc-space-3;
+}
+
+.ft-body {
+  flex: 1;
+  @include u.flex-center;
+  flex-direction: column;
+  gap: t.$lc-space-3;
+  text-align: center;
+  padding: t.$lc-space-4 0;
+}
+
+.ft-cue {
+  @include u.lc-font('xxs', t.$lc-font-weight-semibold);
+  font-family: t.$lc-font-rv-mono;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--lc-rv-hint);
+}
+
+.ft-prompt {
+  @include u.lc-font('7xl', t.$lc-font-weight-semibold);
+  font-family: t.$lc-font-rv-display;
+  color: var(--lc-rv-text);
+  line-height: 1.08;
+}
+
+.ft-input {
+  width: 100%;
+  text-align: center;
+  @include u.lc-font('5xl', t.$lc-font-weight-medium);
+  font-family: t.$lc-font-rv-display;
+  color: var(--lc-rv-mid);
+  background: var(--lc-rv-inset-soft);
+  border: 1px solid var(--lc-rv-border);
+  border-bottom: 2px solid var(--lc-rv-mid);
+  border-radius: t.$lc-radius-md;
+  padding: t.$lc-space-3;
+  margin-top: t.$lc-space-2;
+
+  &::placeholder {
+    @include u.lc-font('md');
+    font-family: t.$lc-font-rv-body;
+    color: var(--lc-rv-hint);
+  }
+
+  &:focus {
+    outline: none;
+  }
+}
+
+.ft-accents {
+  display: flex;
+  gap: t.$lc-space-2;
+  margin-top: t.$lc-space-1;
+}
+
+.ft-accent {
+  @include u.flex-center;
+  @include u.touch-state;
+  width: 46px;
+  min-height: 44px;
+  background: var(--lc-rv-card-alt);
+  border: 1px solid var(--lc-rv-border);
+  border-radius: t.$lc-radius-sm;
+  color: var(--lc-rv-text);
+  @include u.lc-font('2xl', t.$lc-font-weight-medium);
+  font-family: t.$lc-font-rv-display;
+}
+
+.ft-cta {
+  @include u.flex-center;
+  @include u.touch-state;
+  gap: t.$lc-space-2;
+  padding: t.$lc-space-4;
+  border-radius: t.$lc-radius-md;
+  background: t.$lc-rv-easy-bg;
+  color: t.$lc-rv-easy-text;
+  font-family: t.$lc-font-rv-body;
+  @include u.lc-font('lg', t.$lc-font-weight-bold);
+
+  ion-icon {
+    font-size: t.$lc-text-xl;
+  }
+}

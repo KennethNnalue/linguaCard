@@ -30,13 +30,16 @@ export const MASTERY_LABELS: Record<MasteryLevel, string> = {
   5: 'Mastered',
 };
 
+// Warm lifecycle palette (Review redesign). Used as SVG stroke / chart fills —
+// the one sanctioned raw-hex location (SCSS tokens can't reach SVG strokes).
+// New → Mastered: warm grey → amber → brass → sage → mid-green → forest.
 export const MASTERY_COLOURS: Record<MasteryLevel, string> = {
-  0: '#D1D5DB',
-  1: '#FCA5A5',
-  2: '#FCD34D',
-  3: '#6EE7B7',
-  4: '#34D399',
-  5: '#059669',
+  0: '#B0A593',
+  1: '#C99A3E',
+  2: '#D8B981',
+  3: '#5E9E7C',
+  4: '#3E7A5E',
+  5: '#2E6B52',
 };
 
 export interface MasteryInfo {
@@ -312,6 +315,7 @@ export const ReviewRoute = {
   CUSTOM: '/review/custom',
   HISTORY: '/review/history',
   MASTERY: '/review/mastery',
+  LEECHES: '/review/leeches',
 } as const;
 
 export type ReviewRoute = (typeof ReviewRoute)[keyof typeof ReviewRoute];
@@ -352,3 +356,6 @@ export const ARTICLE_GENDER_MAP: Record<string, string> = {
 export const MS_PER_DAY = 86_400_000;
 export const MS_PER_SECOND = 1_000;
 export const SECONDS_PER_MINUTE = 60;
+
+// Rough study-time estimate for the hub "≈ N min" hint (~5s per card).
+export const MINUTES_PER_CARD_REVIEW = 0.08;

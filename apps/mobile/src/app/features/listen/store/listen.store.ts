@@ -427,14 +427,22 @@ export const ListenStore = signalStore(
       },
 
       pause(): void {
-        // Do not increment generation — resume() will re-emit the current segment.
+        // Silence the current word immediately AND invalidate any in-flight
+        // segment completion (generation bump) so a late-resolving audio promise
+        // can't advance the queue while paused. Without the stop(), tapping pause
+        // left the current word audibly playing to the end.
+        abortAndAdvance();
         patchState(store, { status: 'paused' });
       },
 
       resume(): void {
         if (store.status() !== 'paused') return;
         patchState(store, { status: 'playing', errorMessage: null });
-        // Re-use the current generation — we're continuing the same sequence.
+        // Fresh pipeline, then replay the current segment from its start. The
+        // engine has no mid-segment resume, so replaying the current word is the
+        // predictable behaviour. emitNextSegment uses the generation bumped by
+        // pause()'s abortAndAdvance, so no stale completion can interfere.
+        resetPipeline(subscribeRunner);
         emitNextSegment(_generation);
       },
 
@@ -498,7 +506,9 @@ export const ListenStore = signalStore(
 
         if ('playMode' in partial) {
           const playedIdx = store.cardIndex();
-          const remaining = store.rawQueue().slice(playedIdx + 1);
+          // Recompile from the LIVE queue (which may be shuffled) — not rawQueue —
+          // so upcoming scripts stay aligned with their cards.
+          const remaining = store.queue().slice(playedIdx + 1);
           const recompiled = compileQueue(remaining, settings.playMode);
           const newScripts = [...store.scripts().slice(0, playedIdx + 1), ...recompiled];
           patchState(store, { scripts: newScripts });
@@ -513,6 +523,27 @@ export const ListenStore = signalStore(
           if (store.downloadStatus() === 'done') {
             patchState(store, { downloadStatus: 'idle' });
           }
+        }
+
+        // Toggling shuffle mid-session must actually reorder the UPCOMING cards
+        // (played cards, incl. the current one, stay put so the now-playing word
+        // doesn't jump). Turning shuffle off restores the original rawQueue order
+        // for the remaining cards. Skipped when idle (queue not yet started).
+        if ('shuffle' in partial && store.status() !== 'idle') {
+          const playedIdx = store.cardIndex();
+          const played = store.queue().slice(0, playedIdx + 1);
+          const rest = store.queue().slice(playedIdx + 1);
+          const restIds = new Set(rest.map(c => c.id));
+          const reordered = settings.shuffle
+            ? shuffleArray(rest)
+            : store.rawQueue().filter(c => restIds.has(c.id));
+          const newQueue = [...played, ...reordered];
+          patchState(store, {
+            queue: newQueue,
+            scripts: compileQueue(newQueue, settings.playMode),
+          });
+          resetPrefetch();
+          prefetchWindow(playedIdx);
         }
       },
 

@@ -1,0 +1,234 @@
+@use 'theme/tokens' as t;
+@use 'theme/utils' as u;
+
+ion-content {
+  --background: var(--lc-rv-bg);
+}
+
+ion-header ion-toolbar {
+  --background: var(--lc-rv-bg);
+  --border-width: 0;
+}
+
+.lz-nav {
+  display: flex;
+  align-items: center;
+  gap: t.$lc-space-3;
+  padding: t.$lc-space-2 t.$lc-space-4 t.$lc-space-3;
+}
+
+.lz-back {
+  @include u.circle(38px);
+  @include u.flex-center;
+  @include u.touch-state;
+  background: var(--lc-rv-card);
+  border: 1px solid var(--lc-rv-border);
+  color: var(--lc-rv-text);
+  font-size: t.$lc-text-3xl;
+}
+
+.lz-nav-heading {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+}
+
+.lz-kicker {
+  @include u.lc-font('xxs', t.$lc-font-weight-semibold);
+  font-family: t.$lc-font-rv-mono;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--lc-rv-brass-ink);
+}
+
+.lz-title {
+  @include u.lc-font('7xl', t.$lc-font-weight-medium);
+  font-family: t.$lc-font-rv-display;
+  color: var(--lc-rv-text);
+  line-height: 1.05;
+}
+
+.lz-content {
+  padding: 0 t.$lc-space-5 t.$lc-space-16;
+  display: flex;
+  flex-direction: column;
+  gap: t.$lc-space-3;
+}
+
+// ─── Explainer ───────────────────────────────────────────────────────────────
+.lz-explainer {
+  display: flex;
+  gap: t.$lc-space-3;
+  background: var(--lc-rv-note-bg);
+  border-radius: t.$lc-radius-md;
+  padding: t.$lc-space-4;
+}
+
+.lz-explainer-icon {
+  font-size: t.$lc-text-3xl;
+  flex-shrink: 0;
+}
+
+.lz-explainer-text {
+  @include u.lc-font('sm');
+  font-family: t.$lc-font-rv-body;
+  color: var(--lc-rv-note-fg);
+  line-height: 1.45;
+}
+
+// ─── Leech card ──────────────────────────────────────────────────────────────
+.lz-card {
+  background: var(--lc-rv-card);
+  border: 1px solid var(--lc-rv-border);
+  border-radius: t.$lc-radius-lg;
+  box-shadow: t.$lc-shadow-card;
+  padding: t.$lc-space-4;
+  display: flex;
+  flex-direction: column;
+  gap: t.$lc-space-3;
+}
+
+.lz-main {
+  display: flex;
+  align-items: center;
+  gap: t.$lc-space-3;
+}
+
+.lz-word-col {
+  flex: 1;
+  min-width: 0;
+}
+
+.lz-word {
+  @include u.lc-font('3xl', t.$lc-font-weight-semibold);
+  font-family: t.$lc-font-rv-display;
+  color: var(--lc-rv-text);
+}
+
+.lz-trans {
+  @include u.lc-font('sm');
+  font-family: t.$lc-font-rv-body;
+  color: var(--lc-rv-text-soft);
+  margin-top: 1px;
+}
+
+.lz-fail {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  flex-shrink: 0;
+}
+
+.lz-fail-num {
+  @include u.lc-font('5xl', t.$lc-font-weight-semibold);
+  font-family: t.$lc-font-rv-display;
+  color: var(--lc-rv-verdict-wrong);
+  line-height: 1;
+}
+
+.lz-fail-lbl {
+  @include u.lc-font('xxs', t.$lc-font-weight-semibold);
+  font-family: t.$lc-font-rv-mono;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--lc-rv-muted);
+}
+
+.lz-meta {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: t.$lc-space-2;
+}
+
+.lz-chip {
+  @include u.lc-font('xs', t.$lc-font-weight-semibold);
+  font-family: t.$lc-font-rv-body;
+  background: var(--lc-rv-hard-bg);
+  color: var(--lc-rv-hard-text);
+  border-radius: t.$lc-radius-sm;
+  padding: t.$lc-space-1 t.$lc-space-2;
+}
+
+.lz-seen {
+  @include u.lc-font('xs');
+  font-family: t.$lc-font-rv-body;
+  color: var(--lc-rv-muted);
+}
+
+.lz-actions {
+  display: flex;
+  gap: t.$lc-space-2;
+}
+
+.lz-action {
+  flex: 1;
+  @include u.flex-center;
+  @include u.touch-state;
+  gap: t.$lc-space-1;
+  min-height: 44px;
+  background: var(--lc-rv-inset-soft);
+  border: 1px solid var(--lc-rv-border);
+  border-radius: t.$lc-radius-md;
+  color: var(--lc-rv-text);
+  font-family: t.$lc-font-rv-body;
+  @include u.lc-font('sm', t.$lc-font-weight-semibold);
+
+  ion-icon {
+    font-size: t.$lc-text-xl;
+  }
+}
+
+// ─── Empty ───────────────────────────────────────────────────────────────────
+.lz-empty {
+  text-align: center;
+  padding: t.$lc-space-12 t.$lc-space-4;
+}
+
+.lz-empty-icon {
+  font-size: t.$lc-text-10xl;
+}
+
+.lz-empty-title {
+  @include u.lc-font('2xl', t.$lc-font-weight-semibold);
+  font-family: t.$lc-font-rv-display;
+  color: var(--lc-rv-text);
+  margin-top: t.$lc-space-3;
+}
+
+.lz-empty-sub {
+  @include u.lc-font('sm');
+  font-family: t.$lc-font-rv-body;
+  color: var(--lc-rv-muted);
+  margin-top: t.$lc-space-2;
+}
+
+.lz-bottom-spacer {
+  height: t.$lc-space-12;
+}
+
+// ─── Sticky footer ───────────────────────────────────────────────────────────
+.lz-footer {
+  position: sticky;
+  bottom: 0;
+  padding: t.$lc-space-3 t.$lc-space-5 calc(#{t.$lc-space-4} + env(safe-area-inset-bottom));
+  background: var(--lc-rv-bg);
+  border-top: 1px solid var(--lc-rv-border);
+}
+
+.lz-breakthrough {
+  width: 100%;
+  @include u.flex-center;
+  @include u.touch-state;
+  gap: t.$lc-space-2;
+  padding: t.$lc-space-4;
+  border-radius: t.$lc-radius-md;
+  background: var(--lc-rv-verdict-wrong);
+  color: var(--lc-rv-bg);
+  font-family: t.$lc-font-rv-body;
+  @include u.lc-font('lg', t.$lc-font-weight-bold);
+
+  ion-icon {
+    font-size: t.$lc-text-xl;
+  }
+}

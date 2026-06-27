@@ -5,30 +5,35 @@ import { addIcons } from 'ionicons';
 import {
   alertCircleOutline,
   addCircleOutline,
+  bugOutline,
   chevronForwardOutline,
+  optionsOutline,
   playOutline,
-  informationCircleOutline,
+  statsChartOutline,
 } from 'ionicons/icons';
 import { ReviewStore } from '../../store/review.store';
 import { CardStore } from '../../../vault/store/card.store';
 import { ReviewFilterService } from '../../services/review-filter.service';
+import { LeechService } from '../../services/leech.service';
+import { ReviewPrefsService, StudyMode } from '../../services/review-prefs.service';
 import { SessionStatsService } from '../../shared/services/session-stats.service';
-import { TranslatePipe, TranslateService } from '@ngx-translate/core';
+import { TranslatePipe } from '@ngx-translate/core';
 import { SessionDatePipe } from '../../shared/pipes/session-date.pipe';
 import { ReviewStatsStore } from '../../../../shared/srs/review-stats.store';
 import {
-  BreakdownTag,
-  BreakdownTagLabel,
   LocalReviewSession,
-  MASTERY_COLOURS,
-  MASTERY_LABELS,
+  MINUTES_PER_CARD_REVIEW,
   ReviewLimit,
   ReviewRoute,
   ReviewSortOrder,
   ReviewSource,
-  RING_CIRCUMFERENCE_INNER,
-  RING_CIRCUMFERENCE_OUTER,
 } from '../../models/review.model';
+
+interface StudyModeOption {
+  value: StudyMode;
+  labelKey: string;
+  subKey: string;
+}
 
 @Component({
   selector: 'lc-review-hub',
@@ -41,85 +46,79 @@ export class ReviewHubPage {
   private readonly reviewStore = inject(ReviewStore);
   private readonly cardStore = inject(CardStore);
   private readonly filterService = inject(ReviewFilterService);
+  private readonly leech = inject(LeechService);
+  private readonly prefs = inject(ReviewPrefsService);
   private readonly reviewStats = inject(ReviewStatsStore);
   readonly stats = inject(SessionStatsService);
   private readonly router = inject(Router);
-  private readonly translate = inject(TranslateService);
 
   constructor() {
-    addIcons({ alertCircleOutline, addCircleOutline, chevronForwardOutline, playOutline, informationCircleOutline });
+    addIcons({
+      alertCircleOutline,
+      addCircleOutline,
+      bugOutline,
+      chevronForwardOutline,
+      optionsOutline,
+      playOutline,
+      statsChartOutline,
+    });
   }
 
   readonly hasCards = computed(() => this.cardStore.cards().length > 0);
 
-  // Due reviews = studied cards with nextDueAt <= now
+  // ─── Hero counts (all from shared selectors / facade — never re-derived) ────
   readonly overdueCount = computed(() => this.filterService.getDueTodayCount());
-
-  // New cards = never studied (srsState null or lastReviewedAt null)
   readonly newCount = computed(() => this.filterService.getNewCount());
-
-  // Total study workload = due reviews + new cards
   readonly dueTodayCount = computed(() => this.overdueCount() + this.newCount());
+  readonly attentionCount = computed(() => this.filterService.getStrugglingCount());
+  readonly strugglingCount = this.attentionCount;
+  readonly completedToday = this.reviewStats.completedToday;
+  readonly estMinutes = computed(() =>
+    Math.max(1, Math.round((this.dueTodayCount() * MINUTES_PER_CARD_REVIEW))),
+  );
 
-  readonly dueTodayByMastery = computed(() => this.filterService.getDueTodayByMastery());
+  // ─── Mastery snapshot ───────────────────────────────────────────────────────
+  readonly masteredCount = this.cardStore.masteredCount;
+  readonly totalCount = this.cardStore.totalCount;
+  readonly masteryPct = computed(() => {
+    const total = this.totalCount();
+    return total ? Math.round((this.masteredCount() / total) * 100) : 0;
+  });
 
-  readonly strugglingCount = computed(() => this.filterService.getStrugglingCount());
+  // ─── Leeches ────────────────────────────────────────────────────────────────
+  readonly leechCount = this.leech.leechCount;
+
+  // ─── Study mode ─────────────────────────────────────────────────────────────
+  readonly studyMode = this.prefs.mode;
+  readonly studyModes: StudyModeOption[] = [
+    { value: 'flip', labelKey: 'review.mode.flip', subKey: 'review.mode.flipSub' },
+    { value: 'type', labelKey: 'review.mode.type', subKey: 'review.mode.typeSub' },
+    { value: 'audio', labelKey: 'review.mode.audio', subKey: 'review.mode.audioSub' },
+  ];
+  selectMode(mode: StudyMode): void {
+    this.prefs.setMode(mode);
+  }
 
   readonly recentSessions = computed(() => this.reviewStore.sessionHistory().slice(0, 2));
 
-  // Distinct card IDs reviewed today — from facade (local-time bucketed)
-  readonly completedToday = this.reviewStats.completedToday;
+  // Ring geometry. Hero ring r=28 (c≈175.93), mastery ring r=24 (c≈150.80).
+  private readonly heroCirc = 2 * Math.PI * 28;
+  private readonly masteryCirc = 2 * Math.PI * 24;
 
-  readonly ringOffset = computed(() => {
+  // Hero ring: how much of today's workload is done.
+  readonly heroRingOffset = computed(() => {
     const due = this.dueTodayCount();
     const done = this.completedToday();
     const total = due + done;
-    if (total === 0) return RING_CIRCUMFERENCE_OUTER;
-    const progress = Math.min(1, done / total);
-    return RING_CIRCUMFERENCE_OUTER * (1 - progress);
+    const progress = total === 0 ? 0 : Math.min(1, done / total);
+    return this.heroCirc * (1 - progress);
   });
+  readonly heroCircumference = this.heroCirc;
 
-  readonly donutSegments = computed(() => {
-    const dist = this.dueTodayByMastery();
-    const total = Object.values(dist).reduce((a, b) => a + b, 0);
-    if (!total) return [];
+  readonly masteryRingOffset = computed(() => this.masteryCirc * (1 - this.masteryPct() / 100));
+  readonly masteryCircumference = this.masteryCirc;
 
-    let offset = 0;
-    const segments: { colour: string; dash: number; gap: number; offset: number; label: string; count: number }[] = [];
-
-    for (let level = 0; level <= 5; level++) {
-      const count = dist[level as 0 | 1 | 2 | 3 | 4 | 5];
-      if (!count) continue;
-      const dash = (count / total) * RING_CIRCUMFERENCE_INNER;
-      segments.push({
-        colour: MASTERY_COLOURS[level as 0 | 1 | 2 | 3 | 4 | 5],
-        dash,
-        gap: RING_CIRCUMFERENCE_INNER - dash,
-        offset: -offset,
-        label: MASTERY_LABELS[level as 0 | 1 | 2 | 3 | 4 | 5],
-        count,
-      });
-      offset += dash;
-    }
-    return segments;
-  });
-
-  readonly breakdownTags = computed((): BreakdownTag[] => {
-    const dist = this.dueTodayByMastery();
-    return [
-      // New = cards never studied
-      { label: BreakdownTagLabel.NEW, count: this.newCount(), colour: MASTERY_COLOURS[0] },
-      // Due reviewed cards broken down by mastery
-      { label: BreakdownTagLabel.HARD, count: dist[1], colour: MASTERY_COLOURS[1] },
-      { label: BreakdownTagLabel.LEARNING, count: dist[2], colour: MASTERY_COLOURS[2] },
-      { label: BreakdownTagLabel.REVIEW, count: (dist[3] ?? 0) + (dist[4] ?? 0) + (dist[5] ?? 0), colour: MASTERY_COLOURS[3] },
-    ].filter(t => t.count > 0);
-  });
-
-  translateTag(label: string): string {
-    return this.translate.instant(`srs.breakdownTag.${label}`);
-  }
-
+  // ─── Navigation / actions ───────────────────────────────────────────────────
   startTodaysReview(): void {
     const queue = this.filterService.buildQueue({
       source: ReviewSource.ALL,
@@ -148,11 +147,11 @@ export class ReviewHubPage {
   goToCustom(): void { void this.router.navigate([ReviewRoute.CUSTOM]); }
   goToHistory(): void { void this.router.navigate([ReviewRoute.HISTORY]); }
   goToMastery(): void { void this.router.navigate([ReviewRoute.MASTERY]); }
+  goToLeeches(): void { void this.router.navigate([ReviewRoute.LEECHES]); }
   navigateTo(path: string): void { void this.router.navigateByUrl(path); }
 
-  // Thin wrappers — delegate to SessionStatsService so template bindings stay simple
-  sessionRatingColour(s: LocalReviewSession): string { return this.stats.ratingColour(s); }
-  sessionAvgRating(s: LocalReviewSession): string { return this.stats.avgRating(s); }
+  sessionNailed(s: LocalReviewSession): number { return this.stats.nailed(s); }
+  sessionStruggled(s: LocalReviewSession): number { return this.stats.struggled(s); }
   sessionDuration(s: LocalReviewSession): string { return this.stats.formatDuration(s); }
   sessionDotColour(s: LocalReviewSession): string { return this.stats.dotColour(s); }
 }

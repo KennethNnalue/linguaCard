@@ -1,0 +1,45 @@
+<ion-header class="ion-no-border">
+  <ion-toolbar>
+    <div class="cps-head">
+      <span class="cps-title">{{ 'review.custom.collectionsTitle' | translate }}</span>
+      <button type="button" class="cps-close" (click)="dismiss()" [attr.aria-label]="'common.cancel' | translate">
+        <ion-icon name="close-outline"></ion-icon>
+      </button>
+    </div>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+  <div class="cps-list">
+    <p class="cps-label">{{ 'review.custom.pickCollections' | translate }}</p>
+
+    <button type="button" class="cps-row" [class.cps-row--on]="isAll()" (click)="selectAll()">
+      <div class="cps-row-icon">🗂️</div>
+      <div class="cps-row-info">
+        <span class="cps-row-name">{{ 'review.custom.allCollections' | translate }}</span>
+      </div>
+      <span class="cps-radio" [class.cps-radio--on]="isAll()">
+        @if (isAll()) { <ion-icon name="checkmark-outline"></ion-icon> }
+      </span>
+    </button>
+
+    @for (col of options(); track col.id) {
+      <button type="button" class="cps-row" [class.cps-row--on]="isSelected(col.id)" (click)="toggle(col.id)">
+        <div class="cps-row-icon">{{ col.emoji }}</div>
+        <div class="cps-row-info">
+          <span class="cps-row-name">{{ col.name }}</span>
+          <span class="cps-row-meta">{{ 'review.custom.wordsCount' | translate:{ count: col.count } }}</span>
+        </div>
+        <span class="cps-radio" [class.cps-radio--on]="isSelected(col.id)">
+          @if (isSelected(col.id)) { <ion-icon name="checkmark-outline"></ion-icon> }
+        </span>
+      </button>
+    }
+
+    <div class="cps-bottom-spacer"></div>
+  </div>
+</ion-content>
+
+<div class="cps-footer">
+  <button type="button" class="cps-done" (click)="dismiss()">{{ 'review.custom.done' | translate }}</button>
+</div>

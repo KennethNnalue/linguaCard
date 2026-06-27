@@ -1,158 +1,242 @@
 @use 'theme/tokens' as t;
 @use 'theme/utils' as u;
 
-// ── Nav ────────────────────────────────────────────────────────────
+ion-content {
+  --background: var(--lc-rv-bg);
+}
+
+ion-header ion-toolbar {
+  --background: var(--lc-rv-bg);
+  --border-width: 0;
+}
+
 .sh-nav {
   display: flex;
   align-items: center;
-  padding: t.$lc-space-1 t.$lc-space-4 t.$lc-space-2;
   gap: t.$lc-space-3;
+  padding: t.$lc-space-2 t.$lc-space-4 t.$lc-space-3;
 }
 
-.sh-back-btn {
-  @include u.circle(30px);
+.sh-back {
+  @include u.circle(38px);
   @include u.flex-center;
-  background: var(--lc-brand-light);
-  border: none;
-  cursor: pointer;
-  flex-shrink: 0;
   @include u.touch-state;
-
-  ion-icon { font-size: 14px; color: var(--lc-brand); }
+  background: var(--lc-rv-card);
+  border: 1px solid var(--lc-rv-border);
+  color: var(--lc-rv-text);
+  font-size: t.$lc-text-3xl;
 }
 
-.sh-nav-title {
-  font-family: t.$lc-font-display;
-  @include u.lc-font('md', t.$lc-font-weight-semibold);
-  color: var(--lc-text-primary);
-  flex: 1;
-  text-align: center;
-}
-
-.sh-nav-spacer { width: 30px; }
-
-.sh-content { padding-bottom: env(safe-area-inset-bottom, t.$lc-space-6); }
-
-// ── Line tab filters ──────────────────────────────────────────────
-.sh-filters {
+.sh-nav-heading {
   display: flex;
-  gap: t.$lc-space-4;
-  padding: t.$lc-space-1 t.$lc-space-4 0;
-  overflow-x: auto;
-  scrollbar-width: none;
-  &::-webkit-scrollbar { display: none; }
+  flex-direction: column;
+  gap: 1px;
 }
 
-.sh-tab {
-  flex-shrink: 0;
-  padding: t.$lc-space-1 0 9px;
-  background: transparent;
-  border: none;
-  border-bottom: 2px solid transparent;
-  @include u.lc-font('sm', t.$lc-font-weight-regular);
-  font-family: t.$lc-font-body;
-  color: var(--lc-text-hint);
-  cursor: pointer;
-  transition: var(--lc-transition-fast);
+.sh-kicker {
+  @include u.lc-font('xxs', t.$lc-font-weight-semibold);
+  font-family: t.$lc-font-rv-mono;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--lc-rv-brass-ink);
+}
 
-  &.active {
-    color: var(--lc-text-primary);
-    font-weight: t.$lc-font-weight-semibold;
-    border-bottom-color: var(--lc-brand);
+.sh-title {
+  @include u.lc-font('7xl', t.$lc-font-weight-medium);
+  font-family: t.$lc-font-rv-display;
+  color: var(--lc-rv-text);
+  line-height: 1.05;
+}
+
+.sh-content {
+  padding: 0 t.$lc-space-5 t.$lc-space-16;
+  display: flex;
+  flex-direction: column;
+}
+
+// ─── Weekly chart ────────────────────────────────────────────────────────────
+.sh-week-card {
+  background: var(--lc-rv-card);
+  border: 1px solid var(--lc-rv-border);
+  border-radius: t.$lc-radius-lg;
+  box-shadow: t.$lc-shadow-card;
+  padding: t.$lc-space-4;
+}
+
+.sh-week-head {
+  @include u.flex-between;
+  align-items: flex-start;
+  margin-bottom: t.$lc-space-4;
+}
+
+.sh-week-total {
+  @include u.lc-font('8xl', t.$lc-font-weight-semibold);
+  font-family: t.$lc-font-rv-display;
+  color: var(--lc-rv-text);
+}
+
+.sh-week-lbl {
+  display: block;
+  @include u.lc-font('xxs', t.$lc-font-weight-semibold);
+  font-family: t.$lc-font-rv-mono;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--lc-rv-muted);
+}
+
+.sh-streak-pill {
+  @include u.lc-font('xs', t.$lc-font-weight-semibold);
+  font-family: t.$lc-font-rv-body;
+  background: var(--lc-rv-note-bg);
+  color: var(--lc-rv-note-fg);
+  border-radius: t.$lc-radius-full;
+  padding: t.$lc-space-1 t.$lc-space-3;
+}
+
+.sh-bars {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  height: 92px;
+}
+
+.sh-bar-col {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: t.$lc-space-1;
+  flex: 1;
+}
+
+.sh-bar {
+  width: 60%;
+  max-width: 18px;
+  border-radius: t.$lc-radius-sm;
+  background: var(--lc-rv-inset);
+
+  &--active {
+    background: var(--lc-rv-mid-soft);
+  }
+  &--today {
+    background: var(--lc-rv-mid);
   }
 }
 
-.sh-tab-divider {
-  height: 1px;
-  background: var(--lc-border);
-  margin: 0 t.$lc-space-4 t.$lc-space-3;
+.sh-bar-lbl {
+  @include u.lc-font('xxs', t.$lc-font-weight-medium);
+  font-family: t.$lc-font-rv-mono;
+  color: var(--lc-rv-muted);
+
+  &--today {
+    color: var(--lc-rv-mid);
+    font-weight: t.$lc-font-weight-bold;
+  }
 }
 
-// ── Session card ──────────────────────────────────────────────────
-.sh-session-card {
-  margin: 0 t.$lc-space-4 t.$lc-space-2;
-  @include u.lc-card(t.$lc-radius-md);
-  padding: t.$lc-space-3 t.$lc-space-4;
-  cursor: pointer;
-  @include u.touch-state;
+// ─── Session groups ──────────────────────────────────────────────────────────
+.sh-group-label {
+  @include u.lc-font('xxs', t.$lc-font-weight-semibold);
+  font-family: t.$lc-font-rv-mono;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--lc-rv-muted);
+  margin-top: t.$lc-space-5;
+  margin-bottom: t.$lc-space-3;
 }
 
-.sh-session-top {
+.sh-session {
   display: flex;
-  align-items: flex-start;
-  justify-content: space-between;
+  gap: t.$lc-space-3;
+  background: var(--lc-rv-card);
+  border: 1px solid var(--lc-rv-border);
+  border-radius: t.$lc-radius-md;
+  padding: t.$lc-space-3 t.$lc-space-4;
   margin-bottom: t.$lc-space-2;
 }
 
-.sh-session-info {
+.sh-session-dot {
+  @include u.circle(8px);
+  margin-top: t.$lc-space-1;
+}
+
+.sh-session-main {
   flex: 1;
   min-width: 0;
-  margin-inline-end: t.$lc-space-2;
+}
+
+.sh-session-top {
+  @include u.flex-between;
+  gap: t.$lc-space-3;
 }
 
 .sh-session-title {
-  @include u.lc-font('sm', t.$lc-font-weight-semibold);
-  color: var(--lc-text-primary);
-  margin: 0 0 2px;
+  @include u.lc-font('md', t.$lc-font-weight-semibold);
+  font-family: t.$lc-font-rv-body;
+  color: var(--lc-rv-text);
   @include u.text-overflow;
 }
 
-.sh-session-date {
-  @include u.lc-font('xxs');
-  color: var(--lc-text-hint);
-  margin: 0;
-}
-
-// ── Rating pill — uses CSS custom properties so dark mode applies ──
-.sh-rating-pill {
-  @include u.lc-font('xxs', t.$lc-font-weight-bold);
-  padding: 3px t.$lc-space-2 + 2px;
-  border-radius: t.$lc-radius-sm;
+.sh-session-time {
   flex-shrink: 0;
-
-  &.pill--green  { background: var(--lc-rating-5-bg); color: var(--lc-mastery-5); }
-  &.pill--amber  { background: var(--lc-rating-2-bg); color: #9A7000; }
-  &.pill--red    { background: var(--lc-rating-1-bg); color: var(--lc-fem-text); }
-  &.pill--neutral { background: var(--lc-rating-0-bg); color: var(--lc-text-hint); border: 1px solid var(--lc-border); }
+  @include u.lc-font('xs');
+  font-family: t.$lc-font-rv-body;
+  color: var(--lc-rv-muted);
 }
 
-// ── Stats row ─────────────────────────────────────────────────────
-.sh-stats-row {
+.sh-session-stats {
   display: flex;
-  gap: t.$lc-space-1 + 2px;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: t.$lc-space-2;
+  margin-top: t.$lc-space-1;
+  @include u.lc-font('xs');
+  font-family: t.$lc-font-rv-body;
+  color: var(--lc-rv-text-soft);
+
+  b {
+    font-weight: t.$lc-font-weight-bold;
+  }
 }
 
-.sh-stat {
-  flex: 1;
-  background: var(--lc-surface);
-  border-radius: t.$lc-radius-sm;
-  padding: t.$lc-space-1 + 2px t.$lc-space-2;
-  text-align: center;
+.sh-stat--nailed {
+  color: var(--lc-rv-mid);
 }
 
-.sh-stat-val {
-  display: block;
-  font-family: t.$lc-font-display;
-  @include u.lc-font('sm', t.$lc-font-weight-semibold);
-  color: var(--lc-text-primary);
-  line-height: 1;
-  margin-bottom: 2px;
+.sh-stat--struggled {
+  color: var(--lc-rv-hard-text);
 }
 
-.sh-stat-lbl {
-  display: block;
-  @include u.lc-font('xxs', t.$lc-font-weight-medium);
-  color: var(--lc-text-hint);
+.sh-session-dur {
+  margin-left: auto;
+  @include u.lc-font('xs', t.$lc-font-weight-medium);
+  font-family: t.$lc-font-rv-mono;
+  color: var(--lc-rv-muted);
 }
 
-// ── Empty state ───────────────────────────────────────────────────
+// ─── Empty ───────────────────────────────────────────────────────────────────
 .sh-empty {
-  padding: t.$lc-space-12 t.$lc-space-6;
   text-align: center;
+  padding: t.$lc-space-12 t.$lc-space-4;
 }
 
-.sh-empty-icon { font-size: 40px; margin: 0 0 t.$lc-space-3; display: block; }
-.sh-empty-title { @include u.lc-font('xl', t.$lc-font-weight-semibold); color: var(--lc-text-primary); margin: 0 0 t.$lc-space-1; }
-.sh-empty-sub   { @include u.lc-font('sm'); color: var(--lc-text-hint); margin: 0; }
+.sh-empty-icon {
+  font-size: t.$lc-text-10xl;
+}
 
-.sh-bottom-spacer { height: 20px; }
+.sh-empty-title {
+  @include u.lc-font('2xl', t.$lc-font-weight-semibold);
+  font-family: t.$lc-font-rv-display;
+  color: var(--lc-rv-text);
+  margin-top: t.$lc-space-3;
+}
+
+.sh-empty-sub {
+  @include u.lc-font('sm');
+  font-family: t.$lc-font-rv-body;
+  color: var(--lc-rv-muted);
+  margin-top: t.$lc-space-2;
+}
+
+.sh-bottom-spacer {
+  height: t.$lc-space-12;
+}

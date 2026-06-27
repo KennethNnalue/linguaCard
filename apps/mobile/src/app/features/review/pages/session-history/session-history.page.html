@@ -1,64 +1,69 @@
 <ion-header class="ion-no-border">
   <ion-toolbar>
     <div class="sh-nav">
-      <button class="sh-back-btn" (click)="goBack()" [attr.aria-label]="'review.history.backAriaLabel' | translate">
+      <button class="sh-back" (click)="goBack()" [attr.aria-label]="'common.back' | translate">
         <ion-icon name="chevron-back-outline"></ion-icon>
       </button>
-      <span class="sh-nav-title">{{ 'review.history.pageTitle' | translate }}</span>
-      <div class="sh-nav-spacer"></div>
+      <div class="sh-nav-heading">
+        <span class="sh-kicker">{{ 'review.history.kicker' | translate }}</span>
+        <span class="sh-title">{{ 'review.history.title' | translate }}</span>
+      </div>
     </div>
   </ion-toolbar>
 </ion-header>
 
 <ion-content>
   <div class="sh-content">
-
-    <!-- Line tab filters -->
-    <div class="sh-filters">
-      <button class="sh-tab" [class.active]="filter() === 'all'" (click)="setFilter('all')">{{ 'review.history.allSessionsTab' | translate }}</button>
-      <button class="sh-tab" [class.active]="filter() === 'week'" (click)="setFilter('week')">{{ 'review.history.thisWeekTab' | translate }}</button>
-      <button class="sh-tab" [class.active]="filter() === 'month'" (click)="setFilter('month')">{{ 'review.history.thisMonthTab' | translate }}</button>
-    </div>
-    <div class="sh-tab-divider"></div>
-
-    @if (filteredSessions().length > 0) {
-      @for (session of filteredSessions(); track session.id) {
-        @let stats = computeStats(session);
-        <div class="sh-session-card">
-          <div class="sh-session-top">
-            <div class="sh-session-info">
-              <p class="sh-session-title">{{ session.collectionName ?? ('review.hub.allDueCardsLabel' | translate) }}</p>
-              <p class="sh-session-date">{{ session.startedAt | sessionDate: true }}</p>
-            </div>
-            <span class="sh-rating-pill" [class]="ratingPillClass(stats.avgRating)">
-              {{ stats.avgRating }} avg
-            </span>
-          </div>
-          <div class="sh-stats-row">
-            <div class="sh-stat">
-              <span class="sh-stat-val lc-display">{{ stats.totalCards }}</span>
-              <span class="sh-stat-lbl">{{ 'review.history.ratingsStatLabel' | translate }}</span>
-            </div>
-            <div class="sh-stat">
-              <span class="sh-stat-val lc-display">{{ stats.duration }}</span>
-              <span class="sh-stat-lbl">{{ 'review.history.durationStatLabel' | translate }}</span>
-            </div>
-            <div class="sh-stat">
-              <span class="sh-stat-val lc-display">{{ stats.struggled }}</span>
-              <span class="sh-stat-lbl">{{ 'review.history.struggledStatLabel' | translate }}</span>
-            </div>
-            <div class="sh-stat">
-              <span class="sh-stat-val lc-display">{{ stats.nailed }}</span>
-              <span class="sh-stat-lbl">{{ 'review.history.nailedStatLabel' | translate }}</span>
-            </div>
-          </div>
+    <!-- Weekly chart -->
+    <div class="sh-week-card">
+      <div class="sh-week-head">
+        <div>
+          <span class="sh-week-total">{{ weeklyTotal() }}</span>
+          <span class="sh-week-lbl">{{ 'review.history.cardsThisWeek' | translate }}</span>
         </div>
+        <span class="sh-streak-pill">🔥 {{ 'review.history.dayStreak' | translate:{ count: dayStreak() } }}</span>
+      </div>
+      <div class="sh-bars">
+        @for (day of weeklyData(); track day.label) {
+          <div class="sh-bar-col">
+            <div
+              class="sh-bar"
+              [class.sh-bar--today]="day.isToday"
+              [class.sh-bar--active]="!day.isToday && day.count > 0"
+              [style.height.px]="barHeightPx(day.count)"></div>
+            <span class="sh-bar-lbl" [class.sh-bar-lbl--today]="day.isToday">{{ day.label }}</span>
+          </div>
+        }
+      </div>
+    </div>
+
+    <!-- Sessions -->
+    @if (hasSessions()) {
+      @for (group of groups(); track group.labelKey) {
+        <p class="sh-group-label">{{ group.labelKey | translate }}</p>
+        @for (s of group.sessions; track s.id) {
+          <div class="sh-session">
+            <span class="sh-session-dot" [style.background]="sessionDot(s)"></span>
+            <div class="sh-session-main">
+              <div class="sh-session-top">
+                <span class="sh-session-title">{{ s.collectionName ?? ('review.hub.allDueCardsLabel' | translate) }}</span>
+                <span class="sh-session-time">{{ s.startedAt | sessionDate }}</span>
+              </div>
+              <div class="sh-session-stats">
+                <span class="sh-stat"><b>{{ sessionCards(s) }}</b> {{ 'review.history.cards' | translate }}</span>
+                <span class="sh-stat sh-stat--nailed"><b>{{ sessionNailed(s) }}</b> {{ 'review.history.nailed' | translate }}</span>
+                <span class="sh-stat sh-stat--struggled"><b>{{ sessionStruggled(s) }}</b> {{ 'review.history.struggled' | translate }}</span>
+                <span class="sh-session-dur">{{ sessionDuration(s) }}</span>
+              </div>
+            </div>
+          </div>
+        }
       }
     } @else {
       <div class="sh-empty">
-        <p class="sh-empty-icon">📋</p>
-        <p class="sh-empty-title">{{ 'review.history.noSessionsTitle' | translate }}</p>
-        <p class="sh-empty-sub">{{ 'review.history.noSessionsDesc' | translate }}</p>
+        <span class="sh-empty-icon">📊</span>
+        <p class="sh-empty-title">{{ 'review.history.emptyTitle' | translate }}</p>
+        <p class="sh-empty-sub">{{ 'review.history.emptySub' | translate }}</p>
       </div>
     }
 

@@ -1,95 +1,81 @@
 <ion-header class="ion-no-border">
   <ion-toolbar>
     <div class="cs-nav">
-      <button class="cs-back-btn" (click)="goBack()" [attr.aria-label]="'review.custom.backAriaLabel' | translate">
+      <button class="cs-back" (click)="goBack()" [attr.aria-label]="'common.back' | translate">
         <ion-icon name="chevron-back-outline"></ion-icon>
       </button>
-      <span class="cs-nav-title">{{ 'review.custom.pageTitle' | translate }}</span>
-      <div class="cs-nav-spacer"></div>
+      <div class="cs-nav-heading">
+        <span class="cs-kicker">{{ 'review.custom.kicker' | translate }}</span>
+        <span class="cs-title">{{ 'review.custom.title' | translate }}</span>
+      </div>
     </div>
   </ion-toolbar>
 </ion-header>
 
 <ion-content>
   <div class="cs-content">
-
-    <!-- ── Source ── -->
-    <div class="cs-section">
-      <p class="cs-sec-lbl">{{ 'review.custom.sourceSection' | translate }}</p>
-      <button class="cs-source-btn" (click)="openSourcePicker()">
-        <span>{{ sourceLabel() }}</span>
-        <ion-icon name="chevron-down-outline" class="cs-chevron"></ion-icon>
+    <!-- From collections -->
+    @if (collectionOptions().length > 0) {
+      <p class="cs-section-label">{{ 'review.custom.fromCollections' | translate }}</p>
+      <button class="cs-source-row" (click)="openCollectionPicker()">
+        <span class="cs-source-label">{{ collectionSummary() }}</span>
+        <ion-icon name="chevron-forward-outline"></ion-icon>
       </button>
+    }
+
+    <!-- Include cards -->
+    <p class="cs-section-label">{{ 'review.custom.includeCards' | translate }}</p>
+    <div class="cs-chips">
+      @for (p of pools; track p.pool) {
+        <button class="cs-chip" [class.cs-chip--active]="isSelected(p.pool)" (click)="togglePool(p.pool)">
+          <span class="cs-chip-label">{{ p.labelKey | translate }}</span>
+          <span class="cs-chip-count">{{ poolCounts()[p.pool] }}</span>
+        </button>
+      }
     </div>
 
-    <!-- ── Mastery filter ── -->
-    <div class="cs-section">
-      <p class="cs-sec-lbl">{{ 'review.custom.masteryFilterSection' | translate }}</p>
-      <div class="cs-mastery-grid">
-        @for (info of masteryInfo; track info.level) {
-          <button
-            class="cs-mastery-opt"
-            [class.selected]="isMasterySelected(info.level)"
-            (click)="toggleMastery(info.level)">
-            <div class="cs-mastery-dot" [style.background]="info.colour"></div>
-            <span class="cs-mastery-num lc-display">{{ masteryCountMap()[info.level] }}</span>
-            <span class="cs-mastery-lbl">{{ info.label }}</span>
-          </button>
-        }
-      </div>
+    <!-- Session length -->
+    <p class="cs-section-label">{{ 'review.custom.sessionLength' | translate }}</p>
+    <div class="cs-length">
+      <span class="cs-length-val">{{ length() }}</span>
+      <span class="cs-length-unit">{{ 'review.custom.cards' | translate }}</span>
+    </div>
+    <input
+      class="cs-range"
+      type="range"
+      [min]="lengthMin"
+      [max]="lengthMax"
+      [step]="lengthStep"
+      [value]="length()"
+      (input)="onLengthInput($event)"
+      [attr.aria-label]="'review.custom.sessionLength' | translate" />
+
+    <!-- Order -->
+    <p class="cs-section-label">{{ 'review.custom.order' | translate }}</p>
+    <div class="cs-segment">
+      @for (o of orders; track o.value) {
+        <button class="cs-seg" [class.cs-seg--active]="order() === o.value" (click)="setOrder(o.value)">
+          {{ o.labelKey | translate }}
+        </button>
+      }
     </div>
 
-    <!-- ── Sort order ── -->
-    <div class="cs-section">
-      <p class="cs-sec-lbl">{{ 'review.custom.sortOrderSection' | translate }}</p>
-      <div class="cs-sort-chips">
-        @for (opt of sortOptions; track opt.value) {
-          <button
-            class="cs-sort-chip"
-            [class.active]="sortOrder() === opt.value"
-            (click)="setSortOrder(opt.value)">
-            {{ opt.label }}
-          </button>
-        }
-      </div>
+    <!-- Prompt direction -->
+    <p class="cs-section-label">{{ 'review.custom.promptDirection' | translate }}</p>
+    <div class="cs-segment cs-segment--mono">
+      @for (d of directions; track d.value) {
+        <button class="cs-seg" [class.cs-seg--active]="dir() === d.value" (click)="setDir(d.value)">
+          {{ d.labelKey | translate }}
+        </button>
+      }
     </div>
 
-    <!-- ── Card limit ── -->
-    <div class="cs-section">
-      <p class="cs-sec-lbl">{{ 'review.custom.cardLimitSection' | translate }}</p>
-      <div class="cs-slider-row">
-        <ion-range
-          class="cs-range"
-          [min]="10"
-          [max]="100"
-          [step]="5"
-          [value]="limit()"
-          (ionChange)="onLimitChange($event)"
-          color="primary">
-        </ion-range>
-        <span class="cs-slider-val lc-display">{{ limit() }}</span>
-      </div>
-    </div>
-
-    <!-- ── Preview count ── -->
-    <div class="cs-preview">
-      <span class="cs-preview-txt">{{ 'review.custom.matchingCountLabel' | translate }}</span>
-      <span class="cs-preview-count lc-display">{{ matchingCount() }}</span>
-    </div>
-
-    <!-- ── Start button ── -->
-    <div class="cs-start-wrap">
-      <button
-        class="cs-start-btn"
-        [disabled]="!masteryLevels().length || sessionCount() === 0"
-        (click)="startSession()">
-        @if (sessionCount() > 0) {
-          {{ 'review.custom.startSessionBtn' | translate }} ({{ sessionCount() }} {{ 'review.hub.cardsUnit' | translate }})
-        } @else {
-          {{ 'review.custom.noCardsMatchMsg' | translate }}
-        }
-      </button>
-    </div>
-
+    <div class="cs-bottom-spacer"></div>
   </div>
 </ion-content>
+
+<div class="cs-footer">
+  <button class="cs-start" (click)="start()">
+    ▶ {{ 'review.custom.startSession' | translate:{ count: sessionCount() } }}
+  </button>
+</div>

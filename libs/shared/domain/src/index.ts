@@ -362,24 +362,10 @@ export interface ReviewSession {
 }
 
 // ─── SYNC ─────────────────────────────────────────────────────────────────────
-
-export interface SyncOperation {
-  id: string;
-  type:
-    | 'CREATE_CARD'
-    | 'UPDATE_CARD'
-    | 'DELETE_CARD'
-    | 'RATE_CARD'
-    | 'CREATE_CATEGORY'
-    | 'CREATE_COLLECTION'
-    | 'UPDATE_COLLECTION'
-    | 'DELETE_COLLECTION'
-    | 'FLUSH_SRS_RATINGS';
-  payload: unknown;
-  createdAt: string;
-  retryCount: number;
-  status: 'pending' | 'processing' | 'failed';
-}
+// The offline sync queue (SyncOperation / SyncOperationType) is mobile-only
+// infrastructure and lives in apps/mobile core/services/sync.service.ts — it
+// carries mobile-specific fields (e.g. nextRetryAt) and its operation-type union
+// is owned there. Do NOT add a parallel SyncOperation here; it caused type drift.
 
 // ─── PAGINATION ───────────────────────────────────────────────────────────────
 

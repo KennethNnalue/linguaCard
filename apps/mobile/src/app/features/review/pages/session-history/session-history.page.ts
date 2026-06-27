@@ -1,21 +1,20 @@
-import { ChangeDetectionStrategy, Component, computed, inject, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, inject } from '@angular/core';
 import { Location } from '@angular/common';
 import { IonContent, IonHeader, IonIcon, IonToolbar } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
 import { chevronBackOutline } from 'ionicons/icons';
-import { ReviewStore, ReviewSession } from '../../store/review.store';
+import { localDayKey } from '@lingua-card/shared/utils';
+import { ReviewStore } from '../../store/review.store';
 import { SessionStatsService } from '../../shared/services/session-stats.service';
+import { ReviewStatsStore } from '../../../../shared/srs/review-stats.store';
 import { TranslatePipe } from '@ngx-translate/core';
 import { SessionDatePipe } from '../../shared/pipes/session-date.pipe';
-import {
-  FILTER_PERIOD_DAYS,
-  FilterPeriod,
-  MS_PER_DAY,
-  RatingPillClass,
-  SessionStats,
-} from '../../models/review.model';
+import { LocalReviewSession, MS_PER_DAY } from '../../models/review.model';
 
-export type { FilterPeriod, SessionStats };
+interface SessionGroup {
+  labelKey: string;
+  sessions: LocalReviewSession[];
+}
 
 @Component({
   selector: 'lc-session-history',
@@ -26,6 +25,7 @@ export type { FilterPeriod, SessionStats };
 })
 export class SessionHistoryPage {
   private readonly reviewStore = inject(ReviewStore);
+  private readonly reviewStats = inject(ReviewStatsStore);
   readonly statsService = inject(SessionStatsService);
   private readonly location = inject(Location);
 
@@ -33,28 +33,43 @@ export class SessionHistoryPage {
     addIcons({ chevronBackOutline });
   }
 
-  readonly filter = signal<FilterPeriod>(FilterPeriod.ALL);
+  readonly weeklyData = this.reviewStats.weeklyData;
+  readonly weeklyTotal = this.reviewStats.weeklyTotal;
+  readonly dayStreak = this.reviewStats.dayStreak;
 
-  readonly filteredSessions = computed(() => {
-    const all = this.reviewStore.sessionHistory();
-    const period = this.filter();
-    if (period === FilterPeriod.ALL) return all;
-    const days = FILTER_PERIOD_DAYS[period];
-    const cutoff = new Date(Date.now() - days * MS_PER_DAY);
-    return all.filter(s => new Date(s.startedAt) >= cutoff);
+  readonly weekMax = computed(() => Math.max(...this.weeklyData().map(d => d.count), 1));
+
+  barHeightPx(count: number): number {
+    return Math.max(6, Math.round((count / this.weekMax()) * 72));
+  }
+
+  readonly groups = computed<SessionGroup[]>(() => {
+    const sessions = this.reviewStore.sessionHistory();
+    const todayKey = localDayKey(new Date());
+    const yesterdayKey = localDayKey(new Date(Date.now() - MS_PER_DAY));
+    const today: LocalReviewSession[] = [];
+    const yesterday: LocalReviewSession[] = [];
+    const earlier: LocalReviewSession[] = [];
+    for (const s of sessions) {
+      const key = localDayKey(new Date(s.completedAt ?? s.startedAt));
+      if (key === todayKey) today.push(s);
+      else if (key === yesterdayKey) yesterday.push(s);
+      else earlier.push(s);
+    }
+    return [
+      { labelKey: 'review.history.today', sessions: today },
+      { labelKey: 'review.history.yesterday', sessions: yesterday },
+      { labelKey: 'review.history.earlier', sessions: earlier },
+    ].filter(g => g.sessions.length > 0);
   });
 
-  setFilter(f: FilterPeriod): void {
-    this.filter.set(f);
-  }
+  readonly hasSessions = computed(() => this.reviewStore.sessionHistory().length > 0);
 
-  computeStats(session: ReviewSession): SessionStats {
-    return this.statsService.computeStats(session);
-  }
-
-  ratingPillClass(avgRating: string): RatingPillClass {
-    return this.statsService.pillClass(avgRating);
-  }
+  sessionCards(s: LocalReviewSession): number { return Object.keys(s.ratings).length; }
+  sessionNailed(s: LocalReviewSession): number { return this.statsService.nailed(s); }
+  sessionStruggled(s: LocalReviewSession): number { return this.statsService.struggled(s); }
+  sessionDuration(s: LocalReviewSession): string { return this.statsService.formatDuration(s); }
+  sessionDot(s: LocalReviewSession): string { return this.statsService.dotColour(s); }
 
   goBack(): void {
     this.location.back();

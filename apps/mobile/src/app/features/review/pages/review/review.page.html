@@ -1,180 +1,80 @@
 <ion-header class="ion-no-border">
   <ion-toolbar>
     <div class="rv-nav">
-      <button class="rv-icon-btn" (click)="exitSession()" [attr.aria-label]="'review.session.goBackAriaLabel' | translate">
-        <ion-icon name="chevron-back-outline"></ion-icon>
+      <button class="rv-close" (click)="exitSession()" [attr.aria-label]="'review.session.goBackAriaLabel' | translate">
+        <ion-icon name="close-outline"></ion-icon>
       </button>
-      <span class="rv-title lc-display">{{ 'review.session.pageTitle' | translate }}</span>
-      <div class="rv-nav-spacer"></div>
+      <div class="rv-nav-center">
+        @if (activeCategoryNames()) {
+          <span class="rv-nav-cat">{{ activeCategoryNames() }}</span>
+        }
+        <span class="rv-nav-count">{{ 'review.session.cardOf' | translate:{ n: currentIndex() + 1, total: queue().length } }}</span>
+      </div>
+      <span class="rv-nav-remaining">{{ remaining() }}↑</span>
     </div>
 
-    <div class="rv-prog-wrap">
-      <div class="rv-prog-track">
-        <div class="rv-prog-fill" [style.width.%]="progressPercent()"></div>
-      </div>
-      <div class="rv-prog-labels">
-        <span>{{ currentIndex() + 1 }} of {{ queue().length }}</span>
-        <span>{{ activeCategoryNames() }}</span>
-      </div>
+    <div class="rv-prog-track">
+      <div class="rv-prog-fill" [style.width.%]="progressPercent()"></div>
     </div>
   </ion-toolbar>
 </ion-header>
 
 <ion-content>
   @if (queue().length) {
-    <div class="rv-session">
-
-      <!-- ── Flashcard ── -->
-      <div class="rv-card-scene">
-
-        @if (currentCard(); as card) {
-          @if (!isFlipped()) {
-            <!-- Front face -->
-            <div class="rv-card rv-card--front" (click)="flipCard()">
-              <div class="rv-card-hdr">
-                <span class="rv-side-lbl">{{ 'review.session.yourLanguageLabel' | translate }}</span>
-                <span class="rv-lang-chip">{{ 'review.session.englishLangChip' | translate }}</span>
-              </div>
-              <div class="rv-body-front">
-                <p class="rv-front-word lc-display">{{ card.content.front }}</p>
-                @if (card.tags.length) {
-                  <p class="rv-hint">{{ card.tags[0] }}</p>
-                }
-              </div>
-              <button class="rv-tap-pill" tabindex="-1">
-                <ion-icon name="chevron-down-outline"></ion-icon>
-                {{ 'review.session.tapToRevealGerman' | translate }}
-              </button>
-            </div>
-
-          } @else {
-            <!-- Back face (revealed) -->
-            <div class="rv-card rv-card--back rv-card--back-scrollable">
-              <div class="rv-card-hdr">
-                <span class="rv-side-lbl">{{ card.content.front }}</span>
-                <span class="rv-lang-chip">{{ 'review.session.germanLangChip' | translate }}</span>
-              </div>
-              <div class="rv-body-back">
-                @if (card.content.article) {
-                  <div class="rv-art-row">
-                    <lc-article-badge [article]="card.content.article" />
-                    <span class="rv-art-gender">{{ currentArticleLabel() }}</span>
-                  </div>
-                }
-                <p class="rv-back-word lc-display">{{ card.content.back }}</p>
-                @if (card.content.phonetic) {
-                  <p class="rv-phonetic">{{ card.content.phonetic }}</p>
-                }
-                @if (card.content.plural) {
-                  <div class="rv-plural">
-                    <span class="rv-plural-lbl">{{ 'review.session.pluralLabel' | translate }}</span>
-                    <span class="rv-plural-val">{{ card.content.plural }}</span>
-                  </div>
-                }
-                @for (ex of card.content.examples; track ex.id) {
-                  <div class="rv-ex-block">
-                    <div class="rv-ex-row">
-                      <p class="rv-ex-de" [innerHTML]="ex.target | highlightWord: card.content.back"></p>
-                      <button class="rv-ex-play-btn" (click)="playExample($event, ex.target)" [attr.aria-label]="'review.session.playExampleAriaLabel' | translate">
-                        <ion-icon name="volume-high-outline"></ion-icon>
-                      </button>
-                    </div>
-                    <p class="rv-ex-en">"{{ ex.native }}"</p>
-                  </div>
-                }
-                <button class="rv-audio-btn" (click)="playAudio($event)" [disabled]="isPronunciationLoading()">
-                  @if (isPronunciationLoading()) {
-                    <div class="rv-audio-spinner"></div>
-                    {{ 'review.session.generatingAudio' | translate }}
-                  } @else {
-                    <ion-icon name="volume-high-outline"></ion-icon>
-                    {{ 'review.session.playPronunciationBtn' | translate }}
-                  }
-                </button>
-                @if (card.content.notes) {
-                  <div class="rv-note-pill">
-                    <span class="rv-note-icon">💡</span>
-                    <p class="rv-note-text">{{ card.content.notes }}</p>
-                  </div>
-                }
-                @if (card.content.synonyms.length) {
-                  <div class="rv-sec-divider"></div>
-                  <p class="rv-sec-hdr">{{ 'review.session.synonymsHeader' | translate }}</p>
-                  <div class="rv-syn-list">
-                    @for (syn of card.content.synonyms; track $index; let i = $index) {
-                      <div class="rv-syn-row" (click)="toggleSynonym(i)">
-                        @if (syn.article) {
-                          <lc-article-badge [article]="syn.article" />
-                        }
-                        <span class="rv-syn-word">{{ syn.word }}</span>
-                        <span class="rv-syn-trans">{{ syn.translation }}</span>
-                        <span class="rv-syn-chev" [class.open]="isSynonymExpanded(i)">
-                          <ion-icon name="chevron-down-outline"></ion-icon>
-                        </span>
-                      </div>
-                      @if (isSynonymExpanded(i) && syn.example) {
-                        <div class="rv-syn-ex-block">
-                          <div class="rv-ex-row">
-                            <p class="rv-ex-de" [innerHTML]="syn.example | highlightWord: syn.word"></p>
-                            <button class="rv-ex-play-btn" (click)="playExample($event, syn.example)" [attr.aria-label]="'review.session.playExampleAriaLabel' | translate">
-                              <ion-icon name="volume-high-outline"></ion-icon>
-                            </button>
-                          </div>
-                          @if (syn.exampleNative) {
-                            <p class="rv-ex-en">"{{ syn.exampleNative }}"</p>
-                          }
-                        </div>
-                      }
-                    }
-                  </div>
-                }
-              </div>
-            </div>
+    @if (currentCard(); as card) {
+      <div class="rv-scene">
+        @if (!isFlipped()) {
+          @switch (mode()) {
+            @case ('type') {
+              <lc-rv-front-type
+                [prompt]="card.content.front"
+                [typed]="typed()"
+                (typedChange)="typed.set($event)"
+                (check)="checkTyped()" />
+            }
+            @case ('audio') {
+              <lc-rv-front-listen
+                [isLoading]="isPronunciationLoading()"
+                (play)="playAudio()"
+                (replay)="playAudio()"
+                (slow)="playSlow()"
+                (reveal)="reveal()" />
+            }
+            @default {
+              <lc-rv-front-flip [prompt]="flipPrompt()" [cue]="flipCue()" [hint]="flipHint()" (reveal)="reveal()" />
+            }
           }
+        } @else {
+          <lc-rv-card-back
+            [card]="card"
+            [typedResult]="typedResult()"
+            [expandedSynonym]="expandedSynonym()"
+            [isPronunciationLoading]="isPronunciationLoading()"
+            (toggleSynonym)="toggleSynonym($event)"
+            (playAudio)="playAudio()"
+            (playExample)="playExample($event)" />
         }
-
       </div>
-
-    </div>
-
+    }
   } @else {
-    <!-- Empty queue -->
     <div class="lc-empty-state">
       <span class="lc-empty-icon">🎉</span>
       <p class="lc-empty-title">{{ 'review.session.allCaughtUpMsg' | translate }}</p>
       <p class="lc-empty-sub">{{ 'review.session.noDueCardsMsg' | translate }}</p>
-      <button class="lc-btn-primary rv-exit-btn" (click)="exitSession()">{{ 'review.session.backToHomeBtn' | translate }}</button>
+      <button class="rv-exit-btn" (click)="exitSession()">{{ 'review.session.backToHomeBtn' | translate }}</button>
     </div>
   }
 </ion-content>
 
-<!-- ── Sticky bottom bar: secondary actions + rating ── -->
 @if (queue().length) {
-  <div class="rv-bottom-bar">
-    <div class="rv-secondary">
-      <button class="rv-sec-btn" (click)="goToPrevious()" [disabled]="currentIndex() === 0">
-        <ion-icon name="chevron-back-outline"></ion-icon>
-        {{ 'review.session.previousBtn' | translate }}
-      </button>
-      <button class="rv-sec-btn" (click)="skipCard()">
-        <ion-icon name="chevron-forward-outline"></ion-icon>
-        {{ 'review.session.skipBtn' | translate }}
-      </button>
-    </div>
-
-    <div class="rv-rating-area" [class.rv-rating-area--active]="isFlipped()">
-      <p class="rv-rating-prompt">{{ 'review.session.ratingPrompt' | translate }}</p>
-      <div class="rv-rating-row">
-        @for (r of ratingOptionsWithPreviews(); track r.value) {
-          <button
-            class="rv-rating-btn rv-rating-btn--{{ r.value }}"
-            [disabled]="!isFlipped()"
-            (click)="submitRating(r.value)">
-            <span class="rv-r-lbl">{{ r.label }}</span>
-            <span class="rv-r-interval">{{ r.previewLabel ?? '—' }}</span>
-          </button>
-        }
-      </div>
-    </div>
+  <div class="rv-footer">
+    <lc-rv-rating-footer
+      [options]="ratingOptionsWithPreviews()"
+      [flipped]="isFlipped()"
+      [suggested]="suggestedRating()"
+      [canGoPrevious]="currentIndex() > 0"
+      (rate)="submitRating($event)"
+      (previous)="goToPrevious()"
+      (skip)="skipCard()" />
   </div>
 }

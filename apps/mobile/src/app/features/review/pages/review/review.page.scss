@@ -1,42 +1,129 @@
 @use 'theme/tokens' as t;
 @use 'theme/utils' as u;
 
-.rv-nav { @include u.flex-between; padding: t.$lc-space-2 t.$lc-space-4 t.$lc-space-2; }
-.rv-title { @include u.lc-font('xl', t.$lc-font-weight-semibold); color: var(--lc-text-primary); }
-.rv-nav-spacer { width: 34px; }
-
-.rv-icon-btn {
-  @include u.circle(34px); @include u.flex-center;
-  background: var(--lc-brand-light); border: none; cursor: pointer; transition: var(--lc-transition-fast);
-  ion-icon { font-size: 17px; color: var(--lc-brand); }
-  &:active { opacity: 0.7; }
+ion-content {
+  --background: var(--lc-rv-bg);
 }
 
-.rv-prog-wrap { padding: 0 t.$lc-space-4 t.$lc-space-3; }
-.rv-prog-track { height: t.$lc-space-1; background: var(--lc-border); border-radius: t.$lc-space-1; overflow: hidden; margin-bottom: t.$lc-space-2; }
-.rv-prog-fill { height: 100%; background: var(--lc-brand); border-radius: t.$lc-space-1; transition: width 0.4s ease; }
-.rv-prog-labels { @include u.flex-between; @include u.lc-font('xs', t.$lc-font-weight-medium); color: var(--lc-text-hint); }
-
-// Height of the sticky bottom bar content (excluding safe-area padding).
-// Shared by .rv-bottom-bar and .rv-session so the scroll clearance is always in sync.
-$rv-bottom-bar-content-height: 130px;
-
-.rv-session {
-  padding: t.$lc-space-2 t.$lc-space-4 calc(#{$rv-bottom-bar-content-height} + env(safe-area-inset-bottom, 0px) + t.$lc-space-4);
+ion-header ion-toolbar {
+  --background: var(--lc-rv-bg);
+  --border-width: 0;
+  --min-height: auto;
 }
 
-.rv-card-scene {
-  // Natural height — card grows with content
+// ─── Top bar ─────────────────────────────────────────────────────────────────
+.rv-nav {
+  display: flex;
+  align-items: center;
+  gap: t.$lc-space-3;
+  padding: t.$lc-space-2 t.$lc-space-4 t.$lc-space-2;
 }
 
-// ── Sticky bottom bar ─────────────────────────────────────────────────────────
-.rv-bottom-bar {
-  position: fixed;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  background: var(--lc-background);
-  border-top: 1px solid var(--lc-border);
-  padding-bottom: calc(env(safe-area-inset-bottom, 0px) + t.$lc-space-2);
-  z-index: 100;
+.rv-close {
+  @include u.circle(40px);
+  @include u.flex-center;
+  @include u.touch-state;
+  background: var(--lc-rv-card);
+  border: 1px solid var(--lc-rv-border);
+  color: var(--lc-rv-text);
+  font-size: t.$lc-text-3xl;
+}
+
+.rv-nav-center {
+  flex: 1;
+  min-width: 0;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+}
+
+.rv-nav-cat {
+  @include u.lc-font('xxs', t.$lc-font-weight-semibold);
+  font-family: t.$lc-font-rv-mono;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--lc-rv-muted);
+  @include u.text-overflow;
+}
+
+.rv-nav-count {
+  @include u.lc-font('lg', t.$lc-font-weight-medium);
+  font-family: t.$lc-font-rv-display;
+  color: var(--lc-rv-text);
+}
+
+.rv-nav-remaining {
+  flex-shrink: 0;
+  min-width: 40px;
+  text-align: right;
+  @include u.lc-font('xs', t.$lc-font-weight-semibold);
+  font-family: t.$lc-font-rv-mono;
+  color: var(--lc-rv-brass-ink);
+}
+
+// ─── Progress bar ────────────────────────────────────────────────────────────
+.rv-prog-track {
+  height: 5px;
+  margin: 0 t.$lc-space-4 t.$lc-space-1;
+  border-radius: t.$lc-radius-full;
+  background: var(--lc-rv-inset);
+  overflow: hidden;
+}
+
+.rv-prog-fill {
+  height: 100%;
+  border-radius: t.$lc-radius-full;
+  background: linear-gradient(90deg, var(--lc-rv-mid), var(--lc-rv-brass-ink));
+  transition: width 0.4s t.$lc-easing-standard;
+}
+
+// ─── Card scene ──────────────────────────────────────────────────────────────
+.rv-scene {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  padding: t.$lc-space-3 t.$lc-space-4 t.$lc-space-4;
+}
+
+// ─── Footer ──────────────────────────────────────────────────────────────────
+.rv-footer {
+  padding: t.$lc-space-3 t.$lc-space-4 calc(#{t.$lc-space-3} + env(safe-area-inset-bottom));
+  background: var(--lc-rv-bg);
+  border-top: 1px solid var(--lc-rv-border);
+}
+
+// ─── Empty state ─────────────────────────────────────────────────────────────
+.lc-empty-state {
+  text-align: center;
+  padding: t.$lc-space-12 t.$lc-space-4;
+}
+
+.lc-empty-icon {
+  font-size: t.$lc-text-10xl;
+}
+
+.lc-empty-title {
+  @include u.lc-font('2xl', t.$lc-font-weight-semibold);
+  font-family: t.$lc-font-rv-display;
+  color: var(--lc-rv-text);
+  margin-top: t.$lc-space-3;
+}
+
+.lc-empty-sub {
+  @include u.lc-font('sm');
+  font-family: t.$lc-font-rv-body;
+  color: var(--lc-rv-muted);
+  margin-top: t.$lc-space-2;
+}
+
+.rv-exit-btn {
+  @include u.touch-state;
+  margin-top: t.$lc-space-4;
+  background: t.$lc-rv-easy-bg;
+  color: t.$lc-rv-easy-text;
+  font-family: t.$lc-font-rv-body;
+  @include u.lc-font('md', t.$lc-font-weight-bold);
+  border-radius: t.$lc-radius-md;
+  padding: t.$lc-space-3 t.$lc-space-6;
 }

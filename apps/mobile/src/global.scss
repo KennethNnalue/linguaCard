@@ -94,3 +94,16 @@ ion-alert.hydrated {
     color: var(--lc-text-secondary);
   }
 }
+
+/* ── Review session toast (rv-toast) ──────────────────────────────────────────
+ * A small dark "pill" used for scheduling confirmations and leech actions.
+ * Intentionally theme-independent (like the forest hero), per the Review
+ * redesign spec: near-black ink background with warm cream text. */
+ion-toast.rv-toast {
+  --background: #211C16;
+  --color: #F4EFE4;
+  --border-radius: 9999px;
+  --max-width: 320px;
+  font-family: 'Hanken Grotesk', system-ui, sans-serif;
+  text-align: center;
+}

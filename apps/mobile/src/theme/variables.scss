@@ -115,6 +115,51 @@
   --lc-transition-slow:  #{t.$lc-duration-slow} #{t.$lc-easing-spring};
   --lc-flip-duration:    #{t.$lc-duration-flip};
 
+  // ─── REVIEW (Spaced Practice) — Epic Review redesign ──────────────────────
+  // Light values; dark overrides live in body.ion-palette-dark. Components use
+  // var(--lc-rv-*). Fixed forest/leech/brass surfaces come from t.$lc-rv-* SCSS.
+  --lc-font-rv-display: #{t.$lc-font-rv-display};
+  --lc-font-rv-body:    #{t.$lc-font-rv-body};
+  --lc-font-rv-mono:    #{t.$lc-font-rv-mono};
+
+  --lc-rv-bg:           #F4EFE4;   // warm cream page background
+  --lc-rv-card:         #FFFCF6;   // warm-white flashcard / cards
+  --lc-rv-card-alt:     #FBF7EF;   // recent-session rows
+  --lc-rv-inset:        #EFE9DB;   // segmented-control track / inset chips
+  --lc-rv-inset-soft:   #F4EFE4;   // synonym panel / text input bg
+  --lc-rv-border:       rgba(33, 28, 22, 0.10);
+  --lc-rv-border-strong:rgba(33, 28, 22, 0.13);
+  --lc-rv-text:         #211C16;   // primary text on warm
+  --lc-rv-text-soft:    #5A5347;   // translation / secondary
+  --lc-rv-muted:        #8A7F6E;   // meta
+  --lc-rv-hint:         #C2B7A2;   // kicker labels on card
+  --lc-rv-brass-ink:    #8A6636;   // brass mono kicker on light
+  --lc-rv-mid:          #2E6B52;   // forest mid: mastery ring, headword highlight
+  --lc-rv-mid-soft:     #5E9E7C;
+
+  // Rating trios (Again/Hard/Good tinted; Easy is the fixed forest token)
+  --lc-rv-again-bg:     #F8E9EA;  --lc-rv-again-border:  #E7C3C8;  --lc-rv-again-text: #9B4A57;
+  --lc-rv-hard-bg:      #F7F0DD;  --lc-rv-hard-border:   #E5D5A6;  --lc-rv-hard-text:  #8A6B26;
+  --lc-rv-good-bg:      #EAF0EC;  --lc-rv-good-border:   #C2D6C8;  --lc-rv-good-text:  #3E7A5E;
+
+  // Result banner tints
+  --lc-rv-res-correct-bg: #E7F0EA;  --lc-rv-res-correct-bd: #C2D6C8;
+  --lc-rv-res-close-bg:   #F6EFDF;  --lc-rv-res-close-bd:   #E5D5A6;
+  --lc-rv-res-wrong-bg:   #F8ECE6;  --lc-rv-res-wrong-bd:   #E7C9BC;
+  --lc-rv-verdict-correct:#2E6B52;
+  --lc-rv-verdict-close:  #8A6B26;
+  --lc-rv-verdict-wrong:  #B5582E;
+  --lc-rv-char-ok:        #2E6B52;
+  --lc-rv-char-bad:       #B5582E;
+
+  // Quick-study tiles
+  --lc-rv-tile-struggle-bg:#F5E5E0;  --lc-rv-tile-struggle-fg:#B5582E;
+  --lc-rv-tile-new-bg:     #F1EBDD;  --lc-rv-tile-new-fg:     #8A6636;
+  --lc-rv-tile-custom-bg:  #E7EFE9;  --lc-rv-tile-custom-fg:  #2E6B52;
+
+  // Usage / explainer note card
+  --lc-rv-note-bg:      #F6EFDF;  --lc-rv-note-fg: #6E6557;
+
   // ─── STORY STUDIO 2.0 PALETTE (Epic 15) ───────────────────────────────────
   // Light values mirror the $lc-ss-* SCSS tokens. Dark overrides live in the
   // body.ion-palette-dark block. Components reference var(--lc-ss-*).
@@ -282,6 +327,44 @@ body.ion-palette-dark {
   --ion-item-background:     var(--lc-card);
   --ion-toolbar-background:  var(--lc-card);
   --ion-tab-bar-background:  var(--lc-card);
+
+  // ─── REVIEW (Spaced Practice) — DARK ──────────────────────────────────────
+  // Warm cream surfaces remap to the app's dark surfaces; warm text lifts; the
+  // pastel rating/result tints become dark-surface equivalents (mirrors the
+  // existing --lc-rating-* dark derivation). Forest/leech/brass stay fixed.
+  --lc-rv-bg:           #111614;   // matches --lc-surface
+  --lc-rv-card:         #1E2924;   // matches --lc-card
+  --lc-rv-card-alt:     #1A231F;   // one step below card for alt rows
+  --lc-rv-inset:        #253028;   // segmented track / inset
+  --lc-rv-inset-soft:   #182019;   // synonym panel / input bg
+  --lc-rv-border:       rgba(90, 191, 163, 0.16);
+  --lc-rv-border-strong:rgba(90, 191, 163, 0.28);
+  --lc-rv-text:         #E4F0EC;
+  --lc-rv-text-soft:    #A7C3BA;
+  --lc-rv-muted:        #8AA59D;
+  --lc-rv-hint:         #6B8980;
+  --lc-rv-brass-ink:    #D8B981;   // brass reads bright on dark
+  --lc-rv-mid:          #5ABFA3;
+  --lc-rv-mid-soft:     #4DAF90;
+
+  --lc-rv-again-bg:     #321414;  --lc-rv-again-border:  #6B2020;  --lc-rv-again-text: #F98080;
+  --lc-rv-hard-bg:      #2D2610;  --lc-rv-hard-border:   #7A6020;  --lc-rv-hard-text:  #FCD34D;
+  --lc-rv-good-bg:      #162A22;  --lc-rv-good-border:   #2A6B50;  --lc-rv-good-text:  #6EE7B7;
+
+  --lc-rv-res-correct-bg: #122A20;  --lc-rv-res-correct-bd: #1A5E42;
+  --lc-rv-res-close-bg:   #2D2610;  --lc-rv-res-close-bd:   #7A6020;
+  --lc-rv-res-wrong-bg:   #2E1A12;  --lc-rv-res-wrong-bd:   #6B3320;
+  --lc-rv-verdict-correct:#6EE7B7;
+  --lc-rv-verdict-close:  #FCD34D;
+  --lc-rv-verdict-wrong:  #F0A07A;
+  --lc-rv-char-ok:        #6EE7B7;
+  --lc-rv-char-bad:       #F0A07A;
+
+  --lc-rv-tile-struggle-bg:#2E1A12;  --lc-rv-tile-struggle-fg:#F0A07A;
+  --lc-rv-tile-new-bg:     #2A2010;  --lc-rv-tile-new-fg:     #D8B981;
+  --lc-rv-tile-custom-bg:  #162A22;  --lc-rv-tile-custom-fg:  #6EE7B7;
+
+  --lc-rv-note-bg:      #2A2410;  --lc-rv-note-fg: #C7BFA8;
 
   // ─── STORY STUDIO 2.0 — DARK ──────────────────────────────────────────────
   // Keep the green accent family; remap paper/card surfaces to the app's dark

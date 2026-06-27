@@ -2,27 +2,25 @@ import { ChangeDetectionStrategy, Component, computed, DestroyRef, effect, injec
 import { takeUntilDestroyed, toObservable } from '@angular/core/rxjs-interop';
 import { filter, take } from 'rxjs';
 import { ActivatedRoute, Router } from '@angular/router';
-import { IonContent, IonHeader, IonIcon, IonToolbar } from '@ionic/angular/standalone';
+import { IonContent, IonHeader, IonIcon, IonToolbar, ToastController } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
-import {
-  chevronBackOutline,
-  chevronDownOutline,
-  chevronForwardOutline,
-  flagOutline,
-  volumeHighOutline,
-} from 'ionicons/icons';
+import { closeOutline } from 'ionicons/icons';
 import type { Card, ConfidenceRating } from '@lingua-card/shared/domain';
-import { ArticleBadgeComponent } from '../../../../shared/components/article-badge/article-badge.component';
 import { WordAudioService } from '../../../../shared/audio/word-audio.service';
 import { FsrsService } from '../../../../shared/srs/fsrs.service';
 import { CardStore } from '../../../vault/store/card.store';
 import { CategoryStore } from '../../../vault/store/category.store';
 import { CollectionStore } from '../../../vault/store/collection.store';
 import { ReviewStore } from '../../store/review.store';
-import { TranslatePipe } from '@ngx-translate/core';
-import { HighlightWordPipe } from '../../shared/pipes/highlight-word.pipe';
+import { ReviewPrefsService } from '../../services/review-prefs.service';
+import { TranslatePipe, TranslateService } from '@ngx-translate/core';
+import { FrontFlipComponent } from './components/front-flip/front-flip.component';
+import { FrontTypeComponent } from './components/front-type/front-type.component';
+import { FrontListenComponent } from './components/front-listen/front-listen.component';
+import { CardBackComponent } from './components/card-back/card-back.component';
+import { RatingFooterComponent } from './components/rating-footer/rating-footer.component';
+import { gradeTypedAnswer, TypedAnswerResult } from './grading/typed-answer.grader';
 import {
-  ARTICLE_GENDER_MAP,
   buildRatingOptionsWithPreviews,
   RATING_OPTIONS_NO_PREVIEW,
   RatingOption,
@@ -31,46 +29,63 @@ import {
   ReviewRoute,
 } from '../../models/review.model';
 
+const SLOW_RATE = 0.7;
+const TOAST_MS = 1700;
+
 @Component({
   selector: 'lc-review',
   templateUrl: './review.page.html',
-  styleUrls: ['./review.page.scss', './review.card.scss', './review.rating.scss'],
+  styleUrls: ['./review.page.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [IonContent, IonIcon, IonToolbar, IonHeader, HighlightWordPipe, ArticleBadgeComponent, TranslatePipe],
+  imports: [
+    IonContent,
+    IonIcon,
+    IonToolbar,
+    IonHeader,
+    TranslatePipe,
+    FrontFlipComponent,
+    FrontTypeComponent,
+    FrontListenComponent,
+    CardBackComponent,
+    RatingFooterComponent,
+  ],
 })
 export class ReviewPage implements OnInit {
   private readonly cardStore = inject(CardStore);
   private readonly reviewStore = inject(ReviewStore);
   private readonly wordAudio = inject(WordAudioService);
   private readonly fsrs = inject(FsrsService);
+  private readonly prefs = inject(ReviewPrefsService);
   private readonly categoryStore = inject(CategoryStore);
   private readonly collectionStore = inject(CollectionStore);
   private readonly router = inject(Router);
   private readonly injector = inject(Injector);
   private readonly destroyRef = inject(DestroyRef);
   private readonly route = inject(ActivatedRoute);
+  private readonly toast = inject(ToastController);
+  private readonly translate = inject(TranslateService);
 
   constructor() {
-    addIcons({
-      chevronBackOutline,
-      chevronDownOutline,
-      chevronForwardOutline,
-      flagOutline,
-      volumeHighOutline,
-    });
+    addIcons({ closeOutline });
 
+    // Reset per-card transient state whenever the user advances.
     effect(() => {
       this.currentIndex();
       this.expandedSynonym.set(null);
+      this.typed.set('');
+      this.typedResult.set(null);
     });
   }
 
+  readonly mode = this.prefs.mode;
   readonly queue = signal<Card[]>([]);
   readonly currentIndex = signal(0);
   readonly isFlipped = signal(false);
+  readonly typed = signal('');
+  readonly typedResult = signal<TypedAnswerResult | null>(null);
   readonly isPronunciationLoading = this.wordAudio.isLoading;
   private highestIndexReached = 0;
-  private readonly expandedSynonym = signal<number | null>(null);
+  readonly expandedSynonym = signal<number | null>(null);
 
   readonly currentCard = computed<Card | null>(() => {
     const card = this.queue()[this.currentIndex()];
@@ -91,9 +106,42 @@ export class ReviewPage implements OnInit {
     return buildRatingOptionsWithPreviews(this.fsrs.previewIntervals(card.srsState));
   });
 
+  // Progress: half-step credit once the card is flipped (per design spec).
   readonly progressPercent = computed(() => {
-    const q = this.queue();
-    return q.length ? ((this.currentIndex() + 1) / q.length) * 100 : 0;
+    const total = this.queue().length;
+    if (!total) return 0;
+    return ((this.currentIndex() + (this.isFlipped() ? 0.5 : 0)) / total) * 100;
+  });
+
+  readonly remaining = computed(() => Math.max(0, this.queue().length - this.currentIndex() - 1));
+
+  readonly suggestedRating = computed<ConfidenceRating | null>(
+    () => this.typedResult()?.suggested ?? null,
+  );
+
+  // Prompt direction (custom study). Affects the Flip front face only — Type
+  // always asks for German (the grader is German-specific) and Listen plays the
+  // German audio. For "mixed", alternate stably by card index.
+  private readonly showGermanPrompt = computed(() => {
+    const dir = this.prefs.dir();
+    if (dir === 'de-en') return true;
+    if (dir === 'mixed') return this.currentIndex() % 2 === 0;
+    return false;
+  });
+
+  readonly flipPrompt = computed(() => {
+    const card = this.currentCard();
+    if (!card) return '';
+    return this.showGermanPrompt() ? card.content.back : card.content.front;
+  });
+
+  readonly flipCue = computed(() =>
+    this.showGermanPrompt() ? 'review.session.whatDoesThisMean' : 'review.session.whatIsGermanFor',
+  );
+
+  readonly flipHint = computed(() => {
+    const tags = this.currentCard()?.tags ?? [];
+    return tags.length ? tags[0] : null;
   });
 
   readonly activeCategoryNames = computed(() => {
@@ -108,19 +156,10 @@ export class ReviewPage implements OnInit {
       .join(' · ') as string;
   });
 
-  readonly currentArticleLabel = computed(() => {
-    const card = this.currentCard();
-    if (!card?.content.article) return '';
-    const gender = card.content.gender ?? ARTICLE_GENDER_MAP[card.content.article] ?? '';
-    return `${card.content.article} — ${gender}`;
-  });
-
   ngOnInit(): void {
     const pendingQueue = this.reviewStore.pendingQueue();
     if (pendingQueue.length > 0) {
       this.queue.set(pendingQueue);
-      // Clear so ionViewWillEnter (fires after ngOnInit on first entry) doesn't
-      // consume the same queue a second time and reset the session mid-play.
       this.reviewStore.clearPendingQueue();
       return;
     }
@@ -157,8 +196,6 @@ export class ReviewPage implements OnInit {
   }
 
   ionViewWillEnter(): void {
-    // Ionic may reuse the component without calling ngOnInit when navigating
-    // forward to a page already in the stack — re-init to pick up a new pending queue.
     const pendingQueue = this.reviewStore.pendingQueue();
     if (pendingQueue.length > 0) {
       this.queue.set(pendingQueue);
@@ -169,17 +206,21 @@ export class ReviewPage implements OnInit {
     }
   }
 
+  reveal(): void {
+    this.isFlipped.set(true);
+  }
+
+  checkTyped(): void {
+    const card = this.currentCard();
+    if (!card || !this.typed().trim()) return;
+    this.typedResult.set(
+      gradeTypedAnswer(this.typed(), card.content.back, card.content.article ?? null),
+    );
+    this.isFlipped.set(true);
+  }
+
   toggleSynonym(i: number): void {
     this.expandedSynonym.set(this.expandedSynonym() === i ? null : i);
-  }
-
-  isSynonymExpanded(i: number): boolean {
-    return this.expandedSynonym() === i;
-  }
-
-  flipCard(): void {
-    this.isFlipped.set(true);
-    this.expandedSynonym.set(null);
   }
 
   submitRating(rating: ConfidenceRating): void {
@@ -188,27 +229,21 @@ export class ReviewPage implements OnInit {
 
     const idx = this.currentIndex();
     const queueLength = this.queue().length;
-
-    // Update highest-index tracker
     if (idx > this.highestIndexReached) this.highestIndexReached = idx;
-    // Session is only complete when we rate the final card for the first time
     const isLast = idx + 1 >= queueLength && this.highestIndexReached >= queueLength - 1;
 
-    // Optimistic SRS update + local buffer + online flush — all handled inside rateCard().
+    const interval = this.ratingOptionsWithPreviews().find(o => o.value === rating)?.previewLabel;
     this.reviewStore.rateCard(card, rating);
+    void this.showScheduledToast(interval);
 
     if (isLast) {
-      // Resolve latest card objects from CardStore so completedSession.reviewedCards
-      // reflects the updated SRS state after all ratings in this session.
       const liveMap = new Map(this.cardStore.cards().map(c => [c.id, c]));
       const freshQueue = this.queue().map(c => liveMap.get(c.id) ?? c);
       this.reviewStore.completeSession(freshQueue);
       void this.router.navigate([ReviewRoute.SUMMARY], { replaceUrl: true });
     }
 
-    // Advance immediately for responsive UX
     this.isFlipped.set(false);
-    this.expandedSynonym.set(null);
     if (!isLast) {
       this.currentIndex.set(idx + 1);
     }
@@ -218,7 +253,6 @@ export class ReviewPage implements OnInit {
     const prev = this.currentIndex() - 1;
     if (prev < 0) return;
     this.currentIndex.set(prev);
-    // Show the back face if this card was already rated — user can see their answer again
     const card = this.queue()[prev];
     const alreadyRated = this.reviewStore.activeSession()?.ratings[card?.id] !== undefined;
     this.isFlipped.set(alreadyRated);
@@ -232,23 +266,34 @@ export class ReviewPage implements OnInit {
     }
   }
 
-  playAudio(event: Event): void {
-    event.stopPropagation();
+  playAudio(): void {
     const card = this.currentCard();
     if (!card) return;
     void this.wordAudio.playCard(card);
   }
 
-  playExample(event: Event, sentence: string): void {
-    event.stopPropagation();
-    void this.wordAudio.play(sentence, 'de-DE');
+  playSlow(): void {
+    const card = this.currentCard();
+    if (!card) return;
+    void this.wordAudio.playAsPromise(card.content.back, 'de-DE', SLOW_RATE);
   }
 
-  flagCard(): void {
-    // TODO: implement flag via API
+  playExample(sentence: string): void {
+    void this.wordAudio.play(sentence, 'de-DE');
   }
 
   exitSession(): void {
     void this.router.navigate([ReviewRoute.HUB]);
+  }
+
+  private async showScheduledToast(interval?: string | null): Promise<void> {
+    if (!interval) return;
+    const toast = await this.toast.create({
+      message: this.translate.instant('review.session.scheduledToast', { interval }),
+      duration: TOAST_MS,
+      position: 'bottom',
+      cssClass: 'rv-toast',
+    });
+    await toast.present();
   }
 }

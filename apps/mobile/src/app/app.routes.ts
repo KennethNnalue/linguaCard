@@ -122,6 +122,11 @@ export const routes: Routes = [
           import('./features/review/pages/struggling-cards/struggling-cards.page').then(m => m.StrugglingCardsPage),
       },
       {
+        path: 'review/leeches',
+        loadComponent: () =>
+          import('./features/review/pages/leeches/leeches.page').then(m => m.LeechesPage),
+      },
+      {
         path: 'listen',
         loadComponent: () =>
           import('./features/listen/pages/listen/listen.component').then(m => m.ListenComponent),

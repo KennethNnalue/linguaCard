@@ -49,6 +49,12 @@
     '2xl': t.$lc-text-2xl,
     '3xl': t.$lc-text-3xl,
     '4xl': t.$lc-text-4xl,
+    '5xl':  t.$lc-text-5xl,
+    '6xl':  t.$lc-text-6xl,
+    '7xl':  t.$lc-text-7xl,
+    '8xl':  t.$lc-text-8xl,
+    '9xl':  t.$lc-text-9xl,
+    '10xl': t.$lc-text-10xl,
   );
   font-size: map.get($sizes, $size-key);
   font-weight: $weight;

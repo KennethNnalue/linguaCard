@@ -1,0 +1,21 @@
+<div class="ff-card" (click)="reveal.emit()">
+  <div class="ff-hdr">
+    <span class="ff-side-lbl">{{ 'review.session.yourLanguageLabel' | translate }}</span>
+    <span class="ff-lang-chip">{{ 'review.session.englishLangChip' | translate }}</span>
+  </div>
+
+  <div class="ff-body">
+    <span class="ff-cue">{{ cue() | translate }}</span>
+    <p class="ff-prompt">{{ prompt() }}</p>
+    @if (hint()) {
+      <p class="ff-hint">{{ hint() }}</p>
+    } @else {
+      <p class="ff-hint">{{ 'review.session.recallHint' | translate }}</p>
+    }
+  </div>
+
+  <button class="ff-cta" (click)="$event.stopPropagation(); reveal.emit()">
+    <ion-icon name="chevron-down-outline"></ion-icon>
+    {{ 'review.session.revealGerman' | translate }}
+  </button>
+</div>

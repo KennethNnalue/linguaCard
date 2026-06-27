@@ -1,0 +1,127 @@
+@use 'theme/tokens' as t;
+@use 'theme/utils' as u;
+
+:host {
+  display: flex;
+  flex: 1;
+  min-height: 0;
+}
+
+.fl-card {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  background: var(--lc-rv-card);
+  border-radius: t.$lc-radius-xl;
+  box-shadow: t.$lc-rv-shadow-flashcard;
+  padding: t.$lc-space-5;
+}
+
+.fl-hdr {
+  @include u.flex-between;
+}
+
+.fl-side-lbl {
+  @include u.lc-font('xxs', t.$lc-font-weight-semibold);
+  font-family: t.$lc-font-rv-mono;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--lc-rv-hint);
+}
+
+.fl-chip {
+  @include u.lc-font('xs', t.$lc-font-weight-semibold);
+  font-family: t.$lc-font-rv-body;
+  background: var(--lc-rv-good-bg);
+  color: var(--lc-rv-good-text);
+  border-radius: t.$lc-radius-full;
+  padding: t.$lc-space-1 t.$lc-space-3;
+}
+
+.fl-body {
+  flex: 1;
+  @include u.flex-center;
+  flex-direction: column;
+  gap: t.$lc-space-4;
+}
+
+.fl-play {
+  @include u.circle(120px);
+  @include u.flex-center;
+  @include u.touch-state;
+  background: t.$lc-rv-easy-bg;
+  color: t.$lc-rv-brass;
+  font-size: t.$lc-text-10xl;
+  animation: flPulse 2.4s infinite;
+}
+
+.fl-spinner {
+  @include u.circle(40px);
+  border: 3px solid rgba(216, 185, 129, 0.3);
+  border-top-color: t.$lc-rv-brass;
+  animation: flSpin 0.8s linear infinite;
+}
+
+.fl-cue {
+  @include u.lc-font('xxs', t.$lc-font-weight-semibold);
+  font-family: t.$lc-font-rv-mono;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--lc-rv-hint);
+}
+
+.fl-pills {
+  display: flex;
+  gap: t.$lc-space-2;
+}
+
+.fl-pill {
+  display: flex;
+  align-items: center;
+  gap: t.$lc-space-1;
+  @include u.touch-state;
+  min-height: 44px;
+  padding: 0 t.$lc-space-4;
+  background: var(--lc-rv-card-alt);
+  border: 1px solid var(--lc-rv-border);
+  border-radius: t.$lc-radius-full;
+  color: var(--lc-rv-text);
+  @include u.lc-font('sm', t.$lc-font-weight-semibold);
+  font-family: t.$lc-font-rv-body;
+
+  ion-icon {
+    font-size: t.$lc-text-lg;
+  }
+}
+
+.fl-cta {
+  @include u.flex-center;
+  @include u.touch-state;
+  gap: t.$lc-space-2;
+  padding: t.$lc-space-4;
+  border-radius: t.$lc-radius-md;
+  background: t.$lc-rv-easy-bg;
+  color: t.$lc-rv-easy-text;
+  font-family: t.$lc-font-rv-body;
+  @include u.lc-font('lg', t.$lc-font-weight-bold);
+
+  ion-icon {
+    font-size: t.$lc-text-xl;
+  }
+}
+
+@keyframes flPulse {
+  0% {
+    box-shadow: 0 0 0 0 t.$lc-rv-pulse;
+  }
+  70%,
+  100% {
+    box-shadow: 0 0 0 18px transparent;
+  }
+}
+
+@keyframes flSpin {
+  to {
+    transform: rotate(360deg);
+  }
+}

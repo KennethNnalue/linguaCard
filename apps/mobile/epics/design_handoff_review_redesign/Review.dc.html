@@ -1,0 +1,1246 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Spectral:ital,wght@0,300;0,400;0,500;0,600;1,400;1,500&family=Hanken+Grotesk:wght@400;500;600;700;800&family=Spline+Sans+Mono:wght@500;600&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0;}
+::-webkit-scrollbar{width:0;height:0;display:none;}
+.rv-scroll{scrollbar-width:none;-ms-overflow-style:none;}
+@keyframes rvFade{from{opacity:0;}to{opacity:1;}}
+@keyframes rvToast{from{opacity:0;transform:translate(-50%,10px);}to{opacity:1;transform:translate(-50%,0);}}
+@keyframes rvFront{from{opacity:0;transform:translateY(10px) scale(.985);}to{opacity:1;transform:translateY(0) scale(1);}}
+@keyframes rvBack{from{opacity:0;transform:rotateX(7deg) translateY(8px);}to{opacity:1;transform:rotateX(0) translateY(0);}}
+@keyframes rvRise{from{opacity:0;transform:translateY(8px);}to{opacity:1;transform:translateY(0);}}
+@keyframes rvPulse{0%,100%{box-shadow:0 0 0 0 rgba(216,185,129,.5);}50%{box-shadow:0 0 0 7px rgba(216,185,129,0);}}
+</style>
+</helmet>
+
+<div style="min-height:100vh;width:100%;display:flex;align-items:center;justify-content:center;padding:40px 20px;font-family:'Hanken Grotesk',system-ui,sans-serif;background:radial-gradient(130% 120% at 50% 0%,#E8E0CF 0%,#DBD1BB 55%,#CFC4AC 100%);">
+  <div style="position:relative;width:392px;height:844px;border-radius:52px;background:#F4EFE4;border:11px solid #14110C;box-shadow:0 2px 0 1px #2c271f inset,0 40px 90px -20px rgba(33,28,22,.5),0 12px 30px rgba(0,0,0,.2);overflow:hidden;">
+
+    <!-- status bar -->
+    <div style="position:relative;z-index:6;display:flex;align-items:center;justify-content:space-between;padding:15px 28px 7px;font-size:13px;font-weight:700;color:#211C16;">
+      <span>9:41</span>
+      <span style="display:flex;gap:5px;align-items:center;font-size:11px;letter-spacing:1px;">●●● ▮▮</span>
+    </div>
+
+    <!-- ════════════════ SCREEN AREA ════════════════ -->
+    <div class="rv-scroll" style="position:absolute;top:40px;left:0;right:0;bottom:0;overflow-y:auto;overflow-x:hidden;">
+
+      <!-- ═══════════ HUB ═══════════ -->
+      <sc-if value="{{ isHub }}" hint-placeholder-val="{{ true }}">
+      <div style="padding:6px 20px 96px;">
+
+        <!-- header -->
+        <div style="display:flex;align-items:flex-end;justify-content:space-between;padding:8px 0 18px;">
+          <div>
+            <div style="font-family:'Spline Sans Mono',monospace;font-size:10px;font-weight:600;letter-spacing:3px;color:#8A6636;margin-bottom:5px;">DAILY PRACTICE</div>
+            <div style="font-family:'Spectral',serif;font-size:34px;font-weight:500;color:#211C16;line-height:.95;letter-spacing:-.5px;">Review</div>
+          </div>
+          <button onClick="{{ goMastery }}" style="width:42px;height:42px;border-radius:50%;border:1px solid rgba(33,28,22,.13);background:#FFFCF6;display:flex;align-items:center;justify-content:center;cursor:pointer;color:#3A332A;box-shadow:0 2px 6px -3px rgba(33,28,22,.3);">
+            <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><line x1="6" y1="20" x2="6" y2="13"/><line x1="12" y1="20" x2="12" y2="8"/><line x1="18" y1="20" x2="18" y2="4"/></svg>
+          </button>
+        </div>
+
+        <!-- HERO — cards due -->
+        <div style="position:relative;border-radius:26px;padding:24px 22px 20px;overflow:hidden;background:linear-gradient(155deg,#1F4034 0%,#15281F 100%);box-shadow:0 22px 44px -22px rgba(20,30,24,.85),0 2px 6px rgba(0,0,0,.18);margin-bottom:24px;">
+          <div style="position:absolute;top:-46px;right:-30px;width:160px;height:160px;border-radius:50%;background:radial-gradient(circle,rgba(216,185,129,.16),transparent 70%);"></div>
+          <div style="position:relative;font-family:'Spline Sans Mono',monospace;font-size:10px;font-weight:600;letter-spacing:2.5px;color:#D8B981;margin-bottom:18px;">CARDS DUE TODAY</div>
+
+          <div style="position:relative;display:flex;align-items:center;gap:20px;margin-bottom:22px;">
+            <div style="position:relative;width:96px;height:96px;flex-shrink:0;">
+              <svg viewBox="0 0 96 96" style="width:96px;height:96px;transform:rotate(-90deg);">
+                <circle cx="48" cy="48" r="42" fill="none" stroke="rgba(244,239,228,.12)" stroke-width="6"/>
+                <circle cx="48" cy="48" r="42" fill="none" stroke="#D8B981" stroke-width="6" stroke-linecap="round" stroke-dasharray="263.9" stroke-dashoffset="58"/>
+              </svg>
+              <div style="position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;">
+                <span style="font-family:'Spectral',serif;font-size:34px;font-weight:600;color:#F4EFE4;line-height:1;">{{ dueTotal }}</span>
+                <span style="font-family:'Spline Sans Mono',monospace;font-size:8.5px;font-weight:600;letter-spacing:1.5px;color:rgba(244,239,228,.55);margin-top:2px;">DUE</span>
+              </div>
+            </div>
+            <div style="display:flex;flex-direction:column;gap:12px;">
+              <div style="display:flex;align-items:baseline;gap:9px;">
+                <span style="font-family:'Spectral',serif;font-size:26px;font-weight:600;color:#F4EFE4;line-height:1;">{{ newCount }}</span>
+                <span style="font-size:13px;color:rgba(246,241,230,.62);font-weight:500;">new words</span>
+              </div>
+              <div style="display:flex;align-items:baseline;gap:9px;">
+                <span style="font-family:'Spectral',serif;font-size:26px;font-weight:600;color:#E0A35C;line-height:1;">{{ hardCount }}</span>
+                <span style="font-size:13px;color:rgba(246,241,230,.62);font-weight:500;">need attention</span>
+              </div>
+              <div style="font-size:11.5px;color:rgba(246,241,230,.45);font-weight:500;">≈ {{ estMinutes }} min · best done now</div>
+            </div>
+          </div>
+
+          <button onClick="{{ startSession }}" style="position:relative;width:100%;display:flex;align-items:center;justify-content:center;gap:9px;background:#F4EFE4;color:#16281F;border:none;padding:15px;border-radius:16px;font-family:'Hanken Grotesk';font-size:15px;font-weight:700;cursor:pointer;box-shadow:0 10px 26px -10px rgba(0,0,0,.5);">
+            <svg viewBox="0 0 24 24" width="16" height="16" fill="#16281F"><polygon points="6,4 20,12 6,20"/></svg>
+            Start today's review
+          </button>
+        </div>
+
+        <!-- MASTERY SNAPSHOT -->
+        <button onClick="{{ goMastery }}" style="display:flex;align-items:center;gap:16px;width:100%;background:#FFFCF6;border:1px solid rgba(33,28,22,.08);border-radius:20px;padding:16px 18px;cursor:pointer;text-align:left;margin-bottom:28px;box-shadow:0 8px 22px -16px rgba(33,28,22,.5);">
+          <div style="position:relative;width:54px;height:54px;flex-shrink:0;">
+            <svg viewBox="0 0 54 54" style="width:54px;height:54px;transform:rotate(-90deg);">
+              <circle cx="27" cy="27" r="23" fill="none" stroke="rgba(33,28,22,.08)" stroke-width="5"/>
+              <circle cx="27" cy="27" r="23" fill="none" stroke="#2E6B52" stroke-width="5" stroke-linecap="round" stroke-dasharray="144.5" stroke-dashoffset="84"/>
+            </svg>
+            <div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-family:'Spectral',serif;font-size:16px;font-weight:600;color:#2E6B52;">{{ masteryScore }}%</div>
+          </div>
+          <div style="flex:1;min-width:0;">
+            <div style="font-family:'Spectral',serif;font-size:17px;font-weight:600;color:#211C16;line-height:1.1;">Your mastery</div>
+            <div style="font-size:12px;color:#8A7F6E;font-weight:500;margin-top:3px;">{{ masteredCount }} of {{ masteryTotal }} words mastered</div>
+          </div>
+          <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="#B0A593" stroke-width="2.2" stroke-linecap="round" style="flex-shrink:0;"><polyline points="9,6 15,12 9,18"/></svg>
+        </button>
+
+        <!-- LEECHES CALLOUT -->
+        <button onClick="{{ goLeeches }}" style="display:flex;align-items:center;gap:14px;width:100%;background:linear-gradient(150deg,#2A1B14,#3A2417);border:none;border-radius:18px;padding:15px 16px;cursor:pointer;text-align:left;margin-bottom:28px;box-shadow:0 12px 28px -16px rgba(58,36,23,.9);">
+          <div style="width:44px;height:44px;border-radius:13px;background:rgba(216,185,129,.16);display:flex;align-items:center;justify-content:center;flex-shrink:0;color:#E0A35C;">
+            <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2a7 7 0 0 0-7 7c0 2.5 1.5 4 3 5.5S12 17 12 22c0-5 2.5-6 4-7.5S19 11.5 19 9a7 7 0 0 0-7-7z"/><circle cx="9.5" cy="9" r="1"/><circle cx="14.5" cy="9" r="1"/></svg>
+          </div>
+          <div style="flex:1;min-width:0;">
+            <div style="display:flex;align-items:center;gap:8px;">
+              <span style="font-family:'Spectral',serif;font-size:17px;font-weight:600;color:#F4EFE4;line-height:1.1;">{{ leechCount }} leeches detected</span>
+            </div>
+            <div style="font-size:12px;color:rgba(246,241,230,.6);font-weight:500;margin-top:3px;">Words you keep forgetting — let's fix them</div>
+          </div>
+          <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="rgba(246,241,230,.5)" stroke-width="2.2" stroke-linecap="round" style="flex-shrink:0;"><polyline points="9,6 15,12 9,18"/></svg>
+        </button>
+
+        <!-- STUDY MODE -->
+        <div style="font-family:'Spline Sans Mono',monospace;font-size:10px;font-weight:600;letter-spacing:1.5px;color:#9A8F7C;margin-bottom:12px;">STUDY MODE</div>
+        <div style="display:flex;flex-direction:column;gap:9px;margin-bottom:28px;">
+          <sc-for list="{{ modeItems }}" as="m" hint-placeholder-count="3">
+            <button onClick="{{ m.set }}" style="display:flex;align-items:center;gap:13px;width:100%;background:{{ m.bg }};border:1.5px solid {{ m.border }};border-radius:15px;padding:13px 15px;cursor:pointer;text-align:left;">
+              <span style="width:20px;height:20px;border-radius:50%;border:2px solid {{ m.fg }};display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+                <sc-if value="{{ m.on }}" hint-placeholder-val="{{ false }}"><span style="width:9px;height:9px;border-radius:50%;background:{{ m.fg }};"></span></sc-if>
+              </span>
+              <div style="flex:1;min-width:0;">
+                <div style="font-family:'Hanken Grotesk';font-size:14.5px;font-weight:700;color:{{ m.fg }};line-height:1.1;">{{ m.label }}</div>
+                <div style="font-size:11.5px;color:{{ m.subFg }};font-weight:500;margin-top:2px;">{{ m.sub }}</div>
+              </div>
+            </button>
+          </sc-for>
+        </div>
+
+        <!-- QUICK STUDY -->
+        <div style="display:flex;align-items:baseline;justify-content:space-between;margin-bottom:14px;">
+          <div style="font-family:'Spectral',serif;font-size:19px;font-weight:600;color:#211C16;">Quick study</div>
+          <div style="font-family:'Spline Sans Mono',monospace;font-size:10px;font-weight:600;letter-spacing:1.5px;color:#9A8F7C;">PICK A FOCUS</div>
+        </div>
+
+        <div style="display:flex;flex-direction:column;gap:11px;margin-bottom:28px;">
+          <sc-for list="{{ quickStudy }}" as="q" hint-placeholder-count="3">
+            <button onClick="{{ q.go }}" style="display:flex;align-items:center;gap:14px;width:100%;background:#FFFCF6;border:1px solid rgba(33,28,22,.08);border-radius:18px;padding:15px 16px;cursor:pointer;text-align:left;box-shadow:0 8px 22px -16px rgba(33,28,22,.5);">
+              <div style="width:48px;height:48px;border-radius:14px;background:{{ q.iconBg }};display:flex;align-items:center;justify-content:center;flex-shrink:0;color:{{ q.iconColor }};" innerHTML="{{ q.icon }}"></div>
+              <div style="flex:1;min-width:0;">
+                <div style="font-family:'Spectral',serif;font-size:17px;font-weight:600;color:#211C16;line-height:1.1;">{{ q.title }}</div>
+                <div style="font-size:12px;color:#8A7F6E;font-weight:500;margin-top:3px;">{{ q.sub }}</div>
+              </div>
+              <div style="display:flex;align-items:center;gap:8px;flex-shrink:0;">
+                <span style="font-family:'Spectral',serif;font-size:21px;font-weight:600;color:{{ q.countColor }};">{{ q.count }}</span>
+                <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="#B0A593" stroke-width="2.2" stroke-linecap="round"><polyline points="9,6 15,12 9,18"/></svg>
+              </div>
+            </button>
+          </sc-for>
+        </div>
+
+        <!-- RECENT SESSIONS -->
+        <div style="display:flex;align-items:baseline;justify-content:space-between;margin-bottom:14px;">
+          <div style="font-family:'Spectral',serif;font-size:19px;font-weight:600;color:#211C16;">Recent sessions</div>
+          <button onClick="{{ goHistory }}" style="background:none;border:none;cursor:pointer;font-family:'Spline Sans Mono',monospace;font-size:10px;font-weight:600;letter-spacing:1px;color:#8A6636;">SEE ALL →</button>
+        </div>
+
+        <div style="display:flex;flex-direction:column;gap:10px;">
+          <sc-for list="{{ recent }}" as="r" hint-placeholder-count="2">
+            <div style="display:flex;align-items:center;gap:13px;background:#FBF7EF;border:1px solid rgba(33,28,22,.07);border-radius:15px;padding:13px 15px;">
+              <span style="width:8px;height:8px;border-radius:50%;background:{{ r.dot }};flex-shrink:0;"></span>
+              <div style="flex:1;min-width:0;">
+                <div style="font-family:'Hanken Grotesk';font-size:14px;font-weight:700;color:#211C16;">{{ r.title }}</div>
+                <div style="font-size:11.5px;color:#9A8F7C;font-weight:500;margin-top:2px;">{{ r.meta }}</div>
+              </div>
+              <div style="display:flex;align-items:center;gap:10px;flex-shrink:0;">
+                <div style="text-align:right;">
+                  <div style="font-family:'Spectral',serif;font-size:16px;font-weight:600;color:#2E6B52;">{{ r.nailed }}</div>
+                  <div style="font-family:'Spline Sans Mono',monospace;font-size:7.5px;font-weight:600;letter-spacing:.5px;color:#B0A593;">NAILED</div>
+                </div>
+                <div style="text-align:right;">
+                  <div style="font-family:'Spectral',serif;font-size:16px;font-weight:600;color:#C99A3E;">{{ r.struggled }}</div>
+                  <div style="font-family:'Spline Sans Mono',monospace;font-size:7.5px;font-weight:600;letter-spacing:.5px;color:#B0A593;">STRUGGLED</div>
+                </div>
+              </div>
+            </div>
+          </sc-for>
+        </div>
+
+      </div>
+      </sc-if>
+
+      <!-- ═══════════ SESSION ═══════════ -->
+      <sc-if value="{{ isSession }}" hint-placeholder-val="{{ false }}">
+      <div style="height:100%;display:flex;flex-direction:column;">
+
+        <!-- session top bar -->
+        <div style="flex-shrink:0;padding:6px 18px 12px;">
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;">
+            <button onClick="{{ endSession }}" style="width:40px;height:40px;border-radius:50%;border:1px solid rgba(33,28,22,.13);background:#FFFCF6;display:flex;align-items:center;justify-content:center;cursor:pointer;color:#3A332A;">
+              <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+            </button>
+            <div style="text-align:center;">
+              <div style="font-family:'Spline Sans Mono',monospace;font-size:9px;font-weight:600;letter-spacing:2px;color:#9A8F7C;">{{ cur.cat }}</div>
+              <div style="font-family:'Spectral',serif;font-size:15px;font-weight:600;color:#211C16;margin-top:1px;">Card {{ idx1 }} of {{ total }}</div>
+            </div>
+            <div style="width:40px;height:40px;display:flex;align-items:center;justify-content:center;font-family:'Spline Sans Mono',monospace;font-size:11px;font-weight:600;color:#8A6636;">{{ remaining }}↑</div>
+          </div>
+          <div style="height:5px;background:rgba(33,28,22,.09);border-radius:5px;overflow:hidden;">
+            <div style="height:100%;background:linear-gradient(90deg,#2E6B52,#D8B981);border-radius:5px;width:{{ progressPct }}%;transition:width .4s cubic-bezier(.4,0,.2,1);"></div>
+          </div>
+        </div>
+
+        <!-- card scene -->
+        <div style="flex:1;min-height:0;padding:4px 16px 0;display:flex;flex-direction:column;">
+
+          <!-- FRONT FACE · FLIP & RATE -->
+          <sc-if value="{{ frontFlip }}" hint-placeholder-val="{{ true }}">
+          <div style="flex:1;min-height:0;display:flex;flex-direction:column;background:#FFFCF6;border:1px solid rgba(33,28,22,.08);border-radius:28px;box-shadow:0 24px 50px -28px rgba(33,28,22,.7),0 2px 6px rgba(0,0,0,.05);padding:22px 22px 20px;">
+            <div style="display:flex;align-items:center;justify-content:space-between;">
+              <span style="font-family:'Spline Sans Mono',monospace;font-size:10px;font-weight:600;letter-spacing:2px;color:#9A8F7C;">YOUR LANGUAGE</span>
+              <span style="display:flex;align-items:center;gap:6px;font-size:12px;font-weight:600;color:#3B5C86;background:#E9EFF7;padding:4px 11px;border-radius:20px;">🇬🇧 English</span>
+            </div>
+            <div style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;padding:10px 0;">
+              <div style="font-family:'Spline Sans Mono',monospace;font-size:9px;font-weight:600;letter-spacing:2px;color:#C2B7A2;">WHAT IS THE GERMAN FOR</div>
+              <div style="font-family:'Spectral',serif;font-size:38px;font-weight:600;color:#211C16;text-align:center;line-height:1.08;letter-spacing:-.5px;">{{ cur.prompt }}</div>
+              <div style="font-size:13px;color:#A89D8A;font-weight:500;font-style:italic;">try to recall it before revealing</div>
+            </div>
+            <button onClick="{{ flip }}" style="display:flex;align-items:center;justify-content:center;gap:9px;width:100%;background:#1F4034;color:#F4EFE4;border:none;padding:15px;border-radius:16px;font-family:'Hanken Grotesk';font-size:15px;font-weight:700;cursor:pointer;animation:rvPulse 2.4s ease infinite;">
+              <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="#E8D9BE" stroke-width="2" stroke-linecap="round"><polyline points="6,9 12,15 18,9"/></svg>
+              Reveal German
+            </button>
+          </div>
+          </sc-if>
+
+          <!-- FRONT FACE · TYPE ANSWER -->
+          <sc-if value="{{ frontType }}" hint-placeholder-val="{{ false }}">
+          <div style="flex:1;min-height:0;display:flex;flex-direction:column;background:#FFFCF6;border:1px solid rgba(33,28,22,.08);border-radius:28px;box-shadow:0 24px 50px -28px rgba(33,28,22,.7),0 2px 6px rgba(0,0,0,.05);padding:22px 22px 20px;">
+            <div style="display:flex;align-items:center;justify-content:space-between;">
+              <span style="font-family:'Spline Sans Mono',monospace;font-size:10px;font-weight:600;letter-spacing:2px;color:#9A8F7C;">WRITE IT FROM MEMORY</span>
+              <span style="display:flex;align-items:center;gap:6px;font-size:12px;font-weight:600;color:#3B5C86;background:#E9EFF7;padding:4px 11px;border-radius:20px;">⌨ Type</span>
+            </div>
+            <div style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;padding:6px 0;">
+              <div style="font-family:'Spline Sans Mono',monospace;font-size:9px;font-weight:600;letter-spacing:2px;color:#C2B7A2;">TYPE THE GERMAN FOR</div>
+              <div style="font-family:'Spectral',serif;font-size:30px;font-weight:600;color:#211C16;text-align:center;line-height:1.1;letter-spacing:-.5px;">{{ cur.prompt }}</div>
+            </div>
+            <input value="{{ typed }}" onInput="{{ onType }}" placeholder="Type in German — incl. der/die/das" autoComplete="off" autoCapitalize="off" autoCorrect="off" spellCheck="false" style="width:100%;text-align:center;font-family:'Spectral',serif;font-size:26px;font-weight:500;color:#1F4034;background:#F4EFE4;border:1px solid rgba(33,28,22,.1);border-bottom:2px solid #2E6B52;border-radius:12px;padding:13px 12px;outline:none;margin-bottom:12px;" />
+            <div style="display:flex;gap:8px;margin-bottom:14px;justify-content:center;">
+              <sc-for list="{{ accents }}" as="ac" hint-placeholder-count="4">
+                <button onClick="{{ ac.ins }}" style="width:46px;height:40px;border-radius:11px;border:1px solid rgba(33,28,22,.1);background:#FBF7EF;font-family:'Spectral',serif;font-size:19px;font-weight:500;color:#2C261E;cursor:pointer;">{{ ac.ch }}</button>
+              </sc-for>
+            </div>
+            <button onClick="{{ checkTyped }}" style="display:flex;align-items:center;justify-content:center;gap:9px;width:100%;background:#1F4034;color:#F4EFE4;border:none;padding:15px;border-radius:16px;font-family:'Hanken Grotesk';font-size:15px;font-weight:700;cursor:pointer;">
+              <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="#E8D9BE" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20,6 9,17 4,12"/></svg>
+              Check answer
+            </button>
+          </div>
+          </sc-if>
+
+          <!-- FRONT FACE · LISTEN FIRST -->
+          <sc-if value="{{ frontAudio }}" hint-placeholder-val="{{ false }}">
+          <div style="flex:1;min-height:0;display:flex;flex-direction:column;background:#FFFCF6;border:1px solid rgba(33,28,22,.08);border-radius:28px;box-shadow:0 24px 50px -28px rgba(33,28,22,.7),0 2px 6px rgba(0,0,0,.05);padding:22px 22px 20px;">
+            <div style="display:flex;align-items:center;justify-content:space-between;">
+              <span style="font-family:'Spline Sans Mono',monospace;font-size:10px;font-weight:600;letter-spacing:2px;color:#9A8F7C;">LISTEN & RECALL</span>
+              <span style="display:flex;align-items:center;gap:6px;font-size:12px;font-weight:600;color:#2E6B52;background:#EAF0EC;padding:4px 11px;border-radius:20px;">🔊 Audio</span>
+            </div>
+            <div style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:18px;padding:10px 0;">
+              <button onClick="{{ playAudio }}" style="position:relative;width:120px;height:120px;border-radius:50%;border:none;background:#1F4034;display:flex;align-items:center;justify-content:center;cursor:pointer;box-shadow:0 16px 36px -14px rgba(20,30,24,.8);animation:rvPulse 2.4s ease infinite;">
+                <svg viewBox="0 0 24 24" width="44" height="44" fill="#E8D9BE"><polygon points="8,5 20,12 8,19"/></svg>
+              </button>
+              <div style="font-family:'Spline Sans Mono',monospace;font-size:9px;font-weight:600;letter-spacing:2px;color:#C2B7A2;">TAP TO HEAR THE WORD</div>
+              <div style="display:flex;gap:10px;">
+                <button onClick="{{ playAudio }}" style="display:flex;align-items:center;gap:7px;background:#FBF7EF;border:1px solid rgba(33,28,22,.1);border-radius:11px;padding:8px 14px;cursor:pointer;font-family:'Hanken Grotesk';font-size:12.5px;font-weight:600;color:#5A5347;">
+                  <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 3-6.7"/><polyline points="3,3 3,8 8,8"/></svg>Replay
+                </button>
+                <button onClick="{{ playSlow }}" style="display:flex;align-items:center;gap:7px;background:#FBF7EF;border:1px solid rgba(33,28,22,.1);border-radius:11px;padding:8px 14px;cursor:pointer;font-family:'Hanken Grotesk';font-size:12.5px;font-weight:600;color:#5A5347;">🐢 Slow</button>
+              </div>
+            </div>
+            <button onClick="{{ flip }}" style="display:flex;align-items:center;justify-content:center;gap:9px;width:100%;background:#1F4034;color:#F4EFE4;border:none;padding:15px;border-radius:16px;font-family:'Hanken Grotesk';font-size:15px;font-weight:700;cursor:pointer;">
+              <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="#E8D9BE" stroke-width="2" stroke-linecap="round"><polyline points="6,9 12,15 18,9"/></svg>
+              Reveal answer
+            </button>
+          </div>
+          </sc-if>
+
+          <!-- BACK FACE — full rich detail -->
+          <sc-if value="{{ isBack }}" hint-placeholder-val="{{ false }}">
+          <div class="rv-scroll" style="flex:1;min-height:0;overflow-y:auto;background:#FFFCF6;border:1px solid rgba(33,28,22,.08);border-radius:28px;box-shadow:0 24px 50px -28px rgba(33,28,22,.7),0 2px 6px rgba(0,0,0,.05);padding:20px 20px 18px;">
+
+            <!-- TYPED RESULT BANNER -->
+            <sc-if value="{{ showTypedResult }}" hint-placeholder-val="{{ false }}">
+            <div style="border-radius:15px;padding:13px 15px;margin-bottom:16px;background:{{ typedResult.bannerBg }};border:1px solid {{ typedResult.bannerBorder }};">
+              <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px;">
+                <span style="width:24px;height:24px;border-radius:50%;background:{{ typedResult.verdictColor }};color:#FFFCF6;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;flex-shrink:0;">{{ typedResult.icon }}</span>
+                <span style="font-family:'Spectral',serif;font-size:17px;font-weight:600;color:{{ typedResult.verdictColor }};">{{ typedResult.verdict }}</span>
+                <span style="margin-left:auto;font-family:'Spline Sans Mono',monospace;font-size:8.5px;font-weight:600;letter-spacing:1px;color:#9A8F7C;">SUGGESTED ↓</span>
+              </div>
+              <div style="font-family:'Spline Sans Mono',monospace;font-size:8.5px;font-weight:600;letter-spacing:1.5px;color:#9A8F7C;margin-bottom:4px;">YOU WROTE</div>
+              <div style="font-family:'Spectral',serif;font-size:22px;font-weight:500;letter-spacing:.3px;display:flex;flex-wrap:wrap;">
+                <sc-for list="{{ youChars }}" as="ch" hint-placeholder-count="6">
+                  <span style="color:{{ ch.color }};">{{ ch.ch }}</span>
+                </sc-for>
+              </div>
+              <sc-if value="{{ showGenderNote }}" hint-placeholder-val="{{ false }}">
+              <div style="display:flex;align-items:center;gap:6px;margin-top:9px;font-size:12.5px;font-weight:600;color:#8A6B26;">
+                <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><line x1="12" y1="11" x2="12" y2="16"/><circle cx="12" cy="8" r=".6" fill="currentColor" stroke="none"/></svg>
+                {{ genderNote }}
+              </div>
+              </sc-if>
+            </div>
+            </sc-if>
+
+            <!-- header row -->
+            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;">
+              <span style="font-family:'Spline Sans Mono',monospace;font-size:10px;font-weight:600;letter-spacing:1.5px;color:#9A8F7C;max-width:58%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">{{ cur.prompt }}</span>
+              <span style="display:flex;align-items:center;gap:6px;font-size:12px;font-weight:600;color:#2E6B52;background:#EAF0EC;padding:4px 11px;border-radius:20px;flex-shrink:0;">🇩🇪 German</span>
+            </div>
+
+            <!-- article + gender -->
+            <sc-if value="{{ cur.hasArt }}" hint-placeholder-val="{{ true }}">
+            <div style="display:flex;align-items:center;gap:10px;margin-bottom:8px;">
+              <span style="font-family:'Spline Sans Mono',monospace;font-size:13px;font-weight:600;padding:4px 11px;border-radius:9px;background:{{ cur.artBg }};color:{{ cur.artColor }};">{{ cur.art }}</span>
+              <span style="font-size:12.5px;color:#8A7F6E;font-weight:500;">{{ cur.gender }}</span>
+              <span style="font-size:12px;color:#A89D8A;font-weight:500;font-style:italic;font-family:'Spectral',serif;margin-left:auto;">{{ cur.phonetic }}</span>
+            </div>
+            </sc-if>
+
+            <!-- headword -->
+            <h1 style="font-family:'Spectral',serif;font-size:40px;font-weight:600;color:#211C16;line-height:1.0;letter-spacing:-.5px;margin-bottom:6px;">{{ cur.word }}</h1>
+            <div style="font-size:15px;color:#5A5347;font-weight:500;margin-bottom:14px;">{{ cur.trans }}</div>
+
+            <!-- plural + audio row -->
+            <sc-if value="{{ cur.hasPlural }}" hint-placeholder-val="{{ false }}">
+            <div style="display:flex;align-items:center;gap:11px;margin-bottom:14px;">
+              <div style="display:inline-flex;align-items:center;gap:8px;background:#F4EFE4;border:1px solid rgba(33,28,22,.08);border-radius:11px;padding:6px 12px;">
+                <span style="font-family:'Spline Sans Mono',monospace;font-size:9px;font-weight:600;letter-spacing:1px;color:#8A6636;">PLURAL</span>
+                <span style="font-family:'Spectral',serif;font-size:15px;font-weight:500;color:#211C16;">{{ cur.plural }}</span>
+              </div>
+              <button onClick="{{ toast }}" style="width:34px;height:34px;border-radius:50%;border:1px solid rgba(33,28,22,.1);background:#FBF7EF;display:flex;align-items:center;justify-content:center;cursor:pointer;color:#5A5347;flex-shrink:0;">
+                <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><polygon points="11,5 6,9 2,9 2,15 6,15 11,19 11,5"/><path d="M15.5,8.5a5,5,0,0,1,0,7"/></svg>
+              </button>
+            </div>
+            </sc-if>
+
+            <!-- listen pronunciation -->
+            <button onClick="{{ toast }}" style="display:flex;align-items:center;justify-content:center;gap:9px;width:100%;background:#211C16;color:#F4EFE4;border:none;padding:13px;border-radius:14px;font-family:'Hanken Grotesk';font-size:13.5px;font-weight:600;cursor:pointer;margin-bottom:16px;">
+              <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="#E8D9BE" stroke-width="2" stroke-linecap="round"><polygon points="11,5 6,9 2,9 2,15 6,15 11,19 11,5"/><path d="M15.5,8.5a5,5,0,0,1,0,7"/><path d="M19,5a9,9,0,0,1,0,14"/></svg>
+              Listen to pronunciation
+              <span style="width:6px;height:6px;border-radius:50%;background:#6FB58E;"></span>
+            </button>
+
+            <!-- examples -->
+            <div style="height:1px;background:rgba(33,28,22,.08);margin:2px 0 14px;"></div>
+            <div style="font-family:'Spline Sans Mono',monospace;font-size:9.5px;font-weight:600;letter-spacing:1.5px;color:#9A8F7C;margin-bottom:13px;">EXAMPLE SENTENCES</div>
+            <sc-for list="{{ cur.examples }}" as="ex" hint-placeholder-count="1">
+              <div style="display:flex;align-items:flex-start;gap:10px;border-left:2px solid #E0CBA6;padding:1px 0 1px 14px;margin-bottom:14px;">
+                <div style="flex:1;">
+                  <p style="font-family:'Spectral',serif;font-size:16px;font-weight:400;color:#2C261E;line-height:1.5;margin-bottom:4px;" innerHTML="{{ ex.deHtml }}"></p>
+                  <p style="font-size:13px;color:#8A7F6E;font-weight:500;font-style:italic;">{{ ex.en }}</p>
+                </div>
+                <button onClick="{{ toast }}" style="width:30px;height:30px;border-radius:50%;border:1px solid rgba(33,28,22,.1);background:#FBF7EF;display:flex;align-items:center;justify-content:center;cursor:pointer;color:#8A7F6E;flex-shrink:0;">
+                  <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><polygon points="11,5 6,9 2,9 2,15 6,15 11,19 11,5"/><path d="M15.5,8.5a5,5,0,0,1,0,7"/></svg>
+                </button>
+              </div>
+            </sc-for>
+
+            <!-- usage note -->
+            <div style="display:flex;align-items:flex-start;gap:10px;background:#F6EFDF;border-radius:12px;padding:12px 14px;margin-bottom:16px;">
+              <span style="font-size:15px;">💡</span>
+              <p style="font-size:12.5px;color:#6E6557;line-height:1.5;font-weight:500;">{{ cur.note }}</p>
+            </div>
+
+            <!-- synonyms -->
+            <sc-if value="{{ cur.hasSyns }}" hint-placeholder-val="{{ true }}">
+            <div style="height:1px;background:rgba(33,28,22,.08);margin:2px 0 14px;"></div>
+            <div style="font-family:'Spline Sans Mono',monospace;font-size:9.5px;font-weight:600;letter-spacing:1.5px;color:#9A8F7C;margin-bottom:6px;">SYNONYMS</div>
+            <sc-for list="{{ cur.syns }}" as="s" hint-placeholder-count="2">
+              <div style="border-bottom:1px solid rgba(33,28,22,.06);">
+                <div onClick="{{ s.toggle }}" style="display:flex;align-items:center;gap:9px;padding:11px 0;cursor:pointer;user-select:none;">
+                  <sc-if value="{{ s.hasArt }}" hint-placeholder-val="{{ true }}">
+                  <span style="flex-shrink:0;font-family:'Spline Sans Mono',monospace;font-size:10px;font-weight:600;padding:3px 7px;border-radius:6px;background:{{ s.artBg }};color:{{ s.artColor }};min-width:30px;text-align:center;">{{ s.art }}</span>
+                  </sc-if>
+                  <span style="font-family:'Spectral',serif;font-size:16px;font-weight:500;color:#211C16;">{{ s.word }}</span>
+                  <span style="font-size:12px;color:#8A7F6E;margin-left:auto;font-weight:500;text-align:right;max-width:46%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">{{ s.trans }}</span>
+                  <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="#B0A593" stroke-width="2" stroke-linecap="round" style="flex-shrink:0;transform:{{ s.chev }};transition:transform .2s ease;"><polyline points="6,9 12,15 18,9"/></svg>
+                </div>
+                <sc-if value="{{ s.open }}" hint-placeholder-val="{{ false }}">
+                <div style="display:flex;align-items:flex-start;gap:10px;background:#F4EFE4;border-radius:12px;padding:11px 13px;margin:0 0 11px;">
+                  <div style="flex:1;">
+                    <p style="font-family:'Spectral',serif;font-size:15px;font-weight:400;color:#2C261E;line-height:1.5;margin-bottom:4px;" innerHTML="{{ s.exHtml }}"></p>
+                    <p style="font-size:12px;color:#8A7F6E;font-weight:500;font-style:italic;">{{ s.exEn }}</p>
+                  </div>
+                  <button onClick="{{ s.play }}" style="width:28px;height:28px;border-radius:50%;border:1px solid rgba(33,28,22,.1);background:#FBF7EF;display:flex;align-items:center;justify-content:center;cursor:pointer;color:#8A7F6E;flex-shrink:0;">
+                    <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><polygon points="11,5 6,9 2,9 2,15 6,15 11,19 11,5"/><path d="M15.5,8.5a5,5,0,0,1,0,7"/></svg>
+                  </button>
+                </div>
+                </sc-if>
+              </div>
+            </sc-for>
+            </sc-if>
+
+          </div>
+          </sc-if>
+        </div>
+
+        <!-- footer: nav + rating -->
+        <div style="flex-shrink:0;padding:12px 16px 20px;">
+          <sc-if value="{{ isBack }}" hint-placeholder-val="{{ false }}">
+          <div style="display:flex;flex-direction:column;gap:10px;">
+            <div style="display:flex;align-items:center;justify-content:center;gap:26px;">
+              <button onClick="{{ prev }}" style="display:flex;align-items:center;gap:5px;background:none;border:none;cursor:pointer;font-family:'Hanken Grotesk';font-size:12.5px;font-weight:600;color:#A89D8A;">
+                <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><polyline points="15,18 9,12 15,6"/></svg>Previous
+              </button>
+              <button onClick="{{ skip }}" style="display:flex;align-items:center;gap:5px;background:none;border:none;cursor:pointer;font-family:'Hanken Grotesk';font-size:12.5px;font-weight:600;color:#A89D8A;">
+                Skip<svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><polyline points="9,18 15,12 9,6"/></svg>
+              </button>
+            </div>
+            <div style="text-align:center;font-family:'Spline Sans Mono',monospace;font-size:9px;font-weight:600;letter-spacing:1.5px;color:#B0A593;">HOW WELL DID YOU KNOW THIS?</div>
+            <div style="display:flex;gap:8px;">
+              <sc-for list="{{ ratings }}" as="rt" hint-placeholder-count="4">
+                <button onClick="{{ rt.rate }}" style="flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;padding:11px 3px;border-radius:14px;cursor:pointer;border:1.5px solid {{ rt.border }};background:{{ rt.bg }};box-shadow:{{ rt.ring }};">
+                  <span style="font-family:'Hanken Grotesk';font-size:13px;font-weight:700;color:{{ rt.fg }};">{{ rt.label }}</span>
+                  <span style="font-family:'Spline Sans Mono',monospace;font-size:9.5px;font-weight:600;color:{{ rt.sub }};">{{ rt.interval }}</span>
+                </button>
+              </sc-for>
+            </div>
+          </div>
+          </sc-if>
+          <sc-if value="{{ isFront }}" hint-placeholder-val="{{ true }}">
+          <div style="display:flex;align-items:center;justify-content:center;gap:8px;padding:14px 0;color:#B0A593;font-family:'Hanken Grotesk';font-size:12.5px;font-weight:600;">
+            <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+            Rating unlocks after you reveal
+          </div>
+          </sc-if>
+        </div>
+
+      </div>
+      </sc-if>
+
+      <!-- ═══════════ MASTERY BREAKDOWN ═══════════ -->
+      <sc-if value="{{ isMastery }}" hint-placeholder-val="{{ false }}">
+      <div style="padding:6px 20px 40px;">
+        <div style="display:flex;align-items:center;gap:14px;padding:8px 0 18px;">
+          <button onClick="{{ backToHub }}" style="width:40px;height:40px;border-radius:50%;border:1px solid rgba(33,28,22,.13);background:#FFFCF6;display:flex;align-items:center;justify-content:center;cursor:pointer;color:#3A332A;flex-shrink:0;">
+            <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15,18 9,12 15,6"/></svg>
+          </button>
+          <div>
+            <div style="font-family:'Spline Sans Mono',monospace;font-size:9.5px;font-weight:600;letter-spacing:2.5px;color:#8A6636;">YOUR PROGRESS</div>
+            <div style="font-family:'Spectral',serif;font-size:27px;font-weight:500;color:#211C16;line-height:1;letter-spacing:-.4px;">Mastery</div>
+          </div>
+        </div>
+
+        <!-- hero score -->
+        <div style="position:relative;border-radius:24px;padding:24px;overflow:hidden;background:linear-gradient(155deg,#1F4034 0%,#15281F 100%);box-shadow:0 22px 44px -22px rgba(20,30,24,.85);margin-bottom:24px;display:flex;align-items:center;gap:22px;">
+          <div style="position:absolute;top:-40px;right:-30px;width:150px;height:150px;border-radius:50%;background:radial-gradient(circle,rgba(216,185,129,.16),transparent 70%);"></div>
+          <div style="position:relative;width:92px;height:92px;flex-shrink:0;">
+            <svg viewBox="0 0 92 92" style="width:92px;height:92px;transform:rotate(-90deg);">
+              <circle cx="46" cy="46" r="40" fill="none" stroke="rgba(244,239,228,.12)" stroke-width="6"/>
+              <circle cx="46" cy="46" r="40" fill="none" stroke="#D8B981" stroke-width="6" stroke-linecap="round" stroke-dasharray="251.3" stroke-dashoffset="146"/>
+            </svg>
+            <div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-family:'Spectral',serif;font-size:28px;font-weight:600;color:#F4EFE4;">{{ masteryScore }}%</div>
+          </div>
+          <div style="position:relative;">
+            <div style="font-family:'Spline Sans Mono',monospace;font-size:9px;font-weight:600;letter-spacing:2px;color:#D8B981;margin-bottom:6px;">OVERALL MASTERY</div>
+            <div style="font-size:14px;color:rgba(246,241,230,.78);font-weight:500;line-height:1.45;">{{ masteredCount }} of {{ masteryTotal }} words are<br>locked into long-term memory.</div>
+          </div>
+        </div>
+
+        <!-- lifecycle stacked bar -->
+        <div style="font-family:'Spline Sans Mono',monospace;font-size:9.5px;font-weight:600;letter-spacing:1.5px;color:#9A8F7C;margin-bottom:12px;">WHERE YOUR WORDS STAND</div>
+        <div style="display:flex;height:14px;border-radius:8px;overflow:hidden;margin-bottom:18px;gap:2px;">
+          <sc-for list="{{ mLevels }}" as="l" hint-placeholder-count="4">
+            <div style="height:100%;width:{{ l.width }};background:{{ l.color }};"></div>
+          </sc-for>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:2px;margin-bottom:22px;">
+          <sc-for list="{{ mLevels }}" as="l" hint-placeholder-count="4">
+            <div style="display:flex;align-items:center;gap:12px;padding:11px 4px;border-bottom:1px solid rgba(33,28,22,.06);">
+              <span style="width:11px;height:11px;border-radius:3px;background:{{ l.color }};flex-shrink:0;"></span>
+              <div style="flex:1;min-width:0;">
+                <div style="font-family:'Hanken Grotesk';font-size:14.5px;font-weight:700;color:#211C16;">{{ l.label }}</div>
+                <div style="font-size:11.5px;color:#9A8F7C;font-weight:500;margin-top:1px;">{{ l.sub }}</div>
+              </div>
+              <div style="text-align:right;flex-shrink:0;">
+                <span style="font-family:'Spectral',serif;font-size:18px;font-weight:600;color:#211C16;">{{ l.count }}</span>
+                <span style="font-family:'Spline Sans Mono',monospace;font-size:10px;font-weight:600;color:#B0A593;margin-left:5px;">{{ l.pct }}%</span>
+              </div>
+            </div>
+          </sc-for>
+        </div>
+
+        <!-- struggling callout -->
+        <div style="display:flex;align-items:center;gap:14px;background:#F8ECE6;border:1px solid rgba(181,88,46,.18);border-radius:18px;padding:15px 16px;margin-bottom:24px;">
+          <div style="width:44px;height:44px;border-radius:13px;background:#F0DACF;display:flex;align-items:center;justify-content:center;flex-shrink:0;color:#B5582E;">
+            <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12" y2="17"/></svg>
+          </div>
+          <div style="flex:1;min-width:0;">
+            <div style="font-family:'Spectral',serif;font-size:16px;font-weight:600;color:#211C16;line-height:1.1;">{{ strugglingCount }} words need attention</div>
+            <div style="font-size:12px;color:#8A7F6E;font-weight:500;margin-top:2px;">Repeatedly slipping — worth a focused pass</div>
+          </div>
+          <button onClick="{{ drillStruggling }}" style="background:#B5582E;color:#FBF1EA;border:none;padding:9px 14px;border-radius:11px;font-family:'Hanken Grotesk';font-size:12.5px;font-weight:700;cursor:pointer;flex-shrink:0;">Drill</button>
+        </div>
+
+        <!-- by collection -->
+        <div style="font-family:'Spline Sans Mono',monospace;font-size:9.5px;font-weight:600;letter-spacing:1.5px;color:#9A8F7C;margin-bottom:14px;">MASTERY BY COLLECTION</div>
+        <div style="display:flex;flex-direction:column;gap:16px;">
+          <sc-for list="{{ mCollections }}" as="co" hint-placeholder-count="4">
+            <div>
+              <div style="display:flex;align-items:baseline;justify-content:space-between;margin-bottom:7px;">
+                <span style="font-family:'Hanken Grotesk';font-size:14px;font-weight:700;color:#211C16;">{{ co.name }}</span>
+                <span style="font-size:12px;color:#8A7F6E;font-weight:500;">{{ co.mastered }} / {{ co.total }} · {{ co.pct }}%</span>
+              </div>
+              <div style="height:8px;background:rgba(33,28,22,.07);border-radius:8px;overflow:hidden;">
+                <div style="height:100%;border-radius:8px;background:linear-gradient(90deg,#2E6B52,#5E9E7C);width:{{ co.width }};"></div>
+              </div>
+            </div>
+          </sc-for>
+        </div>
+      </div>
+      </sc-if>
+
+      <!-- ═══════════ SESSION HISTORY ═══════════ -->
+      <sc-if value="{{ isHistory }}" hint-placeholder-val="{{ false }}">
+      <div style="padding:6px 20px 40px;">
+        <div style="display:flex;align-items:center;gap:14px;padding:8px 0 18px;">
+          <button onClick="{{ backToHub }}" style="width:40px;height:40px;border-radius:50%;border:1px solid rgba(33,28,22,.13);background:#FFFCF6;display:flex;align-items:center;justify-content:center;cursor:pointer;color:#3A332A;flex-shrink:0;">
+            <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15,18 9,12 15,6"/></svg>
+          </button>
+          <div>
+            <div style="font-family:'Spline Sans Mono',monospace;font-size:9.5px;font-weight:600;letter-spacing:2.5px;color:#8A6636;">YOUR ACTIVITY</div>
+            <div style="font-family:'Spectral',serif;font-size:27px;font-weight:500;color:#211C16;line-height:1;letter-spacing:-.4px;">History</div>
+          </div>
+        </div>
+
+        <!-- weekly chart -->
+        <div style="background:#FFFCF6;border:1px solid rgba(33,28,22,.08);border-radius:20px;padding:18px 18px 14px;margin-bottom:24px;box-shadow:0 8px 22px -16px rgba(33,28,22,.5);">
+          <div style="display:flex;align-items:flex-end;justify-content:space-between;margin-bottom:16px;">
+            <div>
+              <div style="font-family:'Spectral',serif;font-size:24px;font-weight:600;color:#211C16;line-height:1;">{{ weekTotal }}</div>
+              <div style="font-family:'Spline Sans Mono',monospace;font-size:9px;font-weight:600;letter-spacing:1px;color:#9A8F7C;margin-top:4px;">CARDS THIS WEEK</div>
+            </div>
+            <div style="display:flex;align-items:center;gap:6px;background:#F6EFDF;border-radius:20px;padding:6px 12px;">
+              <span style="font-size:14px;">🔥</span>
+              <span style="font-family:'Hanken Grotesk';font-size:13px;font-weight:700;color:#8A6636;">{{ streak }} day streak</span>
+            </div>
+          </div>
+          <div style="display:flex;align-items:flex-end;justify-content:space-between;gap:8px;height:72px;">
+            <sc-for list="{{ weekDays }}" as="d" hint-placeholder-count="7">
+              <div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:7px;height:100%;justify-content:flex-end;">
+                <div style="width:100%;max-width:22px;height:{{ d.h }};border-radius:5px;background:{{ d.barColor }};"></div>
+                <span style="font-family:'Spline Sans Mono',monospace;font-size:10px;font-weight:600;color:{{ d.labelColor }};">{{ d.d }}</span>
+              </div>
+            </sc-for>
+          </div>
+        </div>
+
+        <!-- sessions -->
+        <sc-for list="{{ history }}" as="g" hint-placeholder-count="2">
+          <div style="font-family:'Spline Sans Mono',monospace;font-size:9.5px;font-weight:600;letter-spacing:1.5px;color:#9A8F7C;margin:6px 0 12px;">{{ g.group }}</div>
+          <div style="display:flex;flex-direction:column;gap:10px;margin-bottom:22px;">
+            <sc-for list="{{ g.rows }}" as="r" hint-placeholder-count="2">
+              <div style="background:#FFFCF6;border:1px solid rgba(33,28,22,.08);border-radius:16px;padding:14px 16px;box-shadow:0 6px 18px -14px rgba(33,28,22,.5);">
+                <div style="display:flex;align-items:center;gap:11px;margin-bottom:11px;">
+                  <span style="width:8px;height:8px;border-radius:50%;background:{{ r.dot }};flex-shrink:0;"></span>
+                  <div style="font-family:'Hanken Grotesk';font-size:15px;font-weight:700;color:#211C16;flex:1;min-width:0;">{{ r.title }}</div>
+                  <span style="font-size:11.5px;color:#9A8F7C;font-weight:500;flex-shrink:0;">{{ r.time }}</span>
+                </div>
+                <div style="display:flex;align-items:center;gap:18px;">
+                  <div style="display:flex;align-items:baseline;gap:5px;"><span style="font-family:'Spectral',serif;font-size:17px;font-weight:600;color:#211C16;">{{ r.cards }}</span><span style="font-size:11px;color:#9A8F7C;font-weight:500;">cards</span></div>
+                  <div style="display:flex;align-items:baseline;gap:5px;"><span style="font-family:'Spectral',serif;font-size:17px;font-weight:600;color:#2E6B52;">{{ r.nailed }}</span><span style="font-size:11px;color:#9A8F7C;font-weight:500;">nailed</span></div>
+                  <div style="display:flex;align-items:baseline;gap:5px;"><span style="font-family:'Spectral',serif;font-size:17px;font-weight:600;color:#C99A3E;">{{ r.struggled }}</span><span style="font-size:11px;color:#9A8F7C;font-weight:500;">struggled</span></div>
+                  <span style="margin-left:auto;font-family:'Spline Sans Mono',monospace;font-size:11px;font-weight:600;color:#B0A593;">{{ r.dur }}</span>
+                </div>
+              </div>
+            </sc-for>
+          </div>
+        </sc-for>
+      </div>
+      </sc-if>
+
+      <!-- ═══════════ CUSTOM STUDY ═══════════ -->
+      <sc-if value="{{ isCustom }}" hint-placeholder-val="{{ false }}">
+      <div style="height:100%;display:flex;flex-direction:column;">
+        <div class="rv-scroll" style="flex:1;min-height:0;overflow-y:auto;padding:6px 20px 16px;">
+          <div style="display:flex;align-items:center;gap:14px;padding:8px 0 18px;">
+            <button onClick="{{ backToHub }}" style="width:40px;height:40px;border-radius:50%;border:1px solid rgba(33,28,22,.13);background:#FFFCF6;display:flex;align-items:center;justify-content:center;cursor:pointer;color:#3A332A;flex-shrink:0;">
+              <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15,18 9,12 15,6"/></svg>
+            </button>
+            <div>
+              <div style="font-family:'Spline Sans Mono',monospace;font-size:9.5px;font-weight:600;letter-spacing:2.5px;color:#8A6636;">BUILD A SESSION</div>
+              <div style="font-family:'Spectral',serif;font-size:27px;font-weight:500;color:#211C16;line-height:1;letter-spacing:-.4px;">Custom study</div>
+            </div>
+          </div>
+
+          <!-- card types -->
+          <div style="font-family:'Spline Sans Mono',monospace;font-size:9.5px;font-weight:600;letter-spacing:1.5px;color:#9A8F7C;margin-bottom:12px;">INCLUDE CARDS</div>
+          <div style="display:flex;flex-wrap:wrap;gap:9px;margin-bottom:26px;">
+            <sc-for list="{{ customTypes }}" as="ct" hint-placeholder-count="5">
+              <button onClick="{{ ct.toggle }}" style="display:flex;align-items:center;gap:8px;border:1.5px solid {{ ct.border }};background:{{ ct.bg }};border-radius:13px;padding:10px 14px;cursor:pointer;">
+                <span style="font-family:'Hanken Grotesk';font-size:13.5px;font-weight:700;color:{{ ct.fg }};">{{ ct.label }}</span>
+                <span style="font-family:'Spline Sans Mono',monospace;font-size:11px;font-weight:600;color:{{ ct.poolFg }};">{{ ct.pool }}</span>
+              </button>
+            </sc-for>
+          </div>
+
+          <!-- length -->
+          <div style="display:flex;align-items:baseline;justify-content:space-between;margin-bottom:12px;">
+            <div style="font-family:'Spline Sans Mono',monospace;font-size:9.5px;font-weight:600;letter-spacing:1.5px;color:#9A8F7C;">SESSION LENGTH</div>
+            <div><span style="font-family:'Spectral',serif;font-size:20px;font-weight:600;color:#2E6B52;">{{ customLength }}</span><span style="font-size:12px;color:#8A7F6E;font-weight:500;margin-left:4px;">cards</span></div>
+          </div>
+          <input type="range" min="5" max="50" step="5" value="{{ customLength }}" onInput="{{ setLength }}" style="width:100%;margin-bottom:26px;accent-color:#1F4034;height:6px;cursor:pointer;" />
+
+          <!-- order -->
+          <div style="font-family:'Spline Sans Mono',monospace;font-size:9.5px;font-weight:600;letter-spacing:1.5px;color:#9A8F7C;margin-bottom:12px;">ORDER</div>
+          <div style="display:flex;gap:8px;background:#EFE9DB;border-radius:14px;padding:4px;margin-bottom:24px;">
+            <sc-for list="{{ customOrders }}" as="o" hint-placeholder-count="3">
+              <button onClick="{{ o.set }}" style="flex:1;padding:10px 4px;border:none;border-radius:11px;cursor:pointer;font-family:'Hanken Grotesk';font-size:13px;font-weight:600;background:{{ o.activeBg }};color:{{ o.activeFg }};box-shadow:{{ o.activeShadow }};">{{ o.label }}</button>
+            </sc-for>
+          </div>
+
+          <!-- direction -->
+          <div style="font-family:'Spline Sans Mono',monospace;font-size:9.5px;font-weight:600;letter-spacing:1.5px;color:#9A8F7C;margin-bottom:12px;">PROMPT DIRECTION</div>
+          <div style="display:flex;gap:8px;background:#EFE9DB;border-radius:14px;padding:4px;margin-bottom:8px;">
+            <sc-for list="{{ customDirs }}" as="d" hint-placeholder-count="3">
+              <button onClick="{{ d.set }}" style="flex:1;padding:10px 4px;border:none;border-radius:11px;cursor:pointer;font-family:'Spline Sans Mono',monospace;font-size:12px;font-weight:600;background:{{ d.activeBg }};color:{{ d.activeFg }};box-shadow:{{ d.activeShadow }};">{{ d.label }}</button>
+            </sc-for>
+          </div>
+        </div>
+
+        <!-- sticky start -->
+        <div style="flex-shrink:0;padding:12px 20px 20px;border-top:1px solid rgba(33,28,22,.07);background:#F4EFE4;">
+          <button onClick="{{ startCustom }}" style="display:flex;align-items:center;justify-content:center;gap:9px;width:100%;background:#1F4034;color:#F4EFE4;border:none;padding:16px;border-radius:16px;font-family:'Hanken Grotesk';font-size:15px;font-weight:700;cursor:pointer;box-shadow:0 12px 26px -12px rgba(20,30,24,.7);">
+            <svg viewBox="0 0 24 24" width="16" height="16" fill="#E8D9BE"><polygon points="6,4 20,12 6,20"/></svg>
+            Start {{ customCount }}-card session
+          </button>
+        </div>
+      </div>
+      </sc-if>
+
+      <!-- ═══════════ LEECHES ═══════════ -->
+      <sc-if value="{{ isLeeches }}" hint-placeholder-val="{{ false }}">
+      <div style="height:100%;display:flex;flex-direction:column;">
+        <div class="rv-scroll" style="flex:1;min-height:0;overflow-y:auto;padding:6px 20px 16px;">
+          <div style="display:flex;align-items:center;gap:14px;padding:8px 0 18px;">
+            <button onClick="{{ backToHub }}" style="width:40px;height:40px;border-radius:50%;border:1px solid rgba(33,28,22,.13);background:#FFFCF6;display:flex;align-items:center;justify-content:center;cursor:pointer;color:#3A332A;flex-shrink:0;">
+              <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15,18 9,12 15,6"/></svg>
+            </button>
+            <div>
+              <div style="font-family:'Spline Sans Mono',monospace;font-size:9.5px;font-weight:600;letter-spacing:2.5px;color:#8A6636;">STUBBORN WORDS</div>
+              <div style="font-family:'Spectral',serif;font-size:27px;font-weight:500;color:#211C16;line-height:1;letter-spacing:-.4px;">Leeches</div>
+            </div>
+          </div>
+
+          <!-- explainer -->
+          <div style="display:flex;align-items:flex-start;gap:11px;background:#F6EFDF;border-radius:14px;padding:13px 15px;margin-bottom:22px;">
+            <span style="font-size:15px;">🐛</span>
+            <p style="font-size:12.5px;color:#6E6557;line-height:1.5;font-weight:500;">A <b style="color:#211C16;">leech</b> is a card you've failed far more than you've recalled. They drain your sessions — tackle them head-on, reset them, or rest them for a while.</p>
+          </div>
+
+          <!-- leech list -->
+          <div style="display:flex;flex-direction:column;gap:12px;">
+            <sc-for list="{{ leeches }}" as="l" hint-placeholder-count="3">
+              <div style="background:#FFFCF6;border:1px solid rgba(33,28,22,.08);border-radius:18px;padding:16px;box-shadow:0 8px 22px -16px rgba(33,28,22,.5);">
+                <div style="display:flex;align-items:flex-start;gap:10px;margin-bottom:13px;">
+                  <sc-if value="{{ l.hasArt }}" hint-placeholder-val="{{ true }}">
+                  <span style="font-family:'Spline Sans Mono',monospace;font-size:11px;font-weight:600;padding:3px 8px;border-radius:7px;background:{{ l.artBg }};color:{{ l.artColor }};flex-shrink:0;margin-top:4px;">{{ l.art }}</span>
+                  </sc-if>
+                  <div style="flex:1;min-width:0;">
+                    <div style="font-family:'Spectral',serif;font-size:20px;font-weight:600;color:#211C16;line-height:1.05;">{{ l.word }}</div>
+                    <div style="font-size:13px;color:#8A7F6E;font-weight:500;margin-top:2px;">{{ l.trans }}</div>
+                  </div>
+                  <div style="text-align:right;flex-shrink:0;">
+                    <div style="font-family:'Spectral',serif;font-size:22px;font-weight:600;color:#B5582E;line-height:1;">{{ l.fails }}×</div>
+                    <div style="font-family:'Spline Sans Mono',monospace;font-size:8px;font-weight:600;letter-spacing:.5px;color:#B0A593;margin-top:3px;">FAILED</div>
+                  </div>
+                </div>
+                <div style="display:flex;align-items:center;gap:10px;margin-bottom:13px;">
+                  <span style="font-family:'Spline Sans Mono',monospace;font-size:10px;font-weight:600;color:#C99A3E;background:#F7F0DD;padding:3px 9px;border-radius:7px;">{{ l.lapses }}</span>
+                  <span style="font-size:11.5px;color:#A89D8A;font-weight:500;">Last seen {{ l.lastSeen }}</span>
+                </div>
+                <div style="display:flex;gap:8px;">
+                  <button onClick="{{ l.reset }}" style="flex:1;background:#FBF7EF;border:1px solid rgba(33,28,22,.1);border-radius:11px;padding:10px;cursor:pointer;font-family:'Hanken Grotesk';font-size:12.5px;font-weight:600;color:#5A5347;">Reset</button>
+                  <button onClick="{{ l.suspend }}" style="flex:1;background:#FBF7EF;border:1px solid rgba(33,28,22,.1);border-radius:11px;padding:10px;cursor:pointer;font-family:'Hanken Grotesk';font-size:12.5px;font-weight:600;color:#5A5347;">Rest</button>
+                </div>
+              </div>
+            </sc-for>
+          </div>
+        </div>
+
+        <!-- sticky study -->
+        <div style="flex-shrink:0;padding:12px 20px 20px;border-top:1px solid rgba(33,28,22,.07);background:#F4EFE4;">
+          <button onClick="{{ studyLeeches }}" style="display:flex;align-items:center;justify-content:center;gap:9px;width:100%;background:#B5582E;color:#FBF1EA;border:none;padding:16px;border-radius:16px;font-family:'Hanken Grotesk';font-size:15px;font-weight:700;cursor:pointer;box-shadow:0 12px 26px -12px rgba(181,88,46,.7);">
+            <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="#FBF1EA" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="13,2 3,14 12,14 11,22 21,10 12,10 13,2"/></svg>
+            Break through all {{ leechCount }}
+          </button>
+        </div>
+      </div>
+      </sc-if>
+
+      <!-- ═══════════ DONE / SUMMARY ═══════════ -->
+      <sc-if value="{{ isDone }}" hint-placeholder-val="{{ false }}">
+      <div style="padding:6px 22px 40px;">
+
+        <!-- celebration hero -->
+        <div style="position:relative;border-radius:26px;padding:30px 22px 26px;overflow:hidden;background:linear-gradient(155deg,#1F4034 0%,#15281F 100%);box-shadow:0 22px 44px -22px rgba(20,30,24,.85);margin:14px 0 22px;text-align:center;">
+          <div style="position:absolute;top:-46px;left:50%;transform:translateX(-50%);width:200px;height:200px;border-radius:50%;background:radial-gradient(circle,rgba(216,185,129,.18),transparent 70%);"></div>
+          <div style="position:relative;width:64px;height:64px;margin:0 auto 16px;border-radius:50%;background:rgba(216,185,129,.16);display:flex;align-items:center;justify-content:center;">
+            <svg viewBox="0 0 24 24" width="30" height="30" fill="none" stroke="#D8B981" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20,6 9,17 4,12"/></svg>
+          </div>
+          <div style="position:relative;font-family:'Spectral',serif;font-size:28px;font-weight:600;color:#F4EFE4;line-height:1.05;margin-bottom:6px;">Session complete</div>
+          <div style="position:relative;font-size:13.5px;color:rgba(246,241,230,.6);font-weight:500;">{{ reviewedCount }} cards reviewed in {{ timeStr }}</div>
+        </div>
+
+        <!-- top stat row -->
+        <div style="display:flex;gap:11px;margin-bottom:14px;">
+          <div style="flex:1;background:#FFFCF6;border:1px solid rgba(33,28,22,.08);border-radius:18px;padding:16px 14px;text-align:center;box-shadow:0 8px 22px -16px rgba(33,28,22,.5);">
+            <div style="font-family:'Spectral',serif;font-size:30px;font-weight:600;color:#2E6B52;line-height:1;">{{ recallPct }}%</div>
+            <div style="font-family:'Spline Sans Mono',monospace;font-size:8.5px;font-weight:600;letter-spacing:1px;color:#9A8F7C;margin-top:5px;">RECALL RATE</div>
+          </div>
+          <div style="flex:1;background:#FFFCF6;border:1px solid rgba(33,28,22,.08);border-radius:18px;padding:16px 14px;text-align:center;box-shadow:0 8px 22px -16px rgba(33,28,22,.5);">
+            <div style="display:flex;align-items:baseline;justify-content:center;gap:3px;">
+              <span style="font-family:'Spectral',serif;font-size:30px;font-weight:600;color:#211C16;line-height:1;">{{ newStreak }}</span>
+              <span style="font-size:14px;">🔥</span>
+            </div>
+            <div style="font-family:'Spline Sans Mono',monospace;font-size:8.5px;font-weight:600;letter-spacing:1px;color:#9A8F7C;margin-top:5px;">DAY STREAK</div>
+          </div>
+        </div>
+
+        <!-- breakdown -->
+        <div style="background:#FFFCF6;border:1px solid rgba(33,28,22,.08);border-radius:18px;padding:18px 18px 8px;margin-bottom:22px;box-shadow:0 8px 22px -16px rgba(33,28,22,.5);">
+          <div style="font-family:'Spline Sans Mono',monospace;font-size:9.5px;font-weight:600;letter-spacing:1.5px;color:#9A8F7C;margin-bottom:14px;">HOW IT WENT</div>
+          <sc-for list="{{ summaryBars }}" as="b" hint-placeholder-count="4">
+            <div style="display:flex;align-items:center;gap:12px;margin-bottom:13px;">
+              <span style="width:42px;font-size:12.5px;font-weight:600;color:#5A5347;flex-shrink:0;">{{ b.label }}</span>
+              <div style="flex:1;height:8px;background:rgba(33,28,22,.06);border-radius:8px;overflow:hidden;">
+                <div style="height:100%;border-radius:8px;background:{{ b.color }};width:{{ b.width }};transition:width .6s cubic-bezier(.4,0,.2,1);"></div>
+              </div>
+              <span style="width:20px;text-align:right;font-family:'Spectral',serif;font-size:16px;font-weight:600;color:#211C16;flex-shrink:0;">{{ b.count }}</span>
+            </div>
+          </sc-for>
+        </div>
+
+        <!-- cross-feature bridge -->
+        <div style="display:flex;align-items:center;gap:14px;background:linear-gradient(150deg,#F3ECDC,#EFE6D2);border:1px solid rgba(138,102,54,.18);border-radius:18px;padding:15px 16px;margin-bottom:14px;">
+          <div style="width:46px;height:46px;border-radius:13px;background:#211C16;display:flex;align-items:center;justify-content:center;flex-shrink:0;color:#E8D9BE;">
+            <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M2 4h7a3 3 0 0 1 3 3v13a2.5 2.5 0 0 0-2.5-2.5H2z"/><path d="M22 4h-7a3 3 0 0 0-3 3v13a2.5 2.5 0 0 1 2.5-2.5H22z"/></svg>
+          </div>
+          <div style="flex:1;min-width:0;">
+            <div style="font-family:'Spectral',serif;font-size:16px;font-weight:600;color:#211C16;line-height:1.1;">Lock it in with a story</div>
+            <div style="font-size:12px;color:#8A7F6E;font-weight:500;margin-top:2px;">See today's {{ needsWork }} tricky words in context</div>
+          </div>
+          <button onClick="{{ toStories }}" style="width:36px;height:36px;border-radius:50%;border:none;background:#211C16;display:flex;align-items:center;justify-content:center;cursor:pointer;color:#E8D9BE;flex-shrink:0;">
+            <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><polyline points="9,6 15,12 9,18"/></svg>
+          </button>
+        </div>
+
+        <!-- actions -->
+        <div style="display:flex;flex-direction:column;gap:10px;">
+          <button onClick="{{ reviewMissed }}" style="display:flex;align-items:center;justify-content:center;gap:9px;width:100%;background:#1F4034;color:#F4EFE4;border:none;padding:15px;border-radius:16px;font-family:'Hanken Grotesk';font-size:15px;font-weight:700;cursor:pointer;box-shadow:0 12px 26px -12px rgba(20,30,24,.7);">
+            <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="#E8D9BE" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 3-6.7"/><polyline points="3,3 3,8 8,8"/></svg>
+            Drill the {{ needsWork }} that need work
+          </button>
+          <button onClick="{{ backToHub }}" style="width:100%;background:#FFFCF6;color:#3A332A;border:1px solid rgba(33,28,22,.13);padding:14px;border-radius:16px;font-family:'Hanken Grotesk';font-size:14px;font-weight:600;cursor:pointer;">Back to Review home</button>
+        </div>
+
+      </div>
+      </sc-if>
+
+    </div>
+
+    <!-- ═══════════ BOTTOM NAV (hub only) ═══════════ -->
+    <sc-if value="{{ isHub }}" hint-placeholder-val="{{ true }}">
+    <div style="position:absolute;bottom:0;left:0;right:0;height:74px;background:rgba(248,244,236,.92);backdrop-filter:blur(14px);border-top:1px solid rgba(33,28,22,.08);display:flex;align-items:flex-start;padding:11px 6px 0;z-index:5;">
+      <sc-for list="{{ navItems }}" as="n" hint-placeholder-count="5">
+        <div onClick="{{ n.go }}" style="flex:1;display:flex;flex-direction:column;align-items:center;gap:4px;cursor:pointer;">
+          <div style="color:{{ n.color }};" innerHTML="{{ n.icon }}"></div>
+          <span style="font-size:9.5px;font-weight:{{ n.weight }};color:{{ n.color }};">{{ n.label }}</span>
+        </div>
+      </sc-for>
+    </div>
+    </sc-if>
+
+    <!-- ═══════════ TOAST ═══════════ -->
+    <sc-if value="{{ toastMsg }}" hint-placeholder-val="{{ false }}">
+      <div style="position:absolute;bottom:96px;left:50%;transform:translateX(-50%);z-index:30;background:#211C16;color:#F4EFE4;font-family:'Hanken Grotesk';font-size:13px;font-weight:600;padding:11px 18px;border-radius:13px;box-shadow:0 10px 30px rgba(0,0,0,.4);white-space:nowrap;">{{ toastMsg }}</div>
+    </sc-if>
+
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:392,&quot;height&quot;:844}}">
+class Component extends DCLogic {
+  state = {
+    screen: 'hub',   // hub | session | done
+    idx: 0,
+    flipped: false,
+    expanded: [],    // synonym indices expanded on current card
+    toast: '',
+    tally: { again: 0, hard: 0, good: 0, easy: 0 },
+    startMs: 0,
+    reviewedWords: [],
+    custom: { scope: 'all', types: ['due', 'struggling'], length: 20, order: 'due', dir: 'en-de' },
+    mode: 'flip',          // flip | type | audio
+    typed: '',
+    typedResult: null,     // { verdict, correct, close, youHtml, targetHtml, suggested }
+  };
+
+  CARDS = [
+    { prompt: 'condition, state', word: 'Zustand', art: 'der', phonetic: '[ˈtsuːʃtant]', plural: 'die Zustände', trans: 'condition, state', cat: 'EVERYDAY LIFE',
+      examples: [ { de: 'Der Zustand des Hauses ist schlecht.', en: 'The condition of the house is poor.' } ],
+      note: 'Common in the phrase „außer Zustand“ — out of order / not functioning.',
+      syns: [
+        { art: 'die', word: 'Lage', trans: 'situation, state', ex: 'Die Lage ist kritisch.', exEn: 'The situation is critical.' },
+        { art: 'die', word: 'Verfassung', trans: 'condition (of health)', ex: 'Er ist in guter Verfassung.', exEn: 'He is in good shape.' },
+      ],
+      intervals: { again: '1 min', hard: '8 min', good: '12 min', easy: '4 days' } },
+
+    { prompt: 'delay, lateness', word: 'Verspätung', art: 'die', phonetic: '[fɛɐ̯ˈʃpɛːtʊŋ]', plural: 'die Verspätungen', trans: 'delay, lateness', cat: 'TRAVEL & RAIL',
+      examples: [
+        { de: 'Der Zug hat zwanzig Minuten Verspätung.', en: 'The train is twenty minutes late.' },
+        { de: 'Wegen der Verspätung verpassten wir den Anschluss.', en: 'Because of the delay we missed the connection.' },
+      ],
+      note: 'Idiomatic with haben: „Verspätung haben“ = to be running late (not „sein“).',
+      syns: [
+        { art: 'die', word: 'Verzögerung', trans: 'delay', ex: 'Es gab eine kurze Verzögerung.', exEn: 'There was a brief delay.' },
+        { art: 'der', word: 'Aufschub', trans: 'postponement', ex: 'Wir baten um einen Aufschub.', exEn: 'We asked for a postponement.' },
+      ],
+      intervals: { again: '1 min', hard: '6 min', good: '10 min', easy: '8 days' } },
+
+    { prompt: 'to bring along', word: 'mitbringen', art: null, phonetic: '[ˈmɪtˌbrɪŋən]', plural: null, trans: 'to bring along', cat: 'DAILY LIFE',
+      examples: [ { de: 'Kannst du etwas zu essen mitbringen?', en: 'Can you bring something to eat?' } ],
+      note: 'Separable verb — the prefix detaches: „Ich bringe etwas mit.“',
+      syns: [
+        { art: null, word: 'herbringen', trans: 'to bring here', ex: 'Bring es bitte her.', exEn: 'Please bring it here.' },
+        { art: null, word: 'vorbeibringen', trans: 'to drop off', ex: 'Kannst du die Unterlagen vorbeibringen?', exEn: 'Can you drop off the documents?' },
+      ],
+      intervals: { again: '1 min', hard: '6 min', good: '10 min', easy: '8 days' } },
+
+    { prompt: 'backpack', word: 'Rucksack', art: 'der', phonetic: '[ˈrʊkzak]', plural: 'die Rucksäcke', trans: 'backpack', cat: 'TRAVEL & RAIL',
+      examples: [ { de: 'Ich packe meinen Rucksack für die Wanderung.', en: 'I am packing my backpack for the hike.' } ],
+      note: 'Compound noun: Rück (back) + Sack (sack).',
+      syns: [
+        { art: 'die', word: 'Tasche', trans: 'bag', ex: 'Ich trage eine Tasche zum Einkaufen.', exEn: 'I carry a bag for shopping.' },
+        { art: 'die', word: 'Reisetasche', trans: 'travel bag', ex: 'Die Reisetasche ist schon voll.', exEn: 'The travel bag is already full.' },
+      ],
+      intervals: { again: '1 min', hard: '10 min', good: '1 day', easy: '4 days' } },
+
+    { prompt: 'platform, track', word: 'Gleis', art: 'das', phonetic: '[ɡlaɪ̯s]', plural: 'die Gleise', trans: 'platform, track', cat: 'TRAVEL & RAIL',
+      examples: [ { de: 'Der Zug fährt von Gleis 7 ab.', en: 'The train departs from platform 7.' } ],
+      note: 'Refers to the rail track itself; the area you stand on is „der Bahnsteig“.',
+      syns: [ { art: 'der', word: 'Bahnsteig', trans: 'platform', ex: 'Wir warten auf dem Bahnsteig.', exEn: 'We are waiting on the platform.' } ],
+      intervals: { again: '1 min', hard: '6 min', good: '10 min', easy: '2 days' } },
+
+    { prompt: 'bill, check', word: 'Rechnung', art: 'die', phonetic: '[ˈrɛçnʊŋ]', plural: 'die Rechnungen', trans: 'bill, check', cat: 'FOOD & DINING',
+      examples: [ { de: 'Die Rechnung, bitte!', en: 'The check, please!' } ],
+      note: 'Also means „calculation“ in mathematical contexts.',
+      syns: [ { art: 'die', word: 'Quittung', trans: 'receipt', ex: 'Brauchen Sie eine Quittung?', exEn: 'Do you need a receipt?' } ],
+      intervals: { again: '1 min', hard: '6 min', good: '2 days', easy: '6 days' } },
+  ];
+
+  QUICK = [
+    { key: 'struggling', title: 'Struggling cards', sub: "Failed 3+ times — break through", count: 32, iconBg: '#F5E5E0', iconColor: '#B5582E', countColor: '#B5582E',
+      icon: '<svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12" y2="17"/></svg>' },
+    { key: 'new', title: 'New words only', sub: 'Never-reviewed vocabulary', count: 86, iconBg: '#F1EBDD', iconColor: '#8A6636', countColor: '#8A6636',
+      icon: '<svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/></svg>' },
+    { key: 'custom', title: 'Custom study', sub: 'Build a filtered session', count: '', iconBg: '#E7EFE9', iconColor: '#2E6B52', countColor: '#2E6B52',
+      icon: '<svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="4" y1="21" x2="4" y2="14"/><line x1="4" y1="10" x2="4" y2="3"/><line x1="12" y1="21" x2="12" y2="12"/><line x1="12" y1="8" x2="12" y2="3"/><line x1="20" y1="21" x2="20" y2="16"/><line x1="20" y1="12" x2="20" y2="3"/><line x1="1" y1="14" x2="7" y2="14"/><line x1="9" y1="8" x2="15" y2="8"/><line x1="17" y1="16" x2="23" y2="16"/></svg>' },
+  ];
+
+  RECENT = [
+    { title: 'All due cards', meta: 'Today · 24 cards · 9m', nailed: 19, struggled: 5, dot: '#2E6B52' },
+    { title: 'New words only', meta: 'Yesterday · 20 cards · 7m', nailed: 16, struggled: 4, dot: '#2E6B52' },
+  ];
+
+  NAV = [
+    { label: 'Home', key: 'home', icon: '<svg viewBox="0 0 24 24" width="21" height="21" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9,22 9,12 15,12 15,22"/></svg>' },
+    { label: 'Vault', key: 'vault', icon: '<svg viewBox="0 0 24 24" width="21" height="21" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="12" cy="12" r="3.2"/><line x1="12" y1="3" x2="12" y2="6"/><line x1="12" y1="18" x2="12" y2="21"/></svg>' },
+    { label: 'Review', key: 'review', icon: '<svg viewBox="0 0 24 24" width="21" height="21" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><polygon points="10,8 16,12 10,16"/></svg>' },
+    { label: 'Stories', key: 'stories', icon: '<svg viewBox="0 0 24 24" width="21" height="21" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M2 4h7a3 3 0 0 1 3 3v13a2.5 2.5 0 0 0-2.5-2.5H2z"/><path d="M22 4h-7a3 3 0 0 0-3 3v13a2.5 2.5 0 0 1 2.5-2.5H22z"/></svg>' },
+    { label: 'Listen', key: 'listen', icon: '<svg viewBox="0 0 24 24" width="21" height="21" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><polygon points="11,5 6,9 2,9 2,15 6,15 11,19"/><path d="M15.5,8.5a5,5,0,0,1,0,7"/></svg>' },
+  ];
+
+  MASTERY = {
+    total: 665,
+    levels: [
+      { key: 'new', label: 'New', sub: 'Not yet studied', count: 212, color: '#B0A593' },
+      { key: 'learning', label: 'Learning', sub: 'Seen a few times', count: 188, color: '#C99A3E' },
+      { key: 'familiar', label: 'Familiar', sub: 'Coming along nicely', count: 142, color: '#5E9E7C' },
+      { key: 'mastered', label: 'Mastered', sub: 'In long-term memory', count: 123, color: '#2E6B52' },
+    ],
+    struggling: 14,
+    collections: [
+      { name: 'Everyday Life', total: 210, mastered: 96 },
+      { name: 'Travel & Rail', total: 120, mastered: 71 },
+      { name: 'Food & Dining', total: 96, mastered: 38 },
+      { name: 'Business German', total: 84, mastered: 19 },
+      { name: 'Health & Body', total: 78, mastered: 31 },
+    ],
+  };
+
+  WEEK = {
+    days: [ { d: 'M', v: 46 }, { d: 'T', v: 0 }, { d: 'W', v: 32 }, { d: 'T', v: 51 }, { d: 'F', v: 18 }, { d: 'S', v: 0 }, { d: 'S', v: 24 } ],
+    total: 171, streak: 8,
+  };
+
+  HISTORY = [
+    { group: 'TODAY', rows: [
+      { title: 'All due cards', time: '9:12 AM', cards: 24, nailed: 19, struggled: 5, acc: 88, dur: '9m 12s', dot: '#2E6B52' },
+      { title: 'Struggling cards', time: '8:01 AM', cards: 12, nailed: 7, struggled: 5, acc: 62, dur: '5m 40s', dot: '#C99A3E' },
+    ] },
+    { group: 'YESTERDAY', rows: [
+      { title: 'New words only', time: '7:48 PM', cards: 20, nailed: 16, struggled: 4, acc: 80, dur: '7m 02s', dot: '#2E6B52' },
+      { title: 'Travel & Rail', time: '1:15 PM', cards: 18, nailed: 15, struggled: 3, acc: 83, dur: '6m 18s', dot: '#2E6B52' },
+    ] },
+    { group: 'EARLIER THIS WEEK', rows: [
+      { title: 'All due cards', time: 'Wed · 8:30 AM', cards: 32, nailed: 24, struggled: 8, acc: 75, dur: '11m 04s', dot: '#C99A3E' },
+      { title: 'Food & Dining', time: 'Mon · 6:55 PM', cards: 16, nailed: 14, struggled: 2, acc: 88, dur: '5m 51s', dot: '#2E6B52' },
+    ] },
+  ];
+
+  CUSTOM_TYPES = [
+    { key: 'due', label: 'Due now', pool: 142 },
+    { key: 'new', label: 'New', pool: 212 },
+    { key: 'struggling', label: 'Struggling', pool: 14 },
+    { key: 'learning', label: 'Learning', pool: 188 },
+    { key: 'mastered', label: 'Mastered', pool: 123 },
+  ];
+  CUSTOM_ORDER = [ { key: 'due', label: 'Due first' }, { key: 'hard', label: 'Hardest first' }, { key: 'random', label: 'Shuffle' } ];
+  CUSTOM_DIR = [ { key: 'en-de', label: 'EN → DE' }, { key: 'de-en', label: 'DE → EN' }, { key: 'mix', label: 'Mixed' } ];
+
+  MODES = [
+    { key: 'flip', label: 'Flip & rate', sub: 'Recall, reveal, self-grade' },
+    { key: 'type', label: 'Type answer', sub: 'Write it — proves spelling & gender' },
+    { key: 'audio', label: 'Listen first', sub: 'Hear it, recall the meaning' },
+  ];
+
+  LEECHES = [
+    { word: 'Verspätung', art: 'die', trans: 'delay, lateness', fails: 7, lastSeen: '2h ago', lapses: 'Failed 7 of last 9' },
+    { word: 'Zusammenhang', art: 'der', trans: 'connection, context', fails: 6, lastSeen: 'Yesterday', lapses: 'Failed 6 of last 8' },
+    { word: 'unterschiedlich', art: null, trans: 'different, varying', fails: 5, lastSeen: '3 days ago', lapses: 'Failed 5 of last 7' },
+  ];
+
+  _artStyle(art) {
+    if (art === 'der') return { bg: '#E9EFF7', color: '#3B5C86', gender: 'masculine' };
+    if (art === 'die') return { bg: '#F5E9EC', color: '#9B4A57', gender: 'feminine' };
+    if (art === 'das') return { bg: '#EFEADF', color: '#74695A', gender: 'neuter' };
+    return { bg: '#ECE7DB', color: '#8A7F6E', gender: 'verb' };
+  }
+
+  _esc(s) { return s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'); }
+  _hl(sentence, word) {
+    if (!sentence || !word) return sentence || '';
+    const re = new RegExp('(' + this._esc(word) + ')', 'gi');
+    return sentence.replace(re, '<strong style="color:#2E6B52;font-weight:600;">$1</strong>');
+  }
+
+  _toast(msg) {
+    this.setState({ toast: msg });
+    clearTimeout(this._tt);
+    this._tt = setTimeout(() => this.setState({ toast: '' }), 1700);
+  }
+
+  _advance() {
+    const last = this.state.idx >= this.CARDS.length - 1;
+    if (last) { this.setState({ screen: 'done' }); return; }
+    this.setState({ idx: this.state.idx + 1, flipped: false, expanded: [], typed: '', typedResult: null });
+  }
+
+  _begin(mode) {
+    this.setState({
+      screen: 'session', idx: 0, flipped: false, expanded: [],
+      tally: { again: 0, hard: 0, good: 0, easy: 0 },
+      startMs: Date.now(), reviewedWords: [],
+      typed: '', typedResult: null,
+      mode: mode || this.state.mode,
+    });
+  }
+
+  _norm(s) { return (s || '').toLowerCase().replace(/^(der|die|das)\s+/, '').replace(/\s+/g, ' ').trim(); }
+
+  _lev(a, b) {
+    const m = a.length, n = b.length;
+    const dp = Array.from({ length: m + 1 }, (_, i) => [i, ...Array(n).fill(0)]);
+    for (let j = 0; j <= n; j++) dp[0][j] = j;
+    for (let i = 1; i <= m; i++) for (let j = 1; j <= n; j++)
+      dp[i][j] = a[i - 1] === b[j - 1] ? dp[i - 1][j - 1] : 1 + Math.min(dp[i - 1][j], dp[i][j - 1], dp[i - 1][j - 1]);
+    return dp[m][n];
+  }
+
+  _diffChars(typed, target) {
+    // each char of the typed answer, green if it matches target at that position, else red
+    const chars = [];
+    for (let i = 0; i < typed.length; i++) {
+      const ch = typed[i];
+      const ok = target[i] && target[i].toLowerCase() === ch.toLowerCase();
+      chars.push({ ch: ch === ' ' ? '\u00A0' : ch, color: ok ? '#2E6B52' : '#B5582E' });
+    }
+    return chars;
+  }
+
+  _checkTyped() {
+    const c = this.CARDS[this.state.idx];
+    const ans = this.state.typed;
+    if (!ans.trim()) return;
+
+    const raw = ans.trim().toLowerCase().replace(/\s+/g, ' ');
+    const needsArticle = !!c.art;                       // nouns require der/die/das
+    const targetFull = (needsArticle ? c.art + ' ' : '') + c.word;
+
+    // split user input into leading article (if any) + noun
+    const m = raw.match(/^(der|die|das)\s+(.*)$/);
+    const artUser = m ? m[1] : null;
+    const nounUser = (m ? m[2] : raw).trim();
+    const nounTarget = c.word.toLowerCase();
+
+    const nounExact = nounUser === nounTarget;
+    const nounClose = this._lev(nounUser, nounTarget) <= 2 && nounTarget.length > 3;
+    const artOk = needsArticle ? artUser === c.art : true;
+
+    let verdict, correct = false, close = false, suggested, genderNote = '';
+    if (nounExact && artOk) {
+      correct = true; verdict = 'Correct!'; suggested = 'good';
+    } else if (nounExact && needsArticle && !artOk) {
+      // right word, wrong or missing gender — strict: not full credit
+      close = true; verdict = 'Mind the gender'; suggested = 'hard';
+      genderNote = artUser ? ('It\u2019s ' + c.art + ', not ' + artUser) : ('Don\u2019t forget the article \u2014 it\u2019s ' + c.art);
+    } else if (nounClose) {
+      close = true; verdict = 'So close'; suggested = 'hard';
+      if (needsArticle && !artOk) genderNote = 'Also: it\u2019s ' + c.art;
+    } else {
+      verdict = 'Not quite'; suggested = 'again';
+    }
+
+    this.setState({
+      flipped: true,
+      typedResult: {
+        verdict, correct, close, suggested, genderNote,
+        youChars: this._diffChars(ans.trim(), targetFull),
+        typedRaw: ans.trim(),
+      },
+    });
+  }
+
+  renderVals() {
+    const s = this.state;
+    const N = this.CARDS.length;
+    const c = this.CARDS[s.idx] || this.CARDS[0];
+    const a = this._artStyle(c.art);
+
+    const examples = (c.examples || []).map(ex => ({ deHtml: this._hl(ex.de, c.word), en: ex.en }));
+
+    const syns = (c.syns || []).map((sy, i) => {
+      const sa = this._artStyle(sy.art);
+      const isOpen = s.expanded.includes(i);
+      return {
+        ...sy, hasArt: !!sy.art, artBg: sa.bg, artColor: sa.color,
+        open: isOpen, chev: isOpen ? 'rotate(180deg)' : 'rotate(0deg)',
+        exHtml: this._hl(sy.ex, sy.word), exEn: sy.exEn,
+        toggle: () => {
+          const set = s.expanded.includes(i) ? s.expanded.filter(x => x !== i) : [...s.expanded, i];
+          this.setState({ expanded: set });
+        },
+        play: () => this._toast('🔊 ' + sy.word),
+      };
+    });
+
+    const cur = {
+      prompt: c.prompt, word: c.word, trans: c.trans, phonetic: c.phonetic, cat: c.cat,
+      hasArt: !!c.art, art: c.art || '', artBg: a.bg, artColor: a.color, gender: a.gender,
+      hasPlural: !!c.plural, plural: c.plural || '',
+      note: c.note, examples,
+      hasSyns: syns.length > 0, syns,
+    };
+
+    const iv = c.intervals;
+    const ratings = [
+      { key: 'again', label: 'Again', interval: iv.again, bg: '#F8E9EA', border: '#E7C3C8', fg: '#9B4A57', sub: '#BE8A91' },
+      { key: 'hard', label: 'Hard', interval: iv.hard, bg: '#F7F0DD', border: '#E5D5A6', fg: '#8A6B26', sub: '#B7A067' },
+      { key: 'good', label: 'Good', interval: iv.good, bg: '#EAF0EC', border: '#C2D6C8', fg: '#3E7A5E', sub: '#7FA791' },
+      { key: 'easy', label: 'Easy', interval: iv.easy, bg: '#1F4034', border: '#1F4034', fg: '#F4EFE4', sub: 'rgba(244,239,228,.6)' },
+    ].map(r => ({ ...r,
+      ring: (s.typedResult && s.typedResult.suggested === r.key) ? '0 0 0 2px #D8B981, 0 4px 12px -4px rgba(216,185,129,.6)' : 'none',
+      isSuggested: !!(s.typedResult && s.typedResult.suggested === r.key),
+      rate: () => {
+      const t = { ...s.tally }; t[r.key] = (t[r.key] || 0) + 1;
+      const rw = s.reviewedWords.includes(c.word) ? s.reviewedWords : [...s.reviewedWords, c.word];
+      this.setState({ tally: t, reviewedWords: rw });
+      this._toast('Scheduled · review in ' + r.interval);
+      this._advance();
+    } }));
+
+    const quickStudy = this.QUICK.map(q => ({
+      ...q,
+      go: () => { if (q.key === 'custom') this.setState({ screen: 'custom' }); else this._begin(); },
+    }));
+    const recent = this.RECENT;
+
+    // ── mastery breakdown ──
+    const M = this.MASTERY;
+    const mLevels = M.levels.map(l => ({ ...l, pct: Math.round((l.count / M.total) * 100), width: ((l.count / M.total) * 100) + '%' }));
+    const masteredCount = M.levels.find(l => l.key === 'mastered').count;
+    const learnIdx = M.levels.reduce((sum, l, i) => sum + i * l.count, 0);
+    const masteryScore = Math.round((learnIdx / (3 * M.total)) * 100);
+    const mCollections = M.collections.map(co => ({ ...co, pct: Math.round((co.mastered / co.total) * 100), width: (Math.round((co.mastered / co.total) * 100)) + '%' }));
+
+    // ── weekly + history ──
+    const wkMax = Math.max(...this.WEEK.days.map(d => d.v), 1);
+    const weekDays = this.WEEK.days.map((d, i) => {
+      const today = i === 6, active = d.v > 0;
+      return { ...d, h: Math.max(6, Math.round((d.v / wkMax) * 64)) + 'px',
+        barColor: today ? '#2E6B52' : (active ? '#A9C2B3' : 'rgba(33,28,22,.09)'),
+        labelColor: today ? '#2E6B52' : '#A89D8A' };
+    });
+
+    // ── custom study ──
+    const cu = s.custom;
+    const customTypes = this.CUSTOM_TYPES.map(ct => {
+      const on = cu.types.includes(ct.key);
+      return { ...ct, on, bg: on ? '#1F4034' : '#FFFCF6', fg: on ? '#F4EFE4' : '#5A5347', poolFg: on ? 'rgba(244,239,228,.55)' : '#A89D8A', border: on ? '#1F4034' : 'rgba(33,28,22,.12)',
+        toggle: () => { const set = on ? cu.types.filter(x => x !== ct.key) : [...cu.types, ct.key]; this.setState({ custom: { ...cu, types: set } }); } };
+    });
+    const customPool = this.CUSTOM_TYPES.filter(ct => cu.types.includes(ct.key)).reduce((a, b) => a + b.pool, 0);
+    const customCount = Math.min(customPool, cu.length);
+    const segStyle = (on) => on
+      ? { activeBg: '#FFFCF6', activeFg: '#211C16', activeShadow: '0 2px 6px -2px rgba(33,28,22,.3)' }
+      : { activeBg: 'transparent', activeFg: '#8A7F6E', activeShadow: 'none' };
+    const customOrders = this.CUSTOM_ORDER.map(o => ({ ...o, ...segStyle(cu.order === o.key), set: () => this.setState({ custom: { ...cu, order: o.key } }) }));
+    const customDirs = this.CUSTOM_DIR.map(d => ({ ...d, ...segStyle(cu.dir === d.key), set: () => this.setState({ custom: { ...cu, dir: d.key } }) }));
+
+    const navItems = this.NAV.map(n => ({
+      ...n,
+      color: n.key === 'review' ? '#1F4034' : '#A89D8A',
+      weight: n.key === 'review' ? 700 : 600,
+      go: () => { if (n.key !== 'review') this._toast(n.label + ' — not in this prototype'); },
+    }));
+
+    const progressPct = Math.round(((s.idx + (s.flipped ? 0.5 : 0)) / N) * 100);
+
+    // ── study mode ──
+    const modeItems = this.MODES.map(m => {
+      const on = s.mode === m.key;
+      return { ...m, on, bg: on ? '#1F4034' : '#FFFCF6', fg: on ? '#F4EFE4' : '#211C16', subFg: on ? 'rgba(244,239,228,.6)' : '#9A8F7C', border: on ? '#1F4034' : 'rgba(33,28,22,.1)',
+        set: () => this.setState({ mode: m.key }) };
+    });
+    const modeLabel = (this.MODES.find(m => m.key === s.mode) || this.MODES[0]).label;
+
+    // ── typed-answer result banner ──
+    const tr = s.typedResult;
+    const typedResult = tr ? {
+      ...tr,
+      bannerBg: tr.correct ? '#E7F0EA' : (tr.close ? '#F6EFDF' : '#F8ECE6'),
+      bannerBorder: tr.correct ? 'rgba(46,107,82,.25)' : (tr.close ? 'rgba(201,154,62,.3)' : 'rgba(181,88,46,.25)'),
+      verdictColor: tr.correct ? '#2E6B52' : (tr.close ? '#8A6B26' : '#B5582E'),
+      icon: tr.correct ? '✓' : (tr.close ? '≈' : '✕'),
+    } : null;
+
+    // ── leeches ──
+    const leeches = this.LEECHES.map(l => {
+      const la = this._artStyle(l.art);
+      return { ...l, hasArt: !!l.art, artBg: la.bg, artColor: la.color,
+        suspend: () => this._toast('Suspended „' + l.word + '“'),
+        reset: () => this._toast('Progress reset for „' + l.word + '“') };
+    });
+
+    // ── session summary ──
+    const t = s.tally;
+    const reviewed = t.again + t.hard + t.good + t.easy;
+    const recalled = t.good + t.easy;
+    const recallPct = reviewed ? Math.round((recalled / reviewed) * 100) : 0;
+    const secs = s.startMs ? Math.round((Date.now() - s.startMs) / 1000) : 0;
+    const mm = Math.floor(secs / 60), ss = secs % 60;
+    const timeStr = mm + 'm ' + (ss < 10 ? '0' : '') + ss + 's';
+    const summaryBars = [
+      { key: 'easy', label: 'Easy', count: t.easy, color: '#2E6B52' },
+      { key: 'good', label: 'Good', count: t.good, color: '#5E9E7C' },
+      { key: 'hard', label: 'Hard', count: t.hard, color: '#C99A3E' },
+      { key: 'again', label: 'Again', count: t.again, color: '#B5582E' },
+    ].map(b => ({ ...b, pct: reviewed ? Math.round((b.count / reviewed) * 100) : 0, width: (reviewed ? (b.count / reviewed) * 100 : 0) + '%' }));
+    const needsWork = t.again + t.hard;
+
+    return {
+      isHub: s.screen === 'hub',
+      isSession: s.screen === 'session',
+      isDone: s.screen === 'done',
+      isMastery: s.screen === 'mastery',
+      isHistory: s.screen === 'history',
+      isCustom: s.screen === 'custom',
+      // navigation
+      goMastery: () => this.setState({ screen: 'mastery' }),
+      goHistory: () => this.setState({ screen: 'history' }),
+      goCustom: () => this.setState({ screen: 'custom' }),
+      // mastery data
+      mLevels, masteryScore, masteredCount, masteryTotal: M.total, strugglingCount: M.struggling, mCollections,
+      drillStruggling: () => { this._toast('Loading your struggling cards…'); this._begin(); },
+      // weekly + history
+      weekDays, weekTotal: this.WEEK.total, streak: this.WEEK.streak, history: this.HISTORY,
+      // custom study
+      customTypes, customOrders, customDirs, customCount, customLength: cu.length,
+      setLength: (e) => this.setState({ custom: { ...cu, length: parseInt(e.target.value, 10) } }),
+      startCustom: () => { if (!customCount) { this._toast('Pick at least one card type'); return; } this._begin(); },
+      reviewedCount: reviewed, recallPct, timeStr, needsWork,
+      summaryBars, newStreak: 8,
+      reviewAgain: () => this._begin(),
+      reviewMissed: () => { this._toast('Loading cards that need work…'); this._begin(); },
+      toStories: () => this._toast('Opening Story Studio with these words…'),
+      backToHub: () => this.setState({ screen: 'hub' }),
+      isFront: !s.flipped,
+      isBack: s.flipped,
+      // study mode
+      mode: s.mode, modeItems, modeLabel,
+      frontFlip: !s.flipped && s.mode === 'flip',
+      frontType: !s.flipped && s.mode === 'type',
+      frontAudio: !s.flipped && s.mode === 'audio',
+      // typed answer
+      typed: s.typed,
+      canCheck: s.typed.trim().length > 0,
+      onType: (e) => this.setState({ typed: e.target.value }),
+      insertAccent: (ch) => this.setState({ typed: s.typed + ch }),
+      checkTyped: () => this._checkTyped(),
+      typedResult, showTypedResult: !!typedResult,
+      youChars: typedResult ? typedResult.youChars : [],
+      genderNote: typedResult ? typedResult.genderNote : '',
+      showGenderNote: !!(typedResult && typedResult.genderNote),
+      accents: ['ä', 'ö', 'ü', 'ß'].map(ch => ({ ch, ins: () => this.setState({ typed: this.state.typed + ch }) })),
+      // audio mode
+      playAudio: () => this._toast('🔊 playing…'),
+      playSlow: () => this._toast('🐢 slow playback'),
+      // leeches
+      leeches, leechCount: this.LEECHES.length,
+      goLeeches: () => this.setState({ screen: 'leeches' }),
+      isLeeches: s.screen === 'leeches',
+      studyLeeches: () => this._begin('type'),
+      // hub
+      dueTotal: 142, newCount: 86, hardCount: 14, estMinutes: 11,
+      quickStudy, recent, navItems,
+      // session
+      cur, ratings,
+      idx1: s.idx + 1, total: N, remaining: N - s.idx, progressPct,
+      flip: () => this.setState({ flipped: true }),
+      prev: () => this.setState({ idx: Math.max(0, s.idx - 1), flipped: false, expanded: [], typed: '', typedResult: null }),
+      skip: () => this._advance(),
+      startSession: () => this._begin(),
+      endSession: () => this.setState({ screen: 'hub' }),
+      toast: () => this._toast('Demo action'),
+      toastMsg: s.toast,
+    };
+  }
+}
+</script>
+</body>
+</html>

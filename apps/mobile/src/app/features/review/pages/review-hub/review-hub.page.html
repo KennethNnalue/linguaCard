@@ -1,9 +1,12 @@
 <ion-header class="ion-no-border">
   <ion-toolbar>
     <div class="rh-nav">
-      <span class="rh-nav-title lc-display">{{ 'tabs.review' | translate }}</span>
-      <button class="rh-info-btn" (click)="goToMastery()" [attr.aria-label]="'review.hub.masteryBreakdownAriaLabel' | translate">
-        <ion-icon name="information-circle-outline"></ion-icon>
+      <div class="rh-nav-heading">
+        <span class="rh-kicker">{{ 'review.hub.kicker' | translate }}</span>
+        <span class="rh-nav-title">{{ 'tabs.review' | translate }}</span>
+      </div>
+      <button class="rh-icon-btn" (click)="goToMastery()" [attr.aria-label]="'review.hub.masteryBreakdownAriaLabel' | translate">
+        <ion-icon name="stats-chart-outline"></ion-icon>
       </button>
     </div>
   </ion-toolbar>
@@ -12,48 +15,42 @@
 <ion-content>
   <div class="rh-content">
 
-    <!-- ── Due today hero ── -->
-    <div class="rh-due-hero">
-      <div class="rh-due-greeting">{{ 'review.hub.cardsDueToday' | translate }}</div>
+    <!-- ── Hero: cards due today ── -->
+    <div class="rh-hero">
+      <div class="rh-hero-glow"></div>
+      <span class="rh-hero-kicker">{{ 'review.hub.cardsDueToday' | translate }}</span>
 
-      <div class="rh-ring-row">
-        <!-- Ring progress (same pattern as home hero) -->
+      <div class="rh-hero-row">
         <div class="rh-ring">
           <svg viewBox="0 0 64 64">
-            <circle class="rh-ring-bg" cx="32" cy="32" r="28"/>
+            <circle class="rh-ring-track" cx="32" cy="32" r="28"/>
             <circle
               class="rh-ring-fill"
               cx="32" cy="32" r="28"
-              stroke-dasharray="175.93"
-              [attr.stroke-dashoffset]="ringOffset()"
+              [attr.stroke-dasharray]="heroCircumference"
+              [attr.stroke-dashoffset]="heroRingOffset()"
             />
           </svg>
           <div class="rh-ring-text">
-            <div class="rh-ring-num">{{ dueTodayCount() }}</div>
-            <div class="rh-ring-lbl">{{ 'review.hub.dueLabel' | translate }}</div>
+            <span class="rh-ring-num">{{ dueTodayCount() }}</span>
+            <span class="rh-ring-lbl">{{ 'review.hub.dueLabel' | translate }}</span>
           </div>
         </div>
 
-        <!-- Breakdown tags -->
-        <div class="rh-due-info">
-          @for (tag of breakdownTags(); track tag.label) {
-            <div class="rh-due-tag-row">
-              <span class="rh-due-stat-num">{{ tag.count }}</span>
-              <span class="rh-due-stat-lbl">{{ translateTag(tag.label) }}</span>
-            </div>
-          }
-          @if (breakdownTags().length === 0) {
-            <div class="rh-due-tag-row">
-              <span class="rh-due-stat-lbl">{{ 'review.hub.allCaughtUp' | translate }}</span>
-            </div>
-          }
+        <div class="rh-hero-stats">
+          <div class="rh-hero-stat">
+            <span class="rh-hero-stat-num">{{ newCount() }}</span>
+            <span class="rh-hero-stat-lbl">{{ 'review.hub.newWords' | translate }}</span>
+          </div>
+          <div class="rh-hero-stat">
+            <span class="rh-hero-stat-num rh-hero-stat-num--attention">{{ attentionCount() }}</span>
+            <span class="rh-hero-stat-lbl">{{ 'review.hub.needAttention' | translate }}</span>
+          </div>
+          <span class="rh-hero-meta">{{ 'review.hub.estMinutes' | translate:{ count: estMinutes() } }}</span>
         </div>
       </div>
 
-      <button
-        class="rh-start-btn"
-        [disabled]="dueTodayCount() === 0"
-        (click)="startTodaysReview()">
+      <button class="rh-hero-cta" [disabled]="dueTodayCount() === 0" (click)="startTodaysReview()">
         <ion-icon name="play-outline"></ion-icon>
         {{ dueTodayCount() > 0 ? ('review.hub.startTodaysReview' | translate) : ('review.hub.nothingDueNow' | translate) }}
       </button>
@@ -70,16 +67,66 @@
       </div>
     }
 
-    <!-- ── Quick study presets ── -->
-    <div class="rh-section-header">
-      <span class="rh-section-title">{{ 'review.hub.quickStudySection' | translate }}</span>
+    <!-- ── Mastery snapshot ── -->
+    <button class="rh-mastery" (click)="goToMastery()">
+      <div class="rh-mastery-ring">
+        <svg viewBox="0 0 56 56">
+          <circle class="rh-mastery-track" cx="28" cy="28" r="24"/>
+          <circle
+            class="rh-mastery-fill"
+            cx="28" cy="28" r="24"
+            [attr.stroke-dasharray]="masteryCircumference"
+            [attr.stroke-dashoffset]="masteryRingOffset()"
+          />
+        </svg>
+        <span class="rh-mastery-pct">{{ masteryPct() }}%</span>
+      </div>
+      <div class="rh-mastery-info">
+        <p class="rh-mastery-title">{{ 'review.hub.yourMastery' | translate }}</p>
+        <p class="rh-mastery-sub">{{ 'review.hub.wordsMastered' | translate:{ mastered: masteredCount(), total: totalCount() } }}</p>
+      </div>
+      <ion-icon name="chevron-forward-outline" class="rh-chevron"></ion-icon>
+    </button>
+
+    <!-- ── Leech callout (only when leeches exist) ── -->
+    @if (leechCount() > 0) {
+      <button class="rh-leech" (click)="goToLeeches()">
+        <div class="rh-leech-tile">
+          <ion-icon name="bug-outline"></ion-icon>
+        </div>
+        <div class="rh-leech-info">
+          <p class="rh-leech-title">{{ 'review.hub.leechesDetected' | translate:{ count: leechCount() } }}</p>
+          <p class="rh-leech-sub">{{ 'review.hub.leechesSub' | translate }}</p>
+        </div>
+        <ion-icon name="chevron-forward-outline" class="rh-leech-chevron"></ion-icon>
+      </button>
+    }
+
+    <!-- ── Study mode ── -->
+    <p class="rh-section-label">{{ 'review.mode.section' | translate }}</p>
+    <div class="rh-modes">
+      @for (m of studyModes; track m.value) {
+        <button
+          class="rh-mode-row"
+          [class.rh-mode-row--active]="studyMode() === m.value"
+          (click)="selectMode(m.value)">
+          <span class="rh-radio" [class.rh-radio--active]="studyMode() === m.value"></span>
+          <span class="rh-mode-text">
+            <span class="rh-mode-label">{{ m.labelKey | translate }}</span>
+            <span class="rh-mode-sub">{{ m.subKey | translate }}</span>
+          </span>
+        </button>
+      }
     </div>
 
+    <!-- ── Quick study ── -->
+    <div class="rh-quick-head">
+      <span class="rh-quick-title">{{ 'review.hub.quickStudyTitle' | translate }}</span>
+      <span class="rh-section-label">{{ 'review.hub.pickFocus' | translate }}</span>
+    </div>
     <div class="rh-presets">
-
-      <!-- Struggling cards -->
-      <div class="rh-preset-card" (click)="goToStruggling()">
-        <div class="rh-preset-icon rh-preset-icon--red">
+      <button class="rh-preset" (click)="goToStruggling()">
+        <div class="rh-preset-tile rh-preset-tile--struggle">
           <ion-icon name="alert-circle-outline"></ion-icon>
         </div>
         <div class="rh-preset-info">
@@ -87,15 +134,14 @@
           <p class="rh-preset-sub">{{ 'review.hub.strugglingCardsDesc' | translate }}</p>
         </div>
         @if (strugglingCount() > 0) {
-          <span class="rh-preset-count lc-display">{{ strugglingCount() }}</span>
+          <span class="rh-preset-count rh-preset-count--struggle">{{ strugglingCount() }}</span>
         } @else {
           <ion-icon name="chevron-forward-outline" class="rh-chevron"></ion-icon>
         }
-      </div>
+      </button>
 
-      <!-- New cards only -->
-      <div class="rh-preset-card" (click)="startNewOnly()">
-        <div class="rh-preset-icon rh-preset-icon--accent">
+      <button class="rh-preset" (click)="startNewOnly()">
+        <div class="rh-preset-tile rh-preset-tile--new">
           <ion-icon name="add-circle-outline"></ion-icon>
         </div>
         <div class="rh-preset-info">
@@ -103,29 +149,27 @@
           <p class="rh-preset-sub">{{ 'review.hub.newCardsOnlyDesc' | translate }}</p>
         </div>
         @if (newCount() > 0) {
-          <span class="rh-preset-count lc-display">{{ newCount() }}</span>
+          <span class="rh-preset-count rh-preset-count--new">{{ newCount() }}</span>
         } @else {
           <ion-icon name="chevron-forward-outline" class="rh-chevron"></ion-icon>
         }
-      </div>
+      </button>
 
-      <!-- Custom study -->
-      <div class="rh-preset-card" (click)="goToCustom()">
-        <div class="rh-preset-icon rh-preset-icon--brand">
-          <ion-icon name="play-outline"></ion-icon>
+      <button class="rh-preset" (click)="goToCustom()">
+        <div class="rh-preset-tile rh-preset-tile--custom">
+          <ion-icon name="options-outline"></ion-icon>
         </div>
         <div class="rh-preset-info">
           <p class="rh-preset-title">{{ 'review.hub.customStudyTitle' | translate }}</p>
           <p class="rh-preset-sub">{{ 'review.hub.customStudyDesc' | translate }}</p>
         </div>
         <ion-icon name="chevron-forward-outline" class="rh-chevron"></ion-icon>
-      </div>
-
+      </button>
     </div>
 
     <!-- ── Recent sessions ── -->
     <div class="rh-section-header">
-      <span class="rh-section-title">{{ 'review.hub.recentSessionsSection' | translate }}</span>
+      <span class="rh-quick-title">{{ 'review.hub.recentSessionsSection' | translate }}</span>
       @if (recentSessions().length > 0) {
         <button class="rh-see-all" (click)="goToHistory()">{{ 'review.hub.seeAllLink' | translate }}</button>
       }
@@ -133,8 +177,8 @@
 
     @if (recentSessions().length > 0) {
       @for (session of recentSessions(); track session.id) {
-        <div class="rh-session-item">
-          <div class="rh-session-dot" [style.background]="sessionDotColour(session)"></div>
+        <div class="rh-session">
+          <span class="rh-session-dot" [style.background]="sessionDotColour(session)"></span>
           <div class="rh-session-info">
             <p class="rh-session-title">{{ session.collectionName ?? ('review.hub.allDueCardsLabel' | translate) }}</p>
             <p class="rh-session-meta">
@@ -143,9 +187,10 @@
               · {{ sessionDuration(session) }}
             </p>
           </div>
-          <span class="rh-session-rating lc-display" [style.color]="sessionRatingColour(session)">
-            {{ sessionAvgRating(session) }}
-          </span>
+          <div class="rh-session-tallies">
+            <span class="rh-tally rh-tally--nailed">{{ sessionNailed(session) }} {{ 'review.hub.nailedLabel' | translate }}</span>
+            <span class="rh-tally rh-tally--struggled">{{ sessionStruggled(session) }} {{ 'review.hub.struggledLabel' | translate }}</span>
+          </div>
         </div>
       }
     } @else {

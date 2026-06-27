@@ -1,0 +1,123 @@
+@if (card(); as card) {
+  <div class="cb-card">
+
+    <!-- Type-mode result banner -->
+    @if (banner(); as b) {
+      <div class="cb-banner cb-banner--{{ b.tint }}">
+        <div class="cb-banner-top">
+          <span class="cb-medallion cb-medallion--{{ b.tint }}">{{ b.icon }}</span>
+          <span class="cb-verdict cb-verdict--{{ b.tint }}">{{ b.verdictKey | translate }}</span>
+          <span class="cb-suggested">{{ 'review.session.suggestedHint' | translate }} ↓</span>
+        </div>
+        <span class="cb-you-lbl">{{ 'review.session.youWrote' | translate }}</span>
+        <p class="cb-you">
+          @for (ch of typedResult()!.youChars; track $index) {
+            <span class="cb-char" [class.cb-char--ok]="ch.ok" [class.cb-char--bad]="!ch.ok">{{ ch.ch }}</span>
+          }
+        </p>
+        @if (b.hasGenderNote) {
+          <p class="cb-gender-note">ⓘ {{ b.genderNoteKey | translate:b.genderNoteParams }}</p>
+        }
+      </div>
+    }
+
+    <!-- Header -->
+    <div class="cb-hdr">
+      <span class="cb-side-lbl">{{ card.content.front }}</span>
+      <span class="cb-lang-chip">{{ 'review.session.germanLangChip' | translate }}</span>
+    </div>
+
+    <!-- Article + gender -->
+    @if (card.content.article) {
+      <div class="cb-art-row">
+        <lc-article-badge [article]="card.content.article" />
+        <span class="cb-gender">{{ genderWord() }}</span>
+        @if (card.content.phonetic) {
+          <span class="cb-ipa">{{ card.content.phonetic }}</span>
+        }
+      </div>
+    }
+
+    <!-- Headword + translation -->
+    <p class="cb-word">{{ card.content.back }}</p>
+    <p class="cb-trans">{{ card.content.front }}</p>
+
+    <!-- Plural -->
+    @if (card.content.plural) {
+      <div class="cb-plural">
+        <span class="cb-plural-lbl">{{ 'review.session.pluralLabel' | translate }}</span>
+        <span class="cb-plural-val">{{ card.content.plural }}</span>
+      </div>
+    }
+
+    <!-- Pronunciation -->
+    <button class="cb-audio" (click)="playAudio.emit()" [disabled]="isPronunciationLoading()">
+      @if (isPronunciationLoading()) {
+        <span class="cb-audio-spinner"></span>
+        {{ 'review.session.generatingAudio' | translate }}
+      } @else {
+        <span class="cb-audio-dot"></span>
+        <ion-icon name="volume-high-outline"></ion-icon>
+        {{ 'review.session.playPronunciationBtn' | translate }}
+      }
+    </button>
+
+    <!-- Examples -->
+    @if (card.content.examples.length) {
+      <div class="cb-divider"></div>
+      <p class="cb-sec-hdr">{{ 'review.session.examplesHeader' | translate }}</p>
+      @for (ex of card.content.examples; track ex.id) {
+        <div class="cb-ex">
+          <div class="cb-ex-row">
+            <p class="cb-ex-de" [innerHTML]="ex.target | highlightWord: card.content.back"></p>
+            <button class="cb-ex-play" (click)="playExample.emit(ex.target)" [attr.aria-label]="'review.session.playExampleAriaLabel' | translate">
+              <ion-icon name="volume-high-outline"></ion-icon>
+            </button>
+          </div>
+          <p class="cb-ex-en">"{{ ex.native }}"</p>
+        </div>
+      }
+    }
+
+    <!-- Usage note -->
+    @if (card.content.notes) {
+      <div class="cb-note">
+        <span class="cb-note-icon">💡</span>
+        <p class="cb-note-text">{{ card.content.notes }}</p>
+      </div>
+    }
+
+    <!-- Synonyms -->
+    @if (card.content.synonyms.length) {
+      <div class="cb-divider"></div>
+      <p class="cb-sec-hdr">{{ 'review.session.synonymsHeader' | translate }}</p>
+      <div class="cb-syn-list">
+        @for (syn of card.content.synonyms; track $index; let i = $index) {
+          <button type="button" class="cb-syn-row" [attr.aria-expanded]="isSynonymExpanded(i)" (click)="toggleSynonym.emit(i)">
+            @if (syn.article) {
+              <lc-article-badge [article]="syn.article" />
+            }
+            <span class="cb-syn-word">{{ syn.word }}</span>
+            <span class="cb-syn-trans">{{ syn.translation }}</span>
+            <span class="cb-syn-chev" [class.open]="isSynonymExpanded(i)">
+              <ion-icon name="chevron-down-outline"></ion-icon>
+            </span>
+          </button>
+          @if (isSynonymExpanded(i) && syn.example) {
+            <div class="cb-syn-ex">
+              <div class="cb-ex-row">
+                <p class="cb-ex-de" [innerHTML]="syn.example | highlightWord: syn.word"></p>
+                <button class="cb-ex-play" (click)="playExample.emit(syn.example)" [attr.aria-label]="'review.session.playExampleAriaLabel' | translate">
+                  <ion-icon name="volume-high-outline"></ion-icon>
+                </button>
+              </div>
+              @if (syn.exampleNative) {
+                <p class="cb-ex-en">"{{ syn.exampleNative }}"</p>
+              }
+            </div>
+          }
+        }
+      </div>
+    }
+  </div>
+}

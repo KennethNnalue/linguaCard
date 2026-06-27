@@ -1,0 +1,364 @@
+@use 'theme/tokens' as t;
+@use 'theme/utils' as u;
+
+:host {
+  display: flex;
+  flex: 1;
+  min-height: 0;
+}
+
+.cb-card {
+  flex: 1;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  background: var(--lc-rv-card);
+  border-radius: t.$lc-radius-xl;
+  box-shadow: t.$lc-rv-shadow-flashcard;
+  padding: t.$lc-space-5;
+}
+
+// ─── Result banner (type mode) ───────────────────────────────────────────────
+.cb-banner {
+  border: 1px solid transparent;
+  border-radius: t.$lc-radius-md;
+  padding: t.$lc-space-3 t.$lc-space-4;
+  margin-bottom: t.$lc-space-4;
+
+  &--correct {
+    background: var(--lc-rv-res-correct-bg);
+    border-color: var(--lc-rv-res-correct-bd);
+  }
+  &--close {
+    background: var(--lc-rv-res-close-bg);
+    border-color: var(--lc-rv-res-close-bd);
+  }
+  &--wrong {
+    background: var(--lc-rv-res-wrong-bg);
+    border-color: var(--lc-rv-res-wrong-bd);
+  }
+}
+
+.cb-banner-top {
+  display: flex;
+  align-items: center;
+  gap: t.$lc-space-2;
+}
+
+.cb-medallion {
+  @include u.circle(24px);
+  @include u.flex-center;
+  @include u.lc-font('sm', t.$lc-font-weight-bold);
+  color: var(--lc-rv-card);
+
+  &--correct { background: var(--lc-rv-verdict-correct); }
+  &--close { background: var(--lc-rv-verdict-close); }
+  &--wrong { background: var(--lc-rv-verdict-wrong); }
+}
+
+.cb-verdict {
+  @include u.lc-font('2xl', t.$lc-font-weight-semibold);
+  font-family: t.$lc-font-rv-display;
+
+  &--correct { color: var(--lc-rv-verdict-correct); }
+  &--close { color: var(--lc-rv-verdict-close); }
+  &--wrong { color: var(--lc-rv-verdict-wrong); }
+}
+
+.cb-suggested {
+  margin-left: auto;
+  @include u.lc-font('xxs', t.$lc-font-weight-semibold);
+  font-family: t.$lc-font-rv-mono;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--lc-rv-muted);
+}
+
+.cb-you-lbl {
+  display: block;
+  margin-top: t.$lc-space-2;
+  @include u.lc-font('xxs', t.$lc-font-weight-semibold);
+  font-family: t.$lc-font-rv-mono;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--lc-rv-muted);
+}
+
+.cb-you {
+  @include u.lc-font('3xl', t.$lc-font-weight-medium);
+  font-family: t.$lc-font-rv-display;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+
+.cb-char {
+  &--ok { color: var(--lc-rv-char-ok); }
+  &--bad { color: var(--lc-rv-char-bad); }
+}
+
+.cb-gender-note {
+  margin-top: t.$lc-space-2;
+  @include u.lc-font('xs', t.$lc-font-weight-medium);
+  font-family: t.$lc-font-rv-body;
+  color: var(--lc-rv-hard-text);
+}
+
+// ─── Header ──────────────────────────────────────────────────────────────────
+.cb-hdr {
+  @include u.flex-between;
+  gap: t.$lc-space-3;
+}
+
+.cb-side-lbl {
+  @include u.lc-font('xs', t.$lc-font-weight-medium);
+  font-family: t.$lc-font-rv-mono;
+  color: var(--lc-rv-muted);
+  @include u.text-overflow;
+}
+
+.cb-lang-chip {
+  @include u.lc-font('xs', t.$lc-font-weight-semibold);
+  font-family: t.$lc-font-rv-body;
+  background: var(--lc-rv-good-bg);
+  color: var(--lc-rv-good-text);
+  border-radius: t.$lc-radius-full;
+  padding: t.$lc-space-1 t.$lc-space-3;
+  flex-shrink: 0;
+}
+
+// ─── Article + gender ────────────────────────────────────────────────────────
+.cb-art-row {
+  display: flex;
+  align-items: center;
+  gap: t.$lc-space-2;
+  margin-top: t.$lc-space-4;
+}
+
+.cb-gender {
+  @include u.lc-font('sm');
+  font-family: t.$lc-font-rv-body;
+  color: var(--lc-rv-text-soft);
+}
+
+.cb-ipa {
+  margin-left: auto;
+  @include u.lc-font('sm');
+  font-family: t.$lc-font-rv-display;
+  font-style: italic;
+  color: var(--lc-rv-muted);
+}
+
+// ─── Headword ────────────────────────────────────────────────────────────────
+.cb-word {
+  @include u.lc-font('10xl', t.$lc-font-weight-semibold);
+  font-family: t.$lc-font-rv-display;
+  color: var(--lc-rv-text);
+  line-height: 1.05;
+  margin-top: t.$lc-space-2;
+}
+
+.cb-trans {
+  @include u.lc-font('lg');
+  font-family: t.$lc-font-rv-body;
+  color: var(--lc-rv-text-soft);
+  margin-top: t.$lc-space-1;
+}
+
+// ─── Plural ──────────────────────────────────────────────────────────────────
+.cb-plural {
+  display: inline-flex;
+  align-items: center;
+  gap: t.$lc-space-2;
+  margin-top: t.$lc-space-3;
+  background: var(--lc-rv-inset-soft);
+  border-radius: t.$lc-radius-sm;
+  padding: t.$lc-space-1 t.$lc-space-3;
+}
+
+.cb-plural-lbl {
+  @include u.lc-font('xxs', t.$lc-font-weight-semibold);
+  font-family: t.$lc-font-rv-mono;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--lc-rv-muted);
+}
+
+.cb-plural-val {
+  @include u.lc-font('lg', t.$lc-font-weight-medium);
+  font-family: t.$lc-font-rv-display;
+  color: var(--lc-rv-text);
+}
+
+// ─── Pronunciation ───────────────────────────────────────────────────────────
+.cb-audio {
+  display: flex;
+  align-items: center;
+  gap: t.$lc-space-2;
+  width: 100%;
+  @include u.flex-center;
+  @include u.touch-state;
+  min-height: 44px;
+  margin-top: t.$lc-space-4;
+  background: var(--lc-rv-text);
+  color: var(--lc-rv-card);
+  border-radius: t.$lc-radius-md;
+  @include u.lc-font('sm', t.$lc-font-weight-semibold);
+  font-family: t.$lc-font-rv-body;
+
+  ion-icon {
+    font-size: t.$lc-text-xl;
+  }
+
+  &:disabled {
+    opacity: 0.6;
+  }
+}
+
+.cb-audio-dot {
+  @include u.circle(7px);
+  background: var(--lc-rv-mid-soft);
+}
+
+.cb-audio-spinner {
+  @include u.circle(16px);
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  border-top-color: var(--lc-rv-card);
+  animation: cbSpin 0.8s linear infinite;
+}
+
+// ─── Sections ────────────────────────────────────────────────────────────────
+.cb-divider {
+  height: 1px;
+  background: var(--lc-rv-border);
+  margin: t.$lc-space-4 0 t.$lc-space-3;
+}
+
+.cb-sec-hdr {
+  @include u.lc-font('xxs', t.$lc-font-weight-semibold);
+  font-family: t.$lc-font-rv-mono;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--lc-rv-muted);
+  margin-bottom: t.$lc-space-2;
+}
+
+// ─── Examples ────────────────────────────────────────────────────────────────
+.cb-ex {
+  border-left: 2px solid var(--lc-rv-res-close-bd);
+  padding-left: t.$lc-space-3;
+  margin-bottom: t.$lc-space-3;
+}
+
+.cb-ex-row {
+  display: flex;
+  align-items: flex-start;
+  gap: t.$lc-space-2;
+}
+
+.cb-ex-de {
+  flex: 1;
+  @include u.lc-font('xl');
+  font-family: t.$lc-font-rv-display;
+  color: var(--lc-rv-text);
+  line-height: 1.4;
+
+  ::ng-deep strong {
+    color: var(--lc-rv-mid);
+    font-weight: t.$lc-font-weight-semibold;
+  }
+}
+
+.cb-ex-en {
+  @include u.lc-font('sm');
+  font-family: t.$lc-font-rv-display;
+  font-style: italic;
+  color: var(--lc-rv-muted);
+  margin-top: 2px;
+}
+
+.cb-ex-play {
+  @include u.circle(30px);
+  @include u.flex-center;
+  @include u.touch-state;
+  flex-shrink: 0;
+  background: var(--lc-rv-inset-soft);
+  color: var(--lc-rv-mid);
+  font-size: t.$lc-text-lg;
+}
+
+// ─── Usage note ──────────────────────────────────────────────────────────────
+.cb-note {
+  display: flex;
+  gap: t.$lc-space-2;
+  margin-top: t.$lc-space-3;
+  background: var(--lc-rv-note-bg);
+  border-radius: t.$lc-radius-md;
+  padding: t.$lc-space-3;
+}
+
+.cb-note-icon {
+  flex-shrink: 0;
+}
+
+.cb-note-text {
+  @include u.lc-font('xs');
+  font-family: t.$lc-font-rv-body;
+  color: var(--lc-rv-note-fg);
+  line-height: 1.45;
+}
+
+// ─── Synonyms ────────────────────────────────────────────────────────────────
+.cb-syn-row {
+  display: flex;
+  align-items: center;
+  gap: t.$lc-space-2;
+  width: 100%;
+  text-align: left;
+  background: transparent;
+  border: none;
+  border-bottom: 1px solid var(--lc-rv-border);
+  padding: t.$lc-space-2 0;
+  @include u.touch-state;
+
+  &:last-child {
+    border-bottom: none;
+  }
+}
+
+.cb-syn-word {
+  @include u.lc-font('xl', t.$lc-font-weight-semibold);
+  font-family: t.$lc-font-rv-display;
+  color: var(--lc-rv-text);
+  flex: 1;
+}
+
+.cb-syn-trans {
+  @include u.lc-font('xs');
+  font-family: t.$lc-font-rv-body;
+  color: var(--lc-rv-muted);
+  @include u.text-overflow;
+  max-width: 40%;
+}
+
+.cb-syn-chev {
+  flex-shrink: 0;
+  color: var(--lc-rv-muted);
+  font-size: t.$lc-text-lg;
+  transition: transform var(--lc-transition-fast);
+
+  &.open {
+    transform: rotate(180deg);
+  }
+}
+
+.cb-syn-ex {
+  background: var(--lc-rv-inset-soft);
+  border-radius: t.$lc-radius-md;
+  padding: t.$lc-space-3;
+  margin-bottom: t.$lc-space-2;
+}
+
+@keyframes cbSpin {
+  to {
+    transform: rotate(360deg);
+  }
+}

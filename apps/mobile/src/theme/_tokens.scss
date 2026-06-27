@@ -103,6 +103,13 @@ $lc-text-xl:  1rem;       // 16px
 $lc-text-2xl: 1.125rem;   // 18px
 $lc-text-3xl: 1.25rem;    // 20px
 $lc-text-4xl: 1.5rem;     // 24px
+// Display tier — large editorial headings/numerals (Review redesign + future)
+$lc-text-5xl:  1.625rem;  // 26px
+$lc-text-6xl:  1.75rem;   // 28px
+$lc-text-7xl:  1.875rem;  // 30px
+$lc-text-8xl:  2.125rem;  // 34px
+$lc-text-9xl:  2.375rem;  // 38px
+$lc-text-10xl: 2.5rem;    // 40px
 
 // ─── ANIMATION ──────────────────────────────────────────────────────────────
 $lc-duration-fast:   150ms;
@@ -186,6 +193,35 @@ $lc-vx-cover-3: linear-gradient(150deg, #2E3A54, #5A6E8C);
 $lc-vx-cover-4: linear-gradient(150deg, #4A5640, #7E8C6A);
 $lc-vx-cover-5: linear-gradient(150deg, #5A3A52, #8C6A84);
 $lc-vx-cover-6: linear-gradient(150deg, #36544C, #86A99A);
+
+// ─── REVIEW (Spaced Practice) — Epic Review redesign ────────────────────────
+// Warm editorial "cream + forest + brass" surface, consistent with Vault/Story
+// Studio. Themeable values are remapped to var(--lc-rv-*) in variables.scss
+// (light + dark); the few intentionally theme-independent values (forest hero,
+// leech gradient, brass-on-dark) stay fixed here, mirroring the $lc-vx-* / $lc-ss-*
+// precedent. Fonts are scoped so the global $lc-font-* are untouched.
+$lc-font-rv-display: 'Spectral', Georgia, serif;
+$lc-font-rv-body:    'Hanken Grotesk', system-ui, sans-serif;
+$lc-font-rv-mono:    'Spline Sans Mono', 'Courier New', monospace;
+
+// Fixed-by-design (read well on light + dark)
+$lc-rv-hero-grad:    $lc-vx-hero-grad;                          // forest hero (alias)
+$lc-rv-hero-glow:    radial-gradient(circle at 78% 18%, rgba(216, 185, 129, 0.22), transparent 60%);
+$lc-rv-leech-grad:   linear-gradient(150deg, #2A1B14, #3A2417); // dark "leech" callout
+$lc-rv-brass:        #D8B981;   // brass accent / ring stroke on dark
+$lc-rv-on-hero:      #F4EFE4;   // primary text on forest hero
+$lc-rv-on-hero-soft: rgba(244, 239, 228, 0.7);
+$lc-rv-on-hero-track:rgba(244, 239, 228, 0.12); // ring track on hero
+$lc-rv-on-cta:       #16281F;   // text on the cream CTA
+$lc-rv-attention:    #E0A35C;   // "need attention" stat on hero
+$lc-rv-easy-bg:      #1F4034;   // solid forest "Easy" rating button
+$lc-rv-easy-text:    #F4EFE4;
+
+// Shadows (fixed)
+$lc-rv-shadow-hero:      0 22px 44px -22px rgba(20, 30, 24, 0.85);
+$lc-rv-shadow-flashcard: 0 24px 50px -28px rgba(33, 28, 22, 0.7), 0 2px 6px rgba(0, 0, 0, 0.05);
+$lc-rv-shadow-gold-ring: 0 0 0 2px #D8B981, 0 4px 12px -4px rgba(216, 185, 129, 0.6);
+$lc-rv-pulse:            rgba(216, 185, 129, 0.5); // gold CTA pulse start colour
 
 // ─── Z-INDEX SCALE ──────────────────────────────────────────────────────────
 $lc-z-base:    0;

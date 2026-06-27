@@ -1,44 +1,57 @@
 import { ChangeDetectionStrategy, Component, computed, inject, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
-import { IonContent, IonHeader, IonIcon, IonToolbar } from '@ionic/angular/standalone';
+import { IonContent, IonIcon } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
-import { arrowBackOutline, checkmarkCircleOutline, repeatOutline, refreshOutline } from 'ionicons/icons';
+import { checkmarkOutline, refreshOutline, sparklesOutline } from 'ionicons/icons';
 import { Card, ConfidenceRating } from '@lingua-card/shared/domain';
 import { ReviewStore } from '../../store/review.store';
 import { CardStore } from '../../../vault/store/card.store';
-import { CategoryStore } from '../../../vault/store/category.store';
 import { TranslatePipe } from '@ngx-translate/core';
-import { WordCardComponent } from '../../../../shared/ui/word-card/word-card.component';
-import { getCategoryName } from '../../../../shared/helpers/helpers';
-import { WordAudioService } from '../../../../shared/audio/word-audio.service';
 import { SessionStatsService } from '../../shared/services/session-stats.service';
-import {
-  MASTERY_LABELS,
-  MASTERY_THRESHOLD,
-  RATING_LABELS,
-  ReviewRoute,
-} from '../../models/review.model';
+import { ReviewStatsStore } from '../../../../shared/srs/review-stats.store';
+import { MASTERY_THRESHOLD, ReviewRoute } from '../../models/review.model';
+
+interface RatingBar {
+  value: ConfidenceRating;
+  labelKey: string;
+  cls: string;
+  count: number;
+  percent: number;
+}
+
+const RATING_BAR_KEY: Record<ConfidenceRating, string> = {
+  1: 'review.rating.again',
+  2: 'review.rating.hard',
+  3: 'review.rating.good',
+  4: 'review.rating.easy',
+};
+const RATING_BAR_CLS: Record<ConfidenceRating, string> = {
+  1: 'again',
+  2: 'hard',
+  3: 'good',
+  4: 'easy',
+};
 
 @Component({
   selector: 'lc-session-summary',
   templateUrl: './session-summary.page.html',
   styleUrls: ['./session-summary.page.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [IonContent, IonHeader, IonToolbar, IonIcon, WordCardComponent, TranslatePipe],
+  imports: [IonContent, IonIcon, TranslatePipe],
 })
 export class SessionSummaryPage implements OnInit {
   private readonly reviewStore = inject(ReviewStore);
   private readonly cardStore = inject(CardStore);
-  private readonly categoryStore = inject(CategoryStore);
   private readonly router = inject(Router);
-  private readonly wordAudio = inject(WordAudioService);
   private readonly statsService = inject(SessionStatsService);
+  private readonly reviewStats = inject(ReviewStatsStore);
 
   constructor() {
-    addIcons({ arrowBackOutline, checkmarkCircleOutline, repeatOutline, refreshOutline });
+    addIcons({ checkmarkOutline, refreshOutline, sparklesOutline });
   }
 
   readonly session = this.reviewStore.completedSession;
+  readonly dayStreak = this.reviewStats.dayStreak;
 
   ngOnInit(): void {
     if (!this.session()) {
@@ -56,12 +69,12 @@ export class SessionSummaryPage implements OnInit {
     return s ? this.statsService.formatDuration(s) : '—';
   });
 
-  readonly averageRating = computed(() => {
+  readonly recallRate = computed(() => {
     const s = this.session();
-    return s ? this.statsService.avgRating(s) : '—';
+    return s ? this.statsService.recallRate(s) : 0;
   });
 
-  readonly ratingBreakdown = computed(() => {
+  readonly ratingBreakdown = computed<RatingBar[]>(() => {
     const s = this.session();
     const counts: Record<number, number> = { 1: 0, 2: 0, 3: 0, 4: 0 };
     if (s) {
@@ -70,76 +83,43 @@ export class SessionSummaryPage implements OnInit {
     const maxCount = Math.max(...Object.values(counts), 1);
     return ([4, 3, 2, 1] as ConfidenceRating[]).map(v => ({
       value: v,
-      label: RATING_LABELS[v],
+      labelKey: RATING_BAR_KEY[v],
+      cls: RATING_BAR_CLS[v],
       count: counts[v],
       percent: Math.round((counts[v] / maxCount) * 100),
     }));
   });
 
-  readonly reviewedCardRows = computed(() => {
+  private readonly nonMasteredCards = computed((): Card[] => {
     const s = this.session();
     if (!s) return [];
-    return s.reviewedCards
-      .filter(c => s.ratings[c.id] !== undefined)
-      .map(c => ({
-        card: c,
-        rating: s.ratings[c.id] as ConfidenceRating,
-        masteryLevel: c.srsState?.masteryLevel ?? 0,
-        masteryLabel: MASTERY_LABELS[c.srsState?.masteryLevel ?? 0],
-      }))
-      .sort((a, b) => a.rating - b.rating);
+    return s.reviewedCards.filter(c => (s.ratings[c.id] ?? 4) < MASTERY_THRESHOLD);
   });
 
-  readonly allReviewedCards = computed((): Card[] =>
-    this.reviewedCardRows().map(r => r.card)
-  );
-
-  readonly nonMasteredCards = computed((): Card[] =>
-    this.reviewedCardRows().filter(r => r.rating < MASTERY_THRESHOLD).map(r => r.card)
-  );
-
-  readonly hasNonMasteredCards = computed(() => this.nonMasteredCards().length > 0);
-
-  reviewAllAgain(): void {
-    const staleCards = this.allReviewedCards();
-    if (!staleCards.length) return;
-    const cards = this.resolveLatestCards(staleCards);
-    this.reviewStore.startSession(cards, this.session()?.collectionId ?? null, this.session()?.collectionName ?? null);
-    void this.router.navigate([ReviewRoute.PLAYER]);
-  }
+  readonly tricky = computed(() => this.nonMasteredCards().length);
+  readonly hasTricky = computed(() => this.tricky() > 0);
 
   reviewNonMastered(): void {
-    const staleCards = this.nonMasteredCards();
-    if (!staleCards.length) return;
-    const cards = this.resolveLatestCards(staleCards);
+    const stale = this.nonMasteredCards();
+    if (!stale.length) return;
+    const cards = this.resolveLatestCards(stale);
     this.reviewStore.startSession(cards, this.session()?.collectionId ?? null, 'Struggled cards retry');
     void this.router.navigate([ReviewRoute.PLAYER]);
   }
 
-  // Resolves the freshest Card objects from the live store.
-  // Falls back to the session snapshot cards when the store hasn't loaded yet
-  // (deep-link / page refresh before CardStore HTTP response returns).
-  private resolveLatestCards(fallback: Card[]): Card[] {
-    const liveCards = this.cardStore.cards();
-    if (!liveCards.length) return fallback;
-    const liveMap = new Map(liveCards.map(c => [c.id, c]));
-    return fallback.map(c => liveMap.get(c.id) ?? c);
-  }
-
-  navigateToCard(card: Card): void {
-    void this.router.navigate(['/vault', card.id]);
-  }
-
-  playCardAudio(card: Card): void {
-    void this.wordAudio.playCard(card);
-  }
-
-  getCategoryLabel(card: Card): string {
-    return getCategoryName(card.categoryIds?.[0], this.categoryStore.categories());
+  goToStories(): void {
+    void this.router.navigate(['/stories']);
   }
 
   goToHub(): void {
     this.reviewStore.clearSession();
     void this.router.navigate([ReviewRoute.HUB]);
+  }
+
+  private resolveLatestCards(fallback: Card[]): Card[] {
+    const liveCards = this.cardStore.cards();
+    if (!liveCards.length) return fallback;
+    const liveMap = new Map(liveCards.map(c => [c.id, c]));
+    return fallback.map(c => liveMap.get(c.id) ?? c);
   }
 }

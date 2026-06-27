@@ -1,0 +1,80 @@
+<ion-header class="ion-no-border">
+  <ion-toolbar>
+    <div class="lz-nav">
+      <button class="lz-back" (click)="back()" [attr.aria-label]="'common.back' | translate">
+        <ion-icon name="chevron-back-outline"></ion-icon>
+      </button>
+      <div class="lz-nav-heading">
+        <span class="lz-kicker">{{ 'review.leeches.kicker' | translate }}</span>
+        <span class="lz-title">{{ 'review.leeches.title' | translate }}</span>
+      </div>
+    </div>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+  <div class="lz-content">
+    <!-- Explainer -->
+    <div class="lz-explainer">
+      <span class="lz-explainer-icon">🐛</span>
+      <p class="lz-explainer-text">{{ 'review.leeches.explainer' | translate }}</p>
+    </div>
+
+    @if (leechCount() === 0) {
+      <div class="lz-empty">
+        <span class="lz-empty-icon">✨</span>
+        <p class="lz-empty-title">{{ 'review.leeches.emptyTitle' | translate }}</p>
+        <p class="lz-empty-sub">{{ 'review.leeches.emptySub' | translate }}</p>
+      </div>
+    } @else {
+      @for (entry of leeches(); track entry.card.id) {
+        <div class="lz-card">
+          <div class="lz-main">
+            @if (entry.card.content.article) {
+              <lc-article-badge [article]="entry.card.content.article" />
+            }
+            <div class="lz-word-col">
+              <p class="lz-word">{{ entry.card.content.back }}</p>
+              <p class="lz-trans">{{ entry.card.content.front }}</p>
+            </div>
+            <div class="lz-fail">
+              <span class="lz-fail-num">{{ entry.failCount }}×</span>
+              <span class="lz-fail-lbl">{{ 'review.leeches.failedLabel' | translate }}</span>
+            </div>
+          </div>
+
+          <div class="lz-meta">
+            @if (entry.seenCount > 0) {
+              <span class="lz-chip">{{ 'review.leeches.failedOfLast' | translate:{ fails: entry.failCount, total: entry.seenCount } }}</span>
+            }
+            @if (entry.lastSeenAt) {
+              <span class="lz-seen">{{ 'review.leeches.lastSeen' | translate }} {{ entry.lastSeenAt | sessionDate }}</span>
+            }
+          </div>
+
+          <div class="lz-actions">
+            <button class="lz-action" (click)="reset(entry)">
+              <ion-icon name="refresh-outline"></ion-icon>
+              {{ 'review.leeches.reset' | translate }}
+            </button>
+            <button class="lz-action" (click)="rest(entry)">
+              <ion-icon name="moon-outline"></ion-icon>
+              {{ 'review.leeches.rest' | translate }}
+            </button>
+          </div>
+        </div>
+      }
+    }
+
+    <div class="lz-bottom-spacer"></div>
+  </div>
+</ion-content>
+
+@if (leechCount() > 0) {
+  <div class="lz-footer">
+    <button class="lz-breakthrough" (click)="breakThrough()">
+      <ion-icon name="flash-outline"></ion-icon>
+      {{ 'review.leeches.breakThrough' | translate:{ count: leechCount() } }}
+    </button>
+  </div>
+}

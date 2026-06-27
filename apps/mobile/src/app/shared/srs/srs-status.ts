@@ -20,11 +20,27 @@ export function isDue(card: Card, now: Date): boolean {
 
 /**
  * Mastered = masteryLevel 5. Single threshold used everywhere.
- * (API buildCountsMap uses state === 'mastered', which the SM-2 sets when
+ * (API buildCountsMap uses state === 'mastered', which is set when
  * masteryLevel >= 4; RV09 will reconcile the server side.)
  */
 export function isMastered(card: Card): boolean {
   return (card.srsState?.masteryLevel ?? 0) === 5;
+}
+
+/**
+ * Leech = a studied card you keep failing. The data model has no lapse counter,
+ * so this is a srsState-only heuristic: the card is in FSRS `relearning` (it was
+ * failed and is being re-learned), or it is struggling (low mastery) with high
+ * intrinsic FSRS difficulty. The Leeches page enriches this with an actual
+ * fail-count derived from local session history.
+ */
+export function isLeech(card: Card): boolean {
+  const s = card.srsState;
+  if (!s || s.lastReviewedAt === null) return false;
+  const level = s.masteryLevel ?? 0;
+  const struggling = level >= 1 && level <= 2;
+  const hardFsrs = (s.difficulty ?? 0) >= 7;
+  return s.state === 'relearning' || (struggling && hardFsrs);
 }
 
 /**
@@ -44,7 +60,7 @@ export function lifecycleState(card: Card): CardLifecycleState {
   const s = card.srsState;
   if (!s || s.lastReviewedAt === null) return 'new';
   if (isMastered(card)) return 'mastered';
-  // Use the SM-2 state string when available; fall back to interval heuristic.
-  if (s.state === 'learning' || s.intervalDays <= 7) return 'learning';
+  // Use the FSRS state string when available; fall back to interval heuristic.
+  if (s.state === 'learning' || s.state === 'relearning' || s.intervalDays <= 7) return 'learning';
   return 'review';
 }
