@@ -1,7 +1,5 @@
-import { computed, DestroyRef, inject } from '@angular/core';
-import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { computed, inject } from '@angular/core';
 import { patchState, signalStore, withComputed, withHooks, withMethods, withState } from '@ngrx/signals';
-import { concatMap, from, map, Subject, timer } from 'rxjs';
 import {
   AudioSegment,
   Card,
@@ -10,12 +8,11 @@ import {
   PlayMode,
 } from '@lingua-card/shared/domain';
 import { CardStore } from '../../vault/store/card.store';
-import { WordAudioService } from '../../../shared/audio/word-audio.service';
 import { ScriptCompilerService } from '../services/script-compiler.service';
+import { ListenPlaybackEngine, PlaybackHost } from '../services/listen-playback.engine';
 import {
   DEFAULT_LISTEN_SETTINGS,
   ListenSource,
-  LISTEN_PREFETCH_WINDOW,
   LISTEN_SESSION_KEY,
   LISTEN_SETTINGS_KEY,
   ListenSourceLabel,
@@ -24,7 +21,6 @@ import {
   MIN_ESTIMATED_MINUTES,
   MINUTES_PER_CARD,
   SessionSnapshot,
-  SilenceDuration,
   STRUGGLING_MASTERY_THRESHOLD,
 } from '../models/listen.models';
 
@@ -117,59 +113,8 @@ export const ListenStore = signalStore(
 
   withMethods((store) => {
     const compiler = inject(ScriptCompilerService);
-    const wordAudio = inject(WordAudioService);
     const cardStore = inject(CardStore);
-    const destroyRef = inject(DestroyRef);
-
-    // ── Segment pipeline ────────────────────────────────────────────────────────
-    //
-    // ROOT CAUSE OF next/previous DESYNC:
-    //
-    // concatMap queues inner observables — it never cancels the in-flight one when
-    // a new emission arrives. Tapping Next mid-word means:
-    //   1. The current playAsPromise() keeps running (Audio element has no cancel handle).
-    //   2. A new segment is also queued behind it in concatMap.
-    //   3. When the stale audio finally resolves, concatMap's next() callback reads the
-    //      *current* (already-advanced) store state and advances the segment index again,
-    //      playing segments from the new card out of order.
-    //
-    // FIX — generation counter:
-    // Every call that starts a new playback sequence (next, previous, start, skip, retry,
-    // restart) increments `_generation`. Each segment emission carries the generation at
-    // the time it was emitted (in the `tag` property). The concatMap subscriber checks the
-    // tag against the current generation before acting. Stale completions become no-ops.
-    //
-    // The Subject itself is also completed-and-replaced on each navigation so concatMap's
-    // queue is fully drained — no stale segment ever starts executing after a skip.
-
-    interface TaggedSegment {
-      segment: AudioSegment;
-      generation: number;
-    }
-
-    let _generation = 0;
-    let _subject$ = new Subject<TaggedSegment>();
-
-    /** Stop web-speech + hard-abort any in-flight utterance, then increment generation. */
-    function abortAndAdvance(): number {
-      wordAudio.stop();
-      return ++_generation;
-    }
-
-    /** Drain the current pipeline and create a fresh one subscribed to the runner. */
-    function resetPipeline(runnerFn: (s$: Subject<TaggedSegment>) => void): void {
-      // Complete the old subject so concatMap's queue is fully flushed.
-      const old = _subject$;
-      _subject$ = new Subject<TaggedSegment>();
-      runnerFn(_subject$);
-      old.complete();
-    }
-
-    function emitNextSegment(gen: number): void {
-      const script = store.currentScript();
-      const seg = store.currentSegment();
-      if (script && seg) _subject$.next({ segment: seg, generation: gen });
-    }
+    const engine = inject(ListenPlaybackEngine);
 
     function saveSession(): void {
       try {
@@ -195,134 +140,32 @@ export const ListenStore = signalStore(
       return copy;
     }
 
-    // ── Windowed audio prefetch ───────────────────────────────────────────────
-    // Pre-warm TARGET-language audio (word + first example) for a sliding window
-    // of upcoming cards only — not the whole queue — so we never generate audio
-    // for cards the user never reaches. Native audio is Web Speech, so it is not
-    // prefetched. Cleared whenever the queue is rebuilt.
-    const prefetchedIndices = new Set<number>();
-
-    function resetPrefetch(): void {
-      prefetchedIndices.clear();
-    }
-
-    /**
-     * Target-language audio items actually played for a card under the current
-     * mode: the headword always; the first example only in examples/deepDive (in
-     * compact mode the example is never spoken, so warming it would waste TTS).
-     */
-    function targetItemsForCard(c: Card): { text: string; language: string }[] {
-      const word = c.content.article ? `${c.content.article} ${c.content.back}` : c.content.back;
-      const items = [{ text: word, language: 'de-DE' }];
-      if (store.settings().playMode !== 'compact') {
-        const ex = c.content.examples?.[0];
-        if (ex?.target) items.push({ text: ex.target, language: 'de-DE' });
-      }
-      return items;
-    }
-
-    function prefetchWindow(startIdx: number): void {
-      const queue = store.queue();
-      const end = Math.min(queue.length, Math.max(0, startIdx) + LISTEN_PREFETCH_WINDOW);
-      const items: { text: string; language: string }[] = [];
-      for (let i = Math.max(0, startIdx); i < end; i++) {
-        if (prefetchedIndices.has(i)) continue;
-        prefetchedIndices.add(i);
-        const c = queue[i];
-        if (!c) continue;
-        items.push(...targetItemsForCard(c));
-      }
-      if (items.length) void wordAudio.preWarm(items);
-    }
-
-    /** Wire up the concatMap runner to a given subject. Called once on init and
-     *  re-called each time the pipeline is reset (so the new subject gets a subscriber). */
-    function subscribeRunner(subject$: Subject<TaggedSegment>): void {
-      subject$.pipe(
-        // concatMap plays each segment in order and carries the generation through
-        // so the subscriber next() can verify the completion still belongs to the
-        // active playback sequence — not a stale one triggered by stop()/cancel().
-        concatMap(({ segment, generation }: TaggedSegment) => {
-          // Entry guard: generation already moved on before this slot even started.
-          if (generation !== _generation) {
-            return from(Promise.resolve()).pipe(map(() => generation));
-          }
-
-          if (segment.type === 'silence') {
-            return timer(segment.durationMs ?? SilenceDuration.AfterWord).pipe(
-              map(() => generation),
-            );
-          }
-          // Apply the user-selected playback speed. Read live so a speed change
-          // mid-session takes effect from the next segment.
-          const rate = store.settings().speed;
-          // Target language → cache-first HD pipeline.
-          // Native language (translations, grammar tips) → Web Speech only:
-          // free, instant, and avoids paid TTS for the secondary audio.
-          const playback = segment.lang === 'de'
-            ? wordAudio.playAsPromise(segment.text, 'de-DE', rate)
-            : wordAudio.playNative(segment.text, 'en-US', rate);
-          return from(playback).pipe(
-            map(() => generation),
-          );
-        }),
-        takeUntilDestroyed(destroyRef),
-      ).subscribe({
-        next: (gen: number) => {
-          // Exit guard: the generation that started this segment no longer matches
-          // the current one. This fires when speechSynthesis.cancel() resolves the
-          // fallback promise, or when lc-stop resolves _playAndWait, after
-          // next()/previous()/skip() has already incremented _generation.
-          // Without this guard the subscriber would read the NEW card's state and
-          // corrupt its segmentIndex before the new card's own emission runs.
-          if (gen !== _generation) return;
-
-          if (store.status() !== 'playing') return;
-          const script = store.currentScript();
-          const segIdx = store.segmentIndex();
-          if (!script || segIdx >= script.segments.length) return;
-
-          if (segIdx < script.segments.length - 1) {
-            patchState(store, { segmentIndex: segIdx + 1 });
-            emitNextSegment(gen);
-          } else {
-            const cardIdx = store.cardIndex();
-            const queueLen = store.queue().length;
-            if (cardIdx >= queueLen - 1) {
-              if (store.settings().repeat) {
-                patchState(store, { cardIndex: 0, segmentIndex: 0, status: 'playing' });
-                emitNextSegment(gen);
-              } else {
-                patchState(store, { status: 'complete' });
-              }
-            } else {
-              patchState(store, { cardIndex: cardIdx + 1, segmentIndex: 0 });
-              saveSession();
-              prefetchWindow(cardIdx + 1);
-              emitNextSegment(gen);
-            }
-          }
-        },
-        error: (err) => {
-          patchState(store, {
-            status: 'error',
-            errorMessage: err?.message ?? 'Audio failed',
-          });
-        },
-      });
-    }
+    // Adapter the engine reads from / writes to. Built once; the engine never
+    // imports the store, so there is no circular dependency.
+    const host: PlaybackHost = {
+      currentScript: store.currentScript,
+      currentSegment: store.currentSegment,
+      status: store.status,
+      settings: store.settings,
+      queue: store.queue,
+      cardIndex: store.cardIndex,
+      segmentIndex: store.segmentIndex,
+      downloadStatus: store.downloadStatus,
+      patch: state => patchState(store, state),
+      saveSession,
+    };
 
     return {
       initRunner(): void {
-        subscribeRunner(_subject$);
+        engine.attach(host);
       },
 
       stopAudio(): void {
-        wordAudio.stop();
+        engine.stopAudio();
       },
 
       loadQueue(cards: Card[], label: string): void {
-        abortAndAdvance();
+        engine.abortPlayback();
         const mode = store.settings().playMode;
         const queue = store.settings().shuffle ? shuffleArray(cards) : [...cards];
         const scripts = compileQueue(queue, mode);
@@ -339,10 +182,10 @@ export const ListenStore = signalStore(
         });
         localStorage.removeItem(LISTEN_SESSION_KEY);
 
-        // Warm only the first window of target-language audio. The window slides
-        // forward as playback advances (see prefetchWindow callers).
-        resetPrefetch();
-        prefetchWindow(0);
+        // Warm only the first window of target-language audio; the window slides
+        // forward as playback advances.
+        engine.resetPrefetch();
+        engine.prefetchWindow(0);
       },
 
       loadDueCards(): void {
@@ -380,31 +223,9 @@ export const ListenStore = signalStore(
         patchState(store, { sourceLabel });
       },
 
-      /**
-       * Download the whole queue's TARGET-language audio to the device so the
-       * playlist plays offline. Reuses the cache-first preWarm (which persists to
-       * the device filesystem/IndexedDB). Native audio stays Web Speech, which is
-       * already offline-capable. Cache-read for free users, generates for Pro
-       * (enforced server-side); either way whatever HD exists is downloaded.
-       */
-      async downloadQueueForOffline(): Promise<void> {
-        if (store.downloadStatus() === 'downloading') return;
-        const queue = store.queue();
-        if (!queue.length) return;
-
-        patchState(store, { downloadStatus: 'downloading' });
-        // Download exactly what the current mode plays (compact = headwords only),
-        // so we never fetch/generate example audio the user won't hear offline.
-        const items = queue.flatMap(c => targetItemsForCard(c));
-
-        try {
-          await wordAudio.preWarm(items);
-          // The whole queue is now warm — keep the sliding prefetch from redoing it.
-          for (let i = 0; i < queue.length; i++) prefetchedIndices.add(i);
-          patchState(store, { downloadStatus: 'done' });
-        } catch {
-          patchState(store, { downloadStatus: 'idle' });
-        }
+      /** Download the whole queue's target audio to the device for offline playback. */
+      downloadQueueForOffline(): Promise<void> {
+        return engine.downloadQueueForOffline();
       },
 
       start(opts: { shuffle?: boolean } = {}): void {
@@ -413,90 +234,39 @@ export const ListenStore = signalStore(
           patchState(store, { settings });
           localStorage.setItem(LISTEN_SETTINGS_KEY, JSON.stringify(settings));
         }
-        const gen = abortAndAdvance();
         const queue = store.settings().shuffle ? shuffleArray(store.rawQueue()) : [...store.rawQueue()];
         const scripts = compileQueue(queue, store.settings().playMode);
         patchState(store, {
           queue, scripts, cardIndex: 0, segmentIndex: 0, status: 'playing',
           errorMessage: null, sessionStartedAt: Date.now(),
         });
-        resetPrefetch();
-        prefetchWindow(0);
-        resetPipeline(subscribeRunner);
-        emitNextSegment(gen);
+        engine.resetPrefetch();
+        engine.prefetchWindow(0);
+        engine.restart();
       },
 
       pause(): void {
-        // Silence the current word immediately AND invalidate any in-flight
-        // segment completion (generation bump) so a late-resolving audio promise
-        // can't advance the queue while paused. Without the stop(), tapping pause
-        // left the current word audibly playing to the end.
-        abortAndAdvance();
-        patchState(store, { status: 'paused' });
+        engine.pause();
       },
 
       resume(): void {
-        if (store.status() !== 'paused') return;
-        patchState(store, { status: 'playing', errorMessage: null });
-        // Fresh pipeline, then replay the current segment from its start. The
-        // engine has no mid-segment resume, so replaying the current word is the
-        // predictable behaviour. emitNextSegment uses the generation bumped by
-        // pause()'s abortAndAdvance, so no stale completion can interfere.
-        resetPipeline(subscribeRunner);
-        emitNextSegment(_generation);
+        engine.resume();
       },
 
       next(): void {
-        const idx = store.cardIndex();
-        const queueLen = store.queue().length;
-        if (idx >= queueLen - 1) return;
-        const wasPlaying = store.status() === 'playing';
-        // Abort in-flight audio and get the new generation BEFORE updating state,
-        // so emitNextSegment emits with the correct new generation tag.
-        const gen = abortAndAdvance();
-        patchState(store, { cardIndex: idx + 1, segmentIndex: 0 });
-        saveSession();
-        prefetchWindow(idx + 1);
-        if (wasPlaying) {
-          resetPipeline(subscribeRunner);
-          emitNextSegment(gen);
-        }
+        engine.next();
       },
 
       previous(): void {
-        const idx = store.cardIndex();
-        if (idx <= 0) return;
-        const wasPlaying = store.status() === 'playing';
-        const gen = abortAndAdvance();
-        patchState(store, { cardIndex: idx - 1, segmentIndex: 0 });
-        saveSession();
-        prefetchWindow(idx - 1);
-        if (wasPlaying) {
-          resetPipeline(subscribeRunner);
-          emitNextSegment(gen);
-        }
+        engine.previous();
       },
 
       retrySegment(): void {
-        const gen = abortAndAdvance();
-        patchState(store, { status: 'playing', errorMessage: null });
-        resetPipeline(subscribeRunner);
-        emitNextSegment(gen);
+        engine.retrySegment();
       },
 
       skipCard(): void {
-        const idx = store.cardIndex();
-        const queueLen = store.queue().length;
-        if (idx >= queueLen - 1) {
-          abortAndAdvance();
-          patchState(store, { status: 'complete' });
-          return;
-        }
-        const gen = abortAndAdvance();
-        patchState(store, { cardIndex: idx + 1, segmentIndex: 0, status: 'playing', errorMessage: null });
-        prefetchWindow(idx + 1);
-        resetPipeline(subscribeRunner);
-        emitNextSegment(gen);
+        engine.skipCard();
       },
 
       updateSettings(partial: Partial<PlayerSettings>): void {
@@ -513,22 +283,18 @@ export const ListenStore = signalStore(
           const newScripts = [...store.scripts().slice(0, playedIdx + 1), ...recompiled];
           patchState(store, { scripts: newScripts });
 
-          // The set of audio items per card depends on the mode (examples/deepDive
-          // add the example clip). Re-warm the current window so a switch into an
-          // example mode prefetches the newly-needed example audio instead of
-          // leaving it to a cache-miss fallback. Also reset the offline-download
-          // badge since a prior download may not cover the new mode's example audio.
-          resetPrefetch();
-          prefetchWindow(store.cardIndex());
+          // The set of audio items per card depends on the mode (examples/deepDive add
+          // the example clip). Re-warm the current window and reset the offline badge.
+          engine.resetPrefetch();
+          engine.prefetchWindow(store.cardIndex());
           if (store.downloadStatus() === 'done') {
             patchState(store, { downloadStatus: 'idle' });
           }
         }
 
-        // Toggling shuffle mid-session must actually reorder the UPCOMING cards
-        // (played cards, incl. the current one, stay put so the now-playing word
-        // doesn't jump). Turning shuffle off restores the original rawQueue order
-        // for the remaining cards. Skipped when idle (queue not yet started).
+        // Toggling shuffle mid-session reorders the UPCOMING cards (played cards,
+        // incl. the current one, stay put so the now-playing word doesn't jump).
+        // Turning shuffle off restores the original rawQueue order for the rest.
         if ('shuffle' in partial && store.status() !== 'idle') {
           const playedIdx = store.cardIndex();
           const played = store.queue().slice(0, playedIdx + 1);
@@ -542,8 +308,8 @@ export const ListenStore = signalStore(
             queue: newQueue,
             scripts: compileQueue(newQueue, settings.playMode),
           });
-          resetPrefetch();
-          prefetchWindow(playedIdx);
+          engine.resetPrefetch();
+          engine.prefetchWindow(playedIdx);
         }
       },
 
@@ -552,21 +318,19 @@ export const ListenStore = signalStore(
         patchState(store, { settings });
         localStorage.setItem(LISTEN_SETTINGS_KEY, JSON.stringify(settings));
 
-        const gen = abortAndAdvance();
         const queue = shuffleArray(store.rawQueue());
         const scripts = compileQueue(queue, settings.playMode);
         patchState(store, {
           queue, scripts, cardIndex: 0, segmentIndex: 0, status: 'playing',
           errorMessage: null, sessionStartedAt: Date.now(),
         });
-        resetPrefetch();
-        prefetchWindow(0);
-        resetPipeline(subscribeRunner);
-        emitNextSegment(gen);
+        engine.resetPrefetch();
+        engine.prefetchWindow(0);
+        engine.restart();
       },
 
       resetToIdle(): void {
-        abortAndAdvance();
+        engine.abortPlayback();
         patchState(store, { status: 'idle', segmentIndex: 0, errorMessage: null, selectedSource: ListenSource.Due });
         localStorage.removeItem(LISTEN_SESSION_KEY);
         this.loadDueCards();
