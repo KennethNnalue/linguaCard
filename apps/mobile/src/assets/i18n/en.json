@@ -1010,6 +1010,7 @@
       "sessionComplete": "Session complete!",
       "seeSummary": "See summary",
       "audioUnavailable": "Audio unavailable",
+      "preparingAudio": "Preparing audio…",
       "retryBtn": "Retry",
       "skipCard": "Skip this card",
       "grammarTipLabel": "Grammar tip",

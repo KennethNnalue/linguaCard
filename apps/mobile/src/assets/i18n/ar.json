@@ -821,6 +821,7 @@
       "sessionComplete": "اكتملت الجلسة!",
       "seeSummary": "عرض الملخص",
       "audioUnavailable": "الصوت غير متاح",
+      "preparingAudio": "جارٍ تجهيز الصوت…",
       "retryBtn": "إعادة المحاولة",
       "skipCard": "تخطي هذه البطاقة",
       "grammarTipLabel": "نصيحة النحو",

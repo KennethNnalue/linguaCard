@@ -88,6 +88,24 @@ ion-content {
 }
 
 // ─── ERROR ──────────────────────────────────────────────────────────────────
+.preparing-pill {
+  display: flex;
+  align-items: center;
+  gap: t.$lc-space-2;
+  margin-top: t.$lc-space-2;
+  padding: t.$lc-space-2 + 2px t.$lc-space-3 + 2px;
+  border-radius: 14px;
+  background: var(--lc-brand-light);
+  border: 1px solid var(--lc-border);
+
+  ion-spinner { width: 18px; height: 18px; color: var(--lc-brand-mid); }
+}
+
+.preparing-text {
+  @include u.lc-font('xs', t.$lc-font-weight-semibold);
+  color: var(--lc-text-secondary);
+}
+
 .error-pill {
   display: flex;
   align-items: center;

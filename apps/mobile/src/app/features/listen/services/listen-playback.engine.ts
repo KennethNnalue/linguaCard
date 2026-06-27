@@ -43,7 +43,7 @@ export interface PlaybackHost {
  * ── Why the generation counter ──────────────────────────────────────────────
  * concatMap queues inner observables — it never cancels the in-flight one when
  * a new emission arrives. Tapping Next mid-word would otherwise:
- *   1. leave the current playAsPromise() running (Audio has no cancel handle),
+ *   1. leave the current playTarget() running (Audio has no cancel handle),
  *   2. queue a new segment behind it, and
  *   3. when the stale audio finally resolves, advance the *already-advanced*
  *      state again, playing segments from the new card out of order.
@@ -181,7 +181,25 @@ export class ListenPlaybackEngine {
     return items;
   }
 
+  /** Fire-and-forget warm of the sliding window ahead of the cursor. */
   prefetchWindow(startIdx: number): void {
+    const items = this._collectWindowItems(startIdx);
+    if (items.length) void this.wordAudio.preWarm(items);
+  }
+
+  /**
+   * AWAITED warm of the first window — used by start() to gate playback so the
+   * opening cards never fall back to a robotic voice or a silent beat. The store
+   * shows a "preparing" state while this resolves. Per-segment HD resolution is
+   * still the safety net for anything that slips past the window.
+   */
+  async prepareWindow(startIdx: number): Promise<void> {
+    const items = this._collectWindowItems(startIdx);
+    if (items.length) await this.wordAudio.preWarm(items);
+  }
+
+  /** Collect (and mark) the un-warmed target items for the window at startIdx. */
+  private _collectWindowItems(startIdx: number): { text: string; language: string }[] {
     const queue = this.host.queue();
     const end = Math.min(queue.length, Math.max(0, startIdx) + LISTEN_PREFETCH_WINDOW);
     const items: { text: string; language: string }[] = [];
@@ -192,7 +210,17 @@ export class ListenPlaybackEngine {
       if (!c) continue;
       items.push(...this.targetItemsForCard(c));
     }
-    if (items.length) void this.wordAudio.preWarm(items);
+    return items;
+  }
+
+  /**
+   * How long to hold a (silent) native-translation segment on screen, scaled by
+   * text length and the current playback speed. Clamped so very short or very
+   * long translations stay within a comfortable reading window.
+   */
+  private nativeReadMs(text: string, rate: number): number {
+    const base = 600 + text.length * 45;
+    return Math.round(Math.min(4000, Math.max(900, base)) / Math.max(0.5, rate));
   }
 
   /**
@@ -253,12 +281,16 @@ export class ListenPlaybackEngine {
           }
           // Read speed live so a mid-session change takes effect from the next segment.
           const rate = this.host.settings().speed;
-          // Target language → cache-first HD pipeline; native → Web Speech (free/instant).
-          const playback =
-            segment.lang === 'de'
-              ? this.wordAudio.playAsPromise(segment.text, 'de-DE', rate)
-              : this.wordAudio.playNative(segment.text, 'en-US', rate);
-          return from(playback).pipe(map(() => generation));
+          // Target language → HD-only pipeline (never Web Speech).
+          if (segment.lang === 'de') {
+            return from(this.wordAudio.playTarget(segment.text, 'de-DE', rate)).pipe(
+              map(() => generation),
+            );
+          }
+          // Native translation is shown on screen but NOT spoken — hold a silent
+          // read-beat (scaled by text length and playback speed) so the learner has
+          // time to read it before the sequence advances.
+          return timer(this.nativeReadMs(segment.text, rate)).pipe(map(() => generation));
         }),
         takeUntilDestroyed(this.destroyRef),
       )

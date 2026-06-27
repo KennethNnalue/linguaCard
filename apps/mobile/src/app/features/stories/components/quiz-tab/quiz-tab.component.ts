@@ -2,6 +2,7 @@ import {
   ChangeDetectionStrategy,
   Component,
   computed,
+  effect,
   inject,
   input,
   model,
@@ -53,6 +54,21 @@ export class QuizTabComponent {
   readonly waitingForNext = signal(false);
 
   readonly currentQuestion = computed(() => this.questions()[this.currentIdx()] ?? null);
+
+  // Quiz audio is generated lazily — only here, on the FIRST quiz open (this
+  // component is created via @if when the user switches to the Quiz tab), so
+  // users who never open the quiz never spend TTS resources on it. For platform
+  // stories the same sentences are pre-generated server-side and reused by all
+  // users, so this warm is a cheap cache hit. Runs once per mount.
+  private _warmed = false;
+  private readonly _warmQuizAudio = effect(() => {
+    const qs = this.questions();
+    if (this._warmed || qs.length === 0) return;
+    this._warmed = true;
+    void this.wordAudio.preWarm(
+      qs.map(q => ({ text: this.fullCorrectSentence(q), language: 'de-DE' })),
+    );
+  });
 
   /** The full sentence with the correct answer filled into the blank. */
   private fullCorrectSentence(q: StoryQuizQuestion): string {
@@ -147,7 +163,7 @@ export class QuizTabComponent {
       // Play the full sentence with the correct answer so they hear the right version.
       this.waitingForNext.set(true);
       if (this.autoSpeak()) {
-        void this.wordAudio.playAsPromise(this.fullCorrectSentence(q), 'de-DE');
+        void this.wordAudio.playTarget(this.fullCorrectSentence(q), 'de-DE');
       }
     } else {
       void this.advanceAfterAudio(q);
@@ -162,7 +178,7 @@ export class QuizTabComponent {
 
   private async advanceAfterAudio(q: StoryQuizQuestion): Promise<void> {
     if (this.autoSpeak()) {
-      await this.wordAudio.playAsPromise(this.fullCorrectSentence(q), 'de-DE');
+      await this.wordAudio.playTarget(this.fullCorrectSentence(q), 'de-DE');
     } else {
       await new Promise<void>(r => setTimeout(r, 1500));
     }

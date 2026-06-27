@@ -116,7 +116,7 @@ apps/mobile/src/app/
 │   │   ├── category-chip/             ← <lc-category-chip [active]="true">
 │   │   └── empty-state/               ← <lc-empty-state icon="📚" title="...">
 │   ├── audio/
-│   │   ├── audio.service.ts           ← TTS engine (platform capability, not feature logic)
+│   │   ├── word-audio.service.ts      ← Unified HD audio engine for all word/example/keyword/quiz pronunciation (no Web Speech)
 │   │   └── audio-player/              ← <lc-audio-player> dumb playback button
 │   ├── csv/
 │   │   ├── csv-parser.service.ts      ← Pure parsing: string → ParsedRow[]

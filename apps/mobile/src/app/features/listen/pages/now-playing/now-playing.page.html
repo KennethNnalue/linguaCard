@@ -48,6 +48,13 @@
         </div>
       }
 
+      @if (isPreparing()) {
+        <div class="preparing-pill">
+          <ion-spinner name="dots" />
+          <span class="preparing-text">{{ 'listen.nowPlaying.preparingAudio' | translate }}</span>
+        </div>
+      }
+
       @if (isError()) {
         <div class="error-pill">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">

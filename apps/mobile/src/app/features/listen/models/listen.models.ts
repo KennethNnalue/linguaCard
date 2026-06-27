@@ -72,7 +72,7 @@ export const MAX_FALLBACK_QUEUE_SIZE = 20;
 // How many cards ahead (incl. the current one) to pre-warm target-language audio
 // for. Replaces whole-queue pre-warm so we don't generate audio for cards the
 // user never reaches. Window slides forward as playback advances.
-export const LISTEN_PREFETCH_WINDOW = 3;
+export const LISTEN_PREFETCH_WINDOW = 5;
 
 // ─── Mastery Threshold ────────────────────────────────────────────────────────
 

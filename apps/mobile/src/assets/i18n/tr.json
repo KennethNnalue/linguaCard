@@ -821,6 +821,7 @@
       "sessionComplete": "Oturum tamamlandı!",
       "seeSummary": "Özeti gör",
       "audioUnavailable": "Ses mevcut değil",
+      "preparingAudio": "Ses hazırlanıyor…",
       "retryBtn": "Tekrar dene",
       "skipCard": "Bu kartı atla",
       "grammarTipLabel": "Gramer ipucu",

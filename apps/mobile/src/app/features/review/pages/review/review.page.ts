@@ -275,7 +275,7 @@ export class ReviewPage implements OnInit {
   playSlow(): void {
     const card = this.currentCard();
     if (!card) return;
-    void this.wordAudio.playAsPromise(card.content.back, 'de-DE', SLOW_RATE);
+    void this.wordAudio.playTarget(card.content.back, 'de-DE', SLOW_RATE);
   }
 
   playExample(sentence: string): void {

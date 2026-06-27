@@ -237,12 +237,18 @@ export const ListenStore = signalStore(
         const queue = store.settings().shuffle ? shuffleArray(store.rawQueue()) : [...store.rawQueue()];
         const scripts = compileQueue(queue, store.settings().playMode);
         patchState(store, {
-          queue, scripts, cardIndex: 0, segmentIndex: 0, status: 'playing',
+          queue, scripts, cardIndex: 0, segmentIndex: 0, status: 'loading',
           errorMessage: null, sessionStartedAt: Date.now(),
         });
         engine.resetPrefetch();
-        engine.prefetchWindow(0);
-        engine.restart();
+        // Gate playback until the opening window of HD audio is warm, so the first
+        // cards never fall back to a robotic voice. Per-segment resolution covers
+        // anything past the window. Proceed even if prewarm fails.
+        void engine.prepareWindow(0).finally(() => {
+          if (store.status() !== 'loading') return; // superseded (stopped/navigated)
+          patchState(store, { status: 'playing' });
+          engine.restart();
+        });
       },
 
       pause(): void {
@@ -321,12 +327,15 @@ export const ListenStore = signalStore(
         const queue = shuffleArray(store.rawQueue());
         const scripts = compileQueue(queue, settings.playMode);
         patchState(store, {
-          queue, scripts, cardIndex: 0, segmentIndex: 0, status: 'playing',
+          queue, scripts, cardIndex: 0, segmentIndex: 0, status: 'loading',
           errorMessage: null, sessionStartedAt: Date.now(),
         });
         engine.resetPrefetch();
-        engine.prefetchWindow(0);
-        engine.restart();
+        void engine.prepareWindow(0).finally(() => {
+          if (store.status() !== 'loading') return; // superseded (stopped/navigated)
+          patchState(store, { status: 'playing' });
+          engine.restart();
+        });
       },
 
       resetToIdle(): void {

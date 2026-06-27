@@ -10,7 +10,7 @@ import {
 } from '@angular/core';
 import { Router } from '@angular/router';
 import { NavController } from '@ionic/angular';
-import { IonContent, IonHeader, IonToolbar } from '@ionic/angular/standalone';
+import { IonContent, IonHeader, IonToolbar, IonSpinner } from '@ionic/angular/standalone';
 import { TranslatePipe } from '@ngx-translate/core';
 import { PlayMode } from '@lingua-card/shared/domain';
 import { ListenStore } from '../../store/listen.store';
@@ -28,7 +28,7 @@ import { ListenTransportComponent } from '../../components/listen-transport/list
   styleUrl: './now-playing.page.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [
-    IonContent, IonHeader, IonToolbar, TranslatePipe,
+    IonContent, IonHeader, IonToolbar, IonSpinner, TranslatePipe,
     ListenEqualizerComponent,
     ListenWordCardComponent,
     ListenTeleprompterComponent,
@@ -66,6 +66,7 @@ export class NowPlayingPage {
 
   readonly isPlaying = computed(() => this.listenStore.status() === 'playing');
   readonly isError = computed(() => this.listenStore.status() === 'error');
+  readonly isPreparing = computed(() => this.listenStore.status() === 'loading');
 
   readonly progressPercent = this.listenStore.progressPercent;
 

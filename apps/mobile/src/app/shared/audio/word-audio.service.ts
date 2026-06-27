@@ -1,7 +1,6 @@
 import { Injectable, computed, inject, signal } from '@angular/core';
 import { type Card, type WordAudioResolveRequest } from '@lingua-card/shared/domain';
 import { AiAudioCacheService } from '../../features/ai/audio/ai-audio-cache.service';
-import { AudioService } from './audio.service';
 import { WordAudioApiService } from './word-audio-api.service';
 import { AudioReadinessStore, AudioReadinessStatus } from './audio-readiness.store';
 import { normalizeForAudio } from './normalize';
@@ -10,7 +9,6 @@ import { normalizeForAudio } from './normalize';
 export class WordAudioService {
   private readonly api = inject(WordAudioApiService);
   private readonly cache = inject(AiAudioCacheService);
-  private readonly fallback = inject(AudioService);
   private readonly audioReadiness = inject(AudioReadinessStore);
 
   // Tracks which cache keys are actively being fetched from the API.
@@ -28,11 +26,38 @@ export class WordAudioService {
   // Stop making API calls until this timestamp passes (set on 429/503).
   private _rateLimitedUntil = 0;
 
-  // The HTMLAudioElement currently playing via _playAndWait, if any.
-  // Kept so stop() can abort it immediately — new Audio() creates an anonymous
-  // element with no external cancel handle, so without this reference the
-  // audio plays to completion regardless of navigation or skip actions.
-  private _activeAudio: HTMLAudioElement | null = null;
+  // Monotonic tap counter. Each tap-driven play() takes a sequence number; a
+  // newer tap or a stop() bumps it so a still-resolving older tap abandons its
+  // play() instead of firing late. Also lets stop() cancel a pending resolve.
+  private _tapSeq = 0;
+
+  // Lazily-created silent WAV blob URL used to unlock the shared player.
+  private _silentUrl: string | null = null;
+
+  // ── Single shared <audio> element ───────────────────────────────────────────
+  // ONE long-lived element drives ALL word/example pronunciation — tap-to-play
+  // (vault, review, stories keywords) AND the Listen playlist. Reusing one
+  // element (instead of `new Audio()` per play) is what makes post-`await`
+  // playback survive the autoplay policy on iOS/Chrome PWAs: the element is
+  // "unlocked" once inside the first user gesture (a silent clip), after which
+  // every later `src = …; play()` on the SAME element is permitted — even when
+  // driven programmatically by the playlist sequencer. Story narration is a
+  // separate concern (full-file playback w/ timestamps) handled by StoryAudioEngine.
+  private _player: HTMLAudioElement | null = null;
+  private _unlocked = false;
+
+  constructor() {
+    // Unlock the shared element on the very first user interaction anywhere in
+    // the app, while we are still inside the gesture. By the time the user taps a
+    // word or presses ▶ in Listen, the element is already primed for autoplay.
+    const unlockOnce = () => {
+      this._unlock();
+      window.removeEventListener('pointerdown', unlockOnce);
+      window.removeEventListener('keydown', unlockOnce);
+    };
+    window.addEventListener('pointerdown', unlockOnce);
+    window.addEventListener('keydown', unlockOnce);
+  }
 
   /**
    * Play AI pronunciation for a card's word.
@@ -44,117 +69,142 @@ export class WordAudioService {
   }
 
   /**
-   * Play AI pronunciation for arbitrary text.
+   * Play HD pronunciation for arbitrary text (tap-to-play).
    * Resolved by normalized text — same audio for "der Hund", "Der Hund", "der Hund."
    *
-   * Strategy: Audio.play() MUST be called synchronously within the user-gesture
-   * context — calling it after any `await` triggers autoplay-policy blocking on
-   * Chrome/iOS. Therefore:
+   * HD-only policy: we never play the robotic Web Speech voice. Users found it
+   * jarring — and the old "fallback now, HD next tap" behaviour meant the first
+   * tap played browser audio and a second tap was needed to hear HD.
    *
-   * - Memory-cache hit → play new Audio() immediately (still in gesture context).
-   * - Cache miss → fall back to Web Speech synchronously (always allowed in
-   *   gesture context); trigger background resolution so the next tap hits cache.
+   * - Memory-cache hit → play the shared element immediately.
+   * - Cache miss → resolve the HD asset, then play it on the shared element.
+   *   Audio.play() after an `await` would normally be blocked by autoplay policy
+   *   on iOS/Chrome PWAs, but the shared element is unlocked on first gesture
+   *   (see constructor), so the post-await play() is permitted.
    *
-   * We deliberately do NOT try to "replace" Web Speech mid-play with AI audio
-   * because: (a) the replacement Audio.play() would be blocked anyway, and
-   * (b) cancelling the Web Speech utterance mid-word sounds worse than silence.
+   * If the HD asset genuinely cannot be resolved (offline, backend error), we stay
+   * silent rather than falling back to the browser voice. The `isLoading` signal is
+   * raised during resolution so callers can show a spinner.
    */
   async play(text: string, language = 'de-DE'): Promise<void> {
     const cacheKey = this._cacheKey(normalizeForAudio(text, language), language);
     const cached = this._urlMap.get(cacheKey);
 
     if (cached) {
-      // In-memory hit: still within user-gesture context, play immediately.
-      new Audio(cached).play().catch(() => {
-        // Autoplay blocked even for cached URLs (e.g. policy changed mid-session).
-        // Fall back to Web Speech so the user hears something.
-        this.fallback.speak(text, language, 0.85).subscribe();
-      });
+      void this._playUrl(cached, 1);
       return;
     }
 
-    // Cache miss: play Web Speech synchronously (has gesture context).
-    // Kick off background resolution so the next tap hits memory cache.
-    this.fallback.speak(text, language, 0.85).subscribe();
-    this._backgroundResolve(text, language, cacheKey);
+    // Cache miss: resolve HD, then play (shared element is already unlocked).
+    const seq = ++this._tapSeq;
+    const url = await this.resolveUrl(text, language);
+
+    // A newer tap or a stop() superseded this one while resolving — abandon it.
+    if (seq !== this._tapSeq) return;
+    // HD genuinely unavailable — stay silent (no browser fallback by design).
+    if (!url) return;
+
+    void this._playUrl(url, 1);
   }
 
-  /**
-   * Resolves and caches the audio URL in the background.
-   * Does NOT attempt playback — avoids the post-await autoplay-policy block.
-   * Called after a cache-miss in play() so the next tap is instant.
-   */
-  private _backgroundResolve(text: string, language: string, cacheKey: string): void {
-    // Already inflight — no need to kick off a second request.
-    if (this._inflight.has(cacheKey)) return;
-    // Fire-and-forget; errors are swallowed since this is best-effort pre-warming.
-    this.resolveUrl(text, language).catch(() => undefined);
-  }
-
-  /**
-   * Like play() but resolves when audio ends.
-   * Used by ListenStore for sequential playback.
-   *
-   * The listen playlist drives playback programmatically (not from a tap), so
-   * autoplay policy is less strict — Audio.play() after await is usually fine
-   * in an established media session. The real risk here is a hung Promise that
-   * blocks the playlist indefinitely when the API is slow or down.
-   *
-   * Timeout strategy: if resolveUrl() takes longer than RESOLVE_TIMEOUT_MS,
-   * fall through to Web Speech immediately. The background resolve continues
-   * and the next word in the playlist will benefit from the cache.
-   *
-   * `rate` is the playback speed (1 = normal). It is applied to the
-   * HTMLAudioElement's playbackRate for cached audio and to the Web-Speech
-   * utterance rate for the fallback path. Defaults to 1 so callers outside the
-   * listen playlist (e.g. Stories) are unaffected.
-   *
-   * Cost note: on a cache miss we fall straight to Web Speech and let the
-   * background resolveUrl() persist the HD asset for next time. We deliberately
-   * do NOT generate a throwaway one-shot clip here — that double-paid for audio
-   * that was never cached.
-   */
-  async playAsPromise(text: string, language = 'de-DE', rate = 1): Promise<void> {
-    // Short timeout: windowed prefetch means the word is usually already a
-    // memory-cache hit (resolves instantly). On a genuine miss, fall back to
-    // Web Speech quickly rather than stalling the playlist.
-    const RESOLVE_TIMEOUT_MS = 700;
-
-    const url = await Promise.race([
-      this.resolveUrl(text, language),
-      new Promise<null>(resolve => setTimeout(() => resolve(null), RESOLVE_TIMEOUT_MS)),
-    ]);
-
-    if (url) {
-      return this._playAndWait(url, false, rate);
+  /** Lazily create the single shared <audio> element. */
+  private _ensurePlayer(): HTMLAudioElement {
+    if (!this._player) {
+      this._player = new Audio();
+      this._player.preload = 'auto';
     }
-
-    // Miss → instant Web Speech. resolveUrl() keeps running in the background
-    // (deduplicated via _inflight) so the HD asset is ready next time.
-    return this._speakFallback(text, language, rate);
+    return this._player;
   }
 
   /**
-   * Native-language audio policy for the listen playlist.
-   *
-   * Today: browser Web Speech — free, instant, offline, and works for any
-   * native language without per-language TTS voices. The product value is
-   * hearing the *target* language; the translation is secondary.
-   *
-   * Future (cost/quality option 2): route single native words (not sentences)
-   * through the cached HD pipeline here — the call site does not change.
+   * Unlock the shared element for autoplay by playing a silent clip inside a user
+   * gesture. Idempotent — safe to call on every gesture; only the first matters.
    */
-  playNative(text: string, language = 'en-US', rate = 1): Promise<void> {
-    return this._speakFallback(text, language, rate);
+  private _unlock(): void {
+    if (this._unlocked) return;
+    this._unlocked = true;
+    const player = this._ensurePlayer();
+    player.src = this._silentClipUrl();
+    // Play the ~0.1s silent clip to completion — do NOT chain a pause(), which
+    // could fire after a real play() started in the same gesture and silence it.
+    // A real play() simply reassigns src and interrupts the silent clip.
+    player.play().catch(() => undefined);
   }
 
-  /** Speak via the Web Speech fallback, resolving when it ends (or errors). */
-  private _speakFallback(text: string, language: string, rate: number): Promise<void> {
+  /**
+   * Play a resolved URL on the shared element, resolving when it ends (or errors,
+   * or is stopped). Sequential by design — one word plays at a time across the
+   * whole app — so reusing a single element is safe and avoids the per-element
+   * autoplay unlock that `new Audio()` would require on iOS.
+   */
+  private _playUrl(url: string, rate: number): Promise<void> {
     return new Promise(resolve => {
-      this.fallback.speak(text, language, rate).subscribe({
-        next: () => resolve(), error: () => resolve(), complete: () => resolve(),
-      });
+      const player = this._ensurePlayer();
+      let settled = false;
+      const cleanup = () => {
+        if (settled) return;
+        settled = true;
+        player.removeEventListener('ended', cleanup);
+        player.removeEventListener('error', cleanup);
+        player.removeEventListener('lc-stop', cleanup);
+        resolve();
+      };
+      player.addEventListener('ended', cleanup, { once: true });
+      player.addEventListener('error', cleanup, { once: true });
+      // 'lc-stop' is dispatched by stop() so the promise resolves immediately
+      // instead of hanging (pause() fires no standard event).
+      player.addEventListener('lc-stop', cleanup, { once: true });
+      player.src = url;
+      player.currentTime = 0;
+      player.playbackRate = rate;
+      player.play().catch(cleanup);
     });
+  }
+
+  /** Lazily build a tiny silent WAV blob URL (0.1s) used to unlock audio elements. */
+  private _silentClipUrl(): string {
+    if (this._silentUrl) return this._silentUrl;
+    const sampleRate = 8000;
+    const samples = 800; // ~0.1s
+    const buffer = new ArrayBuffer(44 + samples);
+    const view = new DataView(buffer);
+    const writeStr = (off: number, s: string) => {
+      for (let i = 0; i < s.length; i++) view.setUint8(off + i, s.charCodeAt(i));
+    };
+    writeStr(0, 'RIFF');
+    view.setUint32(4, 36 + samples, true);
+    writeStr(8, 'WAVE');
+    writeStr(12, 'fmt ');
+    view.setUint32(16, 16, true); // fmt chunk size
+    view.setUint16(20, 1, true);  // PCM
+    view.setUint16(22, 1, true);  // mono
+    view.setUint32(24, sampleRate, true);
+    view.setUint32(28, sampleRate, true); // byte rate (8-bit mono)
+    view.setUint16(32, 1, true);  // block align
+    view.setUint16(34, 8, true);  // bits per sample
+    writeStr(36, 'data');
+    view.setUint32(40, samples, true);
+    for (let i = 0; i < samples; i++) view.setUint8(44 + i, 128); // 8-bit silence
+    this._silentUrl = URL.createObjectURL(new Blob([buffer], { type: 'audio/wav' }));
+    return this._silentUrl;
+  }
+
+  /**
+   * Like play() but resolves when audio ends — used by the Listen playlist and
+   * the story quiz for sequential, HD-only playback.
+   *
+   * HD-only, no Web Speech: we wait for the resolved HD asset and play it. The
+   * playlist pre-warms a sliding window (and gates the very first card), so this
+   * is normally an instant memory-cache hit. On a genuine miss it awaits the API
+   * (a brief pause) rather than ever speaking the robotic browser voice. If the
+   * asset truly cannot be resolved, it resolves silently so the sequence advances.
+   *
+   * `rate` is the playback speed applied to the element's playbackRate.
+   */
+  async playTarget(text: string, language = 'de-DE', rate = 1): Promise<void> {
+    const url = await this.resolveUrl(text, language);
+    if (!url) return; // unavailable → silent skip (no browser fallback by design)
+    return this._playUrl(url, rate);
   }
 
   /**
@@ -294,49 +344,21 @@ export class WordAudioService {
     }
   }
 
-  private _playAndWait(url: string, ephemeral = false, rate = 1): Promise<void> {
-    return new Promise(resolve => {
-      const audio = new Audio(url);
-      audio.playbackRate = rate;
-      this._activeAudio = audio;
-
-      const cleanup = () => {
-        // Only clear the reference if it still points to this element —
-        // stop() may have already nulled it and started a new word.
-        if (this._activeAudio === audio) this._activeAudio = null;
-        // Only revoke truly ephemeral blob URLs (one-shot TTS, never stored in
-        // _urlMap). Persistent blobs from the IndexedDB web cache must stay alive
-        // for the entire session — revoking them causes net::ERR_FILE_NOT_FOUND
-        // when previous() replays a card that already played once this session.
-        if (ephemeral && url.startsWith('blob:')) URL.revokeObjectURL(url);
-        resolve();
-      };
-
-      audio.addEventListener('ended', cleanup, { once: true });
-      audio.addEventListener('error', cleanup, { once: true });
-      // 'lc-stop' is dispatched by stop() below so the promise resolves immediately
-      // instead of hanging forever (pause() fires no standard events).
-      audio.addEventListener('lc-stop', cleanup, { once: true });
-      audio.play().catch(cleanup);
-    });
-  }
-
   /**
-   * Immediately stop all in-flight audio: the active HTMLAudioElement (if any)
-   * and the Web Speech fallback. Called by the listen pipeline on next/previous/skip
-   * so the current word does not keep playing after the user navigates away.
+   * Immediately stop the shared element. Called by the listen pipeline on
+   * next/previous/skip (and by tap navigation) so the current word does not keep
+   * playing after the user navigates away. Also cancels any tap-driven play()
+   * still waiting on HD resolution via the sequence bump.
    */
   stop(): void {
-    if (this._activeAudio) {
-      const audio = this._activeAudio;
-      this._activeAudio = null;
-      audio.pause();
-      audio.currentTime = 0;
-      // Dispatch before nulling so the cleanup listener inside _playAndWait resolves
-      // the promise — prevents the concatMap inner observable from hanging forever.
-      audio.dispatchEvent(new Event('lc-stop'));
+    this._tapSeq++;
+    if (this._player) {
+      this._player.pause();
+      this._player.currentTime = 0;
+      // Dispatch so the cleanup listener inside _playUrl resolves its promise —
+      // prevents the playlist's concatMap inner observable from hanging forever.
+      this._player.dispatchEvent(new Event('lc-stop'));
     }
-    this.fallback.stop();
   }
 
   /**
