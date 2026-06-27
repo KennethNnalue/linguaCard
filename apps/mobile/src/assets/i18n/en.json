@@ -804,7 +804,6 @@
       "noDueCardsMsg": "No cards due for review right now.",
       "backToHomeBtn": "Back to Home",
       "ratingLocked": "Rating unlocks after you reveal",
-      "scheduledToast": "Scheduled · review in {{interval}}",
       "whatIsGermanFor": "What is the German for",
       "typeGermanFor": "Type the German for",
       "listenAndRecall": "Listen & recall",

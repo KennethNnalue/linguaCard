@@ -2,7 +2,7 @@ import { ChangeDetectionStrategy, Component, computed, DestroyRef, effect, injec
 import { takeUntilDestroyed, toObservable } from '@angular/core/rxjs-interop';
 import { filter, take } from 'rxjs';
 import { ActivatedRoute, Router } from '@angular/router';
-import { IonContent, IonHeader, IonIcon, IonToolbar, ToastController } from '@ionic/angular/standalone';
+import { IonContent, IonHeader, IonIcon, IonToolbar } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
 import { closeOutline } from 'ionicons/icons';
 import type { Card, ConfidenceRating } from '@lingua-card/shared/domain';
@@ -13,7 +13,7 @@ import { CategoryStore } from '../../../vault/store/category.store';
 import { CollectionStore } from '../../../vault/store/collection.store';
 import { ReviewStore } from '../../store/review.store';
 import { ReviewPrefsService } from '../../services/review-prefs.service';
-import { TranslatePipe, TranslateService } from '@ngx-translate/core';
+import { TranslatePipe } from '@ngx-translate/core';
 import { FrontFlipComponent } from './components/front-flip/front-flip.component';
 import { FrontTypeComponent } from './components/front-type/front-type.component';
 import { FrontListenComponent } from './components/front-listen/front-listen.component';
@@ -30,7 +30,6 @@ import {
 } from '../../models/review.model';
 
 const SLOW_RATE = 0.7;
-const TOAST_MS = 1700;
 
 @Component({
   selector: 'lc-review',
@@ -62,8 +61,6 @@ export class ReviewPage implements OnInit {
   private readonly injector = inject(Injector);
   private readonly destroyRef = inject(DestroyRef);
   private readonly route = inject(ActivatedRoute);
-  private readonly toast = inject(ToastController);
-  private readonly translate = inject(TranslateService);
 
   constructor() {
     addIcons({ closeOutline });
@@ -232,9 +229,7 @@ export class ReviewPage implements OnInit {
     if (idx > this.highestIndexReached) this.highestIndexReached = idx;
     const isLast = idx + 1 >= queueLength && this.highestIndexReached >= queueLength - 1;
 
-    const interval = this.ratingOptionsWithPreviews().find(o => o.value === rating)?.previewLabel;
     this.reviewStore.rateCard(card, rating);
-    void this.showScheduledToast(interval);
 
     if (isLast) {
       const liveMap = new Map(this.cardStore.cards().map(c => [c.id, c]));
@@ -284,16 +279,5 @@ export class ReviewPage implements OnInit {
 
   exitSession(): void {
     void this.router.navigate([ReviewRoute.HUB]);
-  }
-
-  private async showScheduledToast(interval?: string | null): Promise<void> {
-    if (!interval) return;
-    const toast = await this.toast.create({
-      message: this.translate.instant('review.session.scheduledToast', { interval }),
-      duration: TOAST_MS,
-      position: 'bottom',
-      cssClass: 'rv-toast',
-    });
-    await toast.present();
   }
 }
