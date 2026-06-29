@@ -20,6 +20,7 @@ import { SessionStatsService } from '../../shared/services/session-stats.service
 import { TranslatePipe } from '@ngx-translate/core';
 import { SessionDatePipe } from '../../shared/pipes/session-date.pipe';
 import { ReviewStatsStore } from '../../../../shared/srs/review-stats.store';
+import { SettingsStore } from '../../../settings/store/settings.store';
 import {
   LocalReviewSession,
   MINUTES_PER_CARD_REVIEW,
@@ -49,6 +50,7 @@ export class ReviewHubPage {
   private readonly leech = inject(LeechService);
   private readonly prefs = inject(ReviewPrefsService);
   private readonly reviewStats = inject(ReviewStatsStore);
+  private readonly settingsStore = inject(SettingsStore);
   readonly stats = inject(SessionStatsService);
   private readonly router = inject(Router);
 
@@ -120,11 +122,12 @@ export class ReviewHubPage {
 
   // ─── Navigation / actions ───────────────────────────────────────────────────
   startTodaysReview(): void {
+    const dailyGoal = this.settingsStore.dailyGoal();
     const queue = this.filterService.buildQueue({
       source: ReviewSource.ALL,
       masteryLevels: [0, 1, 2, 3, 4, 5],
       sortOrder: ReviewSortOrder.DUE_DATE,
-      limit: ReviewLimit.DUE_TODAY,
+      limit: dailyGoal,
     });
     if (!queue.length) return;
     this.reviewStore.startSession(queue, null, null);

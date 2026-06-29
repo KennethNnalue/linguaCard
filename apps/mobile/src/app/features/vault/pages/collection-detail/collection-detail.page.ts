@@ -22,6 +22,7 @@ import {FabButtonComponent} from '../../../../shared/components/fab-button/fab-b
 import {ReviewFilterService} from '../../../review/services/review-filter.service';
 import {ReviewStore} from '../../../review/store/review.store';
 import {ReviewLimit, ReviewRoute, ReviewSortOrder} from '../../../review/models/review.model';
+import {SettingsStore} from '../../../settings/store/settings.store';
 import {WordRowComponent} from '../../components/word-row/word-row.component';
 import {WordAudioService} from '../../../../shared/audio/word-audio.service';
 import {AudioReadinessStore} from '../../../../shared/audio/audio-readiness.store';
@@ -52,6 +53,7 @@ export class CollectionDetailPage implements OnInit {
   private readonly toastCtrl = inject(ToastController);
   private readonly filterService = inject(ReviewFilterService);
   private readonly reviewStore = inject(ReviewStore);
+  private readonly settingsStore = inject(SettingsStore);
   private readonly wordAudio = inject(WordAudioService);
   private readonly audioReadiness = inject(AudioReadinessStore);
   private readonly audioPrefetch = inject(CollectionAudioPrefetchService);
@@ -266,11 +268,12 @@ export class CollectionDetailPage implements OnInit {
     const col = this.collection();
     if (!col) return;
     const useDue = this.dueCount() > 0;
+    const dailyGoal = this.settingsStore.dailyGoal();
     const queue = this.filterService.buildQueue({
       source: col.id,
       masteryLevels: [0, 1, 2, 3, 4, 5],
       sortOrder: useDue ? ReviewSortOrder.DUE_DATE : ReviewSortOrder.HARDEST,
-      limit: ReviewLimit.DUE_TODAY,
+      limit: dailyGoal,
     });
     if (!queue.length) return;
     const collectionName = `${col.emoji ?? ''} ${col.name}`.trim();

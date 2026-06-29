@@ -15,6 +15,10 @@ import {WordRowComponent} from '../../components/word-row/word-row.component';
 import {SpeedDialFabComponent} from '../../../../shared/components/speed-dial-fab/speed-dial-fab.component';
 import {BottomSheetService} from '../../../../shared/components/bottom-sheet/bottom-sheet.service';
 import {ImportPage} from '../import/import.page';
+import {ReviewFilterService} from '../../../review/services/review-filter.service';
+import {ReviewRoute, ReviewSortOrder, ReviewSource} from '../../../review/models/review.model';
+import {ReviewStore} from '../../../review/store/review.store';
+import {SettingsStore} from '../../../settings/store/settings.store';
 
 type VaultView = 'home' | 'index' | 'explore' | 'collections';
 type MasteryFilter = 'all' | 'due' | 'new' | 'mastered';
@@ -58,6 +62,9 @@ export class VaultPage implements OnInit, OnDestroy {
   private readonly translate = inject(TranslateService);
   private readonly router = inject(Router);
   private readonly route = inject(ActivatedRoute);
+  private readonly reviewStore = inject(ReviewStore);
+  private readonly filterService = inject(ReviewFilterService);
+  private readonly settingsStore = inject(SettingsStore);
 
   constructor() {
     // Curated Explore content is lazy in the store — load it the first time the
@@ -270,7 +277,19 @@ export class VaultPage implements OnInit, OnDestroy {
 
   // ─── Entry points ─────────────────────────────────────────────────────────────
   startReview(): void {
-    void this.router.navigateByUrl('/review');
+    const dailyGoal = this.settingsStore.dailyGoal();
+    const queue = this.filterService.buildQueue({
+      source: ReviewSource.ALL,
+      masteryLevels: [0, 1, 2, 3, 4, 5],
+      sortOrder: ReviewSortOrder.DUE_DATE,
+      limit: dailyGoal,
+    });
+    if (!queue.length) {
+      void this.router.navigate([ReviewRoute.HUB]);
+      return;
+    }
+    this.reviewStore.startSession(queue, null, null);
+    void this.router.navigate([ReviewRoute.PLAYER]);
   }
 
   startListen(): void {

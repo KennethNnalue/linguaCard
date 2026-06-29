@@ -19,7 +19,6 @@ import {CategoryStore} from '../../../vault/store/category.store';
 import {CollectionStore} from '../../../vault/store/collection.store';
 import {
   RING_CIRCUMFERENCE_OUTER,
-  ReviewLimit,
   ReviewRoute,
   ReviewSortOrder,
   ReviewSource,
@@ -281,11 +280,12 @@ export class HomePage {
 
   startSession(): void {
     const collectionId = this.selectedCollectionId();
+    const dailyGoal = this.settingsStore.dailyGoal();
     const queue = this.filterService.buildQueue({
       source: collectionId ?? ReviewSource.ALL,
       masteryLevels: [0, 1, 2, 3, 4, 5],
       sortOrder: ReviewSortOrder.DUE_DATE,
-      limit: ReviewLimit.DUE_TODAY,
+      limit: dailyGoal,
     });
     if (!queue.length) {
       void this.router.navigate([ReviewRoute.HUB]);
