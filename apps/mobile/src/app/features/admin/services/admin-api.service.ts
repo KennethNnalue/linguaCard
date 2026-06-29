@@ -63,6 +63,10 @@ export class AdminApiService {
     return this.http.post<AdminImportStoryResult>(`${this.apiUrl}/platform-stories/${id}/generate-audio`, {});
   }
 
+  setPublishedStory(id: string, isPublished: boolean): Observable<void> {
+    return this.http.patch<void>(`${this.apiUrl}/platform-stories/${id}/publish`, { isPublished });
+  }
+
   // ── Discount codes ─────────────────────────────────────────────────────────
 
   listDiscountCodes(): Observable<AdminDiscountCodeListItem[]> {

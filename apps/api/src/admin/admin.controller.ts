@@ -90,4 +90,13 @@ export class AdminController {
   regenerateStoryAudio(@Param('id') id: string): Promise<AdminImportStoryResult> {
     return this.adminService.regenerateStoryAudio(id);
   }
+
+  @Patch('platform-stories/:id/publish')
+  @HttpCode(204)
+  async setPublishedStory(
+    @Param('id') id: string,
+    @Body() dto: AdminPublishToggleDto,
+  ): Promise<void> {
+    await this.adminService.setPublishedStory(id, dto.isPublished);
+  }
 }

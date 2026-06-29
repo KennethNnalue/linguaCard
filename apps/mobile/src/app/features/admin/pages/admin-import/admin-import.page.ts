@@ -162,6 +162,7 @@ OUTPUT — valid JSON ONLY, no markdown fences, no commentary:
   readonly storiesLoading = signal(false);
   readonly deletingStoryId = signal<string | null>(null);
   readonly regeneratingAudioId = signal<string | null>(null);
+  readonly togglingStoryId = signal<string | null>(null);
 
   readonly storyCategories = STORY_CATEGORIES;
 
@@ -287,6 +288,20 @@ OUTPUT — valid JSON ONLY, no markdown fences, no commentary:
         );
       },
       error: () => { this.regeneratingAudioId.set(null); void this._toast('Audio generation failed', 'danger'); },
+    });
+  }
+
+  togglePublishStory(item: AdminPlatformStoryListItem): void {
+    if (this.togglingStoryId()) return;
+    this.togglingStoryId.set(item.id);
+    const next = !item.isPublished;
+    this.adminApi.setPublishedStory(item.id, next).pipe(takeUntilDestroyed(this._destroyRef)).subscribe({
+      next: () => {
+        this.togglingStoryId.set(null);
+        this.stories.update(list => list.map(s => s.id === item.id ? { ...s, isPublished: next } : s));
+        void this._toast(`"${item.title}" ${next ? 'published' : 'unpublished'}`, 'success');
+      },
+      error: () => { this.togglingStoryId.set(null); void this._toast('Toggle failed', 'danger'); },
     });
   }
 

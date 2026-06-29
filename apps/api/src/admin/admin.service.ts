@@ -415,4 +415,11 @@ export class AdminService {
     await this.storyProgressRepo.delete({ storyId: id });
     await this.storyRepo.delete({ id });
   }
+
+  async setPublishedStory(id: string, isPublished: boolean): Promise<void> {
+    const entity = await this.storyRepo.findOneBy({ id });
+    if (!entity) throw new NotFoundException(`Platform story ${id} not found`);
+    entity.isPublished = isPublished;
+    await this.storyRepo.save(entity);
+  }
 }

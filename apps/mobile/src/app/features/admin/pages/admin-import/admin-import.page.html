@@ -337,9 +337,15 @@
               </div>
             </div>
             <div class="adm-coll-actions">
-              <span class="adm-publish-btn" [class.adm-publish-btn--live]="story.isPublished">
+              <button
+                class="adm-publish-btn"
+                [class.adm-publish-btn--live]="story.isPublished"
+                [disabled]="togglingStoryId() === story.id"
+                (click)="togglePublishStory(story)"
+                [attr.aria-label]="story.isPublished ? 'Unpublish' : 'Publish'">
+                <ion-icon [name]="story.isPublished ? 'eye-outline' : 'eye-off-outline'"></ion-icon>
                 {{ story.isPublished ? 'Live' : 'Draft' }}
-              </span>
+              </button>
               <button
                 class="adm-icon-btn"
                 [disabled]="regeneratingAudioId() === story.id"
