@@ -1,4 +1,4 @@
-import { Injectable, signal } from '@angular/core';
+import {Injectable, signal} from '@angular/core';
 
 /** The three Review study modes chosen on the hub. */
 export type StudyMode = 'flip' | 'type' | 'audio';
@@ -16,9 +16,9 @@ const VALID_DIRS: readonly StudyDirection[] = ['en-de', 'de-en', 'mixed'];
  * session flow. Persisted to localStorage so choices are predictable across
  * launches (mirrors the ThemeService / LanguageService pattern).
  */
-@Injectable({ providedIn: 'root' })
+@Injectable({providedIn: 'root'})
 export class ReviewPrefsService {
-  private readonly _mode = signal<StudyMode>(read(MODE_KEY, VALID_MODES, 'flip'));
+  private readonly _mode = signal<StudyMode>(read(MODE_KEY, VALID_MODES, 'type'));
   private readonly _dir = signal<StudyDirection>(read(DIR_KEY, VALID_DIRS, 'en-de'));
 
   readonly mode = this._mode.asReadonly();

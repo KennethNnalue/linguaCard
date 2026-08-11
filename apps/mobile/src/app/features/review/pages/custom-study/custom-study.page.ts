@@ -121,8 +121,8 @@ export class CustomStudyPage {
         // Apply live so the selection reflects regardless of how the sheet closes.
         onSelectionChange: (ids: string[]) => this.selectedCollectionIds.set(new Set(ids)),
       },
-      breakpoints: [0, 0.85, 1],
-      initialBreakpoint: 0.85,
+      breakpoints: [0, 1],
+      initialBreakpoint: 1,
       handle: true,
     });
     await modal.present();
