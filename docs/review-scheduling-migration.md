@@ -27,6 +27,10 @@ Legacy cards with a `NULL` review state are treated as never-reviewed cards and
 receive an explicit New scheduling state. Existing non-null states are preserved
 and still validated before the legacy columns are removed.
 
+If the legacy scheduling columns are already absent, cards without a scheduling
+row also receive an explicit New state. This supports installations that removed
+the old columns before running the review-domain migration.
+
 Create a database backup before the hosted run. If any validation fails, the
 transaction rolls back without dropping the legacy columns. A successful rerun
 prints `Verified` and makes no schema changes.

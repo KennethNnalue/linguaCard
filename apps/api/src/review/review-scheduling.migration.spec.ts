@@ -56,7 +56,7 @@ describe('review scheduling migration', () => {
   });
 
   test('reruns as verification only after the legacy columns are gone', async () => {
-    const runner = runnerWithCounts([0, 2, 2, 0, 0]);
+    const runner = runnerWithCounts([0, 0, 2, 2, 0, 0]);
 
     await expect(migrateReviewScheduling(runner)).resolves.toEqual({
       cards: 2,
@@ -65,6 +65,19 @@ describe('review scheduling migration', () => {
       migrated: false,
     });
     expect(runner.query).not.toHaveBeenCalledWith(expect.stringContaining('DROP COLUMN'));
+    expect(runner.commitTransaction).toHaveBeenCalledWith();
+  });
+
+  test('creates explicit New states when production has cards but no legacy scheduling column', async () => {
+    const runner = runnerWithCounts([0, 2, 2, 2, 0, 0]);
+
+    await expect(migrateReviewScheduling(runner)).resolves.toEqual({
+      cards: 2,
+      schedulingRows: 2,
+      explicitNewStatesCreated: 2,
+      migrated: true,
+    });
+    expect(runner.query).toHaveBeenCalledWith(expect.stringContaining("'stage', 'new'"));
     expect(runner.commitTransaction).toHaveBeenCalledWith();
   });
 

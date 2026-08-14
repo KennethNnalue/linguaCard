@@ -135,6 +135,31 @@ export async function migrateReviewScheduling(queryRunner: ReviewSchedulingMigra
       if (conflictingRows > 0) {
         throw new Error(`Migration aborted: ${conflictingRows} existing scheduling rows conflict with card data`);
       }
+    } else {
+      explicitNewStatesCreated = await count(queryRunner, `
+        SELECT COUNT(*)::int AS count
+        FROM "cards" card
+        LEFT JOIN "review_scheduling" scheduling ON scheduling."cardId" = card."id"
+        WHERE scheduling."cardId" IS NULL
+      `);
+      if (explicitNewStatesCreated > 0) {
+        await queryRunner.query(`
+          INSERT INTO "review_scheduling" ("cardId", "state", "stateUpdatedAt")
+          SELECT card."id", jsonb_build_object(
+            'cardId', card."id",
+            'stage', 'new',
+            'problemStatus', 'normal',
+            'totalReviewCount', 0,
+            'totalAgainCount', 0,
+            'recentRatings', '[]'::jsonb,
+            'successfulReviewsSinceLastAgain', 0
+          ), NULL
+          FROM "cards" card
+          LEFT JOIN "review_scheduling" scheduling ON scheduling."cardId" = card."id"
+          WHERE scheduling."cardId" IS NULL
+          ON CONFLICT ("cardId") DO NOTHING
+        `);
+      }
     }
 
     const cards = await count(queryRunner, 'SELECT COUNT(*)::int AS count FROM "cards"');
@@ -165,7 +190,12 @@ export async function migrateReviewScheduling(queryRunner: ReviewSchedulingMigra
       `);
     }
     await queryRunner.commitTransaction();
-    return { cards, schedulingRows, explicitNewStatesCreated, migrated: hasLegacyColumns };
+    return {
+      cards,
+      schedulingRows,
+      explicitNewStatesCreated,
+      migrated: hasLegacyColumns || explicitNewStatesCreated > 0,
+    };
   } catch (error) {
     await queryRunner.rollbackTransaction();
     throw error;
