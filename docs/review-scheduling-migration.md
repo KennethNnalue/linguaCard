@@ -30,3 +30,8 @@ and still validated before the legacy columns are removed.
 Create a database backup before the hosted run. If any validation fails, the
 transaction rolls back without dropping the legacy columns. A successful rerun
 prints `Verified` and makes no schema changes.
+
+On Render's free plan, the Blueprint start command runs the compiled migration
+before starting NestJS because pre-deploy commands are unavailable. The
+migration is idempotent: subsequent service restarts verify the schema and then
+continue to API startup.

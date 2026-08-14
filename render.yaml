@@ -5,7 +5,7 @@ services:
     region: oregon
     plan: free
     buildCommand: npm install --include=dev && npm run build:api
-    startCommand: node dist/api/apps/api/src/main.js
+    startCommand: node dist/api/apps/api/src/scripts/migrate-review-scheduling.js && node dist/api/apps/api/src/main.js
     healthCheckPath: /api/v1/health
     envVars:
       - key: NODE_ENV
