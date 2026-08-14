@@ -1,5 +1,5 @@
 import { Controller, Get, Post, Patch, Delete, Param, Body, Query, BadRequestException } from '@nestjs/common';
-import { CardsService, PendingSrsRating } from './cards.service';
+import { CardsService } from './cards.service';
 import { WordDedupService } from './word-dedup.service';
 import { CreateCardDto, UpdateCardDto, CheckDuplicatesDto } from '@lingua-card/shared/dto';
 import type { CardQueryParams } from '@lingua-card/shared/dto';
@@ -15,12 +15,6 @@ export class CardsController {
   @Get()
   findAll(@CurrentUser() userId: string, @Query() query: CardQueryParams) {
     return this.cardsService.findAll(userId, query);
-  }
-
-  // Must be before @Get(':id') so static paths are not treated as card ids
-  @Post('srs/batch')
-  batchRateSrs(@CurrentUser() userId: string, @Body() ratings: PendingSrsRating[]) {
-    return this.cardsService.batchRateSrs(userId, ratings);
   }
 
   @Post('check-duplicates')

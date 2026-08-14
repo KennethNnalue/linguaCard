@@ -1,14 +1,13 @@
 import {Component, computed, inject, signal} from '@angular/core';
 import {ActivatedRoute, Router} from '@angular/router';
 import {toSignal} from '@angular/core/rxjs-interop';
-import {map} from 'rxjs/operators';
+import { map } from 'rxjs';
 import {AlertController, IonContent, IonIcon, ModalController, NavController,} from '@ionic/angular/standalone';
 import {TranslatePipe, TranslateService} from '@ngx-translate/core';
 import {addIcons} from 'ionicons';
 import {
   chevronDownOutline,
   createOutline,
-  playOutline,
   trashOutline,
   volumeHighOutline,
 } from 'ionicons/icons';
@@ -21,9 +20,10 @@ import {WordAudioService} from '../../../../shared/audio/word-audio.service';
 import {AudioReadinessStore} from '../../../../shared/audio/audio-readiness.store';
 import {ArticleBadgeComponent} from '../../../../shared/components/article-badge/article-badge.component';
 import {AddWordSheetComponent} from '../../components/add-word-sheet/add-word-sheet.component';
-import {QuickRateSheetComponent} from '../../components/quick-rate-sheet/quick-rate-sheet.component';
 import {getCategoryName} from '../../../../shared/helpers/helpers';
 import {normalizeForAudio} from '../../../../shared/audio/normalize';
+import {stageIndicator} from '../../../review/domain/review-status';
+import {MASTERY_LABEL_KEYS} from '../../../review/models/review.model';
 
 @Component({
   selector: 'lc-word-detail',
@@ -50,7 +50,6 @@ export class WordDetailComponent {
     addIcons({
       chevronDownOutline,
       volumeHighOutline,
-      playOutline,
       createOutline,
       trashOutline,
     });
@@ -67,7 +66,7 @@ export class WordDetailComponent {
 
   readonly categories = this.categoryStore.categories;
 
-  readonly masteryLevel = computed(() => this.card()?.srsState?.masteryLevel ?? 0);
+  readonly masteryLevel = computed(() => stageIndicator(this.card()?.reviewState.stage ?? 'new'));
 
 
   // Used only for the SVG ring stroke — mastery colors are the same in both modes
@@ -78,10 +77,7 @@ export class WordDetailComponent {
 
   readonly masteryLabel = computed(() => {
     this.languageService.current(); // recompute on UI language change
-    const state = this.card()?.srsState?.state;
-    if (!state || state === 'new') return this.translate.instant('srs.masteryLabel.new');
-    const key = {learning: 'srs.masteryLabel.learning', review: 'srs.masteryLabel.review', relearning: 'srs.masteryLabel.review', mastered: 'srs.masteryLabel.mastered'}[state];
-    return key ? this.translate.instant(key) : this.translate.instant('srs.masteryLabel.new');
+    return this.translate.instant(MASTERY_LABEL_KEYS[this.card()?.reviewState.stage ?? 'new']);
   });
 
   readonly masteryRingOffset = computed(() => {
@@ -93,7 +89,7 @@ export class WordDetailComponent {
 
   readonly nextReviewText = computed(() => {
     this.languageService.current(); // recompute on UI language change
-    const nextDue = this.card()?.srsState?.nextDueAt;
+    const nextDue = this.card()?.reviewState.dueAt;
     if (!nextDue) return '—';
     const days = Math.ceil((new Date(nextDue).getTime() - Date.now()) / 86_400_000);
     if (days <= 0) return this.translate.instant('wordDetail.nextReview.dueNow');
@@ -103,7 +99,7 @@ export class WordDetailComponent {
 
   readonly lastReviewedText = computed(() => {
     this.languageService.current(); // recompute on UI language change
-    const last = this.card()?.srsState?.lastReviewedAt;
+    const last = this.card()?.updatedAt;
     if (!last) return this.translate.instant('wordDetail.lastReviewed.never');
     const days = Math.floor((Date.now() - new Date(last).getTime()) / 86_400_000);
     if (days === 0) return this.translate.instant('wordDetail.lastReviewed.today');
@@ -111,18 +107,16 @@ export class WordDetailComponent {
   });
 
   readonly stabilityLabel = computed(() => {
-    const s = this.card()?.srsState?.stability;
-    if (s === null || s === undefined) return '—';
-    if (s < 1)   return '<1d';
-    if (s < 30)  return `${Math.round(s)}d`;
-    if (s < 365) return `${Math.round(s / 30 * 10) / 10}mo`;
-    return `${Math.round(s / 365 * 10) / 10}yr`;
+    const minutes = this.card()?.reviewState.intervalMinutes;
+    if (minutes === null || minutes === undefined) return '—';
+    return `${Math.round(minutes / 1_440)}d`;
   });
 
   readonly retrievabilityLabel = computed(() => {
-    const r = this.card()?.srsState?.retrievability;
-    if (r === null || r === undefined) return '—';
-    return `${Math.round(r * 100)}%`;
+    const state = this.card()?.reviewState;
+    if (!state || state.totalReviewCount === 0) return '—';
+    const successful = state.totalReviewCount - state.totalAgainCount;
+    return `${Math.round((successful / state.totalReviewCount) * 100)}%`;
   });
 
   readonly categoryName = computed(() => {
@@ -182,19 +176,6 @@ export class WordDetailComponent {
 
   playExample(sentence: string): void {
     void this.wordAudio.play(sentence, 'de-DE');
-  }
-
-  async openQuickRate(): Promise<void> {
-    const card = this.card();
-    if (!card) return;
-    const modal = await this.modalCtrl.create({
-      component: QuickRateSheetComponent,
-      componentProps: { card },
-      breakpoints: [0, 0.6, 0.75],
-      initialBreakpoint: 0.75,
-      handleBehavior: 'cycle',
-    });
-    await modal.present();
   }
 
   async openEdit(): Promise<void> {

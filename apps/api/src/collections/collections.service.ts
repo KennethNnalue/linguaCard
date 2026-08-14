@@ -44,15 +44,16 @@ export class CollectionsService {
     const rows: Array<{ collectionId: string; cardCount: number; masteredCount: number; dueCount: number }> =
       await this.cardRepo.manager.query(
         `SELECT
-           "collectionId",
+           card."collectionId",
            COUNT(*)::int AS "cardCount",
-           SUM(CASE WHEN ("srsState"->>'masteryLevel')::int = 5 THEN 1 ELSE 0 END)::int AS "masteredCount",
-           SUM(CASE WHEN "srsState" IS NOT NULL
-                      AND "srsState"->>'lastReviewedAt' IS NOT NULL
-                      AND "srsState"->>'nextDueAt' <= $1 THEN 1 ELSE 0 END)::int AS "dueCount"
-         FROM cards
-         WHERE "collectionId" IS NOT NULL AND "userId" = $2
-         GROUP BY "collectionId"`,
+           SUM(CASE WHEN scheduling."state"->>'stage' = 'mastered' THEN 1 ELSE 0 END)::int AS "masteredCount",
+           SUM(CASE WHEN scheduling."state"->>'dueAt' <= $1
+                      AND COALESCE(scheduling."state"->>'masterySource', '') <> 'manual'
+                    THEN 1 ELSE 0 END)::int AS "dueCount"
+         FROM cards card
+         INNER JOIN review_scheduling scheduling ON scheduling."cardId" = card."id"
+         WHERE card."collectionId" IS NOT NULL AND card."userId" = $2
+         GROUP BY card."collectionId"`,
         [now, userId],
       );
     const map = new Map<string, LiveCounts>();

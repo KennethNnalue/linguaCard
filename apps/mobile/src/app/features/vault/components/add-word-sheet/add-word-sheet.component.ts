@@ -2,7 +2,7 @@ import { ChangeDetectionStrategy, Component, computed, DestroyRef, inject, Input
 import { Router } from '@angular/router';
 import { FormArray, FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { takeUntilDestroyed, toSignal } from '@angular/core/rxjs-interop';
-import { distinctUntilChanged } from 'rxjs';
+import { distinctUntilChanged, of, switchMap } from 'rxjs';
 import {
   IonContent,
   IonHeader,
@@ -33,8 +33,6 @@ import { AssignCollectionSheetComponent } from '../assign-collection-sheet/assig
 import { CardDedupService } from '../../../../shared/dedup/card-dedup.service';
 import { EnrichOneApiService } from '../../import/services/enrich-one-api.service';
 import { DictionaryApiService } from '../../services/dictionary-api.service';
-import { switchMap } from 'rxjs/operators';
-import { of } from 'rxjs';
 
 // ─── Synonym form group shape ────────────────────────────────────────────────
 
@@ -459,23 +457,6 @@ export class AddWordSheetComponent implements OnInit {
       createdAt: now,
       updatedAt: now,
       version: 1,
-      srsState: {
-        id: crypto.randomUUID(),
-        cardId: '',
-        userId,
-        algorithm: 'fsrs',
-        intervalDays: 1,
-        easeFactor: 2.5,
-        repetitions: 0,
-        lastRating: null,
-        lastReviewedAt: null,
-        nextDueAt: now,
-        masteryLevel: 0,
-        state: 'new',
-        stability: null,
-        difficulty: null,
-        retrievability: null,
-      },
     }).subscribe({
       next: () => { this.saving.set(false); this.modalCtrl.dismiss({ created: true }); },
       error: () => this.saving.set(false),

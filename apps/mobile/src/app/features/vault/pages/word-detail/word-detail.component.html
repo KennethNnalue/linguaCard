@@ -82,7 +82,7 @@
         </div>
         <div class="stats-grid">
           <div class="stat-cell">
-            <div class="stat-val">{{ word.srsState?.repetitions ?? 0 }}</div>
+            <div class="stat-val">{{ word.reviewState.totalReviewCount }}</div>
             <div class="stat-lbl">{{ 'wordDetail.stats.reviews' | translate }}</div>
           </div>
           <div class="stat-cell">
@@ -176,10 +176,6 @@
 
 <!-- Bottom action bar -->
 <div class="actions">
-  <button class="btn-rate" (click)="openQuickRate()">
-    <ion-icon name="play-outline"></ion-icon>
-    {{ 'wordDetail.rateThisWord' | translate }}
-  </button>
   <button class="btn-icon" (click)="openEdit()" [attr.aria-label]="'common.edit' | translate">
     <ion-icon name="create-outline"></ion-icon>
   </button>

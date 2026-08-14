@@ -6,14 +6,14 @@ import { chevronBackOutline } from 'ionicons/icons';
 import { localDayKey } from '@lingua-card/shared/utils';
 import { ReviewStore } from '../../store/review.store';
 import { SessionStatsService } from '../../shared/services/session-stats.service';
-import { ReviewStatsStore } from '../../../../shared/srs/review-stats.store';
+import { ReviewStatsStore } from '../../store/review-stats.store';
 import { TranslatePipe } from '@ngx-translate/core';
 import { SessionDatePipe } from '../../shared/pipes/session-date.pipe';
-import { LocalReviewSession, MS_PER_DAY } from '../../models/review.model';
+import { MS_PER_DAY, ReviewSessionHistoryEntry } from '../../models/review.model';
 
 interface SessionGroup {
   labelKey: string;
-  sessions: LocalReviewSession[];
+  sessions: ReviewSessionHistoryEntry[];
 }
 
 @Component({
@@ -47,9 +47,9 @@ export class SessionHistoryPage {
     const sessions = this.reviewStore.sessionHistory();
     const todayKey = localDayKey(new Date());
     const yesterdayKey = localDayKey(new Date(Date.now() - MS_PER_DAY));
-    const today: LocalReviewSession[] = [];
-    const yesterday: LocalReviewSession[] = [];
-    const earlier: LocalReviewSession[] = [];
+    const today: ReviewSessionHistoryEntry[] = [];
+    const yesterday: ReviewSessionHistoryEntry[] = [];
+    const earlier: ReviewSessionHistoryEntry[] = [];
     for (const s of sessions) {
       const key = localDayKey(new Date(s.completedAt ?? s.startedAt));
       if (key === todayKey) today.push(s);
@@ -65,11 +65,11 @@ export class SessionHistoryPage {
 
   readonly hasSessions = computed(() => this.reviewStore.sessionHistory().length > 0);
 
-  sessionCards(s: LocalReviewSession): number { return Object.keys(s.ratings).length; }
-  sessionNailed(s: LocalReviewSession): number { return this.statsService.nailed(s); }
-  sessionStruggled(s: LocalReviewSession): number { return this.statsService.struggled(s); }
-  sessionDuration(s: LocalReviewSession): string { return this.statsService.formatDuration(s); }
-  sessionDot(s: LocalReviewSession): string { return this.statsService.dotColour(s); }
+  sessionCards(s: ReviewSessionHistoryEntry): number { return s.reviewedCardIds.length; }
+  sessionNailed(s: ReviewSessionHistoryEntry): number { return this.statsService.nailed(s); }
+  sessionStruggled(s: ReviewSessionHistoryEntry): number { return this.statsService.struggled(s); }
+  sessionDuration(s: ReviewSessionHistoryEntry): string { return this.statsService.formatDuration(s); }
+  sessionDot(s: ReviewSessionHistoryEntry): string { return this.statsService.dotColour(s); }
 
   goBack(): void {
     this.location.back();

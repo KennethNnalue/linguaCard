@@ -31,14 +31,14 @@ import {AddWordSheetComponent} from '../../../vault/components/add-word-sheet/ad
 import {ResetDataSheetComponent} from '../../../auth/components/reset-data-sheet/reset-data-sheet.component';
 import {WordCardComponent} from '../../../../shared/ui/word-card/word-card.component';
 import {WordAudioService} from '../../../../shared/audio/word-audio.service';
-import {ReviewStatsStore} from '../../../../shared/srs/review-stats.store';
+import {ReviewStatsStore} from '../../../review/store/review-stats.store';
 import {SettingsStore} from '../../../settings/store/settings.store';
 import {ShareStore} from '../../../sharing/store/share.store';
 import {StreakMilestoneComponent} from '../../components/streak-milestone/streak-milestone.component';
 import {GettingStartedChecklistComponent} from '../../components/getting-started-checklist/getting-started-checklist.component';
 import {StudyGoalsPromptComponent} from '../../../settings/components/study-goals-prompt/study-goals-prompt.component';
 import {BottomSheetService} from '../../../../shared/components/bottom-sheet/bottom-sheet.service';
-import {isDue, isNew} from '../../../../shared/srs/srs-status';
+import {isDue, isNew} from '../../../review/domain/review-status';
 import {Card} from '@lingua-card/shared/domain';
 
 @Component({
@@ -281,18 +281,12 @@ export class HomePage {
   startSession(): void {
     const collectionId = this.selectedCollectionId();
     const dailyGoal = this.settingsStore.dailyGoal();
-    const queue = this.filterService.buildQueue({
-      source: collectionId ?? ReviewSource.ALL,
-      masteryLevels: [0, 1, 2, 3, 4, 5],
-      sortOrder: ReviewSortOrder.DUE_DATE,
-      limit: dailyGoal,
+    void this.reviewStore.startSession(
+      collectionId ? { kind: 'collection', collectionId } : { kind: 'daily' },
+      dailyGoal,
+    ).then(result => {
+      if (result.kind === 'started') void this.router.navigate([ReviewRoute.PLAYER]);
     });
-    if (!queue.length) {
-      void this.router.navigate([ReviewRoute.HUB]);
-      return;
-    }
-    this.reviewStore.startSession(queue, null, null);
-    void this.router.navigate([ReviewRoute.PLAYER]);
   }
 
   navigateToCard(card: Card): void {

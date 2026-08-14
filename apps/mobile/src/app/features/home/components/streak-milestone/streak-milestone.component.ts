@@ -1,6 +1,6 @@
 import { ChangeDetectionStrategy, Component, computed, inject, OnInit, signal } from '@angular/core';
 import { ModalController } from '@ionic/angular/standalone';
-import { ReviewStatsStore } from '../../../../shared/srs/review-stats.store';
+import { ReviewStatsStore } from '../../../review/store/review-stats.store';
 
 const MILESTONES = [3, 7, 14, 30, 50, 100, 365];
 const STORAGE_KEY = 'lc_last_celebrated_milestone';

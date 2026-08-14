@@ -10,7 +10,7 @@ import {
 } from '@ionic/angular/standalone';
 import {TranslateService, TranslatePipe} from '@ngx-translate/core';
 import {Card, Collection} from '@lingua-card/shared/domain';
-import {isDue, isMastered} from '../../../../shared/srs/srs-status';
+import {isDue, isMastered} from '../../../review/domain/review-status';
 import {firstValueFrom} from 'rxjs';
 import {CollectionApiService} from '../../services/collection-api.service';
 import {CardStore} from '../../store/card.store';
@@ -267,18 +267,10 @@ export class CollectionDetailPage implements OnInit {
   startReview(): void {
     const col = this.collection();
     if (!col) return;
-    const useDue = this.dueCount() > 0;
     const dailyGoal = this.settingsStore.dailyGoal();
-    const queue = this.filterService.buildQueue({
-      source: col.id,
-      masteryLevels: [0, 1, 2, 3, 4, 5],
-      sortOrder: useDue ? ReviewSortOrder.DUE_DATE : ReviewSortOrder.HARDEST,
-      limit: dailyGoal,
+    void this.reviewStore.startSession({ kind: 'collection', collectionId: col.id }, dailyGoal).then(result => {
+      if (result.kind === 'started') void this.router.navigate([ReviewRoute.PLAYER]);
     });
-    if (!queue.length) return;
-    const collectionName = `${col.emoji ?? ''} ${col.name}`.trim();
-    this.reviewStore.startSession(queue, col.id, collectionName);
-    this.router.navigate([ReviewRoute.PLAYER]);
   }
 
   startListen(): void {

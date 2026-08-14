@@ -1,33 +1,27 @@
-import { ChangeDetectionStrategy, Component, computed, DestroyRef, effect, inject, Injector, OnInit, signal } from '@angular/core';
-import { takeUntilDestroyed, toObservable } from '@angular/core/rxjs-interop';
-import { filter, take } from 'rxjs';
-import { ActivatedRoute, Router } from '@angular/router';
+import { ChangeDetectionStrategy, Component, computed, effect, inject, signal } from '@angular/core';
+import { Router } from '@angular/router';
 import { IonContent, IonHeader, IonIcon, IonToolbar } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
 import { closeOutline } from 'ionicons/icons';
-import type { Card, ConfidenceRating } from '@lingua-card/shared/domain';
+import type { ReviewRating, ScheduledCard } from '@lingua-card/shared/domain';
 import { WordAudioService } from '../../../../shared/audio/word-audio.service';
-import { FsrsService } from '../../../../shared/srs/fsrs.service';
 import { CardStore } from '../../../vault/store/card.store';
 import { CategoryStore } from '../../../vault/store/category.store';
-import { CollectionStore } from '../../../vault/store/collection.store';
 import { ReviewStore } from '../../store/review.store';
-import { ReviewPrefsService } from '../../services/review-prefs.service';
 import { TranslatePipe } from '@ngx-translate/core';
 import { FrontFlipComponent } from './components/front-flip/front-flip.component';
 import { FrontTypeComponent } from './components/front-type/front-type.component';
-import { FrontListenComponent } from './components/front-listen/front-listen.component';
 import { CardBackComponent } from './components/card-back/card-back.component';
 import { RatingFooterComponent } from './components/rating-footer/rating-footer.component';
-import { gradeTypedAnswer, TypedAnswerResult } from './grading/typed-answer.grader';
+import { AnswerEvaluatorService, TypedAnswerEvaluation } from '../../services/answer-evaluator.service';
 import {
   buildRatingOptionsWithPreviews,
   RATING_OPTIONS_NO_PREVIEW,
   RatingOption,
-  ReviewMode,
-  ReviewQueryParam,
   ReviewRoute,
 } from '../../models/review.model';
+import { previewRatings } from '../../domain/review-domain';
+import { schedulingStateFor } from '../../domain/review-persistence';
 
 const SLOW_RATE = 0.7;
 
@@ -44,48 +38,46 @@ const SLOW_RATE = 0.7;
     TranslatePipe,
     FrontFlipComponent,
     FrontTypeComponent,
-    FrontListenComponent,
     CardBackComponent,
     RatingFooterComponent,
   ],
 })
-export class ReviewPage implements OnInit {
+export class ReviewPage {
   private readonly cardStore = inject(CardStore);
-  private readonly reviewStore = inject(ReviewStore);
+  protected readonly reviewStore = inject(ReviewStore);
   private readonly wordAudio = inject(WordAudioService);
-  private readonly fsrs = inject(FsrsService);
-  private readonly prefs = inject(ReviewPrefsService);
   private readonly categoryStore = inject(CategoryStore);
-  private readonly collectionStore = inject(CollectionStore);
   private readonly router = inject(Router);
-  private readonly injector = inject(Injector);
-  private readonly destroyRef = inject(DestroyRef);
-  private readonly route = inject(ActivatedRoute);
+  private readonly answerEvaluator = inject(AnswerEvaluatorService);
 
   constructor() {
     addIcons({ closeOutline });
 
     // Reset per-card transient state whenever the user advances.
     effect(() => {
-      this.currentIndex();
+      this.reviewStore.presentation();
       this.expandedSynonym.set(null);
       this.typed.set('');
       this.typedResult.set(null);
+      this.dontKnowSelected.set(false);
+      this.previousCardId.set(null);
+      this.isFlipped.set(false);
     });
   }
 
-  readonly mode = this.prefs.mode;
-  readonly queue = signal<Card[]>([]);
-  readonly currentIndex = signal(0);
+  readonly mode = computed(() => this.reviewStore.session()?.definition.mode ?? null);
   readonly isFlipped = signal(false);
   readonly typed = signal('');
-  readonly typedResult = signal<TypedAnswerResult | null>(null);
+  readonly typedResult = signal<TypedAnswerEvaluation | null>(null);
+  readonly dontKnowSelected = signal(false);
+  readonly previousCardId = signal<string | null>(null);
+  readonly isViewingPrevious = computed(() => this.previousCardId() !== null);
   readonly isPronunciationLoading = this.wordAudio.isLoading;
-  private highestIndexReached = 0;
   readonly expandedSynonym = signal<number | null>(null);
 
-  readonly currentCard = computed<Card | null>(() => {
-    const card = this.queue()[this.currentIndex()];
+  readonly currentCard = computed<ScheduledCard | null>(() => {
+    const cardId = this.previousCardId() ?? this.reviewStore.presentation()?.cardId;
+    const card = cardId ? this.cardStore.cards().find(candidate => candidate.id === cardId) : undefined;
     if (!card) return null;
     return {
       ...card,
@@ -99,32 +91,51 @@ export class ReviewPage implements OnInit {
 
   readonly ratingOptionsWithPreviews = computed<RatingOption[]>(() => {
     const card = this.currentCard();
-    if (!card?.srsState || !this.isFlipped()) return RATING_OPTIONS_NO_PREVIEW;
-    return buildRatingOptionsWithPreviews(this.fsrs.previewIntervals(card.srsState));
+    if (!card || !this.isFlipped()) return RATING_OPTIONS_NO_PREVIEW;
+    const previews = previewRatings(schedulingStateFor(card), new Date());
+    const options = buildRatingOptionsWithPreviews({
+      again: previews.again.nextIntervalMinutes ?? 0,
+      hard: previews.hard.nextIntervalMinutes ?? 0,
+      good: previews.good.nextIntervalMinutes ?? 0,
+      easy: previews.easy.nextIntervalMinutes ?? 0,
+    });
+    return this.dontKnowSelected()
+      ? options.filter(option => option.value === 'again')
+      : options;
   });
 
   // Progress: half-step credit once the card is flipped (per design spec).
   readonly progressPercent = computed(() => {
-    const total = this.queue().length;
+    const total = this.reviewStore.totalOriginalCount();
     if (!total) return 0;
-    return ((this.currentIndex() + (this.isFlipped() ? 0.5 : 0)) / total) * 100;
+    const completed = this.reviewStore.completedOriginalCount();
+    return ((completed + (this.isFlipped() ? 0.5 : 0)) / total) * 100;
   });
 
-  readonly remaining = computed(() => Math.max(0, this.queue().length - this.currentIndex() - 1));
+  readonly currentPosition = computed(() => Math.min(
+    this.reviewStore.completedOriginalCount() + 1,
+    this.reviewStore.totalOriginalCount(),
+  ));
 
-  readonly suggestedRating = computed<ConfidenceRating | null>(
-    () => this.typedResult()?.suggested ?? null,
+  readonly remaining = computed(() => {
+    const session = this.reviewStore.session();
+    if (!session) return 0;
+    return session.definition.originalCardIds.filter(cardId =>
+      !session.completedOriginalCardIds.includes(cardId)
+      && !session.sessionSkippedCardIds.includes(cardId)
+      && cardId !== session.currentCardId,
+    ).length;
+  });
+
+  readonly suggestedRating = computed<ReviewRating | null>(
+    () => this.dontKnowSelected() ? 'again' : this.typedResult()?.evaluation.suggestedRating ?? null,
   );
 
-  // Prompt direction (custom study). Affects the Flip front face only — Type
-  // always asks for German (the grader is German-specific) and Listen plays the
-  // German audio. For "mixed", alternate stably by card index.
   private readonly showGermanPrompt = computed(() => {
-    const dir = this.prefs.dir();
-    if (dir === 'de-en') return true;
-    if (dir === 'mixed') return this.currentIndex() % 2 === 0;
-    return false;
+    return this.reviewStore.presentation()?.direction === 'target_to_source';
   });
+
+  readonly expectsGermanAnswer = computed(() => !this.showGermanPrompt());
 
   readonly flipPrompt = computed(() => {
     const card = this.currentCard();
@@ -142,66 +153,17 @@ export class ReviewPage implements OnInit {
   });
 
   readonly activeCategoryNames = computed(() => {
-    const queue = this.queue();
-    if (!queue.length) return '';
+    const session = this.reviewStore.session();
+    if (!session) return '';
+    const cards = new Map(this.cardStore.cards().map(card => [card.id, card]));
     const cats = this.categoryStore.categories();
-    const ids = [...new Set(queue.flatMap(c => c.categoryIds))];
+    const ids = [...new Set(session.definition.originalCardIds.flatMap(cardId => cards.get(cardId)?.categoryIds ?? []))];
     return ids
       .map(id => cats.find(c => c.id === id)?.name)
       .filter(Boolean)
       .slice(0, 3)
       .join(' · ') as string;
   });
-
-  ngOnInit(): void {
-    const pendingQueue = this.reviewStore.pendingQueue();
-    if (pendingQueue.length > 0) {
-      this.queue.set(pendingQueue);
-      this.reviewStore.clearPendingQueue();
-      return;
-    }
-
-    const collectionId = this.route.snapshot.queryParamMap.get(ReviewQueryParam.COLLECTION_ID);
-    const mode = this.route.snapshot.queryParamMap.get(ReviewQueryParam.MODE);
-    const cardIdsParam = this.route.snapshot.queryParamMap.get(ReviewQueryParam.CARD_IDS);
-
-    toObservable(this.cardStore.isLoading, { injector: this.injector })
-      .pipe(filter(loading => !loading), take(1), takeUntilDestroyed(this.destroyRef))
-      .subscribe(() => {
-        let cards: Card[];
-
-        if (mode === ReviewMode.RETRY && cardIdsParam) {
-          const ids = new Set(cardIdsParam.split(','));
-          cards = this.cardStore.cards().filter(c => ids.has(c.id));
-        } else if (mode === ReviewMode.ALL) {
-          cards = this.cardStore.cards();
-          if (collectionId) cards = cards.filter(c => c.collectionId === collectionId);
-        } else {
-          cards = this.cardStore.dueCards();
-          if (collectionId) cards = cards.filter(c => c.collectionId === collectionId);
-        }
-
-        this.queue.set(cards);
-        if (cards.length > 0) {
-          const col = collectionId
-            ? this.collectionStore.collections().find(c => c.id === collectionId) ?? null
-            : null;
-          const collectionName = col ? `${col.emoji ?? ''} ${col.name}`.trim() : null;
-          this.reviewStore.startSession(cards, collectionId, collectionName);
-        }
-      });
-  }
-
-  ionViewWillEnter(): void {
-    const pendingQueue = this.reviewStore.pendingQueue();
-    if (pendingQueue.length > 0) {
-      this.queue.set(pendingQueue);
-      this.currentIndex.set(0);
-      this.isFlipped.set(false);
-      this.highestIndexReached = 0;
-      this.reviewStore.clearPendingQueue();
-    }
-  }
 
   reveal(): void {
     this.isFlipped.set(true);
@@ -210,9 +172,11 @@ export class ReviewPage implements OnInit {
   checkTyped(): void {
     const card = this.currentCard();
     if (!card || !this.typed().trim()) return;
-    this.typedResult.set(
-      gradeTypedAnswer(this.typed(), card.content.back, card.content.article ?? null),
-    );
+    this.typedResult.set(this.answerEvaluator.evaluateTypedAnswer({
+      answer: this.typed(),
+      expectedWord: this.expectsGermanAnswer() ? card.content.back : card.content.front,
+      expectedArticle: this.expectsGermanAnswer() ? card.content.article ?? null : null,
+    }));
     this.isFlipped.set(true);
   }
 
@@ -220,45 +184,49 @@ export class ReviewPage implements OnInit {
     this.expandedSynonym.set(this.expandedSynonym() === i ? null : i);
   }
 
-  submitRating(rating: ConfidenceRating): void {
+  async submitRating(rating: ReviewRating): Promise<void> {
+    if (this.isViewingPrevious()) return;
     const card = this.currentCard();
     if (!card) return;
 
-    const idx = this.currentIndex();
-    const queueLength = this.queue().length;
-    if (idx > this.highestIndexReached) this.highestIndexReached = idx;
-    const isLast = idx + 1 >= queueLength && this.highestIndexReached >= queueLength - 1;
+    const typedResult = this.typedResult();
+    const isTyped = this.mode() === 'typing' && typedResult !== null;
+    const finalRating = this.dontKnowSelected() ? 'again' : rating;
+    const saved = await this.reviewStore.commitCurrentRating(finalRating, {
+      reviewMode: isTyped ? 'typing' : 'recall',
+      responseType: this.dontKnowSelected() ? 'dont_know' : isTyped ? 'typed_answer' : 'self_rated',
+      answerEvaluation: isTyped ? typedResult.evaluation : undefined,
+    });
+    if (!saved) return;
 
-    this.reviewStore.rateCard(card, rating);
-
-    if (isLast) {
-      const liveMap = new Map(this.cardStore.cards().map(c => [c.id, c]));
-      const freshQueue = this.queue().map(c => liveMap.get(c.id) ?? c);
-      this.reviewStore.completeSession(freshQueue);
+    if (this.reviewStore.operation().kind === 'completed') {
       void this.router.navigate([ReviewRoute.SUMMARY], { replaceUrl: true });
     }
+  }
 
-    this.isFlipped.set(false);
-    if (!isLast) {
-      this.currentIndex.set(idx + 1);
+  async dontKnow(): Promise<void> {
+    this.dontKnowSelected.set(true);
+    this.isFlipped.set(true);
+  }
+
+  async skipCard(): Promise<void> {
+    if (this.isViewingPrevious()) return;
+    if (!await this.reviewStore.skipCurrentCard()) return;
+    if (this.reviewStore.operation().kind === 'completed') {
+      void this.router.navigate([ReviewRoute.SUMMARY], { replaceUrl: true });
     }
   }
 
-  goToPrevious(): void {
-    const prev = this.currentIndex() - 1;
-    if (prev < 0) return;
-    this.currentIndex.set(prev);
-    const card = this.queue()[prev];
-    const alreadyRated = this.reviewStore.activeSession()?.ratings[card?.id] !== undefined;
-    this.isFlipped.set(alreadyRated);
+  showPrevious(): void {
+    const cardId = this.reviewStore.lastReviewedCardId();
+    if (!cardId) return;
+    this.previousCardId.set(cardId);
+    this.isFlipped.set(true);
   }
 
-  skipCard(): void {
+  returnToCurrent(): void {
+    this.previousCardId.set(null);
     this.isFlipped.set(false);
-    const next = this.currentIndex() + 1;
-    if (next < this.queue().length) {
-      this.currentIndex.set(next);
-    }
   }
 
   playAudio(): void {
@@ -278,6 +246,7 @@ export class ReviewPage implements OnInit {
   }
 
   exitSession(): void {
+    this.reviewStore.leaveSession();
     void this.router.navigate([ReviewRoute.HUB]);
   }
 }

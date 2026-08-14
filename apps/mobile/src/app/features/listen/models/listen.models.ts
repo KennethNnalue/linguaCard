@@ -1,4 +1,4 @@
-import { Card, PlaybackScript, PlayMode, PlayerSettings, PlayerStatus } from '@lingua-card/shared/domain';
+import { PlaybackScript, PlayMode, PlayerSettings, PlayerStatus, ScheduledCard } from '@lingua-card/shared/domain';
 
 // ─── Storage Keys ─────────────────────────────────────────────────────────────
 
@@ -74,10 +74,6 @@ export const MAX_FALLBACK_QUEUE_SIZE = 20;
 // user never reaches. Window slides forward as playback advances.
 export const LISTEN_PREFETCH_WINDOW = 5;
 
-// ─── Mastery Threshold ────────────────────────────────────────────────────────
-
-export const STRUGGLING_MASTERY_THRESHOLD = 2;
-
 // ─── Estimated Duration ───────────────────────────────────────────────────────
 
 export const MINUTES_PER_CARD = 0.25;
@@ -96,15 +92,15 @@ export const DEFAULT_LISTEN_SETTINGS: PlayerSettings = {
 
 export interface SessionSnapshot {
   cardIndex: number;
-  queue: Card[];
+  queue: ScheduledCard[];
   sourceLabel: string;
 }
 
 export interface ListenState {
   sourceLabel: string;
   selectedSource: ListenSourceKey;
-  rawQueue: Card[];
-  queue: Card[];
+  rawQueue: ScheduledCard[];
+  queue: ScheduledCard[];
   scripts: PlaybackScript[];
   cardIndex: number;
   segmentIndex: number;

@@ -6,6 +6,7 @@ import { Cron, CronExpression } from '@nestjs/schedule';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository, EntityManager, LessThan } from 'typeorm';
 import { randomUUID } from 'crypto';
+import { createNewReviewScheduling } from '../review/review-scheduling.entity';
 import type {
   ShareRecord, CreateShareDto, ShareNotificationList,
   ShareNotification,
@@ -288,9 +289,10 @@ export class SharesService {
     });
     await manager.save(col);
 
-    const newCards = sourceCards.map(c =>
-      manager.create(CardEntity, {
-        id: randomUUID(),
+    const newCards = sourceCards.map(c => {
+      const cardId = randomUUID();
+      return manager.create(CardEntity, {
+        id: cardId,
         userId: recipientUserId,
         collectionId: newColId,
         deckId: c.deckId,
@@ -300,9 +302,9 @@ export class SharesService {
         categoryIds: [...c.categoryIds],
         tags: [...c.tags],
         version: 1,
-        srsState: null,
-      }),
-    );
+        scheduling: createNewReviewScheduling(cardId),
+      });
+    });
 
     if (newCards.length) {
       await manager.save(newCards);

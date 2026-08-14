@@ -1,7 +1,8 @@
-import { Component, ChangeDetectionStrategy, input } from '@angular/core';
+import { Component, ChangeDetectionStrategy, computed, input } from '@angular/core';
 import { Card } from '../../../core/models/mock-data';
 import { ArticleBadgeComponent } from '../../components/article-badge/article-badge.component';
 import { MasteryDotComponent } from '../../components/mastery-dot/mastery-dot.component';
+import { stageIndicator } from '../../../features/review/domain/review-status';
 
 @Component({
   selector: 'lc-word-item',
@@ -16,4 +17,5 @@ export class WordItemComponent {
   showMastery = input(true);
   showAudio = input(false);
   interactive = input(true);
+  masteryLevel = computed(() => stageIndicator(this.card().reviewState.stage));
 }

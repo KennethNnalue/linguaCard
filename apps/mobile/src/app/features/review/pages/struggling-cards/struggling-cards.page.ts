@@ -4,7 +4,7 @@ import { NavController, IonContent, IonHeader, IonIcon, IonToolbar } from '@ioni
 import { addIcons } from 'ionicons';
 import { chevronBackOutline } from 'ionicons/icons';
 import { TranslatePipe } from '@ngx-translate/core';
-import {Card} from '@lingua-card/shared/domain';
+import {ScheduledCard} from '@lingua-card/shared/domain';
 import {ReviewStore} from '../../store/review.store';
 import {ReviewFilterService} from '../../services/review-filter.service';
 import {CategoryStore} from '../../../vault/store/category.store';
@@ -37,7 +37,7 @@ export class StrugglingCardsPage {
 
   readonly strugglingCards = computed(() => this.filterService.getStrugglingCards(ReviewLimit.DUE_TODAY));
 
-  articleBg(card: Card): string {
+  articleBg(card: ScheduledCard): string {
     switch (card.content.article) {
       case 'der': return 'var(--lc-masc-bg)';
       case 'die': return 'var(--lc-fem-bg)';
@@ -46,7 +46,7 @@ export class StrugglingCardsPage {
     }
   }
 
-  articleBorder(card: Card): string {
+  articleBorder(card: ScheduledCard): string {
     switch (card.content.article) {
       case 'der': return 'var(--lc-masc-border)';
       case 'die': return 'var(--lc-fem-border)';
@@ -55,18 +55,18 @@ export class StrugglingCardsPage {
     }
   }
 
-  failCount(card: Card): number {
+  failCount(card: ScheduledCard): number {
     // Use repetitions as the lapse proxy: a card stuck at low mastery with many
     // repetitions has been reviewed (and reset) many times — it is genuinely struggling.
-    return card.srsState?.repetitions ?? 0;
+    return card.reviewState.totalAgainCount;
   }
 
-  failBadgeClass(card: Card): string {
+  failBadgeClass(card: ScheduledCard): string {
     return this.failCount(card) >= STRUGGLING_FAIL_BADGE_RED_THRESHOLD ? 'fail-badge--red' : 'fail-badge--amber';
   }
 
-  lastReviewedLabel(card: Card): string {
-    const t = card.srsState?.lastReviewedAt;
+  lastReviewedLabel(card: ScheduledCard): string {
+    const t = card.updatedAt;
     if (!t) return 'Never';
     const days = Math.floor((Date.now() - new Date(t).getTime()) / MS_PER_DAY);
     if (days === 0) return 'Today';
@@ -77,15 +77,16 @@ export class StrugglingCardsPage {
   startReview(): void {
     const queue = this.strugglingCards();
     if (!queue.length) return;
-    this.reviewStore.startSession(queue, null, 'Struggling cards');
-    void this.navCtrl.navigateForward(ReviewRoute.PLAYER);
+    void this.reviewStore.startSession({ kind: 'struggling' }, queue.length).then(result => {
+      if (result.kind === 'started') void this.navCtrl.navigateForward(ReviewRoute.PLAYER);
+    });
   }
 
-  getCategoryLabel(card: Card): string {
+  getCategoryLabel(card: ScheduledCard): string {
     return getCategoryName(card.categoryIds?.[0], this.categoryStore.categories());
   }
 
-  openWordDetail(card: Card): void {
+  openWordDetail(card: ScheduledCard): void {
     void this.router.navigate(['/vault', card.id]);
   }
 

@@ -1,9 +1,8 @@
 import { inject, Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { forkJoin, Observable, of, switchMap } from 'rxjs';
-import { map } from 'rxjs/operators';
+import { forkJoin, map, Observable, of, switchMap } from 'rxjs';
 import { environment } from '../../../../environments/environment';
-import { Card } from '@lingua-card/shared/domain';
+import { Card, CardAdministrationCommand, CardAdministrationResult, ScheduledCard } from '@lingua-card/shared/domain';
 import { UpdateCardDto } from '@lingua-card/shared/dto';
 
 @Injectable({ providedIn: 'root' })
@@ -11,22 +10,26 @@ export class CardApiService {
   private readonly http = inject(HttpClient);
   private readonly baseUrl = `${environment.apiUrl}/cards`;
 
-  getAll(params?: { collectionId?: string }): Observable<Card[]> {
+  getAll(params?: { collectionId?: string }): Observable<ScheduledCard[]> {
     const httpParams: Record<string, string> = {};
     if (params?.collectionId) httpParams['collectionId'] = params.collectionId;
-    return this.http.get<Card[]>(this.baseUrl, { params: httpParams });
+    return this.http.get<ScheduledCard[]>(this.baseUrl, { params: httpParams });
   }
 
-  getById(id: string): Observable<Card> {
-    return this.http.get<Card>(`${this.baseUrl}/${id}`);
+  getById(id: string): Observable<ScheduledCard> {
+    return this.http.get<ScheduledCard>(`${this.baseUrl}/${id}`);
   }
 
-  create(payload: Omit<Card, 'id'>): Observable<Card> {
-    return this.http.post<Card>(this.baseUrl, payload);
+  create(payload: Omit<Card, 'id'>): Observable<ScheduledCard> {
+    return this.http.post<ScheduledCard>(this.baseUrl, payload);
   }
 
-  update(id: string, dto: UpdateCardDto): Observable<Card> {
-    return this.http.patch<Card>(`${this.baseUrl}/${id}`, dto);
+  update(id: string, dto: UpdateCardDto): Observable<ScheduledCard> {
+    return this.http.patch<ScheduledCard>(`${this.baseUrl}/${id}`, dto);
+  }
+
+  executeAdministration(id: string, command: CardAdministrationCommand): Observable<CardAdministrationResult> {
+    return this.http.post<CardAdministrationResult>(`${this.baseUrl}/${id}/administration`, command);
   }
 
   remove(id: string): Observable<void> {
@@ -41,9 +44,5 @@ export class CardApiService {
           : forkJoin(cards.map(c => this.remove(c.id))).pipe(map(() => undefined as void))
       )
     );
-  }
-
-  batchRateSrs(ratings: import('../../../core/services/local-data.service').PendingSrsRating[]): Observable<void> {
-    return this.http.post<void>(`${this.baseUrl}/srs/batch`, ratings);
   }
 }

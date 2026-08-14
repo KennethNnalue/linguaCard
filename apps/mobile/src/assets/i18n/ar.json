@@ -733,6 +733,7 @@
       "audioChip": "🔊 صوت",
       "cardOf": "بطاقة {{n}} من {{total}}",
       "checkAnswer": "تحقق من الإجابة",
+      "dontKnow": "لا أعرف",
       "examplesHeader": "جُمل أمثلة",
       "listenAndRecall": "استمع وتذكّر",
       "ratingLocked": "يُفتح التقييم بعد الكشف",
@@ -886,6 +887,9 @@
       "resetToast": "تمت إعادة ضبط {{word}} — كأنها جديدة",
       "rest": "إراحة",
       "restToast": "إراحة {{word}} لمدة أسبوع",
+      "resetConfirmTitle": "إعادة ضبط هذه البطاقة؟",
+      "resetConfirmMessage": "سيعود التقدم إلى جديد مع الاحتفاظ بسجل المراجعة.",
+      "commandFailed": "تعذر تحديث البطاقة. حاول مرة أخرى.",
       "title": "الكلمات العنيدة"
     },
     "mode": {

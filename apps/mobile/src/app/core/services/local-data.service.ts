@@ -1,14 +1,8 @@
 import { inject, Injectable } from '@angular/core';
 import { Storage } from '@ionic/storage-angular';
-import { Card, Category, Collection, PlatformStory, PlatformStoryCard, Story } from '@lingua-card/shared/domain';
+import { Category, Collection, PlatformStory, PlatformStoryCard, ScheduledCard, Story } from '@lingua-card/shared/domain';
 import type { UpsertSessionDto } from '../../features/review/services/review-session-api.service';
-
-export interface PendingSrsRating {
-  cardId: string;
-  rating: number;
-  reviewedAt: string;
-  sessionId: string;
-}
+import type { PersistedActiveReviewSession, PersistedReviewLocalState } from '../../features/review/domain/review-persistence';
 
 type SyncFeature = 'stories' | 'cards' | 'collections' | 'categories';
 
@@ -37,12 +31,12 @@ export class LocalDataService {
   }
 
   // ── Cards ────────────────────────────────────────────────────
-  async getCards(userId: string): Promise<Card[]> {
+  async getCards(userId: string): Promise<ScheduledCard[]> {
     await this.init();
     return (await this.storage.get(`cards:${userId}`)) ?? [];
   }
 
-  async setCards(userId: string, cards: Card[]): Promise<void> {
+  async setCards(userId: string, cards: ScheduledCard[]): Promise<void> {
     await this.init();
     await this.storage.set(`cards:${userId}`, cards);
   }
@@ -129,15 +123,31 @@ export class LocalDataService {
     await this.storage.set(`pending_sessions:${userId}`, sessions);
   }
 
-  // ── SRS pending ratings ───────────────────────────────────────
-  async getPendingSrsRatings(userId: string): Promise<PendingSrsRating[]> {
+  async getReviewLocalState(userId: string): Promise<PersistedReviewLocalState> {
     await this.init();
-    return (await this.storage.get(`srs_ratings:${userId}`)) ?? [];
+    return (await this.storage.get(`review_domain_v1:${userId}`)) ?? {
+      schedulingStates: {}, outbox: [], records: [], events: [],
+    };
   }
 
-  async setPendingSrsRatings(userId: string, ratings: PendingSrsRating[]): Promise<void> {
+  async setReviewLocalState(userId: string, state: PersistedReviewLocalState): Promise<void> {
     await this.init();
-    await this.storage.set(`srs_ratings:${userId}`, ratings);
+    await this.storage.set(`review_domain_v1:${userId}`, state);
+  }
+
+  async getActiveReviewSession(userId: string): Promise<PersistedActiveReviewSession | null> {
+    await this.init();
+    return (await this.storage.get(`active_review_session:${userId}`)) ?? null;
+  }
+
+  async setActiveReviewSession(userId: string, session: PersistedActiveReviewSession): Promise<void> {
+    await this.init();
+    await this.storage.set(`active_review_session:${userId}`, session);
+  }
+
+  async clearActiveReviewSession(userId: string): Promise<void> {
+    await this.init();
+    await this.storage.remove(`active_review_session:${userId}`);
   }
 
   // ── Timestamps ───────────────────────────────────────────────
@@ -159,9 +169,10 @@ export class LocalDataService {
       this.storage.remove(`collections:${userId}`),
       this.storage.remove(`categories:${userId}`),
       this.storage.remove(`stories:${userId}`),
-      this.storage.remove(`srs_ratings:${userId}`),
+      this.storage.remove(`review_domain_v1:${userId}`),
       this.storage.remove(`session_history:${userId}`),
       this.storage.remove(`pending_sessions:${userId}`),
+      this.storage.remove(`active_review_session:${userId}`),
       this.storage.remove('last_synced_at:cards'),
       this.storage.remove('last_synced_at:collections'),
       this.storage.remove('last_synced_at:categories'),

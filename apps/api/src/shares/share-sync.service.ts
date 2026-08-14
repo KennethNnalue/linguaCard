@@ -2,6 +2,7 @@ import { Injectable, Logger } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository, EntityManager } from 'typeorm';
 import { randomUUID } from 'crypto';
+import { createNewReviewScheduling } from '../review/review-scheduling.entity';
 import { ShareSyncLinkEntity } from './share-sync-link.entity';
 import { CardEntity } from '../cards/card.entity';
 import { StoryEntity } from '../stories/story.entity';
@@ -86,8 +87,9 @@ export class ShareSyncService {
 
     for (const link of links) {
       try {
+        const cardId = randomUUID();
         const clone = this.cardRepo.create({
-          id: randomUUID(),
+          id: cardId,
           userId: await this.ownerOfCollection(link.targetResourceId),
           collectionId: link.targetResourceId,
           deckId: card.deckId,
@@ -97,7 +99,7 @@ export class ShareSyncService {
           categoryIds: [...card.categoryIds],
           tags: [...card.tags],
           version: 1,
-          srsState: null,
+          scheduling: createNewReviewScheduling(cardId),
         });
         await this.cardRepo.save(clone);
       } catch (err) {

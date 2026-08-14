@@ -2,7 +2,6 @@ import { Injectable } from '@angular/core';
 import {
   RATING_GOOD_THRESHOLD,
   RATING_OK_THRESHOLD,
-  MASTERY_THRESHOLD,
   RatingPillClass,
   SECONDS_PER_MINUTE,
   SESSION_COLOUR_BAD,
@@ -16,17 +15,19 @@ import {
   SESSION_DOT_WARN,
   SessionStats,
 } from '../../models/review.model';
-import type { LocalReviewSession } from '../../models/review.model';
+import type { ReviewSessionHistoryEntry } from '../../models/review.model';
 
 @Injectable({ providedIn: 'root' })
 export class SessionStatsService {
-  private avgRatingNum(session: LocalReviewSession): number | null {
-    const vals = Object.values(session.ratings) as number[];
+  private readonly scores = { again: 1, hard: 2, good: 3, easy: 4 } as const;
+
+  private avgRatingNum(session: ReviewSessionHistoryEntry): number | null {
+    const vals = Object.values(session.ratings).map(rating => this.scores[rating]);
     return vals.length ? vals.reduce((a, b) => a + b, 0) / vals.length : null;
   }
 
-  computeStats(session: LocalReviewSession): SessionStats {
-    const ratings = Object.values(session.ratings) as number[];
+  computeStats(session: ReviewSessionHistoryEntry): SessionStats {
+    const ratings = Object.values(session.ratings);
     const avg = this.avgRatingNum(session);
 
     const ms = session.completedAt
@@ -42,30 +43,30 @@ export class SessionStatsService {
       totalCards: ratings.length || session.totalCards,
       duration,
       avgRating: avg != null ? avg.toFixed(1) : '–',
-      struggled: ratings.filter(r => r <= 2).length,
-      nailed: ratings.filter(r => r === 4).length,
+      struggled: ratings.filter(r => r === 'again' || r === 'hard').length,
+      nailed: ratings.filter(r => r === 'good' || r === 'easy').length,
     };
   }
 
   /** Cards recalled well (rated Good or Easy) — the "Nailed" stat. */
-  nailed(session: LocalReviewSession): number {
-    return (Object.values(session.ratings) as number[]).filter(r => r >= MASTERY_THRESHOLD).length;
+  nailed(session: ReviewSessionHistoryEntry): number {
+    return Object.values(session.ratings).filter(r => r === 'good' || r === 'easy').length;
   }
 
   /** Cards failed (rated Again or Hard) — the "Struggled" stat. */
-  struggled(session: LocalReviewSession): number {
-    return (Object.values(session.ratings) as number[]).filter(r => r < MASTERY_THRESHOLD).length;
+  struggled(session: ReviewSessionHistoryEntry): number {
+    return Object.values(session.ratings).filter(r => r === 'again' || r === 'hard').length;
   }
 
   /** Recall rate 0–100 across a session (recalled / rated). */
-  recallRate(session: LocalReviewSession): number {
+  recallRate(session: ReviewSessionHistoryEntry): number {
     const total = Object.values(session.ratings).length;
     if (!total) return 0;
     return Math.round((this.nailed(session) / total) * 100);
   }
 
   /** Duration in human-readable "Xm Ys" format (used on hub / summary). */
-  formatDuration(session: LocalReviewSession): string {
+  formatDuration(session: ReviewSessionHistoryEntry): string {
     if (!session.completedAt || !session.startedAt) return '—';
     const ms = new Date(session.completedAt).getTime() - new Date(session.startedAt).getTime();
     const totalSecs = Math.max(0, Math.floor(ms / 1000));
@@ -74,12 +75,12 @@ export class SessionStatsService {
     return m > 0 ? `${m}m ${sec}s` : `${sec}s`;
   }
 
-  avgRating(session: LocalReviewSession): string {
+  avgRating(session: ReviewSessionHistoryEntry): string {
     const avg = this.avgRatingNum(session);
     return avg != null ? avg.toFixed(1) : '—';
   }
 
-  ratingColour(session: LocalReviewSession): string {
+  ratingColour(session: ReviewSessionHistoryEntry): string {
     const avg = this.avgRatingNum(session);
     if (avg == null) return SESSION_COLOUR_NEUTRAL;
     if (avg >= RATING_GOOD_THRESHOLD) return SESSION_COLOUR_GOOD;
@@ -87,7 +88,7 @@ export class SessionStatsService {
     return SESSION_COLOUR_BAD;
   }
 
-  dotColour(session: LocalReviewSession): string {
+  dotColour(session: ReviewSessionHistoryEntry): string {
     const avg = this.avgRatingNum(session);
     if (avg == null) return SESSION_DOT_EMPTY;
     if (avg >= RATING_GOOD_THRESHOLD) return SESSION_DOT_GOOD;

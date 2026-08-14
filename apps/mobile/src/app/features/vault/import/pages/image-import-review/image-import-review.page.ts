@@ -24,8 +24,7 @@ import {
   ImageExtractedWord,
   ParsedImportRow,
 } from '@lingua-card/shared/domain';
-import { firstValueFrom, forkJoin, of } from 'rxjs';
-import { catchError, map, switchMap } from 'rxjs/operators';
+import { catchError, firstValueFrom, forkJoin, map, of, switchMap } from 'rxjs';
 import { CardApiService } from '../../../services/card-api.service';
 import { CollectionApiService } from '../../../services/collection-api.service';
 import { AuthService } from '../../../../../core/services/auth.service';
@@ -265,23 +264,6 @@ export class ImageImportReviewPage implements OnInit {
         createdAt: now,
         updatedAt: now,
         version: 1,
-        srsState: {
-          id: crypto.randomUUID(),
-          cardId: '',
-          userId,
-          algorithm: 'fsrs',
-          intervalDays: 1,
-          easeFactor: 2.5,
-          repetitions: 0,
-          lastRating: null,
-          lastReviewedAt: null,
-          nextDueAt: now,
-          masteryLevel: 0,
-          state: 'new',
-          stability: null,
-          difficulty: null,
-          retrievability: null,
-        },
       }).pipe(catchError(() => of(null)))
     );
 

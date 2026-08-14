@@ -1,0 +1,4 @@
+interface:
+  display_name: "Angular Signal Store"
+  short_description: "Angular and NgRx Signal Store architecture rules"
+  default_prompt: "Use $angular-signal-store to implement or review this Angular feature."

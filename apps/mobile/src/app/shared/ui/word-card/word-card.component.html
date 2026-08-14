@@ -33,7 +33,7 @@
           <lc-mastery-dot [level]="masteryLevel()" />
           <span>{{ masteryLabel() }}</span>
         </div>
-        @if (isDue() && card().srsState) {
+        @if (isDue() && card().reviewState) {
           <span class="wc-due">Due</span>
         } @else if (intervalText()) {
           <span class="wc-interval">{{ intervalText() }}</span>

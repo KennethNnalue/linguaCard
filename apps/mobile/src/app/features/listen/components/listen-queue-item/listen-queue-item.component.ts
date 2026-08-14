@@ -1,6 +1,6 @@
 import { ChangeDetectionStrategy, Component, computed, inject, input, output } from '@angular/core';
 import { TranslatePipe } from '@ngx-translate/core';
-import { Card, PlayMode } from '@lingua-card/shared/domain';
+import { PlayMode, ScheduledCard } from '@lingua-card/shared/domain';
 import { ArticleBadgeComponent } from '../../../../shared/components/article-badge/article-badge.component';
 import { WordAudioService } from '../../../../shared/audio/word-audio.service';
 
@@ -15,7 +15,7 @@ import { WordAudioService } from '../../../../shared/audio/word-audio.service';
 export class ListenQueueItemComponent {
   private readonly wordAudio = inject(WordAudioService);
 
-  readonly card = input.required<Card>();
+  readonly card = input.required<ScheduledCard>();
   readonly categoryLabel = input('');
   readonly playMode = input.required<PlayMode>();
   readonly preview = output<void>();

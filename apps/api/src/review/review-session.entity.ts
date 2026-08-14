@@ -1,5 +1,5 @@
 import { Column, CreateDateColumn, Entity, Index, PrimaryColumn } from 'typeorm';
-import type { ConfidenceRating } from '@lingua-card/shared/domain';
+import type { ReviewRating } from '@lingua-card/shared/domain';
 
 @Entity('review_sessions')
 export class ReviewSessionEntity {
@@ -34,9 +34,9 @@ export class ReviewSessionEntity {
   @Column({ default: 0 })
   newCards!: number;
 
-  /** cardId → ConfidenceRating (1–4) */
+  /** cardId → committed review rating */
   @Column('jsonb', { default: {} })
-  ratings!: Record<string, ConfidenceRating>;
+  ratings!: Record<string, ReviewRating>;
 
   @CreateDateColumn()
   createdAt!: Date;

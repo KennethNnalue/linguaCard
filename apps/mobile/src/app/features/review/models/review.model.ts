@@ -1,9 +1,9 @@
-import type { Card, ConfidenceRating, MasteryLevel } from '@lingua-card/shared/domain';
+import type { LearningStage, ReviewRating } from '@lingua-card/shared/domain';
 
 // ─── SYNC OPERATION TYPES ────────────────────────────────────────────────────
 
 export const SyncOperationType = {
-  FLUSH_SRS_RATINGS: 'FLUSH_SRS_RATINGS',
+  FLUSH_REVIEW_COMMITS: 'FLUSH_REVIEW_COMMITS',
   FLUSH_REVIEW_SESSIONS: 'FLUSH_REVIEW_SESSIONS',
   PATCH_SETTINGS: 'PATCH_SETTINGS',
 } as const;
@@ -12,117 +12,101 @@ export type SyncOperationType = (typeof SyncOperationType)[keyof typeof SyncOper
 
 // ─── MASTERY ──────────────────────────────────────────────────────────────────
 
-export const MASTERY_LABEL_KEYS: Record<MasteryLevel, string> = {
-  0: 'srs.masteryLabel.new',
-  1: 'srs.masteryLabel.learning',
-  2: 'srs.masteryLabel.familiar',
-  3: 'srs.masteryLabel.review',
-  4: 'srs.masteryLabel.good',
-  5: 'srs.masteryLabel.mastered',
+export const MASTERY_LABEL_KEYS: Record<LearningStage, string> = {
+  new: 'srs.masteryLabel.new',
+  learning: 'srs.masteryLabel.learning',
+  familiar: 'srs.masteryLabel.familiar',
+  strong: 'srs.masteryLabel.good',
+  mastered: 'srs.masteryLabel.mastered',
 };
 
-export const MASTERY_LABELS: Record<MasteryLevel, string> = {
-  0: 'New',
-  1: 'Learning',
-  2: 'Familiar',
-  3: 'Review',
-  4: 'Good',
-  5: 'Mastered',
+export const MASTERY_LABELS: Record<LearningStage, string> = {
+  new: 'New',
+  learning: 'Learning',
+  familiar: 'Familiar',
+  strong: 'Strong',
+  mastered: 'Mastered',
 };
 
 // Warm lifecycle palette (Review redesign). Used as SVG stroke / chart fills —
 // the one sanctioned raw-hex location (SCSS tokens can't reach SVG strokes).
 // New → Mastered: warm grey → amber → brass → sage → mid-green → forest.
-export const MASTERY_COLOURS: Record<MasteryLevel, string> = {
-  0: '#B0A593',
-  1: '#C99A3E',
-  2: '#D8B981',
-  3: '#5E9E7C',
-  4: '#3E7A5E',
-  5: '#2E6B52',
+export const MASTERY_COLOURS: Record<LearningStage, string> = {
+  new: '#B0A593',
+  learning: '#C99A3E',
+  familiar: '#D8B981',
+  strong: '#3E7A5E',
+  mastered: '#2E6B52',
 };
 
 export interface MasteryInfo {
-  level: MasteryLevel;
+  level: LearningStage;
   label: string;
   colour: string;
 }
 
 export const MASTERY_INFO: MasteryInfo[] = [
-  { level: 0, label: MASTERY_LABELS[0], colour: MASTERY_COLOURS[0] },
-  { level: 1, label: MASTERY_LABELS[1], colour: MASTERY_COLOURS[1] },
-  { level: 2, label: MASTERY_LABELS[2], colour: MASTERY_COLOURS[2] },
-  { level: 3, label: MASTERY_LABELS[3], colour: MASTERY_COLOURS[3] },
-  { level: 4, label: MASTERY_LABELS[4], colour: MASTERY_COLOURS[4] },
-  { level: 5, label: MASTERY_LABELS[5], colour: MASTERY_COLOURS[5] },
+  { level: 'new', label: MASTERY_LABELS.new, colour: MASTERY_COLOURS.new },
+  { level: 'learning', label: MASTERY_LABELS.learning, colour: MASTERY_COLOURS.learning },
+  { level: 'familiar', label: MASTERY_LABELS.familiar, colour: MASTERY_COLOURS.familiar },
+  { level: 'strong', label: MASTERY_LABELS.strong, colour: MASTERY_COLOURS.strong },
+  { level: 'mastered', label: MASTERY_LABELS.mastered, colour: MASTERY_COLOURS.mastered },
 ];
 
 export const MASTERY_INFO_DESC: MasteryInfo[] = [...MASTERY_INFO].reverse();
 
-// ─── CONFIDENCE RATINGS (4-button FSRS scale) ────────────────────────────────
+// ─── REVIEW RATINGS ──────────────────────────────────────────────────────────
 
-export const RATING_LABELS: Record<ConfidenceRating, string> = {
-  1: 'Again',
-  2: 'Hard',
-  3: 'Good',
-  4: 'Easy',
+export const RATING_LABELS: Record<ReviewRating, string> = {
+  again: 'Again', hard: 'Hard', good: 'Good', easy: 'Easy',
 };
 
-export const RATING_DESCRIPTIONS: Record<ConfidenceRating, string> = {
-  1: 'Completely forgot',
-  2: 'Recalled with effort',
-  3: 'Recalled correctly',
-  4: 'Recalled instantly',
+export const RATING_DESCRIPTIONS: Record<ReviewRating, string> = {
+  again: 'Completely forgot', hard: 'Recalled with effort', good: 'Recalled correctly', easy: 'Recalled instantly',
 };
 
 export interface RatingOption {
-  value: ConfidenceRating;
+  value: ReviewRating;
   label: string;
   description: string;
-  /** Next interval in days — populated by FsrsService.previewIntervals() */
-  previewDays?: number | null;
+  /** Next interval in integer minutes. */
+  previewMinutes?: number | null;
   /** Formatted label, e.g. "8d", "10min", "2hr" */
   previewLabel?: string | null;
 }
 
-export function formatPreviewInterval(days: number | null | undefined): string {
-  if (days === null || days === undefined) return '—';
-  if (days < 1 / 24) {
-    // less than 1 hour — show minutes
-    return `${Math.max(1, Math.round(days * 24 * 60))}min`;
-  }
-  if (days < 1) {
-    // less than 1 day — show hours
-    return `${Math.round(days * 24)}hr`;
-  }
-  return `${Math.round(days)}d`;
+export function formatPreviewInterval(minutes: number | null | undefined): string {
+  if (minutes === null || minutes === undefined) return '—';
+  if (minutes < 60) return `${Math.max(1, minutes)}min`;
+  if (minutes < 1_440) return `${Math.round(minutes / 60)}hr`;
+  return `${Math.round(minutes / 1_440)}d`;
 }
 
 export const RATING_OPTIONS: RatingOption[] = [
-  { value: 1, label: 'Again', description: 'Completely forgot' },
-  { value: 2, label: 'Hard',  description: 'Recalled with effort' },
-  { value: 3, label: 'Good',  description: 'Recalled correctly' },
-  { value: 4, label: 'Easy',  description: 'Recalled instantly' },
+  { value: 'again', label: 'Again', description: 'Completely forgot' },
+  { value: 'hard', label: 'Hard', description: 'Recalled with effort' },
+  { value: 'good', label: 'Good', description: 'Recalled correctly' },
+  { value: 'easy', label: 'Easy', description: 'Recalled instantly' },
 ];
 
 export function buildRatingOptionsWithPreviews(
-  previews: Record<ConfidenceRating, number>,
+  previews: Record<ReviewRating, number>,
 ): RatingOption[] {
   return RATING_OPTIONS.map(opt => ({
     ...opt,
-    previewDays: previews[opt.value],
+    previewMinutes: previews[opt.value],
     previewLabel: formatPreviewInterval(previews[opt.value]),
   }));
 }
 
 export const RATING_OPTIONS_NO_PREVIEW: RatingOption[] = RATING_OPTIONS.map(opt => ({
   ...opt,
-  previewDays: null,
+  previewMinutes: null,
   previewLabel: null,
 }));
 
 // Threshold: ratings below this reset progress (Again=1, Hard=2 both fail)
-export const MASTERY_THRESHOLD: ConfidenceRating = 3;
+export const SUCCESSFUL_REVIEW_RATINGS: readonly ReviewRating[] = ['good', 'easy'];
 
 // ─── SESSION HISTORY LIMITS ───────────────────────────────────────────────────
 
@@ -164,7 +148,7 @@ export type ReviewSourceValue = typeof ReviewSource.ALL | string;
 
 export interface ReviewFilters {
   source: ReviewSourceValue;
-  masteryLevels: MasteryLevel[];
+  stages: LearningStage[];
   sortOrder: ReviewSortOrder;
   limit: number;
 }
@@ -235,7 +219,7 @@ export const RatingPillClass = {
 
 export type RatingPillClass = (typeof RatingPillClass)[keyof typeof RatingPillClass];
 
-// Calibrated for 1–4 FSRS scale: ≥3.0 = mostly Good/Easy, ≥2.0 = mixed, <2.0 = mostly failing
+// Calibrated for the 1–4 review scale.
 export const RATING_GOOD_THRESHOLD = 3.0;
 export const RATING_OK_THRESHOLD = 2.0;
 
@@ -259,51 +243,20 @@ export const RING_RADIUS_INNER = 26;
 export const RING_CIRCUMFERENCE_OUTER = 2 * Math.PI * RING_RADIUS_OUTER;
 export const RING_CIRCUMFERENCE_INNER = 2 * Math.PI * RING_RADIUS_INNER;
 
-// ─── REVIEW SESSION (LOCAL / FEATURE) ────────────────────────────────────────
+// ─── REVIEW SESSION HISTORY ──────────────────────────────────────────────────
 
-/**
- * Mobile-side session record. `reviewedCards` holds full Card objects for
- * display — this differs from the domain `ReviewSession` where `reviewedCards`
- * is a plain count (number). The two types share a name root but are intentionally
- * separate; session history is device-local and never POSTed to the backend.
- */
-export interface LocalReviewSession {
+export interface ReviewSessionHistoryEntry {
   id: string;
   startedAt: string;
-  completedAt: string | null;
+  completedAt: string;
   totalCards: number;
-  ratings: Record<string, ConfidenceRating>;
+  newCards: number;
+  ratings: Record<string, ReviewRating>;
   collectionId: string | null;
   collectionName: string | null;
-  reviewedCards: Card[];
+  originalCardIds: readonly string[];
+  reviewedCardIds: readonly string[];
 }
-
-/**
- * Returns the set of card IDs rated in a session.
- * Prefers reviewedCards (full objects) when hydrated; falls back to ratings
- * keys, which are always persisted and survive app restarts even when card
- * hydration hasn't completed yet.
- */
-export function sessionCardIds(session: LocalReviewSession): string[] {
-  return (session.reviewedCards?.length ?? 0) > 0
-    ? session.reviewedCards.map(c => c.id)
-    : Object.keys(session.ratings);
-}
-
-// ─── REVIEW QUERY PARAMS ──────────────────────────────────────────────────────
-
-export const ReviewQueryParam = {
-  COLLECTION_ID: 'collectionId',
-  MODE: 'mode',
-  CARD_IDS: 'cardIds',
-} as const;
-
-export const ReviewMode = {
-  RETRY: 'retry',
-  ALL: 'all',
-} as const;
-
-export type ReviewMode = (typeof ReviewMode)[keyof typeof ReviewMode];
 
 // ─── NAVIGATION ROUTES ────────────────────────────────────────────────────────
 
@@ -340,7 +293,6 @@ export interface BreakdownTag {
 // ─── STRUGGLING CARD THRESHOLDS ───────────────────────────────────────────────
 
 // Cards at Beginner or Learning (levels 1–2) that have been reviewed at least once
-export const STRUGGLING_MASTERY_MAX: MasteryLevel = 2;
 export const STRUGGLING_FAIL_BADGE_RED_THRESHOLD = 4;
 
 // ─── ARTICLE GENDER MAP ───────────────────────────────────────────────────────

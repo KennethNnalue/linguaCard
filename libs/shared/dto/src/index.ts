@@ -1,6 +1,6 @@
 import { IsString, IsOptional, IsArray, IsBoolean, IsNumber, IsIn, IsEmail, MaxLength, MinLength, ValidateNested } from 'class-validator';
 import { Type } from 'class-transformer';
-import type { ArticleType, LanguageCode, ShareResourceType, ShareSyncMode } from '@lingua-card/shared/domain';
+import type { ArticleType, ShareResourceType, ShareSyncMode } from '@lingua-card/shared/domain';
 
 // ─── CARD DTOs ────────────────────────────────────────────────────────────────
 
@@ -53,11 +53,6 @@ export class UpdateCardDto {
   @IsOptional() @IsArray() categoryIds?: string[];
   @IsOptional() @IsArray() tags?: string[];
   @IsOptional() @IsString() collectionId?: string | null;
-  @IsOptional() srsState?: Record<string, unknown> | null;
-}
-
-export class RateCardDto {
-  @IsNumber() @IsIn([1, 2, 3, 4]) rating!: number;
 }
 
 // ─── COLLECTION DTOs ──────────────────────────────────────────────────────────
@@ -119,7 +114,7 @@ export class RespondToShareDto {
   @IsBoolean() accept!: boolean;
 }
 
-// ─── SRS DTOs ────────────────────────────────────────────────────────────────
+// ─── REVIEW DTOs ─────────────────────────────────────────────────────────────
 
 export class ReviewSessionCreateDto {
   @IsString() deckId!: string;

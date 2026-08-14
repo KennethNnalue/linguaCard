@@ -1,14 +1,24 @@
 import {Injectable, signal} from '@angular/core';
+import type { RequestedPromptDirection, ReviewMode } from '../domain/review-domain';
 
-/** The three Review study modes chosen on the hub. */
-export type StudyMode = 'flip' | 'type' | 'audio';
+export type StudyMode = 'flip' | 'type';
 
 /** Prompt direction for a session (custom study). */
 export type StudyDirection = 'en-de' | 'de-en' | 'mixed';
 
+export function toReviewMode(mode: StudyMode): ReviewMode {
+  return mode === 'type' ? 'typing' : 'recall';
+}
+
+export function toPromptDirection(direction: StudyDirection): RequestedPromptDirection {
+  if (direction === 'de-en') return 'target_to_source';
+  if (direction === 'mixed') return 'mixed';
+  return 'source_to_target';
+}
+
 const MODE_KEY = 'lc-review-mode';
 const DIR_KEY = 'lc-review-dir';
-const VALID_MODES: readonly StudyMode[] = ['flip', 'type', 'audio'];
+const VALID_MODES: readonly StudyMode[] = ['flip', 'type'];
 const VALID_DIRS: readonly StudyDirection[] = ['en-de', 'de-en', 'mixed'];
 
 /**

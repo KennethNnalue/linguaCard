@@ -1,7 +1,6 @@
 import { inject, Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { forkJoin, Observable, of, switchMap } from 'rxjs';
-import { map } from 'rxjs/operators';
+import { forkJoin, map, Observable, of, switchMap } from 'rxjs';
 import { environment } from '../../../../environments/environment';
 import { Card, Collection, CreateCollectionDto, RawExtractedWord, UpdateCollectionDto } from '@lingua-card/shared/domain';
 

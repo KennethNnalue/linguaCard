@@ -733,6 +733,7 @@
       "audioChip": "🔊 Ses",
       "cardOf": "{{total}} karttan {{n}}.",
       "checkAnswer": "Cevabı kontrol et",
+      "dontKnow": "Bilmiyorum",
       "examplesHeader": "Örnek cümleler",
       "listenAndRecall": "Dinle ve hatırla",
       "ratingLocked": "Değerlendirme, cevabı gösterince açılır",
@@ -886,6 +887,9 @@
       "resetToast": "{{word}} sıfırlandı — yeniden başa",
       "rest": "Dinlendir",
       "restToast": "{{word}} bir hafta dinlendiriliyor",
+      "resetConfirmTitle": "Bu kart sıfırlansın mı?",
+      "resetConfirmMessage": "İlerleme Yeni durumuna döner. Tekrar geçmişi korunur.",
+      "commandFailed": "Kart güncellenemedi. Lütfen tekrar deneyin.",
       "title": "İnatçılar"
     },
     "mode": {

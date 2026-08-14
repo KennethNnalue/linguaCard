@@ -3,9 +3,8 @@
 export type LanguageCode = 'en' | 'de' | 'fr' | 'es' | 'it' | 'pt' | 'ja' | 'zh' | 'ko' | 'ar' | 'uk' | 'tr' | 'ru';
 export type GenderType = 'masculine' | 'feminine' | 'neuter' | null;
 export type ArticleType = 'der' | 'die' | 'das' | 'le' | 'la' | 'el' | 'un' | 'une' | null;
-export type MasteryLevel = 0 | 1 | 2 | 3 | 4 | 5;
-export type SRSState = 'new' | 'learning' | 'review' | 'relearning' | 'mastered';
-export type ConfidenceRating = 1 | 2 | 3 | 4;
+export type LearningStage = 'new' | 'learning' | 'familiar' | 'strong' | 'mastered';
+export type ReviewRating = 'again' | 'hard' | 'good' | 'easy';
 export type ThemeMode = 'light' | 'dark' | 'system';
 export type OnboardingMotivation = 'travel' | 'work' | 'family' | 'culture' | 'exams';
 export type OnboardingLevel = 'beginner' | 'some' | 'intermediate';
@@ -69,53 +68,149 @@ export interface LearningContext {
   flagEmoji: string;
   articleSystem: ArticleSystem | null;
   ttsVoice: string;
-  defaultSRSConfig: SRSConfig;
 }
 
-// ─── SRS ──────────────────────────────────────────────────────────────────────
-
-export interface SRSConfig {
-  algorithm: 'sm2' | 'fsrs' | 'leitner';
-  newCardsPerDay: number;
-  reviewsPerDay: number;
-  intervalModifier: number;
-  easeBonus: number;
-  hardInterval: number;
-  minimumEaseFactor: number;
-  startingEaseFactor: number;
-}
-
-export interface SRSStateData {
-  id: string;
+export interface ReviewSchedulingState {
   cardId: string;
-  userId: string;
+  stage: LearningStage;
+  intervalMinutes?: number;
+  dueAt?: string;
+  masterySource?: 'earned' | 'manual';
+  manualMasterySnapshot?: {
+    previousStage: LearningStage;
+    previousIntervalMinutes?: number;
+    previousDueAt?: string;
+  };
+  relearning?: {
+    previousStage: 'learning' | 'familiar' | 'strong' | 'mastered';
+    previousIntervalMinutes: number;
+    step: 'immediate' | 'one_day' | 'final';
+  };
+  problemStatus: 'normal' | 'leech';
+  totalReviewCount: number;
+  totalAgainCount: number;
+  recentRatings: ReviewRating[];
+  successfulReviewsSinceLastAgain: number;
+}
 
-  /** 'fsrs' after migration; 'sm2' for un-migrated rows. */
-  algorithm: 'sm2' | 'fsrs';
+export function createNewReviewSchedulingState(cardId: string): ReviewSchedulingState {
+  return {
+    cardId,
+    stage: 'new',
+    problemStatus: 'normal',
+    totalReviewCount: 0,
+    totalAgainCount: 0,
+    recentRatings: [],
+    successfulReviewsSinceLastAgain: 0,
+  };
+}
 
-  // ─── Scheduling fields (used by both algorithms) ──────────────────────────
-  intervalDays: number;
-  nextDueAt: string;
-  lastReviewedAt: string | null;
-  lastRating: ConfidenceRating | null;
-  masteryLevel: MasteryLevel;
+export const CardAdministrationType = {
+  MANUALLY_MASTER: 'CardManuallyMastered',
+  UNDO_MANUAL_MASTERY: 'ManualMasteryUndone',
+  SCHEDULE_LEECH_REST: 'LeechRestScheduled',
+  RESET_PROGRESS: 'CardProgressReset',
+} as const;
 
-  /** 'relearning' replaces SM-2's reset-to-zero on failure. */
-  state: SRSState;
+export type CardAdministrationType = typeof CardAdministrationType[keyof typeof CardAdministrationType];
 
-  // ─── FSRS-specific fields (null for SM-2 rows until migration runs) ────────
-  /** Days until recall probability drops to target retention. Null before first FSRS review. */
-  stability: number | null;
-  /** Intrinsic hardness 1–10, updated each review. Null before first FSRS review. */
-  difficulty: number | null;
-  /** Current recall probability 0–1. Null before first FSRS review. */
-  retrievability: number | null;
+export interface CardAdministrationCommand {
+  commandId: string;
+  type: CardAdministrationType;
+  confirmHistoryRetention?: true;
+}
 
-  // ─── SM-2 legacy fields (kept during migration, removed in cleanup) ────────
-  /** @deprecated Use stability instead. Kept for SM-2 rows. */
-  easeFactor: number;
-  /** @deprecated Not used by FSRS. Kept for SM-2 rows. */
-  repetitions: number;
+export interface CardAdministrationEvent {
+  eventId: string;
+  commandId: string;
+  type: CardAdministrationType;
+  cardId: string;
+  occurredAt: string;
+  historyRetained: true;
+}
+
+export interface CardAdministrationResult {
+  event: CardAdministrationEvent;
+  nextState: ReviewSchedulingState;
+}
+
+const ADMIN_REST_DAYS = 7;
+const ADMIN_UNDO_MAXIMUM_MINUTES = 7 * 1_440;
+
+export function applyCardAdministration(
+  state: ReviewSchedulingState,
+  command: CardAdministrationCommand,
+  occurredAt: Date,
+  eventId: string,
+): CardAdministrationResult {
+  if (command.type === CardAdministrationType.RESET_PROGRESS && command.confirmHistoryRetention !== true) {
+    throw new Error('Progress reset requires confirmation that review history will be retained');
+  }
+  return {
+    event: {
+      eventId,
+      commandId: command.commandId,
+      type: command.type,
+      cardId: state.cardId,
+      occurredAt: occurredAt.toISOString(),
+      historyRetained: true,
+    },
+    nextState: nextAdministrationState(state, command.type, occurredAt),
+  };
+}
+
+function nextAdministrationState(
+  state: ReviewSchedulingState,
+  type: CardAdministrationType,
+  occurredAt: Date,
+): ReviewSchedulingState {
+  if (type === CardAdministrationType.MANUALLY_MASTER) {
+    if (state.masterySource === 'manual') return state;
+    return {
+      ...state,
+      stage: 'mastered', intervalMinutes: undefined, dueAt: undefined, relearning: undefined,
+      masterySource: 'manual',
+      manualMasterySnapshot: {
+        previousStage: state.stage,
+        previousIntervalMinutes: state.intervalMinutes,
+        previousDueAt: state.dueAt,
+      },
+    };
+  }
+  if (type === CardAdministrationType.UNDO_MANUAL_MASTERY) {
+    const snapshot = state.manualMasterySnapshot;
+    if (state.masterySource !== 'manual' || !snapshot) throw new Error('Card is not manually mastered');
+    if (snapshot.previousStage === 'new' || snapshot.previousIntervalMinutes === undefined) {
+      return {
+        ...state, stage: 'new', intervalMinutes: undefined, dueAt: undefined,
+        masterySource: undefined, manualMasterySnapshot: undefined,
+      };
+    }
+    const intervalMinutes = Math.min(snapshot.previousIntervalMinutes, ADMIN_UNDO_MAXIMUM_MINUTES);
+    return {
+      ...state,
+      stage: stageForAdministrativeInterval(intervalMinutes),
+      intervalMinutes,
+      dueAt: new Date(occurredAt.getTime() + intervalMinutes * 60_000).toISOString(),
+      masterySource: undefined,
+      manualMasterySnapshot: undefined,
+    };
+  }
+  if (type === CardAdministrationType.SCHEDULE_LEECH_REST) {
+    if (state.problemStatus !== 'leech') throw new Error('Only leech cards can be rested');
+    return {
+      ...state,
+      dueAt: new Date(occurredAt.getTime() + ADMIN_REST_DAYS * 86_400_000).toISOString(),
+    };
+  }
+  return createNewReviewSchedulingState(state.cardId);
+}
+
+function stageForAdministrativeInterval(intervalMinutes: number): LearningStage {
+  if (intervalMinutes >= 60 * 1_440) return 'mastered';
+  if (intervalMinutes >= 14 * 1_440) return 'strong';
+  if (intervalMinutes >= 3 * 1_440) return 'familiar';
+  return 'learning';
 }
 
 
@@ -227,7 +322,10 @@ export interface Card {
   createdAt: string;
   updatedAt: string;
   version: number;
-  srsState?: SRSStateData;
+}
+
+export interface ScheduledCard extends Card {
+  reviewState: ReviewSchedulingState;
 }
 
 // ─── CATEGORY ─────────────────────────────────────────────────────────────────
@@ -343,12 +441,7 @@ export interface ProgressStats {
 
 // ─── REVIEW SESSION ───────────────────────────────────────────────────────────
 
-/**
- * Server-side / API shape for a completed review session.
- * `reviewedCards` is a count (number), not an array.
- * Do NOT confuse with `LocalReviewSession` in the mobile app which holds the
- * full `Card[]` array for in-process and history display.
- */
+/** Server-side / API shape for a completed review session. */
 export interface ReviewSession {
   id: string;
   userId: string;
@@ -358,7 +451,7 @@ export interface ReviewSession {
   totalCards: number;
   reviewedCards: number;
   newCards: number;
-  ratings: Record<string, ConfidenceRating>;
+  ratings: Record<string, ReviewRating>;
 }
 
 // ─── SYNC ─────────────────────────────────────────────────────────────────────

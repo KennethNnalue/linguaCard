@@ -9,6 +9,7 @@ import {
 import { CardEntity } from '../cards/card.entity';
 import { CollectionEntity } from '../collections/collection.entity';
 import { CategoryEntity } from '../categories/category.entity';
+import { createNewReviewScheduling } from '../review/review-scheduling.entity';
 
 @Injectable()
 export class SeedService implements OnApplicationBootstrap {
@@ -81,7 +82,10 @@ export class SeedService implements OnApplicationBootstrap {
         categoryIds: c.categoryIds,
         tags: c.tags,
         version: c.version,
-        srsState: c.srsState ?? null,
+        scheduling: {
+          ...createNewReviewScheduling(c.id),
+          state: c.reviewState,
+        },
       }),
     );
     await this.cards.save(entities);

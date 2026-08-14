@@ -28,9 +28,7 @@
     @if (categoryLabel()) {
       <span class="cat">{{ categoryLabel() }}</span>
     }
-    @if (card().srsState?.state) {
-      <span class="status">{{ card().srsState!.state }}</span>
-    }
+    <span class="status">{{ card().reviewState.stage }}</span>
     @if (hdReady()) {
       <span class="hd" [title]="'listen.queue.hdReadyTitle' | translate">
         <span class="hd-dot" aria-hidden="true"></span>HD

@@ -2,6 +2,7 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { randomUUID } from 'crypto';
+import { createNewReviewScheduling } from '../review/review-scheduling.entity';
 import type {
   PlatformCollectionListResponse,
   PlatformCollectionSummary,
@@ -249,9 +250,10 @@ export class PlatformCollectionsService {
           continue;
         }
 
+        const cardId = randomUUID();
         newCards.push(
           manager.create(CardEntity, {
-            id: randomUUID(),
+            id: cardId,
             userId,
             collectionId: colId,
             deckId: 'deck-001',
@@ -272,7 +274,7 @@ export class PlatformCollectionsService {
             categoryIds: [],
             tags: [`platform:${platformCollectionId}`],
             version: 1,
-            srsState: null,
+            scheduling: createNewReviewScheduling(cardId),
           }),
         );
       }
@@ -297,12 +299,13 @@ export class PlatformCollectionsService {
       await this.collectionRepo.manager.query(
         `SELECT
            COUNT(*)::int AS "cardCount",
-           SUM(CASE WHEN ("srsState"->>'masteryLevel')::int = 5 THEN 1 ELSE 0 END)::int AS "masteredCount",
-           SUM(CASE WHEN "srsState" IS NOT NULL
-                      AND "srsState"->>'lastReviewedAt' IS NOT NULL
-                      AND "srsState"->>'nextDueAt' <= $1 THEN 1 ELSE 0 END)::int AS "dueCount"
-         FROM cards
-         WHERE "collectionId" = $2 AND "userId" = $3`,
+           SUM(CASE WHEN scheduling."state"->>'stage' = 'mastered' THEN 1 ELSE 0 END)::int AS "masteredCount",
+           SUM(CASE WHEN scheduling."state"->>'dueAt' <= $1
+                      AND COALESCE(scheduling."state"->>'masterySource', '') <> 'manual'
+                    THEN 1 ELSE 0 END)::int AS "dueCount"
+         FROM cards card
+         INNER JOIN review_scheduling scheduling ON scheduling."cardId" = card."id"
+         WHERE card."collectionId" = $2 AND card."userId" = $3`,
         [now, e.id, userId],
       );
     const counts = rows[0] ?? { cardCount: 0, masteredCount: 0, dueCount: 0 };

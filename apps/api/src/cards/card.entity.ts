@@ -1,8 +1,9 @@
 import {
   Entity, PrimaryColumn, Column, Index,
-  CreateDateColumn, UpdateDateColumn,
+  CreateDateColumn, OneToOne, UpdateDateColumn,
 } from 'typeorm';
-import type { CardContent, SRSStateData } from '@lingua-card/shared/domain';
+import type { CardContent } from '@lingua-card/shared/domain';
+import { ReviewSchedulingEntity } from '../review/review-scheduling.entity';
 
 @Entity('cards')
 export class CardEntity {
@@ -38,8 +39,11 @@ export class CardEntity {
   @Column({ default: 1 })
   version!: number;
 
-  @Column('jsonb', { nullable: true })
-  srsState!: SRSStateData | null;
+  @OneToOne(() => ReviewSchedulingEntity, scheduling => scheduling.card, {
+    cascade: ['insert'],
+    eager: true,
+  })
+  scheduling!: ReviewSchedulingEntity;
 
   @CreateDateColumn()
   createdAt!: Date;

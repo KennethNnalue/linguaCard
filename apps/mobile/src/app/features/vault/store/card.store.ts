@@ -1,4 +1,4 @@
-import { computed, inject } from '@angular/core';
+import { computed, effect, inject } from '@angular/core';
 import {
   patchState,
   signalStore,
@@ -7,14 +7,16 @@ import {
   withMethods,
   withState,
 } from '@ngrx/signals';
-import { firstValueFrom, Observable, of } from 'rxjs';
-import { catchError, tap } from 'rxjs/operators';
-import { Card } from '@lingua-card/shared/domain';
+import { catchError, firstValueFrom, Observable, of, tap } from 'rxjs';
+import { Card, ScheduledCard } from '@lingua-card/shared/domain';
 import { CardApiService } from '../services/card-api.service';
 import { LocalDataService } from '../../../core/services/local-data.service';
 import { SyncService } from '../../../core/services/sync.service';
 import { AuthService } from '../../../core/services/auth.service';
-import { isDue, isMastered, isNew, isStruggling } from '../../../shared/srs/srs-status';
+import { isDue, isMastered, isNew, isStruggling } from '../../review/domain/review-status';
+import { createNewSchedulingState } from '../../review/domain/review-domain';
+import { overlayLocalSchedulingStates, serializeSchedulingState } from '../../review/domain/review-persistence';
+import { ReviewLocalRepository } from '../../review/services/review-local.repository';
 
 export interface CardFilter {
   categoryId: string | null;
@@ -23,21 +25,31 @@ export interface CardFilter {
 }
 
 interface CardState {
-  cards: Card[];
-  isLoading: boolean;
-  isRefreshing: boolean;
-  hasEverLoaded: boolean;
-  error: string | null;
+  cards: ScheduledCard[];
+  loadState: CardLoadState;
   selectedCardId: string | null;
   filter: CardFilter;
 }
 
+export type CardLoadState =
+  | { status: 'idle' }
+  | { status: 'loading'; mode: 'initial' | 'refreshing' }
+  | {
+      status: 'ready';
+      origin: 'cache' | 'api';
+      isEmpty: boolean;
+      warnings: readonly CardLoadFailure[];
+    }
+  | { status: 'error'; failures: readonly CardLoadFailure[]; hasCachedCards: boolean };
+
+export interface CardLoadFailure {
+  phase: 'cache_read' | 'api' | 'cache_write';
+  message: string;
+}
+
 const initialState: CardState = {
   cards: [],
-  isLoading: false,
-  isRefreshing: false,
-  hasEverLoaded: false,
-  error: null,
+  loadState: { status: 'idle' },
   selectedCardId: null,
   filter: { categoryId: null, collectionId: null, search: '' },
 };
@@ -46,7 +58,17 @@ export const CardStore = signalStore(
   { providedIn: 'root' },
   withState(initialState),
 
-  withComputed(({ cards, selectedCardId, filter }) => ({
+  withComputed(({ cards, loadState, selectedCardId, filter }) => ({
+    isLoading: computed(() => {
+      const state = loadState();
+      return state.status === 'loading' && state.mode === 'initial';
+    }),
+    isRefreshing: computed(() => {
+      const state = loadState();
+      return state.status === 'loading' && state.mode === 'refreshing';
+    }),
+    isReady: computed(() => loadState().status === 'ready'),
+    loadError: computed(() => loadState().status === 'error' ? loadState() : null),
     filteredCards: computed(() => {
       const all = cards();
       const { categoryId, collectionId, search } = filter();
@@ -85,12 +107,8 @@ export const CardStore = signalStore(
     totalCount: computed(() => cards().length),
     masteredCount: computed(() => cards().filter(isMastered).length),
     learningCount: computed(() =>
-      cards().filter(
-        (c) =>
-          c.srsState?.state === 'learning' || c.srsState?.state === 'review'
-      ).length
+      cards().filter(c => c.reviewState.stage !== 'new' && c.reviewState.stage !== 'mastered').length
     ),
-    // "new" = never studied (no srsState or lastReviewedAt is null)
     newCount: computed(() => cards().filter(isNew).length),
     // "reviews" = studied cards that are due today
     reviewCount: computed(() => { const now = new Date(); return cards().filter(c => isDue(c, now)).length; }),
@@ -102,58 +120,116 @@ export const CardStore = signalStore(
     const localData = inject(LocalDataService);
     const syncService = inject(SyncService);
     const authService = inject(AuthService);
+    const reviewLocal = inject(ReviewLocalRepository);
+    let loadSequence = 0;
 
     function uid(): string | undefined {
       return authService.currentUser()?.id;
     }
 
+    function currentLoadState(): CardLoadState {
+      return store.loadState();
+    }
+
     return {
-      /**
-       * Cache-first: serve cached data immediately, then silently refresh from
-       * the API — but only when online. If offline and cache exists, skip the
-       * network entirely so the page renders without errors or spinners.
-       */
-      loadCards(): void {
-        void (async () => {
-          const userId = uid();
+      async loadCards(): Promise<CardLoadState> {
+        const sequence = ++loadSequence;
+        const userId = uid();
+        const failures: CardLoadFailure[] = [];
+        const isCurrent = (): boolean => sequence === loadSequence && userId === uid();
+        const hasVisibleCards = store.cards().length > 0;
+        patchState(store, { loadState: { status: 'loading', mode: hasVisibleCards ? 'refreshing' : 'initial' } });
 
-          // 1. Show cache immediately
-          if (userId) {
-            const cached = await localData.getCards(userId);
-            if (cached.length > 0) {
-              patchState(store, { cards: cached, hasEverLoaded: true });
-            }
-          }
-
-          // 2. Offline with cached data — nothing more to do
-          if (!navigator.onLine && store.hasEverLoaded()) {
-            return;
-          }
-
-          // 3. Block with skeleton only if truly nothing to show
-          if (!store.hasEverLoaded()) {
-            patchState(store, { isLoading: true, error: null });
-          } else {
-            patchState(store, { isRefreshing: true });
-          }
-
+        if (userId) {
           try {
-            const cards = await firstValueFrom(cardApi.getAll());
-            patchState(store, { cards, isLoading: false, isRefreshing: false, hasEverLoaded: true });
-            if (userId) await localData.setCards(userId, cards);
+            const cached = overlayLocalSchedulingStates(
+              await localData.getCards(userId),
+              await reviewLocal.schedulingStates(userId),
+            );
+            if (!isCurrent()) return currentLoadState();
+            if (cached.length > 0) {
+              patchState(store, { cards: cached });
+            }
           } catch {
-            patchState(store, { isLoading: false, isRefreshing: false });
+            if (!isCurrent()) return currentLoadState();
+            failures.push({ phase: 'cache_read', message: 'Unable to read cards saved on this device.' });
           }
-        })();
+        }
+
+        if (!navigator.onLine && store.cards().length > 0) {
+          const ready: CardLoadState = {
+            status: 'ready',
+            origin: 'cache',
+            isEmpty: false,
+            warnings: failures,
+          };
+          patchState(store, { loadState: ready });
+          return ready;
+        }
+
+        patchState(store, { loadState: { status: 'loading', mode: store.cards().length > 0 ? 'refreshing' : 'initial' } });
+
+        let cards: ScheduledCard[];
+        try {
+          const serverCards = await firstValueFrom(cardApi.getAll());
+          cards = userId
+            ? overlayLocalSchedulingStates(serverCards, await reviewLocal.schedulingStates(userId))
+            : serverCards;
+        } catch {
+          if (!isCurrent()) return currentLoadState();
+          failures.push({ phase: 'api', message: 'Unable to refresh cards from the server.' });
+          if (store.cards().length > 0) {
+            const ready: CardLoadState = {
+              status: 'ready',
+              origin: 'cache',
+              isEmpty: false,
+              warnings: failures,
+            };
+            patchState(store, { loadState: ready });
+            return ready;
+          }
+          const failed: CardLoadState = {
+            status: 'error',
+            failures,
+            hasCachedCards: store.cards().length > 0,
+          };
+          patchState(store, { loadState: failed });
+          return failed;
+        }
+
+        if (!isCurrent()) return currentLoadState();
+        patchState(store, { cards });
+        if (userId) {
+          try {
+            await localData.setCards(userId, cards);
+          } catch {
+            if (!isCurrent()) return currentLoadState();
+            failures.push({ phase: 'cache_write', message: 'Unable to save refreshed cards on this device.' });
+          }
+        }
+
+        if (!isCurrent()) return currentLoadState();
+        const ready: CardLoadState = {
+          status: 'ready',
+          origin: 'api',
+          isEmpty: cards.length === 0,
+          warnings: failures,
+        };
+        patchState(store, { loadState: ready });
+        return ready;
       },
 
       /**
        * Optimistic create: adds card to store immediately.
        * Resolves to the server card when online, or temp card when offline.
        */
-      createCard(dto: Omit<Card, 'id'>): Observable<Card> {
+      createCard(dto: Omit<Card, 'id'>): Observable<ScheduledCard> {
         const tempId = `temp_${crypto.randomUUID()}`;
-        const tempCard: Card = { ...dto, id: tempId };
+        const tempCard: ScheduledCard = {
+          ...dto,
+          id: tempId,
+          reviewState: serializeSchedulingState(createNewSchedulingState(tempId)),
+        };
 
         patchState(store, { cards: [...store.cards(), tempCard] });
 
@@ -205,7 +281,7 @@ export const CardStore = signalStore(
         });
       },
 
-      updateCard(updated: Card): void {
+      updateCard(updated: ScheduledCard): void {
         patchState(store, {
           cards: store.cards().map(c => c.id === updated.id ? updated : c),
         });
@@ -213,15 +289,15 @@ export const CardStore = signalStore(
         if (userId) void localData.setCards(userId, store.cards());
       },
 
-      setCardsFromSync(cards: Card[]): void {
+      setCardsFromSync(cards: ScheduledCard[]): void {
         patchState(store, { cards });
       },
 
       reset(): void {
+        loadSequence += 1;
         patchState(store, {
           cards: [],
-          isLoading: false,
-          error: null,
+          loadState: { status: 'idle' },
           selectedCardId: null,
           filter: { categoryId: null, collectionId: null, search: '' },
         });
@@ -229,9 +305,21 @@ export const CardStore = signalStore(
     };
   }),
 
-  withHooks({
-    onInit(store) {
-      store.loadCards();
-    },
+  withHooks((store) => {
+    const authService = inject(AuthService);
+    let activeUserId = authService.currentUser()?.id;
+
+    return {
+      onInit() {
+        effect(() => {
+          const nextUserId = authService.currentUser()?.id;
+          if (nextUserId === activeUserId) return;
+          activeUserId = nextUserId;
+          store.reset();
+          if (nextUserId) void store.loadCards();
+        });
+        if (activeUserId) void store.loadCards();
+      },
+    };
   })
 );

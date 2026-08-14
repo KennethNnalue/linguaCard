@@ -5,7 +5,9 @@
   </div>
 
   <div class="ft-body">
-    <span class="ft-cue">{{ 'review.session.typeGermanFor' | translate }}</span>
+    <span class="ft-cue">
+      {{ (expectsGermanAnswer() ? 'review.session.typeGermanFor' : 'review.session.typeMeaningOf') | translate }}
+    </span>
     <p class="ft-prompt">{{ prompt() }}</p>
 
     <input
@@ -18,17 +20,22 @@
       autocorrect="off"
       autocomplete="off"
       spellcheck="false"
-      [attr.placeholder]="'review.session.typePlaceholder' | translate" />
+      [attr.placeholder]="(expectsGermanAnswer() ? 'review.session.typePlaceholder' : 'review.session.typeTranslationPlaceholder') | translate" />
 
-    <div class="ft-accents">
-      @for (a of accents; track a) {
-        <button class="ft-accent" type="button" (click)="append(a)">{{ a }}</button>
-      }
-    </div>
+    @if (expectsGermanAnswer()) {
+      <div class="ft-accents">
+        @for (a of accents; track a) {
+          <button class="ft-accent" type="button" (click)="append(a)">{{ a }}</button>
+        }
+      </div>
+    }
   </div>
 
   <button class="ft-cta" (click)="check.emit()">
     <ion-icon name="checkmark-outline"></ion-icon>
     {{ 'review.session.checkAnswer' | translate }}
+  </button>
+  <button class="ft-dont-know" type="button" (click)="dontKnow.emit()">
+    {{ 'review.session.dontKnow' | translate }}
   </button>
 </div>

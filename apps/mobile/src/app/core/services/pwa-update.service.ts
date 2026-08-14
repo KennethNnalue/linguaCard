@@ -1,7 +1,6 @@
 import { ApplicationRef, inject, Injectable, signal } from '@angular/core';
 import { SwUpdate, VersionReadyEvent } from '@angular/service-worker';
-import { concat, fromEvent, interval, merge } from 'rxjs';
-import { filter, first, map } from 'rxjs/operators';
+import { concat, filter, first, fromEvent, interval, map, merge } from 'rxjs';
 
 /**
  * Keeps the PWA on the latest deployed build.

@@ -19,15 +19,13 @@ import { ReviewPrefsService, StudyMode } from '../../services/review-prefs.servi
 import { SessionStatsService } from '../../shared/services/session-stats.service';
 import { TranslatePipe } from '@ngx-translate/core';
 import { SessionDatePipe } from '../../shared/pipes/session-date.pipe';
-import { ReviewStatsStore } from '../../../../shared/srs/review-stats.store';
+import { ReviewStatsStore } from '../../store/review-stats.store';
 import { SettingsStore } from '../../../settings/store/settings.store';
 import {
-  LocalReviewSession,
   MINUTES_PER_CARD_REVIEW,
+  ReviewSessionHistoryEntry,
   ReviewLimit,
   ReviewRoute,
-  ReviewSortOrder,
-  ReviewSource,
 } from '../../models/review.model';
 
 interface StudyModeOption {
@@ -95,7 +93,6 @@ export class ReviewHubPage {
   readonly studyModes: StudyModeOption[] = [
     { value: 'flip', labelKey: 'review.mode.flip', subKey: 'review.mode.flipSub' },
     { value: 'type', labelKey: 'review.mode.type', subKey: 'review.mode.typeSub' },
-    { value: 'audio', labelKey: 'review.mode.audio', subKey: 'review.mode.audioSub' },
   ];
   selectMode(mode: StudyMode): void {
     this.prefs.setMode(mode);
@@ -123,27 +120,15 @@ export class ReviewHubPage {
   // ─── Navigation / actions ───────────────────────────────────────────────────
   startTodaysReview(): void {
     const dailyGoal = this.settingsStore.dailyGoal();
-    const queue = this.filterService.buildQueue({
-      source: ReviewSource.ALL,
-      masteryLevels: [0, 1, 2, 3, 4, 5],
-      sortOrder: ReviewSortOrder.DUE_DATE,
-      limit: dailyGoal,
+    void this.reviewStore.startSession({ kind: 'daily' }, dailyGoal).then(result => {
+      if (result.kind === 'started') void this.router.navigate([ReviewRoute.PLAYER]);
     });
-    if (!queue.length) return;
-    this.reviewStore.startSession(queue, null, null);
-    void this.router.navigate([ReviewRoute.PLAYER]);
   }
 
   startNewOnly(): void {
-    const queue = this.filterService.buildQueue({
-      source: ReviewSource.ALL,
-      masteryLevels: [0],
-      sortOrder: ReviewSortOrder.RANDOM,
-      limit: ReviewLimit.NEW_ONLY,
+    void this.reviewStore.startSession({ kind: 'new-only' }, ReviewLimit.NEW_ONLY).then(result => {
+      if (result.kind === 'started') void this.router.navigate([ReviewRoute.PLAYER]);
     });
-    if (!queue.length) return;
-    this.reviewStore.startSession(queue, null, 'New cards');
-    void this.router.navigate([ReviewRoute.PLAYER]);
   }
 
   goToStruggling(): void { void this.router.navigate([ReviewRoute.STRUGGLING]); }
@@ -153,8 +138,8 @@ export class ReviewHubPage {
   goToLeeches(): void { void this.router.navigate([ReviewRoute.LEECHES]); }
   navigateTo(path: string): void { void this.router.navigateByUrl(path); }
 
-  sessionNailed(s: LocalReviewSession): number { return this.stats.nailed(s); }
-  sessionStruggled(s: LocalReviewSession): number { return this.stats.struggled(s); }
-  sessionDuration(s: LocalReviewSession): string { return this.stats.formatDuration(s); }
-  sessionDotColour(s: LocalReviewSession): string { return this.stats.dotColour(s); }
+  sessionNailed(s: ReviewSessionHistoryEntry): number { return this.stats.nailed(s); }
+  sessionStruggled(s: ReviewSessionHistoryEntry): number { return this.stats.struggled(s); }
+  sessionDuration(s: ReviewSessionHistoryEntry): string { return this.stats.formatDuration(s); }
+  sessionDotColour(s: ReviewSessionHistoryEntry): string { return this.stats.dotColour(s); }
 }

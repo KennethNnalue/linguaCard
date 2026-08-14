@@ -1,0 +1,4 @@
+interface:
+  display_name: "Application Architecture"
+  short_description: "Shared architecture and TypeScript quality rules"
+  default_prompt: "Use $application-architecture to implement or review this application change."

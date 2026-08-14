@@ -35,8 +35,7 @@ import { DictionaryApiService } from '../../services/dictionary-api.service';
 import { AssignCollectionSheetComponent } from '../../components/assign-collection-sheet/assign-collection-sheet.component';
 import { CardDedupService } from '../../../../shared/dedup/card-dedup.service';
 import { CollectionAudioPrefetchService } from '../../../../shared/audio/collection-audio-prefetch.service';
-import { forkJoin, of } from 'rxjs';
-import { catchError, map } from 'rxjs/operators';
+import { catchError, forkJoin, map, of } from 'rxjs';
 
 interface SelectableRow extends ParsedImportRow {
   selected: boolean;
@@ -249,23 +248,6 @@ export class ImportReviewPage implements OnInit {
         createdAt: now,
         updatedAt: now,
         version: 1,
-        srsState: {
-          id: crypto.randomUUID(),
-          cardId: '',
-          userId,
-          algorithm: 'fsrs',
-          intervalDays: 1,
-          easeFactor: 2.5,
-          repetitions: 0,
-          lastRating: null,
-          lastReviewedAt: null,
-          nextDueAt: now,
-          masteryLevel: 0,
-          state: 'new',
-          stability: null,
-          difficulty: null,
-          retrievability: null,
-        },
       }).pipe(catchError(() => of(null)))
     );
 

@@ -7,7 +7,7 @@ import type { Card } from '@lingua-card/shared/domain';
 import { ArticleBadgeComponent } from '../../../../../../shared/components/article-badge/article-badge.component';
 import { HighlightWordPipe } from '../../../../shared/pipes/highlight-word.pipe';
 import { ARTICLE_GENDER_MAP } from '../../../../models/review.model';
-import { TypedAnswerResult } from '../../grading/typed-answer.grader';
+import { TypedAnswerFeedback } from '../../../../services/answer-evaluator.service';
 
 interface ResultBanner {
   tint: 'correct' | 'close' | 'wrong';
@@ -36,7 +36,7 @@ const VERDICT_ICON = { correct: '✓', close: '≈', wrong: '✕' } as const;
 })
 export class CardBackComponent {
   readonly card = input.required<Card>();
-  readonly typedResult = input<TypedAnswerResult | null>(null);
+  readonly typedResult = input<TypedAnswerFeedback | null>(null);
   readonly expandedSynonym = input<number | null>(null);
   readonly isPronunciationLoading = input(false);
 

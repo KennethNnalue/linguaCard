@@ -1,0 +1,4 @@
+interface:
+  display_name: "NestJS Backend"
+  short_description: "NestJS backend architecture and testing rules"
+  default_prompt: "Use $nestjs-backend to implement or review this NestJS change."

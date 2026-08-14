@@ -4,7 +4,7 @@ import type { DataRefresher } from '../../../core/models/data-refresher.model';
 import { LocalDataService } from '../../../core/services/local-data.service';
 import { ReviewSessionApiService } from './review-session-api.service';
 import { ReviewStore } from '../store/review.store';
-import { ReviewStatsStore } from '../../../shared/srs/review-stats.store';
+import { ReviewStatsStore } from '../store/review-stats.store';
 import { MAX_SESSION_HISTORY } from '../models/review.model';
 
 @Injectable({ providedIn: 'root' })
@@ -28,11 +28,12 @@ export class SessionRefresher implements DataRefresher {
       collectionId: null as string | null,
       collectionName: null as string | null,
       startedAt: s.startedAt,
-      completedAt: s.completedAt,
+      completedAt: s.completedAt ?? s.startedAt,
       totalCards: s.totalCards,
-      reviewedCards: s.reviewedCards,
       newCards: s.newCards,
       ratings: s.ratings,
+      originalCardIds: Object.keys(s.ratings),
+      reviewedCardIds: Object.keys(s.ratings),
     }));
     await this.localData.setPendingSessions(_userId, []);
     await this.localData.setSessionHistory(_userId, slim);

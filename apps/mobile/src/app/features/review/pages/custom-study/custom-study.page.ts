@@ -3,8 +3,8 @@ import { Router } from '@angular/router';
 import { IonContent, IonHeader, IonIcon, IonToolbar, ModalController, ToastController } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
 import { chevronBackOutline, chevronForwardOutline } from 'ionicons/icons';
-import type { Card } from '@lingua-card/shared/domain';
-import { isDue, isMastered, isNew, isStruggling, lifecycleState } from '../../../../shared/srs/srs-status';
+import type { ScheduledCard } from '@lingua-card/shared/domain';
+import { isDue, isMastered, isNew, isStruggling, lifecycleState } from '../../domain/review-status';
 import { CardStore } from '../../../vault/store/card.store';
 import { CollectionStore } from '../../../vault/store/collection.store';
 import { CollectionPickerSheetComponent } from '../../components/collection-picker-sheet/collection-picker-sheet.component';
@@ -95,7 +95,7 @@ export class CustomStudyPage {
   });
 
   /** Cards that feed the pools — all cards, or only the selected collections'. */
-  private readonly sourceCards = computed<Card[]>(() => {
+  private readonly sourceCards = computed<ScheduledCard[]>(() => {
     const ids = this.selectedCollectionIds();
     const all = this.cardStore.cards();
     if (ids.size === 0) return all;
@@ -128,7 +128,7 @@ export class CustomStudyPage {
     await modal.present();
   }
 
-  private poolCards(pool: Pool, now: Date): Card[] {
+  private poolCards(pool: Pool, now: Date): ScheduledCard[] {
     const cards = this.sourceCards();
     switch (pool) {
       case 'due': return cards.filter(c => isDue(c, now));
@@ -150,9 +150,9 @@ export class CustomStudyPage {
     };
   });
 
-  private readonly matchingCards = computed<Card[]>(() => {
+  private readonly matchingCards = computed<ScheduledCard[]>(() => {
     const now = new Date();
-    const byId = new Map<string, Card>();
+    const byId = new Map<string, ScheduledCard>();
     for (const pool of this.selected()) {
       for (const c of this.poolCards(pool, now)) byId.set(c.id, c);
     }
@@ -168,7 +168,8 @@ export class CustomStudyPage {
 
   togglePool(pool: Pool): void {
     const next = new Set(this.selected());
-    next.has(pool) ? next.delete(pool) : next.add(pool);
+    if (next.has(pool)) next.delete(pool);
+    else next.add(pool);
     this.selected.set(next);
   }
 
@@ -184,15 +185,15 @@ export class CustomStudyPage {
     this.prefs.setDir(dir);
   }
 
-  private orderQueue(cards: Card[]): Card[] {
+  private orderQueue(cards: ScheduledCard[]): ScheduledCard[] {
     const copy = [...cards];
     switch (this.order()) {
       case 'due':
         return copy.sort((a, b) =>
-          (a.srsState?.nextDueAt ?? '9999').localeCompare(b.srsState?.nextDueAt ?? '9999'),
+          (a.reviewState.dueAt ?? '9999').localeCompare(b.reviewState.dueAt ?? '9999'),
         );
       case 'hardest':
-        return copy.sort((a, b) => (b.srsState?.difficulty ?? 0) - (a.srsState?.difficulty ?? 0));
+        return copy.sort((a, b) => b.reviewState.totalAgainCount - a.reviewState.totalAgainCount);
       case 'shuffle':
         for (let i = copy.length - 1; i > 0; i--) {
           const j = Math.floor(Math.random() * (i + 1));
@@ -215,21 +216,12 @@ export class CustomStudyPage {
     }
     const queue = this.orderQueue(this.matchingCards()).slice(0, this.length());
 
-    // Carry collection context when exactly one collection is selected, so the
-    // session (and history) is correctly attributed.
-    const ids = this.selectedCollectionIds();
-    let collectionId: string | null = null;
-    let label = this.translate.instant('review.custom.title');
-    if (ids.size === 1) {
-      const opt = this.collectionOptions().find(c => ids.has(c.id));
-      if (opt) {
-        collectionId = opt.id;
-        label = `${opt.emoji} ${opt.name}`.trim();
-      }
-    }
-
-    this.reviewStore.startSession(queue, collectionId, label);
-    void this.router.navigate([ReviewRoute.PLAYER]);
+    void this.reviewStore.startSession(
+      { kind: 'custom', filters: { cardIds: queue.map(card => card.id) } },
+      queue.length,
+    ).then(result => {
+      if (result.kind === 'started') void this.router.navigate([ReviewRoute.PLAYER]);
+    });
   }
 
   goBack(): void {

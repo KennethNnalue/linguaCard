@@ -2,13 +2,13 @@ import { Injectable, Logger, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { randomUUID } from 'crypto';
+import { createNewReviewScheduling } from '../review/review-scheduling.entity';
 import type {
   CardContent,
   ExampleSentence,
   GenderType,
   RawExtractedWord,
   RawWordInput,
-  SRSStateData,
   WordDictionaryEntry,
 } from '@lingua-card/shared/domain';
 import { CollectionEntity } from '../collections/collection.entity';
@@ -162,26 +162,9 @@ export class CollectionCompleteService {
       dictionaryWordId: entry.id,
     };
 
-    const srsState: SRSStateData = {
-      id: randomUUID(),
-      cardId: '',
-      userId,
-      algorithm: 'fsrs',
-      intervalDays: 1,
-      easeFactor: 2.5,
-      repetitions: 0,
-      lastRating: null,
-      lastReviewedAt: null,
-      nextDueAt: now,
-      masteryLevel: 0,
-      state: 'new',
-      stability: null,
-      difficulty: null,
-      retrievability: null,
-    };
-
+    const cardId = randomUUID();
     const entity = this.cardRepo.create({
-      id: randomUUID(),
+      id: cardId,
       deckId: 'deck-001',
       collectionId,
       userId,
@@ -190,7 +173,7 @@ export class CollectionCompleteService {
       categoryIds: [],
       tags: [],
       version: 1,
-      srsState,
+      scheduling: createNewReviewScheduling(cardId),
     });
 
     await this.cardRepo.save(entity);

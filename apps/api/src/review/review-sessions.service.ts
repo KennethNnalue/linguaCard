@@ -1,21 +1,9 @@
-import { Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import type { ReviewSession } from '@lingua-card/shared/domain';
 import { ReviewSessionEntity } from './review-session.entity';
-
-export interface UpsertSessionDto {
-  id: string;
-  deckId?: string;
-  collectionId?: string | null;
-  collectionName?: string | null;
-  startedAt: string;
-  completedAt: string | null;
-  totalCards: number;
-  reviewedCards: number;
-  newCards?: number;
-  ratings: Record<string, number>;
-}
+import { UpsertReviewSessionDto } from './review-session.dto';
 
 @Injectable()
 export class ReviewSessionsService {
@@ -28,7 +16,13 @@ export class ReviewSessionsService {
    * Upsert a session. Called when the client flushes a completed session.
    * Uses INSERT … ON CONFLICT (id) DO UPDATE so re-syncs are idempotent.
    */
-  async upsert(userId: string, dto: UpsertSessionDto): Promise<ReviewSession> {
+  async upsert(userId: string, dto: UpsertReviewSessionDto): Promise<ReviewSession> {
+    if (dto.reviewedCards > dto.totalCards || (dto.newCards ?? 0) > dto.totalCards) {
+      throw new BadRequestException('Review session counters are inconsistent');
+    }
+    if (!Object.values(dto.ratings).every(isReviewRating)) {
+      throw new BadRequestException('Review session contains an invalid rating');
+    }
     await this.repo
       .createQueryBuilder()
       .insert()
@@ -44,7 +38,7 @@ export class ReviewSessionsService {
         totalCards: dto.totalCards,
         reviewedCards: dto.reviewedCards,
         newCards: dto.newCards ?? 0,
-        ratings: dto.ratings as Record<string, import('@lingua-card/shared/domain').ConfidenceRating>,
+        ratings: dto.ratings,
       })
       .orUpdate(
         ['completedAt', 'totalCards', 'reviewedCards', 'newCards', 'ratings'],
@@ -57,7 +51,7 @@ export class ReviewSessionsService {
   }
 
   /** Batch upsert — used when the offline sync queue flushes multiple sessions. */
-  async upsertBatch(userId: string, sessions: UpsertSessionDto[]): Promise<{ upserted: number }> {
+  async upsertBatch(userId: string, sessions: UpsertReviewSessionDto[]): Promise<{ upserted: number }> {
     for (const s of sessions) {
       await this.upsert(userId, s);
     }
@@ -87,4 +81,8 @@ export class ReviewSessionsService {
       ratings: e.ratings,
     };
   }
+}
+
+function isReviewRating(value: unknown): boolean {
+  return value === 'again' || value === 'hard' || value === 'good' || value === 'easy';
 }

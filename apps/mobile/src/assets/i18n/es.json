@@ -733,6 +733,7 @@
       "audioChip": "🔊 Audio",
       "cardOf": "Tarjeta {{n}} de {{total}}",
       "checkAnswer": "Comprobar respuesta",
+      "dontKnow": "No lo sé",
       "examplesHeader": "Frases de ejemplo",
       "listenAndRecall": "Escucha y recuerda",
       "ratingLocked": "La valoración se desbloquea al revelar",
@@ -886,6 +887,9 @@
       "resetToast": "{{word}} reiniciada — como nueva",
       "rest": "Descansar",
       "restToast": "Descansando {{word}} durante una semana",
+      "resetConfirmTitle": "¿Reiniciar esta tarjeta?",
+      "resetConfirmMessage": "El progreso vuelve a Nuevo. El historial de repasos se conserva.",
+      "commandFailed": "No se pudo actualizar la tarjeta. Inténtalo de nuevo.",
       "title": "Palabras difíciles"
     },
     "mode": {

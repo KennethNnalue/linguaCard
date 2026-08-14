@@ -2,12 +2,13 @@ import { computed, inject } from '@angular/core';
 import { patchState, signalStore, withComputed, withHooks, withMethods, withState } from '@ngrx/signals';
 import {
   AudioSegment,
-  Card,
   PlaybackScript,
   PlayerSettings,
   PlayMode,
+  ScheduledCard,
 } from '@lingua-card/shared/domain';
 import { CardStore } from '../../vault/store/card.store';
+import { isStruggling } from '../../review/domain/review-status';
 import { ScriptCompilerService } from '../services/script-compiler.service';
 import { ListenPlaybackEngine, PlaybackHost } from '../services/listen-playback.engine';
 import {
@@ -21,7 +22,6 @@ import {
   MIN_ESTIMATED_MINUTES,
   MINUTES_PER_CARD,
   SessionSnapshot,
-  STRUGGLING_MASTERY_THRESHOLD,
 } from '../models/listen.models';
 
 function loadSettings(): PlayerSettings {
@@ -73,7 +73,7 @@ export const ListenStore = signalStore(
     const cardStore = inject(CardStore);
 
     return {
-      currentCard: computed<Card | null>(() => queue()[cardIndex()] ?? null),
+      currentCard: computed<ScheduledCard | null>(() => queue()[cardIndex()] ?? null),
       currentScript: computed<PlaybackScript | null>(() => scripts()[cardIndex()] ?? null),
       currentSegment: computed<AudioSegment | null>(() => {
         const script = scripts()[cardIndex()];
@@ -98,7 +98,7 @@ export const ListenStore = signalStore(
       dueCount: computed(() => cardStore.dueCards().length),
       allCount: computed(() => cardStore.cards().length),
       strugglingCount: computed(() =>
-        cardStore.cards().filter(c => (c.srsState?.masteryLevel ?? 5) <= STRUGGLING_MASTERY_THRESHOLD).length
+        cardStore.cards().filter(isStruggling).length
       ),
       collectionCounts: computed(() => {
         const all = cardStore.cards();
@@ -127,7 +127,7 @@ export const ListenStore = signalStore(
       } catch { /* non-fatal */ }
     }
 
-    function compileQueue(cards: Card[], mode: PlayMode): PlaybackScript[] {
+    function compileQueue(cards: ScheduledCard[], mode: PlayMode): PlaybackScript[] {
       return cards.map(c => compiler.compile(c, mode));
     }
 
@@ -164,7 +164,7 @@ export const ListenStore = signalStore(
         engine.stopAudio();
       },
 
-      loadQueue(cards: Card[], label: string): void {
+      loadQueue(cards: ScheduledCard[], label: string): void {
         engine.abortPlayback();
         const mode = store.settings().playMode;
         const queue = store.settings().shuffle ? shuffleArray(cards) : [...cards];
@@ -206,9 +206,7 @@ export const ListenStore = signalStore(
 
       loadStrugglingCards(): void {
         patchState(store, { selectedSource: ListenSource.Struggling });
-        const cards = cardStore.cards().filter(c =>
-          (c.srsState?.masteryLevel ?? 5) <= STRUGGLING_MASTERY_THRESHOLD
-        );
+        const cards = cardStore.cards().filter(isStruggling);
         this.loadQueue(cards, ListenSourceLabel.Struggling);
       },
 
@@ -351,11 +349,12 @@ export const ListenStore = signalStore(
     onInit(store) {
       const saved = loadSettings();
       patchState(store, { settings: saved });
+      store.initRunner();
 
       const session = loadSession();
       if (session?.queue?.length) {
         const mode = saved.playMode;
-        const scripts = session.queue.map((c: Card) =>
+        const scripts = session.queue.map((c) =>
           inject(ScriptCompilerService).compile(c, mode)
         );
         patchState(store, {
@@ -370,8 +369,6 @@ export const ListenStore = signalStore(
       } else {
         store.loadDueCards();
       }
-
-      store.initRunner();
     },
   }),
 );

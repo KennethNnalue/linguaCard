@@ -3,11 +3,13 @@ import {IonIcon} from '@ionic/angular/standalone';
 import {TranslateService} from '@ngx-translate/core';
 import {addIcons} from 'ionicons';
 import {volumeHighOutline} from 'ionicons/icons';
-import {Card} from '@lingua-card/shared/domain';
+import {ScheduledCard} from '@lingua-card/shared/domain';
 import {LanguageService} from '../../../core/services/language.service';
 import {ArticleBadgeComponent} from '../../components/article-badge/article-badge.component';
 import {MasteryDotComponent} from '../../components/mastery-dot/mastery-dot.component';
 import type {AudioReadinessStatus} from '../../audio/audio-readiness.store';
+import { isDue, stageIndicator } from '../../../features/review/domain/review-status';
+import { MASTERY_LABEL_KEYS } from '../../../features/review/models/review.model';
 
 @Component({
   selector: 'lc-word-card',
@@ -17,7 +19,7 @@ import type {AudioReadinessStatus} from '../../audio/audio-readiness.store';
   imports: [ArticleBadgeComponent, MasteryDotComponent, IonIcon],
 })
 export class WordCardComponent {
-  readonly card = input.required<Card>();
+  readonly card = input.required<ScheduledCard>();
   readonly categoryName = input<string>('');
   readonly compact = input<boolean>(false);
   readonly audioStatus = input<AudioReadinessStatus | 'unknown'>('unknown');
@@ -31,7 +33,7 @@ export class WordCardComponent {
     addIcons({volumeHighOutline});
   }
 
-  readonly masteryLevel = computed(() => this.card().srsState?.masteryLevel ?? 0);
+  readonly masteryLevel = computed(() => stageIndicator(this.card().reviewState.stage));
 
   readonly masteryColor = computed(() =>
     ['#D1D5DB', '#FCA5A5', '#FCD34D', '#6EE7B7', '#34D399', '#059669'][this.masteryLevel()]
@@ -39,20 +41,16 @@ export class WordCardComponent {
 
   readonly masteryLabel = computed(() => {
     this.languageService.current(); // recompute on UI language change
-    const state = this.card().srsState?.state;
-    if (!state || state === 'new') return this.translate.instant('srs.masteryLabel.new');
-    const key = {learning: 'srs.masteryLabel.learning', review: 'srs.masteryLabel.review', relearning: 'srs.masteryLabel.review', mastered: 'srs.masteryLabel.mastered'}[state];
-    return key ? this.translate.instant(key) : this.translate.instant('srs.masteryLabel.new');
+    return this.translate.instant(MASTERY_LABEL_KEYS[this.card().reviewState.stage]);
   });
 
   readonly isDue = computed(() => {
-    const next = this.card().srsState?.nextDueAt;
-    return !next || new Date(next).getTime() <= Date.now();
+    return isDue(this.card(), new Date());
   });
 
   readonly intervalText = computed(() => {
-    const days = this.card().srsState?.intervalDays ?? 0;
-    return days > 0 ? `${days}d interval` : '';
+    const minutes = this.card().reviewState.intervalMinutes ?? 0;
+    return minutes > 0 ? `${Math.round(minutes / 1_440)}d interval` : '';
   });
 
   readonly firstExample = computed(() => this.card().content.examples?.[0] ?? null);

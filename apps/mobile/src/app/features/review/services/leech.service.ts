@@ -1,14 +1,14 @@
 import { computed, inject, Injectable } from '@angular/core';
-import type { Card } from '@lingua-card/shared/domain';
+import type { ScheduledCard } from '@lingua-card/shared/domain';
 import { CardStore } from '../../vault/store/card.store';
-import { FsrsService } from '../../../shared/srs/fsrs.service';
-import { isLeech } from '../../../shared/srs/srs-status';
+import { isLeech } from '../domain/review-status';
 import { ReviewStore } from '../store/review.store';
-import { LocalReviewSession, MASTERY_THRESHOLD, MS_PER_DAY } from '../models/review.model';
+import { ReviewSessionHistoryEntry } from '../models/review.model';
+import { CardAdministrationService } from './card-administration.service';
 
 /** A leech card enriched with a fail history derived from local sessions. */
 export interface LeechEntry {
-  card: Card;
+  card: ScheduledCard;
   /** Failures (rating < Good) across all retained sessions. */
   failCount: number;
   /** Times this card was rated across all retained sessions. */
@@ -17,24 +17,11 @@ export interface LeechEntry {
   lastSeenAt: string | null;
 }
 
-/** How long "Rest" snoozes a card before it becomes due again. */
-const REST_SNOOZE_DAYS = 7;
-
-/**
- * Leech detection + management. `isLeech` (srsState-only) decides membership;
- * this service enriches each leech with an actual fail-count from
- * `ReviewStore.sessionHistory()` (the data model has no per-card lapse counter).
- *
- * Reset/Rest are optimistic + locally durable via `CardStore.updateCard`
- * (IndexedDB). A server-authoritative reset/suspend endpoint does not exist yet,
- * so a future server `loadCards()` can overwrite these — durable server reset is
- * a backend follow-up.
- */
 @Injectable({ providedIn: 'root' })
 export class LeechService {
   private readonly cardStore = inject(CardStore);
   private readonly reviewStore = inject(ReviewStore);
-  private readonly fsrs = inject(FsrsService);
+  private readonly administration = inject(CardAdministrationService);
 
   readonly leeches = computed<LeechEntry[]>(() => {
     const sessions = this.reviewStore.sessionHistory();
@@ -48,25 +35,19 @@ export class LeechService {
   readonly leechCount = computed(() => this.cardStore.cards().filter(isLeech).length);
 
   /** Card list for a "Break through all" session (strongest leeches first). */
-  breakthroughQueue(): Card[] {
+  breakthroughQueue(): ScheduledCard[] {
     return this.leeches().map(l => l.card);
   }
 
-  /** Reset progress: card returns to the "new" pool. */
-  reset(card: Card): void {
-    const fresh = this.fsrs.freshState(card.id, card.userId);
-    this.cardStore.updateCard({ ...card, srsState: fresh });
+  async reset(card: ScheduledCard): Promise<void> {
+    await this.administration.resetProgress(card);
   }
 
-  /** Snooze: push the next due date out so the card rests for a while. */
-  rest(card: Card): void {
-    const s = card.srsState;
-    if (!s) return;
-    const nextDueAt = new Date(Date.now() + REST_SNOOZE_DAYS * MS_PER_DAY).toISOString();
-    this.cardStore.updateCard({ ...card, srsState: { ...s, nextDueAt } });
+  async rest(card: ScheduledCard): Promise<void> {
+    await this.administration.scheduleLeechRest(card);
   }
 
-  private enrich(card: Card, sessions: LocalReviewSession[]): LeechEntry {
+  private enrich(card: ScheduledCard, sessions: ReviewSessionHistoryEntry[]): LeechEntry {
     let failCount = 0;
     let seenCount = 0;
     let lastSeenAt: string | null = null;
@@ -74,7 +55,7 @@ export class LeechService {
       const rating = s.ratings[card.id];
       if (rating === undefined) continue;
       seenCount++;
-      if (rating < MASTERY_THRESHOLD) failCount++;
+      if (rating === 'again' || rating === 'hard') failCount++;
       if (s.completedAt && (!lastSeenAt || s.completedAt > lastSeenAt)) {
         lastSeenAt = s.completedAt;
       }

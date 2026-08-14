@@ -1,5 +1,5 @@
 import { Component, ChangeDetectionStrategy, input } from '@angular/core';
-import { MasteryLevel } from '../../../core/models/mock-data';
+type MasteryIndicator = 0 | 1 | 2 | 3 | 4 | 5;
 
 @Component({
   selector: 'lc-mastery-dot',
@@ -9,5 +9,5 @@ import { MasteryLevel } from '../../../core/models/mock-data';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class MasteryDotComponent {
-  level = input<MasteryLevel>(0);
+  level = input<MasteryIndicator>(0);
 }

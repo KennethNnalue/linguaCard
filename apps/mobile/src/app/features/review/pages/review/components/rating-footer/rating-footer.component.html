@@ -3,13 +3,15 @@
     <ion-icon name="chevron-back-outline"></ion-icon>
     {{ 'review.session.previousBtn' | translate }}
   </button>
-  <button class="rf-sec-btn" (click)="skip.emit()">
-    {{ 'review.session.skipBtn' | translate }}
+  <button class="rf-sec-btn" (click)="readOnly() ? returnToCurrent.emit() : skip.emit()">
+    {{ (readOnly() ? 'review.session.returnToCurrentBtn' : 'review.session.skipBtn') | translate }}
     <ion-icon name="chevron-forward-outline"></ion-icon>
   </button>
 </div>
 
-@if (flipped()) {
+@if (readOnly()) {
+  <div class="rf-locked">{{ 'review.session.previousReadOnly' | translate }}</div>
+} @else if (flipped()) {
   <p class="rf-prompt">{{ 'review.session.ratingPrompt' | translate }}</p>
   <div class="rf-row">
     @for (r of options(); track r.value) {

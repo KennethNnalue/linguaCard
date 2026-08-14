@@ -13,10 +13,11 @@ import { TranslatePipe } from '@ngx-translate/core';
 })
 export class FrontTypeComponent {
   readonly prompt = input.required<string>();
+  readonly expectsGermanAnswer = input.required<boolean>();
   readonly typed = model<string>('');
   readonly check = output<void>();
+  readonly dontKnow = output<void>();
 
-  /** German accent keys — the #1 typing friction point. */
   readonly accents = ['ä', 'ö', 'ü', 'ß'];
 
   constructor() {

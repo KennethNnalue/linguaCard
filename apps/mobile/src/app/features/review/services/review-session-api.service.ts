@@ -1,7 +1,7 @@
 import { inject, Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
-import type { ReviewSession } from '@lingua-card/shared/domain';
+import type { ReviewRating, ReviewSession } from '@lingua-card/shared/domain';
 import { environment } from '../../../../environments/environment';
 
 export interface UpsertSessionDto {
@@ -14,7 +14,7 @@ export interface UpsertSessionDto {
   totalCards: number;
   reviewedCards: number;
   newCards: number;
-  ratings: Record<string, number>;
+  ratings: Record<string, ReviewRating>;
 }
 
 @Injectable({ providedIn: 'root' })
@@ -27,7 +27,7 @@ export class ReviewSessionApiService {
   }
 
   upsertBatch(sessions: UpsertSessionDto[]): Observable<{ upserted: number }> {
-    return this.http.post<{ upserted: number }>(`${this.apiUrl}/batch`, sessions);
+    return this.http.post<{ upserted: number }>(`${this.apiUrl}/batch`, { sessions });
   }
 
   findRecent(limit = 50): Observable<ReviewSession[]> {

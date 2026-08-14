@@ -7,8 +7,8 @@ import {CardStore} from '../../store/card.store';
 import {CollectionStore} from '../../store/collection.store';
 import {PlatformCollectionStore} from '../../store/platform-collection.store';
 import {SyncService} from '../../../../core/services/sync.service';
-import {ReviewStatsStore} from '../../../../shared/srs/review-stats.store';
-import {isDue, isMastered, isNew} from '../../../../shared/srs/srs-status';
+import {ReviewStatsStore} from '../../../review/store/review-stats.store';
+import {isDue, isMastered, isNew, stageIndicator} from '../../../review/domain/review-status';
 import {AddWordSheetComponent} from '../../components/add-word-sheet/add-word-sheet.component';
 import {AssignCollectionSheetComponent} from '../../components/assign-collection-sheet/assign-collection-sheet.component';
 import {WordRowComponent} from '../../components/word-row/word-row.component';
@@ -177,7 +177,7 @@ export class VaultPage implements OnInit, OnDestroy {
     const cards = this.cardStore.cards();
     const total = cards.length || 1;
     const buckets = [0, 0, 0, 0, 0, 0];
-    for (const c of cards) buckets[c.srsState?.masteryLevel ?? 0]++;
+    for (const c of cards) buckets[stageIndicator(c.reviewState.stage)]++;
     return buckets.map((n, level) => ({
       level,
       width: (n / total) * 100,
@@ -189,7 +189,7 @@ export class VaultPage implements OnInit, OnDestroy {
   readonly masteryPct = computed(() => {
     const cards = this.cardStore.cards();
     if (cards.length === 0) return 0;
-    const weighted = cards.reduce((sum, c) => sum + (c.srsState?.masteryLevel ?? 0), 0);
+    const weighted = cards.reduce((sum, c) => sum + stageIndicator(c.reviewState.stage), 0);
     return Math.round((weighted / (cards.length * 5)) * 100);
   });
 
@@ -278,18 +278,9 @@ export class VaultPage implements OnInit, OnDestroy {
   // ─── Entry points ─────────────────────────────────────────────────────────────
   startReview(): void {
     const dailyGoal = this.settingsStore.dailyGoal();
-    const queue = this.filterService.buildQueue({
-      source: ReviewSource.ALL,
-      masteryLevels: [0, 1, 2, 3, 4, 5],
-      sortOrder: ReviewSortOrder.DUE_DATE,
-      limit: dailyGoal,
+    void this.reviewStore.startSession({ kind: 'daily' }, dailyGoal).then(result => {
+      if (result.kind === 'started') void this.router.navigate([ReviewRoute.PLAYER]);
     });
-    if (!queue.length) {
-      void this.router.navigate([ReviewRoute.HUB]);
-      return;
-    }
-    this.reviewStore.startSession(queue, null, null);
-    void this.router.navigate([ReviewRoute.PLAYER]);
   }
 
   startListen(): void {
@@ -408,4 +399,3 @@ export class VaultPage implements OnInit, OnDestroy {
     return 'none';
   }
 }
-

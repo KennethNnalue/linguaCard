@@ -1,12 +1,12 @@
 import { Injectable } from '@nestjs/common';
 import type { StreakStatus, GoalProgress } from '@lingua-card/shared/domain';
-import { ReviewSessionsService } from '../review/review-sessions.service';
 import { UserSettingsService } from '../settings/user-settings.service';
+import { ReviewProgressRepository } from './review-progress.repository';
 
 @Injectable()
 export class StatsService {
   constructor(
-    private readonly sessions: ReviewSessionsService,
+    private readonly reviewProgress: ReviewProgressRepository,
     private readonly settings: UserSettingsService,
   ) {}
 
@@ -28,16 +28,8 @@ export class StatsService {
   }
 
   private async dailyCardCounts(userId: string, timezone: string): Promise<Map<string, number>> {
-    const allSessions = await this.sessions.findRecent(userId, 500);
-    const byDay = new Map<string, Set<string>>();
-    for (const s of allSessions) {
-      if (!s.completedAt) continue;
-      const key = this.localDayKey(s.completedAt, timezone);
-      const set = byDay.get(key) ?? new Set<string>();
-      for (const cardId of Object.keys(s.ratings ?? {})) set.add(cardId);
-      byDay.set(key, set);
-    }
-    return new Map([...byDay].map(([k, set]) => [k, set.size]));
+    const progress = await this.reviewProgress.dailyProgress(userId, timezone);
+    return new Map(progress.map(day => [day.dayKey, day.uniqueCardsReviewed]));
   }
 
   async computeStreak(userId: string): Promise<StreakStatus> {

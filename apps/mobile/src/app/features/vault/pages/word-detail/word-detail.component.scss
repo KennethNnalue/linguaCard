@@ -395,25 +395,6 @@
   border-top: 1px solid var(--lc-border);
 }
 
-.btn-rate {
-  flex: 1;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: t.$lc-space-2;
-  background: var(--lc-brand);
-  color: var(--lc-text-inverse);
-  border: none;
-  border-radius: t.$lc-radius-md + 2px;
-  padding: t.$lc-space-3 + 1px;
-  font-family: t.$lc-font-body;
-  @include u.lc-font('md', t.$lc-font-weight-bold);
-  cursor: pointer;
-  @include u.touch-state;
-
-  ion-icon { font-size: 15px; }
-}
-
 .btn-icon {
   @include u.square(48px);
   @include u.flex-center;

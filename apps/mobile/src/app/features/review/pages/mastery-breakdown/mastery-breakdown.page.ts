@@ -4,15 +4,16 @@ import { IonContent, IonHeader, IonIcon, IonToolbar } from '@ionic/angular/stand
 import { addIcons } from 'ionicons';
 import { chevronBackOutline, warningOutline } from 'ionicons/icons';
 import { TranslatePipe } from '@ngx-translate/core';
-import { isMastered, lifecycleState, type CardLifecycleState } from '../../../../shared/srs/srs-status';
+import type { LearningStage } from '@lingua-card/shared/domain';
+import { isMastered, lifecycleState } from '../../domain/review-status';
 import { CardStore } from '../../../vault/store/card.store';
 import { CollectionStore } from '../../../vault/store/collection.store';
 import { ReviewStore } from '../../store/review.store';
 import { ReviewFilterService } from '../../services/review-filter.service';
-import { ReviewLimit, ReviewRoute, ReviewSortOrder, ReviewSource } from '../../models/review.model';
+import { ReviewLimit, ReviewRoute } from '../../models/review.model';
 
 interface LifecycleBucket {
-  state: CardLifecycleState;
+  state: LearningStage;
   labelKey: string;
   subKey: string;
   colour: string;
@@ -30,10 +31,11 @@ interface CollectionMastery {
 
 // Lifecycle bucket colours (warm redesign palette). Fixed hex — used as inline
 // style/SVG fills where SCSS tokens cannot reach.
-const LIFECYCLE: { state: CardLifecycleState; labelKey: string; subKey: string; colour: string }[] = [
+const LIFECYCLE: { state: LearningStage; labelKey: string; subKey: string; colour: string }[] = [
   { state: 'new', labelKey: 'review.mastery.bucketNew', subKey: 'review.mastery.bucketNewSub', colour: '#B0A593' },
   { state: 'learning', labelKey: 'review.mastery.bucketLearning', subKey: 'review.mastery.bucketLearningSub', colour: '#C99A3E' },
-  { state: 'review', labelKey: 'review.mastery.bucketFamiliar', subKey: 'review.mastery.bucketFamiliarSub', colour: '#5E9E7C' },
+  { state: 'familiar', labelKey: 'review.mastery.bucketFamiliar', subKey: 'review.mastery.bucketFamiliarSub', colour: '#D8B981' },
+  { state: 'strong', labelKey: 'review.mastery.bucketFamiliar', subKey: 'review.mastery.bucketFamiliarSub', colour: '#5E9E7C' },
   { state: 'mastered', labelKey: 'review.mastery.bucketMastered', subKey: 'review.mastery.bucketMasteredSub', colour: '#2E6B52' },
 ];
 
@@ -72,7 +74,7 @@ export class MasteryBreakdownPage {
   readonly buckets = computed<LifecycleBucket[]>(() => {
     const cards = this.cardStore.cards();
     const total = cards.length || 1;
-    const counts: Record<CardLifecycleState, number> = { new: 0, learning: 0, review: 0, mastered: 0 };
+    const counts: Record<LearningStage, number> = { new: 0, learning: 0, familiar: 0, strong: 0, mastered: 0 };
     for (const c of cards) counts[lifecycleState(c)]++;
     return LIFECYCLE.map(l => ({
       ...l,
@@ -102,15 +104,9 @@ export class MasteryBreakdownPage {
   });
 
   drillStruggling(): void {
-    const queue = this.filterService.buildQueue({
-      source: ReviewSource.ALL,
-      masteryLevels: [1, 2],
-      sortOrder: ReviewSortOrder.MOST_LAPSES,
-      limit: ReviewLimit.STRUGGLING,
+    void this.reviewStore.startSession({ kind: 'struggling' }, ReviewLimit.STRUGGLING).then(result => {
+      if (result.kind === 'started') void this.router.navigate([ReviewRoute.PLAYER]);
     });
-    if (!queue.length) return;
-    this.reviewStore.startSession(queue, null, 'Struggling cards');
-    void this.router.navigate([ReviewRoute.PLAYER]);
   }
 
   goBack(): void {

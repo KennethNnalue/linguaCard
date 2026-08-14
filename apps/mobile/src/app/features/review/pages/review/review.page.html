@@ -8,7 +8,7 @@
         @if (activeCategoryNames()) {
           <span class="rv-nav-cat">{{ activeCategoryNames() }}</span>
         }
-        <span class="rv-nav-count">{{ 'review.session.cardOf' | translate:{ n: currentIndex() + 1, total: queue().length } }}</span>
+        <span class="rv-nav-count">{{ 'review.session.cardOf' | translate:{ n: currentPosition(), total: reviewStore.totalOriginalCount() } }}</span>
       </div>
       <span class="rv-nav-remaining">{{ remaining() }}↑</span>
     </div>
@@ -20,25 +20,19 @@
 </ion-header>
 
 <ion-content>
-  @if (queue().length) {
+  @if (reviewStore.presentation()) {
     @if (currentCard(); as card) {
       <div class="rv-scene">
         @if (!isFlipped()) {
           @switch (mode()) {
-            @case ('type') {
+            @case ('typing') {
               <lc-rv-front-type
-                [prompt]="card.content.front"
+                [prompt]="flipPrompt()"
+                [expectsGermanAnswer]="expectsGermanAnswer()"
                 [typed]="typed()"
                 (typedChange)="typed.set($event)"
-                (check)="checkTyped()" />
-            }
-            @case ('audio') {
-              <lc-rv-front-listen
-                [isLoading]="isPronunciationLoading()"
-                (play)="playAudio()"
-                (replay)="playAudio()"
-                (slow)="playSlow()"
-                (reveal)="reveal()" />
+                (check)="checkTyped()"
+                (dontKnow)="dontKnow()" />
             }
             @default {
               <lc-rv-front-flip [prompt]="flipPrompt()" [cue]="flipCue()" [hint]="flipHint()" (reveal)="reveal()" />
@@ -47,7 +41,7 @@
         } @else {
           <lc-rv-card-back
             [card]="card"
-            [typedResult]="typedResult()"
+            [typedResult]="typedResult()?.feedback ?? null"
             [expandedSynonym]="expandedSynonym()"
             [isPronunciationLoading]="isPronunciationLoading()"
             (toggleSynonym)="toggleSynonym($event)"
@@ -66,15 +60,17 @@
   }
 </ion-content>
 
-@if (queue().length) {
+@if (reviewStore.presentation()) {
   <div class="rv-footer">
     <lc-rv-rating-footer
       [options]="ratingOptionsWithPreviews()"
       [flipped]="isFlipped()"
       [suggested]="suggestedRating()"
-      [canGoPrevious]="currentIndex() > 0"
+      [canGoPrevious]="reviewStore.lastReviewedCardId() !== null && !isViewingPrevious()"
+      [readOnly]="isViewingPrevious()"
       (rate)="submitRating($event)"
-      (previous)="goToPrevious()"
+      (previous)="showPrevious()"
+      (returnToCurrent)="returnToCurrent()"
       (skip)="skipCard()" />
   </div>
 }

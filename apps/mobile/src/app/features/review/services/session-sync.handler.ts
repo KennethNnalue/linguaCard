@@ -13,13 +13,23 @@ export class SessionSyncHandler implements SyncHandler {
   private readonly sessionApi = inject(ReviewSessionApiService);
 
   async execute(payload: unknown): Promise<void> {
-    const { userId } = payload as { userId: string };
-    if (!userId) return;
+    if (!isUserPayload(payload)) return;
+    const { userId } = payload;
 
     const pending = await this.localData.getPendingSessions(userId);
     if (pending.length === 0) return;
 
     await firstValueFrom(this.sessionApi.upsertBatch(pending));
-    await this.localData.setPendingSessions(userId, []);
+    const sentIds = new Set(pending.map(session => session.id));
+    const current = await this.localData.getPendingSessions(userId);
+    await this.localData.setPendingSessions(
+      userId,
+      current.filter(session => !sentIds.has(session.id)),
+    );
   }
+}
+
+function isUserPayload(payload: unknown): payload is { userId: string } {
+  return typeof payload === 'object' && payload !== null
+    && 'userId' in payload && typeof payload.userId === 'string';
 }

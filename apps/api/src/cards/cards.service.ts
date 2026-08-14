@@ -2,20 +2,13 @@ import { Injectable, Logger, NotFoundException, Optional } from '@nestjs/common'
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { randomUUID } from 'crypto';
-import type { Card, CardContent, ConfidenceRating, GenderType, SRSStateData } from '@lingua-card/shared/domain';
+import type { CardContent, GenderType, ScheduledCard } from '@lingua-card/shared/domain';
 import type { CreateCardDto, UpdateCardDto, CardQueryParams } from '@lingua-card/shared/dto';
-import { computeFSRS, freshFsrsState } from '@lingua-card/shared/utils';
 import { CardEntity } from './card.entity';
 import { WordAudioService } from '../word-audio/word-audio.service';
 import { SubscriptionService } from '../subscriptions/subscription.service';
 import { ShareSyncService } from '../shares/share-sync.service';
-
-export interface PendingSrsRating {
-  cardId: string;
-  rating: number;
-  reviewedAt: string;
-  sessionId: string;
-}
+import { createNewReviewScheduling } from '../review/review-scheduling.entity';
 
 @Injectable()
 export class CardsService {
@@ -29,25 +22,27 @@ export class CardsService {
     @Optional() private readonly syncService?: ShareSyncService,
   ) {}
 
-  async findAll(userId: string, query: CardQueryParams): Promise<Card[]> {
+  async findAll(userId: string, query: CardQueryParams): Promise<ScheduledCard[]> {
     const qb = this.repo.createQueryBuilder('card')
+      .innerJoinAndSelect('card.scheduling', 'scheduling')
       .where('card.userId = :userId', { userId });
     if (query.collectionId) qb.andWhere('card.collectionId = :collectionId', { collectionId: query.collectionId });
     if (query.categoryId)   qb.andWhere(':categoryId = ANY(card.categoryIds)', { categoryId: query.categoryId });
-    if (query.state)        qb.andWhere("card.srsState->>'state' = :state", { state: query.state });
+    if (query.state)        qb.andWhere("scheduling.state->>'stage' = :state", { state: query.state });
     return (await qb.getMany()).map(this.toModel);
   }
 
-  async findOne(userId: string, id: string): Promise<Card> {
+  async findOne(userId: string, id: string): Promise<ScheduledCard> {
     const entity = await this.repo.findOneBy({ id, userId });
     if (!entity) throw new NotFoundException(`Card ${id} not found`);
     return this.toModel(entity);
   }
 
-  async create(userId: string, dto: CreateCardDto): Promise<Card> {
+  async create(userId: string, dto: CreateCardDto): Promise<ScheduledCard> {
     const now = new Date().toISOString();
+    const cardId = randomUUID();
     const entity = this.repo.create({
-      id: randomUUID(),
+      id: cardId,
       deckId: dto.deckId,
       collectionId: dto.collectionId ?? null,
       dictionaryWordId: dto.content.dictionaryWordId ?? null,
@@ -74,23 +69,7 @@ export class CardsService {
       categoryIds: dto.categoryIds ?? [],
       tags: dto.tags ?? [],
       version: 1,
-      srsState: {
-        id: randomUUID(),
-        cardId: '',
-        userId,
-        algorithm: 'fsrs',
-        intervalDays: 1,
-        easeFactor: 2.5,
-        repetitions: 0,
-        lastRating: null,
-        lastReviewedAt: null,
-        nextDueAt: now,
-        masteryLevel: 0,
-        state: 'new',
-        stability: null,
-        difficulty: null,
-        retrievability: null,
-      } satisfies SRSStateData,
+      scheduling: createNewReviewScheduling(cardId),
     });
     const saved = await this.repo.save(entity);
 
@@ -114,14 +93,13 @@ export class CardsService {
     return this.toModel(saved);
   }
 
-  async update(userId: string, id: string, dto: UpdateCardDto): Promise<Card> {
+  async update(userId: string, id: string, dto: UpdateCardDto): Promise<ScheduledCard> {
     const entity = await this.repo.findOneBy({ id, userId });
     if (!entity) throw new NotFoundException(`Card ${id} not found`);
     if (dto.content)      entity.content    = { ...entity.content, ...dto.content } as CardContent;
     if (dto.categoryIds)  entity.categoryIds = dto.categoryIds;
     if (dto.tags)         entity.tags        = dto.tags;
     if (dto.collectionId !== undefined) entity.collectionId = dto.collectionId ?? null;
-    if (dto.srsState !== undefined) entity.srsState = dto.srsState as unknown as SRSStateData;
     const saved = await this.repo.save(entity);
 
     void this.syncService?.onCardUpdated(saved).catch(err =>
@@ -148,50 +126,7 @@ export class CardsService {
     return { deleted: result.affected ?? 0 };
   }
 
-  async batchRateSrs(userId: string, ratings: PendingSrsRating[]): Promise<{ updated: number }> {
-    const cardIds = ratings.map(r => r.cardId);
-    const entities = await this.repo
-      .createQueryBuilder('card')
-      .where('card.userId = :userId', { userId })
-      .andWhere('card.id IN (:...cardIds)', { cardIds })
-      .getMany();
-
-    const entityMap = new Map(entities.map(e => [e.id, e]));
-
-    // Apply in chronological order so a batch carrying several reviews of the
-    // same card replays them as they happened.
-    const ordered = [...ratings].sort((a, b) => a.reviewedAt.localeCompare(b.reviewedAt));
-
-    for (const rating of ordered) {
-      const entity = entityMap.get(rating.cardId);
-      if (!entity) continue;
-      if (rating.rating < 1 || rating.rating > 4) {
-        this.logger.warn(`batchRateSrs: skipping card ${rating.cardId} — invalid rating ${rating.rating}`);
-        continue;
-      }
-
-      // Last-write-wins by review time: ignore a rating that is not newer than
-      // the card's last recorded review. This stops a stale offline rating
-      // (flushed late) from clobbering a newer review made on another device,
-      // and makes re-flushed ratings idempotent.
-      const lastReviewedAt = entity.srsState?.lastReviewedAt;
-      if (lastReviewedAt && rating.reviewedAt <= lastReviewedAt) {
-        this.logger.debug(
-          `batchRateSrs: skipping stale rating for card ${rating.cardId} ` +
-          `(reviewedAt ${rating.reviewedAt} <= last ${lastReviewedAt})`,
-        );
-        continue;
-      }
-
-      const existing = entity.srsState ?? freshFsrsState(entity.id, userId, randomUUID);
-      entity.srsState = computeFSRS(existing, rating.rating as ConfidenceRating, new Date(rating.reviewedAt));
-    }
-
-    await this.repo.save([...entityMap.values()]);
-    return { updated: entities.length };
-  }
-
-  private toModel(e: CardEntity): Card {
+  private toModel(e: CardEntity): ScheduledCard {
     return {
       id: e.id,
       deckId: e.deckId,
@@ -202,7 +137,7 @@ export class CardsService {
       categoryIds: e.categoryIds,
       tags: e.tags,
       version: e.version,
-      srsState: e.srsState ?? undefined,
+      reviewState: e.scheduling.state,
       createdAt: e.createdAt instanceof Date ? e.createdAt.toISOString() : e.createdAt,
       updatedAt: e.updatedAt instanceof Date ? e.updatedAt.toISOString() : e.updatedAt,
     };

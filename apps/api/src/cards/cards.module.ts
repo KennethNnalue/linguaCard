@@ -7,10 +7,11 @@ import { WordDedupService } from './word-dedup.service';
 import { WordAudioModule } from '../word-audio/word-audio.module';
 import { SubscriptionsModule } from '../subscriptions/subscriptions.module';
 import { SharesModule } from '../shares/shares.module';
+import { ReviewSchedulingEntity } from '../review/review-scheduling.entity';
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([CardEntity]),
+    TypeOrmModule.forFeature([CardEntity, ReviewSchedulingEntity]),
     WordAudioModule,
     SubscriptionsModule,
     forwardRef(() => SharesModule),

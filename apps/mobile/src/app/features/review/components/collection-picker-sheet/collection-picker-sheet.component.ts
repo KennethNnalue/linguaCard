@@ -62,7 +62,8 @@ export class CollectionPickerSheetComponent implements OnInit {
 
   toggle(id: string): void {
     const next = new Set(this.selectedIds());
-    next.has(id) ? next.delete(id) : next.add(id);
+    if (next.has(id)) next.delete(id);
+    else next.add(id);
     this.selectedIds.set(next);
     this.emitChange();
   }

@@ -3,20 +3,14 @@ import { IonIcon } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
 import { chevronBackOutline, chevronForwardOutline, lockClosedOutline } from 'ionicons/icons';
 import { TranslatePipe } from '@ngx-translate/core';
-import type { ConfidenceRating } from '@lingua-card/shared/domain';
+import type { ReviewRating } from '@lingua-card/shared/domain';
 import { RatingOption } from '../../../../models/review.model';
 
-const RATING_KEY: Record<ConfidenceRating, string> = {
-  1: 'review.rating.again',
-  2: 'review.rating.hard',
-  3: 'review.rating.good',
-  4: 'review.rating.easy',
+const RATING_KEY: Record<ReviewRating, string> = {
+  again: 'review.rating.again', hard: 'review.rating.hard', good: 'review.rating.good', easy: 'review.rating.easy',
 };
-const RATING_CLASS: Record<ConfidenceRating, string> = {
-  1: 'again',
-  2: 'hard',
-  3: 'good',
-  4: 'easy',
+const RATING_CLASS: Record<ReviewRating, string> = {
+  again: 'again', hard: 'hard', good: 'good', easy: 'easy',
 };
 
 @Component({
@@ -29,12 +23,14 @@ const RATING_CLASS: Record<ConfidenceRating, string> = {
 export class RatingFooterComponent {
   readonly options = input.required<RatingOption[]>();
   readonly flipped = input(false);
-  readonly suggested = input<ConfidenceRating | null>(null);
+  readonly suggested = input<ReviewRating | null>(null);
   readonly canGoPrevious = input(false);
+  readonly readOnly = input(false);
 
-  readonly rate = output<ConfidenceRating>();
+  readonly rate = output<ReviewRating>();
   readonly previous = output<void>();
   readonly skip = output<void>();
+  readonly returnToCurrent = output<void>();
 
   readonly hasSuggested = computed(() => this.suggested() !== null);
 
@@ -42,10 +38,10 @@ export class RatingFooterComponent {
     addIcons({ chevronBackOutline, chevronForwardOutline, lockClosedOutline });
   }
 
-  ratingKey(value: ConfidenceRating): string {
+  ratingKey(value: ReviewRating): string {
     return RATING_KEY[value];
   }
-  ratingClass(value: ConfidenceRating): string {
+  ratingClass(value: ReviewRating): string {
     return RATING_CLASS[value];
   }
 }

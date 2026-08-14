@@ -22,7 +22,7 @@
     "test": {
       "executor": "nx:run-commands",
       "options": {
-        "command": "jest --testPathPattern=apps/mobile",
+        "command": "jest --testPathPatterns=apps/mobile",
         "cwd": "."
       }
     },
