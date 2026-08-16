@@ -757,10 +757,15 @@
       "wordsStudied": "{{count}} palabras estudiadas",
       "dayStreak": "Racha de {{count}} días",
       "sessionPoints": "+{{count}} Puntos de aprendizaje en esta sesión",
+      "reviewPoints": "+{{count}} Puntos de aprendizaje",
       "dailyGoalBonus": "+{{count}} Puntos de aprendizaje por el objetivo",
       "totalLearningPoints": "{{count}} Puntos de aprendizaje en total",
       "dailyProgress": "Objetivo diario: {{current}}/{{target}}",
-      "masteryEarned": "Tarjetas dominadas: {{count}}"
+      "masteryEarned": "Tarjetas dominadas: {{count}}",
+      "freezeEarned": "Protección de racha conseguida",
+      "freezeEarnProgress": "{{current}}/{{target}} días con objetivo para la próxima protección",
+      "freezeCapacity": "Máximo de 2 protecciones disponibles",
+      "progress": { "back": "Atrás", "kicker": "Tu ritmo", "title": "Progreso", "currentStreak": "Racha actual", "bestStreak": "Récord: {{count}} días", "freezesReady": "Protecciones disponibles", "usedRecently": "{{count}} usadas recientemente", "lastDays": "Últimos 14 días", "lastDaysHint": "Historial de objetivos y protección de racha", "safe": "A salvo hoy", "atRisk": "En riesgo", "buildStreak": "Construye tu racha", "goalMet": "Objetivo cumplido", "protected": "Protegido", "missed": "Perdido", "open": "Abierto", "untracked": "Antes de empezar", "loading": "Cargando tu progreso…", "loadError": "No pudimos cargar tu progreso.", "retry": "Intentar de nuevo", "emptyTitle": "Tu ritmo empieza hoy", "emptyHint": "Completa tu primer objetivo diario para iniciar tu historial.", "learningPoints": "Puntos de aprendizaje", "pointsHint": "Ganados con repasos diarios, objetivos y dominio", "howFreezesWork": "Cómo funcionan las protecciones", "freezeExplanation": "Si pierdes un día completo, una protección disponible conserva tu racha automáticamente. No añade repasos ni puntos de aprendizaje." }
     },
     "summary": {
       "backAriaLabel": "Volver a la bóveda",

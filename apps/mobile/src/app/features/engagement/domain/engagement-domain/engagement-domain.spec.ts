@@ -136,7 +136,7 @@ describe('engagement domain', () => {
     const reconciliation = reconcileClosedStreakDays({
       userId: 'user-1', todayKey: dayKey, occurredAt: new Date('2026-08-16T23:59:59.000Z'),
       days: [{ dayKey, goalTarget: 2, uniqueCardsReviewed: 0, status: 'open' }],
-      transactions: [{ transactionId: 'grant-1', userId: 'user-1', occurredAt: new Date(), amount: 1, reason: 'granted', sourceId: 'grant-1' }],
+      transactions: [{ transactionId: 'grant-1', userId: 'user-1', occurredAt: new Date('2026-08-13T08:00:00.000Z'), amount: 1, reason: 'granted', sourceId: 'grant-1' }],
       goalTarget: () => 2, transactionId: closedDayKey => `consumed:${closedDayKey}`,
     });
     expect(reconciliation.consumed).toEqual([]);
@@ -168,7 +168,7 @@ describe('engagement domain', () => {
     const reconciliation = reconcileClosedStreakDays({
       userId: 'user-1', todayKey: dayKey, occurredAt: new Date('2026-08-16T08:00:00.000Z'),
       days: [{ dayKey: engagementDayKey('2026-08-13'), goalTarget: 2, uniqueCardsReviewed: 2, status: 'goal_met' }],
-      transactions: [{ transactionId: 'grant-1', userId: 'user-1', occurredAt: new Date(), amount: 1, reason: 'granted', sourceId: 'grant-1' }],
+      transactions: [{ transactionId: 'grant-1', userId: 'user-1', occurredAt: new Date('2026-08-13T08:00:00.000Z'), amount: 1, reason: 'granted', sourceId: 'grant-1' }],
       goalTarget: () => 2, transactionId: closedDayKey => `consumed:${closedDayKey}`,
     });
     expect(reconciliation.days.find(day => day.dayKey === '2026-08-14')?.status).toBe('protected_by_freeze');
@@ -185,14 +185,14 @@ describe('engagement domain', () => {
     });
     const result = { eventId: event.eventId, dayKey, dailyProgress: transition.next,
       streak: { current: 4, longest: 4, state: 'safe' as const, lastQualifiedDayKey: dayKey },
-      rewardTransactions, pointsAwarded: 16,
+      rewardTransactions, pointsAwarded: 16, freezeEarned: true,
       feedback: { kind: 'daily_goal_reached' as const, feedbackId: 'feedback', dayKey, current: 2, target: 2, messageKey: 'review.engagement.dailyGoalComplete' as const },
     };
     expect(buildSessionCelebration({
       sessionId: 'session-1', committedReviewCount: 2, uniqueCardsReviewedInSession: 2,
       engagementResults: [result], dailyProgressAtCompletion: transition.next,
       streakAtCompletion: result.streak, learningPointsBalance: 50,
-    })).toMatchObject({ intensity: 'goal_completed', earnedMasteryCount: 1,
+    })).toMatchObject({ intensity: 'goal_completed', earnedMasteryCount: 1, freezeEarned: true,
       rewards: { pointsEarnedInSession: 16, dailyGoalBonus: 10, totalLearningPoints: 50 } });
   });
 });

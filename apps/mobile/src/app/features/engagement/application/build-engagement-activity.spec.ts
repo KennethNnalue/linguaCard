@@ -20,7 +20,7 @@ describe('buildEngagementActivity', () => {
         '2026-08-16': progress('2026-08-16', 3),
       },
     };
-    const activity = buildEngagementActivity(state, engagementDayKey('2026-08-16'));
+    const activity = buildEngagementActivity(state, engagementDayKey('2026-08-16'), 2);
     expect(activity.weeklyData.map(day => [day.label, day.dayKey, day.count])).toEqual([
       ['Mo', '2026-08-10', 2], ['Tu', '2026-08-11', 0], ['We', '2026-08-12', 1],
       ['Th', '2026-08-13', 0], ['Fr', '2026-08-14', 0], ['Sa', '2026-08-15', 0], ['Su', '2026-08-16', 3],
@@ -36,7 +36,38 @@ describe('buildEngagementActivity', () => {
         '2026-08-16': progress('2026-08-16', 2, 3),
       },
     };
-    const activity = buildEngagementActivity(state, engagementDayKey('2026-08-16'));
+    const activity = buildEngagementActivity(state, engagementDayKey('2026-08-16'), 3);
     expect(activity.last7DaysGoalActivity.slice(-2)).toEqual([true, false]);
+  });
+
+  test('exposes frozen and normal streak days without inventing review activity', () => {
+    const state = {
+      ...EMPTY_ENGAGEMENT_STATE,
+      streakDays: [
+        { dayKey: engagementDayKey('2026-08-15'), goalTarget: 3, uniqueCardsReviewed: 0,
+          status: 'protected_by_freeze' as const, freezeTransactionId: 'freeze-1' },
+        { dayKey: engagementDayKey('2026-08-16'), goalTarget: 3, uniqueCardsReviewed: 3,
+          status: 'goal_met' as const },
+      ],
+      dailyProgress: { '2026-08-16': progress('2026-08-16', 3, 3) },
+    };
+    const activity = buildEngagementActivity(state, engagementDayKey('2026-08-16'), 3);
+    expect(activity.recentDays.slice(-2)).toEqual([
+      { dayKey: '2026-08-15', reviewed: 0, goal: 3, status: 'protected_by_freeze' },
+      { dayKey: '2026-08-16', reviewed: 3, goal: 3, status: 'goal_met' },
+    ]);
+  });
+
+  test('marks dates before the first tracked review as untracked instead of missed', () => {
+    const state = {
+      ...EMPTY_ENGAGEMENT_STATE,
+      dailyProgress: { '2026-08-15': progress('2026-08-15', 1, 3) },
+    };
+
+    const activity = buildEngagementActivity(state, engagementDayKey('2026-08-16'), 3);
+
+    expect(activity.recentDays.at(-3)?.status).toBe('untracked');
+    expect(activity.recentDays.at(-2)?.status).toBe('missed');
+    expect(activity.recentDays.at(-1)?.status).toBe('open');
   });
 });

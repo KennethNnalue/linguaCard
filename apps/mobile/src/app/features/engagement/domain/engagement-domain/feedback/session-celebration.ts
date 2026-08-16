@@ -16,10 +16,11 @@ export interface SessionCelebration {
   sessionId: string;
   titleKey: 'review.summary.sessionComplete';
   reviewedWords: number;
-  dailyProgress: { current: number; target: number; goalComplete: boolean; completedDuringSession: boolean };
-  streak: { current: number; state: 'safe' | 'at_risk' | 'broken' };
+  dailyProgress: { start: number; current: number; target: number; goalComplete: boolean; completedDuringSession: boolean };
+  streak: { previous: number; current: number; state: 'safe' | 'at_risk' | 'broken' };
   rewards: { pointsEarnedInSession: number; dailyGoalBonus: number; totalLearningPoints: number };
   earnedMasteryCount: number;
+  freezeEarned: boolean;
   intensity: 'standard' | 'goal_completed';
 }
 
@@ -37,20 +38,32 @@ export function buildSessionCelebration(input: SessionEngagementSummaryInput): S
   const dailyGoalBonus = transactions.filter(transaction => transaction.reason === 'daily_goal_completed')
     .reduce((total, transaction) => total + transaction.amount, 0);
   const earnedMasteryCount = transactions.filter(transaction => transaction.reason === 'earned_card_mastery').length;
+  const firstResult = input.engagementResults[0];
+  const firstReviewAddedCard = firstResult?.rewardTransactions.some(
+    transaction => transaction.reason === 'first_daily_card_review' && transaction.sessionId === input.sessionId,
+  ) ?? false;
+  const dailyProgressAtStart = firstResult
+    ? Math.max(0, firstResult.dailyProgress.uniqueCardsReviewed - (firstReviewAddedCard ? 1 : 0))
+    : input.dailyProgressAtCompletion.uniqueCardsReviewed;
+  const streakBeforeSession = completedDuringSession
+    ? Math.max(0, input.streakAtCompletion.current - 1)
+    : input.streakAtCompletion.current;
   return {
     celebrationId: `session-complete:${input.sessionId}`,
     sessionId: input.sessionId,
     titleKey: 'review.summary.sessionComplete',
     reviewedWords: input.uniqueCardsReviewedInSession,
     dailyProgress: {
+      start: dailyProgressAtStart,
       current: input.dailyProgressAtCompletion.uniqueCardsReviewed,
       target: input.dailyProgressAtCompletion.targetUniqueCards,
       goalComplete: input.dailyProgressAtCompletion.uniqueCardsReviewed >= input.dailyProgressAtCompletion.targetUniqueCards,
       completedDuringSession,
     },
-    streak: { current: input.streakAtCompletion.current, state: input.streakAtCompletion.state },
+    streak: { previous: streakBeforeSession, current: input.streakAtCompletion.current, state: input.streakAtCompletion.state },
     rewards: { pointsEarnedInSession, dailyGoalBonus, totalLearningPoints: input.learningPointsBalance },
     earnedMasteryCount,
+    freezeEarned: sessionResults.some(result => result.freezeEarned === true),
     intensity: completedDuringSession ? 'goal_completed' : 'standard',
   };
 }

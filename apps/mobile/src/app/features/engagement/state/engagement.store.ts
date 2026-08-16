@@ -15,6 +15,7 @@ interface EngagementFeatureState {
   dashboard: EngagementDashboard | null;
   activity: EngagementActivity | null;
   pendingFeedback: DailyGoalReachedFeedback | null;
+  reviewAcknowledgement: { id: string; points: number } | null;
   activeCelebration: SessionCelebration | null;
   celebrationShouldAnimate: boolean;
   syncError: { code: string; message: string; recoverable: boolean } | null;
@@ -22,7 +23,7 @@ interface EngagementFeatureState {
 
 const initialState: EngagementFeatureState = {
   loadState: { status: 'idle' }, dashboard: null, activity: null, pendingFeedback: null,
-  activeCelebration: null, celebrationShouldAnimate: false,
+  activeCelebration: null, celebrationShouldAnimate: false, reviewAcknowledgement: null,
   syncError: null,
 };
 
@@ -34,8 +35,13 @@ export const EngagementStore = signalStore(
     dailyGoal: computed(() => store.dashboard()?.today.goal ?? 0),
     dayStreak: computed(() => store.dashboard()?.streak.current ?? 0),
     learningPoints: computed(() => store.dashboard()?.learningPoints ?? 0),
+    streakFreezes: computed(() => store.dashboard()?.streakFreezes ?? 0),
+    streakFreezeProgress: computed(() => store.dashboard()?.streakFreezeProgress ?? {
+      daysTowardNext: 0, interval: 7, atCapacity: false,
+    }),
     streak: computed(() => store.dashboard()?.streak ?? { current: 0, longest: 0, state: 'broken' as const, lastQualifiedDayKey: null }),
     last7DaysActivity: computed(() => store.activity()?.last7DaysGoalActivity ?? []),
+    recentDays: computed(() => store.activity()?.recentDays ?? []),
     weeklyData: computed(() => store.activity()?.weeklyData ?? []),
     weeklyTotal: computed(() => store.activity()?.weeklyTotal ?? 0),
   })),
@@ -47,6 +53,7 @@ export const EngagementStore = signalStore(
     const presentationReceipts = inject(EngagementPresentationReceiptService);
     const celebrationBuilder = inject(BuildSessionCelebrationService);
     const serverReconciler = inject(ReconcileEngagementWithServerService);
+    let acknowledgementTimer: ReturnType<typeof setTimeout> | null = null;
 
     function context(): { userId: string; timeZone: string; configuredDailyGoal: number } | null {
       const userId = auth.currentUser()?.id;
@@ -80,6 +87,9 @@ export const EngagementStore = signalStore(
         try {
           const outcome = await projector.project({ ...request, event, suppressTransientFeedback });
           const feedback = outcome.result.feedback;
+          const reviewPoints = outcome.result.rewardTransactions
+            .filter(transaction => transaction.reason === 'first_daily_card_review')
+            .reduce((total, transaction) => total + transaction.amount, 0);
           const showFeedback = feedback !== undefined
             && await presentationReceipts.claim(request.userId, feedback.feedbackId);
           patchState(store, {
@@ -87,7 +97,18 @@ export const EngagementStore = signalStore(
             activity: outcome.activity,
             pendingFeedback: showFeedback ? feedback : store.pendingFeedback(),
             loadState: { status: 'ready' },
+            reviewAcknowledgement: reviewPoints > 0
+              ? { id: outcome.result.eventId, points: reviewPoints }
+              : null,
           });
+          if (acknowledgementTimer) clearTimeout(acknowledgementTimer);
+          if (reviewPoints > 0) {
+            acknowledgementTimer = setTimeout(() => {
+              if (store.reviewAcknowledgement()?.id === outcome.result.eventId) {
+                patchState(store, { reviewAcknowledgement: null });
+              }
+            }, 2_000);
+          }
         } catch {
           patchState(store, { loadState: { status: 'error', error: {
             code: 'engagement_projection_failed', message: 'Review saved. Engagement progress will be retried.', recoverable: true,
@@ -114,7 +135,14 @@ export const EngagementStore = signalStore(
         try {
           const reconciliation = await serverReconciler.reconcile(request.userId, dashboard);
           if (reconciliation.appliedServerDashboard) {
-            patchState(store, { dashboard: reconciliation.dashboard, loadState: { status: 'ready' }, syncError: null });
+            patchState(store, {
+              dashboard: reconciliation.dashboard,
+              activity: reconciliation.recentDays && store.activity()
+                ? { ...store.activity()!, recentDays: reconciliation.recentDays }
+                : store.activity(),
+              loadState: { status: 'ready' },
+              syncError: null,
+            });
           } else {
             patchState(store, { syncError: null });
           }
@@ -126,6 +154,9 @@ export const EngagementStore = signalStore(
       },
       dismissFeedback(feedbackId: string): void {
         if (store.pendingFeedback()?.feedbackId === feedbackId) patchState(store, { pendingFeedback: null });
+      },
+      dismissReviewAcknowledgement(id: string): void {
+        if (store.reviewAcknowledgement()?.id === id) patchState(store, { reviewAcknowledgement: null });
       },
       async prepareSessionCelebration(sessionId: string): Promise<void> {
         const request = context();
@@ -150,6 +181,7 @@ export const EngagementStore = signalStore(
         }
       },
       resetForUserChange(): void {
+        if (acknowledgementTimer) clearTimeout(acknowledgementTimer);
         patchState(store, initialState);
       },
     };

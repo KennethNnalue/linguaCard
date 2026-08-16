@@ -131,14 +131,14 @@
 
 .hero-ring {
   position: relative;
-  width: 64px;
-  height: 64px;
+  width: 76px;
+  height: 76px;
   flex-shrink: 0;
 
   svg {
     transform: rotate(-90deg);
-    width: 64px;
-    height: 64px;
+    width: 76px;
+    height: 76px;
   }
 }
 
@@ -165,9 +165,28 @@
 
 .ring-num {
   font-family: t.$lc-font-display;
-  @include u.lc-font('2xl', t.$lc-font-weight-semibold);
+  @include u.lc-font('xl', t.$lc-font-weight-semibold);
   color: white;
   line-height: 1;
+}
+
+.home-protected {
+  margin:0 t.$lc-space-4 t.$lc-space-3;
+  padding:t.$lc-space-3 t.$lc-space-4;
+  display:grid;
+  grid-template-columns:auto 1fr auto;
+  align-items:center;
+  gap:t.$lc-space-3;
+  text-align:left;
+  border:1px solid color-mix(in srgb, var(--ion-color-primary) 35%, var(--lc-border));
+  border-radius:t.$lc-radius-md;
+  background:color-mix(in srgb, var(--ion-color-primary) 10%, var(--lc-surface));
+  color:var(--lc-text-primary);
+  @include u.touch-state;
+
+  > span:nth-child(2) { display:grid; gap:2px; }
+  strong { @include u.lc-font('xs', t.$lc-font-weight-semibold); }
+  small { @include u.lc-font('xxs'); color:var(--lc-text-hint); line-height:1.35; }
 }
 
 .ring-lbl {
@@ -200,6 +219,8 @@
   color: rgba(255, 255, 255, 0.55);
 }
 
+.hero-freeze-progress { margin:-2px 0 3px; color:rgba(255, 255, 255, .48); @include u.lc-font('xxs'); }
+
 .hero-col-pill {
   @include u.lc-font('xxs', t.$lc-font-weight-medium);
   color: rgba(255, 255, 255, 0.5);
@@ -209,6 +230,20 @@
   font-family: t.$lc-font-body;
   cursor: pointer;
   margin-top: 2px;
+}
+
+.hero-workload {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  margin: 0 0 t.$lc-space-3;
+  color: rgba(255, 255, 255, 0.68);
+  @include u.lc-font('xxs');
+
+  strong { color: white; font-weight: t.$lc-font-weight-semibold; }
+  span { margin: 0 2px; opacity: .55; }
 }
 
 .hero-actions {

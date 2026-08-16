@@ -20,8 +20,8 @@
         <span class="ss-tile-lbl">{{ 'review.summary.recallRate' | translate }}</span>
       </div>
       <div class="ss-tile">
-        <span class="ss-tile-num">{{ dayStreak() }} 🔥</span>
-        <span class="ss-tile-lbl">{{ 'review.summary.dayStreak' | translate }}</span>
+        <span class="ss-tile-num">{{ reviewedCount() }}</span>
+        <span class="ss-tile-lbl">{{ 'review.summary.cardsReviewedLabel' | translate }}</span>
       </div>
     </div>
 
@@ -39,17 +39,6 @@
       }
     </div>
 
-    <!-- Cross-feature bridge -->
-    <button class="ss-bridge" (click)="goToStories()">
-      <div class="ss-bridge-icon">
-        <ion-icon name="sparkles-outline"></ion-icon>
-      </div>
-      <div class="ss-bridge-info">
-        <p class="ss-bridge-title">{{ 'review.summary.lockItIn' | translate }}</p>
-        <p class="ss-bridge-sub">{{ 'review.summary.seeTrickyWords' | translate:{ count: tricky() } }}</p>
-      </div>
-    </button>
-
     <!-- Actions -->
     <div class="ss-actions">
       @if (hasTricky()) {
@@ -60,6 +49,17 @@
       }
       <button class="ss-secondary" (click)="goToHub()">{{ 'review.summary.backToReviewHome' | translate }}</button>
     </div>
+
+    <!-- Cross-feature bridge -->
+    <button class="ss-bridge" (click)="goToStories()">
+      <div class="ss-bridge-icon">
+        <ion-icon name="sparkles-outline"></ion-icon>
+      </div>
+      <div class="ss-bridge-info">
+        <p class="ss-bridge-title">{{ 'review.summary.lockItIn' | translate }}</p>
+        <p class="ss-bridge-sub">{{ 'review.summary.seeTrickyWords' | translate:{ count: tricky() } }}</p>
+      </div>
+    </button>
 
     <div class="ss-bottom-spacer"></div>
   </div>

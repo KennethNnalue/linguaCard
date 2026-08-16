@@ -78,6 +78,11 @@ export class ReviewPage {
   readonly isViewingPrevious = computed(() => this.previousCardId() !== null);
   readonly isPronunciationLoading = this.wordAudio.isLoading;
   readonly expandedSynonym = signal<number | null>(null);
+  readonly engagementReady = computed(() => this.engagementStore.loadState().status === 'ready');
+  readonly dailyGoalProgress = computed(() => {
+    const goal = this.engagementStore.dailyGoal();
+    return goal > 0 ? Math.min(100, (this.engagementStore.completedToday() / goal) * 100) : 0;
+  });
 
   readonly currentCard = computed<ScheduledCard | null>(() => {
     const cardId = this.previousCardId() ?? this.reviewStore.presentation()?.cardId;

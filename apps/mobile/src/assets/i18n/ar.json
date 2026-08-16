@@ -757,10 +757,15 @@
       "wordsStudied": "تمت دراسة {{count}} كلمة",
       "dayStreak": "سلسلة {{count}} يومًا",
       "sessionPoints": "+{{count}} نقطة تعلم في هذه الجلسة",
+      "reviewPoints": "+{{count}} نقطة تعلم",
       "dailyGoalBonus": "+{{count}} نقطة تعلم لمكافأة الهدف",
       "totalLearningPoints": "إجمالي نقاط التعلم: {{count}}",
       "dailyProgress": "الهدف اليومي: {{current}}/{{target}}",
-      "masteryEarned": "البطاقات المتقنة: {{count}}"
+      "masteryEarned": "البطاقات المتقنة: {{count}}",
+      "freezeEarned": "حصلت على تجميد للسلسلة",
+      "freezeEarnProgress": "{{current}}/{{target}} أيام أهداف نحو التجميد التالي",
+      "freezeCapacity": "الحد الأقصى: تجميدان متاحان",
+      "progress": { "back": "رجوع", "kicker": "إيقاعك", "title": "التقدم", "currentStreak": "السلسلة الحالية", "bestStreak": "الأفضل: {{count}} يومًا", "freezesReady": "مرات التجميد المتاحة", "usedRecently": "استُخدم {{count}} مؤخرًا", "lastDays": "آخر 14 يومًا", "lastDaysHint": "سجل الأهداف وحماية السلسلة", "safe": "آمنة اليوم", "atRisk": "معرضة للخطر", "buildStreak": "ابدأ سلسلتك", "goalMet": "اكتمل الهدف", "protected": "محمي", "missed": "فائت", "open": "مفتوح", "untracked": "قبل أن تبدأ", "loading": "جارٍ تحميل تقدمك…", "loadError": "تعذر تحميل تقدمك.", "retry": "حاول مجددًا", "emptyTitle": "يبدأ إيقاعك اليوم", "emptyHint": "أكمل هدفك اليومي الأول لبدء سجل تقدمك.", "learningPoints": "نقاط التعلم", "pointsHint": "تُكتسب من المراجعات اليومية والأهداف والإتقان", "howFreezesWork": "كيف يعمل التجميد", "freezeExplanation": "إذا فاتك يوم كامل، يحمي تجميد متاح سلسلتك تلقائيًا. لا يضيف مراجعات أو نقاط تعلم." }
     },
     "summary": {
       "backAriaLabel": "العودة للخزنة",

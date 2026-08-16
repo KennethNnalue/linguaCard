@@ -834,10 +834,15 @@
       "wordsStudied": "{{count}} words studied",
       "dayStreak": "{{count}}-day streak",
       "sessionPoints": "+{{count}} Learning Points this session",
+      "reviewPoints": "+{{count}} Learning Points",
       "dailyGoalBonus": "+{{count}} Learning Points goal bonus",
       "totalLearningPoints": "{{count}} total Learning Points",
       "dailyProgress": "Daily goal: {{current}}/{{target}}",
-      "masteryEarned": "{{count}} cards mastered"
+      "masteryEarned": "{{count}} cards mastered",
+      "freezeEarned": "Streak freeze earned",
+      "freezeEarnProgress": "{{current}}/{{target}} goal days toward the next freeze",
+      "freezeCapacity": "Maximum 2 freezes ready",
+      "progress": { "back": "Back", "kicker": "Your rhythm", "title": "Progress", "currentStreak": "Current streak", "bestStreak": "Best: {{count}} days", "freezesReady": "Freezes ready", "usedRecently": "{{count}} used recently", "lastDays": "Last 14 days", "lastDaysHint": "Goal and streak protection history", "safe": "Safe today", "atRisk": "At risk", "buildStreak": "Build your streak", "goalMet": "Goal met", "protected": "Protected", "missed": "Missed", "open": "Open", "untracked": "Before you started", "loading": "Loading your progress…", "loadError": "We couldn't load your progress.", "retry": "Try again", "emptyTitle": "Your rhythm starts today", "emptyHint": "Complete your first daily goal to begin your progress history.", "learningPoints": "Learning Points", "pointsHint": "Earned from daily reviews, goals and mastery", "howFreezesWork": "How freezes work", "freezeExplanation": "If you miss a full day, one available freeze protects your streak automatically. It never adds reviews or Learning Points." }
     },
     "summary": {
       "backAriaLabel": "Back to vault",

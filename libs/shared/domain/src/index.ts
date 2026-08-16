@@ -14,6 +14,94 @@ export type SyncStatus = 'synced' | 'pending' | 'syncing' | 'error';
 export type PlayMode = 'compact' | 'examples' | 'deepDive';
 export type PlayerStatus = 'idle' | 'loading' | 'playing' | 'paused' | 'error' | 'complete';
 
+export const STREAK_FREEZE_GOAL_INTERVAL = 7;
+export const MAX_STREAK_FREEZE_INVENTORY = 2;
+
+export function streakFreezeGrantMilestone(
+  qualifyingGoalDayCount: number,
+  currentInventory: number,
+): number | null {
+  if (!Number.isInteger(qualifyingGoalDayCount) || qualifyingGoalDayCount < 1) return null;
+  if (!Number.isInteger(currentInventory) || currentInventory < 0) return null;
+  if (currentInventory >= MAX_STREAK_FREEZE_INVENTORY) return null;
+  if (qualifyingGoalDayCount % STREAK_FREEZE_GOAL_INTERVAL !== 0) return null;
+  return qualifyingGoalDayCount / STREAK_FREEZE_GOAL_INTERVAL;
+}
+
+export interface StreakFreezeLedgerDay {
+  dayKey: string;
+  reviewed: number;
+  goal: number;
+}
+
+export interface StreakFreezeLedgerEntry {
+  amount: number;
+  reason: 'granted' | 'consumed' | 'revoked' | 'expired';
+  occurredDayKey: string;
+  protectedDayKey?: string;
+}
+
+function adjacentDayKey(value: string, offset: number): string {
+  const date = new Date(`${value}T00:00:00.000Z`);
+  date.setUTCDate(date.getUTCDate() + offset);
+  return date.toISOString().slice(0, 10);
+}
+
+export function planStreakFreezeProtectionDays(input: {
+  todayKey: string;
+  firstTrackedDayKey: string | null;
+  progress: readonly StreakFreezeLedgerDay[];
+  transactions: readonly StreakFreezeLedgerEntry[];
+}): readonly string[] {
+  if (!input.firstTrackedDayKey) return [];
+  const yesterdayKey = adjacentDayKey(input.todayKey, -1);
+  if (input.firstTrackedDayKey > yesterdayKey) return [];
+
+  const progressByDay = new Map(input.progress.map(day => [day.dayKey, day]));
+  const inventoryChanges = input.transactions
+    .filter(transaction => transaction.reason !== 'consumed')
+    .sort((left, right) => left.occurredDayKey.localeCompare(right.occurredDayKey));
+  const consumptionByDay = new Map<string, number>();
+  for (const transaction of input.transactions) {
+    if (transaction.reason !== 'consumed' || !transaction.protectedDayKey) continue;
+    consumptionByDay.set(
+      transaction.protectedDayKey,
+      (consumptionByDay.get(transaction.protectedDayKey) ?? 0) + transaction.amount,
+    );
+  }
+
+  const planned: string[] = [];
+  let inventory = 0;
+  let inventoryChangeIndex = 0;
+  for (
+    let dayKey = input.firstTrackedDayKey;
+    dayKey <= yesterdayKey;
+    dayKey = adjacentDayKey(dayKey, 1)
+  ) {
+    while (
+      inventoryChangeIndex < inventoryChanges.length
+      && inventoryChanges[inventoryChangeIndex].occurredDayKey <= dayKey
+    ) {
+      inventory += inventoryChanges[inventoryChangeIndex].amount;
+      inventoryChangeIndex += 1;
+    }
+
+    const existingConsumption = consumptionByDay.get(dayKey);
+    if (existingConsumption !== undefined) {
+      inventory += existingConsumption;
+      continue;
+    }
+
+    const progress = progressByDay.get(dayKey);
+    if (progress && progress.reviewed >= progress.goal) continue;
+    if (inventory < 1) continue;
+
+    planned.push(dayKey);
+    inventory -= 1;
+  }
+  return planned;
+}
+
 export type SegmentType =
   | 'word_target'
   | 'word_native'

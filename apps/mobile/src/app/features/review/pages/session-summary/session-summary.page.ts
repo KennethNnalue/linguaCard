@@ -44,7 +44,6 @@ export class SessionSummaryPage implements OnInit {
   }
 
   readonly session = this.reviewStore.completedSession;
-  readonly dayStreak = this.engagementStore.dayStreak;
   readonly celebration = this.engagementStore.activeCelebration;
   readonly celebrationShouldAnimate = this.engagementStore.celebrationShouldAnimate;
 

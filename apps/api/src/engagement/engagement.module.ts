@@ -9,6 +9,7 @@ import { StreakFreezeTransactionEntity } from './entities/streak-freeze-transact
 import { EngagementController } from './engagement.controller';
 import { EngagementDashboardService } from './engagement-dashboard.service';
 import { EngagementProjectionService } from './engagement-projection.service';
+import { StreakFreezeReconciliationService } from './streak-freeze-reconciliation.service';
 
 export const ENGAGEMENT_ENTITIES = [
   EngagementProcessedEventEntity, DailyReviewCardEntity, DailyProgressEntity,
@@ -18,7 +19,7 @@ export const ENGAGEMENT_ENTITIES = [
 @Module({
   imports: [SettingsModule, TypeOrmModule.forFeature([...ENGAGEMENT_ENTITIES])],
   controllers: [EngagementController],
-  providers: [EngagementProjectionService, EngagementDashboardService],
+  providers: [EngagementProjectionService, EngagementDashboardService, StreakFreezeReconciliationService],
   exports: [EngagementProjectionService, EngagementDashboardService],
 })
 export class EngagementModule {}

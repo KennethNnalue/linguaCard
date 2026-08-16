@@ -11,5 +11,6 @@ export interface EngagementProjectionResult {
   streak: Streak;
   rewardTransactions: readonly RewardTransaction[];
   pointsAwarded: number;
+  freezeEarned?: boolean;
   feedback?: DailyGoalReachedFeedback;
 }

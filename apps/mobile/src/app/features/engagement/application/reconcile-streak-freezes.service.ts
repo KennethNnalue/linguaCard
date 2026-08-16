@@ -47,6 +47,7 @@ export class ReconcileStreakFreezesService {
         days: current.streakDays, transactions: current.streakFreezeTransactions,
         goalTarget: () => request.configuredDailyGoal,
         transactionId: dayKey => `freeze-consumed:${request.userId}:${dayKey}`,
+        transactionDayKey: occurredAt => resolveEngagementDayKey(occurredAt, request.timeZone),
       });
       consumedFreezeCount = reconciliation.consumed.length;
       if (reconciliation.consumed.length === 0 && streakDaysEqual(reconciliation.days, current.streakDays)) return current;
@@ -58,7 +59,7 @@ export class ReconcileStreakFreezesService {
     });
     return {
       dashboard: buildEngagementDashboard(state, todayKey, request.configuredDailyGoal),
-      activity: buildEngagementActivity(state, todayKey),
+      activity: buildEngagementActivity(state, todayKey, request.configuredDailyGoal),
       consumedFreezeCount,
     };
   }

@@ -1,0 +1,115 @@
+<ion-header class="ion-no-border">
+  <ion-toolbar>
+    <div class="ep-nav">
+      <button class="ep-back" (click)="goBack()" [attr.aria-label]="'review.engagement.progress.back' | translate">
+        <ion-icon name="chevron-back-outline" aria-hidden="true" />
+      </button>
+      <div>
+        <span class="ep-kicker">{{ 'review.engagement.progress.kicker' | translate }}</span>
+        <h1>{{ 'review.engagement.progress.title' | translate }}</h1>
+      </div>
+    </div>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+  <div class="ep-content">
+    @if (loadState().status === 'loading' || loadState().status === 'idle') {
+      <section class="ep-status" role="status">
+        <span class="ep-status-icon ep-status-icon--loading" aria-hidden="true"></span>
+        <h2>{{ 'review.engagement.progress.loading' | translate }}</h2>
+      </section>
+    } @else if (loadState().status === 'error') {
+      <section class="ep-status" role="alert">
+        <span class="ep-status-icon">!</span>
+        <h2>{{ 'review.engagement.progress.loadError' | translate }}</h2>
+        <button (click)="retry()">{{ 'review.engagement.progress.retry' | translate }}</button>
+      </section>
+    } @else if (dashboard(); as view) {
+      <div class="ep-overview">
+        <div class="ep-stat">
+          <ion-icon name="flame-outline" aria-hidden="true" />
+          <strong>{{ view.streak.current }}</strong>
+          <span>{{ 'review.engagement.progress.currentStreak' | translate }}</span>
+          <small>{{ 'review.engagement.progress.bestStreak' | translate:{ count: view.streak.longest } }}</small>
+        </div>
+        <div class="ep-stat ep-stat--freeze">
+          <ion-icon name="snow-outline" aria-hidden="true" />
+          <strong>{{ view.streakFreezes }}</strong>
+          <span>{{ 'review.engagement.progress.freezesReady' | translate }}</span>
+          <small>{{ 'review.engagement.progress.usedRecently' | translate:{ count: protectedDays() } }}</small>
+          @if (view.streakFreezeProgress.atCapacity) {
+            <small>{{ 'review.engagement.freezeCapacity' | translate }}</small>
+          } @else {
+            <small>{{ 'review.engagement.freezeEarnProgress' | translate:{
+              current: view.streakFreezeProgress.daysTowardNext,
+              target: view.streakFreezeProgress.interval
+            } }}</small>
+          }
+        </div>
+      </div>
+
+      <section class="ep-card" aria-labelledby="ep-days-title">
+        <div class="ep-card-head">
+          <div>
+            <h2 id="ep-days-title">{{ 'review.engagement.progress.lastDays' | translate }}</h2>
+            <p>{{ 'review.engagement.progress.lastDaysHint' | translate }}</p>
+          </div>
+          @if (view.streak.state === 'safe') {
+            <span class="ep-state ep-state--safe">{{ 'review.engagement.progress.safe' | translate }}</span>
+          } @else if (view.streak.state === 'at_risk') {
+            <span class="ep-state ep-state--risk">{{ 'review.engagement.progress.atRisk' | translate }}</span>
+          } @else {
+            <span class="ep-state">{{ 'review.engagement.progress.buildStreak' | translate }}</span>
+          }
+        </div>
+
+        @if (hasTrackedHistory()) {
+          <div class="ep-days">
+            @for (day of days(); track day.dayKey) {
+              <div
+                class="ep-day ep-day--{{ day.status }}"
+                [attr.aria-label]="(statusLabelKey(day.status) | translate) + ': ' + day.reviewed + '/' + day.goal">
+                @if (day.status === 'protected_by_freeze') {
+                  <ion-icon name="snow-outline" aria-hidden="true" />
+                } @else if (day.status === 'goal_met') {
+                  <span aria-hidden="true">✓</span>
+                } @else {
+                  <span>{{ dayNumber(day) }}</span>
+                }
+              </div>
+            }
+          </div>
+          <div class="ep-legend">
+            <span><i class="ep-dot ep-dot--goal"></i>{{ 'review.engagement.progress.goalMet' | translate }}</span>
+            <span><i class="ep-dot ep-dot--freeze"></i>{{ 'review.engagement.progress.protected' | translate }}</span>
+            <span><i class="ep-dot ep-dot--missed"></i>{{ 'review.engagement.progress.missed' | translate }}</span>
+            <span><i class="ep-dot"></i>{{ 'review.engagement.progress.open' | translate }}</span>
+            <span><i class="ep-dot ep-dot--untracked"></i>{{ 'review.engagement.progress.untracked' | translate }}</span>
+          </div>
+        } @else {
+          <div class="ep-empty">
+            <strong>{{ 'review.engagement.progress.emptyTitle' | translate }}</strong>
+            <span>{{ 'review.engagement.progress.emptyHint' | translate }}</span>
+          </div>
+        }
+      </section>
+
+      <section class="ep-card ep-points">
+        <div>
+          <h2>{{ 'review.engagement.progress.learningPoints' | translate }}</h2>
+          <p>{{ 'review.engagement.progress.pointsHint' | translate }}</p>
+        </div>
+        <strong>{{ view.learningPoints }}</strong>
+      </section>
+
+      <section class="ep-card ep-explainer">
+        <div class="ep-explainer-icon"><ion-icon name="snow-outline" aria-hidden="true" /></div>
+        <div>
+          <h2>{{ 'review.engagement.progress.howFreezesWork' | translate }}</h2>
+          <p>{{ 'review.engagement.progress.freezeExplanation' | translate }}</p>
+        </div>
+      </section>
+    }
+  </div>
+</ion-content>

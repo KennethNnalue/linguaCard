@@ -57,30 +57,36 @@
             <circle
               class="ring-fill"
               cx="32" cy="32" r="28"
-              stroke-dasharray="175.93"
-              [attr.stroke-dashoffset]="ringOffset()"
+              [attr.stroke-dasharray]="GOAL_RING_CIRCUMFERENCE"
+              [attr.stroke-dashoffset]="goalRingOffset()"
             />
           </svg>
           <div class="ring-text">
-            <div class="ring-num">{{ totalDue() }}</div>
-            <div class="ring-lbl">{{ 'home.stats.dueLabel' | translate }}</div>
+            <div class="ring-num">{{ completedToday() }}/{{ dailyGoal() }}</div>
+            <div class="ring-lbl">{{ 'home.goalRing.todayLabel' | translate }}</div>
           </div>
         </div>
 
         <div class="hero-meta">
-          <div class="hero-stat-row">
-            <span class="hero-stat-num">{{ newCardsCount() }}</span>
-            <span class="hero-stat-lbl">{{ 'home.stats.newCardsLabel' | translate }}</span>
-          </div>
-          <div class="hero-stat-row">
-            <span class="hero-stat-num">{{ reviewsCount() }}</span>
-            <span class="hero-stat-lbl">{{ 'home.stats.reviewsLabel' | translate }}</span>
-          </div>
+          <div class="hero-stat-row"><span class="hero-stat-num">🔥 {{ streak().current }}</span><span class="hero-stat-lbl">{{ 'home.streak.label' | translate }}</span></div>
+          <div class="hero-stat-row"><span class="hero-stat-num">❄ {{ streakFreezes() }}</span><span class="hero-stat-lbl">{{ 'review.engagement.progress.freezesReady' | translate }}</span></div>
+          @if (!streakFreezeProgress().atCapacity) {
+            <div class="hero-freeze-progress">{{ 'review.engagement.freezeEarnProgress' | translate:{
+              current: streakFreezeProgress().daysTowardNext,
+              target: streakFreezeProgress().interval
+            } }}</div>
+          }
           <button class="hero-col-pill" (click)="openCollectionPicker()">
             {{ selectedCollectionLabel() }}
           </button>
         </div>
       </div>
+
+      <p class="hero-workload">
+        <strong>{{ reviewsCount() }}</strong> {{ 'home.stats.reviewsLabel' | translate }}
+        <span aria-hidden="true">·</span>
+        <strong>{{ newCardsCount() }}</strong> {{ 'home.stats.newCardsLabel' | translate }}
+      </p>
 
       <div class="hero-actions">
         <button class="hero-btn-start" (click)="startSession()">
@@ -94,93 +100,16 @@
       </div>
     </div>
 
-    <!-- ── At-risk / goal banner ── -->
-    @if (streakReady() && dailyGoalPct() < 1) {
-      <div class="at-risk-banner" [class.at-risk-banner--broken]="streak().state === 'broken'">
-        <span class="at-risk-flame">🔥</span>
-        @if (streak().state === 'at_risk') {
-          <div class="at-risk-txt">{{ 'home.atRisk.keepStreakPrefix' | translate }} {{ streak().current }}-{{ 'home.atRisk.keepStreakSuffix' | translate }}</div>
-        } @else if (streak().state === 'broken') {
-          <div class="at-risk-txt">{{ 'home.atRisk.reviewText' | translate }} {{ dailyGoal() }} {{ 'home.atRisk.startStreakSuffix' | translate }}</div>
-        } @else {
-          <div class="at-risk-txt">{{ dailyGoal() - completedToday() }} {{ 'home.atRisk.dailyGoalSuffix' | translate }}</div>
-        }
-        <button class="at-risk-cta" (click)="startSession()">{{ 'home.atRisk.startButton' | translate }}</button>
-      </div>
+    @if (yesterdayWasProtected()) {
+      <button class="home-protected" [routerLink]="['/review/progress']">
+        <span>❄</span>
+        <span><strong>{{ 'review.engagement.progress.protected' | translate }}</strong><small>{{ 'review.engagement.progress.freezeExplanation' | translate }}</small></span>
+        <span aria-hidden="true">›</span>
+      </button>
     }
 
     <!-- ── Getting started checklist ── -->
     <lc-getting-started-checklist />
-
-    <!-- ── Streak + Goal row ── -->
-    <div class="streak-goal-row">
-      <!-- Streak card -->
-      <div class="streak-card">
-        <span class="streak-flame">🔥</span>
-        <div class="streak-num">{{ streak().current }}</div>
-        <div class="streak-unit">{{ 'home.streak.label' | translate }}</div>
-        @if (streak().state === 'safe') {
-          <div class="streak-state streak-state--safe">{{ 'home.streak.onTrack' | translate }}</div>
-        } @else if (streak().state === 'at_risk') {
-          <div class="streak-state streak-state--risk">{{ 'home.streak.atRisk' | translate }}</div>
-        } @else {
-          <div class="streak-state streak-state--broken">{{ 'home.streak.broken' | translate }}</div>
-        }
-      </div>
-
-      <!-- Daily goal ring card -->
-      <div class="streak-card">
-        <div class="goal-ring-wrap">
-          <svg viewBox="0 0 64 64" aria-hidden="true">
-            <circle
-              cx="32" cy="32" r="27"
-              fill="none"
-              [attr.stroke]="streak().state === 'at_risk' ? 'var(--lc-amber-bg)' : 'var(--lc-brand-light)'"
-              stroke-width="6"
-            />
-            @if (dailyGoalPct() < 1) {
-              <circle
-                cx="32" cy="32" r="27"
-                fill="none"
-                [attr.stroke]="streak().state === 'at_risk' ? 'var(--lc-amber)' : 'var(--lc-brand)'"
-                stroke-width="6"
-                [attr.stroke-dasharray]="GOAL_RING_CIRCUMFERENCE"
-                [attr.stroke-dashoffset]="goalRingOffset()"
-                stroke-linecap="round"
-                transform="rotate(-90 32 32)"
-              />
-            } @else {
-              <circle
-                cx="32" cy="32" r="27"
-                fill="none"
-                stroke="var(--lc-brand)"
-                stroke-width="6"
-                [attr.stroke-dasharray]="GOAL_RING_CIRCUMFERENCE"
-                stroke-dashoffset="0"
-                stroke-linecap="round"
-                transform="rotate(-90 32 32)"
-              />
-            }
-          </svg>
-          <div class="goal-ring-inner">
-            @if (dailyGoalPct() >= 1) {
-              <span class="goal-check">✓</span>
-            } @else {
-              <div class="goal-ring-num">{{ completedToday() }}/{{ dailyGoal() }}</div>
-              <div class="goal-ring-sub">{{ 'home.goalRing.todayLabel' | translate }}</div>
-            }
-          </div>
-        </div>
-        <div class="streak-unit">{{ 'home.goalRing.label' | translate }}</div>
-        @if (dailyGoalPct() >= 1) {
-          <div class="streak-state streak-state--safe">{{ completedToday() }}/{{ dailyGoal() }} {{ 'home.goalRing.doneLabel' | translate }}</div>
-        } @else if (streak().state === 'at_risk') {
-          <div class="streak-state streak-state--risk">{{ 'home.goalRing.notStarted' | translate }}</div>
-        } @else {
-          <div class="streak-state streak-state--safe">{{ dailyGoal() - completedToday() }} {{ 'home.goalRing.toGoLabel' | translate }}</div>
-        }
-      </div>
-    </div>
 
     <!-- ── Word of the Day ── -->
     @if (wordOfTheDay(); as wotd) {
@@ -204,7 +133,7 @@
     <!-- ── This week ── -->
     <div class="sec-header">
       <span class="sec-title">{{ 'home.weeklyChart.title' | translate }}</span>
-      <span class="sec-link" [routerLink]="['/review/history']">{{ 'home.weeklyChart.detailsLink' | translate }}</span>
+      <span class="sec-link" [routerLink]="['/review/progress']">{{ 'home.weeklyChart.detailsLink' | translate }}</span>
     </div>
     <div class="weekly-card">
       <div class="weekly-bars">

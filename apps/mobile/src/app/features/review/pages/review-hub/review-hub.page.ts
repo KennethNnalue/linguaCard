@@ -134,6 +134,7 @@ export class ReviewHubPage {
   goToStruggling(): void { void this.router.navigate([ReviewRoute.STRUGGLING]); }
   goToCustom(): void { void this.router.navigate([ReviewRoute.CUSTOM]); }
   goToHistory(): void { void this.router.navigate([ReviewRoute.HISTORY]); }
+  goToProgress(): void { void this.router.navigate([ReviewRoute.PROGRESS]); }
   goToMastery(): void { void this.router.navigate([ReviewRoute.MASTERY]); }
   goToLeeches(): void { void this.router.navigate([ReviewRoute.LEECHES]); }
   navigateTo(path: string): void { void this.router.navigateByUrl(path); }

@@ -40,14 +40,25 @@ h1 {
 .session-celebration__facts,
 .session-celebration__bonus,
 .session-celebration__mastery,
+.session-celebration__freeze,
 .session-celebration__balance { position: relative; }
 
 .session-celebration__reviewed { margin: 0.5rem 0 0; color: t.$lc-rv-on-hero-soft; }
 .session-celebration__goal { margin: 0.75rem 0 0; color: t.$lc-rv-brass; font-weight: 800; }
 .session-celebration__goal-progress { margin: 0.75rem 0 0; color: t.$lc-rv-on-hero-soft; font-weight: 700; }
-.session-celebration__facts { display: flex; justify-content: center; gap: 1rem; margin-top: 0.8rem; font-weight: 700; }
+.session-celebration__facts {
+  display: grid;
+  gap: 0.45rem;
+  width: min(100%, 22rem);
+  margin: 0.8rem auto 0;
+  font-weight: 700;
+
+  span { display: flex; justify-content: space-between; gap: 1rem; color: t.$lc-rv-on-hero-soft; }
+  strong { color: t.$lc-rv-on-hero; }
+}
 .session-celebration__bonus { margin: 0.65rem 0 0; color: t.$lc-rv-brass; font-weight: 800; }
 .session-celebration__mastery { margin: 0.45rem 0 0; font-weight: 700; }
+.session-celebration__freeze { margin: 0.45rem 0 0; color:t.$lc-rv-brass; font-weight:800; }
 .session-celebration__balance { margin: 0.35rem 0 0; color: t.$lc-rv-on-hero-soft; font-size: 0.8rem; }
 
 .session-celebration__sparkles span { position: absolute; color: t.$lc-rv-brass; }

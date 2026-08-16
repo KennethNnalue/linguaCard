@@ -26,8 +26,9 @@
   }
 
   <div class="session-celebration__facts">
-    <span>🔥 {{ 'review.engagement.dayStreak' | translate:{ count: celebration().streak.current } }}</span>
-    <span>{{ 'review.engagement.sessionPoints' | translate:{ count: celebration().rewards.pointsEarnedInSession } }}</span>
+    <span>{{ 'home.goalRing.label' | translate }} <strong>{{ celebration().dailyProgress.start }} → {{ celebration().dailyProgress.current }}/{{ celebration().dailyProgress.target }}</strong></span>
+    <span>{{ 'home.streak.label' | translate }} <strong>{{ celebration().streak.previous }} → {{ celebration().streak.current }} 🔥</strong></span>
+    <span>{{ 'review.engagement.progress.learningPoints' | translate }} <strong>+{{ celebration().rewards.pointsEarnedInSession }}</strong></span>
   </div>
 
   @if (celebration().rewards.dailyGoalBonus > 0) {
@@ -39,6 +40,9 @@
     <p class="session-celebration__mastery">
       {{ 'review.engagement.masteryEarned' | translate:{ count: celebration().earnedMasteryCount } }}
     </p>
+  }
+  @if (celebration().freezeEarned) {
+    <p class="session-celebration__freeze">❄ {{ 'review.engagement.freezeEarned' | translate }}</p>
   }
   <p class="session-celebration__balance">
     {{ 'review.engagement.totalLearningPoints' | translate:{ count: celebration().rewards.totalLearningPoints } }}

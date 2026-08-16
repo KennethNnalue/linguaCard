@@ -757,10 +757,15 @@
       "wordsStudied": "Изучено слов: {{count}}",
       "dayStreak": "Серия: {{count}} дней",
       "sessionPoints": "+{{count}} баллов обучения за эту сессию",
+      "reviewPoints": "+{{count}} баллов обучения",
       "dailyGoalBonus": "+{{count}} баллов обучения за выполнение цели",
       "totalLearningPoints": "Всего баллов обучения: {{count}}",
       "dailyProgress": "Дневная цель: {{current}}/{{target}}",
-      "masteryEarned": "Освоено карточек: {{count}}"
+      "masteryEarned": "Освоено карточек: {{count}}",
+      "freezeEarned": "Заморозка серии получена",
+      "freezeEarnProgress": "{{current}}/{{target}} дней с целью до следующей заморозки",
+      "freezeCapacity": "Доступен максимум: 2 заморозки",
+      "progress": { "back": "Назад", "kicker": "Ваш ритм", "title": "Прогресс", "currentStreak": "Текущая серия", "bestStreak": "Рекорд: {{count}} дн.", "freezesReady": "Заморозки", "usedRecently": "Недавно использовано: {{count}}", "lastDays": "Последние 14 дней", "lastDaysHint": "История целей и защиты серии", "safe": "Сегодня защищено", "atRisk": "Под угрозой", "buildStreak": "Начните серию", "goalMet": "Цель выполнена", "protected": "Защищено", "missed": "Пропущено", "open": "Сегодня", "untracked": "До начала", "loading": "Загружаем прогресс…", "loadError": "Не удалось загрузить прогресс.", "retry": "Повторить", "emptyTitle": "Ваш ритм начинается сегодня", "emptyHint": "Выполните первую дневную цель, чтобы начать историю прогресса.", "learningPoints": "Баллы обучения", "pointsHint": "За ежедневные повторы, цели и освоение", "howFreezesWork": "Как работает заморозка", "freezeExplanation": "Если вы пропустите полный день, доступная заморозка автоматически защитит серию. Она не добавляет повторы или баллы обучения." }
     },
     "summary": {
       "backAriaLabel": "Назад в хранилище",

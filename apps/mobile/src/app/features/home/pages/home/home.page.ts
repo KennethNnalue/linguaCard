@@ -17,10 +17,7 @@ import {LanguageService} from '../../../../core/services/language.service';
 import {CardStore} from '../../../vault/store/card.store';
 import {CategoryStore} from '../../../vault/store/category.store';
 import {CollectionStore} from '../../../vault/store/collection.store';
-import {
-  RING_CIRCUMFERENCE_OUTER,
-  ReviewRoute,
-} from '../../../review/models/review.model';
+import {ReviewRoute} from '../../../review/models/review.model';
 import {ReviewFilterService} from '../../../review/services/review-filter.service';
 import {ReviewStore} from '../../../review/store/review.store';
 import {getCategoryName} from '../../../../shared/helpers/helpers';
@@ -151,20 +148,7 @@ export class HomePage {
     return cards.filter(c => isDue(c, now)).length;
   });
 
-  // Total study workload = new (never studied) + reviews (studied & due)
   readonly totalDue = computed(() => this.newCardsCount() + this.reviewsCount());
-
-  // Hero ring (due cards progress)
-  readonly ringProgress = computed(() => {
-    const done = this.engagementStore.completedToday();
-    const total = this.totalDue() + done;
-    if (total === 0) return 0;
-    return Math.min(1, done / total);
-  });
-
-  readonly ringOffset = computed(() =>
-    RING_CIRCUMFERENCE_OUTER * (1 - this.ringProgress())
-  );
 
   readonly selectedCollectionLabel = computed(() => {
     this.languageService.current(); // recompute on UI language change
@@ -178,6 +162,8 @@ export class HomePage {
   readonly completedToday = this.engagementStore.completedToday;
   readonly dayStreak = this.engagementStore.dayStreak;
   readonly streak = this.engagementStore.streak;
+  readonly streakFreezes = this.engagementStore.streakFreezes;
+  readonly streakFreezeProgress = this.engagementStore.streakFreezeProgress;
   readonly streakReady = computed(() => this.engagementStore.loadState().status === 'ready');
   readonly last7DaysActivity = this.engagementStore.last7DaysActivity;
   readonly totalCards = this.cardStore.totalCount;
@@ -191,8 +177,7 @@ export class HomePage {
     return Math.min(1, this.completedToday() / goal);
   });
 
-  // SVG ring: circumference for r=27 = 2*PI*27 ≈ 169.6
-  readonly GOAL_RING_CIRCUMFERENCE = 2 * Math.PI * 27;
+  readonly GOAL_RING_CIRCUMFERENCE = 2 * Math.PI * 28;
 
   readonly goalRingOffset = computed(() =>
     this.GOAL_RING_CIRCUMFERENCE * (1 - this.dailyGoalPct())
@@ -209,6 +194,10 @@ export class HomePage {
   // ─── Weekly chart — from facade ──────────────────────────────────────────────
   readonly weeklyData = this.engagementStore.weeklyData;
   readonly weeklyTotal = this.engagementStore.weeklyTotal;
+  readonly yesterdayWasProtected = computed(() => {
+    const days = this.engagementStore.recentDays();
+    return days.at(-2)?.status === 'protected_by_freeze';
+  });
 
   // ─── Recent words ─────────────────────────────────────────────────────────────
   readonly recentCards = computed(() => {

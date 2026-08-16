@@ -267,6 +267,7 @@ export const ReviewRoute = {
   STRUGGLING: '/review/struggling',
   CUSTOM: '/review/custom',
   HISTORY: '/review/history',
+  PROGRESS: '/review/progress',
   MASTERY: '/review/mastery',
   LEECHES: '/review/leeches',
 } as const;

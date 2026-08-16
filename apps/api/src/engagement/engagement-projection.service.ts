@@ -1,11 +1,12 @@
 import { Injectable } from '@nestjs/common';
 import { EntityManager } from 'typeorm';
-import type { UserSettings } from '@lingua-card/shared/domain';
+import { streakFreezeGrantMilestone, type UserSettings } from '@lingua-card/shared/domain';
 import { DailyProgressEntity } from './entities/daily-progress.entity';
 import { DailyReviewCardEntity } from './entities/daily-review-card.entity';
 import { EngagementProcessedEventEntity } from './entities/engagement-processed-event.entity';
 import { RewardReason, RewardTransactionEntity } from './entities/reward-transaction.entity';
 import { buildServerRewardAwards } from './engagement-reward-policy';
+import { StreakFreezeTransactionEntity } from './entities/streak-freeze-transaction.entity';
 
 const REWARD_POINTS: Readonly<Record<RewardReason, number>> = {
   first_daily_card_review: 1,
@@ -76,6 +77,8 @@ export class EngagementProjectionService {
     }
     await progressRepository.save(progress);
 
+    if (reachedNow) await this.grantStreakFreezeForMilestone(manager, userId, event);
+
     for (const award of buildServerRewardAwards({
       userId, dayKey, event, addedUniqueCard, reachedGoalNow: reachedNow,
     })) {
@@ -85,6 +88,40 @@ export class EngagementProjectionService {
         cardId: award.cardId,
       });
     }
+  }
+
+  private async grantStreakFreezeForMilestone(
+    manager: EntityManager,
+    userId: string,
+    event: ServerReviewCommittedEvent,
+  ): Promise<void> {
+    await manager.query('SELECT pg_advisory_xact_lock(hashtext($1))', [`streak-freeze:${userId}`]);
+    const qualifyingGoalDayCount = await manager.getRepository(DailyProgressEntity)
+      .createQueryBuilder('progress')
+      .where('progress.userId = :userId', { userId })
+      .andWhere('progress.uniqueCardsReviewed >= progress.targetUniqueCards')
+      .getCount();
+    const freezeRepository = manager.getRepository(StreakFreezeTransactionEntity);
+    const inventoryRow = await freezeRepository.createQueryBuilder('transaction')
+      .select('COALESCE(SUM(transaction.amount), 0)', 'total')
+      .where('transaction.userId = :userId', { userId })
+      .getRawOne<{ total: string }>();
+    const milestone = streakFreezeGrantMilestone(
+      qualifyingGoalDayCount,
+      Number(inventoryRow?.total ?? 0),
+    );
+    if (milestone === null) return;
+
+    const sourceId = `freeze-earned:${userId}:milestone:${milestone}`;
+    await freezeRepository.createQueryBuilder().insert().values({
+      transactionId: sourceId,
+      userId,
+      occurredAt: new Date(event.reviewedAt),
+      amount: 1,
+      reason: 'granted',
+      protectedDayKey: null,
+      sourceId,
+    }).orIgnore().execute();
   }
 
   private async insertReward(

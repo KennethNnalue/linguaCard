@@ -7,6 +7,8 @@ import { EngagementLocalRepository } from '../data-access/engagement-local.repos
 import { EngagementActivity, EngagementDashboard } from '../models/engagement-view.models';
 import { buildEngagementDashboard } from './build-engagement-dashboard';
 import { buildEngagementActivity } from './build-engagement-activity';
+import { streakFreezeGrantMilestone } from '@lingua-card/shared/domain';
+import { streakFreezeInventory } from '../domain/engagement-domain/streak/streak-freeze';
 
 export interface ProjectReviewEngagementRequest {
   userId: string;
@@ -33,7 +35,7 @@ export class ProjectReviewEngagementService {
     if (previousResult) return {
       result: previousResult,
       dashboard: buildEngagementDashboard(existing, previousResult.dayKey, previousResult.dailyProgress.targetUniqueCards),
-      activity: buildEngagementActivity(existing, previousResult.dayKey),
+      activity: buildEngagementActivity(existing, previousResult.dayKey, previousResult.dailyProgress.targetUniqueCards),
       duplicate: true,
     };
 
@@ -58,6 +60,18 @@ export class ProjectReviewEngagementService {
       };
       const streakDays = [...existingDays, today].sort((left, right) => left.dayKey.localeCompare(right.dayKey));
       const streak = calculateStreak(streakDays, dayKey);
+      const qualifyingGoalDayCount = streakDays.filter(day => day.status === 'goal_met').length;
+      const freezeMilestone = transition.goalTransition === 'reached_now'
+        ? streakFreezeGrantMilestone(qualifyingGoalDayCount, streakFreezeInventory(state.streakFreezeTransactions))
+        : null;
+      const freezeGrant = freezeMilestone === null ? null : {
+        transactionId: `freeze-earned:${request.userId}:milestone:${freezeMilestone}`,
+        userId: request.userId,
+        occurredAt: new Date(request.event.reviewedAt.getTime()),
+        amount: 1,
+        reason: 'granted' as const,
+        sourceId: `freeze-earned:${request.userId}:milestone:${freezeMilestone}`,
+      };
       const feedback = transition.goalTransition === 'reached_now' && !request.suppressTransientFeedback
         ? { kind: 'daily_goal_reached' as const, feedbackId: `daily-goal-reached:${request.userId}:${dayKey}`,
           dayKey, current: transition.next.uniqueCardsReviewed, target: transition.next.targetUniqueCards,
@@ -65,7 +79,9 @@ export class ProjectReviewEngagementService {
         : undefined;
       const result: EngagementProjectionResult = {
         eventId: request.event.eventId, dayKey, dailyProgress: transition.next, streak, rewardTransactions,
-        pointsAwarded: rewardTransactions.reduce((total, transaction) => total + transaction.amount, 0), feedback,
+        pointsAwarded: rewardTransactions.reduce((total, transaction) => total + transaction.amount, 0),
+        freezeEarned: freezeGrant !== null,
+        feedback,
       };
       return {
         ...state,
@@ -75,6 +91,9 @@ export class ProjectReviewEngagementService {
         streakDays,
         rewardTransactions: [...state.rewardTransactions, ...rewardTransactions.filter(transaction =>
           !state.rewardTransactions.some(existingTransaction => existingTransaction.deduplicationKey === transaction.deduplicationKey))],
+        streakFreezeTransactions: freezeGrant
+          ? [...state.streakFreezeTransactions, freezeGrant]
+          : state.streakFreezeTransactions,
       };
     });
     const projectionResult = nextState.projectionResults[request.event.eventId];
@@ -82,7 +101,7 @@ export class ProjectReviewEngagementService {
     return {
       result: projectionResult,
       dashboard: buildEngagementDashboard(nextState, dayKey, projectionResult.dailyProgress.targetUniqueCards),
-      activity: buildEngagementActivity(nextState, dayKey),
+      activity: buildEngagementActivity(nextState, dayKey, projectionResult.dailyProgress.targetUniqueCards),
       duplicate: false,
     };
   }

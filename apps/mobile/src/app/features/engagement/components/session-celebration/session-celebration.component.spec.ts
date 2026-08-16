@@ -7,10 +7,10 @@ function celebration(): SessionCelebration {
   return {
     celebrationId: 'session-complete:session-1', sessionId: 'session-1',
     titleKey: 'review.summary.sessionComplete', reviewedWords: 20,
-    dailyProgress: { current: 20, target: 20, goalComplete: true, completedDuringSession: true },
-    streak: { current: 14, state: 'safe' },
+    dailyProgress: { start: 18, current: 20, target: 20, goalComplete: true, completedDuringSession: true },
+    streak: { previous: 13, current: 14, state: 'safe' },
     rewards: { pointsEarnedInSession: 35, dailyGoalBonus: 10, totalLearningPoints: 120 },
-    earnedMasteryCount: 1, intensity: 'goal_completed',
+    earnedMasteryCount: 1, freezeEarned: true, intensity: 'goal_completed',
   };
 }
 
@@ -29,6 +29,7 @@ describe('SessionCelebrationComponent', () => {
         wordsStudied: '{{count}} words studied', dailyGoalComplete: 'Daily goal complete',
         dayStreak: '{{count}}-day streak', sessionPoints: '+{{count}} Learning Points this session',
         dailyGoalBonus: '+{{count}} Learning Points goal bonus', totalLearningPoints: '{{count}} total Learning Points',
+        freezeEarned: 'Streak freeze earned',
       },
     } });
     translate.use('en');
@@ -42,6 +43,7 @@ describe('SessionCelebrationComponent', () => {
     expect(fixture.nativeElement.textContent).toContain('20');
     expect(fixture.nativeElement.textContent).toContain('14');
     expect(fixture.nativeElement.textContent).toContain('35');
+    expect(fixture.nativeElement.textContent).toContain('Streak freeze earned');
     expect(fixture.nativeElement.querySelector('.session-celebration--animate')).toBeNull();
   });
 

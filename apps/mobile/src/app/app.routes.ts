@@ -117,6 +117,12 @@ export const routes: Routes = [
           import('./features/review/pages/session-history/session-history.page').then(m => m.SessionHistoryPage),
       },
       {
+        path: 'review/progress',
+        loadComponent: () =>
+          import('./features/engagement/pages/engagement-progress/engagement-progress.page')
+            .then(m => m.EngagementProgressPage),
+      },
+      {
         path: 'review/struggling',
         loadComponent: () =>
           import('./features/review/pages/struggling-cards/struggling-cards.page').then(m => m.StrugglingCardsPage),

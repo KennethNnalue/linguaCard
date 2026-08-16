@@ -78,6 +78,42 @@ ion-header ion-toolbar {
   transition: width 0.4s t.$lc-easing-standard;
 }
 
+.rv-goal-progress {
+  display: grid;
+  gap: 3px;
+  padding: t.$lc-space-1 t.$lc-space-4 t.$lc-space-2;
+  @include u.lc-font('xxs');
+  color: var(--lc-rv-muted);
+
+  strong { color: var(--lc-rv-mid); }
+}
+
+.rv-goal-copy { display:flex; justify-content:center; gap:t.$lc-space-2; }
+.rv-goal-track { width:min(180px, 52vw); height:3px; margin:auto; overflow:hidden; border-radius:t.$lc-radius-full; background:var(--lc-rv-inset); }
+.rv-goal-track span { display:block; height:100%; border-radius:inherit; background:var(--lc-rv-mid); transition:width .3s t.$lc-easing-standard; }
+
+.rv-points {
+  display: block;
+  width: fit-content;
+  margin: 0 auto t.$lc-space-1;
+  padding: 5px t.$lc-space-3;
+  border: 0;
+  border-radius: t.$lc-radius-full;
+  background: var(--lc-rv-note-bg);
+  color: var(--lc-rv-note-fg);
+  @include u.lc-font('xxs', t.$lc-font-weight-semibold);
+  animation: rv-points-in 280ms t.$lc-easing-standard both;
+}
+
+@keyframes rv-points-in {
+  from { opacity: 0; transform: translateY(-4px) scale(.96); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .rv-points { animation: none; }
+}
+
 // ─── Card scene ──────────────────────────────────────────────────────────────
 .rv-scene {
   display: flex;

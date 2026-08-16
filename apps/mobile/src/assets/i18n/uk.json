@@ -757,10 +757,15 @@
       "wordsStudied": "Вивчено слів: {{count}}",
       "dayStreak": "Серія: {{count}} днів",
       "sessionPoints": "+{{count}} балів навчання за цю сесію",
+      "reviewPoints": "+{{count}} балів навчання",
       "dailyGoalBonus": "+{{count}} балів навчання за виконання цілі",
       "totalLearningPoints": "Усього балів навчання: {{count}}",
       "dailyProgress": "Денна ціль: {{current}}/{{target}}",
-      "masteryEarned": "Опановано карток: {{count}}"
+      "masteryEarned": "Опановано карток: {{count}}",
+      "freezeEarned": "Заморозку серії отримано",
+      "freezeEarnProgress": "{{current}}/{{target}} днів із ціллю до наступної заморозки",
+      "freezeCapacity": "Доступний максимум: 2 заморозки",
+      "progress": { "back": "Назад", "kicker": "Ваш ритм", "title": "Прогрес", "currentStreak": "Поточна серія", "bestStreak": "Рекорд: {{count}} дн.", "freezesReady": "Заморозки", "usedRecently": "Нещодавно використано: {{count}}", "lastDays": "Останні 14 днів", "lastDaysHint": "Історія цілей і захисту серії", "safe": "Сьогодні захищено", "atRisk": "Під загрозою", "buildStreak": "Почніть серію", "goalMet": "Ціль виконано", "protected": "Захищено", "missed": "Пропущено", "open": "Сьогодні", "untracked": "До початку", "loading": "Завантажуємо прогрес…", "loadError": "Не вдалося завантажити прогрес.", "retry": "Повторити", "emptyTitle": "Ваш ритм починається сьогодні", "emptyHint": "Виконайте першу денну ціль, щоб почати історію прогресу.", "learningPoints": "Бали навчання", "pointsHint": "За щоденні повторення, цілі й опанування", "howFreezesWork": "Як працює заморозка", "freezeExplanation": "Якщо ви пропустите повний день, доступна заморозка автоматично захистить серію. Вона не додає повторення чи бали навчання." }
     },
     "summary": {
       "backAriaLabel": "Назад до сховища",

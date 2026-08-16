@@ -16,6 +16,22 @@
     <div class="rv-prog-track">
       <div class="rv-prog-fill" [style.width.%]="progressPercent()"></div>
     </div>
+    @if (engagementReady()) {
+      <div class="rv-goal-progress" role="status">
+        <div class="rv-goal-copy">
+          <span>{{ 'home.goalRing.label' | translate }}</span>
+          <strong>{{ engagementStore.completedToday() }}/{{ engagementStore.dailyGoal() }}</strong>
+        </div>
+        <div class="rv-goal-track" aria-hidden="true">
+          <span [style.width.%]="dailyGoalProgress()"></span>
+        </div>
+      </div>
+    }
+    @if (engagementStore.reviewAcknowledgement(); as acknowledgement) {
+      <button class="rv-points" (click)="engagementStore.dismissReviewAcknowledgement(acknowledgement.id)">
+        {{ 'review.engagement.reviewPoints' | translate:{ count: acknowledgement.points } }}
+      </button>
+    }
     @if (engagementStore.pendingFeedback(); as feedback) {
       <lc-daily-goal-feedback
         [feedback]="feedback"

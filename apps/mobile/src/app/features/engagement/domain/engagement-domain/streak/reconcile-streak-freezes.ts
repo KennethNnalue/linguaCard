@@ -1,6 +1,7 @@
-import { EngagementCalendar, EngagementDayKey, engagementCalendar } from '../shared/engagement-date';
+import { planStreakFreezeProtectionDays } from '@lingua-card/shared/domain';
+import { EngagementCalendar, EngagementDayKey, engagementCalendar, engagementDayKey } from '../shared/engagement-date';
 import { StreakDay } from './streak-day';
-import { StreakFreezeTransaction, streakFreezeInventory } from './streak-freeze';
+import { StreakFreezeTransaction } from './streak-freeze';
 
 export interface ReconcileStreakFreezesInput {
   userId: string;
@@ -10,6 +11,7 @@ export interface ReconcileStreakFreezesInput {
   transactions: readonly StreakFreezeTransaction[];
   goalTarget(dayKey: EngagementDayKey): number;
   transactionId(dayKey: EngagementDayKey): string;
+  transactionDayKey?(occurredAt: Date): EngagementDayKey;
   calendar?: EngagementCalendar;
 }
 
@@ -35,7 +37,23 @@ export function reconcileClosedStreakDays(input: ReconcileStreakFreezesInput): S
   const daysByKey = new Map(ordered.map(day => [day.dayKey, day]));
   const transactions = [...input.transactions];
   const consumed: StreakFreezeTransaction[] = [];
-  let inventory = streakFreezeInventory(transactions);
+  const transactionDayKey = input.transactionDayKey
+    ?? ((occurredAt: Date) => engagementDayKey(occurredAt.toISOString().slice(0, 10)));
+  const plannedProtectionDays = new Set(planStreakFreezeProtectionDays({
+    todayKey: input.todayKey,
+    firstTrackedDayKey: firstTrackedDay,
+    progress: ordered.map(day => ({
+      dayKey: day.dayKey,
+      reviewed: day.uniqueCardsReviewed,
+      goal: day.goalTarget,
+    })),
+    transactions: transactions.map(transaction => ({
+      amount: transaction.amount,
+      reason: transaction.reason,
+      occurredDayKey: transactionDayKey(transaction.occurredAt),
+      protectedDayKey: transaction.protectedDayKey,
+    })),
+  }));
 
   for (const dayKey of calendar.daysBetween(firstTrackedDay, yesterdayKey)) {
     const existingDay = daysByKey.get(dayKey);
@@ -57,7 +75,7 @@ export function reconcileClosedStreakDays(input: ReconcileStreakFreezesInput): S
       continue;
     }
 
-    if (inventory > 0) {
+    if (plannedProtectionDays.has(dayKey)) {
       const transaction: StreakFreezeTransaction = {
         transactionId: input.transactionId(dayKey), userId: input.userId,
         occurredAt: new Date(input.occurredAt.getTime()), amount: -1, reason: 'consumed',
@@ -65,7 +83,6 @@ export function reconcileClosedStreakDays(input: ReconcileStreakFreezesInput): S
       };
       transactions.push(transaction);
       consumed.push(transaction);
-      inventory -= 1;
       daysByKey.set(dayKey, {
         dayKey,
         goalTarget,
