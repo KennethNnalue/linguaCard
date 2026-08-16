@@ -4,6 +4,7 @@ export class CreateEngagementTables1760000000000 implements MigrationInterface {
   name = 'CreateEngagementTables1760000000000';
 
   async up(queryRunner: QueryRunner): Promise<void> {
+    await queryRunner.query('SELECT pg_advisory_xact_lock($1)', [7_314_209_002]);
     await queryRunner.query(`
       CREATE TABLE IF NOT EXISTS "engagement_processed_events" (
         "userId" varchar NOT NULL,

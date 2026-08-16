@@ -27,6 +27,7 @@ import { DailyReviewCardEntity } from '../engagement/entities/daily-review-card.
 import { DailyProgressEntity } from '../engagement/entities/daily-progress.entity';
 import { RewardTransactionEntity } from '../engagement/entities/reward-transaction.entity';
 import { StreakFreezeTransactionEntity } from '../engagement/entities/streak-freeze-transaction.entity';
+import { CreateEngagementTables1760000000000 } from '../engagement/migration/CreateEngagementTables';
 
 export default registerAs('database', (): TypeOrmModuleOptions => ({
   type: 'postgres',
@@ -35,6 +36,8 @@ export default registerAs('database', (): TypeOrmModuleOptions => ({
     ? { rejectUnauthorized: false }
     : false,
   entities: [UserEntity, CardEntity, ReviewSchedulingEntity, CollectionEntity, CategoryEntity, StoryEntity, WordAudioEntity, SubscriptionEntity, ReviewSessionEntity, ReviewCommitEntity, CardAdministrationEventEntity, PlatformStoryEntity, UserStoryProgressEntity, UserSettingsEntity, PushSubscriptionEntity, WordDictionaryEntity, PlatformCollectionEntity, PlatformCollectionWordEntity, DiscountCodeEntity, DiscountRedemptionEntity, ShareEntity, ShareSyncLinkEntity, EngagementProcessedEventEntity, DailyReviewCardEntity, DailyProgressEntity, RewardTransactionEntity, StreakFreezeTransactionEntity],
+  migrations: [CreateEngagementTables1760000000000],
+  migrationsRun: true,
   synchronize: process.env['TYPEORM_SYNCHRONIZE'] === 'true' && process.env['NODE_ENV'] !== 'production',
   logging: process.env['NODE_ENV'] !== 'production',
 }));
