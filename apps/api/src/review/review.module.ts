@@ -11,9 +11,15 @@ import { ReviewSchedulingEntity } from './review-scheduling.entity';
 import { CardAdministrationEventEntity } from './card-administration.entity';
 import { CardAdministrationController } from './card-administration.controller';
 import { CardAdministrationService } from './card-administration.service';
+import { EngagementModule } from '../engagement/engagement.module';
+import { SettingsModule } from '../settings/settings.module';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([ReviewSessionEntity, ReviewCommitEntity, CardAdministrationEventEntity, CardEntity, ReviewSchedulingEntity])],
+  imports: [
+    TypeOrmModule.forFeature([ReviewSessionEntity, ReviewCommitEntity, CardAdministrationEventEntity, CardEntity, ReviewSchedulingEntity]),
+    EngagementModule,
+    SettingsModule,
+  ],
   controllers: [ReviewSessionsController, ReviewCommitsController, CardAdministrationController],
   providers: [ReviewSessionsService, ReviewCommitsService, CardAdministrationService],
   exports: [ReviewSessionsService],

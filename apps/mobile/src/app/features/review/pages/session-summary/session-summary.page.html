@@ -1,12 +1,17 @@
 <ion-content>
   <div class="ss-content">
-    <!-- Celebration hero -->
-    <div class="ss-hero">
-      <div class="ss-hero-glow"></div>
-      <div class="ss-medallion">✓</div>
-      <p class="ss-hero-title">{{ 'review.summary.sessionComplete' | translate }}</p>
-      <p class="ss-hero-sub">{{ 'review.summary.cardsReviewedIn' | translate:{ count: reviewedCount(), time: duration() } }}</p>
-    </div>
+    @if (celebration(); as celebrationView) {
+      <lc-session-celebration
+        [celebration]="celebrationView"
+        [animate]="celebrationShouldAnimate()" />
+    } @else {
+      <div class="ss-hero">
+        <div class="ss-hero-glow"></div>
+        <div class="ss-medallion">✓</div>
+        <p class="ss-hero-title">{{ 'review.summary.sessionComplete' | translate }}</p>
+        <p class="ss-hero-sub">{{ 'review.summary.cardsReviewedIn' | translate:{ count: reviewedCount(), time: duration() } }}</p>
+      </div>
+    }
 
     <!-- Stat tiles -->
     <div class="ss-tiles">

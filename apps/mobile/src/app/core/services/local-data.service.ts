@@ -3,6 +3,7 @@ import { Storage } from '@ionic/storage-angular';
 import { Category, Collection, PlatformStory, PlatformStoryCard, ScheduledCard, Story } from '@lingua-card/shared/domain';
 import type { UpsertSessionDto } from '../../features/review/services/review-session-api.service';
 import type { PersistedActiveReviewSession, PersistedReviewLocalState } from '../../features/review/domain/review-persistence';
+import { EMPTY_ENGAGEMENT_STATE, PersistedEngagementState } from '../../features/engagement/data-access/engagement-local.models';
 
 type SyncFeature = 'stories' | 'cards' | 'collections' | 'categories';
 
@@ -135,6 +136,16 @@ export class LocalDataService {
     await this.storage.set(`review_domain_v1:${userId}`, state);
   }
 
+  async getEngagementState(userId: string): Promise<PersistedEngagementState> {
+    await this.init();
+    return (await this.storage.get(`engagement_domain_v1:${userId}`)) ?? EMPTY_ENGAGEMENT_STATE;
+  }
+
+  async setEngagementState(userId: string, state: PersistedEngagementState): Promise<void> {
+    await this.init();
+    await this.storage.set(`engagement_domain_v1:${userId}`, state);
+  }
+
   async getActiveReviewSession(userId: string): Promise<PersistedActiveReviewSession | null> {
     await this.init();
     return (await this.storage.get(`active_review_session:${userId}`)) ?? null;
@@ -170,6 +181,7 @@ export class LocalDataService {
       this.storage.remove(`categories:${userId}`),
       this.storage.remove(`stories:${userId}`),
       this.storage.remove(`review_domain_v1:${userId}`),
+      this.storage.remove(`engagement_domain_v1:${userId}`),
       this.storage.remove(`session_history:${userId}`),
       this.storage.remove(`pending_sessions:${userId}`),
       this.storage.remove(`active_review_session:${userId}`),

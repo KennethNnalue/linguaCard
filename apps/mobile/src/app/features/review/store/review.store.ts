@@ -12,6 +12,7 @@ import {
 } from '../domain/review-domain';
 import {
   deserializeReviewSessionState,
+  deserializeReviewCommittedEvent,
   PendingReviewCommit,
   schedulingStateFor,
   serializeReviewSessionState,
@@ -23,6 +24,7 @@ import { ReviewSessionBuilderService } from '../services/review-session-builder.
 import { UpsertSessionDto } from '../services/review-session-api.service';
 import { ReviewCommitService } from '../services/review-commit.service';
 import { ReviewLocalRepository } from '../services/review-local.repository';
+import { EngagementStore } from '../../engagement/state/engagement.store';
 
 export interface ReviewCommitContext {
   reviewMode?: 'typing' | 'recall';
@@ -106,6 +108,7 @@ export const ReviewStore = signalStore(
     const reviewPrefs = inject(ReviewPrefsService);
     const reviewCommit = inject(ReviewCommitService);
     const reviewLocal = inject(ReviewLocalRepository);
+    const engagementStore = inject(EngagementStore);
     let persistenceChain: Promise<void> = Promise.resolve();
 
     function serializePersistence(work: () => Promise<void>): Promise<void> {
@@ -341,6 +344,15 @@ export const ReviewStore = signalStore(
           sessionRatings: ratings,
           lastReviewedCardId: presentation.cardId,
         });
+        const nextSelection = selectNextCard(reviewedSession, schedulingStates(), new Date());
+        try {
+          await engagementStore.projectCommittedReview(
+            deserializeReviewCommittedEvent(pendingCommit.event),
+            nextSelection.kind === 'complete',
+          );
+        } catch {
+          patchState(store, { commitError: 'Review saved. Engagement progress will be retried.' });
+        }
         try {
           await persistActiveSession(reviewedSession, ratings);
           await presentNextCard(reviewedSession, new Date());

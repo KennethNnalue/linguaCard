@@ -829,6 +829,16 @@
       "cardOf": "Card {{n}} of {{total}}",
       "whatDoesThisMean": "What does this mean"
     },
+    "engagement": {
+      "dailyGoalComplete": "Daily goal complete",
+      "wordsStudied": "{{count}} words studied",
+      "dayStreak": "{{count}}-day streak",
+      "sessionPoints": "+{{count}} Learning Points this session",
+      "dailyGoalBonus": "+{{count}} Learning Points goal bonus",
+      "totalLearningPoints": "{{count}} total Learning Points",
+      "dailyProgress": "Daily goal: {{current}}/{{target}}",
+      "masteryEarned": "{{count}} cards mastered"
+    },
     "summary": {
       "backAriaLabel": "Back to vault",
       "title": "Session Complete!",

@@ -4,15 +4,22 @@ import { CardEntity } from '../cards/card.entity';
 import { ReviewCommitEntity } from './review-commit.entity';
 import { parseReviewCommit } from './review-commit.parser';
 import { ReviewSchedulingEntity } from './review-scheduling.entity';
+import { EngagementProjectionService } from '../engagement/engagement-projection.service';
+import { UserSettingsService } from '../settings/user-settings.service';
 
 @Injectable()
 export class ReviewCommitsService {
-  constructor(private readonly dataSource: DataSource) {}
+  constructor(
+    private readonly dataSource: DataSource,
+    private readonly engagement: EngagementProjectionService,
+    private readonly settings: UserSettingsService,
+  ) {}
 
   async commitBatch(userId: string, values: unknown[]): Promise<{ accepted: number; duplicates: number }> {
     const commits = values.map(parseReviewCommit).sort((left, right) =>
       left.event.reviewedAt.localeCompare(right.event.reviewedAt),
     );
+    const engagementSettings = await this.settings.getForUser(userId);
     let accepted = 0;
 
     await this.dataSource.transaction(async manager => {
@@ -51,6 +58,12 @@ export class ReviewCommitsService {
           .where('"cardId" = :cardId', { cardId: card.id })
           .andWhere('(\"stateUpdatedAt\" IS NULL OR \"stateUpdatedAt\" < :reviewedAt)', { reviewedAt })
           .execute();
+      }
+    });
+
+    await this.dataSource.transaction(async manager => {
+      for (const commit of commits) {
+        await this.engagement.projectCommittedReview(manager, userId, commit.event, engagementSettings);
       }
     });
 

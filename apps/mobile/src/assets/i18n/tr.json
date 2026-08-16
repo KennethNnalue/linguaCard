@@ -752,6 +752,16 @@
       "writeFromMemory": "Ezberden yaz",
       "youWrote": "Yazdığın"
     },
+    "engagement": {
+      "dailyGoalComplete": "Günlük hedef tamamlandı",
+      "wordsStudied": "{{count}} kelime çalışıldı",
+      "dayStreak": "{{count}} günlük seri",
+      "sessionPoints": "Bu oturumda +{{count}} Öğrenme Puanı",
+      "dailyGoalBonus": "Hedef bonusu: +{{count}} Öğrenme Puanı",
+      "totalLearningPoints": "Toplam {{count}} Öğrenme Puanı",
+      "dailyProgress": "Günlük hedef: {{current}}/{{target}}",
+      "masteryEarned": "Uzmanlaşılan kart: {{count}}"
+    },
     "summary": {
       "backAriaLabel": "Kasaya dön",
       "title": "Oturum Tamamlandı!",

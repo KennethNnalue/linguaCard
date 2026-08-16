@@ -1,0 +1,76 @@
+@use 'theme/tokens' as t;
+
+:host { display: block; }
+
+.session-celebration {
+  position: relative;
+  overflow: hidden;
+  padding: 2rem 1.25rem;
+  border-radius: 1.25rem;
+  background: t.$lc-rv-hero-grad;
+  box-shadow: t.$lc-rv-shadow-hero;
+  color: t.$lc-rv-on-hero;
+  text-align: center;
+}
+
+.session-celebration__medallion {
+  position: relative;
+  display: grid;
+  place-items: center;
+  width: 4rem;
+  height: 4rem;
+  margin: 0 auto 1rem;
+  border-radius: 50%;
+  background: rgb(216 185 129 / 16%);
+  color: t.$lc-rv-brass;
+  font-size: 2rem;
+  font-weight: 700;
+}
+
+h1 {
+  position: relative;
+  margin: 0;
+  font-family: t.$lc-font-rv-display;
+  font-size: 2rem;
+}
+
+.session-celebration__reviewed,
+.session-celebration__goal,
+.session-celebration__goal-progress,
+.session-celebration__facts,
+.session-celebration__bonus,
+.session-celebration__mastery,
+.session-celebration__balance { position: relative; }
+
+.session-celebration__reviewed { margin: 0.5rem 0 0; color: t.$lc-rv-on-hero-soft; }
+.session-celebration__goal { margin: 0.75rem 0 0; color: t.$lc-rv-brass; font-weight: 800; }
+.session-celebration__goal-progress { margin: 0.75rem 0 0; color: t.$lc-rv-on-hero-soft; font-weight: 700; }
+.session-celebration__facts { display: flex; justify-content: center; gap: 1rem; margin-top: 0.8rem; font-weight: 700; }
+.session-celebration__bonus { margin: 0.65rem 0 0; color: t.$lc-rv-brass; font-weight: 800; }
+.session-celebration__mastery { margin: 0.45rem 0 0; font-weight: 700; }
+.session-celebration__balance { margin: 0.35rem 0 0; color: t.$lc-rv-on-hero-soft; font-size: 0.8rem; }
+
+.session-celebration__sparkles span { position: absolute; color: t.$lc-rv-brass; }
+.session-celebration__sparkles span:nth-child(1) { top: 18%; left: 18%; }
+.session-celebration__sparkles span:nth-child(2) { top: 28%; right: 16%; }
+.session-celebration__sparkles span:nth-child(3) { bottom: 20%; left: 24%; }
+.session-celebration__sparkles span:nth-child(4) { bottom: 28%; right: 22%; }
+
+.session-celebration--animate .session-celebration__medallion { animation: medallion-in 650ms ease-out both; }
+.session-celebration--animate .session-celebration__sparkles span { animation: sparkle-in 800ms ease-out both; }
+
+@keyframes medallion-in {
+  from { opacity: 0; transform: scale(0.65); }
+  to { opacity: 1; transform: scale(1); }
+}
+
+@keyframes sparkle-in {
+  from { opacity: 0; transform: scale(0.4) rotate(-20deg); }
+  55% { opacity: 1; }
+  to { opacity: 0.75; transform: scale(1) rotate(0); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .session-celebration--animate .session-celebration__medallion,
+  .session-celebration--animate .session-celebration__sparkles span { animation: none; }
+}

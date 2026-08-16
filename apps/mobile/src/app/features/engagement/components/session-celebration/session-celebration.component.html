@@ -1,0 +1,46 @@
+<section
+  class="session-celebration"
+  [class.session-celebration--goal]="celebration().intensity === 'goal_completed'"
+  [class.session-celebration--animate]="animate()"
+  aria-labelledby="session-celebration-title">
+  @if (animate() && celebration().intensity === 'goal_completed') {
+    <div class="session-celebration__sparkles" aria-hidden="true">
+      <span>✦</span><span>✧</span><span>✦</span><span>✧</span>
+    </div>
+  }
+  <div class="session-celebration__medallion" aria-hidden="true">✓</div>
+  <h1 id="session-celebration-title">{{ celebration().titleKey | translate }}</h1>
+  <p class="session-celebration__reviewed">
+    {{ 'review.engagement.wordsStudied' | translate:{ count: celebration().reviewedWords } }}
+  </p>
+
+  @if (celebration().dailyProgress.completedDuringSession) {
+    <p class="session-celebration__goal">✓ {{ 'review.engagement.dailyGoalComplete' | translate }}</p>
+  } @else {
+    <p class="session-celebration__goal-progress">
+      {{ 'review.engagement.dailyProgress' | translate:{
+        current: celebration().dailyProgress.current,
+        target: celebration().dailyProgress.target
+      } }}
+    </p>
+  }
+
+  <div class="session-celebration__facts">
+    <span>🔥 {{ 'review.engagement.dayStreak' | translate:{ count: celebration().streak.current } }}</span>
+    <span>{{ 'review.engagement.sessionPoints' | translate:{ count: celebration().rewards.pointsEarnedInSession } }}</span>
+  </div>
+
+  @if (celebration().rewards.dailyGoalBonus > 0) {
+    <p class="session-celebration__bonus">
+      {{ 'review.engagement.dailyGoalBonus' | translate:{ count: celebration().rewards.dailyGoalBonus } }}
+    </p>
+  }
+  @if (celebration().earnedMasteryCount > 0) {
+    <p class="session-celebration__mastery">
+      {{ 'review.engagement.masteryEarned' | translate:{ count: celebration().earnedMasteryCount } }}
+    </p>
+  }
+  <p class="session-celebration__balance">
+    {{ 'review.engagement.totalLearningPoints' | translate:{ count: celebration().rewards.totalLearningPoints } }}
+  </p>
+</section>

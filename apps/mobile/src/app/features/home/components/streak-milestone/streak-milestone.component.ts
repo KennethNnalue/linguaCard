@@ -1,6 +1,5 @@
-import { ChangeDetectionStrategy, Component, computed, inject, OnInit, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, inject, input, OnInit, signal } from '@angular/core';
 import { ModalController } from '@ionic/angular/standalone';
-import { ReviewStatsStore } from '../../../review/store/review-stats.store';
 
 const MILESTONES = [3, 7, 14, 30, 50, 100, 365];
 const STORAGE_KEY = 'lc_last_celebrated_milestone';
@@ -13,13 +12,13 @@ const STORAGE_KEY = 'lc_last_celebrated_milestone';
 })
 export class StreakMilestoneComponent implements OnInit {
   private readonly modalCtrl = inject(ModalController);
-  private readonly reviewStats = inject(ReviewStatsStore);
+  readonly streakCurrent = input.required<number>();
 
   readonly milestone = signal<number>(0);
   readonly reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
   ngOnInit(): void {
-    const current = this.reviewStats.streak().current;
+    const current = this.streakCurrent();
     const reached = MILESTONES.filter(m => m <= current);
     if (reached.length === 0) { void this.modalCtrl.dismiss(); return; }
     this.milestone.set(reached[reached.length - 1]);

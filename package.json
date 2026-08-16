@@ -16,6 +16,7 @@
     "dev:api": "npx ts-node -r tsconfig-paths/register apps/api/src/main.ts",
     "build:api": "tsc -p apps/api/tsconfig.json && tsc-alias -p apps/api/tsconfig.json",
     "migrate:review-scheduling": "nx build api && node dist/api/apps/api/src/scripts/migrate-review-scheduling.js",
+    "migrate:engagement": "npm run build:api && node dist/api/apps/api/src/scripts/migrate-engagement.js",
     "build:web": "node scripts/set-env.mjs && ng build --project=mobile --configuration=production",
     "test": "jest",
     "test:watch": "jest --watch",

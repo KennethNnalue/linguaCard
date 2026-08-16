@@ -7,14 +7,14 @@ import { PushController } from './push.controller';
 import { PushConfig } from './push.config';
 import { ReminderSchedulerService } from './reminder-scheduler.service';
 import { SettingsModule } from '../settings/settings.module';
-import { StatsModule } from '../stats/stats.module';
+import { EngagementModule } from '../engagement/engagement.module';
 
 @Module({
   imports: [
     TypeOrmModule.forFeature([PushSubscriptionEntity]),
     ConfigModule,
     SettingsModule,
-    StatsModule,
+    EngagementModule,
   ],
   providers: [PushConfig, PushService, ReminderSchedulerService],
   controllers: [PushController],

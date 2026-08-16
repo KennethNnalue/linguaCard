@@ -19,7 +19,7 @@ import { ReviewPrefsService, StudyMode } from '../../services/review-prefs.servi
 import { SessionStatsService } from '../../shared/services/session-stats.service';
 import { TranslatePipe } from '@ngx-translate/core';
 import { SessionDatePipe } from '../../shared/pipes/session-date.pipe';
-import { ReviewStatsStore } from '../../store/review-stats.store';
+import { EngagementStore } from '../../../engagement/state/engagement.store';
 import { SettingsStore } from '../../../settings/store/settings.store';
 import {
   MINUTES_PER_CARD_REVIEW,
@@ -47,7 +47,7 @@ export class ReviewHubPage {
   private readonly filterService = inject(ReviewFilterService);
   private readonly leech = inject(LeechService);
   private readonly prefs = inject(ReviewPrefsService);
-  private readonly reviewStats = inject(ReviewStatsStore);
+  private readonly engagementStore = inject(EngagementStore);
   private readonly settingsStore = inject(SettingsStore);
   readonly stats = inject(SessionStatsService);
   private readonly router = inject(Router);
@@ -72,7 +72,7 @@ export class ReviewHubPage {
   readonly dueTodayCount = computed(() => this.overdueCount() + this.newCount());
   readonly attentionCount = computed(() => this.filterService.getStrugglingCount());
   readonly strugglingCount = this.attentionCount;
-  readonly completedToday = this.reviewStats.completedToday;
+  readonly completedToday = this.engagementStore.completedToday;
   readonly estMinutes = computed(() =>
     Math.max(1, Math.round((this.dueTodayCount() * MINUTES_PER_CARD_REVIEW))),
   );

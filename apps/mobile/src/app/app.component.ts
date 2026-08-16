@@ -10,7 +10,7 @@ import {SyncService} from './core/services/sync.service';
 import {SyncNotificationService} from './core/services/sync-notification.service';
 import {NetworkService} from './core/services/network.service';
 import {ReviewStore} from './features/review/store/review.store';
-import {ReviewStatsStore} from './features/review/store/review-stats.store';
+import {EngagementStore} from './features/engagement/state/engagement.store';
 import {SettingsStore} from './features/settings/store/settings.store';
 import {SubscriptionStore} from './features/subscription/store/subscription.store';
 import {ShareStore} from './features/sharing/store/share.store';
@@ -33,7 +33,7 @@ export class AppComponent implements OnInit {
   private readonly syncNotification = inject(SyncNotificationService);
   private readonly networkService = inject(NetworkService);
   private readonly reviewStore = inject(ReviewStore);
-  private readonly reviewStats = inject(ReviewStatsStore);
+  private readonly engagementStore = inject(EngagementStore);
   private readonly settingsStore = inject(SettingsStore);
   private readonly subscriptionStore = inject(SubscriptionStore);
   private readonly shareStore = inject(ShareStore);
@@ -56,9 +56,9 @@ export class AppComponent implements OnInit {
     if (this.authService.isAuthenticated()) {
       this.subscriptionStore.loadStatus();
       await this.settingsStore.load();
+      await this.engagementStore.loadEngagement();
+      await this.engagementStore.reconcileWithServer();
       this.languageService.reconcileFromServer(this.settingsStore.settings()?.uiLanguage);
-      void this.reviewStats.refreshStreak();
-      void this.reviewStats.refreshGoalProgress();
       this.shareStore.startAutoRefresh();
     }
 

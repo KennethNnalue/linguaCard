@@ -752,6 +752,16 @@
       "writeFromMemory": "Escríbelo de memoria",
       "youWrote": "Escribiste"
     },
+    "engagement": {
+      "dailyGoalComplete": "Objetivo diario completado",
+      "wordsStudied": "{{count}} palabras estudiadas",
+      "dayStreak": "Racha de {{count}} días",
+      "sessionPoints": "+{{count}} Puntos de aprendizaje en esta sesión",
+      "dailyGoalBonus": "+{{count}} Puntos de aprendizaje por el objetivo",
+      "totalLearningPoints": "{{count}} Puntos de aprendizaje en total",
+      "dailyProgress": "Objetivo diario: {{current}}/{{target}}",
+      "masteryEarned": "Tarjetas dominadas: {{count}}"
+    },
     "summary": {
       "backAriaLabel": "Volver a la bóveda",
       "title": "¡Sesión completada!",

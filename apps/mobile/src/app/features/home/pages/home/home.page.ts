@@ -20,8 +20,6 @@ import {CollectionStore} from '../../../vault/store/collection.store';
 import {
   RING_CIRCUMFERENCE_OUTER,
   ReviewRoute,
-  ReviewSortOrder,
-  ReviewSource,
 } from '../../../review/models/review.model';
 import {ReviewFilterService} from '../../../review/services/review-filter.service';
 import {ReviewStore} from '../../../review/store/review.store';
@@ -31,7 +29,7 @@ import {AddWordSheetComponent} from '../../../vault/components/add-word-sheet/ad
 import {ResetDataSheetComponent} from '../../../auth/components/reset-data-sheet/reset-data-sheet.component';
 import {WordCardComponent} from '../../../../shared/ui/word-card/word-card.component';
 import {WordAudioService} from '../../../../shared/audio/word-audio.service';
-import {ReviewStatsStore} from '../../../review/store/review-stats.store';
+import {EngagementStore} from '../../../engagement/state/engagement.store';
 import {SettingsStore} from '../../../settings/store/settings.store';
 import {ShareStore} from '../../../sharing/store/share.store';
 import {StreakMilestoneComponent} from '../../components/streak-milestone/streak-milestone.component';
@@ -64,7 +62,7 @@ export class HomePage {
   private readonly cardStore = inject(CardStore);
   private readonly categoryStore = inject(CategoryStore);
   private readonly collectionStore = inject(CollectionStore);
-  private readonly reviewStats = inject(ReviewStatsStore);
+  private readonly engagementStore = inject(EngagementStore);
   private readonly settingsStore = inject(SettingsStore);
   readonly shareStore = inject(ShareStore);
   private readonly wordAudio = inject(WordAudioService);
@@ -86,7 +84,7 @@ export class HomePage {
       if (StreakMilestoneComponent.shouldShow(current)) {
         const reached = [3, 7, 14, 30, 50, 100, 365].filter(m => m <= current);
         StreakMilestoneComponent.markShown(reached[reached.length - 1]);
-        void this.showMilestoneModal();
+        void this.showMilestoneModal(current);
       }
     });
     effect(() => {
@@ -97,9 +95,10 @@ export class HomePage {
     });
   }
 
-  private async showMilestoneModal(): Promise<void> {
+  private async showMilestoneModal(streakCurrent: number): Promise<void> {
     const modal = await this.modalCtrl.create({
       component: StreakMilestoneComponent,
+      componentProps: { streakCurrent },
       cssClass: 'milestone-modal-wrapper',
       breakpoints: [0, 0.55, 0.7],
       initialBreakpoint: 0.55,
@@ -157,7 +156,7 @@ export class HomePage {
 
   // Hero ring (due cards progress)
   readonly ringProgress = computed(() => {
-    const done = this.reviewStats.completedToday();
+    const done = this.engagementStore.completedToday();
     const total = this.totalDue() + done;
     if (total === 0) return 0;
     return Math.min(1, done / total);
@@ -176,15 +175,15 @@ export class HomePage {
   });
 
   // ─── Stat cards + goal progress ─────────────────────────────────────────────
-  readonly completedToday = this.reviewStats.completedToday;
-  readonly dayStreak = this.reviewStats.dayStreak;
-  readonly streak = this.reviewStats.streak;
-  readonly streakReady = computed(() => this.reviewStats.serverStreak() !== null);
-  readonly last7DaysActivity = this.reviewStats.last7DaysActivity;
+  readonly completedToday = this.engagementStore.completedToday;
+  readonly dayStreak = this.engagementStore.dayStreak;
+  readonly streak = this.engagementStore.streak;
+  readonly streakReady = computed(() => this.engagementStore.loadState().status === 'ready');
+  readonly last7DaysActivity = this.engagementStore.last7DaysActivity;
   readonly totalCards = this.cardStore.totalCount;
   readonly masteredCount = this.cardStore.masteredCount;
-  readonly dailyGoal = this.reviewStats.dailyGoal;
-  readonly weeklyGoal = this.reviewStats.weeklyGoal;
+  readonly dailyGoal = this.engagementStore.dailyGoal;
+  readonly weeklyGoal = computed(() => this.settingsStore.weeklyGoal());
 
   readonly dailyGoalPct = computed(() => {
     const goal = this.dailyGoal();
@@ -208,8 +207,8 @@ export class HomePage {
   });
 
   // ─── Weekly chart — from facade ──────────────────────────────────────────────
-  readonly weeklyData = this.reviewStats.weeklyData;
-  readonly weeklyTotal = this.reviewStats.weeklyTotal;
+  readonly weeklyData = this.engagementStore.weeklyData;
+  readonly weeklyTotal = this.engagementStore.weeklyTotal;
 
   // ─── Recent words ─────────────────────────────────────────────────────────────
   readonly recentCards = computed(() => {

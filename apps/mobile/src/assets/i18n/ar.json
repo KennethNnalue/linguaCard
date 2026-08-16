@@ -752,6 +752,16 @@
       "writeFromMemory": "اكتبها من الذاكرة",
       "youWrote": "كتبتَ"
     },
+    "engagement": {
+      "dailyGoalComplete": "اكتمل الهدف اليومي",
+      "wordsStudied": "تمت دراسة {{count}} كلمة",
+      "dayStreak": "سلسلة {{count}} يومًا",
+      "sessionPoints": "+{{count}} نقطة تعلم في هذه الجلسة",
+      "dailyGoalBonus": "+{{count}} نقطة تعلم لمكافأة الهدف",
+      "totalLearningPoints": "إجمالي نقاط التعلم: {{count}}",
+      "dailyProgress": "الهدف اليومي: {{current}}/{{target}}",
+      "masteryEarned": "البطاقات المتقنة: {{count}}"
+    },
     "summary": {
       "backAriaLabel": "العودة للخزنة",
       "title": "اكتملت الجلسة!",

@@ -14,7 +14,17 @@ function createCommit() {
       cardId: 'card-1',
       sessionId: 'session-1',
       reviewedAt,
+      mode: 'recall',
+      direction: 'source_to_target',
+      responseType: 'self_rated',
       rating: 'good',
+      stageBefore: 'new',
+      stageAfter: 'learning',
+      becameMastered: false,
+      lostMastery: false,
+      becameLeech: false,
+      recoveredFromLeech: false,
+      wasRelearning: false,
     },
     record: {
       reviewId: 'review-1',
@@ -22,7 +32,15 @@ function createCommit() {
       cardId: 'card-1',
       sessionId: 'session-1',
       reviewedAt,
+      reviewMode: 'recall',
+      promptDirection: 'source_to_target',
+      responseType: 'self_rated',
       rating: 'good',
+      stageBefore: 'new',
+      stageAfter: 'learning',
+      problemStatusBefore: 'normal',
+      problemStatusAfter: 'normal',
+      wasRelearning: false,
     },
     nextState: {
       cardId: 'card-1',
@@ -60,6 +78,28 @@ describe('parseReviewCommit', () => {
   it('rejects malformed optional scheduling state', () => {
     const value = createCommit();
     Object.assign(value.nextState, { relearning: 'invalid' });
+
+    expect(() => parseReviewCommit(value)).toThrow(BadRequestException);
+  });
+
+  it('rejects a forged earned-mastery fact', () => {
+    const value = createCommit();
+    value.event.becameMastered = true;
+
+    expect(() => parseReviewCommit(value)).toThrow(BadRequestException);
+  });
+
+  it('rejects a review event that omits its response contract', () => {
+    const value = createCommit();
+    Reflect.deleteProperty(value.event, 'responseType');
+
+    expect(() => parseReviewCommit(value)).toThrow(BadRequestException);
+  });
+
+  it('rejects a non-UTC review timestamp', () => {
+    const value = createCommit();
+    value.event.reviewedAt = '2026-08-14T12:00:00.000+02:00';
+    value.record.reviewedAt = value.event.reviewedAt;
 
     expect(() => parseReviewCommit(value)).toThrow(BadRequestException);
   });

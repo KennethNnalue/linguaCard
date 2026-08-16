@@ -6,7 +6,7 @@ import { chevronBackOutline } from 'ionicons/icons';
 import { localDayKey } from '@lingua-card/shared/utils';
 import { ReviewStore } from '../../store/review.store';
 import { SessionStatsService } from '../../shared/services/session-stats.service';
-import { ReviewStatsStore } from '../../store/review-stats.store';
+import { EngagementStore } from '../../../engagement/state/engagement.store';
 import { TranslatePipe } from '@ngx-translate/core';
 import { SessionDatePipe } from '../../shared/pipes/session-date.pipe';
 import { MS_PER_DAY, ReviewSessionHistoryEntry } from '../../models/review.model';
@@ -25,7 +25,7 @@ interface SessionGroup {
 })
 export class SessionHistoryPage {
   private readonly reviewStore = inject(ReviewStore);
-  private readonly reviewStats = inject(ReviewStatsStore);
+  private readonly engagementStore = inject(EngagementStore);
   readonly statsService = inject(SessionStatsService);
   private readonly location = inject(Location);
 
@@ -33,9 +33,9 @@ export class SessionHistoryPage {
     addIcons({ chevronBackOutline });
   }
 
-  readonly weeklyData = this.reviewStats.weeklyData;
-  readonly weeklyTotal = this.reviewStats.weeklyTotal;
-  readonly dayStreak = this.reviewStats.dayStreak;
+  readonly weeklyData = this.engagementStore.weeklyData;
+  readonly weeklyTotal = this.engagementStore.weeklyTotal;
+  readonly dayStreak = this.engagementStore.dayStreak;
 
   readonly weekMax = computed(() => Math.max(...this.weeklyData().map(d => d.count), 1));
 

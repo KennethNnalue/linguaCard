@@ -7,8 +7,9 @@ import { ReviewRating } from '@lingua-card/shared/domain';
 import { ReviewStore } from '../../store/review.store';
 import { TranslatePipe } from '@ngx-translate/core';
 import { SessionStatsService } from '../../shared/services/session-stats.service';
-import { ReviewStatsStore } from '../../store/review-stats.store';
+import { EngagementStore } from '../../../engagement/state/engagement.store';
 import { ReviewRoute } from '../../models/review.model';
+import { SessionCelebrationComponent } from '../../../engagement/components/session-celebration/session-celebration.component';
 
 interface RatingBar {
   value: ReviewRating;
@@ -30,25 +31,30 @@ const RATING_BAR_CLS: Record<ReviewRating, string> = {
   templateUrl: './session-summary.page.html',
   styleUrls: ['./session-summary.page.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [IonContent, IonIcon, TranslatePipe],
+  imports: [IonContent, IonIcon, TranslatePipe, SessionCelebrationComponent],
 })
 export class SessionSummaryPage implements OnInit {
   private readonly reviewStore = inject(ReviewStore);
   private readonly router = inject(Router);
   private readonly statsService = inject(SessionStatsService);
-  private readonly reviewStats = inject(ReviewStatsStore);
+  private readonly engagementStore = inject(EngagementStore);
 
   constructor() {
     addIcons({ checkmarkOutline, refreshOutline, sparklesOutline });
   }
 
   readonly session = this.reviewStore.completedSession;
-  readonly dayStreak = this.reviewStats.dayStreak;
+  readonly dayStreak = this.engagementStore.dayStreak;
+  readonly celebration = this.engagementStore.activeCelebration;
+  readonly celebrationShouldAnimate = this.engagementStore.celebrationShouldAnimate;
 
   ngOnInit(): void {
-    if (!this.session()) {
+    const session = this.session();
+    if (!session) {
       void this.router.navigate([ReviewRoute.HUB], { replaceUrl: true });
+      return;
     }
+    void this.engagementStore.prepareSessionCelebration(session.id);
   }
 
   readonly reviewedCount = computed(() => {
@@ -98,16 +104,26 @@ export class SessionSummaryPage implements OnInit {
       { kind: 'explicit', cardIds },
       cardIds.length,
     ).then(result => {
-      if (result.kind === 'started') void this.router.navigate([ReviewRoute.PLAYER]);
+      if (result.kind === 'started') {
+        this.dismissCelebration();
+        void this.router.navigate([ReviewRoute.PLAYER]);
+      }
     });
   }
 
   goToStories(): void {
+    this.dismissCelebration();
     void this.router.navigate(['/stories']);
   }
 
   goToHub(): void {
+    this.dismissCelebration();
     this.reviewStore.clearSession();
     void this.router.navigate([ReviewRoute.HUB]);
+  }
+
+  private dismissCelebration(): void {
+    const celebration = this.celebration();
+    if (celebration) this.engagementStore.dismissCelebration(celebration.celebrationId);
   }
 }

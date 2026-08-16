@@ -68,6 +68,12 @@ export function toPendingReviewCommit(
   };
 }
 
+export function deserializeReviewCommittedEvent(event: PendingReviewCommit['event']): ReviewCommittedEvent {
+  const reviewedAt = new Date(event.reviewedAt);
+  if (!Number.isFinite(reviewedAt.getTime())) throw new Error('Persisted review timestamp is invalid');
+  return { ...event, reviewedAt };
+}
+
 export function overlayLocalSchedulingStates(
   cards: readonly ScheduledCard[],
   schedulingStates: Readonly<Record<string, PersistedCardSchedulingState>>,

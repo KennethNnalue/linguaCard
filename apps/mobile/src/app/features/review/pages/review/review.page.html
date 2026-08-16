@@ -16,6 +16,11 @@
     <div class="rv-prog-track">
       <div class="rv-prog-fill" [style.width.%]="progressPercent()"></div>
     </div>
+    @if (engagementStore.pendingFeedback(); as feedback) {
+      <lc-daily-goal-feedback
+        [feedback]="feedback"
+        (dismissed)="engagementStore.dismissFeedback($event)" />
+    }
   </ion-toolbar>
 </ion-header>
 

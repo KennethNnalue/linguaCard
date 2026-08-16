@@ -7,7 +7,7 @@ import {CardStore} from '../../store/card.store';
 import {CollectionStore} from '../../store/collection.store';
 import {PlatformCollectionStore} from '../../store/platform-collection.store';
 import {SyncService} from '../../../../core/services/sync.service';
-import {ReviewStatsStore} from '../../../review/store/review-stats.store';
+import {EngagementStore} from '../../../engagement/state/engagement.store';
 import {isDue, isMastered, isNew, stageIndicator} from '../../../review/domain/review-status';
 import {AddWordSheetComponent} from '../../components/add-word-sheet/add-word-sheet.component';
 import {AssignCollectionSheetComponent} from '../../components/assign-collection-sheet/assign-collection-sheet.component';
@@ -16,7 +16,7 @@ import {SpeedDialFabComponent} from '../../../../shared/components/speed-dial-fa
 import {BottomSheetService} from '../../../../shared/components/bottom-sheet/bottom-sheet.service';
 import {ImportPage} from '../import/import.page';
 import {ReviewFilterService} from '../../../review/services/review-filter.service';
-import {ReviewRoute, ReviewSortOrder, ReviewSource} from '../../../review/models/review.model';
+import {ReviewRoute} from '../../../review/models/review.model';
 import {ReviewStore} from '../../../review/store/review.store';
 import {SettingsStore} from '../../../settings/store/settings.store';
 
@@ -55,7 +55,7 @@ export class VaultPage implements OnInit, OnDestroy {
   private readonly cardStore = inject(CardStore);
   private readonly collectionStore = inject(CollectionStore);
   private readonly platformStore = inject(PlatformCollectionStore);
-  private readonly reviewStats = inject(ReviewStatsStore);
+  private readonly engagementStore = inject(EngagementStore);
   private readonly syncService = inject(SyncService);
   private readonly modalCtrl = inject(ModalController);
   private readonly bottomSheet = inject(BottomSheetService);
@@ -85,7 +85,7 @@ export class VaultPage implements OnInit, OnDestroy {
   ngOnInit(): void {
     // The Vault may be the first page shown (deep link / tab restore); the streak
     // store has no auto-load, so refresh it here rather than depending on Home.
-    void this.reviewStats.refreshStreak();
+    void this.engagementStore.loadEngagement();
     // Start each visit with a clean search so a stale query can't filter the
     // shared CardStore / PlatformCollectionStore from a previous session.
     this.applyCollectionSearch('');
@@ -154,7 +154,7 @@ export class VaultPage implements OnInit, OnDestroy {
   readonly collections = this.collectionStore.collections;
   readonly collectionsLoading = this.collectionStore.isLoading;
   readonly collectionCount = computed(() => this.collections().length);
-  readonly dayStreak = this.reviewStats.dayStreak;
+  readonly dayStreak = this.engagementStore.dayStreak;
 
   /** Lifecycle counts — canonical selectors (new is never counted as due). */
   private readonly counts = computed(() => {

@@ -22,6 +22,11 @@ import { ShareSyncLinkEntity } from '../shares/share-sync-link.entity';
 import { ReviewCommitEntity } from '../review/review-commit.entity';
 import { CardAdministrationEventEntity } from '../review/card-administration.entity';
 import { ReviewSchedulingEntity } from '../review/review-scheduling.entity';
+import { EngagementProcessedEventEntity } from '../engagement/entities/engagement-processed-event.entity';
+import { DailyReviewCardEntity } from '../engagement/entities/daily-review-card.entity';
+import { DailyProgressEntity } from '../engagement/entities/daily-progress.entity';
+import { RewardTransactionEntity } from '../engagement/entities/reward-transaction.entity';
+import { StreakFreezeTransactionEntity } from '../engagement/entities/streak-freeze-transaction.entity';
 
 export default registerAs('database', (): TypeOrmModuleOptions => ({
   type: 'postgres',
@@ -29,7 +34,7 @@ export default registerAs('database', (): TypeOrmModuleOptions => ({
   ssl: process.env['NODE_ENV'] === 'production'
     ? { rejectUnauthorized: false }
     : false,
-  entities: [UserEntity, CardEntity, ReviewSchedulingEntity, CollectionEntity, CategoryEntity, StoryEntity, WordAudioEntity, SubscriptionEntity, ReviewSessionEntity, ReviewCommitEntity, CardAdministrationEventEntity, PlatformStoryEntity, UserStoryProgressEntity, UserSettingsEntity, PushSubscriptionEntity, WordDictionaryEntity, PlatformCollectionEntity, PlatformCollectionWordEntity, DiscountCodeEntity, DiscountRedemptionEntity, ShareEntity, ShareSyncLinkEntity],
+  entities: [UserEntity, CardEntity, ReviewSchedulingEntity, CollectionEntity, CategoryEntity, StoryEntity, WordAudioEntity, SubscriptionEntity, ReviewSessionEntity, ReviewCommitEntity, CardAdministrationEventEntity, PlatformStoryEntity, UserStoryProgressEntity, UserSettingsEntity, PushSubscriptionEntity, WordDictionaryEntity, PlatformCollectionEntity, PlatformCollectionWordEntity, DiscountCodeEntity, DiscountRedemptionEntity, ShareEntity, ShareSyncLinkEntity, EngagementProcessedEventEntity, DailyReviewCardEntity, DailyProgressEntity, RewardTransactionEntity, StreakFreezeTransactionEntity],
   synchronize: process.env['TYPEORM_SYNCHRONIZE'] === 'true' && process.env['NODE_ENV'] !== 'production',
   logging: process.env['NODE_ENV'] !== 'production',
 }));

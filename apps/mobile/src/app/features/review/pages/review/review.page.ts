@@ -22,6 +22,8 @@ import {
 } from '../../models/review.model';
 import { previewRatings } from '../../domain/review-domain';
 import { schedulingStateFor } from '../../domain/review-persistence';
+import { EngagementStore } from '../../../engagement/state/engagement.store';
+import { DailyGoalFeedbackComponent } from '../../../engagement/components/daily-goal-feedback/daily-goal-feedback.component';
 
 const SLOW_RATE = 0.7;
 
@@ -40,11 +42,13 @@ const SLOW_RATE = 0.7;
     FrontTypeComponent,
     CardBackComponent,
     RatingFooterComponent,
+    DailyGoalFeedbackComponent,
   ],
 })
 export class ReviewPage {
   private readonly cardStore = inject(CardStore);
   protected readonly reviewStore = inject(ReviewStore);
+  protected readonly engagementStore = inject(EngagementStore);
   private readonly wordAudio = inject(WordAudioService);
   private readonly categoryStore = inject(CategoryStore);
   private readonly router = inject(Router);

@@ -752,6 +752,16 @@
       "writeFromMemory": "Напишите по памяти",
       "youWrote": "Вы написали"
     },
+    "engagement": {
+      "dailyGoalComplete": "Дневная цель выполнена",
+      "wordsStudied": "Изучено слов: {{count}}",
+      "dayStreak": "Серия: {{count}} дней",
+      "sessionPoints": "+{{count}} баллов обучения за эту сессию",
+      "dailyGoalBonus": "+{{count}} баллов обучения за выполнение цели",
+      "totalLearningPoints": "Всего баллов обучения: {{count}}",
+      "dailyProgress": "Дневная цель: {{current}}/{{target}}",
+      "masteryEarned": "Освоено карточек: {{count}}"
+    },
     "summary": {
       "backAriaLabel": "Назад в хранилище",
       "title": "Занятие завершено!",

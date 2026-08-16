@@ -752,6 +752,16 @@
       "writeFromMemory": "Напишіть з памʼяті",
       "youWrote": "Ви написали"
     },
+    "engagement": {
+      "dailyGoalComplete": "Денну ціль виконано",
+      "wordsStudied": "Вивчено слів: {{count}}",
+      "dayStreak": "Серія: {{count}} днів",
+      "sessionPoints": "+{{count}} балів навчання за цю сесію",
+      "dailyGoalBonus": "+{{count}} балів навчання за виконання цілі",
+      "totalLearningPoints": "Усього балів навчання: {{count}}",
+      "dailyProgress": "Денна ціль: {{current}}/{{target}}",
+      "masteryEarned": "Опановано карток: {{count}}"
+    },
     "summary": {
       "backAriaLabel": "Назад до сховища",
       "title": "Сесію завершено!",
