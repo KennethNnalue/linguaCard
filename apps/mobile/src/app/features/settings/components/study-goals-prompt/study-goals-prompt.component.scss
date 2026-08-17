@@ -3,8 +3,7 @@
 
 .sgp-modal {
   background: t.$lc-card;
-  border-radius: 24px;
-  padding: t.$lc-space-8 t.$lc-space-6 t.$lc-space-6;
+  padding: t.$lc-space-6 t.$lc-space-6 calc(#{t.$lc-space-4} + env(safe-area-inset-bottom));
   text-align: center;
 }
 

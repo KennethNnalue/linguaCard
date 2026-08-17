@@ -35,6 +35,7 @@ import {StudyGoalsPromptComponent} from '../../../settings/components/study-goal
 import {BottomSheetService} from '../../../../shared/components/bottom-sheet/bottom-sheet.service';
 import {isDue, isNew} from '../../../review/domain/review-status';
 import {Card} from '@lingua-card/shared/domain';
+import {GoalPromptPolicyService} from '../../../settings/services/goal-prompt-policy.service';
 
 @Component({
   selector: 'lc-home',
@@ -71,8 +72,9 @@ export class HomePage {
   private readonly router = inject(Router);
   private readonly reviewStore = inject(ReviewStore);
   private readonly filterService = inject(ReviewFilterService);
+  private readonly goalPromptPolicy = inject(GoalPromptPolicyService);
 
-  private readonly goalPromptShown = signal(false);
+  private goalPromptCheckInProgress = false;
 
   constructor() {
     addIcons({playOutline, libraryOutline, notificationsOutline});
@@ -85,11 +87,12 @@ export class HomePage {
       }
     });
     effect(() => {
-      if (!this.goalPromptShown() && this.settingsStore.needsGoalSetup()) {
-        this.goalPromptShown.set(true);
-        void this.showGoalsPrompt();
-      }
+      if (this.settingsStore.needsGoalSetup()) void this.showGoalsPromptIfEligible();
     });
+  }
+
+  ionViewWillEnter(): void {
+    if (this.settingsStore.needsGoalSetup()) void this.showGoalsPromptIfEligible();
   }
 
   private async showMilestoneModal(streakCurrent: number): Promise<void> {
@@ -104,15 +107,21 @@ export class HomePage {
     await modal.present();
   }
 
-  private async showGoalsPrompt(): Promise<void> {
-    const modal = await this.modalCtrl.create({
-      component: StudyGoalsPromptComponent,
-      cssClass: 'goals-prompt-modal-wrapper',
-      breakpoints: [0, 0.6, 0.75],
-      initialBreakpoint: 0.6,
-      handleBehavior: 'cycle',
-    });
-    await modal.present();
+  private async showGoalsPromptIfEligible(): Promise<void> {
+    if (this.goalPromptCheckInProgress) return;
+    this.goalPromptCheckInProgress = true;
+    try {
+      const userId = this.authService.currentUser()?.id;
+      if (!userId || !await this.goalPromptPolicy.shouldShow(userId)) return;
+      const modal = await this.modalCtrl.create({
+        component: StudyGoalsPromptComponent,
+        cssClass: 'goals-prompt-modal-wrapper',
+      });
+      await this.goalPromptPolicy.markShown(userId);
+      await modal.present();
+    } finally {
+      this.goalPromptCheckInProgress = false;
+    }
   }
 
   readonly user = this.authService.currentUser;

@@ -73,6 +73,15 @@ lc-import-review ion-content::part(scroll) {
   --max-height: 80vh;
 }
 
+/* Goal review prompt — content-sized and anchored to the viewport bottom. */
+.goals-prompt-modal-wrapper {
+  align-items: flex-end;
+  --height: auto;
+  --max-height: calc(100vh - env(safe-area-inset-top));
+  --border-radius: 28px 28px 0 0;
+  --box-shadow: 0 -8px 40px rgba(45, 90, 78, 0.14), 0 -2px 8px rgba(0, 0, 0, 0.06);
+}
+
 /* Confirmation / alert dialogs.
  * Bind the surface and text to LDS tokens so the title and message keep readable
  * contrast in BOTH themes. Ionic's defaults render the message at a near-invisible

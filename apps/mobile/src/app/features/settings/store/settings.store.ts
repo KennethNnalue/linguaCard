@@ -6,7 +6,7 @@ import { DEFAULT_STUDY_GOALS } from '@lingua-card/shared/domain';
 import { SettingsApiService } from '../services/settings-api.service';
 import { SyncService } from '../../../core/services/sync.service';
 
-const GOAL_PROMPT_INTERVAL_MS = 30 * 24 * 60 * 60 * 1000;
+const GOAL_PROMPT_INTERVAL_MS = 7 * 24 * 60 * 60 * 1000;
 
 interface SettingsState {
   settings: UserSettings | null;
@@ -60,7 +60,10 @@ export const SettingsStore = signalStore(
         const stamped: UpdateUserSettingsDto = { ...dto, clientUpdatedAt: new Date().toISOString() };
         const current = store.settings();
         if (current) {
-          const { completeOnboarding, clientUpdatedAt, ...settingsFields } = dto;
+          const { completeOnboarding } = dto;
+          const settingsFields = { ...dto };
+          delete settingsFields.completeOnboarding;
+          delete settingsFields.clientUpdatedAt;
           const optimistic: Partial<UserSettings> = { ...settingsFields };
           if (completeOnboarding === true) {
             optimistic.onboardingCompletedAt = new Date().toISOString();
