@@ -1,7 +1,7 @@
 import { ChangeDetectionStrategy, Component, computed, input, output, signal } from '@angular/core';
 import { IonIcon } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
-import { chevronDownOutline, ellipsisVerticalOutline, volumeHighOutline } from 'ionicons/icons';
+import { chevronDownOutline, createOutline, ellipsisVerticalOutline, volumeHighOutline } from 'ionicons/icons';
 import { TranslatePipe } from '@ngx-translate/core';
 import type { Card } from '@lingua-card/shared/domain';
 import { ArticleBadgeComponent } from '../../../../../../shared/components/article-badge/article-badge.component';
@@ -45,10 +45,11 @@ export class CardBackComponent {
   readonly playAudio = output<void>();
   readonly playExample = output<string>();
   readonly manualMasteryRequested = output<void>();
+  readonly editRequested = output<void>();
   readonly isActionsMenuOpen = signal(false);
 
   constructor() {
-    addIcons({ chevronDownOutline, ellipsisVerticalOutline, volumeHighOutline });
+    addIcons({ chevronDownOutline, createOutline, ellipsisVerticalOutline, volumeHighOutline });
   }
 
   readonly genderWord = computed(() => {
@@ -93,5 +94,10 @@ export class CardBackComponent {
   requestManualMastery(): void {
     this.isActionsMenuOpen.set(false);
     this.manualMasteryRequested.emit();
+  }
+
+  requestEdit(): void {
+    this.isActionsMenuOpen.set(false);
+    this.editRequested.emit();
   }
 }

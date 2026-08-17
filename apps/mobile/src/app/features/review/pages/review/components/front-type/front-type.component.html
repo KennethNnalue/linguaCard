@@ -1,4 +1,4 @@
-<div class="ft-card">
+<div class="ft-card" [class.ft-card--compact]="compact()">
   <div class="ft-hdr">
     <span class="ft-side-lbl">{{ 'review.session.writeFromMemory' | translate }}</span>
     <span class="ft-chip">{{ 'review.session.typeChip' | translate }}</span>
@@ -16,6 +16,8 @@
       type="text"
       [value]="typed()"
       (input)="onInput($event)"
+      (focus)="focusChanged.emit(true)"
+      (blur)="focusChanged.emit(false)"
       (keydown.enter)="onEnter($event)"
       autocapitalize="off"
       autocorrect="off"

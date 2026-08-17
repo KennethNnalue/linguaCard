@@ -1,6 +1,6 @@
 import { ChangeDetectionStrategy, Component, computed, effect, inject, signal } from '@angular/core';
 import { Router } from '@angular/router';
-import { IonContent, IonHeader, IonIcon, IonToolbar } from '@ionic/angular/standalone';
+import { IonContent, IonHeader, IonIcon, IonToolbar, ModalController } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
 import { closeOutline } from 'ionicons/icons';
 import type { ReviewRating, ScheduledCard } from '@lingua-card/shared/domain';
@@ -24,6 +24,7 @@ import { previewRatings } from '../../domain/review-domain';
 import { schedulingStateFor } from '../../domain/review-persistence';
 import { EngagementStore } from '../../../engagement/state/engagement.store';
 import { DailyGoalFeedbackComponent } from '../../../engagement/components/daily-goal-feedback/daily-goal-feedback.component';
+import { AddWordSheetComponent } from '../../../vault/components/add-word-sheet/add-word-sheet.component';
 
 const SLOW_RATE = 0.7;
 const MOMENTUM_CHECKPOINTS = [3, 5, 10] as const;
@@ -54,6 +55,7 @@ export class ReviewPage {
   private readonly categoryStore = inject(CategoryStore);
   private readonly router = inject(Router);
   private readonly answerEvaluator = inject(AnswerEvaluatorService);
+  private readonly modalController = inject(ModalController);
 
   constructor() {
     addIcons({ closeOutline });
@@ -67,6 +69,7 @@ export class ReviewPage {
       this.dontKnowSelected.set(false);
       this.previousCardId.set(null);
       this.isFlipped.set(false);
+      this.isTypingFocused.set(false);
     });
   }
 
@@ -78,6 +81,7 @@ export class ReviewPage {
   readonly previousCardId = signal<string | null>(null);
   readonly isMasteryConfirmationOpen = signal(false);
   readonly masteredCardLabel = signal<string | null>(null);
+  readonly isTypingFocused = signal(false);
   readonly isViewingPrevious = computed(() => this.previousCardId() !== null);
   readonly isPronunciationLoading = this.wordAudio.isLoading;
   readonly expandedSynonym = signal<number | null>(null);
@@ -86,6 +90,14 @@ export class ReviewPage {
     const goal = this.engagementStore.dailyGoal();
     return goal > 0 ? Math.min(100, (this.engagementStore.completedToday() / goal) * 100) : 0;
   });
+  readonly hasMetDailyGoal = computed(() => {
+    const goal = this.engagementStore.dailyGoal();
+    return goal > 0 && this.engagementStore.completedToday() >= goal;
+  });
+  readonly reviewsBeyondDailyGoal = computed(() => Math.max(
+    0,
+    this.engagementStore.completedToday() - this.engagementStore.dailyGoal(),
+  ));
   readonly momentumCheckpoints = computed(() => {
     const total = this.reviewStore.totalOriginalCount();
     return MOMENTUM_CHECKPOINTS
@@ -262,6 +274,19 @@ export class ReviewPage {
     if (this.reviewStore.operation().kind === 'completed') {
       void this.router.navigate([ReviewRoute.SUMMARY], { replaceUrl: true });
     }
+  }
+
+  async openCardEditor(): Promise<void> {
+    if (this.reviewStore.isBusy()) return;
+    const card = this.currentCard();
+    if (!card) return;
+    const modal = await this.modalController.create({
+      component: AddWordSheetComponent,
+      componentProps: { cardToEdit: card },
+      breakpoints: [0, 0.95, 1],
+      initialBreakpoint: 1,
+    });
+    await modal.present();
   }
 
   showPrevious(): void {

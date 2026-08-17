@@ -15,9 +15,11 @@ export class FrontTypeComponent {
   private readonly answerInput = viewChild<ElementRef<HTMLInputElement>>('answerInput');
   readonly prompt = input.required<string>();
   readonly expectsGermanAnswer = input.required<boolean>();
+  readonly compact = input(false);
   readonly typed = model<string>('');
   readonly check = output<void>();
   readonly dontKnow = output<void>();
+  readonly focusChanged = output<boolean>();
 
   readonly accents = ['ä', 'ö', 'ü', 'ß'];
 

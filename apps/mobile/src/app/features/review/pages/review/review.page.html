@@ -1,4 +1,4 @@
-<ion-header class="ion-no-border">
+<ion-header class="ion-no-border" [class.rv-keyboard-active]="isTypingFocused()">
   <ion-toolbar>
     <div class="rv-nav">
       <button class="rv-close" (click)="exitSession()" [attr.aria-label]="'review.session.goBackAriaLabel' | translate">
@@ -29,15 +29,26 @@
       }
     </div>
     @if (engagementReady()) {
-      <div class="rv-goal-progress" role="status">
-        <div class="rv-goal-copy">
-          <span>{{ 'home.goalRing.label' | translate }}</span>
-          <strong>{{ engagementStore.completedToday() }}/{{ engagementStore.dailyGoal() }}</strong>
+      @if (hasMetDailyGoal()) {
+        <div class="rv-goal-exceeded" role="status">
+          <span class="rv-goal-exceeded-icon" aria-hidden="true">✦</span>
+          @if (reviewsBeyondDailyGoal() > 0) {
+            <strong>{{ 'review.engagement.beyondGoal' | translate:{ count: reviewsBeyondDailyGoal() } }}</strong>
+          } @else {
+            <strong>{{ 'review.engagement.goalCompleteKeepGoing' | translate }}</strong>
+          }
         </div>
-        <div class="rv-goal-track" aria-hidden="true">
-          <span [style.width.%]="dailyGoalProgress()"></span>
+      } @else {
+        <div class="rv-goal-progress" role="status">
+          <div class="rv-goal-copy">
+            <span>{{ 'home.goalRing.label' | translate }}</span>
+            <strong>{{ engagementStore.completedToday() }}/{{ engagementStore.dailyGoal() }}</strong>
+          </div>
+          <div class="rv-goal-track" aria-hidden="true">
+            <span [style.width.%]="dailyGoalProgress()"></span>
+          </div>
         </div>
-      </div>
+      }
     }
     @if (engagementStore.reviewAcknowledgement(); as acknowledgement) {
       <button class="rv-points" (click)="engagementStore.dismissReviewAcknowledgement(acknowledgement.id)">
@@ -52,7 +63,7 @@
   </ion-toolbar>
 </ion-header>
 
-<ion-content>
+<ion-content [class.rv-keyboard-active]="isTypingFocused()">
   @if (reviewStore.presentation()) {
     @if (currentCard(); as card) {
       <div class="rv-scene" [class.rv-scene--revealed]="isFlipped()">
@@ -63,8 +74,10 @@
                 <lc-rv-front-type
                   [prompt]="flipPrompt()"
                   [expectsGermanAnswer]="expectsGermanAnswer()"
+                  [compact]="isTypingFocused()"
                   [typed]="typed()"
                   (typedChange)="typed.set($event)"
+                  (focusChanged)="isTypingFocused.set($event)"
                   (check)="checkTyped()"
                   (dontKnow)="dontKnow()" />
               }
@@ -84,7 +97,8 @@
               (toggleSynonym)="toggleSynonym($event)"
               (playAudio)="playAudio()"
               (playExample)="playExample($event)"
-              (manualMasteryRequested)="requestManualMastery()" />
+              (manualMasteryRequested)="requestManualMastery()"
+              (editRequested)="openCardEditor()" />
           </div>
         }
       </div>
@@ -138,7 +152,7 @@
 }
 
 @if (reviewStore.presentation()) {
-  <div class="rv-footer">
+  <div class="rv-footer" [class.rv-footer--keyboard]="isTypingFocused()">
     <lc-rv-rating-footer
       [options]="ratingOptionsWithPreviews()"
       [flipped]="isFlipped()"

@@ -759,6 +759,8 @@
       "masteringCard": "جارٍ الحفظ…",
       "cardMastered": "تم إتقان البطاقة",
       "removedFromReviews": "تمت إزالتها من المراجعات المستقبلية",
+      "editCard": "تعديل هذه البطاقة",
+      "editCardHint": "صحح الكلمة أو المعنى أو الأمثلة",
       "whatIsGermanFor": "ما هي بالألمانية",
       "writeFromMemory": "اكتبها من الذاكرة",
       "youWrote": "كتبتَ"
@@ -769,6 +771,8 @@
       "dayStreak": "سلسلة {{count}} يومًا",
       "sessionPoints": "+{{count}} نقطة تعلم في هذه الجلسة",
       "reviewPoints": "+{{count}} نقطة تعلم",
+      "goalCompleteKeepGoing": "اكتمل الهدف اليومي · استمر!",
+      "beyondGoal": "تجاوزت الهدف · +{{count}} إضافية اليوم",
       "dailyGoalBonus": "+{{count}} نقطة تعلم لمكافأة الهدف",
       "totalLearningPoints": "إجمالي نقاط التعلم: {{count}}",
       "dailyProgress": "الهدف اليومي: {{current}}/{{target}}",

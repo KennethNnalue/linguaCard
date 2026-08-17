@@ -128,17 +128,20 @@
 }
 
 .cb-actions-menu {
-  display: flex;
-  justify-content: flex-end;
+  display: grid;
+  gap: 1px;
+  width: min(310px, 100%);
+  margin-left: auto;
   margin-top: t.$lc-space-2;
   animation: cb-menu-in 160ms t.$lc-easing-standard both;
 }
 
-.cb-master-action {
+.cb-master-action,
+.cb-edit-action {
   display: flex;
   flex-direction: column;
   gap: 2px;
-  width: min(290px, 100%);
+  width: 100%;
   padding: t.$lc-space-3 t.$lc-space-4;
   border: 1px solid var(--lc-rv-border);
   border-radius: t.$lc-radius-md;
@@ -149,6 +152,16 @@
 
   strong { @include u.lc-font('sm', t.$lc-font-weight-bold); }
   span { @include u.lc-font('xs'); color: var(--lc-rv-muted); }
+}
+
+.cb-edit-action {
+  flex-direction: row;
+  align-items: center;
+  gap: t.$lc-space-3;
+
+  ion-icon { flex-shrink: 0; font-size: t.$lc-text-xl; color: var(--lc-rv-mid); }
+  span { min-width: 0; }
+  small { display: block; @include u.lc-font('xs'); color: var(--lc-rv-muted); }
 }
 
 @keyframes cb-menu-in {

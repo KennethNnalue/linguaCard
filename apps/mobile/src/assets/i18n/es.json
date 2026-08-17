@@ -759,6 +759,8 @@
       "masteringCard": "Guardando…",
       "cardMastered": "Tarjeta dominada",
       "removedFromReviews": "Eliminada de futuros repasos",
+      "editCard": "Editar esta tarjeta",
+      "editCardHint": "Corrige la palabra, el significado o los ejemplos",
       "whatIsGermanFor": "Cómo se dice en alemán",
       "writeFromMemory": "Escríbelo de memoria",
       "youWrote": "Escribiste"
@@ -769,6 +771,8 @@
       "dayStreak": "Racha de {{count}} días",
       "sessionPoints": "+{{count}} Puntos de aprendizaje en esta sesión",
       "reviewPoints": "+{{count}} Puntos de aprendizaje",
+      "goalCompleteKeepGoing": "Meta diaria cumplida · ¡sigue así!",
+      "beyondGoal": "Meta superada · +{{count}} extra hoy",
       "dailyGoalBonus": "+{{count}} Puntos de aprendizaje por el objetivo",
       "totalLearningPoints": "{{count}} Puntos de aprendizaje en total",
       "dailyProgress": "Objetivo diario: {{current}}/{{target}}",

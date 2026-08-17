@@ -759,6 +759,8 @@
       "masteringCard": "Kaydediliyor…",
       "cardMastered": "Kart ustalaşıldı",
       "removedFromReviews": "Gelecekteki tekrarlardan kaldırıldı",
+      "editCard": "Bu kartı düzenle",
+      "editCardHint": "Kelimeyi, anlamı veya örnekleri düzelt",
       "whatIsGermanFor": "Almancası ne",
       "writeFromMemory": "Ezberden yaz",
       "youWrote": "Yazdığın"
@@ -769,6 +771,8 @@
       "dayStreak": "{{count}} günlük seri",
       "sessionPoints": "Bu oturumda +{{count}} Öğrenme Puanı",
       "reviewPoints": "+{{count}} Öğrenme Puanı",
+      "goalCompleteKeepGoing": "Günlük hedef tamam · devam et!",
+      "beyondGoal": "Hedef aşıldı · bugün +{{count}} fazla",
       "dailyGoalBonus": "Hedef bonusu: +{{count}} Öğrenme Puanı",
       "totalLearningPoints": "Toplam {{count}} Öğrenme Puanı",
       "dailyProgress": "Günlük hedef: {{current}}/{{target}}",

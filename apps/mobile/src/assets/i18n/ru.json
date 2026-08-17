@@ -759,6 +759,8 @@
       "masteringCard": "Сохранение…",
       "cardMastered": "Карточка освоена",
       "removedFromReviews": "Удалена из будущих повторений",
+      "editCard": "Редактировать карточку",
+      "editCardHint": "Исправить слово, значение или примеры",
       "whatIsGermanFor": "Как будет по-немецки",
       "writeFromMemory": "Напишите по памяти",
       "youWrote": "Вы написали"
@@ -769,6 +771,8 @@
       "dayStreak": "Серия: {{count}} дней",
       "sessionPoints": "+{{count}} баллов обучения за эту сессию",
       "reviewPoints": "+{{count}} баллов обучения",
+      "goalCompleteKeepGoing": "Дневная цель выполнена · продолжайте!",
+      "beyondGoal": "Цель превышена · ещё {{count}} сегодня",
       "dailyGoalBonus": "+{{count}} баллов обучения за выполнение цели",
       "totalLearningPoints": "Всего баллов обучения: {{count}}",
       "dailyProgress": "Дневная цель: {{current}}/{{target}}",

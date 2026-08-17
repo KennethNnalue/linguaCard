@@ -838,7 +838,9 @@
       "confirmMasterCard": "Mark as mastered",
       "masteringCard": "Saving…",
       "cardMastered": "Card mastered",
-      "removedFromReviews": "Removed from future reviews"
+      "removedFromReviews": "Removed from future reviews",
+      "editCard": "Edit this card",
+      "editCardHint": "Fix the word, meaning or examples"
     },
     "engagement": {
       "dailyGoalComplete": "Daily goal complete",
@@ -846,6 +848,8 @@
       "dayStreak": "{{count}}-day streak",
       "sessionPoints": "+{{count}} Learning Points this session",
       "reviewPoints": "+{{count}} Learning Points",
+      "goalCompleteKeepGoing": "Daily goal complete · keep going!",
+      "beyondGoal": "Goal crushed · +{{count}} extra today",
       "dailyGoalBonus": "+{{count}} Learning Points goal bonus",
       "totalLearningPoints": "{{count}} total Learning Points",
       "dailyProgress": "Daily goal: {{current}}/{{target}}",

@@ -63,7 +63,12 @@
 }
 
 .ft-input {
+  box-sizing: border-box;
   width: 100%;
+  min-height: 64px;
+  line-height: 1.2;
+  overflow: hidden;
+  caret-color: var(--lc-rv-mid);
   text-align: center;
   @include u.lc-font('5xl', t.$lc-font-weight-medium);
   font-family: t.$lc-font-rv-display;
@@ -84,6 +89,20 @@
   &:focus {
     outline: none;
   }
+}
+
+.ft-card--compact {
+  padding: t.$lc-space-3;
+
+  .ft-hdr { display: none; }
+  .ft-body { gap: t.$lc-space-2; padding: t.$lc-space-1 0 t.$lc-space-2; }
+  .ft-cue { display: none; }
+  .ft-prompt { @include u.lc-font('4xl', t.$lc-font-weight-semibold); }
+  .ft-input { min-height: 54px; margin-top: 0; padding: t.$lc-space-2 t.$lc-space-3; @include u.lc-font('3xl', t.$lc-font-weight-medium); }
+  .ft-accents { margin-top: 0; }
+  .ft-accent { width: 42px; min-height: 40px; }
+  .ft-cta { padding: t.$lc-space-3; @include u.lc-font('md', t.$lc-font-weight-bold); }
+  .ft-dont-know { margin-top: 0; padding: t.$lc-space-1 t.$lc-space-3; }
 }
 
 .ft-accents {

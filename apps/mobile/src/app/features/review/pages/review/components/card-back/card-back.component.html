@@ -39,6 +39,13 @@
     </div>
     @if (isActionsMenuOpen()) {
       <div class="cb-actions-menu">
+        <button type="button" class="cb-edit-action" (click)="requestEdit()">
+          <ion-icon name="create-outline" aria-hidden="true"></ion-icon>
+          <span>
+            <strong>{{ 'review.session.editCard' | translate }}</strong>
+            <small>{{ 'review.session.editCardHint' | translate }}</small>
+          </span>
+        </button>
         <button type="button" class="cb-master-action" (click)="requestManualMastery()">
           <strong>{{ 'review.session.masterCard' | translate }}</strong>
           <span>{{ 'review.session.masterCardHint' | translate }}</span>

@@ -6,7 +6,7 @@ ion-content {
 }
 
 .ss-content {
-  padding: t.$lc-space-6 t.$lc-space-5 t.$lc-space-16;
+  padding: calc(#{t.$lc-space-6} + env(safe-area-inset-top)) t.$lc-space-5 t.$lc-space-16;
   display: flex;
   flex-direction: column;
   gap: t.$lc-space-4;
