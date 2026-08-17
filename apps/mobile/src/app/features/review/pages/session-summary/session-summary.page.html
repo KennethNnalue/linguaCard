@@ -25,6 +25,16 @@
       </div>
     </div>
 
+    @if (manuallyMasteredCount() > 0) {
+      <div class="ss-mastered" role="status">
+        <span class="ss-mastered-icon" aria-hidden="true">★</span>
+        <div>
+          <strong>{{ 'review.summary.manuallyMastered' | translate:{ count: manuallyMasteredCount() } }}</strong>
+          <span>{{ 'review.summary.manuallyMasteredHint' | translate }}</span>
+        </div>
+      </div>
+    }
+
     <!-- How it went -->
     <div class="ss-card">
       <p class="ss-card-title">{{ 'review.summary.howItWent' | translate }}</p>

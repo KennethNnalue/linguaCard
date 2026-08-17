@@ -1,6 +1,7 @@
 import { inject, Injectable } from '@angular/core';
 import { LocalDataService } from '../../../core/services/local-data.service';
-import { PendingReviewCommit, PersistedReviewLocalState } from '../domain/review-persistence';
+import { PendingCardAdministration, PendingReviewCommit, PersistedReviewLocalState } from '../domain/review-persistence';
+import type { ReviewSchedulingState } from '@lingua-card/shared/domain';
 
 const MAX_LOCAL_REVIEW_HISTORY = 5_000;
 
@@ -15,6 +16,7 @@ export class ReviewLocalRepository {
       const duplicateAttempt = state.records.some(record => record.attemptId === commit.record.attemptId);
       if (duplicateEvent || duplicateAttempt) return state;
       return {
+        ...state,
         schedulingStates: {
           ...state.schedulingStates,
           [commit.event.cardId]: commit.nextState,
@@ -36,6 +38,33 @@ export class ReviewLocalRepository {
 
   async schedulingStates(userId: string): Promise<PersistedReviewLocalState['schedulingStates']> {
     return (await this.localData.getReviewLocalState(userId)).schedulingStates;
+  }
+
+  async administer(
+    userId: string,
+    administration: PendingCardAdministration,
+    nextState: ReviewSchedulingState,
+  ): Promise<void> {
+    await this.mutate(userId, state => ({
+      ...state,
+      schedulingStates: { ...state.schedulingStates, [administration.cardId]: nextState },
+      administrationOutbox: [
+        ...(state.administrationOutbox ?? []).filter(item => item.command.commandId !== administration.command.commandId),
+        administration,
+      ],
+    }));
+  }
+
+  async pendingAdministrations(userId: string): Promise<readonly PendingCardAdministration[]> {
+    return (await this.localData.getReviewLocalState(userId)).administrationOutbox ?? [];
+  }
+
+  async removeAdministrationCommands(userId: string, commandIds: ReadonlySet<string>): Promise<void> {
+    await this.mutate(userId, state => ({
+      ...state,
+      administrationOutbox: (state.administrationOutbox ?? [])
+        .filter(item => !commandIds.has(item.command.commandId)),
+    }));
   }
 
   async removeOutboxEvents(userId: string, eventIds: ReadonlySet<string>): Promise<void> {

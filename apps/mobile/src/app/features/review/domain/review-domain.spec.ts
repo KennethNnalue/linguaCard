@@ -2,7 +2,7 @@ import {
   CardSchedulingState, MINUTES_PER_DAY as D,
   commitReview, createNewSchedulingState, createReviewSession, deriveLearningStage,
   isCardOverdue, markAsMastered, previewRatings, projectDailyProgress,
-  recordPresentation, recordSessionReview, scheduleReview, selectNextCard,
+  recordPresentation, recordSessionReview, resolveManuallyMasteredCard, scheduleReview, selectNextCard,
   resolvePresentation, skipSessionCard, suggestedRatingFor, undoManualMastery,
 } from './review-domain';
 
@@ -162,6 +162,25 @@ describe('session state machine and skip semantics', () => {
       presentationKind: 'relearning',
     });
     expect(skipSessionCard(session, 'A', 'relearning').sessionSkippedCardIds).toEqual(['A']);
+  });
+  test('manual mastery resolves a card without recording a review or skip', () => {
+    const session = recordPresentation(createReviewSession(definition), {
+      kind: 'present', cardId: 'A', presentationKind: 'original',
+    });
+    const resolved = resolveManuallyMasteredCard(session, 'A', 'original');
+    expect(resolved.manuallyMasteredCardIds).toEqual(['A']);
+    expect(resolved.completedOriginalCardIds).toEqual([]);
+    expect(resolved.sessionSkippedCardIds).toEqual([]);
+    expect(resolved.reviewAttemptCount).toBe(0);
+    expect(selectNextCard(resolved, new Map(), now)).toMatchObject({ cardId: 'B', presentationKind: 'original' });
+  });
+  test('manual mastery excludes due relearning presentations', () => {
+    const due = state({ cardId: 'A', stage: 'familiar', intervalMinutes: 10, dueAt: now, relearning: { previousStage: 'familiar', previousIntervalMinutes: 7 * D, step: 'immediate' } });
+    const session = recordPresentation(createReviewSession(definition), {
+      kind: 'present', cardId: 'A', presentationKind: 'relearning',
+    });
+    const resolved = resolveManuallyMasteredCard(session, 'A', 'relearning');
+    expect(selectNextCard(resolved, new Map([['A', due]]), now)).toMatchObject({ cardId: 'B', presentationKind: 'original' });
   });
   test('mixed direction resolves deterministically per original card', () => {
     const session = createReviewSession({ ...definition, direction: 'mixed' });

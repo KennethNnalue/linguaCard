@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, input, model, output } from '@angular/core';
+import { ChangeDetectionStrategy, Component, ElementRef, input, model, output, viewChild } from '@angular/core';
 import { IonIcon } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
 import { checkmarkOutline } from 'ionicons/icons';
@@ -12,6 +12,7 @@ import { TranslatePipe } from '@ngx-translate/core';
   imports: [IonIcon, TranslatePipe],
 })
 export class FrontTypeComponent {
+  private readonly answerInput = viewChild<ElementRef<HTMLInputElement>>('answerInput');
   readonly prompt = input.required<string>();
   readonly expectsGermanAnswer = input.required<boolean>();
   readonly typed = model<string>('');
@@ -25,11 +26,26 @@ export class FrontTypeComponent {
   }
 
   onInput(event: Event): void {
-    this.typed.set((event.target as HTMLInputElement).value);
+    if (event.target instanceof HTMLInputElement) this.typed.set(event.target.value);
   }
 
   append(ch: string): void {
-    this.typed.update(v => v + ch);
+    const inputElement = this.answerInput()?.nativeElement;
+    const currentValue = this.typed();
+    const selectionStart = inputElement?.selectionStart ?? currentValue.length;
+    const selectionEnd = inputElement?.selectionEnd ?? selectionStart;
+    this.typed.set(`${currentValue.slice(0, selectionStart)}${ch}${currentValue.slice(selectionEnd)}`);
+    queueMicrotask(() => {
+      const input = this.answerInput()?.nativeElement;
+      if (!input) return;
+      const caretPosition = selectionStart + ch.length;
+      input.focus({ preventScroll: true });
+      input.setSelectionRange(caretPosition, caretPosition);
+    });
+  }
+
+  preserveInputFocus(event: PointerEvent): void {
+    event.preventDefault();
   }
 
   onEnter(event: Event): void {

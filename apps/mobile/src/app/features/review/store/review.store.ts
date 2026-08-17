@@ -8,7 +8,7 @@ import { CardStore } from '../../vault/store/card.store';
 import {
   PromptDirection, recordPresentation, recordSessionReview,
   resolvePresentation, ReviewPresentation, ReviewSessionSource, ReviewSessionState,
-  selectNextCard, skipSessionCard,
+  resolveManuallyMasteredCard, selectNextCard, skipSessionCard,
 } from '../domain/review-domain';
 import {
   deserializeReviewSessionState,
@@ -25,6 +25,7 @@ import { UpsertSessionDto } from '../services/review-session-api.service';
 import { ReviewCommitService } from '../services/review-commit.service';
 import { ReviewLocalRepository } from '../services/review-local.repository';
 import { EngagementStore } from '../../engagement/state/engagement.store';
+import { CardAdministrationService } from '../services/card-administration.service';
 
 export interface ReviewCommitContext {
   reviewMode?: 'typing' | 'recall';
@@ -38,6 +39,7 @@ export type ReviewOperation =
   | { kind: 'starting' }
   | { kind: 'ready' }
   | { kind: 'committing' }
+  | { kind: 'administering'; action: 'manual_mastery' }
   | { kind: 'completed' }
   | { kind: 'error'; message: string; recoverable: boolean };
 
@@ -56,6 +58,7 @@ interface ReviewState {
 
 type PersistedSessionHistoryEntry = Omit<ReviewSessionHistoryEntry, 'originalCardIds'> & {
   originalCardIds?: readonly string[];
+  manuallyMasteredCardIds?: readonly string[];
 };
 
 const initialState: ReviewState = {
@@ -77,6 +80,7 @@ function isPersistedSessionHistoryEntry(value: unknown): value is PersistedSessi
   if (!('newCards' in value) || typeof value.newCards !== 'number') return false;
   if (!('reviewedCardIds' in value) || !Array.isArray(value.reviewedCardIds) || !value.reviewedCardIds.every(id => typeof id === 'string')) return false;
   if ('originalCardIds' in value && (!Array.isArray(value.originalCardIds) || !value.originalCardIds.every(id => typeof id === 'string'))) return false;
+  if ('manuallyMasteredCardIds' in value && (!Array.isArray(value.manuallyMasteredCardIds) || !value.manuallyMasteredCardIds.every(id => typeof id === 'string'))) return false;
   if (!('ratings' in value) || typeof value.ratings !== 'object' || value.ratings === null || Array.isArray(value.ratings)) return false;
   return Object.values(value.ratings).every(isReviewRating);
 }
@@ -96,7 +100,12 @@ export const ReviewStore = signalStore(
   withState(initialState),
   withComputed(store => ({
     isCommitting: computed(() => store.operation().kind === 'committing'),
+    isBusy: computed(() => store.operation().kind === 'committing' || store.operation().kind === 'administering'),
     completedOriginalCount: computed(() => store.session()?.completedOriginalCardIds.length ?? 0),
+    resolvedOriginalCount: computed(() => {
+      const session = store.session();
+      return session ? session.completedOriginalCardIds.length + session.manuallyMasteredCardIds.length : 0;
+    }),
     totalOriginalCount: computed(() => store.session()?.definition.originalCardIds.length ?? 0),
   })),
   withMethods(store => {
@@ -109,6 +118,7 @@ export const ReviewStore = signalStore(
     const reviewCommit = inject(ReviewCommitService);
     const reviewLocal = inject(ReviewLocalRepository);
     const engagementStore = inject(EngagementStore);
+    const cardAdministration = inject(CardAdministrationService);
     let persistenceChain: Promise<void> = Promise.resolve();
 
     function serializePersistence(work: () => Promise<void>): Promise<void> {
@@ -171,6 +181,7 @@ export const ReviewStore = signalStore(
         collectionName: null,
         originalCardIds: [...session.definition.originalCardIds],
         reviewedCardIds: Object.keys(ratings),
+        manuallyMasteredCardIds: [...session.manuallyMasteredCardIds],
       };
     }
     async function completeActiveSession(session: ReviewSessionState): Promise<void> {
@@ -249,11 +260,15 @@ export const ReviewStore = signalStore(
           .map(session => ({
             ...session,
             originalCardIds: session.originalCardIds ?? session.reviewedCardIds,
+            manuallyMasteredCardIds: session.manuallyMasteredCardIds ?? [],
           }));
         const committedEvents = (await reviewLocal.committedEvents(userId)).filter(isCommittedReviewEvent);
         patchState(store, { sessionHistory: sessions, committedEvents });
         if ((await reviewLocal.pendingCommits(userId)).length > 0) {
           await syncService.enqueue({ type: SyncOperationType.FLUSH_REVIEW_COMMITS, payload: { userId } });
+        }
+        if ((await reviewLocal.pendingAdministrations(userId)).length > 0) {
+          await syncService.enqueue({ type: SyncOperationType.FLUSH_CARD_ADMINISTRATIONS, payload: { userId } });
         }
       },
       async startSession(source: ReviewSessionSource, limit: number): Promise<StartSessionResult> {
@@ -340,7 +355,7 @@ export const ReviewStore = signalStore(
         const reviewedSession = recordSessionReview(session, presentation.cardId, presentation.kind);
         const ratings = { ...store.sessionRatings(), [presentation.cardId]: rating };
         patchState(store, {
-          session: reviewedSession, presentation: null,
+          session: reviewedSession,
           sessionRatings: ratings,
           lastReviewedCardId: presentation.cardId,
         });
@@ -379,6 +394,47 @@ export const ReviewStore = signalStore(
             operation: { kind: 'error', message: 'The skipped card could not be saved.', recoverable: true },
           });
           return false;
+        }
+        return true;
+      },
+      async masterCurrentCard(): Promise<boolean> {
+        if (store.isBusy()) return false;
+        const session = store.session();
+        const presentation = store.presentation();
+        if (!session || !presentation) return false;
+        const card = cardById(presentation.cardId);
+        if (!card) {
+          patchState(store, { operation: { kind: 'error', message: 'The current review card is unavailable.', recoverable: false } });
+          return false;
+        }
+        patchState(store, { operation: { kind: 'administering', action: 'manual_mastery' }, commitError: null });
+        try {
+          await cardAdministration.manuallyMaster(card);
+        } catch {
+          patchState(store, {
+            operation: { kind: 'error', message: 'This card could not be marked as mastered. Check your connection and try again.', recoverable: true },
+            commitError: 'Manual mastery could not be saved.',
+          });
+          return false;
+        }
+        const resolved = resolveManuallyMasteredCard(session, presentation.cardId, presentation.kind);
+        try {
+          await persistActiveSession(resolved);
+          patchState(store, { session: resolved, presentation: null });
+          await presentNextCard(resolved, new Date());
+        } catch {
+          const selection = selectNextCard(resolved, schedulingStates(), new Date());
+          if (selection.kind === 'complete') {
+            await completeActiveSession(selection.state);
+          } else {
+            const nextSession = recordPresentation(resolved, selection);
+            patchState(store, {
+              session: nextSession,
+              presentation: resolvePresentation(nextSession, selection),
+              operation: { kind: 'ready' },
+              commitError: 'Card mastered, but session progress could not be saved on this device.',
+            });
+          }
         }
         return true;
       },

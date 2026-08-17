@@ -86,6 +86,10 @@
   }
 }
 
+@media (prefers-reduced-motion: reduce) {
+  .ff-cta { animation: none; }
+}
+
 @keyframes ffPulse {
   0% {
     box-shadow: 0 0 0 0 t.$lc-rv-pulse;

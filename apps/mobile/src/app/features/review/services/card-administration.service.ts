@@ -1,18 +1,23 @@
 import { inject, Injectable } from '@angular/core';
-import { firstValueFrom } from 'rxjs';
 import {
+  applyCardAdministration,
   CardAdministrationCommand,
   CardAdministrationResult,
   CardAdministrationType,
   ScheduledCard,
 } from '@lingua-card/shared/domain';
-import { CardApiService } from '../../vault/services/card-api.service';
 import { CardStore } from '../../vault/store/card.store';
+import { AuthService } from '../../../core/services/auth.service';
+import { SyncService } from '../../../core/services/sync.service';
+import { SyncOperationType } from '../models/review.model';
+import { ReviewLocalRepository } from './review-local.repository';
 
 @Injectable({ providedIn: 'root' })
 export class CardAdministrationService {
-  private readonly api = inject(CardApiService);
   private readonly cards = inject(CardStore);
+  private readonly auth = inject(AuthService);
+  private readonly sync = inject(SyncService);
+  private readonly localRepository = inject(ReviewLocalRepository);
 
   manuallyMaster(card: ScheduledCard): Promise<CardAdministrationResult> {
     return this.execute(card, { commandId: crypto.randomUUID(), type: CardAdministrationType.MANUALLY_MASTER });
@@ -35,8 +40,17 @@ export class CardAdministrationService {
   }
 
   private async execute(card: ScheduledCard, command: CardAdministrationCommand): Promise<CardAdministrationResult> {
-    const result = await firstValueFrom(this.api.executeAdministration(card.id, command));
+    const userId = this.auth.currentUser()?.id;
+    if (!userId) throw new Error('A signed-in user is required to administer a card');
+    const result = applyCardAdministration(card.reviewState, command, new Date(), crypto.randomUUID());
+    await this.localRepository.administer(userId, { cardId: card.id, command }, result.nextState);
     this.cards.updateCard({ ...card, reviewState: result.nextState });
+    try {
+      await this.sync.enqueue({ type: SyncOperationType.FLUSH_CARD_ADMINISTRATIONS, payload: { userId } });
+      if (navigator.onLine) void this.sync.processQueue();
+    } catch {
+      // The durable administration outbox is checked again during app initialization.
+    }
     return result;
   }
 }

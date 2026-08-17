@@ -748,6 +748,17 @@
       "typeGermanFor": "Escribe en alemán",
       "typePlaceholder": "Escribe en alemán — incl. der/die/das",
       "whatDoesThisMean": "Qué significa esto",
+      "cardActions": "Acciones de la tarjeta",
+      "masterCard": "Dominar esta tarjeta",
+      "masterCardHint": "Eliminarla de los repasos programados",
+      "masterConfirmTitle": "¿Dominar «{{word}}»?",
+      "masterConfirmBody": "Esta tarjeta se eliminará de los repasos programados. Tu historial se conservará.",
+      "masterConfirmUndo": "Puedes deshacerlo desde los detalles de la palabra.",
+      "keepReviewing": "Seguir repasando",
+      "confirmMasterCard": "Marcar como dominada",
+      "masteringCard": "Guardando…",
+      "cardMastered": "Tarjeta dominada",
+      "removedFromReviews": "Eliminada de futuros repasos",
       "whatIsGermanFor": "Cómo se dice en alemán",
       "writeFromMemory": "Escríbelo de memoria",
       "youWrote": "Escribiste"
@@ -787,7 +798,9 @@
       "lockItIn": "Afiánzalo con una historia",
       "recallRate": "Tasa de aciertos",
       "seeTrickyWords": "Ve las {{count}} palabras difíciles de hoy en contexto",
-      "sessionComplete": "Sesión completada"
+      "sessionComplete": "Sesión completada",
+      "manuallyMastered": "{{count}} dominadas manualmente",
+      "manuallyMasteredHint": "Eliminadas de futuros repasos programados"
     },
     "custom": {
       "backAriaLabel": "Atrás",
@@ -1452,6 +1465,7 @@
     },
     "plural": "Plural",
     "masteryProgress": "Progreso de dominio",
+    "manualMastery": { "title": "Dominada manualmente", "hint": "Excluida de los repasos programados", "undoTitle": "¿Volver a repasar esta tarjeta?", "undoMessage": "«{{word}}» volverá a los repasos programados. Se restaurará su progreso anterior con un intervalo máximo de siete días.", "undoButton": "Deshacer dominio", "saving": "Guardando…", "error": "No se pudo cambiar el dominio. Inténtalo de nuevo." },
     "level": "Nivel {{level}} — {{label}}",
     "stats": {
       "reviews": "Repasos",

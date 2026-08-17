@@ -24,8 +24,27 @@
     <!-- Header -->
     <div class="cb-hdr">
       <span class="cb-side-lbl">{{ card.content.front }}</span>
-      <span class="cb-lang-chip">{{ 'review.session.germanLangChip' | translate }}</span>
+      <div class="cb-hdr-actions">
+        <span class="cb-lang-chip">{{ 'review.session.germanLangChip' | translate }}</span>
+        <button
+          type="button"
+          class="cb-more"
+          [disabled]="busy()"
+          [attr.aria-label]="'review.session.cardActions' | translate"
+          [attr.aria-expanded]="isActionsMenuOpen()"
+          (click)="toggleActionsMenu()">
+          <ion-icon name="ellipsis-vertical-outline"></ion-icon>
+        </button>
+      </div>
     </div>
+    @if (isActionsMenuOpen()) {
+      <div class="cb-actions-menu">
+        <button type="button" class="cb-master-action" (click)="requestManualMastery()">
+          <strong>{{ 'review.session.masterCard' | translate }}</strong>
+          <span>{{ 'review.session.masterCardHint' | translate }}</span>
+        </button>
+      </div>
+    }
 
     <!-- Article + gender -->
     @if (card.content.article) {

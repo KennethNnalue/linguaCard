@@ -1,4 +1,4 @@
-import {Component, computed, inject, signal} from '@angular/core';
+import {ChangeDetectionStrategy, Component, computed, inject, signal} from '@angular/core';
 import {ActivatedRoute, Router} from '@angular/router';
 import {toSignal} from '@angular/core/rxjs-interop';
 import { map } from 'rxjs';
@@ -24,11 +24,13 @@ import {getCategoryName} from '../../../../shared/helpers/helpers';
 import {normalizeForAudio} from '../../../../shared/audio/normalize';
 import {stageIndicator} from '../../../review/domain/review-status';
 import {MASTERY_LABEL_KEYS} from '../../../review/models/review.model';
+import {CardAdministrationService} from '../../../review/services/card-administration.service';
 
 @Component({
   selector: 'lc-word-detail',
   templateUrl: './word-detail.component.html',
   styleUrls: ['./word-detail.component.scss'],
+  changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [IonContent, IonIcon, ArticleBadgeComponent, TranslatePipe],
 })
 export class WordDetailComponent {
@@ -45,6 +47,8 @@ export class WordDetailComponent {
   private readonly navCtrl = inject(NavController);
   private readonly translate = inject(TranslateService);
   private readonly languageService = inject(LanguageService);
+  private readonly cardAdministration = inject(CardAdministrationService);
+  readonly administrationState = signal<'idle' | 'saving' | 'error'>('idle');
 
   constructor() {
     addIcons({
@@ -67,6 +71,7 @@ export class WordDetailComponent {
   readonly categories = this.categoryStore.categories;
 
   readonly masteryLevel = computed(() => stageIndicator(this.card()?.reviewState.stage ?? 'new'));
+  readonly isManuallyMastered = computed(() => this.card()?.reviewState.masterySource === 'manual');
 
 
   // Used only for the SVG ring stroke — mastery colors are the same in both modes
@@ -202,6 +207,35 @@ export class WordDetailComponent {
       ],
     });
     await alert.present();
+  }
+
+  async confirmUndoManualMastery(): Promise<void> {
+    const card = this.card();
+    if (!card || !this.isManuallyMastered() || this.administrationState() === 'saving') return;
+    const alert = await this.alertCtrl.create({
+      header: this.translate.instant('wordDetail.manualMastery.undoTitle'),
+      message: this.translate.instant('wordDetail.manualMastery.undoMessage', { word: card.content.back }),
+      buttons: [
+        { text: this.translate.instant('common.cancel'), role: 'cancel' },
+        {
+          text: this.translate.instant('wordDetail.manualMastery.undoButton'),
+          handler: () => { void this.undoManualMastery(); },
+        },
+      ],
+    });
+    await alert.present();
+  }
+
+  private async undoManualMastery(): Promise<void> {
+    const card = this.card();
+    if (!card) return;
+    this.administrationState.set('saving');
+    try {
+      await this.cardAdministration.undoManualMastery(card);
+      this.administrationState.set('idle');
+    } catch {
+      this.administrationState.set('error');
+    }
   }
 
   highlightWord(sentence: string, word: string): string {

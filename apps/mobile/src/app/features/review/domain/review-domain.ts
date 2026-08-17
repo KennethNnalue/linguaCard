@@ -465,6 +465,7 @@ export interface ReviewSessionState {
   currentCardId?: string;
   currentDirection?: PromptDirection;
   completedOriginalCardIds: readonly string[];
+  manuallyMasteredCardIds: readonly string[];
   sessionSkippedCardIds: readonly string[];
   skipCounts: Readonly<Record<string, number>>;
   lastPresentedCardId?: string;
@@ -486,7 +487,7 @@ export interface SessionCompletion { kind: 'complete'; state: ReviewSessionState
 
 export function createReviewSession(definition: ReviewSessionDefinition): ReviewSessionState {
   if (new Set(definition.originalCardIds).size !== definition.originalCardIds.length) throw new Error('Original card IDs must be unique');
-  return { definition: { ...definition, originalCardIds: [...definition.originalCardIds], startedAt: new Date(definition.startedAt.getTime()) }, status: 'active', completedOriginalCardIds: [], sessionSkippedCardIds: [], skipCounts: {}, reviewAttemptCount: 0 };
+  return { definition: { ...definition, originalCardIds: [...definition.originalCardIds], startedAt: new Date(definition.startedAt.getTime()) }, status: 'active', completedOriginalCardIds: [], manuallyMasteredCardIds: [], sessionSkippedCardIds: [], skipCounts: {}, reviewAttemptCount: 0 };
 }
 
 export function resolvePresentation(
@@ -507,7 +508,10 @@ function resolvePromptDirection(session: ReviewSessionState, cardId: string): Pr
     : 'target_to_source';
 }
 
-const unresolvedOriginals = (session: ReviewSessionState): string[] => session.definition.originalCardIds.filter(id => !session.completedOriginalCardIds.includes(id) && !session.sessionSkippedCardIds.includes(id));
+const unresolvedOriginals = (session: ReviewSessionState): string[] => session.definition.originalCardIds.filter(id =>
+  !session.completedOriginalCardIds.includes(id)
+  && !session.manuallyMasteredCardIds.includes(id)
+  && !session.sessionSkippedCardIds.includes(id));
 const nextUnresolvedOriginal = (session: ReviewSessionState): string | undefined => {
   const unresolved = unresolvedOriginals(session);
   if (!session.lastPresentedCardId) return unresolved[0];
@@ -517,7 +521,10 @@ const nextUnresolvedOriginal = (session: ReviewSessionState): string | undefined
 const dueRelearning = (session: ReviewSessionState, cards: ReadonlyMap<string, CardSchedulingState>, now: Date): string[] =>
   session.definition.originalCardIds.filter(id => {
     const card = cards.get(id);
-    return !session.sessionSkippedCardIds.includes(id) && card?.relearning !== undefined && isCardDue(card, now);
+    return !session.manuallyMasteredCardIds.includes(id)
+      && !session.sessionSkippedCardIds.includes(id)
+      && card?.relearning !== undefined
+      && isCardDue(card, now);
   });
 
 export function selectNextCard(session: ReviewSessionState, cards: ReadonlyMap<string, CardSchedulingState>, now: Date): SessionSelection | SessionCompletion {
@@ -597,6 +604,25 @@ export function skipSessionCard(session: ReviewSessionState, cardId: string, pre
     lastPresentationKind: presentationKind,
     skipCounts: { ...session.skipCounts, [cardId]: count },
     sessionSkippedCardIds: exclude && !session.sessionSkippedCardIds.includes(cardId) ? [...session.sessionSkippedCardIds, cardId] : session.sessionSkippedCardIds,
+  };
+}
+
+export function resolveManuallyMasteredCard(
+  session: ReviewSessionState,
+  cardId: string,
+  presentationKind: PresentationKind,
+): ReviewSessionState {
+  if (session.status !== 'active') throw new Error('Completed sessions are immutable');
+  assertCurrentPresentation(session, cardId, presentationKind);
+  return {
+    ...session,
+    currentCardId: undefined,
+    currentDirection: undefined,
+    lastPresentedCardId: cardId,
+    lastPresentationKind: presentationKind,
+    manuallyMasteredCardIds: session.manuallyMasteredCardIds.includes(cardId)
+      ? session.manuallyMasteredCardIds
+      : [...session.manuallyMasteredCardIds, cardId],
   };
 }
 

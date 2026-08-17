@@ -1,7 +1,7 @@
-import { ChangeDetectionStrategy, Component, computed, input, output } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, input, output, signal } from '@angular/core';
 import { IonIcon } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
-import { chevronDownOutline, volumeHighOutline } from 'ionicons/icons';
+import { chevronDownOutline, ellipsisVerticalOutline, volumeHighOutline } from 'ionicons/icons';
 import { TranslatePipe } from '@ngx-translate/core';
 import type { Card } from '@lingua-card/shared/domain';
 import { ArticleBadgeComponent } from '../../../../../../shared/components/article-badge/article-badge.component';
@@ -39,13 +39,16 @@ export class CardBackComponent {
   readonly typedResult = input<TypedAnswerFeedback | null>(null);
   readonly expandedSynonym = input<number | null>(null);
   readonly isPronunciationLoading = input(false);
+  readonly busy = input(false);
 
   readonly toggleSynonym = output<number>();
   readonly playAudio = output<void>();
   readonly playExample = output<string>();
+  readonly manualMasteryRequested = output<void>();
+  readonly isActionsMenuOpen = signal(false);
 
   constructor() {
-    addIcons({ chevronDownOutline, volumeHighOutline });
+    addIcons({ chevronDownOutline, ellipsisVerticalOutline, volumeHighOutline });
   }
 
   readonly genderWord = computed(() => {
@@ -80,5 +83,15 @@ export class CardBackComponent {
 
   isSynonymExpanded(i: number): boolean {
     return this.expandedSynonym() === i;
+  }
+
+  toggleActionsMenu(): void {
+    if (this.busy()) return;
+    this.isActionsMenuOpen.update(open => !open);
+  }
+
+  requestManualMastery(): void {
+    this.isActionsMenuOpen.set(false);
+    this.manualMasteryRequested.emit();
   }
 }

@@ -748,6 +748,17 @@
       "typeGermanFor": "اكتبها بالألمانية",
       "typePlaceholder": "اكتب بالألمانية — بما في ذلك der/die/das",
       "whatDoesThisMean": "ماذا يعني هذا",
+      "cardActions": "إجراءات البطاقة",
+      "masterCard": "إتقان هذه البطاقة",
+      "masterCardHint": "إزالتها من المراجعات المجدولة",
+      "masterConfirmTitle": "إتقان «{{word}}»؟",
+      "masterConfirmBody": "ستتم إزالة البطاقة من المراجعات مع الاحتفاظ بسجل التعلم.",
+      "masterConfirmUndo": "يمكنك التراجع من تفاصيل الكلمة.",
+      "keepReviewing": "متابعة المراجعة",
+      "confirmMasterCard": "وضع علامة متقن",
+      "masteringCard": "جارٍ الحفظ…",
+      "cardMastered": "تم إتقان البطاقة",
+      "removedFromReviews": "تمت إزالتها من المراجعات المستقبلية",
       "whatIsGermanFor": "ما هي بالألمانية",
       "writeFromMemory": "اكتبها من الذاكرة",
       "youWrote": "كتبتَ"
@@ -787,7 +798,9 @@
       "lockItIn": "رسّخها بقصة",
       "recallRate": "معدل التذكّر",
       "seeTrickyWords": "شاهد {{count}} كلمة صعبة اليوم في سياقها",
-      "sessionComplete": "اكتملت الجلسة"
+      "sessionComplete": "اكتملت الجلسة",
+      "manuallyMastered": "تم إتقان {{count}} يدويًا",
+      "manuallyMasteredHint": "تمت إزالتها من المراجعات المستقبلية"
     },
     "custom": {
       "backAriaLabel": "رجوع",
@@ -1452,6 +1465,7 @@
     },
     "plural": "الجمع",
     "masteryProgress": "تقدم الإتقان",
+    "manualMastery": { "title": "تم الإتقان يدويًا", "hint": "مستبعدة من المراجعات المجدولة", "undoTitle": "إعادة البطاقة إلى المراجعة؟", "undoMessage": "ستعود «{{word}}» إلى المراجعات المجدولة، مع استعادة التقدم السابق بفاصل أقصاه سبعة أيام.", "undoButton": "التراجع عن الإتقان", "saving": "جارٍ الحفظ…", "error": "تعذر تغيير حالة الإتقان. حاول مرة أخرى." },
     "level": "المستوى {{level}} — {{label}}",
     "stats": {
       "reviews": "المراجعات",

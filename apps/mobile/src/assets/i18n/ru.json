@@ -748,6 +748,17 @@
       "typeGermanFor": "Напишите по-немецки",
       "typePlaceholder": "Пишите по-немецки — вместе с der/die/das",
       "whatDoesThisMean": "Что это значит",
+      "cardActions": "Действия с карточкой",
+      "masterCard": "Освоить эту карточку",
+      "masterCardHint": "Убрать из запланированных повторений",
+      "masterConfirmTitle": "Освоить «{{word}}»?",
+      "masterConfirmBody": "Карточка будет удалена из повторений. История обучения сохранится.",
+      "masterConfirmUndo": "Это можно отменить в сведениях о слове.",
+      "keepReviewing": "Продолжить повторение",
+      "confirmMasterCard": "Отметить освоенной",
+      "masteringCard": "Сохранение…",
+      "cardMastered": "Карточка освоена",
+      "removedFromReviews": "Удалена из будущих повторений",
       "whatIsGermanFor": "Как будет по-немецки",
       "writeFromMemory": "Напишите по памяти",
       "youWrote": "Вы написали"
@@ -787,7 +798,9 @@
       "lockItIn": "Закрепите это историей",
       "recallRate": "Уровень припоминания",
       "seeTrickyWords": "Посмотрите {{count}} трудных слов сегодня в контексте",
-      "sessionComplete": "Сессия завершена"
+      "sessionComplete": "Сессия завершена",
+      "manuallyMastered": "Освоено вручную: {{count}}",
+      "manuallyMasteredHint": "Удалены из будущих повторений"
     },
     "custom": {
       "backAriaLabel": "Назад",
@@ -1452,6 +1465,7 @@
     },
     "plural": "Множественное число",
     "masteryProgress": "Прогресс освоения",
+    "manualMastery": { "title": "Освоено вручную", "hint": "Исключено из запланированных повторений", "undoTitle": "Вернуть карточку в повторения?", "undoMessage": "«{{word}}» вернётся в запланированные повторения. Предыдущий прогресс восстановится с интервалом не более семи дней.", "undoButton": "Отменить освоение", "saving": "Сохранение…", "error": "Не удалось изменить статус. Повторите попытку." },
     "level": "Уровень {{level}} — {{label}}",
     "stats": {
       "reviews": "Повторений",

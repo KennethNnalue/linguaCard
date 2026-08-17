@@ -17,6 +17,7 @@ export type SyncOperationType =
   | 'DELETE_STORY'
   | 'FLUSH_REVIEW_COMMITS'
   | 'FLUSH_REVIEW_SESSIONS'
+  | 'FLUSH_CARD_ADMINISTRATIONS'
   | 'PATCH_SETTINGS';
 
 export interface SyncOperation {

@@ -748,6 +748,17 @@
       "typeGermanFor": "Almancasını yaz",
       "typePlaceholder": "Almanca yaz — der/die/das dahil",
       "whatDoesThisMean": "Bu ne anlama geliyor",
+      "cardActions": "Kart işlemleri",
+      "masterCard": "Bu kartı ustalaştır",
+      "masterCardHint": "Planlanmış tekrarlardan kaldır",
+      "masterConfirmTitle": "“{{word}}” ustalaşıldı olarak işaretlensin mi?",
+      "masterConfirmBody": "Bu kart planlanmış tekrarlardan kaldırılacak. Öğrenme geçmişiniz korunacak.",
+      "masterConfirmUndo": "Kelime ayrıntılarından geri alabilirsiniz.",
+      "keepReviewing": "Tekrara devam et",
+      "confirmMasterCard": "Ustalaşıldı olarak işaretle",
+      "masteringCard": "Kaydediliyor…",
+      "cardMastered": "Kart ustalaşıldı",
+      "removedFromReviews": "Gelecekteki tekrarlardan kaldırıldı",
       "whatIsGermanFor": "Almancası ne",
       "writeFromMemory": "Ezberden yaz",
       "youWrote": "Yazdığın"
@@ -787,7 +798,9 @@
       "lockItIn": "Bir hikâyeyle pekiştir",
       "recallRate": "Hatırlama oranı",
       "seeTrickyWords": "Bugünün {{count}} zor kelimesini bağlam içinde gör",
-      "sessionComplete": "Oturum tamamlandı"
+      "sessionComplete": "Oturum tamamlandı",
+      "manuallyMastered": "{{count}} kart manuel ustalaşıldı",
+      "manuallyMasteredHint": "Gelecekteki planlanmış tekrarlardan kaldırıldı"
     },
     "custom": {
       "backAriaLabel": "Geri",
@@ -1452,6 +1465,7 @@
     },
     "plural": "Çoğul",
     "masteryProgress": "Ustalık İlerlemesi",
+    "manualMastery": { "title": "Manuel olarak ustalaşıldı", "hint": "Planlanmış tekrarlardan çıkarıldı", "undoTitle": "Bu kart tekrar edilsin mi?", "undoMessage": "“{{word}}” planlanmış tekrarlara dönecek. Önceki ilerlemesi en fazla yedi günlük aralıkla geri yüklenecek.", "undoButton": "Ustalığı geri al", "saving": "Kaydediliyor…", "error": "Ustalık değiştirilemedi. Tekrar deneyin." },
     "level": "Seviye {{level}} — {{label}}",
     "stats": {
       "reviews": "Tekrarlar",

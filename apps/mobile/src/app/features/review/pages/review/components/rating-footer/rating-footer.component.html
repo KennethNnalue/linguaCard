@@ -1,9 +1,9 @@
 <div class="rf-secondary">
-  <button class="rf-sec-btn" [disabled]="!canGoPrevious()" (click)="previous.emit()">
+  <button class="rf-sec-btn" [disabled]="busy() || !canGoPrevious()" (click)="previous.emit()">
     <ion-icon name="chevron-back-outline"></ion-icon>
     {{ 'review.session.previousBtn' | translate }}
   </button>
-  <button class="rf-sec-btn" (click)="readOnly() ? returnToCurrent.emit() : skip.emit()">
+  <button class="rf-sec-btn" [disabled]="busy()" (click)="readOnly() ? returnToCurrent.emit() : skip.emit()">
     {{ (readOnly() ? 'review.session.returnToCurrentBtn' : 'review.session.skipBtn') | translate }}
     <ion-icon name="chevron-forward-outline"></ion-icon>
   </button>
@@ -18,6 +18,8 @@
       <button
         class="rf-btn rf-btn--{{ ratingClass(r.value) }}"
         [class.rf-btn--suggested]="suggested() === r.value"
+        [disabled]="busy()"
+        [attr.aria-busy]="busy()"
         (click)="rate.emit(r.value)">
         <span class="rf-lbl">{{ ratingKey(r.value) | translate }}</span>
         <span class="rf-interval">{{ r.previewLabel ?? '—' }}</span>

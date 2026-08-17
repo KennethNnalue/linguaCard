@@ -5,6 +5,7 @@ import type { LearningStage, ReviewRating } from '@lingua-card/shared/domain';
 export const SyncOperationType = {
   FLUSH_REVIEW_COMMITS: 'FLUSH_REVIEW_COMMITS',
   FLUSH_REVIEW_SESSIONS: 'FLUSH_REVIEW_SESSIONS',
+  FLUSH_CARD_ADMINISTRATIONS: 'FLUSH_CARD_ADMINISTRATIONS',
   PATCH_SETTINGS: 'PATCH_SETTINGS',
 } as const;
 
@@ -256,6 +257,7 @@ export interface ReviewSessionHistoryEntry {
   collectionName: string | null;
   originalCardIds: readonly string[];
   reviewedCardIds: readonly string[];
+  manuallyMasteredCardIds: readonly string[];
 }
 
 // ─── NAVIGATION ROUTES ────────────────────────────────────────────────────────

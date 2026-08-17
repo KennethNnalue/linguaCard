@@ -98,6 +98,23 @@
             <div class="stat-lbl">{{ 'wordDetail.stats.lastSeen' | translate }}</div>
           </div>
         </div>
+        @if (isManuallyMastered()) {
+          <div class="manual-mastery">
+            <div class="manual-mastery-copy">
+              <strong>{{ 'wordDetail.manualMastery.title' | translate }}</strong>
+              <span>{{ 'wordDetail.manualMastery.hint' | translate }}</span>
+            </div>
+            <button
+              type="button"
+              [disabled]="administrationState() === 'saving'"
+              (click)="confirmUndoManualMastery()">
+              {{ (administrationState() === 'saving' ? 'wordDetail.manualMastery.saving' : 'wordDetail.manualMastery.undoButton') | translate }}
+            </button>
+          </div>
+        }
+        @if (administrationState() === 'error') {
+          <p class="manual-mastery-error" role="alert">{{ 'wordDetail.manualMastery.error' | translate }}</p>
+        }
       </section>
 
       <!-- Examples -->

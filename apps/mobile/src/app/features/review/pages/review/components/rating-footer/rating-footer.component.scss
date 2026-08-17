@@ -59,6 +59,16 @@
   padding: t.$lc-space-2 t.$lc-space-1;
   border-radius: t.$lc-radius-md;
   border: 1px solid transparent;
+  transition: transform 140ms t.$lc-easing-standard, filter 140ms ease, opacity 140ms ease;
+
+  &:active:not(:disabled) {
+    transform: translateY(2px) scale(.97);
+  }
+
+  &:disabled {
+    cursor: wait;
+    opacity: .62;
+  }
 
   &--again {
     background: var(--lc-rv-again-bg);
@@ -85,6 +95,11 @@
   &--suggested {
     box-shadow: t.$lc-rv-shadow-gold-ring;
   }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .rf-btn { transition: opacity 1ms linear; }
+  .rf-btn:active:not(:disabled) { transform: none; }
 }
 
 .rf-lbl {

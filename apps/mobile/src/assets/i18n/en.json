@@ -827,7 +827,18 @@
       "youWrote": "You wrote",
       "examplesHeader": "Example sentences",
       "cardOf": "Card {{n}} of {{total}}",
-      "whatDoesThisMean": "What does this mean"
+      "whatDoesThisMean": "What does this mean",
+      "cardActions": "Card actions",
+      "masterCard": "Master this card",
+      "masterCardHint": "Remove it from scheduled reviews",
+      "masterConfirmTitle": "Master “{{word}}”?",
+      "masterConfirmBody": "This card will be removed from scheduled reviews. Your learning and review history will remain saved.",
+      "masterConfirmUndo": "You can undo mastery from the word details screen.",
+      "keepReviewing": "Keep reviewing",
+      "confirmMasterCard": "Mark as mastered",
+      "masteringCard": "Saving…",
+      "cardMastered": "Card mastered",
+      "removedFromReviews": "Removed from future reviews"
     },
     "engagement": {
       "dailyGoalComplete": "Daily goal complete",
@@ -864,7 +875,9 @@
       "lockItIn": "Lock it in with a story",
       "seeTrickyWords": "See today's {{count}} tricky words in context",
       "drillThatNeedWork": "Drill the {{count}} that need work",
-      "backToReviewHome": "Back to Review home"
+      "backToReviewHome": "Back to Review home",
+      "manuallyMastered": "{{count}} manually mastered",
+      "manuallyMasteredHint": "Removed from future scheduled reviews"
     },
     "custom": {
       "backAriaLabel": "Back",
@@ -1529,6 +1542,7 @@
     },
     "plural": "Plural",
     "masteryProgress": "Mastery Progress",
+    "manualMastery": { "title": "Manually mastered", "hint": "Excluded from scheduled reviews", "undoTitle": "Resume reviewing this card?", "undoMessage": "“{{word}}” will return to scheduled reviews. Its previous progress will be restored with a maximum seven-day interval.", "undoButton": "Undo mastery", "saving": "Saving…", "error": "Mastery could not be changed. Try again." },
     "level": "Level {{level}} — {{label}}",
     "stats": {
       "reviews": "Reviews",

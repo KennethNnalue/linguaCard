@@ -26,6 +26,7 @@ import { EngagementStore } from '../../../engagement/state/engagement.store';
 import { DailyGoalFeedbackComponent } from '../../../engagement/components/daily-goal-feedback/daily-goal-feedback.component';
 
 const SLOW_RATE = 0.7;
+const MOMENTUM_CHECKPOINTS = [3, 5, 10] as const;
 
 @Component({
   selector: 'lc-review',
@@ -75,6 +76,8 @@ export class ReviewPage {
   readonly typedResult = signal<TypedAnswerEvaluation | null>(null);
   readonly dontKnowSelected = signal(false);
   readonly previousCardId = signal<string | null>(null);
+  readonly isMasteryConfirmationOpen = signal(false);
+  readonly masteredCardLabel = signal<string | null>(null);
   readonly isViewingPrevious = computed(() => this.previousCardId() !== null);
   readonly isPronunciationLoading = this.wordAudio.isLoading;
   readonly expandedSynonym = signal<number | null>(null);
@@ -82,6 +85,16 @@ export class ReviewPage {
   readonly dailyGoalProgress = computed(() => {
     const goal = this.engagementStore.dailyGoal();
     return goal > 0 ? Math.min(100, (this.engagementStore.completedToday() / goal) * 100) : 0;
+  });
+  readonly momentumCheckpoints = computed(() => {
+    const total = this.reviewStore.totalOriginalCount();
+    return MOMENTUM_CHECKPOINTS
+      .filter(checkpoint => checkpoint < total)
+      .map(checkpoint => ({
+        count: checkpoint,
+        position: (checkpoint / total) * 100,
+        reached: this.reviewStore.resolvedOriginalCount() >= checkpoint,
+      }));
   });
 
   readonly currentCard = computed<ScheduledCard | null>(() => {
@@ -113,16 +126,15 @@ export class ReviewPage {
       : options;
   });
 
-  // Progress: half-step credit once the card is flipped (per design spec).
   readonly progressPercent = computed(() => {
     const total = this.reviewStore.totalOriginalCount();
     if (!total) return 0;
-    const completed = this.reviewStore.completedOriginalCount();
+    const completed = this.reviewStore.resolvedOriginalCount();
     return ((completed + (this.isFlipped() ? 0.5 : 0)) / total) * 100;
   });
 
   readonly currentPosition = computed(() => Math.min(
-    this.reviewStore.completedOriginalCount() + 1,
+    this.reviewStore.resolvedOriginalCount() + 1,
     this.reviewStore.totalOriginalCount(),
   ));
 
@@ -131,6 +143,7 @@ export class ReviewPage {
     if (!session) return 0;
     return session.definition.originalCardIds.filter(cardId =>
       !session.completedOriginalCardIds.includes(cardId)
+      && !session.manuallyMasteredCardIds.includes(cardId)
       && !session.sessionSkippedCardIds.includes(cardId)
       && cardId !== session.currentCardId,
     ).length;
@@ -221,6 +234,31 @@ export class ReviewPage {
   async skipCard(): Promise<void> {
     if (this.isViewingPrevious()) return;
     if (!await this.reviewStore.skipCurrentCard()) return;
+    if (this.reviewStore.operation().kind === 'completed') {
+      void this.router.navigate([ReviewRoute.SUMMARY], { replaceUrl: true });
+    }
+  }
+
+  requestManualMastery(): void {
+    if (this.isViewingPrevious() || this.reviewStore.isBusy()) return;
+    this.isMasteryConfirmationOpen.set(true);
+  }
+
+  cancelManualMastery(): void {
+    if (this.reviewStore.isBusy()) return;
+    this.isMasteryConfirmationOpen.set(false);
+  }
+
+  async confirmManualMastery(): Promise<void> {
+    const card = this.currentCard();
+    if (!card || this.reviewStore.isBusy()) return;
+    const cardLabel = card.content.back;
+    const mastered = await this.reviewStore.masterCurrentCard();
+    if (!mastered) return;
+    this.isMasteryConfirmationOpen.set(false);
+    this.masteredCardLabel.set(cardLabel);
+    await new Promise(resolve => setTimeout(resolve, 650));
+    this.masteredCardLabel.set(null);
     if (this.reviewStore.operation().kind === 'completed') {
       void this.router.navigate([ReviewRoute.SUMMARY], { replaceUrl: true });
     }

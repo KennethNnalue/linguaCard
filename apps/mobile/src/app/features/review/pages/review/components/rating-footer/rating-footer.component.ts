@@ -26,6 +26,7 @@ export class RatingFooterComponent {
   readonly suggested = input<ReviewRating | null>(null);
   readonly canGoPrevious = input(false);
   readonly readOnly = input(false);
+  readonly busy = input(false);
 
   readonly rate = output<ReviewRating>();
   readonly previous = output<void>();

@@ -11,6 +11,7 @@
     <p class="ft-prompt">{{ prompt() }}</p>
 
     <input
+      #answerInput
       class="ft-input"
       type="text"
       [value]="typed()"
@@ -25,7 +26,11 @@
     @if (expectsGermanAnswer()) {
       <div class="ft-accents">
         @for (a of accents; track a) {
-          <button class="ft-accent" type="button" (click)="append(a)">{{ a }}</button>
+          <button
+            class="ft-accent"
+            type="button"
+            (pointerdown)="preserveInputFocus($event)"
+            (click)="append(a)">{{ a }}</button>
         }
       </div>
     }

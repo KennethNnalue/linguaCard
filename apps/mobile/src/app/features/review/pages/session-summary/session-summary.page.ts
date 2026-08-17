@@ -60,6 +60,7 @@ export class SessionSummaryPage implements OnInit {
     const s = this.session();
     return s ? Object.keys(s.ratings).length : 0;
   });
+  readonly manuallyMasteredCount = computed(() => this.session()?.manuallyMasteredCardIds.length ?? 0);
 
   readonly duration = computed(() => {
     const s = this.session();

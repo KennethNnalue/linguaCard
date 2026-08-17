@@ -126,8 +126,12 @@ export class LocalDataService {
 
   async getReviewLocalState(userId: string): Promise<PersistedReviewLocalState> {
     await this.init();
-    return (await this.storage.get(`review_domain_v1:${userId}`)) ?? {
-      schedulingStates: {}, outbox: [], records: [], events: [],
+    const state = await this.storage.get(`review_domain_v1:${userId}`) as PersistedReviewLocalState | null;
+    if (state) {
+      return { ...state, administrationOutbox: state.administrationOutbox ?? [] };
+    }
+    return {
+      schedulingStates: {}, outbox: [], records: [], events: [], administrationOutbox: [],
     };
   }
 

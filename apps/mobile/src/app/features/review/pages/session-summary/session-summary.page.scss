@@ -90,6 +90,31 @@ ion-content {
   color: var(--lc-rv-muted);
 }
 
+.ss-mastered {
+  display: flex;
+  align-items: center;
+  gap: t.$lc-space-3;
+  padding: t.$lc-space-3 t.$lc-space-4;
+  border: 1px solid var(--lc-rv-border);
+  border-radius: t.$lc-radius-lg;
+  background: var(--lc-rv-note-bg);
+  color: var(--lc-rv-note-fg);
+
+  strong,
+  span { display: block; }
+  strong { font-family: t.$lc-font-rv-display; @include u.lc-font('md', t.$lc-font-weight-semibold); }
+  span { margin-top: 2px; font-family: t.$lc-font-rv-body; @include u.lc-font('xs'); }
+}
+
+.ss-mastered-icon {
+  @include u.circle(40px);
+  @include u.flex-center;
+  flex-shrink: 0;
+  background: var(--lc-rv-card);
+  color: var(--lc-rv-brass-ink);
+  font-size: t.$lc-text-2xl;
+}
+
 // ─── How it went ─────────────────────────────────────────────────────────────
 .ss-card {
   background: var(--lc-rv-card);

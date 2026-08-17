@@ -13,8 +13,20 @@
       <span class="rv-nav-remaining">{{ remaining() }}↑</span>
     </div>
 
-    <div class="rv-prog-track">
+    <div
+      class="rv-prog-track"
+      role="progressbar"
+      [attr.aria-valuemin]="0"
+      [attr.aria-valuemax]="reviewStore.totalOriginalCount()"
+      [attr.aria-valuenow]="reviewStore.completedOriginalCount()">
       <div class="rv-prog-fill" [style.width.%]="progressPercent()"></div>
+      @for (checkpoint of momentumCheckpoints(); track checkpoint.count) {
+        <span
+          class="rv-prog-checkpoint"
+          [class.rv-prog-checkpoint--reached]="checkpoint.reached"
+          [style.left.%]="checkpoint.position"
+          aria-hidden="true"></span>
+      }
     </div>
     @if (engagementReady()) {
       <div class="rv-goal-progress" role="status">
@@ -43,31 +55,37 @@
 <ion-content>
   @if (reviewStore.presentation()) {
     @if (currentCard(); as card) {
-      <div class="rv-scene">
+      <div class="rv-scene" [class.rv-scene--revealed]="isFlipped()">
         @if (!isFlipped()) {
-          @switch (mode()) {
-            @case ('typing') {
-              <lc-rv-front-type
-                [prompt]="flipPrompt()"
-                [expectsGermanAnswer]="expectsGermanAnswer()"
-                [typed]="typed()"
-                (typedChange)="typed.set($event)"
-                (check)="checkTyped()"
-                (dontKnow)="dontKnow()" />
+          <div class="rv-card-stage rv-card-stage--front">
+            @switch (mode()) {
+              @case ('typing') {
+                <lc-rv-front-type
+                  [prompt]="flipPrompt()"
+                  [expectsGermanAnswer]="expectsGermanAnswer()"
+                  [typed]="typed()"
+                  (typedChange)="typed.set($event)"
+                  (check)="checkTyped()"
+                  (dontKnow)="dontKnow()" />
+              }
+              @default {
+                <lc-rv-front-flip [prompt]="flipPrompt()" [cue]="flipCue()" [hint]="flipHint()" (reveal)="reveal()" />
+              }
             }
-            @default {
-              <lc-rv-front-flip [prompt]="flipPrompt()" [cue]="flipCue()" [hint]="flipHint()" (reveal)="reveal()" />
-            }
-          }
+          </div>
         } @else {
-          <lc-rv-card-back
-            [card]="card"
-            [typedResult]="typedResult()?.feedback ?? null"
-            [expandedSynonym]="expandedSynonym()"
-            [isPronunciationLoading]="isPronunciationLoading()"
-            (toggleSynonym)="toggleSynonym($event)"
-            (playAudio)="playAudio()"
-            (playExample)="playExample($event)" />
+          <div class="rv-card-stage rv-card-stage--back">
+            <lc-rv-card-back
+              [card]="card"
+              [typedResult]="typedResult()?.feedback ?? null"
+              [expandedSynonym]="expandedSynonym()"
+              [isPronunciationLoading]="isPronunciationLoading()"
+              [busy]="reviewStore.isBusy()"
+              (toggleSynonym)="toggleSynonym($event)"
+              (playAudio)="playAudio()"
+              (playExample)="playExample($event)"
+              (manualMasteryRequested)="requestManualMastery()" />
+          </div>
         }
       </div>
     }
@@ -81,12 +99,51 @@
   }
 </ion-content>
 
+@if (isMasteryConfirmationOpen()) {
+  <div class="rv-dialog-backdrop" (click)="cancelManualMastery()">
+    <section
+      class="rv-dialog"
+      role="dialog"
+      aria-modal="true"
+      [attr.aria-labelledby]="'rv-mastery-title'"
+      (click)="$event.stopPropagation()">
+      <div class="rv-dialog-medallion" aria-hidden="true">★</div>
+      <h2 id="rv-mastery-title">{{ 'review.session.masterConfirmTitle' | translate:{ word: currentCard()?.content?.back } }}</h2>
+      <p>{{ 'review.session.masterConfirmBody' | translate }}</p>
+      <span class="rv-dialog-note">{{ 'review.session.masterConfirmUndo' | translate }}</span>
+      @if (reviewStore.operation(); as operation) {
+        @if (operation.kind === 'error') {
+          <p class="rv-dialog-error" role="alert">{{ operation.message }}</p>
+        }
+      }
+      <div class="rv-dialog-actions">
+        <button class="rv-dialog-secondary" [disabled]="reviewStore.isBusy()" (click)="cancelManualMastery()">
+          {{ 'review.session.keepReviewing' | translate }}
+        </button>
+        <button class="rv-dialog-primary" [disabled]="reviewStore.isBusy()" (click)="confirmManualMastery()">
+          {{ (reviewStore.isBusy() ? 'review.session.masteringCard' : 'review.session.confirmMasterCard') | translate }}
+        </button>
+      </div>
+    </section>
+  </div>
+}
+
+@if (masteredCardLabel(); as masteredLabel) {
+  <div class="rv-mastery-feedback" role="status" aria-live="polite">
+    <div class="rv-mastery-seal" aria-hidden="true">✓</div>
+    <strong>{{ 'review.session.cardMastered' | translate }}</strong>
+    <span>{{ masteredLabel }}</span>
+    <small>{{ 'review.session.removedFromReviews' | translate }}</small>
+  </div>
+}
+
 @if (reviewStore.presentation()) {
   <div class="rv-footer">
     <lc-rv-rating-footer
       [options]="ratingOptionsWithPreviews()"
       [flipped]="isFlipped()"
       [suggested]="suggestedRating()"
+      [busy]="reviewStore.isBusy()"
       [canGoPrevious]="reviewStore.lastReviewedCardId() !== null && !isViewingPrevious()"
       [readOnly]="isViewingPrevious()"
       (rate)="submitRating($event)"

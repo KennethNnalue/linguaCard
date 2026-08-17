@@ -1,4 +1,4 @@
-import type { ReviewRating, ReviewSchedulingState, ScheduledCard } from '@lingua-card/shared/domain';
+import type { CardAdministrationCommand, ReviewRating, ReviewSchedulingState, ScheduledCard } from '@lingua-card/shared/domain';
 import {
   CardSchedulingState,
   ReviewCommittedEvent,
@@ -14,11 +14,17 @@ export interface PendingReviewCommit {
   nextState: PersistedCardSchedulingState;
 }
 
+export interface PendingCardAdministration {
+  cardId: string;
+  command: CardAdministrationCommand;
+}
+
 export interface PersistedReviewLocalState {
   schedulingStates: Readonly<Record<string, PersistedCardSchedulingState>>;
   outbox: readonly PendingReviewCommit[];
   records: readonly PendingReviewCommit['record'][];
   events: readonly PendingReviewCommit['event'][];
+  administrationOutbox: readonly PendingCardAdministration[];
 }
 
 export interface PersistedReviewSessionState extends Omit<ReviewSessionState, 'definition' | 'completedAt'> {
@@ -99,6 +105,7 @@ export function serializeReviewSessionState(session: ReviewSessionState): Persis
 export function deserializeReviewSessionState(session: PersistedReviewSessionState): ReviewSessionState {
   return {
     ...session,
+    manuallyMasteredCardIds: session.manuallyMasteredCardIds ?? [],
     definition: {
       ...session.definition,
       originalCardIds: [...session.definition.originalCardIds],

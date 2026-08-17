@@ -34,6 +34,7 @@ export class SessionRefresher implements DataRefresher {
       ratings: s.ratings,
       originalCardIds: Object.keys(s.ratings),
       reviewedCardIds: Object.keys(s.ratings),
+      manuallyMasteredCardIds: [],
     }));
     await this.localData.setPendingSessions(_userId, []);
     await this.localData.setSessionHistory(_userId, slim);
