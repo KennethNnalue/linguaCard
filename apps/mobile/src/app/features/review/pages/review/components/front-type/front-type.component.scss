@@ -109,12 +109,20 @@
   display: flex;
   gap: t.$lc-space-2;
   margin-top: t.$lc-space-1;
+  width: 100%;
+  overflow-x: auto;
+  padding-bottom: t.$lc-space-1;
+  scrollbar-width: none;
+
+  &::-webkit-scrollbar {
+    display: none;
+  }
 }
 
 .ft-accent {
   @include u.flex-center;
   @include u.touch-state;
-  width: 46px;
+  min-width: 44px;
   min-height: 44px;
   background: var(--lc-rv-card-alt);
   border: 1px solid var(--lc-rv-border);

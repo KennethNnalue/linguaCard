@@ -17,7 +17,7 @@ import { ReviewFilterService } from '../../services/review-filter.service';
 import { LeechService } from '../../services/leech.service';
 import { ReviewPrefsService, StudyMode } from '../../services/review-prefs.service';
 import { SessionStatsService } from '../../shared/services/session-stats.service';
-import { TranslatePipe } from '@ngx-translate/core';
+import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { SessionDatePipe } from '../../shared/pipes/session-date.pipe';
 import { EngagementStore } from '../../../engagement/state/engagement.store';
 import { SettingsStore } from '../../../settings/store/settings.store';
@@ -27,6 +27,9 @@ import {
   ReviewLimit,
   ReviewRoute,
 } from '../../models/review.model';
+import {ReviewHubPresentationStore} from '../../store/review-hub-presentation.store';
+import {ButtonComponent} from '../../../../shared/ui/button/button.component';
+import {BottomSheetService} from '../../../../shared/components/bottom-sheet/bottom-sheet.service';
 
 interface StudyModeOption {
   value: StudyMode;
@@ -39,7 +42,7 @@ interface StudyModeOption {
   templateUrl: './review-hub.page.html',
   styleUrls: ['./review-hub.page.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [IonContent, IonHeader, IonToolbar, IonIcon, SessionDatePipe, TranslatePipe],
+  imports: [IonContent, IonHeader, IonToolbar, IonIcon, SessionDatePipe, TranslatePipe, ButtonComponent],
 })
 export class ReviewHubPage {
   private readonly reviewStore = inject(ReviewStore);
@@ -51,6 +54,9 @@ export class ReviewHubPage {
   private readonly settingsStore = inject(SettingsStore);
   readonly stats = inject(SessionStatsService);
   private readonly router = inject(Router);
+  private readonly translate = inject(TranslateService);
+  private readonly bottomSheet = inject(BottomSheetService);
+  readonly presentation = inject(ReviewHubPresentationStore);
 
   constructor() {
     addIcons({
@@ -98,6 +104,20 @@ export class ReviewHubPage {
     this.prefs.setMode(mode);
   }
 
+  async changeMode(): Promise<void> {
+    await this.bottomSheet.open(this.translate.instant('review.mode.section'), [
+      {
+        label: this.translate.instant('review.mode.type'),
+        handler: () => this.presentation.selectMode('type'),
+      },
+      {
+        label: this.translate.instant('review.mode.flip'),
+        handler: () => this.presentation.selectMode('flip'),
+      },
+      {label: this.translate.instant('common.cancel'), role: 'cancel'},
+    ]);
+  }
+
   readonly recentSessions = computed(() => this.reviewStore.sessionHistory().slice(0, 2));
 
   // Ring geometry. Hero ring r=28 (c≈175.93), mastery ring r=24 (c≈150.80).
@@ -119,10 +139,31 @@ export class ReviewHubPage {
 
   // ─── Navigation / actions ───────────────────────────────────────────────────
   startTodaysReview(): void {
+    const resumableSessionId = this.reviewStore.resumableSessionId();
+    if (resumableSessionId) {
+      void this.reviewStore.resumeSession(resumableSessionId).then(resumed => {
+        if (resumed) void this.router.navigate([ReviewRoute.PLAYER]);
+      });
+      return;
+    }
     const dailyGoal = this.settingsStore.dailyGoal();
     void this.reviewStore.startSession({ kind: 'daily' }, dailyGoal).then(result => {
       if (result.kind === 'started') void this.router.navigate([ReviewRoute.PLAYER]);
     });
+  }
+
+  performPrimaryAction(): void {
+    const hero = this.presentation.hero();
+    if (hero.kind === 'empty') {
+      void this.router.navigate(['/vault']);
+      return;
+    }
+    if (hero.kind === 'caught-up') {
+      if (hero.newAvailable > 0) this.startNewOnly();
+      else void this.router.navigate(['/vault']);
+      return;
+    }
+    this.startTodaysReview();
   }
 
   startNewOnly(): void {

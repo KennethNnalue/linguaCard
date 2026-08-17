@@ -38,6 +38,12 @@
     border-color: t.$lc-accent;
   }
 
+  &--filled-inverse {
+    background: t.$lc-rv-on-hero;
+    color: t.$lc-rv-on-cta;
+    border-color: t.$lc-rv-on-hero;
+  }
+
   &--outline-primary {
     background: transparent;
     color: t.$lc-brand;

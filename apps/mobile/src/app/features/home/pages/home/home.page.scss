@@ -65,6 +65,84 @@
   padding: 0;
 }
 
+// ─── DAILY PRACTICE HERO ────────────────────────────────────────────────────
+.daily-hero {
+  margin: 0 t.$lc-space-4 t.$lc-space-3;
+  padding: t.$lc-space-6 t.$lc-space-5;
+  border-radius: t.$lc-radius-xl;
+  background: t.$lc-rv-hero-grad;
+  box-shadow: t.$lc-rv-shadow-hero;
+  color: t.$lc-rv-on-hero;
+}
+
+.daily-hero-complete {
+  background: t.$lc-vx-hero-grad;
+}
+
+.daily-eyebrow {
+  display: block;
+  margin-bottom: t.$lc-space-2;
+  color: t.$lc-rv-brass;
+  font-family: t.$lc-font-rv-mono;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  @include u.lc-font('xxs', t.$lc-font-weight-semibold);
+}
+
+.daily-title {
+  margin: 0;
+  color: t.$lc-rv-on-hero;
+  font-family: t.$lc-font-rv-display;
+  line-height: 1.08;
+  @include u.lc-font('7xl', t.$lc-font-weight-semibold);
+}
+
+.daily-count,
+.daily-progress-count {
+  margin: t.$lc-space-4 0 0;
+  color: t.$lc-rv-on-hero;
+  font-family: t.$lc-font-rv-display;
+  @include u.lc-font('5xl', t.$lc-font-weight-semibold);
+}
+
+.daily-progress-count {
+  @include u.lc-font('8xl', t.$lc-font-weight-semibold);
+}
+
+.daily-progress {
+  height: t.$lc-space-2;
+  margin: t.$lc-space-3 0;
+  overflow: hidden;
+  border-radius: t.$lc-radius-full;
+  background: t.$lc-rv-on-hero-track;
+
+  span {
+    display: block;
+    height: 100%;
+    border-radius: inherit;
+    background: t.$lc-rv-brass;
+    transition: width t.$lc-duration-base t.$lc-easing-standard;
+  }
+}
+
+.daily-support {
+  margin: t.$lc-space-3 0 0;
+  color: t.$lc-rv-on-hero-soft;
+  line-height: 1.45;
+  @include u.lc-font('sm');
+}
+
+.daily-streak {
+  margin: t.$lc-space-4 0;
+  color: t.$lc-rv-on-hero;
+  @include u.lc-font('sm', t.$lc-font-weight-semibold);
+}
+
+.daily-hero lc-button {
+  display: block;
+  margin-top: t.$lc-space-5;
+}
+
 // ─── HERO CARD ───────────────────────────────────────────────────────────────
 .hero-card {
   margin: 0 t.$lc-space-4 t.$lc-space-3;

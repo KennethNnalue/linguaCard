@@ -31,6 +31,7 @@
           <button
             class="ft-accent"
             type="button"
+            [attr.aria-label]="'review.session.insertCharacter' | translate:{ character: a }"
             (pointerdown)="preserveInputFocus($event)"
             (click)="append(a)">{{ a }}</button>
         }

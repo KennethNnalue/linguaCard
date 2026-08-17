@@ -21,7 +21,7 @@ export class FrontTypeComponent {
   readonly dontKnow = output<void>();
   readonly focusChanged = output<boolean>();
 
-  readonly accents = ['ä', 'ö', 'ü', 'ß'];
+  readonly accents = ['ä', 'ö', 'ü', 'ß', 'Ä', 'Ö', 'Ü'] as const;
 
   constructor() {
     addIcons({ checkmarkOutline });

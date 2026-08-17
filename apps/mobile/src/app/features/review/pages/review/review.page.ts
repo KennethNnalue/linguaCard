@@ -1,14 +1,13 @@
 import { ChangeDetectionStrategy, Component, computed, effect, inject, signal } from '@angular/core';
 import { Router } from '@angular/router';
-import { IonContent, IonHeader, IonIcon, IonToolbar, ModalController } from '@ionic/angular/standalone';
+import { AlertController, IonContent, IonHeader, IonIcon, IonToolbar, ModalController } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
 import { closeOutline } from 'ionicons/icons';
 import type { ReviewRating, ScheduledCard } from '@lingua-card/shared/domain';
 import { WordAudioService } from '../../../../shared/audio/word-audio.service';
 import { CardStore } from '../../../vault/store/card.store';
-import { CategoryStore } from '../../../vault/store/category.store';
 import { ReviewStore } from '../../store/review.store';
-import { TranslatePipe } from '@ngx-translate/core';
+import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { FrontFlipComponent } from './components/front-flip/front-flip.component';
 import { FrontTypeComponent } from './components/front-type/front-type.component';
 import { CardBackComponent } from './components/card-back/card-back.component';
@@ -22,12 +21,9 @@ import {
 } from '../../models/review.model';
 import { previewRatings } from '../../domain/review-domain';
 import { schedulingStateFor } from '../../domain/review-persistence';
-import { EngagementStore } from '../../../engagement/state/engagement.store';
-import { DailyGoalFeedbackComponent } from '../../../engagement/components/daily-goal-feedback/daily-goal-feedback.component';
 import { AddWordSheetComponent } from '../../../vault/components/add-word-sheet/add-word-sheet.component';
 
 const SLOW_RATE = 0.7;
-const MOMENTUM_CHECKPOINTS = [3, 5, 10] as const;
 
 @Component({
   selector: 'lc-review',
@@ -44,18 +40,17 @@ const MOMENTUM_CHECKPOINTS = [3, 5, 10] as const;
     FrontTypeComponent,
     CardBackComponent,
     RatingFooterComponent,
-    DailyGoalFeedbackComponent,
   ],
 })
 export class ReviewPage {
   private readonly cardStore = inject(CardStore);
   protected readonly reviewStore = inject(ReviewStore);
-  protected readonly engagementStore = inject(EngagementStore);
   private readonly wordAudio = inject(WordAudioService);
-  private readonly categoryStore = inject(CategoryStore);
   private readonly router = inject(Router);
   private readonly answerEvaluator = inject(AnswerEvaluatorService);
   private readonly modalController = inject(ModalController);
+  private readonly alertController = inject(AlertController);
+  private readonly translate = inject(TranslateService);
 
   constructor() {
     addIcons({ closeOutline });
@@ -85,29 +80,6 @@ export class ReviewPage {
   readonly isViewingPrevious = computed(() => this.previousCardId() !== null);
   readonly isPronunciationLoading = this.wordAudio.isLoading;
   readonly expandedSynonym = signal<number | null>(null);
-  readonly engagementReady = computed(() => this.engagementStore.loadState().status === 'ready');
-  readonly dailyGoalProgress = computed(() => {
-    const goal = this.engagementStore.dailyGoal();
-    return goal > 0 ? Math.min(100, (this.engagementStore.completedToday() / goal) * 100) : 0;
-  });
-  readonly hasMetDailyGoal = computed(() => {
-    const goal = this.engagementStore.dailyGoal();
-    return goal > 0 && this.engagementStore.completedToday() >= goal;
-  });
-  readonly reviewsBeyondDailyGoal = computed(() => Math.max(
-    0,
-    this.engagementStore.completedToday() - this.engagementStore.dailyGoal(),
-  ));
-  readonly momentumCheckpoints = computed(() => {
-    const total = this.reviewStore.totalOriginalCount();
-    return MOMENTUM_CHECKPOINTS
-      .filter(checkpoint => checkpoint < total)
-      .map(checkpoint => ({
-        count: checkpoint,
-        position: (checkpoint / total) * 100,
-        reached: this.reviewStore.resolvedOriginalCount() >= checkpoint,
-      }));
-  });
 
   readonly currentCard = computed<ScheduledCard | null>(() => {
     const cardId = this.previousCardId() ?? this.reviewStore.presentation()?.cardId;
@@ -150,16 +122,6 @@ export class ReviewPage {
     this.reviewStore.totalOriginalCount(),
   ));
 
-  readonly remaining = computed(() => {
-    const session = this.reviewStore.session();
-    if (!session) return 0;
-    return session.definition.originalCardIds.filter(cardId =>
-      !session.completedOriginalCardIds.includes(cardId)
-      && !session.manuallyMasteredCardIds.includes(cardId)
-      && !session.sessionSkippedCardIds.includes(cardId)
-      && cardId !== session.currentCardId,
-    ).length;
-  });
 
   readonly suggestedRating = computed<ReviewRating | null>(
     () => this.dontKnowSelected() ? 'again' : this.typedResult()?.evaluation.suggestedRating ?? null,
@@ -186,18 +148,6 @@ export class ReviewPage {
     return tags.length ? tags[0] : null;
   });
 
-  readonly activeCategoryNames = computed(() => {
-    const session = this.reviewStore.session();
-    if (!session) return '';
-    const cards = new Map(this.cardStore.cards().map(card => [card.id, card]));
-    const cats = this.categoryStore.categories();
-    const ids = [...new Set(session.definition.originalCardIds.flatMap(cardId => cards.get(cardId)?.categoryIds ?? []))];
-    return ids
-      .map(id => cats.find(c => c.id === id)?.name)
-      .filter(Boolean)
-      .slice(0, 3)
-      .join(' · ') as string;
-  });
 
   reveal(): void {
     this.isFlipped.set(true);
@@ -317,7 +267,28 @@ export class ReviewPage {
     void this.wordAudio.play(sentence, 'de-DE');
   }
 
-  exitSession(): void {
+  async requestExit(): Promise<void> {
+    if (this.reviewStore.resolvedOriginalCount() === 0) {
+      this.exitSession();
+      return;
+    }
+
+    const alert = await this.alertController.create({
+      header: this.translate.instant('review.session.leaveTitle'),
+      message: this.translate.instant('review.session.leaveBody'),
+      buttons: [
+        {text: this.translate.instant('review.session.keepReviewing'), role: 'cancel'},
+        {
+          text: this.translate.instant('review.session.leaveAction'),
+          role: 'destructive',
+          handler: () => this.exitSession(),
+        },
+      ],
+    });
+    await alert.present();
+  }
+
+  private exitSession(): void {
     this.reviewStore.leaveSession();
     void this.router.navigate([ReviewRoute.HUB]);
   }

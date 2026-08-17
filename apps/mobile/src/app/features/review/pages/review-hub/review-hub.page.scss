@@ -85,6 +85,97 @@ ion-header ion-toolbar {
   margin-bottom: t.$lc-space-4;
 }
 
+.rh-recommendation-title,
+.rh-recommendation-count {
+  position: relative;
+  margin: 0;
+  color: t.$lc-rv-on-hero;
+  font-family: t.$lc-font-rv-display;
+  line-height: 1.08;
+  @include u.lc-font('8xl', t.$lc-font-weight-semibold);
+}
+
+.rh-recommendation-count {
+  @include u.lc-font('9xl', t.$lc-font-weight-semibold);
+}
+
+.rh-recommendation-copy {
+  position: relative;
+  max-width: 28ch;
+  margin: t.$lc-space-3 0 0;
+  color: t.$lc-rv-on-hero-soft;
+  font-family: t.$lc-font-rv-body;
+  line-height: 1.45;
+  @include u.lc-font('sm');
+}
+
+.rh-recommendation-time {
+  position: relative;
+  margin: t.$lc-space-3 0 0;
+  color: t.$lc-rv-brass;
+  font-family: t.$lc-font-rv-mono;
+  @include u.lc-font('xs', t.$lc-font-weight-semibold);
+}
+
+.rh-hero lc-button {
+  position: relative;
+  display: block;
+  margin-top: t.$lc-space-5;
+}
+
+.rh-mode-summary {
+  position: relative;
+  @include u.flex-between;
+  gap: t.$lc-space-3;
+  margin-top: t.$lc-space-4;
+  padding-top: t.$lc-space-4;
+  border-top: 1px solid t.$lc-rv-on-hero-track;
+
+  > span {
+    display: grid;
+    gap: t.$lc-space-1;
+  }
+
+  strong {
+    color: t.$lc-rv-on-hero;
+    font-family: t.$lc-font-rv-body;
+    @include u.lc-font('sm', t.$lc-font-weight-semibold);
+  }
+
+  small {
+    color: t.$lc-rv-brass;
+    font-family: t.$lc-font-rv-mono;
+    @include u.lc-font('xxs');
+  }
+
+  button {
+    @include u.touch-state;
+    padding: t.$lc-space-2;
+    color: t.$lc-rv-brass;
+    font-family: t.$lc-font-rv-body;
+    @include u.lc-font('xs', t.$lc-font-weight-semibold);
+  }
+}
+
+.rh-queue {
+  margin-top: t.$lc-space-5;
+  padding: t.$lc-space-4;
+  border: 1px solid var(--lc-rv-border);
+  border-radius: t.$lc-radius-md;
+  background: var(--lc-rv-card);
+
+  .rh-section-header {
+    margin: 0 0 t.$lc-space-2;
+  }
+
+  p {
+    margin: 0;
+    color: var(--lc-rv-muted);
+    font-family: t.$lc-font-rv-body;
+    @include u.lc-font('xs');
+  }
+}
+
 .rh-hero-row {
   position: relative;
   display: flex;

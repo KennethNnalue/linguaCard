@@ -107,6 +107,10 @@ export const ReviewStore = signalStore(
       return session ? session.completedOriginalCardIds.length + session.manuallyMasteredCardIds.length : 0;
     }),
     totalOriginalCount: computed(() => store.session()?.definition.originalCardIds.length ?? 0),
+    resumableSessionId: computed(() => {
+      const session = store.session();
+      return session?.status === 'active' ? session.definition.id : null;
+    }),
   })),
   withMethods(store => {
     const cardStore = inject(CardStore);

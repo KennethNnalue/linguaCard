@@ -15,57 +15,65 @@
 <ion-content>
   <div class="rh-content">
 
-    <!-- ── Hero: cards due today ── -->
-    <div class="rh-hero">
+    <!-- ── Hero: bounded daily recommendation ── -->
+    @if (presentation.hero(); as hero) {
+    <section class="rh-hero">
       <div class="rh-hero-glow"></div>
-      <span class="rh-hero-kicker">{{ 'review.hub.cardsDueToday' | translate }}</span>
+      <span class="rh-hero-kicker">{{ 'review.hub.todayReview' | translate }}</span>
+      @switch (hero.kind) {
+        @case ('empty') {
+          <h1 class="rh-recommendation-title">{{ 'review.hub.emptyTitle' | translate }}</h1>
+          <p class="rh-recommendation-copy">{{ 'review.hub.emptySupport' | translate }}</p>
+        }
+        @case ('not-started') {
+          <p class="rh-recommendation-count">{{ 'review.hub.cardCount' | translate:{ count: hero.cards } }}</p>
+          <p class="rh-recommendation-copy">{{ 'review.hub.notStartedSupport' | translate }}</p>
+          <p class="rh-recommendation-time">{{ 'review.hub.aboutMinutes' | translate:{ count: hero.minutes } }}</p>
+        }
+        @case ('in-progress') {
+          <p class="rh-recommendation-count">{{ 'review.hub.cardCount' | translate:{ count: hero.cards } }}</p>
+          <p class="rh-recommendation-copy">{{ 'review.hub.goalRemainingSupport' | translate }}</p>
+          <p class="rh-recommendation-time">{{ 'review.hub.aboutMinutes' | translate:{ count: hero.minutes } }}</p>
+        }
+        @case ('complete') {
+          <h1 class="rh-recommendation-title">{{ 'review.hub.goalCompleteTitle' | translate }}</h1>
+          <p class="rh-recommendation-copy">{{ 'review.hub.reviewedToday' | translate:{ count: hero.reviewed } }}</p>
+          @if (hero.optionalCards > 0) {
+            <p class="rh-recommendation-time">{{ 'review.hub.readyWhenYouAre' | translate:{ count: hero.optionalCards } }}</p>
+          }
+        }
+        @case ('caught-up') {
+          <h1 class="rh-recommendation-title">{{ 'review.hub.caughtUpTitle' | translate }}</h1>
+          <p class="rh-recommendation-copy">{{ 'review.hub.caughtUpSupport' | translate }}</p>
+        }
+      }
 
-      <div class="rh-hero-row">
-        <div class="rh-ring">
-          <svg viewBox="0 0 64 64">
-            <circle class="rh-ring-track" cx="32" cy="32" r="28"/>
-            <circle
-              class="rh-ring-fill"
-              cx="32" cy="32" r="28"
-              [attr.stroke-dasharray]="heroCircumference"
-              [attr.stroke-dashoffset]="heroRingOffset()"
-            />
-          </svg>
-          <div class="rh-ring-text">
-            <span class="rh-ring-num">{{ dueTodayCount() }}</span>
-            <span class="rh-ring-lbl">{{ 'review.hub.dueLabel' | translate }}</span>
-          </div>
+      <lc-button variant="filled-inverse" size="lg" [fullWidth]="true" (click)="performPrimaryAction()">
+        @switch (hero.kind) {
+          @case ('empty') { {{ 'review.hub.addWords' | translate }} }
+          @case ('in-progress') { {{ 'review.hub.continueReview' | translate }} }
+          @case ('complete') { {{ 'review.hub.keepReviewing' | translate }} }
+          @case ('caught-up') { {{ 'review.hub.addWords' | translate }} }
+          @default { {{ 'review.hub.startTodaysReview' | translate }} }
+        }
+      </lc-button>
+
+      @if (hero.kind !== 'empty' && hero.kind !== 'caught-up') {
+        <div class="rh-mode-summary">
+          <span><strong>{{ (presentation.mode() === 'type' ? 'review.mode.type' : 'review.mode.flip') | translate }}</strong><small>{{ presentation.mode() === 'type' ? ('review.mode.recommended' | translate) : ('review.mode.flipSub' | translate) }}</small></span>
+          <button (click)="changeMode()">{{ 'review.mode.change' | translate }}</button>
         </div>
-
-        <div class="rh-hero-stats">
-          <div class="rh-hero-stat">
-            <span class="rh-hero-stat-num">{{ newCount() }}</span>
-            <span class="rh-hero-stat-lbl">{{ 'review.hub.newWords' | translate }}</span>
-          </div>
-          <div class="rh-hero-stat">
-            <span class="rh-hero-stat-num rh-hero-stat-num--attention">{{ attentionCount() }}</span>
-            <span class="rh-hero-stat-lbl">{{ 'review.hub.needAttention' | translate }}</span>
-          </div>
-          <span class="rh-hero-meta">{{ 'review.hub.estMinutes' | translate:{ count: estMinutes() } }}</span>
-        </div>
-      </div>
-
-      <button class="rh-hero-cta" [disabled]="dueTodayCount() === 0" (click)="startTodaysReview()">
-        <ion-icon name="play-outline"></ion-icon>
-        {{ dueTodayCount() > 0 ? ('review.hub.startTodaysReview' | translate) : ('review.hub.nothingDueNow' | translate) }}
-      </button>
-    </div>
-
-    @if (!hasCards()) {
-      <div class="lc-empty-state">
-        <span class="lc-empty-icon">🎉</span>
-        <p class="lc-empty-title">{{ 'onboarding.empty.reviewTitle' | translate }}</p>
-        <p class="lc-empty-sub">{{ 'onboarding.empty.reviewSubtitle' | translate }}</p>
-        <div class="lc-empty-actions">
-          <button class="lc-empty-primary" (click)="navigateTo('/vault')">{{ 'onboarding.empty.reviewExplore' | translate }}</button>
-        </div>
-      </div>
+      }
+    </section>
     }
+
+    <!-- ── Review queue: secondary transparency ── -->
+    <section class="rh-queue">
+      <div class="rh-section-header">
+        <span class="rh-quick-title">{{ 'review.hub.queueTitle' | translate }}</span>
+      </div>
+      <p>{{ 'review.hub.queueSummary' | translate:{ due: presentation.queue().dueNow, new: presentation.queue().newAvailable } }}</p>
+    </section>
 
     <!-- ── Mastery snapshot ── -->
     <button class="rh-mastery" (click)="goToMastery()">
@@ -88,38 +96,7 @@
       <ion-icon name="chevron-forward-outline" class="rh-chevron"></ion-icon>
     </button>
 
-    <!-- ── Leech callout (only when leeches exist) ── -->
-    @if (leechCount() > 0) {
-      <button class="rh-leech" (click)="goToLeeches()">
-        <div class="rh-leech-tile">
-          <ion-icon name="bug-outline"></ion-icon>
-        </div>
-        <div class="rh-leech-info">
-          <p class="rh-leech-title">{{ 'review.hub.leechesDetected' | translate:{ count: leechCount() } }}</p>
-          <p class="rh-leech-sub">{{ 'review.hub.leechesSub' | translate }}</p>
-        </div>
-        <ion-icon name="chevron-forward-outline" class="rh-leech-chevron"></ion-icon>
-      </button>
-    }
-
-    <!-- ── Study mode ── -->
-    <p class="rh-section-label">{{ 'review.mode.section' | translate }}</p>
-    <div class="rh-modes">
-      @for (m of studyModes; track m.value) {
-        <button
-          class="rh-mode-row"
-          [class.rh-mode-row--active]="studyMode() === m.value"
-          (click)="selectMode(m.value)">
-          <span class="rh-radio" [class.rh-radio--active]="studyMode() === m.value"></span>
-          <span class="rh-mode-text">
-            <span class="rh-mode-label">{{ m.labelKey | translate }}</span>
-            <span class="rh-mode-sub">{{ m.subKey | translate }}</span>
-          </span>
-        </button>
-      }
-    </div>
-
-    <!-- ── Quick study ── -->
+    <!-- ── Practice ── -->
     <div class="rh-quick-head">
       <span class="rh-quick-title">{{ 'review.hub.quickStudyTitle' | translate }}</span>
       <span class="rh-section-label">{{ 'review.hub.pickFocus' | translate }}</span>

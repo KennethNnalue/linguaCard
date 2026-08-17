@@ -40,65 +40,55 @@
 
   <div class="home-content">
 
-    <!-- ── Hero card ── -->
-    <div class="hero-card" [class.hero-card--complete]="dailyGoalPct() >= 1">
-      @if (dailyGoalPct() >= 1) {
-        <div class="hero-greeting hero-greeting--complete">{{ 'home.hero.completeGreeting' | translate }}</div>
-        <div class="hero-title">{{ 'home.hero.completeTitle' | translate }}</div>
-      } @else {
-        <div class="hero-greeting">{{ greeting() }}</div>
-        <div class="hero-title">{{ 'home.hero.readyTitle' | translate }}</div>
-      }
-
-      <div class="hero-ring-row">
-        <div class="hero-ring">
-          <svg viewBox="0 0 64 64">
-            <circle class="ring-bg" cx="32" cy="32" r="28"/>
-            <circle
-              class="ring-fill"
-              cx="32" cy="32" r="28"
-              [attr.stroke-dasharray]="GOAL_RING_CIRCUMFERENCE"
-              [attr.stroke-dashoffset]="goalRingOffset()"
-            />
-          </svg>
-          <div class="ring-text">
-            <div class="ring-num">{{ completedToday() }}/{{ dailyGoal() }}</div>
-            <div class="ring-lbl">{{ 'home.goalRing.todayLabel' | translate }}</div>
-          </div>
-        </div>
-
-        <div class="hero-meta">
-          <div class="hero-stat-row"><span class="hero-stat-num">🔥 {{ streak().current }}</span><span class="hero-stat-lbl">{{ 'home.streak.label' | translate }}</span></div>
-          <div class="hero-stat-row"><span class="hero-stat-num">❄ {{ streakFreezes() }}</span><span class="hero-stat-lbl">{{ 'review.engagement.progress.freezesReady' | translate }}</span></div>
-          @if (!streakFreezeProgress().atCapacity) {
-            <div class="hero-freeze-progress">{{ 'review.engagement.freezeEarnProgress' | translate:{
-              current: streakFreezeProgress().daysTowardNext,
-              target: streakFreezeProgress().interval
-            } }}</div>
+    <!-- ── Daily practice hero ── -->
+    @if (homePresentation.hero(); as hero) {
+      <section class="daily-hero" [class.daily-hero-complete]="hero.kind === 'complete'">
+        <span class="daily-eyebrow">{{ 'home.daily.eyebrow' | translate }}</span>
+        @switch (hero.kind) {
+          @case ('empty') {
+            <h1 class="daily-title">{{ 'home.daily.emptyTitle' | translate }}</h1>
+            <p class="daily-support">{{ 'home.daily.emptySupport' | translate }}</p>
           }
-          <button class="hero-col-pill" (click)="openCollectionPicker()">
-            {{ selectedCollectionLabel() }}
-          </button>
-        </div>
-      </div>
-
-      <p class="hero-workload">
-        <strong>{{ reviewsCount() }}</strong> {{ 'home.stats.reviewsLabel' | translate }}
-        <span aria-hidden="true">·</span>
-        <strong>{{ newCardsCount() }}</strong> {{ 'home.stats.newCardsLabel' | translate }}
-      </p>
-
-      <div class="hero-actions">
-        <button class="hero-btn-start" (click)="startSession()">
-          <ion-icon name="play-outline"></ion-icon>
-          {{ 'home.actions.startSession' | translate }}
-        </button>
-        <button class="hero-btn-filter" (click)="openCollectionPicker()">
-          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round"><path d="M4 6h16M4 12h10M4 18h6"/></svg>
-          {{ 'home.actions.filter' | translate }}
-        </button>
-      </div>
-    </div>
+          @case ('first-review') {
+            <h1 class="daily-title">{{ 'home.daily.firstTitle' | translate }}</h1>
+            <p class="daily-count">{{ 'home.daily.cardsAndMinutes' | translate:{ cards: hero.cards, minutes: hero.minutes } }}</p>
+            <p class="daily-support">{{ 'home.daily.firstSupport' | translate }}</p>
+          }
+          @case ('not-started') {
+            <h1 class="daily-title">{{ 'home.daily.title' | translate }}</h1>
+            <p class="daily-count">{{ 'home.daily.cardsAndMinutes' | translate:{ cards: hero.cards, minutes: hero.minutes } }}</p>
+            <p class="daily-support">{{ 'home.daily.notStartedSupport' | translate }}</p>
+            <p class="daily-streak">🔥 {{ 'home.daily.streak' | translate:{ count: hero.streak } }}</p>
+          }
+          @case ('in-progress') {
+            <h1 class="daily-title">{{ 'home.daily.title' | translate }}</h1>
+            <p class="daily-progress-count">{{ hero.completed }} {{ 'home.daily.of' | translate }} {{ hero.goal }}</p>
+            <div class="daily-progress" role="progressbar" [attr.aria-label]="'home.daily.progressAria' | translate" [attr.aria-valuenow]="hero.completed" [attr.aria-valuemax]="hero.goal">
+              <span [style.width.%]="hero.progress * 100"></span>
+            </div>
+            <p class="daily-support">{{ 'home.daily.remaining' | translate:{ count: hero.remaining, minutes: hero.minutes } }}</p>
+            <p class="daily-streak">🔥 {{ 'home.daily.streak' | translate:{ count: hero.streak } }}</p>
+          }
+          @case ('complete') {
+            <h1 class="daily-title">{{ 'home.daily.completeTitle' | translate }}</h1>
+            <p class="daily-count">{{ 'home.daily.reviewedToday' | translate:{ count: hero.reviewed } }}</p>
+            <p class="daily-streak">🔥 {{ 'home.daily.streak' | translate:{ count: hero.streak } }}</p>
+          }
+          @case ('caught-up') {
+            <h1 class="daily-title">{{ 'home.daily.caughtUpTitle' | translate }}</h1>
+            <p class="daily-support">{{ 'home.daily.caughtUpSupport' | translate }}</p>
+          }
+        }
+        <lc-button variant="filled-inverse" size="lg" [fullWidth]="true" (click)="performHeroAction()">
+          @switch (hero.action) {
+            @case ('add-vocabulary') { {{ 'home.daily.addWords' | translate }} }
+            @case ('keep-practicing') { {{ 'home.daily.keepPracticing' | translate }} }
+            @case ('learn-new') { {{ 'home.daily.learnNew' | translate }} }
+            @default { {{ (hero.kind === 'in-progress' ? 'home.daily.continueReview' : 'home.daily.startReview') | translate }} }
+          }
+        </lc-button>
+      </section>
+    }
 
     @if (yesterdayWasProtected()) {
       <button class="home-protected" [routerLink]="['/review/progress']">

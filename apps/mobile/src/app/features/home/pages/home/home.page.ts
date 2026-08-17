@@ -36,6 +36,8 @@ import {BottomSheetService} from '../../../../shared/components/bottom-sheet/bot
 import {isDue, isNew} from '../../../review/domain/review-status';
 import {Card} from '@lingua-card/shared/domain';
 import {GoalPromptPolicyService} from '../../../settings/services/goal-prompt-policy.service';
+import {HomePresentationStore} from '../../store/home-presentation.store';
+import {ButtonComponent} from '../../../../shared/ui/button/button.component';
 
 @Component({
   selector: 'lc-home',
@@ -54,6 +56,7 @@ import {GoalPromptPolicyService} from '../../../settings/services/goal-prompt-po
     WordCardComponent,
     TranslatePipe,
     GettingStartedChecklistComponent,
+    ButtonComponent,
   ],
 })
 export class HomePage {
@@ -73,6 +76,7 @@ export class HomePage {
   private readonly reviewStore = inject(ReviewStore);
   private readonly filterService = inject(ReviewFilterService);
   private readonly goalPromptPolicy = inject(GoalPromptPolicyService);
+  readonly homePresentation = inject(HomePresentationStore);
 
   private goalPromptCheckInProgress = false;
 
@@ -284,6 +288,14 @@ export class HomePage {
     ).then(result => {
       if (result.kind === 'started') void this.router.navigate([ReviewRoute.PLAYER]);
     });
+  }
+
+  performHeroAction(): void {
+    if (this.homePresentation.hero().action === 'add-vocabulary') {
+      void this.openAddWord();
+      return;
+    }
+    this.startSession();
   }
 
   navigateToCard(card: Card): void {

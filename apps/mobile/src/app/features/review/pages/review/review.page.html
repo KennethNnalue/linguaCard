@@ -1,65 +1,19 @@
 <ion-header class="ion-no-border" [class.rv-keyboard-active]="isTypingFocused()">
   <ion-toolbar>
     <div class="rv-nav">
-      <button class="rv-close" (click)="exitSession()" [attr.aria-label]="'review.session.goBackAriaLabel' | translate">
+      <button class="rv-close" (click)="requestExit()" [attr.aria-label]="'review.session.goBackAriaLabel' | translate">
         <ion-icon name="close-outline"></ion-icon>
       </button>
-      <div class="rv-nav-center">
-        @if (activeCategoryNames()) {
-          <span class="rv-nav-cat">{{ activeCategoryNames() }}</span>
-        }
-        <span class="rv-nav-count">{{ 'review.session.cardOf' | translate:{ n: currentPosition(), total: reviewStore.totalOriginalCount() } }}</span>
+      <div
+        class="rv-prog-track"
+        role="progressbar"
+        [attr.aria-valuemin]="0"
+        [attr.aria-valuemax]="reviewStore.totalOriginalCount()"
+        [attr.aria-valuenow]="reviewStore.completedOriginalCount()">
+        <div class="rv-prog-fill" [style.width.%]="progressPercent()"></div>
       </div>
-      <span class="rv-nav-remaining">{{ remaining() }}↑</span>
+      <span class="rv-nav-count">{{ currentPosition() }} / {{ reviewStore.totalOriginalCount() }}</span>
     </div>
-
-    <div
-      class="rv-prog-track"
-      role="progressbar"
-      [attr.aria-valuemin]="0"
-      [attr.aria-valuemax]="reviewStore.totalOriginalCount()"
-      [attr.aria-valuenow]="reviewStore.completedOriginalCount()">
-      <div class="rv-prog-fill" [style.width.%]="progressPercent()"></div>
-      @for (checkpoint of momentumCheckpoints(); track checkpoint.count) {
-        <span
-          class="rv-prog-checkpoint"
-          [class.rv-prog-checkpoint--reached]="checkpoint.reached"
-          [style.left.%]="checkpoint.position"
-          aria-hidden="true"></span>
-      }
-    </div>
-    @if (engagementReady()) {
-      @if (hasMetDailyGoal()) {
-        <div class="rv-goal-exceeded" role="status">
-          <span class="rv-goal-exceeded-icon" aria-hidden="true">✦</span>
-          @if (reviewsBeyondDailyGoal() > 0) {
-            <strong>{{ 'review.engagement.beyondGoal' | translate:{ count: reviewsBeyondDailyGoal() } }}</strong>
-          } @else {
-            <strong>{{ 'review.engagement.goalCompleteKeepGoing' | translate }}</strong>
-          }
-        </div>
-      } @else {
-        <div class="rv-goal-progress" role="status">
-          <div class="rv-goal-copy">
-            <span>{{ 'home.goalRing.label' | translate }}</span>
-            <strong>{{ engagementStore.completedToday() }}/{{ engagementStore.dailyGoal() }}</strong>
-          </div>
-          <div class="rv-goal-track" aria-hidden="true">
-            <span [style.width.%]="dailyGoalProgress()"></span>
-          </div>
-        </div>
-      }
-    }
-    @if (engagementStore.reviewAcknowledgement(); as acknowledgement) {
-      <button class="rv-points" (click)="engagementStore.dismissReviewAcknowledgement(acknowledgement.id)">
-        {{ 'review.engagement.reviewPoints' | translate:{ count: acknowledgement.points } }}
-      </button>
-    }
-    @if (engagementStore.pendingFeedback(); as feedback) {
-      <lc-daily-goal-feedback
-        [feedback]="feedback"
-        (dismissed)="engagementStore.dismissFeedback($event)" />
-    }
   </ion-toolbar>
 </ion-header>
 
@@ -108,7 +62,7 @@
       <span class="lc-empty-icon">🎉</span>
       <p class="lc-empty-title">{{ 'review.session.allCaughtUpMsg' | translate }}</p>
       <p class="lc-empty-sub">{{ 'review.session.noDueCardsMsg' | translate }}</p>
-      <button class="rv-exit-btn" (click)="exitSession()">{{ 'review.session.backToHomeBtn' | translate }}</button>
+      <button class="rv-exit-btn" (click)="requestExit()">{{ 'review.session.backToHomeBtn' | translate }}</button>
     </div>
   }
 </ion-content>
@@ -157,6 +111,7 @@
       [options]="ratingOptionsWithPreviews()"
       [flipped]="isFlipped()"
       [suggested]="suggestedRating()"
+      [automatic]="mode() === 'typing' && typedResult() !== null"
       [busy]="reviewStore.isBusy()"
       [canGoPrevious]="reviewStore.lastReviewedCardId() !== null && !isViewingPrevious()"
       [readOnly]="isViewingPrevious()"
