@@ -85,17 +85,33 @@ export class ReviewPlayerService {
   private trackVisibleViewport(modal: HTMLIonModalElement): () => void {
     if (Capacitor.isNativePlatform()) return () => undefined;
     const viewport = window.visualViewport;
-    const updateHeight = () => {
+    const initialScrollY = window.scrollY;
+    document.documentElement.classList.add('lc-review-player-open');
+    document.body.classList.add('lc-review-player-open');
+    const updateViewport = () => {
       const height = viewport?.height ?? window.innerHeight;
       modal.style.setProperty('--review-player-visible-height', `${Math.round(height)}px`);
+      this.pinReviewPlayerToViewport(modal);
     };
-    updateHeight();
-    viewport?.addEventListener('resize', updateHeight);
-    window.addEventListener('resize', updateHeight);
+    updateViewport();
+    viewport?.addEventListener('resize', updateViewport);
+    viewport?.addEventListener('scroll', updateViewport);
+    window.addEventListener('resize', updateViewport);
     return () => {
-      viewport?.removeEventListener('resize', updateHeight);
-      window.removeEventListener('resize', updateHeight);
+      viewport?.removeEventListener('resize', updateViewport);
+      viewport?.removeEventListener('scroll', updateViewport);
+      window.removeEventListener('resize', updateViewport);
       modal.style.removeProperty('--review-player-visible-height');
+      document.documentElement.classList.remove('lc-review-player-open');
+      document.body.classList.remove('lc-review-player-open');
+      window.scrollTo({ top: initialScrollY, left: 0, behavior: 'instant' });
     };
+  }
+
+  private pinReviewPlayerToViewport(modal: HTMLIonModalElement): void {
+    const scrollingElement = document.scrollingElement;
+    if (scrollingElement) scrollingElement.scrollTop = 0;
+    const content = modal.querySelector<HTMLIonContentElement>('ion-content');
+    if (content) void content.scrollToTop(0);
   }
 }
