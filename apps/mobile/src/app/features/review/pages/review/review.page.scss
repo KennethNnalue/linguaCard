@@ -259,6 +259,10 @@ ion-content.rv-keyboard-active .rv-scene {
   padding: t.$lc-space-1 t.$lc-space-3 t.$lc-space-2;
 }
 
+ion-content.rv-keyboard-active {
+  --overflow: hidden;
+}
+
 .rv-dialog-backdrop,
 .rv-mastery-feedback {
   position: fixed;
