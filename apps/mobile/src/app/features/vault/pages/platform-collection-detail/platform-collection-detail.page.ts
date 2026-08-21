@@ -1,11 +1,11 @@
+import { AppNotificationService } from '@lingua-card/mobile/notifications';
 import { ChangeDetectionStrategy, Component, computed, effect, inject, signal } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import {
   IonContent,
   IonIcon,
   ModalController,
-  ToastController,
-} from '@ionic/angular/standalone';
+  } from '@ionic/angular/standalone';
 import { TranslateService, TranslatePipe } from '@ngx-translate/core';
 import { addIcons } from 'ionicons';
 import { volumeHighOutline } from 'ionicons/icons';
@@ -28,7 +28,7 @@ import { GenerateStorySheetComponent } from '../../../stories/components/generat
 export class PlatformCollectionDetailPage {
   private readonly router = inject(Router);
   private readonly modalCtrl = inject(ModalController);
-  private readonly toastCtrl = inject(ToastController);
+  private readonly toastCtrl = inject(AppNotificationService);
   private readonly translate = inject(TranslateService);
   private readonly platformStore = inject(PlatformCollectionStore);
   private readonly wordAudio = inject(WordAudioService);

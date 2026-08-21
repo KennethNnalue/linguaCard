@@ -1,7 +1,8 @@
+import { AppNotificationService } from '@lingua-card/mobile/notifications';
 import { Component, inject, signal } from '@angular/core';
 import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
-import { IonContent, IonIcon, IonSpinner, ToastController } from '@ionic/angular/standalone';
+import { IonContent, IonIcon, IonSpinner } from '@ionic/angular/standalone';
 import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { addIcons } from 'ionicons';
 import { alertCircleOutline, eyeOffOutline, eyeOutline, logoGoogle } from 'ionicons/icons';
@@ -17,7 +18,7 @@ import { LanguagePickerComponent } from '../../../../shared/components/language-
 export class LoginPage {
   private readonly authService = inject(AuthService);
   private readonly router = inject(Router);
-  private readonly toastCtrl = inject(ToastController);
+  private readonly toastCtrl = inject(AppNotificationService);
   private readonly translate = inject(TranslateService);
 
   readonly loading = signal(false);

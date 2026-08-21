@@ -1,11 +1,11 @@
+import { AppNotificationService } from '@lingua-card/mobile/notifications';
 import { Component, computed, inject, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import {
   IonContent,
   IonIcon,
   ModalController,
-  ToastController,
-} from '@ionic/angular/standalone';
+  } from '@ionic/angular/standalone';
 import { firstValueFrom } from 'rxjs';
 import { addIcons } from 'ionicons';
 import { alertCircleOutline, trashOutline } from 'ionicons/icons';
@@ -32,7 +32,7 @@ export class ResetDataSheetComponent {
   private readonly cardStore = inject(CardStore);
   private readonly collectionStore = inject(CollectionStore);
   private readonly modalCtrl = inject(ModalController);
-  private readonly toastCtrl = inject(ToastController);
+  private readonly toastCtrl = inject(AppNotificationService);
   private readonly translate = inject(TranslateService);
 
   readonly password = signal('');

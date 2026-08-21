@@ -1,5 +1,5 @@
 import { effect, Injectable, inject } from '@angular/core';
-import { ToastController } from '@ionic/angular/standalone';
+import { AppNotificationService } from '@lingua-card/mobile/notifications';
 import { TranslateService } from '@ngx-translate/core';
 import { SyncService } from './sync.service';
 import { LocalDataService } from './local-data.service';
@@ -9,7 +9,7 @@ import type { SyncResult } from './sync.service';
 
 @Injectable({ providedIn: 'root' })
 export class SyncNotificationService {
-  private readonly toastCtrl = inject(ToastController);
+  private readonly toastCtrl = inject(AppNotificationService);
   private readonly translate = inject(TranslateService);
   private readonly syncService = inject(SyncService);
   private readonly localData = inject(LocalDataService);
@@ -87,8 +87,8 @@ export class SyncNotificationService {
       message,
       duration,
       color,
-      position: 'bottom',
-      positionAnchor: 'footer',
+      position: 'top',
+      cssClass: 'lc-app-notification',
     });
     await toast.present();
   }
@@ -98,7 +98,8 @@ export class SyncNotificationService {
     this.activeErrorToast = await this.toastCtrl.create({
       message: this.translate.instant('sync.notifications.failed'),
       color: 'danger',
-      position: 'bottom',
+      position: 'top',
+      cssClass: 'lc-app-notification',
       buttons: [
         {
           text: this.translate.instant('sync.notifications.retryNow'),

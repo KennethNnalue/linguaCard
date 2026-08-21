@@ -1,8 +1,8 @@
+import { AppNotificationService } from '@lingua-card/mobile/notifications';
 import { Component, ChangeDetectionStrategy, inject, OnInit, signal } from '@angular/core';
 import {
   AlertController, IonContent, IonHeader, IonToolbar, IonTitle, IonButtons, IonBackButton,
-  IonSegment, IonSegmentButton, IonLabel, ToastController,
-} from '@ionic/angular/standalone';
+  IonSegment, IonSegmentButton, IonLabel, } from '@ionic/angular/standalone';
 import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { firstValueFrom } from 'rxjs';
 import type { ShareNotification, ShareRecord, ShareStatus } from '@lingua-card/shared/domain';
@@ -143,7 +143,7 @@ const STATUS_LABEL_KEYS: Record<ShareStatus, string> = {
 export class NotificationsPage implements OnInit {
   readonly store = inject(ShareStore);
   private readonly alertCtrl = inject(AlertController);
-  private readonly toastCtrl = inject(ToastController);
+  private readonly toastCtrl = inject(AppNotificationService);
   private readonly translate = inject(TranslateService);
   private readonly shareApi = inject(ShareApiService);
   private readonly cardStore = inject(CardStore);

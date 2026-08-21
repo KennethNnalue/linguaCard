@@ -807,6 +807,9 @@
       "masterConfirmBody": "ستتم إزالة البطاقة من المراجعات مع الاحتفاظ بسجل التعلم.",
       "masterConfirmUndo": "يمكنك التراجع من تفاصيل الكلمة.",
       "keepReviewing": "متابعة المراجعة",
+      "leaveTitle": "مغادرة هذه المراجعة؟",
+      "leaveBody": "تم حفظ المراجعات المكتملة. يمكنك متابعة البطاقات المتبقية لاحقًا.",
+      "leaveAction": "مغادرة المراجعة",
       "confirmMasterCard": "وضع علامة متقن",
       "masteringCard": "جارٍ الحفظ…",
       "cardMastered": "تم إتقان البطاقة",
@@ -1005,6 +1008,7 @@
     "type": {
       "alsoArticle": "أيضًا: إنها {{article}}",
       "correct": "صحيح!",
+      "almost": "تقريبًا",
       "dontForgetArticle": "لا تنسَ أداة التعريف — إنها {{article}}",
       "itsArticleNot": "إنها {{article}}، وليست {{userArticle}}",
       "mindGender": "انتبه لأداة التعريف",

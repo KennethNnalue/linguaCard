@@ -7,6 +7,7 @@ export interface ReviewVerdictView {
   tint: 'correct' | 'close' | 'wrong';
   icon: string;
   verdictKey: string;
+  subtitleKey: string | null;
   showAttempt: boolean;
 }
 
@@ -17,7 +18,7 @@ export interface ReviewRevealView {
 
 const VERDICT_KEY = {
   correct: 'review.type.correct',
-  gender: 'review.type.mindGender',
+  gender: 'review.type.almost',
   close: 'review.type.soClose',
   wrong: 'review.type.notQuite',
 } as const;
@@ -35,6 +36,7 @@ export function buildReviewReveal(
       tint: feedback.tint,
       icon: VERDICT_ICON[feedback.tint],
       verdictKey: VERDICT_KEY[feedback.outcome],
+      subtitleKey: feedback.outcome === 'gender' ? 'review.type.mindGender' : null,
       showAttempt: feedback.outcome !== 'correct',
     } : null,
   };

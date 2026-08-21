@@ -105,8 +105,8 @@
   .ft-accents { margin-top: 0; }
   .ft-accents { justify-content:center; }
   .ft-accent { min-width: 52px; min-height: 40px; }
-  .ft-cta { margin-top: t.$lc-space-2; padding: t.$lc-space-3; @include u.lc-font('md', t.$lc-font-weight-bold); }
-  .ft-dont-know { margin-top: 0; padding: t.$lc-space-1 t.$lc-space-3; }
+  .ft-cta { margin-top: t.$lc-space-2; }
+  .ft-dont-know { margin-top: 0; }
 }
 
 .ft-accents {
@@ -137,34 +137,16 @@
 }
 
 .ft-cta {
-  @include u.flex-center;
-  @include u.touch-state;
-  gap: t.$lc-space-2;
-  padding: t.$lc-space-4;
-  border-radius: t.$lc-radius-md;
-  background: t.$lc-rv-easy-bg;
-  color: t.$lc-rv-easy-text;
-  font-family: t.$lc-font-rv-body;
-  @include u.lc-font('lg', t.$lc-font-weight-bold);
+  display: block;
+  width: 100%;
 
   ion-icon {
     font-size: t.$lc-text-xl;
   }
 
-  &:disabled {
-    opacity: .45;
-    pointer-events: none;
-  }
 }
 
 .ft-dont-know {
-  @include u.touch-state;
   align-self: center;
   margin-top: t.$lc-space-2;
-  padding: t.$lc-space-2 t.$lc-space-4;
-  color: var(--lc-rv-text-soft);
-  font-family: t.$lc-font-rv-body;
-  @include u.lc-font('sm', t.$lc-font-weight-semibold);
-  border: 0;
-  background: transparent;
 }

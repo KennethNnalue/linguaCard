@@ -1,5 +1,6 @@
+import { AppNotificationService } from '@lingua-card/mobile/notifications';
 import { inject, Injectable } from '@angular/core';
-import { ModalController, ToastController } from '@ionic/angular/standalone';
+import { ModalController } from '@ionic/angular/standalone';
 import { TranslateService } from '@ngx-translate/core';
 import { firstValueFrom } from 'rxjs';
 import type { StoryKeyword, StoryVocabWord, WordDictionaryEntry } from '@lingua-card/shared/domain';
@@ -34,7 +35,7 @@ export class StoryWordSheetService {
   private readonly wordAudio = inject(WordAudioService);
   private readonly authService = inject(AuthService);
   private readonly modalCtrl = inject(ModalController);
-  private readonly toastCtrl = inject(ToastController);
+  private readonly toastCtrl = inject(AppNotificationService);
   private readonly translate = inject(TranslateService);
 
   /**

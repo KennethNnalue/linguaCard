@@ -1,3 +1,4 @@
+import { AppNotificationService } from '@lingua-card/mobile/notifications';
 import {Component, ElementRef, inject, signal, ViewChild} from '@angular/core';
 import {Router} from '@angular/router';
 import {
@@ -6,8 +7,7 @@ import {
   IonIcon,
   IonToolbar,
   ModalController,
-  ToastController,
-} from '@ionic/angular/standalone';
+  } from '@ionic/angular/standalone';
 import {addIcons} from 'ionicons';
 import {
   arrowBackOutline,
@@ -42,7 +42,7 @@ export class ImportPage {
   private readonly categoryStore = inject(CategoryStore);
   private readonly importState = inject(ImportStateService);
   private readonly router = inject(Router);
-  private readonly toastCtrl = inject(ToastController);
+  private readonly toastCtrl = inject(AppNotificationService);
   private readonly modalCtrl = inject(ModalController);
   private readonly translate = inject(TranslateService);
 

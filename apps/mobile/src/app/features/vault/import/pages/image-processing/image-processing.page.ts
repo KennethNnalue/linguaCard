@@ -1,6 +1,7 @@
+import { AppNotificationService } from '@lingua-card/mobile/notifications';
 import { Component, computed, inject, OnDestroy, OnInit, signal } from '@angular/core';
 import { Router } from '@angular/router';
-import { IonContent, ToastController } from '@ionic/angular/standalone';
+import { IonContent } from '@ionic/angular/standalone';
 import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { firstValueFrom } from 'rxjs';
 import { EnrichWordsResult, WordExtractionResult } from '@lingua-card/shared/domain';
@@ -20,7 +21,7 @@ export class ImageProcessingPage implements OnInit, OnDestroy {
   private readonly importImageState = inject(ImageImportStateService);
   private readonly imageImportApi   = inject(ImageImportApiService);
   private readonly router           = inject(Router);
-  private readonly toastCtrl        = inject(ToastController);
+  private readonly toastCtrl        = inject(AppNotificationService);
   private readonly translateService = inject(TranslateService);
 
   readonly image          = this.importImageState.image;

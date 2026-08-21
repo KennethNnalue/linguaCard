@@ -1,3 +1,4 @@
+import { AppNotificationService } from '@lingua-card/mobile/notifications';
 import {
   ChangeDetectionStrategy,
   Component,
@@ -13,7 +14,6 @@ import { ActivatedRoute, Router } from '@angular/router';
 import {
   IonContent,
   IonIcon,
-  ToastController,
   ViewWillEnter,
   ViewWillLeave,
 } from '@ionic/angular/standalone';
@@ -64,7 +64,7 @@ export class StoryReaderPage implements OnInit, ViewWillEnter, ViewWillLeave {
   private readonly wordSheet = inject(StoryWordSheetService);
   private readonly interaction = inject(StoryReaderInteractionService);
   private readonly translate = inject(TranslateService);
-  private readonly toastCtrl = inject(ToastController);
+  private readonly toastCtrl = inject(AppNotificationService);
 
   // ── Story state ─────────────────────────────────────────────────
   readonly story = signal<Story | null>(null);

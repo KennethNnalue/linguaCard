@@ -1,8 +1,9 @@
+import { AppNotificationService } from '@lingua-card/mobile/notifications';
 import { ChangeDetectionStrategy, Component, DestroyRef, inject, signal } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
-import { AlertController, IonContent, IonHeader, IonIcon, IonToolbar, ToastController } from '@ionic/angular/standalone';
+import { AlertController, IonContent, IonHeader, IonIcon, IonToolbar } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
 import { arrowBackOutline, cloudUploadOutline, eyeOutline, eyeOffOutline, sparklesOutline, trashOutline, volumeHighOutline } from 'ionicons/icons';
 import type {
@@ -30,7 +31,7 @@ import { AdminApiService } from '../../services/admin-api.service';
 })
 export class AdminImportPage {
   private readonly adminApi = inject(AdminApiService);
-  private readonly toastCtrl = inject(ToastController);
+  private readonly toastCtrl = inject(AppNotificationService);
   private readonly alertCtrl = inject(AlertController);
   private readonly router = inject(Router);
   private readonly _destroyRef = inject(DestroyRef);

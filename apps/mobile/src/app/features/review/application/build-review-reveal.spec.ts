@@ -18,7 +18,13 @@ describe('buildReviewReveal', () => {
 
   it('keeps correct status compact by omitting the submitted attempt', () => {
     expect(buildReviewReveal('die', feedback({ outcome: 'correct' })).verdict).toMatchObject({
-      verdictKey: 'review.type.correct', showAttempt: false,
+      verdictKey: 'review.type.correct', subtitleKey: null, showAttempt: false,
+    });
+  });
+
+  it('separates the prominent article-error verdict from its explanation', () => {
+    expect(buildReviewReveal('der', feedback({ outcome: 'gender', tint: 'close', articleWrong: true }))).toMatchObject({
+      verdict: { verdictKey: 'review.type.almost', subtitleKey: 'review.type.mindGender' },
     });
   });
 });

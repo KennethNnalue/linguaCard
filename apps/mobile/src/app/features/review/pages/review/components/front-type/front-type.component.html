@@ -40,19 +40,23 @@
     }
   </div>
 
-  <button
+  <lc-button
     class="ft-cta"
+    variant="review-primary"
+    size="md"
+    [fullWidth]="true"
     [disabled]="!canSubmit()"
     (pointerdown)="preserveInputFocus($event)"
     (click)="check.emit()">
     <ion-icon name="checkmark-outline"></ion-icon>
     {{ 'review.session.checkAnswer' | translate }}
-  </button>
-  <button
+  </lc-button>
+  <lc-button
     class="ft-dont-know"
-    type="button"
+    variant="review-ghost"
+    size="sm"
     (pointerdown)="preserveInputFocus($event)"
     (click)="dontKnow.emit()">
     {{ 'review.session.dontKnow' | translate }}
-  </button>
+  </lc-button>
 </div>

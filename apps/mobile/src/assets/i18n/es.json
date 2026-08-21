@@ -807,6 +807,9 @@
       "masterConfirmBody": "Esta tarjeta se eliminará de los repasos programados. Tu historial se conservará.",
       "masterConfirmUndo": "Puedes deshacerlo desde los detalles de la palabra.",
       "keepReviewing": "Seguir repasando",
+      "leaveTitle": "¿Salir de este repaso?",
+      "leaveBody": "Tus repasos completados están guardados. Puedes continuar las tarjetas restantes más tarde.",
+      "leaveAction": "Salir del repaso",
       "confirmMasterCard": "Marcar como dominada",
       "masteringCard": "Guardando…",
       "cardMastered": "Tarjeta dominada",
@@ -1005,6 +1008,7 @@
     "type": {
       "alsoArticle": "Además: es {{article}}",
       "correct": "¡Correcto!",
+      "almost": "Casi",
       "dontForgetArticle": "No olvides el artículo — es {{article}}",
       "itsArticleNot": "Es {{article}}, no {{userArticle}}",
       "mindGender": "Revisa el artículo",

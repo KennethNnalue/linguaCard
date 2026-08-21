@@ -1,3 +1,4 @@
+import { AppNotificationService } from '@lingua-card/mobile/notifications';
 import {Component, computed, effect, inject, OnInit, signal} from '@angular/core';
 import {ActivatedRoute, Router} from '@angular/router';
 import {
@@ -6,8 +7,7 @@ import {
   AlertController,
   IonContent,
   ModalController,
-  ToastController,
-} from '@ionic/angular/standalone';
+  } from '@ionic/angular/standalone';
 import {TranslateService, TranslatePipe} from '@ngx-translate/core';
 import {Card, Collection} from '@lingua-card/shared/domain';
 import {isDue, isMastered} from '../../../review/domain/review-status';
@@ -50,7 +50,7 @@ export class CollectionDetailPage implements OnInit {
   private readonly modalCtrl = inject(ModalController);
   private readonly alertCtrl = inject(AlertController);
   private readonly actionSheetCtrl = inject(ActionSheetController);
-  private readonly toastCtrl = inject(ToastController);
+  private readonly toastCtrl = inject(AppNotificationService);
   private readonly filterService = inject(ReviewFilterService);
   private readonly reviewStore = inject(ReviewStore);
   private readonly settingsStore = inject(SettingsStore);

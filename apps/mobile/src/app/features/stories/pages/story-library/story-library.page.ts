@@ -1,3 +1,4 @@
+import { AppNotificationService } from '@lingua-card/mobile/notifications';
 import {
   ChangeDetectionStrategy,
   Component,
@@ -17,8 +18,7 @@ import {
   IonRefresher,
   IonRefresherContent,
   ModalController,
-  ToastController,
-} from '@ionic/angular/standalone';
+  } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
 import {
   bookOutline,
@@ -75,7 +75,7 @@ export class StoryLibraryPage implements OnInit {
   private readonly router              = inject(Router);
   private readonly modalCtrl           = inject(ModalController);
   private readonly alertCtrl           = inject(AlertController);
-  private readonly toastCtrl           = inject(ToastController);
+  private readonly toastCtrl           = inject(AppNotificationService);
   private readonly subscriptionStore   = inject(SubscriptionStore);
   private readonly platformApi         = inject(PlatformStoryApiService);
   private readonly actionSheetCtrl     = inject(ActionSheetController);

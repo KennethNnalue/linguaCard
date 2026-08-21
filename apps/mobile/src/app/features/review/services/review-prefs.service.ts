@@ -33,7 +33,7 @@ const VALID_AUTOPLAY: readonly ReviewAutoplayMode[] = ['off', 'answer', 'answer_
 export class ReviewPrefsService {
   private readonly _mode = signal<StudyMode>(read(MODE_KEY, VALID_MODES, 'type'));
   private readonly _dir = signal<StudyDirection>(read(DIR_KEY, VALID_DIRS, 'en-de'));
-  private readonly _autoplay = signal<ReviewAutoplayMode>(read(AUTOPLAY_KEY, VALID_AUTOPLAY, 'off'));
+  private readonly _autoplay = signal<ReviewAutoplayMode>(read(AUTOPLAY_KEY, VALID_AUTOPLAY, 'answer'));
 
   readonly mode = this._mode.asReadonly();
   readonly dir = this._dir.asReadonly();

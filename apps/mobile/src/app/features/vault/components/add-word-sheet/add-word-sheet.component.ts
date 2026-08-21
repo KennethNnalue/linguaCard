@@ -1,3 +1,4 @@
+import { AppNotificationService } from '@lingua-card/mobile/notifications';
 import { ChangeDetectionStrategy, Component, computed, DestroyRef, inject, Input, OnInit, signal } from '@angular/core';
 import { Router } from '@angular/router';
 import { FormArray, FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
@@ -9,8 +10,7 @@ import {
   IonIcon,
   IonToolbar,
   ModalController,
-  ToastController,
-} from '@ionic/angular/standalone';
+  } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
 import {
   addOutline,
@@ -63,7 +63,7 @@ export class AddWordSheetComponent implements OnInit {
   private readonly enrichOneApi = inject(EnrichOneApiService);
   private readonly dictionaryApi = inject(DictionaryApiService);
   private readonly modalCtrl = inject(ModalController);
-  private readonly toastCtrl = inject(ToastController);
+  private readonly toastCtrl = inject(AppNotificationService);
   private readonly router = inject(Router);
   private readonly dedupService = inject(CardDedupService);
   private readonly destroyRef = inject(DestroyRef);

@@ -1,3 +1,4 @@
+import { AppNotificationService } from '@lingua-card/mobile/notifications';
 import {
   ChangeDetectionStrategy,
   Component,
@@ -16,7 +17,6 @@ import { ActivatedRoute, Router } from '@angular/router';
 import {
   IonContent,
   IonIcon,
-  ToastController,
   ViewWillLeave,
 } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
@@ -70,7 +70,7 @@ export class PlatformStoryReaderPage implements OnInit, ViewWillLeave {
   private readonly wordSheet = inject(StoryWordSheetService);
   private readonly tokenizer = inject(StoryTokenizerService);
   private readonly storyStore = inject(StoryStore);
-  private readonly toastCtrl = inject(ToastController);
+  private readonly toastCtrl = inject(AppNotificationService);
   private readonly translate = inject(TranslateService);
 
   readonly story = signal<PlatformStory | null>(null);

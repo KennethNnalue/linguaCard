@@ -1,7 +1,8 @@
+import { AppNotificationService } from '@lingua-card/mobile/notifications';
 import { ChangeDetectionStrategy, Component, DestroyRef, inject, signal } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { ReactiveFormsModule, FormBuilder, Validators } from '@angular/forms';
-import { IonContent, IonHeader, IonToolbar, IonTitle, IonIcon, ModalController, ToastController } from '@ionic/angular/standalone';
+import { IonContent, IonHeader, IonToolbar, IonTitle, IonIcon, ModalController } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
 import { closeOutline, checkmarkCircleOutline, giftOutline } from 'ionicons/icons';
 import { TranslatePipe, TranslateService } from '@ngx-translate/core';
@@ -18,7 +19,7 @@ import { SubscriptionStore } from '../../store/subscription.store';
 })
 export class RedeemCodeSheetComponent {
   private readonly modalCtrl     = inject(ModalController);
-  private readonly toastCtrl     = inject(ToastController);
+  private readonly toastCtrl     = inject(AppNotificationService);
   private readonly discountApi   = inject(DiscountApiService);
   private readonly subscription  = inject(SubscriptionStore);
   private readonly translate     = inject(TranslateService);

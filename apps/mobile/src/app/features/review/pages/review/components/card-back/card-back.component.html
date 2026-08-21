@@ -5,9 +5,10 @@
     @if (banner(); as b) {
       <div class="cb-banner cb-banner--{{ b.tint }}">
         <div class="cb-banner-top">
-          <span class="cb-medallion cb-medallion--{{ b.tint }}">{{ b.icon }}</span>
           <span class="cb-verdict cb-verdict--{{ b.tint }}">{{ b.verdictKey | translate }}</span>
+          <span class="cb-medallion cb-medallion--{{ b.tint }}">{{ b.icon }}</span>
         </div>
+        @if (b.subtitleKey) { <p class="cb-verdict-sub">{{ b.subtitleKey | translate }}</p> }
         @if (b.showAttempt) {
         <div class="cb-attempt">
           <span class="cb-you-lbl">{{ 'review.session.youWrote' | translate }}</span>

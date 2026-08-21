@@ -71,6 +71,7 @@ export class ReviewPage {
       this.typed.set('');
       this.typedResult.set(null);
       this.dontKnowSelected.set(false);
+      this.manualRating.set(null);
       this.previousCardId.set(null);
       this.isFlipped.set(false);
       this.isTypingFocused.set(false);
@@ -82,6 +83,7 @@ export class ReviewPage {
   readonly typed = signal('');
   readonly typedResult = signal<TypedAnswerEvaluation | null>(null);
   readonly dontKnowSelected = signal(false);
+  readonly manualRating = signal<ReviewRating | null>(null);
   readonly previousCardId = signal<string | null>(null);
   readonly isMasteryConfirmationOpen = signal(false);
   readonly masteredCardLabel = signal<string | null>(null);
@@ -147,6 +149,11 @@ export class ReviewPage {
     this.reviewStore.totalOriginalCount(),
   ));
 
+  readonly displayedPosition = computed(() => Math.max(
+    1,
+    this.currentPosition() - (this.isViewingPrevious() ? 1 : 0),
+  ));
+
   readonly playerHeader = computed(() => buildReviewPlayerHeader({
     currentPosition: this.currentPosition(),
     totalCards: this.reviewStore.totalOriginalCount(),
@@ -156,6 +163,12 @@ export class ReviewPage {
   readonly suggestedRating = computed<ReviewRating | null>(
     () => this.dontKnowSelected() ? 'again' : this.typedResult()?.evaluation.suggestedRating ?? null,
   );
+
+  readonly displayedRating = computed<ReviewRating | null>(() => {
+    if (this.isViewingPrevious()) return this.historicalRating() ?? 'good';
+    if (!this.isFlipped()) return null;
+    return this.manualRating() ?? this.suggestedRating() ?? 'good';
+  });
 
   private readonly showGermanPrompt = computed(() => {
     return this.reviewStore.presentation()?.direction === 'target_to_source';
@@ -297,8 +310,30 @@ export class ReviewPage {
         icon: 'star-outline',
         handler: () => this.requestManualMastery(),
       },
+      {
+        label: this.translate.instant('review.session.changeRating'),
+        description: this.translate.instant('review.session.changeRatingHint'),
+        icon: 'options-outline',
+        handler: () => void this.openRatingActions(),
+      },
       {label: this.translate.instant('common.cancel'), role: 'cancel'},
     ]);
+  }
+
+  async openRatingActions(): Promise<void> {
+    await this.bottomSheet.open(this.translate.instant('review.session.changeRating'), [
+      ...this.ratingOptionsWithPreviews().map(option => ({
+        label: this.translate.instant(`review.rating.${option.value}`),
+        description: option.previewLabel ?? undefined,
+        handler: () => this.manualRating.set(option.value),
+      })),
+      {label: this.translate.instant('common.cancel'), role: 'cancel' as const},
+    ]);
+  }
+
+  submitDisplayedRating(): void {
+    const rating = this.displayedRating();
+    if (rating) void this.submitRating(rating);
   }
 
   showPrevious(): void {
@@ -313,6 +348,7 @@ export class ReviewPage {
     this.typedResult.set(committed?.cardId === cardId ? committed.typedResult : null);
     this.dontKnowSelected.set(committed?.cardId === cardId ? committed.dontKnow : false);
     this.isFlipped.set(true);
+    void this.runRevealAutoplay(true);
   }
 
   returnToCurrent(): void {
@@ -360,9 +396,9 @@ export class ReviewPage {
     this.wordAudio.stop();
   }
 
-  private async runRevealAutoplay(): Promise<void> {
+  private async runRevealAutoplay(includeHistorical = false): Promise<void> {
     const card = this.currentCard();
-    if (!card || this.isViewingPrevious()) return;
+    if (!card || (this.isViewingPrevious() && !includeHistorical)) return;
     const connection = (navigator as Navigator & { connection?: { saveData?: boolean } }).connection;
     const policy = {
       mode: this.reviewPrefs.autoplay(),

@@ -1,12 +1,12 @@
-<ion-header class="ion-no-border" [class.rv-keyboard-active]="isTypingFocused()">
+<ion-header class="ion-no-border" [class.rv-keyboard-active]="mode() === 'typing' && !isFlipped()">
   <ion-toolbar>
     @if (playerHeader(); as header) {
       <div class="rv-nav">
         <button class="rv-close" (click)="requestExit()" [attr.aria-label]="'review.session.goBackAriaLabel' | translate">
           <ion-icon name="close-outline"></ion-icon>
         </button>
-        <span class="rv-nav-count" [class.rv-nav-count--history]="isViewingPrevious()">
-          {{ (isViewingPrevious() ? 'review.session.previousReadOnlyHeader' : 'review.session.cardOf') | translate:{ n: header.currentPosition, total: header.totalCards } }}
+        <span class="rv-nav-count">
+          {{ 'review.session.cardOf' | translate:{ n: displayedPosition(), total: header.totalCards } }}
         </span>
         <div class="rv-nav-tools">
           @if (!isViewingPrevious()) { <span class="rv-nav-remaining">{{ header.remainingCards }}↑</span> }
@@ -30,7 +30,7 @@
   </ion-toolbar>
 </ion-header>
 
-<ion-content [class.rv-keyboard-active]="isTypingFocused()">
+<ion-content [class.rv-keyboard-active]="mode() === 'typing' && !isFlipped()">
   @if (reviewStore.presentation()) {
     @if (currentCard(); as card) {
       <div class="rv-scene" [class.rv-scene--revealed]="isFlipped()">
@@ -41,7 +41,7 @@
                 <lc-rv-front-type
                   [prompt]="flipPrompt()"
                   [expectsGermanAnswer]="expectsGermanAnswer()"
-                  [compact]="isTypingFocused()"
+                  [compact]="true"
                   [typed]="typed()"
                   (typedChange)="typed.set($event)"
                   (focusChanged)="isTypingFocused.set($event)"
@@ -121,19 +121,17 @@
 }
 
 @if (reviewStore.presentation()) {
-  <div class="rv-footer" [class.rv-footer--keyboard]="isTypingFocused()">
+  <div class="rv-footer" [class.rv-footer--keyboard]="mode() === 'typing' && !isFlipped()">
     <lc-rv-rating-footer
       [options]="ratingOptionsWithPreviews()"
       [flipped]="isFlipped()"
-      [suggested]="suggestedRating()"
-      [automatic]="mode() === 'typing' && typedResult() !== null"
+      [selfRated]="mode() !== 'typing'"
       [busy]="reviewStore.isBusy()"
       [canGoPrevious]="reviewStore.lastReviewedCardId() !== null && !isViewingPrevious()"
       [readOnly]="isViewingPrevious()"
-      [historicalRating]="historicalRating()"
       (rate)="submitRating($event)"
       (previous)="showPrevious()"
       (returnToCurrent)="returnToCurrent()"
-      (skip)="skipCard()" />
+      (continueReview)="submitDisplayedRating()" />
   </div>
 }

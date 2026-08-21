@@ -17,7 +17,7 @@ ion-header ion-toolbar {
   grid-template-columns: 48px minmax(0, 1fr) 82px;
   align-items: center;
   gap: t.$lc-space-2;
-  padding: t.$lc-space-3 t.$lc-space-4 t.$lc-space-2;
+  padding: calc(env(safe-area-inset-top, 0px) + #{t.$lc-space-3}) t.$lc-space-4 t.$lc-space-2;
   width: min(100%, 560px);
   margin-inline: auto;
 }
@@ -56,18 +56,6 @@ ion-header ion-toolbar {
   @include u.lc-font('lg', t.$lc-font-weight-medium);
   font-family: t.$lc-font-rv-display;
   color: var(--lc-rv-text);
-}
-
-.rv-nav-count--history {
-  justify-self: center;
-  padding: 5px t.$lc-space-3;
-  border: 1px solid var(--lc-rv-border);
-  border-radius: t.$lc-radius-full;
-  @include u.lc-font('xs', t.$lc-font-weight-medium);
-  white-space: nowrap;
-  max-width: 100%;
-  overflow: hidden;
-  text-overflow: ellipsis;
 }
 
 .rv-nav-remaining {
@@ -245,7 +233,10 @@ ion-header ion-toolbar {
 .rv-footer--keyboard { display: none; }
 
 ion-header.rv-keyboard-active {
-  .rv-nav { padding-top: 2px; padding-bottom: 2px; }
+  .rv-nav {
+    padding-top: calc(env(safe-area-inset-top, 0px) + 2px);
+    padding-bottom: 2px;
+  }
   .rv-goal-progress,
   .rv-goal-exceeded,
   .rv-points { display: none; }

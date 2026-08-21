@@ -1,3 +1,4 @@
+import { AppNotificationService } from '@lingua-card/mobile/notifications';
 import { ChangeDetectionStrategy, Component, computed, DestroyRef, inject, OnInit, signal } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { Router } from '@angular/router';
@@ -7,8 +8,7 @@ import {
   IonIcon,
   IonToolbar,
   ModalController,
-  ToastController,
-} from '@ionic/angular/standalone';
+  } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
 import {
   arrowBackOutline,
@@ -64,7 +64,7 @@ export class ImportReviewPage implements OnInit {
   private readonly collectionStore = inject(CollectionStore);
   private readonly cardStore = inject(CardStore);
   private readonly router = inject(Router);
-  private readonly toastCtrl = inject(ToastController);
+  private readonly toastCtrl = inject(AppNotificationService);
   private readonly modalCtrl = inject(ModalController);
   private readonly collectionApi = inject(CollectionApiService);
   private readonly dedupService = inject(CardDedupService);

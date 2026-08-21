@@ -807,6 +807,9 @@
       "masterConfirmBody": "Bu kart planlanmış tekrarlardan kaldırılacak. Öğrenme geçmişiniz korunacak.",
       "masterConfirmUndo": "Kelime ayrıntılarından geri alabilirsiniz.",
       "keepReviewing": "Tekrara devam et",
+      "leaveTitle": "Bu tekrardan çıkılsın mı?",
+      "leaveBody": "Tamamlanan tekrarlar kaydedildi. Kalan kartlara daha sonra devam edebilirsiniz.",
+      "leaveAction": "Tekrardan çık",
       "confirmMasterCard": "Ustalaşıldı olarak işaretle",
       "masteringCard": "Kaydediliyor…",
       "cardMastered": "Kart ustalaşıldı",
@@ -1005,6 +1008,7 @@
     "type": {
       "alsoArticle": "Ayrıca: {{article}} olmalı",
       "correct": "Doğru!",
+      "almost": "Neredeyse",
       "dontForgetArticle": "Artikeli unutma — {{article}} olmalı",
       "itsArticleNot": "{{userArticle}} değil, {{article}} olmalı",
       "mindGender": "Artikeline dikkat",

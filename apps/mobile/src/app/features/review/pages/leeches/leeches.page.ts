@@ -1,6 +1,7 @@
+import { AppNotificationService } from '@lingua-card/mobile/notifications';
 import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
 import { Router } from '@angular/router';
-import { AlertController, IonContent, IonHeader, IonIcon, IonToolbar, ToastController } from '@ionic/angular/standalone';
+import { AlertController, IonContent, IonHeader, IonIcon, IonToolbar } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
 import { chevronBackOutline, flashOutline, refreshOutline, moonOutline } from 'ionicons/icons';
 import { TranslatePipe, TranslateService } from '@ngx-translate/core';
@@ -25,7 +26,7 @@ export class LeechesPage {
   private readonly prefs = inject(ReviewPrefsService);
   private readonly reviewStore = inject(ReviewStore);
   private readonly router = inject(Router);
-  private readonly toast = inject(ToastController);
+  private readonly toast = inject(AppNotificationService);
   private readonly translate = inject(TranslateService);
   private readonly alerts = inject(AlertController);
 

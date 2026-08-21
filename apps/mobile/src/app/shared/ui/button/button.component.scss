@@ -11,7 +11,11 @@
   border: 1px solid transparent;
   border-radius: t.$lc-radius-md;
   cursor: pointer;
+  transition: transform 140ms t.$lc-easing-standard, box-shadow 180ms ease, filter 180ms ease, opacity 180ms ease;
   @include u.touch-state;
+
+  &:active:not(:disabled) { transform: translateY(1px) scale(.985); }
+  &:focus-visible { outline: 2px solid var(--lc-rv-mid, #{t.$lc-brand}); outline-offset: 2px; }
 
   &:disabled {
     opacity: 0.45;
@@ -21,9 +25,9 @@
   &--full { width: 100%; }
 
   // ─── SIZES ──────────────────────────────────────────────────────────────────
-  &--sm { @include u.lc-font('sm', t.$lc-font-weight-semibold); padding: t.$lc-space-2 t.$lc-space-3; }
-  &--md { @include u.lc-font('md', t.$lc-font-weight-semibold); padding: t.$lc-space-3 t.$lc-space-5; }
-  &--lg { @include u.lc-font('lg', t.$lc-font-weight-semibold); padding: t.$lc-space-4 t.$lc-space-6; }
+  &--sm { min-height: 40px; @include u.lc-font('sm', t.$lc-font-weight-semibold); padding: t.$lc-space-2 t.$lc-space-3; }
+  &--md { min-height: 48px; @include u.lc-font('md', t.$lc-font-weight-semibold); padding: t.$lc-space-3 t.$lc-space-5; }
+  &--lg { min-height: 54px; @include u.lc-font('lg', t.$lc-font-weight-semibold); padding: t.$lc-space-4 t.$lc-space-6; }
 
   // ─── VARIANTS ───────────────────────────────────────────────────────────────
   &--filled-primary {
@@ -56,11 +60,29 @@
     border-color: transparent;
   }
 
+  &--review-primary {
+    background: var(--lc-rv-mid);
+    color: var(--lc-rv-bg);
+    border-color: color-mix(in srgb, var(--lc-rv-mid) 76%, var(--lc-rv-border));
+    box-shadow: 0 8px 20px color-mix(in srgb, var(--lc-rv-mid) 18%, transparent);
+  }
+
+  &--review-ghost {
+    background: transparent;
+    color: var(--lc-rv-text-soft);
+    border-color: transparent;
+  }
+
   &--destructive {
     background: t.$lc-fem-bg;
     color: t.$lc-fem-text;
     border-color: t.$lc-fem-border;
   }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .btn { transition-duration: 1ms; }
+  .btn:active:not(:disabled) { transform: none; }
 }
 
 .btn-spinner {

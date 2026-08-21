@@ -1,3 +1,4 @@
+import { AppNotificationService } from '@lingua-card/mobile/notifications';
 import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
 import { Router } from '@angular/router';
 import {
@@ -6,8 +7,7 @@ import {
   IonIcon,
   IonToolbar,
   ModalController,
-  ToastController,
-} from '@ionic/angular/standalone';
+  } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
 import { arrowBackOutline, closeCircleOutline, documentOutline } from 'ionicons/icons';
 import { TranslatePipe } from '@ngx-translate/core';
@@ -32,7 +32,7 @@ const MAX_FILE_SIZE_BYTES = 5 * 1024 * 1024;
 export class ImageImportPage {
   private readonly router = inject(Router);
   private readonly importImageState = inject(ImageImportStateService);
-  private readonly toastCtrl = inject(ToastController);
+  private readonly toastCtrl = inject(AppNotificationService);
   private readonly modalCtrl = inject(ModalController);
   readonly subscriptionStore = inject(SubscriptionStore);
 

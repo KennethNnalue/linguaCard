@@ -807,6 +807,9 @@
       "masterConfirmBody": "Карточка будет удалена из повторений. История обучения сохранится.",
       "masterConfirmUndo": "Это можно отменить в сведениях о слове.",
       "keepReviewing": "Продолжить повторение",
+      "leaveTitle": "Выйти из повторения?",
+      "leaveBody": "Завершённые повторения сохранены. Остальные карточки можно продолжить позже.",
+      "leaveAction": "Выйти",
       "confirmMasterCard": "Отметить освоенной",
       "masteringCard": "Сохранение…",
       "cardMastered": "Карточка освоена",
@@ -1005,6 +1008,7 @@
     "type": {
       "alsoArticle": "Также: это {{article}}",
       "correct": "Верно!",
+      "almost": "Почти",
       "dontForgetArticle": "Не забудьте артикль — это {{article}}",
       "itsArticleNot": "Это {{article}}, а не {{userArticle}}",
       "mindGender": "Обратите внимание на артикль",

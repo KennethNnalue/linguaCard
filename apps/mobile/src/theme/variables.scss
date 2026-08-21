@@ -301,9 +301,9 @@ body.ion-palette-dark {
   --lc-masc-bg:         #1A2B42;
   --lc-masc-text:       #7BB8F8;
   --lc-masc-border:     #2D4F7A;
-  --lc-fem-bg:          #321414;
-  --lc-fem-text:        #F98080;
-  --lc-fem-border:      #6B2020;
+  --lc-fem-bg:          #351126;
+  --lc-fem-text:        #F472B6;
+  --lc-fem-border:      #831843;
   --lc-neut-bg:         #272820;
   --lc-neut-text:       #A8B8B4;
   --lc-neut-border:     #4A4E48;
@@ -456,9 +456,10 @@ body.ion-palette-dark {
   border: 1px solid transparent;
   white-space: nowrap;
 }
-.lc-article-badge--der { background: var(--lc-masc-bg); color: var(--lc-masc-text); border-color: var(--lc-masc-border); }
-.lc-article-badge--die { background: var(--lc-fem-bg);  color: var(--lc-fem-text);  border-color: var(--lc-fem-border); }
-.lc-article-badge--das { background: var(--lc-neut-bg); color: var(--lc-neut-text); border-color: var(--lc-neut-border); }
+.lc-article-badge { text-transform: uppercase; }
+.lc-article-badge--der { background: color-mix(in srgb, var(--lc-masc-text) 74%, #06182d); color: #fff; border-color: var(--lc-masc-border); }
+.lc-article-badge--die { background: color-mix(in srgb, var(--lc-fem-text) 74%, #3b0824); color: #fff; border-color: var(--lc-fem-border); }
+.lc-article-badge--das { background: color-mix(in srgb, var(--lc-neut-text) 72%, #20242b); color: #fff; border-color: var(--lc-neut-border); }
 
 // Mastery dot
 .lc-mastery-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
@@ -565,6 +566,19 @@ body.ion-palette-dark {
 // Sync status dot
 .lc-sync-dot { width: 7px; height: 7px; border-radius: 50%; flex-shrink: 0; }
 .lc-sync-dot--synced  { background: var(--lc-mastery-4); }
+
+// Unified application notification surface. Toasts stay clear of the active
+// review controls and respect notched-device status bars in both themes.
+ion-toast.lc-app-notification {
+  --width: min(calc(100% - 32px), 520px);
+  --max-width: 520px;
+  --border-radius: 14px;
+  --box-shadow: 0 12px 32px rgba(0, 0, 0, .22);
+  --start: auto;
+  --end: auto;
+  margin-top: calc(env(safe-area-inset-top, 0px) + 8px);
+  font-weight: 600;
+}
 .lc-sync-dot--pending { background: var(--lc-mastery-2); }
 .lc-sync-dot--syncing { background: var(--lc-mastery-2); animation: lc-pulse 1s infinite; }
 .lc-sync-dot--error   { background: var(--lc-fem-text); }

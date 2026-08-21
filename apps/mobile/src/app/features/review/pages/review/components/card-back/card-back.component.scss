@@ -22,8 +22,8 @@
 .cb-banner {
   border: 0;
   padding: 0;
-  margin-bottom: t.$lc-space-3;
-  padding-right: 52px;
+  margin-bottom: t.$lc-space-4;
+  padding-inline: 52px;
 
   &--correct {
     background: transparent;
@@ -38,14 +38,17 @@
 
 .cb-banner-top {
   display: flex;
+  flex-direction: column;
   align-items: center;
-  gap: t.$lc-space-2;
+  gap: t.$lc-space-1;
 }
 
 .cb-medallion {
-  @include u.circle(22px);
+  @include u.circle(42px);
   @include u.flex-center;
-  @include u.lc-font('sm', t.$lc-font-weight-bold);
+  border: 2px solid currentColor;
+  box-shadow: 0 5px 14px color-mix(in srgb, currentColor 20%, transparent), inset 0 0 0 3px color-mix(in srgb, white 18%, transparent);
+  @include u.lc-font('xl', t.$lc-font-weight-bold);
   color: var(--lc-rv-card);
 
   &--correct { background: var(--lc-rv-verdict-correct); }
@@ -54,7 +57,7 @@
 }
 
 .cb-verdict {
-  @include u.lc-font('xl', t.$lc-font-weight-semibold);
+  @include u.lc-font('4xl', t.$lc-font-weight-semibold);
   font-family: t.$lc-font-rv-display;
 
   &--correct { color: var(--lc-rv-verdict-correct); }
@@ -62,7 +65,16 @@
   &--wrong { color: var(--lc-rv-verdict-wrong); }
 }
 
+.cb-verdict-sub {
+  margin-top: 2px;
+  text-align: center;
+  color: var(--lc-rv-text-soft);
+  font-family: t.$lc-font-rv-body;
+  @include u.lc-font('xs', t.$lc-font-weight-medium);
+}
+
 .cb-attempt {
+  justify-content: center;
   display: flex;
   align-items: baseline;
   flex-wrap: wrap;

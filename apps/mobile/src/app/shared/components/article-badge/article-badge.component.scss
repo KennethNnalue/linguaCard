@@ -12,8 +12,9 @@
   border-radius: t.$lc-radius-full;
   border: 1px solid transparent;
   white-space: nowrap;
+  text-transform: uppercase;
 
-  &--der { background: var(--lc-masc-bg); color: var(--lc-masc-text); border-color: var(--lc-masc-border); }
-  &--die { background: var(--lc-fem-bg);  color: var(--lc-fem-text);  border-color: var(--lc-fem-border); }
-  &--das { background: var(--lc-neut-bg); color: var(--lc-neut-text); border-color: var(--lc-neut-border); }
+  &--der { background: color-mix(in srgb, var(--lc-masc-text) 74%, #06182d); color: #fff; border-color: var(--lc-masc-border); }
+  &--die { background: color-mix(in srgb, var(--lc-fem-text) 74%, #3b0824); color: #fff; border-color: var(--lc-fem-border); }
+  &--das { background: color-mix(in srgb, var(--lc-neut-text) 72%, #20242b); color: #fff; border-color: var(--lc-neut-border); }
 }

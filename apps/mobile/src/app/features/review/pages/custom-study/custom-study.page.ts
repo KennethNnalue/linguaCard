@@ -1,6 +1,7 @@
+import { AppNotificationService } from '@lingua-card/mobile/notifications';
 import { ChangeDetectionStrategy, Component, computed, inject, signal } from '@angular/core';
 import { Router } from '@angular/router';
-import { IonContent, IonHeader, IonIcon, IonToolbar, ModalController, ToastController } from '@ionic/angular/standalone';
+import { IonContent, IonHeader, IonIcon, IonToolbar, ModalController } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
 import { chevronBackOutline, chevronForwardOutline } from 'ionicons/icons';
 import type { ScheduledCard } from '@lingua-card/shared/domain';
@@ -58,7 +59,7 @@ export class CustomStudyPage {
   private readonly reviewStore = inject(ReviewStore);
   private readonly prefs = inject(ReviewPrefsService);
   private readonly router = inject(Router);
-  private readonly toastCtrl = inject(ToastController);
+  private readonly toastCtrl = inject(AppNotificationService);
   private readonly modalCtrl = inject(ModalController);
   private readonly translate = inject(TranslateService);
 

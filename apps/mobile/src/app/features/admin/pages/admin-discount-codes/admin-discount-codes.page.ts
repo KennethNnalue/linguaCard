@@ -1,8 +1,9 @@
+import { AppNotificationService } from '@lingua-card/mobile/notifications';
 import { ChangeDetectionStrategy, Component, DestroyRef, inject, OnInit, signal } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { DatePipe, Location } from '@angular/common';
-import { IonContent, IonHeader, IonIcon, IonToolbar, ToastController } from '@ionic/angular/standalone';
+import { IonContent, IonHeader, IonIcon, IonToolbar } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
 import { arrowBackOutline, copyOutline, pricetagsOutline } from 'ionicons/icons';
 import { TranslatePipe, TranslateService } from '@ngx-translate/core';
@@ -18,7 +19,7 @@ import { AdminApiService } from '../../services/admin-api.service';
 })
 export class AdminDiscountCodesPage implements OnInit {
   private readonly adminApi   = inject(AdminApiService);
-  private readonly toastCtrl  = inject(ToastController);
+  private readonly toastCtrl  = inject(AppNotificationService);
   private readonly translate  = inject(TranslateService);
   private readonly location   = inject(Location);
   private readonly _destroyRef = inject(DestroyRef);

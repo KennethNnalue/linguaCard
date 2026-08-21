@@ -1,10 +1,10 @@
+import { AppNotificationService } from '@lingua-card/mobile/notifications';
 import { Component, ChangeDetectionStrategy, inject, Input, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import {
   IonContent, IonHeader, IonToolbar, IonTitle, IonButtons, IonButton,
   IonItem, IonLabel, IonInput, IonToggle, IonSpinner,
-  ModalController, ToastController,
-} from '@ionic/angular/standalone';
+  ModalController, } from '@ionic/angular/standalone';
 import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { firstValueFrom } from 'rxjs';
 import type { ShareResourceType, ShareSyncMode } from '@lingua-card/shared/domain';
@@ -82,7 +82,7 @@ export class ShareSheetComponent {
   @Input() resourceId!: string;
 
   private readonly modalCtrl = inject(ModalController);
-  private readonly toastCtrl = inject(ToastController);
+  private readonly toastCtrl = inject(AppNotificationService);
   private readonly translate = inject(TranslateService);
   private readonly shareApi = inject(ShareApiService);
 

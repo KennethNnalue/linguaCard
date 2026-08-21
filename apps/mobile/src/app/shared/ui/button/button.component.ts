@@ -1,6 +1,14 @@
 import {ChangeDetectionStrategy, Component, input} from '@angular/core';
 
-export type ButtonVariant = 'filled-primary' | 'filled-accent' | 'filled-inverse' | 'outline-primary' | 'ghost-primary' | 'destructive';
+export type ButtonVariant =
+  | 'filled-primary'
+  | 'filled-accent'
+  | 'filled-inverse'
+  | 'outline-primary'
+  | 'ghost-primary'
+  | 'review-primary'
+  | 'review-ghost'
+  | 'destructive';
 export type ButtonSize = 'sm' | 'md' | 'lg';
 
 @Component({

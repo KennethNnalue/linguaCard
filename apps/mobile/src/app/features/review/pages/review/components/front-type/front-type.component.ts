@@ -4,13 +4,14 @@ import { addIcons } from 'ionicons';
 import { checkmarkOutline } from 'ionicons/icons';
 import { TranslatePipe } from '@ngx-translate/core';
 import { canSubmitRecallAnswer, insertRecallCharacter } from '../../../../application/recall-answer';
+import { ButtonComponent } from '../../../../../../shared/ui/button/button.component';
 
 @Component({
   selector: 'lc-rv-front-type',
   templateUrl: './front-type.component.html',
   styleUrls: ['./front-type.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [IonIcon, TranslatePipe],
+  imports: [IonIcon, TranslatePipe, ButtonComponent],
 })
 export class FrontTypeComponent {
   private readonly answerInput = viewChild<ElementRef<HTMLInputElement>>('answerInput');
@@ -26,7 +27,16 @@ export class FrontTypeComponent {
 
   constructor() {
     addIcons({ checkmarkOutline });
-    afterNextRender(() => this.answerInput()?.nativeElement.focus({ preventScroll: true }));
+    afterNextRender(() => {
+      // Route transitions can finish after the first render on iOS. Focusing on
+      // the next frame keeps typing sessions keyboard-first without a flash of
+      // the expanded pre-keyboard layout.
+      requestAnimationFrame(() => this.focusInput());
+    });
+  }
+
+  focusInput(): void {
+    this.answerInput()?.nativeElement.focus({ preventScroll: true });
   }
 
   canSubmit(): boolean {

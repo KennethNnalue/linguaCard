@@ -1,160 +1,71 @@
 @use 'theme/tokens' as t;
 @use 'theme/utils' as u;
 
-:host {
-  display: block;
-}
+:host { display: block; }
 
-// ─── Secondary row (prev / skip) ─────────────────────────────────────────────
-.rf-secondary {
-  @include u.flex-between;
-  margin-bottom: t.$lc-space-2;
-}
-
-.rf-sec-btn {
-  display: flex;
+.rf-primary-row {
+  display: grid;
+  grid-template-columns: minmax(90px, 1fr) minmax(112px, 1fr);
   align-items: center;
+  gap: t.$lc-space-2;
+  lc-button { justify-self: end; }
+}
+
+.rf-self-rating {
+  margin-top: t.$lc-space-2;
+
+  > p {
+    margin: 0 0 t.$lc-space-2;
+    text-align: center;
+    color: var(--lc-rv-muted);
+    font-family: t.$lc-font-rv-mono;
+    text-transform: uppercase;
+    letter-spacing: .1em;
+    @include u.lc-font('3xs', t.$lc-font-weight-semibold);
+  }
+}
+
+.rf-rating-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: t.$lc-space-2;
+}
+
+.rf-rate {
+  display: grid;
+  justify-items: center;
   gap: 2px;
-  @include u.touch-state;
-  @include u.lc-font('sm', t.$lc-font-weight-semibold);
+  min-height: 54px;
+  padding: t.$lc-space-2 t.$lc-space-1;
+  border: 1px solid currentColor;
+  border-radius: t.$lc-radius-md;
+  background: var(--lc-rv-inset-soft);
   font-family: t.$lc-font-rv-body;
-  color: var(--lc-rv-muted);
-  min-height: 44px;
-  padding: 0 t.$lc-space-2;
-  border: 0;
-  background: transparent;
-
-  ion-icon {
-    font-size: t.$lc-text-lg;
-  }
-
-  &:disabled {
-    opacity: 0.4;
-  }
-}
-
-.rf-auto {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: t.$lc-space-3;
-  min-height: 48px;
-  color: var(--lc-rv-muted);
-  font-family: t.$lc-font-rv-body;
-  @include u.lc-font('xs', t.$lc-font-weight-medium);
-
-  lc-button { min-width: 132px; }
-}
-
-.rf-auto-rating {
-  min-height: 44px;
-  padding: 0 t.$lc-space-2;
-  border: 0;
-  background: transparent;
-  font-family: t.$lc-font-rv-mono;
-  @include u.lc-font('sm', t.$lc-font-weight-bold);
   @include u.touch-state;
 
-  &--again { color: var(--lc-rv-again-text); }
-  &--hard { color: var(--lc-rv-hard-text); }
-  &--good { color: var(--lc-rv-good-text); }
+  strong { @include u.lc-font('xs', t.$lc-font-weight-bold); }
+  span { font-family: t.$lc-font-rv-mono; opacity: .82; @include u.lc-font('3xs', t.$lc-font-weight-medium); }
+  &:disabled { opacity: .52; }
+  &--again { color: var(--lc-rv-again-text); background: var(--lc-rv-again-bg); }
+  &--hard { color: var(--lc-rv-hard-text); background: var(--lc-rv-hard-bg); }
+  &--good { color: var(--lc-rv-good-text); background: var(--lc-rv-good-bg); }
   &--easy { color: var(--lc-rv-mid); }
 }
 
-// ─── Rating prompt ───────────────────────────────────────────────────────────
-.rf-prompt {
-  @include u.lc-font('xxs', t.$lc-font-weight-semibold);
-  font-family: t.$lc-font-rv-mono;
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
-  color: var(--lc-rv-muted);
-  text-align: center;
-  margin-bottom: t.$lc-space-2;
-}
-
-// ─── Rating buttons ──────────────────────────────────────────────────────────
-.rf-row {
+.rf-sec-btn {
+  justify-self: start;
   display: flex;
-  gap: t.$lc-space-2;
-}
-
-.rf-btn {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
   align-items: center;
   gap: 2px;
-  @include u.touch-state;
-  min-height: 56px;
-  padding: t.$lc-space-2 t.$lc-space-1;
+  min-height: 44px;
+  padding: 0 t.$lc-space-2;
+  border: 0;
   border-radius: t.$lc-radius-md;
-  border: 1px solid transparent;
-  transition: transform 140ms t.$lc-easing-standard, filter 140ms ease, opacity 140ms ease;
-
-  &:active:not(:disabled) {
-    transform: translateY(2px) scale(.97);
-  }
-
-  &:disabled {
-    cursor: wait;
-    opacity: .62;
-  }
-
-  &--again {
-    background: var(--lc-rv-again-bg);
-    border-color: var(--lc-rv-again-border);
-    color: var(--lc-rv-again-text);
-  }
-  &--hard {
-    background: var(--lc-rv-hard-bg);
-    border-color: var(--lc-rv-hard-border);
-    color: var(--lc-rv-hard-text);
-  }
-  &--good {
-    background: var(--lc-rv-good-bg);
-    border-color: var(--lc-rv-good-border);
-    color: var(--lc-rv-good-text);
-  }
-  &--easy {
-    background: t.$lc-rv-easy-bg;
-    border-color: t.$lc-rv-easy-bg;
-    color: t.$lc-rv-easy-text;
-  }
-
-  // Type-mode suggested rating: gold ring
-  &--suggested {
-    box-shadow: t.$lc-rv-shadow-gold-ring;
-  }
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .rf-btn { transition: opacity 1ms linear; }
-  .rf-btn:active:not(:disabled) { transform: none; }
-}
-
-.rf-lbl {
-  @include u.lc-font('sm', t.$lc-font-weight-bold);
-  font-family: t.$lc-font-rv-body;
-}
-
-.rf-interval {
-  @include u.lc-font('xxs', t.$lc-font-weight-medium);
-  font-family: t.$lc-font-rv-mono;
-  opacity: 0.85;
-}
-
-// ─── Locked hint (front face) ────────────────────────────────────────────────
-.rf-locked {
-  @include u.flex-center;
-  gap: t.$lc-space-2;
-  min-height: 56px;
-  border-radius: t.$lc-radius-md;
-  background: var(--lc-rv-inset);
+  background: transparent;
   color: var(--lc-rv-muted);
-  @include u.lc-font('sm', t.$lc-font-weight-medium);
   font-family: t.$lc-font-rv-body;
-
-  ion-icon {
-    font-size: t.$lc-text-lg;
-  }
+  @include u.lc-font('sm', t.$lc-font-weight-semibold);
+  @include u.touch-state;
+  ion-icon { font-size: t.$lc-text-lg; }
+  &:disabled { opacity: .38; }
 }

@@ -1,62 +1,30 @@
-<div class="rf-secondary">
+<div class="rf-primary-row">
   <button class="rf-sec-btn" [disabled]="busy() || !canGoPrevious()" (click)="previous.emit()">
     <ion-icon name="chevron-back-outline"></ion-icon>
     {{ 'review.session.previousBtn' | translate }}
   </button>
-  <button class="rf-sec-btn" [disabled]="busy()" (click)="readOnly() ? returnToCurrent.emit() : skip.emit()">
-    {{ (readOnly() ? 'review.session.returnToCurrentBtn' : 'review.session.skipBtn') | translate }}
-    <ion-icon name="chevron-forward-outline"></ion-icon>
-  </button>
+
+  @if (flipped() && (!selfRated() || readOnly())) {
+    <lc-button variant="review-primary" size="md" [loading]="busy()" (click)="readOnly() ? returnToCurrent.emit() : continueReview.emit()">
+      {{ 'common.continue' | translate }}
+    </lc-button>
+  }
 </div>
 
-@if (readOnly()) {
-  <div class="rf-locked">
-    {{ 'review.session.previousReadOnly' | translate }}
-    @if (historicalRating(); as rating) { · {{ ratingKey(rating) | translate }} }
-  </div>
-} @else if (flipped() && automatic() && suggested(); as autoRating) {
-  @if (alternativesVisible()) {
-    <p class="rf-prompt">{{ 'review.session.chooseDifferentRating' | translate }}</p>
-    <div class="rf-row">
-      @for (r of options(); track r.value) {
+@if (flipped() && selfRated() && !readOnly()) {
+  <div class="rf-self-rating">
+    <p>{{ 'review.session.ratingPrompt' | translate }}</p>
+    <div class="rf-rating-grid">
+      @for (option of options(); track option.value) {
         <button
-          class="rf-btn rf-btn--{{ ratingClass(r.value) }}"
-          [class.rf-btn--suggested]="suggested() === r.value"
+          type="button"
+          class="rf-rate rf-rate--{{ option.value }}"
           [disabled]="busy()"
-          (click)="rate.emit(r.value)">
-          <span class="rf-lbl">{{ ratingKey(r.value) | translate }}</span>
-          <span class="rf-interval">{{ r.previewLabel ?? '—' }}</span>
+          (click)="rate.emit(option.value)">
+          <strong>{{ ratingKey(option.value) | translate }}</strong>
+          <span>{{ option.previewLabel ?? '—' }}</span>
         </button>
       }
     </div>
-  } @else {
-    <div class="rf-auto" role="status">
-      <button class="rf-auto-rating rf-auto-rating--{{ ratingClass(autoRating) }}" type="button" (click)="alternativesVisible.set(true)">
-        {{ ratingKey(autoRating) | translate }}
-      </button>
-      <lc-button variant="filled-primary" size="md" [loading]="busy()" (click)="acceptSuggested()">
-        {{ 'common.continue' | translate }}
-      </lc-button>
-    </div>
-  }
-} @else if (flipped()) {
-  <p class="rf-prompt">{{ 'review.session.ratingPrompt' | translate }}</p>
-  <div class="rf-row">
-    @for (r of options(); track r.value) {
-      <button
-        class="rf-btn rf-btn--{{ ratingClass(r.value) }}"
-        [class.rf-btn--suggested]="suggested() === r.value"
-        [disabled]="busy()"
-        [attr.aria-busy]="busy()"
-        (click)="rate.emit(r.value)">
-        <span class="rf-lbl">{{ ratingKey(r.value) | translate }}</span>
-        <span class="rf-interval">{{ r.previewLabel ?? '—' }}</span>
-      </button>
-    }
-  </div>
-} @else {
-  <div class="rf-locked">
-    <ion-icon name="lock-closed-outline"></ion-icon>
-    {{ 'review.session.ratingLocked' | translate }}
   </div>
 }
