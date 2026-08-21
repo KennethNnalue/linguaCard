@@ -203,6 +203,7 @@ export class ReviewPage {
   checkTyped(): void {
     const card = this.currentCard();
     if (!card || !this.typed().trim()) return;
+    this.typingFront()?.blurInput();
     this.isTypingFocused.set(false);
     this.typedResult.set(this.answerEvaluator.evaluateTypedAnswer({
       answer: this.typed(),
@@ -226,6 +227,7 @@ export class ReviewPage {
 
     const typedResult = this.typedResult();
     const isTyped = this.mode() === 'typing' && typedResult !== null;
+    if (isTyped) this.typingFront()?.focusInput();
     const finalRating = this.dontKnowSelected() ? 'again' : rating;
     this.cancelAudio();
     const saved = await this.reviewStore.commitCurrentRating(finalRating, {
@@ -233,7 +235,10 @@ export class ReviewPage {
       responseType: this.dontKnowSelected() ? 'dont_know' : isTyped ? 'typed_answer' : 'self_rated',
       answerEvaluation: isTyped ? typedResult.evaluation : undefined,
     });
-    if (!saved) return;
+    if (!saved) {
+      if (isTyped) this.typingFront()?.blurInput();
+      return;
+    }
     this.lastCommittedView.set({cardId: card.id, typedResult, dontKnow: this.dontKnowSelected(), rating: finalRating});
     this.feedback.ratingCommitted();
 
@@ -243,6 +248,7 @@ export class ReviewPage {
   }
 
   async dontKnow(): Promise<void> {
+    this.typingFront()?.blurInput();
     this.isTypingFocused.set(false);
     this.dontKnowSelected.set(true);
     this.isFlipped.set(true);

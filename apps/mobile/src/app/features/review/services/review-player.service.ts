@@ -80,7 +80,7 @@ export class ReviewPlayerService {
     if (Capacitor.isNativePlatform()) {
       await Keyboard.setScroll({ isDisabled: true }).catch(() => undefined);
     }
-    input.focus({ preventScroll: true });
+    input.focus();
     if (Capacitor.getPlatform() === 'android') {
       await Keyboard.show().catch(() => undefined);
     }
@@ -126,7 +126,7 @@ export class ReviewPlayerService {
     document.body.classList.add('lc-review-player-open');
     const updateViewport = () => {
       const height = viewport?.height ?? window.innerHeight;
-      modal.style.setProperty('--review-player-visible-height', `${Math.round(height)}px`);
+      modal.style.setProperty('--review-player-visible-height', `${Math.ceil(height)}px`);
       this.pinReviewPlayerToViewport(modal);
     };
     updateViewport();

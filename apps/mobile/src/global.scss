@@ -118,7 +118,7 @@ ion-toast.rv-toast {
 }
 ion-modal.lc-review-player-modal {
   --width: 100%;
-  --height: var(--review-player-visible-height, 100%);
+  --height: calc(var(--review-player-visible-height, 100%) + 2px);
   --max-width: none;
   --max-height: none;
   --border-radius: 0;
@@ -133,6 +133,7 @@ ion-modal.lc-review-player-modal::part(content) {
   height: 100%;
   max-height: 100%;
   overflow: hidden;
+  transform: translateY(-1px);
 }
 
 html.lc-review-player-open,

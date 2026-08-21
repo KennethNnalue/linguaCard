@@ -36,7 +36,11 @@ export class FrontTypeComponent {
   }
 
   focusInput(): void {
-    this.answerInput()?.nativeElement.focus({ preventScroll: true });
+    this.answerInput()?.nativeElement.focus();
+  }
+
+  blurInput(): void {
+    this.answerInput()?.nativeElement.blur();
   }
 
   canSubmit(): boolean {

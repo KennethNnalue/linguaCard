@@ -192,11 +192,19 @@ ion-header ion-toolbar {
 }
 
 .rv-card-stage {
+  position: relative;
   display: flex;
   flex: 1;
   min-height: 0;
   transform-origin: center;
   backface-visibility: hidden;
+}
+
+.rv-typing-front--inactive {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  pointer-events: none;
 }
 
 .rv-card-stage--front {

@@ -34,27 +34,23 @@
   @if (reviewStore.presentation()) {
     @if (currentCard(); as card) {
       <div class="rv-scene" [class.rv-scene--revealed]="isFlipped()">
-        @if (!isFlipped()) {
-          <div class="rv-card-stage rv-card-stage--front">
-            @switch (mode()) {
-              @case ('typing') {
-                <lc-rv-front-type
-                  [prompt]="flipPrompt()"
-                  [expectsGermanAnswer]="expectsGermanAnswer()"
-                  [compact]="true"
-                  [typed]="typed()"
-                  (typedChange)="typed.set($event)"
-                  (focusChanged)="isTypingFocused.set($event)"
-                  (check)="checkTyped()"
-                  (dontKnow)="dontKnow()" />
-              }
-              @default {
-                <lc-rv-front-flip [prompt]="flipPrompt()" [cue]="flipCue()" [hint]="flipHint()" (reveal)="reveal()" />
-              }
-            }
-          </div>
-        } @else {
-          <div class="rv-card-stage rv-card-stage--back">
+        <div class="rv-card-stage" [class.rv-card-stage--front]="!isFlipped()" [class.rv-card-stage--back]="isFlipped()">
+          @if (mode() === 'typing') {
+            <lc-rv-front-type
+              [class.rv-typing-front--inactive]="isFlipped()"
+              [attr.aria-hidden]="isFlipped()"
+              [prompt]="flipPrompt()"
+              [expectsGermanAnswer]="expectsGermanAnswer()"
+              [compact]="true"
+              [typed]="typed()"
+              (typedChange)="typed.set($event)"
+              (focusChanged)="isTypingFocused.set($event)"
+              (check)="checkTyped()"
+              (dontKnow)="dontKnow()" />
+          } @else if (!isFlipped()) {
+            <lc-rv-front-flip [prompt]="flipPrompt()" [cue]="flipCue()" [hint]="flipHint()" (reveal)="reveal()" />
+          }
+          @if (isFlipped()) {
             <lc-rv-card-back
               [card]="card"
               [typedResult]="typedResult()?.feedback ?? null"
@@ -68,8 +64,8 @@
               (playAudio)="playAudio()"
               (playExample)="playExample($event)"
               (cardActionsRequested)="openCardActions()" />
-          </div>
-        }
+          }
+        </div>
       </div>
     }
   } @else {
