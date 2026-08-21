@@ -8,32 +8,49 @@ import { ReviewStore } from '../store/review.store';
 import { ReviewRoute } from '../models/review.model';
 import { Capacitor } from '@capacitor/core';
 import { Keyboard } from '@capacitor/keyboard';
+import { ReviewPrefsService } from './review-prefs.service';
 
 @Injectable({ providedIn: 'root' })
 export class ReviewPlayerService {
   private readonly modalController = inject(ModalController);
   private readonly reviewStore = inject(ReviewStore);
   private readonly router = inject(Router);
+  private readonly reviewPrefs = inject(ReviewPrefsService);
 
   async open(cards: readonly ScheduledCard[], source: ReviewSessionSource): Promise<boolean> {
     if (cards.length === 0) return false;
-    const result = await this.reviewStore.startSessionForCards(source, cards.map(card => card.id));
-    if (result.kind !== 'started') return false;
-    return this.present();
+    const focusBridge = this.captureIosTypingFocus();
+    try {
+      const result = await this.reviewStore.startSessionForCards(source, cards.map(card => card.id));
+      if (result.kind !== 'started') return false;
+      return await this.present(focusBridge);
+    } finally {
+      focusBridge?.remove();
+    }
   }
 
   async openSource(source: ReviewSessionSource, limit: number): Promise<boolean> {
-    const result = await this.reviewStore.startSession(source, limit);
-    if (result.kind !== 'started') return false;
-    return this.present();
+    const focusBridge = this.captureIosTypingFocus();
+    try {
+      const result = await this.reviewStore.startSession(source, limit);
+      if (result.kind !== 'started') return false;
+      return await this.present(focusBridge);
+    } finally {
+      focusBridge?.remove();
+    }
   }
 
   async resume(sessionId: string): Promise<boolean> {
-    if (!await this.reviewStore.resumeSession(sessionId)) return false;
-    return this.present();
+    const focusBridge = this.captureIosTypingFocus();
+    try {
+      if (!await this.reviewStore.resumeSession(sessionId)) return false;
+      return await this.present(focusBridge);
+    } finally {
+      focusBridge?.remove();
+    }
   }
 
-  private async present(): Promise<boolean> {
+  private async present(focusBridge: HTMLInputElement | null): Promise<boolean> {
     const modal = await this.modalController.create({
       component: ReviewPage,
       cssClass: 'lc-review-player-modal',
@@ -45,6 +62,7 @@ export class ReviewPlayerService {
     try {
       await modal.present();
       await this.prepareTypingInput(modal);
+      focusBridge?.remove();
       const result = await modal.onWillDismiss<{ completed?: boolean }>();
       completed = result.data?.completed === true;
     } finally {
@@ -80,6 +98,24 @@ export class ReviewPlayerService {
   private async restoreKeyboardBehavior(): Promise<void> {
     if (!Capacitor.isNativePlatform()) return;
     await Keyboard.setScroll({ isDisabled: false }).catch(() => undefined);
+  }
+
+  private captureIosTypingFocus(): HTMLInputElement | null {
+    if (Capacitor.isNativePlatform() || this.reviewPrefs.mode() !== 'type' || !this.isIosBrowser()) return null;
+    const input = document.createElement('input');
+    input.className = 'lc-ios-keyboard-focus-bridge';
+    input.type = 'text';
+    input.tabIndex = -1;
+    input.setAttribute('aria-hidden', 'true');
+    input.setAttribute('autocomplete', 'off');
+    document.body.append(input);
+    input.focus({ preventScroll: true });
+    return input;
+  }
+
+  private isIosBrowser(): boolean {
+    return /iPad|iPhone|iPod/.test(navigator.userAgent)
+      || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
   }
 
   private trackVisibleViewport(modal: HTMLIonModalElement): () => void {
