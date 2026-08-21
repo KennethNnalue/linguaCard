@@ -1,64 +1,60 @@
-<ion-header class="ion-no-border">
-  <ion-toolbar>
-    <div class="sc-nav">
-      <button class="sc-back-btn" (click)="goBack()" [attr.aria-label]="'review.struggling.backAriaLabel' | translate">
-        <ion-icon name="chevron-back-outline"></ion-icon>
+<ion-content [fullscreen]="true" class="sc-content">
+  <header class="cover">
+    <span class="cover-glow"></span>
+    <div class="cover-nav">
+      <button class="cover-btn" (click)="goBack()" [attr.aria-label]="'review.struggling.backAriaLabel' | translate">
+        <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><polyline points="15,18 9,12 15,6"/></svg>
       </button>
-      <span class="sc-nav-title">{{ 'review.struggling.pageTitle' | translate }}</span>
-      <div class="sc-nav-spacer"></div>
     </div>
-  </ion-toolbar>
-</ion-header>
-
-<ion-content>
-  <div class="sc-content">
-
-    @if (strugglingCards().length > 0) {
-
-      <!-- Warning banner -->
-      <div class="sc-banner">
-        <span class="sc-banner-icon">⚠️</span>
-        <div>
-          <p class="sc-banner-title">{{ strugglingCards().length }} {{ 'review.struggling.needsAttentionMsg' | translate }}</p>
-          <p class="sc-banner-sub">{{ 'review.struggling.focusMsg' | translate }}</p>
-        </div>
+    <div class="cover-id">
+      <span class="cover-emoji" aria-hidden="true">🧠</span>
+      <div>
+        <div class="cover-eyebrow">{{ 'review.hub.strugglingCardsDesc' | translate }}</div>
+        <h1 class="cover-name">{{ 'review.struggling.pageTitle' | translate }}</h1>
       </div>
+    </div>
+  </header>
 
-      <!-- Card list -->
-      <div class="sc-list">
-        @for (card of strugglingCards(); track card.id) {
-          <div class="sc-card-wrap">
-            <lc-word-card
-              [card]="card"
-              [categoryName]="getCategoryLabel(card)"
-              (cardClick)="openWordDetail(card)"
-              (playAudio)="openWordDetail(card)"
-            />
-            <span class="sc-fail-badge" [class.sc-fail-badge--red]="failCount(card) >= 4">
-              {{ failCount(card) }} {{ failCount(card) === 1 ? ('review.struggling.failSingular' | translate) : ('review.struggling.failPlural' | translate) }}
-            </span>
-          </div>
-        }
+  <section class="stats-card">
+    <div class="stats-row">
+      <div class="stat">
+        <span class="stat-num">{{ strugglingCards().length }}</span>
+        <span class="stat-lbl">{{ 'common.words' | translate }}</span>
       </div>
-
-      <!-- Review button -->
-      <div class="sc-review-wrap">
-        <button class="sc-review-btn" (click)="startReview()">
-          {{ 'review.struggling.reviewAllBtn' | translate }} ({{ strugglingCards().length }})
-        </button>
+      <span class="stat-div"></span>
+      <div class="stat">
+        <span class="stat-num stat-num--attention">{{ totalFailures() }}</span>
+        <span class="stat-lbl">{{ 'review.struggling.failPlural' | translate }}</span>
       </div>
-
-    } @else {
-
-      <!-- Empty state -->
-      <div class="sc-empty">
-        <p class="sc-empty-icon">🎉</p>
-        <p class="sc-empty-title">{{ 'review.struggling.noCardsTitle' | translate }}</p>
-        <p class="sc-empty-sub">{{ 'review.struggling.encouragementMsg' | translate }}</p>
+      <span class="stat-div"></span>
+      <div class="stat">
+        <span class="stat-num stat-num--due">{{ dueCount() }}</span>
+        <span class="stat-lbl">{{ 'collections.card.dueLabel' | translate }}</span>
       </div>
+    </div>
+    <div class="stats-actions">
+      <button class="btn-review" (click)="startReview()" [disabled]="strugglingCards().length === 0">
+        <svg viewBox="0 0 24 24" width="14" height="14" fill="currentColor"><polygon points="6,4 20,12 6,20"/></svg>
+        {{ 'review.struggling.reviewAllBtn' | translate }}
+      </button>
+      <button class="btn-listen" (click)="startListen()" [disabled]="strugglingCards().length === 0">
+        <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><polygon points="11,5 6,9 2,9 2,15 6,15 11,19 11,5"/><path d="M15.5,8.5a5,5,0,0,1,0,7"/></svg>
+        {{ 'collectionDetail.actions.listenLabel' | translate }}
+      </button>
+    </div>
+  </section>
 
+  <div class="word-list">
+    @for (card of strugglingCards(); track card.id) {
+      <lc-word-row [card]="card" (rowClick)="openWordDetail(card)" />
+    } @empty {
+      <div class="empty">
+        <span class="empty-icon">🎉</span>
+        <p class="empty-title">{{ 'review.struggling.noCardsTitle' | translate }}</p>
+        <p class="empty-sub">{{ 'review.struggling.encouragementMsg' | translate }}</p>
+      </div>
     }
-
-    <div class="sc-bottom-spacer"></div>
   </div>
+
+  <div class="tail-space"></div>
 </ion-content>

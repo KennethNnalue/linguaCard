@@ -1,113 +1,185 @@
 @use 'theme/tokens' as t;
 @use 'theme/utils' as u;
 
-.sc-nav {
+.cover {
+  position: relative;
+  overflow: hidden;
+  padding: calc(#{t.$lc-space-2} + env(safe-area-inset-top)) t.$lc-space-5 t.$lc-space-5;
+  color: #fff;
+  background: linear-gradient(145deg, #713f4b 0%, #4f303b 58%, #33242b 100%);
+}
+
+.cover-glow {
+  position: absolute;
+  top: -40px;
+  right: -30px;
+  width: 150px;
+  height: 150px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.07);
+  pointer-events: none;
+}
+
+.cover-nav {
+  position: relative;
+  display: flex;
+  padding: t.$lc-space-1 0 t.$lc-space-4 + 2px;
+}
+
+.cover-btn {
+  @include u.circle(40px);
+  @include u.flex-center;
+  @include u.touch-state;
+  background: rgba(0, 0, 0, 0.18);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  color: #fff;
+  cursor: pointer;
+}
+
+.cover-id {
+  position: relative;
   display: flex;
   align-items: center;
-  padding: t.$lc-space-1 t.$lc-space-4 t.$lc-space-2;
-  gap: t.$lc-space-3;
+  gap: t.$lc-space-3 + 2px;
 }
 
-.sc-nav-title {
+.cover-emoji {
+  font-size: 42px;
+  filter: drop-shadow(0 3px 6px rgba(0, 0, 0, 0.3));
+}
+
+.cover-eyebrow {
+  margin-bottom: 4px;
+  font-family: t.$lc-font-mono;
+  @include u.lc-font('xxs', t.$lc-font-weight-semibold);
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.72);
+}
+
+.cover-name {
+  margin: 0;
   font-family: t.$lc-font-display;
-  @include u.lc-font('md', t.$lc-font-weight-semibold);
-  color: var(--lc-text-primary);
-  flex: 1;
-  text-align: center;
+  font-size: 27px;
+  font-weight: t.$lc-font-weight-semibold;
+  line-height: 1;
+  color: #fff;
 }
 
-.sc-nav-spacer { width: 30px; }
-
-.sc-back-btn {
-  @include u.circle(30px);
-  @include u.flex-center;
-  background: t.$lc-brand-light;
-  border: none;
-  cursor: pointer;
-  flex-shrink: 0;
-  @include u.touch-state;
-
-  ion-icon { font-size: 14px; color: t.$lc-brand; }
+.stats-card {
+  position: relative;
+  z-index: t.$lc-z-raised;
+  margin: -14px t.$lc-space-4 0;
+  padding: t.$lc-space-4;
+  border: 1px solid var(--lc-border);
+  border-radius: t.$lc-radius-lg;
+  background: var(--lc-card);
+  box-shadow: var(--lc-shadow-float);
 }
 
-.sc-content {
-  padding-bottom: env(safe-area-inset-bottom, 24px);
-}
-
-// ── Banner ────────────────────────────────────────────────────────
-.sc-banner {
-  margin: 0 t.$lc-space-4 t.$lc-space-3;
-  background: t.$lc-fem-bg;
-  border: 1px solid t.$lc-fem-border;
-  border-radius: t.$lc-radius-md;
-  padding: t.$lc-space-3 t.$lc-space-3;
+.stats-row {
   display: flex;
-  align-items: flex-start;
-  gap: t.$lc-space-2 + 2px;
+  align-items: center;
+  justify-content: space-around;
+  margin-bottom: t.$lc-space-4 - 1px;
 }
 
-.sc-banner-icon { font-size: t.$lc-text-xl; flex-shrink: 0; }
-.sc-banner-title { @include u.lc-font('xs', t.$lc-font-weight-semibold); color: t.$lc-fem-text; margin: 0 0 3px; }
-.sc-banner-sub { @include u.lc-font('xxs'); color: t.$lc-fem-text; opacity: 0.75; line-height: 1.5; margin: 0; }
+.stat {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
 
-// ── Card list ─────────────────────────────────────────────────────
-.sc-list {
-  padding: 0 t.$lc-space-4;
+.stat-num {
+  font-family: t.$lc-font-display;
+  @include u.lc-font('4xl', t.$lc-font-weight-semibold);
+  line-height: 1;
+  color: var(--lc-text-primary);
+
+  &--attention { color: var(--lc-fem-text); }
+  &--due { color: var(--lc-accent); }
+}
+
+.stat-lbl {
+  margin-top: t.$lc-space-1;
+  font-family: t.$lc-font-mono;
+  @include u.lc-font('xxs', t.$lc-font-weight-semibold);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--lc-text-hint);
+}
+
+.stat-div {
+  width: 1px;
+  height: 30px;
+  background: var(--lc-border);
+}
+
+.stats-actions {
+  display: flex;
+  gap: 9px;
+}
+
+.btn-review,
+.btn-listen {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: t.$lc-space-2;
+  padding: t.$lc-space-3 + 1px;
+  border-radius: t.$lc-radius-md + 2px;
+  font-family: t.$lc-font-body;
+  @include u.lc-font('sm', t.$lc-font-weight-bold);
+  @include u.touch-state;
+  cursor: pointer;
+
+  &:disabled { opacity: 0.5; pointer-events: none; }
+}
+
+.btn-review {
+  flex: 1;
+  border: 0;
+  background: var(--lc-brand);
+  color: var(--lc-text-inverse);
+  box-shadow: 0 8px 18px -8px rgba(31, 64, 52, 0.6);
+}
+
+.btn-listen {
+  padding-inline: t.$lc-space-4;
+  border: 1px solid var(--lc-border);
+  background: var(--lc-surface);
+  color: var(--lc-text-secondary);
+  font-weight: t.$lc-font-weight-semibold;
+}
+
+.word-list {
   display: flex;
   flex-direction: column;
   gap: t.$lc-space-2;
+  padding: t.$lc-space-4 + 2px t.$lc-space-4 0;
 }
 
-// Wrapper positions the fail badge over the word card
-.sc-card-wrap {
-  position: relative;
-}
-
-.sc-fail-badge {
-  position: absolute;
-  top: t.$lc-space-2;
-  right: 44px; // sit left of the audio button
-  @include u.lc-font('xxs', t.$lc-font-weight-bold);
-  padding: 2px t.$lc-space-1 + 2px;
-  border-radius: t.$lc-radius-full;
-  background: t.$lc-accent-light;
-  border: 1px solid t.$lc-accent;
-  color: t.$lc-accent;
-  pointer-events: none;
-  z-index: 1;
-
-  &--red {
-    background: t.$lc-fem-bg;
-    border-color: t.$lc-fem-border;
-    color: t.$lc-fem-text;
-  }
-}
-
-// ── Review button ─────────────────────────────────────────────────
-.sc-review-wrap { padding: t.$lc-space-4 t.$lc-space-4 0; }
-
-.sc-review-btn {
-  width: 100%;
-  background: t.$lc-fem-text;
-  color: white;
-  border: none;
-  border-radius: t.$lc-radius-md;
-  padding: t.$lc-space-3;
-  @include u.lc-font('sm', t.$lc-font-weight-semibold);
-  font-family: t.$lc-font-body;
-  text-align: center;
-  cursor: pointer;
-  @include u.touch-state;
-}
-
-// ── Empty state ───────────────────────────────────────────────────
-.sc-empty {
-  padding: t.$lc-space-12 t.$lc-space-6;
+.empty {
+  @include u.flex-center;
+  flex-direction: column;
+  gap: t.$lc-space-2;
+  padding: t.$lc-space-10 t.$lc-space-6;
   text-align: center;
 }
 
-.sc-empty-icon { font-size: 48px; margin: 0 0 t.$lc-space-4; display: block; }
-.sc-empty-title { @include u.lc-font('3xl', t.$lc-font-weight-semibold); color: var(--lc-text-primary); margin: 0 0 t.$lc-space-2; }
-.sc-empty-sub { @include u.lc-font('sm'); color: var(--lc-text-hint); margin: 0; }
+.empty-icon { font-size: 40px; }
 
-.sc-bottom-spacer { height: 20px; }
+.empty-title {
+  margin: 0;
+  font-family: t.$lc-font-display;
+  @include u.lc-font('xl', t.$lc-font-weight-semibold);
+  color: var(--lc-text-primary);
+}
+
+.empty-sub {
+  margin: 0;
+  @include u.lc-font('sm');
+  color: var(--lc-text-secondary);
+}
+
+.tail-space { height: calc(24px + env(safe-area-inset-bottom)); }

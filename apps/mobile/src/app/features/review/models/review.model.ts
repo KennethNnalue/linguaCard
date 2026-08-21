@@ -264,7 +264,6 @@ export interface ReviewSessionHistoryEntry {
 
 export const ReviewRoute = {
   HUB: '/review',
-  PLAYER: '/review/player',
   SUMMARY: '/review/summary',
   STRUGGLING: '/review/struggling',
   CUSTOM: '/review/custom',

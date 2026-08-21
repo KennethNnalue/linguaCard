@@ -16,8 +16,7 @@ import {SpeedDialFabComponent} from '../../../../shared/components/speed-dial-fa
 import {BottomSheetService} from '../../../../shared/components/bottom-sheet/bottom-sheet.service';
 import {ImportPage} from '../import/import.page';
 import {ReviewFilterService} from '../../../review/services/review-filter.service';
-import {ReviewRoute} from '../../../review/models/review.model';
-import {ReviewStore} from '../../../review/store/review.store';
+import {ReviewPlayerService} from '../../../review/services/review-player.service';
 import {SettingsStore} from '../../../settings/store/settings.store';
 
 type VaultView = 'home' | 'index' | 'explore' | 'collections';
@@ -62,7 +61,7 @@ export class VaultPage implements OnInit, OnDestroy {
   private readonly translate = inject(TranslateService);
   private readonly router = inject(Router);
   private readonly route = inject(ActivatedRoute);
-  private readonly reviewStore = inject(ReviewStore);
+  private readonly reviewPlayer = inject(ReviewPlayerService);
   private readonly filterService = inject(ReviewFilterService);
   private readonly settingsStore = inject(SettingsStore);
 
@@ -278,9 +277,7 @@ export class VaultPage implements OnInit, OnDestroy {
   // ─── Entry points ─────────────────────────────────────────────────────────────
   startReview(): void {
     const dailyGoal = this.settingsStore.dailyGoal();
-    void this.reviewStore.startSession({ kind: 'daily' }, dailyGoal).then(result => {
-      if (result.kind === 'started') void this.router.navigate([ReviewRoute.PLAYER]);
-    });
+    void this.reviewPlayer.openSource({ kind: 'daily' }, dailyGoal);
   }
 
   startListen(): void {

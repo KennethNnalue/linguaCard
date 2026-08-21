@@ -20,9 +20,7 @@ import {AddWordSheetComponent} from '../../components/add-word-sheet/add-word-sh
 import {getCategoryName} from '../../../../shared/helpers/helpers';
 import {FabButtonComponent} from '../../../../shared/components/fab-button/fab-button.component';
 import {ReviewFilterService} from '../../../review/services/review-filter.service';
-import {ReviewStore} from '../../../review/store/review.store';
-import {ReviewLimit, ReviewRoute, ReviewSortOrder} from '../../../review/models/review.model';
-import {SettingsStore} from '../../../settings/store/settings.store';
+import {ReviewPlayerService} from '../../../review/services/review-player.service';
 import {WordRowComponent} from '../../components/word-row/word-row.component';
 import {WordAudioService} from '../../../../shared/audio/word-audio.service';
 import {AudioReadinessStore} from '../../../../shared/audio/audio-readiness.store';
@@ -52,8 +50,7 @@ export class CollectionDetailPage implements OnInit {
   private readonly actionSheetCtrl = inject(ActionSheetController);
   private readonly toastCtrl = inject(AppNotificationService);
   private readonly filterService = inject(ReviewFilterService);
-  private readonly reviewStore = inject(ReviewStore);
-  private readonly settingsStore = inject(SettingsStore);
+  private readonly reviewPlayer = inject(ReviewPlayerService);
   private readonly wordAudio = inject(WordAudioService);
   private readonly audioReadiness = inject(AudioReadinessStore);
   private readonly audioPrefetch = inject(CollectionAudioPrefetchService);
@@ -267,10 +264,7 @@ export class CollectionDetailPage implements OnInit {
   startReview(): void {
     const col = this.collection();
     if (!col) return;
-    const dailyGoal = this.settingsStore.dailyGoal();
-    void this.reviewStore.startSession({ kind: 'collection', collectionId: col.id }, dailyGoal).then(result => {
-      if (result.kind === 'started') void this.router.navigate([ReviewRoute.PLAYER]);
-    });
+    void this.reviewPlayer.open(this.allCards(), { kind: 'collection', collectionId: col.id });
   }
 
   startListen(): void {

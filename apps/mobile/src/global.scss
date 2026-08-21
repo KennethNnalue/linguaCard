@@ -116,3 +116,17 @@ ion-toast.rv-toast {
   font-family: 'Hanken Grotesk', system-ui, sans-serif;
   text-align: center;
 }
+ion-modal.lc-review-player-modal {
+  --width: 100%;
+  --height: 100%;
+  --max-width: none;
+  --max-height: none;
+  --border-radius: 0;
+  --box-shadow: none;
+}
+
+ion-modal.lc-review-player-modal::part(content) {
+  width: 100%;
+  height: 100dvh;
+  overflow: hidden;
+}

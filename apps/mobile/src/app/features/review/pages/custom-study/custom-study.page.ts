@@ -9,7 +9,7 @@ import { isDue, isMastered, isNew, isStruggling, lifecycleState } from '../../do
 import { CardStore } from '../../../vault/store/card.store';
 import { CollectionStore } from '../../../vault/store/collection.store';
 import { CollectionPickerSheetComponent } from '../../components/collection-picker-sheet/collection-picker-sheet.component';
-import { ReviewStore } from '../../store/review.store';
+import { ReviewPlayerService } from '../../services/review-player.service';
 import { ReviewPrefsService, StudyDirection } from '../../services/review-prefs.service';
 import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { ReviewRoute } from '../../models/review.model';
@@ -56,7 +56,7 @@ const LENGTH_STEP = 5;
 export class CustomStudyPage {
   private readonly cardStore = inject(CardStore);
   private readonly collectionStore = inject(CollectionStore);
-  private readonly reviewStore = inject(ReviewStore);
+  private readonly reviewPlayer = inject(ReviewPlayerService);
   private readonly prefs = inject(ReviewPrefsService);
   private readonly router = inject(Router);
   private readonly toastCtrl = inject(AppNotificationService);
@@ -217,12 +217,7 @@ export class CustomStudyPage {
     }
     const queue = this.orderQueue(this.matchingCards()).slice(0, this.length());
 
-    void this.reviewStore.startSession(
-      { kind: 'custom', filters: { cardIds: queue.map(card => card.id) } },
-      queue.length,
-    ).then(result => {
-      if (result.kind === 'started') void this.router.navigate([ReviewRoute.PLAYER]);
-    });
+    void this.reviewPlayer.open(queue, { kind: 'custom', filters: { cardIds: queue.map(card => card.id) } });
   }
 
   goBack(): void {

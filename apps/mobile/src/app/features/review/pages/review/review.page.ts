@@ -1,5 +1,4 @@
-import { ChangeDetectionStrategy, Component, HostListener, computed, effect, inject, signal } from '@angular/core';
-import { Router } from '@angular/router';
+import { ChangeDetectionStrategy, Component, HostListener, computed, effect, inject, signal, viewChild } from '@angular/core';
 import { AlertController, IonContent, IonHeader, IonIcon, IonToolbar, ModalController } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
 import { closeOutline, volumeHighOutline, volumeMuteOutline } from 'ionicons/icons';
@@ -17,7 +16,6 @@ import {
   buildRatingOptionsWithPreviews,
   RATING_OPTIONS_NO_PREVIEW,
   RatingOption,
-  ReviewRoute,
 } from '../../models/review.model';
 import { previewRatings } from '../../domain/review-domain';
 import { schedulingStateFor } from '../../domain/review-persistence';
@@ -48,10 +46,10 @@ const SLOW_RATE = 0.7;
   ],
 })
 export class ReviewPage {
+  private readonly typingFront = viewChild(FrontTypeComponent);
   private readonly cardStore = inject(CardStore);
   protected readonly reviewStore = inject(ReviewStore);
   private readonly wordAudio = inject(WordAudioService);
-  private readonly router = inject(Router);
   private readonly answerEvaluator = inject(AnswerEvaluatorService);
   private readonly modalController = inject(ModalController);
   private readonly alertController = inject(AlertController);
@@ -107,6 +105,10 @@ export class ReviewPage {
     rating: ReviewRating;
   } | null>(null);
   readonly historicalRating = computed(() => this.isViewingPrevious() ? this.lastCommittedView()?.rating ?? null : null);
+
+  ionViewDidEnter(): void {
+    if (this.mode() === 'typing') this.typingFront()?.focusInput();
+  }
 
   readonly currentCard = computed<ScheduledCard | null>(() => {
     const cardId = this.previousCardId() ?? this.reviewStore.presentation()?.cardId;
@@ -236,7 +238,7 @@ export class ReviewPage {
     this.feedback.ratingCommitted();
 
     if (this.reviewStore.operation().kind === 'completed') {
-      void this.router.navigate([ReviewRoute.SUMMARY], { replaceUrl: true });
+      await this.modalController.dismiss({ completed: true }, 'completed');
     }
   }
 
@@ -253,7 +255,7 @@ export class ReviewPage {
     this.cancelAudio();
     if (!await this.reviewStore.skipCurrentCard()) return;
     if (this.reviewStore.operation().kind === 'completed') {
-      void this.router.navigate([ReviewRoute.SUMMARY], { replaceUrl: true });
+      await this.modalController.dismiss({ completed: true }, 'completed');
     }
   }
 
@@ -278,7 +280,7 @@ export class ReviewPage {
     await new Promise(resolve => setTimeout(resolve, 650));
     this.masteredCardLabel.set(null);
     if (this.reviewStore.operation().kind === 'completed') {
-      void this.router.navigate([ReviewRoute.SUMMARY], { replaceUrl: true });
+      await this.modalController.dismiss({ completed: true }, 'completed');
     }
   }
 
@@ -442,6 +444,6 @@ export class ReviewPage {
   private exitSession(): void {
     this.cancelAudio();
     this.reviewStore.leaveSession();
-    void this.router.navigate([ReviewRoute.HUB]);
+    void this.modalController.dismiss({ completed: false }, 'cancel');
   }
 }

@@ -24,13 +24,14 @@ import { SettingsStore } from '../../../settings/store/settings.store';
 import {
   MINUTES_PER_CARD_REVIEW,
   ReviewSessionHistoryEntry,
-  ReviewLimit,
   ReviewRoute,
 } from '../../models/review.model';
 import {ReviewHubPresentationStore} from '../../store/review-hub-presentation.store';
 import {ButtonComponent} from '../../../../shared/ui/button/button.component';
 import {BottomSheetService} from '../../../../shared/components/bottom-sheet/bottom-sheet.service';
 import type {ReviewAutoplayMode} from '../../application/review-audio-policy';
+import { ReviewPlayerService } from '../../services/review-player.service';
+import { isNew } from '../../domain/review-status';
 
 interface StudyModeOption {
   value: StudyMode;
@@ -47,6 +48,7 @@ interface StudyModeOption {
 })
 export class ReviewHubPage {
   private readonly reviewStore = inject(ReviewStore);
+  private readonly reviewPlayer = inject(ReviewPlayerService);
   private readonly cardStore = inject(CardStore);
   private readonly filterService = inject(ReviewFilterService);
   private readonly leech = inject(LeechService);
@@ -161,15 +163,11 @@ export class ReviewHubPage {
   startTodaysReview(): void {
     const resumableSessionId = this.reviewStore.resumableSessionId();
     if (resumableSessionId) {
-      void this.reviewStore.resumeSession(resumableSessionId).then(resumed => {
-        if (resumed) void this.router.navigate([ReviewRoute.PLAYER]);
-      });
+      void this.reviewPlayer.resume(resumableSessionId);
       return;
     }
     const dailyGoal = this.settingsStore.dailyGoal();
-    void this.reviewStore.startSession({ kind: 'daily' }, dailyGoal).then(result => {
-      if (result.kind === 'started') void this.router.navigate([ReviewRoute.PLAYER]);
-    });
+    void this.reviewPlayer.openSource({ kind: 'daily' }, dailyGoal);
   }
 
   performPrimaryAction(): void {
@@ -187,9 +185,8 @@ export class ReviewHubPage {
   }
 
   startNewOnly(): void {
-    void this.reviewStore.startSession({ kind: 'new-only' }, ReviewLimit.NEW_ONLY).then(result => {
-      if (result.kind === 'started') void this.router.navigate([ReviewRoute.PLAYER]);
-    });
+    const cards = this.cardStore.cards().filter(isNew);
+    void this.reviewPlayer.open(cards, { kind: 'new-only' });
   }
 
   goToStruggling(): void { void this.router.navigate([ReviewRoute.STRUGGLING]); }

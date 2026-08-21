@@ -87,11 +87,11 @@ export class ReviewFilterService {
     return dist;
   }
 
-  getStrugglingCards(limit: number = ReviewLimit.STRUGGLING): ScheduledCard[] {
-    return this.cardStore.cards()
+  getStrugglingCards(limit?: number): ScheduledCard[] {
+    const cards = this.cardStore.cards()
       .filter(isStruggling)
-      .sort((a, b) => b.reviewState.totalAgainCount - a.reviewState.totalAgainCount)
-      .slice(0, limit);
+      .sort((a, b) => b.reviewState.totalAgainCount - a.reviewState.totalAgainCount);
+    return limit === undefined ? cards : cards.slice(0, limit);
   }
 
   getStrugglingCount(): number {

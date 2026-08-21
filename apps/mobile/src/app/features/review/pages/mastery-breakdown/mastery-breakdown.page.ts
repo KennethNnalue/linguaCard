@@ -8,9 +8,9 @@ import type { LearningStage } from '@lingua-card/shared/domain';
 import { isMastered, lifecycleState } from '../../domain/review-status';
 import { CardStore } from '../../../vault/store/card.store';
 import { CollectionStore } from '../../../vault/store/collection.store';
-import { ReviewStore } from '../../store/review.store';
+import { ReviewPlayerService } from '../../services/review-player.service';
 import { ReviewFilterService } from '../../services/review-filter.service';
-import { ReviewLimit, ReviewRoute } from '../../models/review.model';
+import { ReviewRoute } from '../../models/review.model';
 
 interface LifecycleBucket {
   state: LearningStage;
@@ -49,7 +49,7 @@ const LIFECYCLE: { state: LearningStage; labelKey: string; subKey: string; colou
 export class MasteryBreakdownPage {
   private readonly cardStore = inject(CardStore);
   private readonly collectionStore = inject(CollectionStore);
-  private readonly reviewStore = inject(ReviewStore);
+  private readonly reviewPlayer = inject(ReviewPlayerService);
   private readonly filterService = inject(ReviewFilterService);
   private readonly router = inject(Router);
 
@@ -104,9 +104,8 @@ export class MasteryBreakdownPage {
   });
 
   drillStruggling(): void {
-    void this.reviewStore.startSession({ kind: 'struggling' }, ReviewLimit.STRUGGLING).then(result => {
-      if (result.kind === 'started') void this.router.navigate([ReviewRoute.PLAYER]);
-    });
+    const cards = this.filterService.getStrugglingCards();
+    void this.reviewPlayer.open(cards, { kind: 'struggling' });
   }
 
   goBack(): void {

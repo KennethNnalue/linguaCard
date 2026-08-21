@@ -9,7 +9,7 @@ import { ArticleBadgeComponent } from '../../../../shared/components/article-bad
 import { SessionDatePipe } from '../../shared/pipes/session-date.pipe';
 import { LeechEntry, LeechService } from '../../services/leech.service';
 import { ReviewPrefsService } from '../../services/review-prefs.service';
-import { ReviewStore } from '../../store/review.store';
+import { ReviewPlayerService } from '../../services/review-player.service';
 import { ReviewRoute } from '../../models/review.model';
 
 const TOAST_MS = 1700;
@@ -24,7 +24,7 @@ const TOAST_MS = 1700;
 export class LeechesPage {
   private readonly leech = inject(LeechService);
   private readonly prefs = inject(ReviewPrefsService);
-  private readonly reviewStore = inject(ReviewStore);
+  private readonly reviewPlayer = inject(ReviewPlayerService);
   private readonly router = inject(Router);
   private readonly toast = inject(AppNotificationService);
   private readonly translate = inject(TranslateService);
@@ -79,12 +79,7 @@ export class LeechesPage {
     const queue = this.leech.breakthroughQueue();
     if (!queue.length) return;
     this.prefs.setMode('type');
-    void this.reviewStore.startSession(
-      { kind: 'explicit', cardIds: queue.map(card => card.id) },
-      queue.length,
-    ).then(result => {
-      if (result.kind === 'started') void this.router.navigate([ReviewRoute.PLAYER]);
-    });
+    void this.reviewPlayer.open(queue, { kind: 'explicit', cardIds: queue.map(card => card.id) });
   }
 
   private async showToast(key: string, params?: Record<string, unknown>): Promise<void> {

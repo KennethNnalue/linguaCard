@@ -92,8 +92,8 @@ export const routes: Routes = [
       },
       {
         path: 'review/player',
-        loadComponent: () =>
-          import('./features/review/pages/review/review.page').then(m => m.ReviewPage),
+        redirectTo: 'review',
+        pathMatch: 'full',
       },
       {
         path: 'review/summary',

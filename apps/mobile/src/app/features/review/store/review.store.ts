@@ -6,7 +6,7 @@ import { LocalDataService } from '../../../core/services/local-data.service';
 import { SyncService } from '../../../core/services/sync.service';
 import { CardStore } from '../../vault/store/card.store';
 import {
-  PromptDirection, recordPresentation, recordSessionReview,
+  createReviewSession, PromptDirection, recordPresentation, recordSessionReview,
   resolvePresentation, ReviewPresentation, ReviewSessionSource, ReviewSessionState,
   resolveManuallyMasteredCard, selectNextCard, skipSessionCard,
 } from '../domain/review-domain';
@@ -311,6 +311,40 @@ export const ReviewStore = signalStore(
           };
         }
         return result;
+      },
+      async startSessionForCards(source: ReviewSessionSource, cardIds: readonly string[]): Promise<StartSessionResult> {
+        patchState(store, {
+          session: null, presentation: null, operation: { kind: 'starting' }, sessionRatings: {},
+          sessionNewCardCount: 0, completedSession: null, commitError: null, lastReviewedCardId: null,
+        });
+        const availableCards = new Map(cardStore.cards().map(card => [card.id, card]));
+        const originalCardIds = [...new Set(cardIds)].filter(cardId => availableCards.has(cardId));
+        if (originalCardIds.length === 0) {
+          patchState(store, { operation: { kind: 'idle' } });
+          return availableCards.size === 0 ? { kind: 'empty_library' } : { kind: 'source_matched_nothing' };
+        }
+        const session = createReviewSession({
+          id: crypto.randomUUID(), source,
+          mode: toReviewMode(reviewPrefs.mode()), direction: toPromptDirection(reviewPrefs.dir()),
+          originalCardIds, startedAt: new Date(),
+        });
+        patchState(store, {
+          session,
+          sessionNewCardCount: originalCardIds.filter(cardId => availableCards.get(cardId)?.reviewState.stage === 'new').length,
+        });
+        try {
+          await presentNextCard(session, new Date());
+          return { kind: 'started', session };
+        } catch {
+          patchState(store, {
+            session, presentation: null,
+            operation: { kind: 'error', message: 'The review session could not be saved on this device.', recoverable: true },
+          });
+          return {
+            kind: 'load_failed',
+            error: { code: 'session_persistence_failed', message: 'The review session could not be saved on this device.' },
+          };
+        }
       },
       async resumeSession(sessionId: string): Promise<boolean> {
         const userId = authService.currentUser()?.id;

@@ -1,92 +1,47 @@
 import { ChangeDetectionStrategy, Component, computed, inject } from '@angular/core';
 import { Router } from '@angular/router';
-import { NavController, IonContent, IonHeader, IonIcon, IonToolbar } from '@ionic/angular/standalone';
-import { addIcons } from 'ionicons';
-import { chevronBackOutline } from 'ionicons/icons';
+import { IonContent } from '@ionic/angular/standalone';
 import { TranslatePipe } from '@ngx-translate/core';
-import {ScheduledCard} from '@lingua-card/shared/domain';
-import {ReviewStore} from '../../store/review.store';
+import {ReviewPlayerService} from '../../services/review-player.service';
 import {ReviewFilterService} from '../../services/review-filter.service';
-import {CategoryStore} from '../../../vault/store/category.store';
-import {WordCardComponent} from '../../../../shared/ui/word-card/word-card.component';
-import {getCategoryName} from '../../../../shared/helpers/helpers';
-import {
-  MS_PER_DAY,
-  ReviewLimit,
-  ReviewRoute,
-  STRUGGLING_FAIL_BADGE_RED_THRESHOLD,
-} from '../../models/review.model';
+import {ReviewRoute} from '../../models/review.model';
+import {WordRowComponent} from '../../../vault/components/word-row/word-row.component';
+import {ListenStore} from '../../../listen/store/listen.store';
+import {ListenSourceLabel} from '../../../listen/models/listen.models';
+import {isDue} from '../../domain/review-status';
 
 @Component({
   selector: 'lc-struggling-cards',
   templateUrl: './struggling-cards.page.html',
-  styleUrls: ['./struggling-cards.page.scss'],
+  styleUrl: './struggling-cards.page.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [IonContent, IonHeader, IonToolbar, IonIcon, WordCardComponent, TranslatePipe],
+  imports: [IonContent, WordRowComponent, TranslatePipe],
 })
 export class StrugglingCardsPage {
   private readonly filterService = inject(ReviewFilterService);
-  private readonly reviewStore = inject(ReviewStore);
-  private readonly categoryStore = inject(CategoryStore);
-  private readonly navCtrl = inject(NavController);
+  private readonly reviewPlayer = inject(ReviewPlayerService);
+  private readonly listenStore = inject(ListenStore);
   private readonly router = inject(Router);
 
-  constructor() {
-    addIcons({ chevronBackOutline });
-  }
-
-  readonly strugglingCards = computed(() => this.filterService.getStrugglingCards(ReviewLimit.DUE_TODAY));
-
-  articleBg(card: ScheduledCard): string {
-    switch (card.content.article) {
-      case 'der': return 'var(--lc-masc-bg)';
-      case 'die': return 'var(--lc-fem-bg)';
-      case 'das': return 'var(--lc-neut-bg)';
-      default: return 'var(--lc-card)';
-    }
-  }
-
-  articleBorder(card: ScheduledCard): string {
-    switch (card.content.article) {
-      case 'der': return 'var(--lc-masc-border)';
-      case 'die': return 'var(--lc-fem-border)';
-      case 'das': return 'var(--lc-neut-border)';
-      default: return 'var(--lc-border)';
-    }
-  }
-
-  failCount(card: ScheduledCard): number {
-    // Use repetitions as the lapse proxy: a card stuck at low mastery with many
-    // repetitions has been reviewed (and reset) many times — it is genuinely struggling.
-    return card.reviewState.totalAgainCount;
-  }
-
-  failBadgeClass(card: ScheduledCard): string {
-    return this.failCount(card) >= STRUGGLING_FAIL_BADGE_RED_THRESHOLD ? 'fail-badge--red' : 'fail-badge--amber';
-  }
-
-  lastReviewedLabel(card: ScheduledCard): string {
-    const t = card.updatedAt;
-    if (!t) return 'Never';
-    const days = Math.floor((Date.now() - new Date(t).getTime()) / MS_PER_DAY);
-    if (days === 0) return 'Today';
-    if (days === 1) return '1d ago';
-    return `${days}d ago`;
-  }
+  readonly strugglingCards = computed(() => this.filterService.getStrugglingCards());
+  readonly totalFailures = computed(() => this.strugglingCards()
+    .reduce((total, card) => total + card.reviewState.totalAgainCount, 0));
+  readonly dueCount = computed(() => this.strugglingCards().filter(card => isDue(card, new Date())).length);
 
   startReview(): void {
     const queue = this.strugglingCards();
     if (!queue.length) return;
-    void this.reviewStore.startSession({ kind: 'struggling' }, queue.length).then(result => {
-      if (result.kind === 'started') void this.navCtrl.navigateForward(ReviewRoute.PLAYER);
-    });
+    void this.reviewPlayer.open(queue, { kind: 'struggling' });
   }
 
-  getCategoryLabel(card: ScheduledCard): string {
-    return getCategoryName(card.categoryIds?.[0], this.categoryStore.categories());
+  startListen(): void {
+    const queue = this.strugglingCards();
+    if (!queue.length) return;
+    this.listenStore.loadQueue(queue, ListenSourceLabel.Struggling);
+    void this.router.navigate(['/listen']);
   }
 
-  openWordDetail(card: ScheduledCard): void {
+  openWordDetail(card: { id: string }): void {
     void this.router.navigate(['/vault', card.id]);
   }
 

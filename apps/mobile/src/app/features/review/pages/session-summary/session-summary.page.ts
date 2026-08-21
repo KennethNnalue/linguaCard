@@ -11,6 +11,8 @@ import { EngagementStore } from '../../../engagement/state/engagement.store';
 import { ReviewRoute } from '../../models/review.model';
 import { SessionCelebrationComponent } from '../../../engagement/components/session-celebration/session-celebration.component';
 import {ReviewFeedbackService} from '../../services/review-feedback.service';
+import { CardStore } from '../../../vault/store/card.store';
+import { ReviewPlayerService } from '../../services/review-player.service';
 
 interface RatingBar {
   value: ReviewRating;
@@ -40,6 +42,8 @@ export class SessionSummaryPage implements OnInit {
   private readonly statsService = inject(SessionStatsService);
   private readonly engagementStore = inject(EngagementStore);
   private readonly feedback = inject(ReviewFeedbackService);
+  private readonly cardStore = inject(CardStore);
+  private readonly reviewPlayer = inject(ReviewPlayerService);
 
   constructor() {
     addIcons({ checkmarkOutline, refreshOutline, sparklesOutline });
@@ -112,15 +116,13 @@ export class SessionSummaryPage implements OnInit {
   reviewNonMastered(): void {
     const cardIds = this.nonMasteredCardIds();
     if (!cardIds.length) return;
-    void this.reviewStore.startSession(
-      { kind: 'explicit', cardIds },
-      cardIds.length,
-    ).then(result => {
-      if (result.kind === 'started') {
-        this.dismissCelebration();
-        void this.router.navigate([ReviewRoute.PLAYER]);
-      }
+    const byId = new Map(this.cardStore.cards().map(card => [card.id, card]));
+    const cards = cardIds.flatMap(cardId => {
+      const card = byId.get(cardId);
+      return card ? [card] : [];
     });
+    this.dismissCelebration();
+    void this.reviewPlayer.open(cards, { kind: 'explicit', cardIds });
   }
 
   goToStories(): void {

@@ -17,9 +17,8 @@ import {LanguageService} from '../../../../core/services/language.service';
 import {CardStore} from '../../../vault/store/card.store';
 import {CategoryStore} from '../../../vault/store/category.store';
 import {CollectionStore} from '../../../vault/store/collection.store';
-import {ReviewRoute} from '../../../review/models/review.model';
 import {ReviewFilterService} from '../../../review/services/review-filter.service';
-import {ReviewStore} from '../../../review/store/review.store';
+import {ReviewPlayerService} from '../../../review/services/review-player.service';
 import {getCategoryName} from '../../../../shared/helpers/helpers';
 import {UserMenuComponent} from '../../../../shared/components/user-menu/user-menu.component';
 import {AddWordSheetComponent} from '../../../vault/components/add-word-sheet/add-word-sheet.component';
@@ -73,7 +72,7 @@ export class HomePage {
   private readonly translate = inject(TranslateService);
   private readonly languageService = inject(LanguageService);
   private readonly router = inject(Router);
-  private readonly reviewStore = inject(ReviewStore);
+  private readonly reviewPlayer = inject(ReviewPlayerService);
   private readonly filterService = inject(ReviewFilterService);
   private readonly goalPromptPolicy = inject(GoalPromptPolicyService);
   readonly homePresentation = inject(HomePresentationStore);
@@ -281,13 +280,13 @@ export class HomePage {
 
   startSession(): void {
     const collectionId = this.selectedCollectionId();
+    if (collectionId) {
+      const cards = this.cardStore.cards().filter(card => card.collectionId === collectionId);
+      void this.reviewPlayer.open(cards, { kind: 'collection', collectionId });
+      return;
+    }
     const dailyGoal = this.settingsStore.dailyGoal();
-    void this.reviewStore.startSession(
-      collectionId ? { kind: 'collection', collectionId } : { kind: 'daily' },
-      dailyGoal,
-    ).then(result => {
-      if (result.kind === 'started') void this.router.navigate([ReviewRoute.PLAYER]);
-    });
+    void this.reviewPlayer.openSource({ kind: 'daily' }, dailyGoal);
   }
 
   performHeroAction(): void {
