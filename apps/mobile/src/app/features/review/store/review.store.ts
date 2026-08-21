@@ -19,7 +19,12 @@ import {
 } from '../domain/review-persistence';
 import { StartSessionResult } from '../domain/session-builder';
 import { MAX_SESSION_HISTORY, ReviewSessionHistoryEntry, SyncOperationType } from '../models/review.model';
-import { ReviewPrefsService, toPromptDirection, toReviewMode } from '../services/review-prefs.service';
+import {
+  applyCurrentReviewPreferences,
+  ReviewPrefsService,
+  toPromptDirection,
+  toReviewMode,
+} from '../services/review-prefs.service';
 import { ReviewSessionBuilderService } from '../services/review-session-builder.service';
 import { UpsertSessionDto } from '../services/review-session-api.service';
 import { ReviewCommitService } from '../services/review-commit.service';
@@ -351,11 +356,15 @@ export const ReviewStore = signalStore(
         if (!userId) return false;
         const persisted = await localData.getActiveReviewSession(userId);
         if (!persisted || persisted.session.definition.id !== sessionId) return false;
-        const session = deserializeReviewSessionState(persisted.session);
-        if (session.status !== 'active') {
+        const persistedSession = deserializeReviewSessionState(persisted.session);
+        if (persistedSession.status !== 'active') {
           await localData.clearActiveReviewSession(userId);
           return false;
         }
+        const session = applyCurrentReviewPreferences(persistedSession, {
+          mode: reviewPrefs.mode(),
+          direction: reviewPrefs.dir(),
+        });
         patchState(store, {
           session,
           presentation: null,

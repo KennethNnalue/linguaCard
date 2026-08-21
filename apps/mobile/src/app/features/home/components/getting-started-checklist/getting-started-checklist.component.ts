@@ -1,17 +1,19 @@
-import { ChangeDetectionStrategy, Component, computed, inject, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, inject } from '@angular/core';
 import { Router } from '@angular/router';
 import { TranslatePipe } from '@ngx-translate/core';
 import { CardStore } from '../../../vault/store/card.store';
 import { SettingsStore } from '../../../settings/store/settings.store';
 import { ReviewStore } from '../../../review/store/review.store';
-
-const DISMISSED_KEY = 'lc_onboarding_checklist_dismissed';
-const STORY_OPENED_KEY = 'lc_onboarding_story_opened';
+import { StoryStore } from '../../../stories/store/story.store';
 
 interface ChecklistItem {
   labelKey: string;
-  done: boolean;
+  completed: boolean;
   route: string;
+}
+
+export function nextIncompleteChecklistItem(items: readonly ChecklistItem[]): ChecklistItem | null {
+  return items.find(item => !item.completed) ?? null;
 }
 
 @Component({
@@ -25,42 +27,32 @@ export class GettingStartedChecklistComponent {
   private readonly cardStore = inject(CardStore);
   private readonly settingsStore = inject(SettingsStore);
   private readonly reviewStore = inject(ReviewStore);
+  private readonly storyStore = inject(StoryStore);
   private readonly router = inject(Router);
-
-  readonly dismissed = signal(localStorage.getItem(DISMISSED_KEY) === 'true');
-  readonly storyOpened = signal(localStorage.getItem(STORY_OPENED_KEY) === 'true');
 
   readonly items = computed<ChecklistItem[]>(() => {
     const hasCards = this.cardStore.cards().length > 0;
     const hasGoals = this.settingsStore.settings()?.goalsSetAt !== null;
     const hasReviewed = this.reviewStore.sessionHistory().length > 0;
-    const hasStory = this.storyOpened();
+    const hasOpenedStory = Object.keys(this.storyStore.lastOpenedAt()).length > 0;
 
     return [
-      { labelKey: 'onboarding.checklist.addWord', done: hasCards, route: '/vault' },
-      { labelKey: 'onboarding.checklist.setGoal', done: hasGoals, route: '/settings/goals' },
-      { labelKey: 'onboarding.checklist.firstReview', done: hasReviewed, route: '/review' },
-      { labelKey: 'onboarding.checklist.tryStory', done: hasStory, route: '/stories' },
+      { labelKey: 'onboarding.checklist.addWord', completed: hasCards, route: '/vault' },
+      { labelKey: 'onboarding.checklist.setGoal', completed: hasGoals, route: '/settings/goals' },
+      { labelKey: 'onboarding.checklist.firstReview', completed: hasReviewed, route: '/review' },
+      { labelKey: 'onboarding.checklist.tryStory', completed: hasOpenedStory, route: '/stories' },
     ];
   });
 
-  readonly doneCount = computed(() => this.items().filter(i => i.done).length);
-  readonly totalCount = computed(() => this.items().length);
-  readonly allDone = computed(() => this.doneCount() === this.totalCount());
+  readonly nextItem = computed(() => nextIncompleteChecklistItem(this.items()));
 
   readonly visible = computed(() => {
-    if (this.dismissed()) return false;
     const settings = this.settingsStore.settings();
     if (!settings || settings.onboardingCompletedAt === null) return false;
-    return true;
+    return this.nextItem() !== null;
   });
 
   navigate(route: string): void {
     this.router.navigateByUrl(route);
-  }
-
-  dismiss(): void {
-    this.dismissed.set(true);
-    localStorage.setItem(DISMISSED_KEY, 'true');
   }
 }

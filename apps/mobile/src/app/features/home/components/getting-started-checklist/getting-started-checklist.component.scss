@@ -12,7 +12,6 @@
 .cl-head {
   display: flex;
   align-items: center;
-  justify-content: space-between;
   margin-bottom: t.$lc-space-3 + 1px;
 }
 
@@ -21,29 +20,11 @@
   color: var(--lc-text-primary);
 }
 
-.cl-progress {
-  @include u.lc-font('xs', 600);
-  color: var(--lc-brand);
-}
-
-.cl-dismiss {
-  @include u.lc-font('xs', 600);
-  color: var(--lc-text-hint);
-  background: none;
-  border: none;
-  font-family: t.$lc-font-body;
-  cursor: pointer;
-}
-
 .cl-row {
   display: flex;
   align-items: center;
   gap: t.$lc-space-3 - 1px;
   padding: t.$lc-space-2 0;
-
-  & + & {
-    border-top: 1px solid var(--lc-border);
-  }
 }
 
 .cl-check {
@@ -51,30 +32,13 @@
   height: 22px;
   border-radius: t.$lc-radius-full;
   flex-shrink: 0;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-
-  &--done {
-    background: var(--lc-brand);
-    color: white;
-    @include u.lc-font('xs', 700);
-  }
-
-  &--todo {
-    border: 2px solid var(--lc-border-strong);
-  }
+  border: 2px solid var(--lc-border-strong);
 }
 
 .cl-text {
   flex: 1;
   @include u.lc-font('sm', 500);
   color: var(--lc-text-primary);
-
-  &--done {
-    color: var(--lc-text-hint);
-    text-decoration: line-through;
-  }
 }
 
 .cl-go {
@@ -85,11 +49,4 @@
   font-family: t.$lc-font-body;
   cursor: pointer;
   white-space: nowrap;
-}
-
-.cl-done-msg {
-  @include u.lc-font('sm', 600);
-  color: var(--lc-brand);
-  text-align: center;
-  padding: t.$lc-space-2 0 0;
 }

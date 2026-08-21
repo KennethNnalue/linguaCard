@@ -1,5 +1,5 @@
 import {Injectable, signal} from '@angular/core';
-import type { RequestedPromptDirection, ReviewMode } from '../domain/review-domain';
+import type { RequestedPromptDirection, ReviewMode, ReviewSessionState } from '../domain/review-domain';
 import type { ReviewAutoplayMode } from '../application/review-audio-policy';
 
 export type StudyMode = 'flip' | 'type';
@@ -15,6 +15,20 @@ export function toPromptDirection(direction: StudyDirection): RequestedPromptDir
   if (direction === 'de-en') return 'target_to_source';
   if (direction === 'mixed') return 'mixed';
   return 'source_to_target';
+}
+
+export function applyCurrentReviewPreferences(
+  session: ReviewSessionState,
+  preferences: { mode: StudyMode; direction: StudyDirection },
+): ReviewSessionState {
+  return {
+    ...session,
+    definition: {
+      ...session.definition,
+      mode: toReviewMode(preferences.mode),
+      direction: toPromptDirection(preferences.direction),
+    },
+  };
 }
 
 const MODE_KEY = 'lc-review-mode';
