@@ -13,18 +13,22 @@ ion-header ion-toolbar {
 
 // ─── Top bar ─────────────────────────────────────────────────────────────────
 .rv-nav {
-  display: flex;
+  display: grid;
+  grid-template-columns: 48px minmax(0, 1fr) 82px;
   align-items: center;
-  gap: t.$lc-space-3;
-  padding: t.$lc-space-2 t.$lc-space-4 t.$lc-space-2;
+  gap: t.$lc-space-2;
+  padding: t.$lc-space-3 t.$lc-space-4 t.$lc-space-2;
+  width: min(100%, 560px);
+  margin-inline: auto;
 }
 
 .rv-close {
-  @include u.circle(40px);
+  width: 44px;
+  height: 44px;
   @include u.flex-center;
   @include u.touch-state;
-  background: var(--lc-rv-card);
-  border: 1px solid var(--lc-rv-border);
+  background: transparent;
+  border: 0;
   color: var(--lc-rv-text);
   font-size: t.$lc-text-3xl;
 }
@@ -48,9 +52,22 @@ ion-header ion-toolbar {
 }
 
 .rv-nav-count {
+  text-align: center;
   @include u.lc-font('lg', t.$lc-font-weight-medium);
   font-family: t.$lc-font-rv-display;
   color: var(--lc-rv-text);
+}
+
+.rv-nav-count--history {
+  justify-self: center;
+  padding: 5px t.$lc-space-3;
+  border: 1px solid var(--lc-rv-border);
+  border-radius: t.$lc-radius-full;
+  @include u.lc-font('xs', t.$lc-font-weight-medium);
+  white-space: nowrap;
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .rv-nav-remaining {
@@ -62,20 +79,42 @@ ion-header ion-toolbar {
   color: var(--lc-rv-brass-ink);
 }
 
+.rv-nav-tools {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: t.$lc-space-1;
+}
+
+.rv-mute {
+  @include u.circle(40px);
+  @include u.flex-center;
+  @include u.touch-state;
+  border: 0;
+  background: transparent;
+  color: var(--lc-rv-text-soft);
+  font-size: t.$lc-text-xl;
+
+  &[aria-pressed='true'] { color: var(--lc-rv-brass-ink); }
+  &:focus-visible { outline: 2px solid var(--lc-rv-mid); outline-offset: -2px; }
+}
+
 // ─── Progress bar ────────────────────────────────────────────────────────────
 .rv-prog-track {
   position: relative;
   height: 5px;
   margin: 0 t.$lc-space-4 t.$lc-space-1;
   border-radius: t.$lc-radius-full;
-  background: var(--lc-rv-inset);
+  background: color-mix(in srgb, var(--lc-rv-inset) 88%, var(--lc-rv-bg));
   overflow: hidden;
+  max-width: 528px;
+  margin-inline: auto;
 }
 
 .rv-prog-fill {
   height: 100%;
   border-radius: t.$lc-radius-full;
-  background: linear-gradient(90deg, var(--lc-rv-mid), var(--lc-rv-brass-ink));
+  background: linear-gradient(90deg, #71D8BC 0%, #D8B981 100%);
   transition: width 0.4s t.$lc-easing-standard;
 }
 
@@ -84,32 +123,17 @@ ion-header ion-toolbar {
   top: 50%;
   width: 9px;
   height: 9px;
-  border: 2px solid var(--lc-rv-inset);
+  border: 0;
   border-radius: 50%;
-  background: var(--lc-rv-bg);
+  background: color-mix(in srgb, var(--lc-rv-bg) 82%, black);
   transform: translate(-50%, -50%);
   transition: background-color 180ms ease, border-color 180ms ease, transform 220ms t.$lc-easing-standard;
 }
 
 .rv-prog-checkpoint--reached {
-  border-color: var(--lc-rv-brass-ink);
-  background: var(--lc-rv-brass-ink);
-  transform: translate(-50%, -50%) scale(1.18);
+  background: color-mix(in srgb, var(--lc-rv-mid) 74%, var(--lc-rv-bg));
+  transform: translate(-50%, -50%);
 }
-
-.rv-goal-progress {
-  display: grid;
-  gap: 3px;
-  padding: t.$lc-space-1 t.$lc-space-4 t.$lc-space-2;
-  @include u.lc-font('xxs');
-  color: var(--lc-rv-muted);
-
-  strong { color: var(--lc-rv-mid); }
-}
-
-.rv-goal-copy { display:flex; justify-content:center; gap:t.$lc-space-2; }
-.rv-goal-track { width:min(180px, 52vw); height:3px; margin:auto; overflow:hidden; border-radius:t.$lc-radius-full; background:var(--lc-rv-inset); }
-.rv-goal-track span { display:block; height:100%; border-radius:inherit; background:var(--lc-rv-mid); transition:width .3s t.$lc-easing-standard; }
 
 .rv-goal-exceeded {
   display: flex;
@@ -162,6 +186,8 @@ ion-header ion-toolbar {
   flex-direction: column;
   height: 100%;
   padding: t.$lc-space-3 t.$lc-space-4 t.$lc-space-4;
+  width: min(100%, 560px);
+  margin-inline: auto;
 }
 
 .rv-card-stage {
@@ -192,7 +218,6 @@ ion-header ion-toolbar {
 
 @media (prefers-reduced-motion: reduce) {
   .rv-prog-fill,
-  .rv-goal-track span,
   .rv-prog-checkpoint {
     transition-duration: 1ms;
   }
@@ -213,6 +238,8 @@ ion-header ion-toolbar {
   padding: t.$lc-space-3 t.$lc-space-4 calc(#{t.$lc-space-3} + env(safe-area-inset-bottom));
   background: var(--lc-rv-bg);
   border-top: 1px solid var(--lc-rv-border);
+
+  > * { display: block; width: min(100%, 528px); margin-inline: auto; }
 }
 
 .rv-footer--keyboard { display: none; }
@@ -396,4 +423,11 @@ ion-content.rv-keyboard-active .rv-scene {
   @include u.lc-font('md', t.$lc-font-weight-bold);
   border-radius: t.$lc-radius-md;
   padding: t.$lc-space-3 t.$lc-space-6;
+}
+
+@media (max-width: 359px) {
+  .rv-nav { grid-template-columns: 44px minmax(0, 1fr) 72px; padding-inline: t.$lc-space-3; }
+  .rv-scene { padding-inline: t.$lc-space-3; }
+  .rv-footer { padding-inline: t.$lc-space-3; }
+  .rv-nav-count { @include u.lc-font('md', t.$lc-font-weight-medium); }
 }

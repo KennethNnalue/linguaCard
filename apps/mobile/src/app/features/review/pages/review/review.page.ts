@@ -1,8 +1,8 @@
-import { ChangeDetectionStrategy, Component, computed, effect, inject, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, HostListener, computed, effect, inject, signal } from '@angular/core';
 import { Router } from '@angular/router';
 import { AlertController, IonContent, IonHeader, IonIcon, IonToolbar, ModalController } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
-import { closeOutline } from 'ionicons/icons';
+import { closeOutline, volumeHighOutline, volumeMuteOutline } from 'ionicons/icons';
 import type { ReviewRating, ScheduledCard } from '@lingua-card/shared/domain';
 import { WordAudioService } from '../../../../shared/audio/word-audio.service';
 import { CardStore } from '../../../vault/store/card.store';
@@ -22,6 +22,11 @@ import {
 import { previewRatings } from '../../domain/review-domain';
 import { schedulingStateFor } from '../../domain/review-persistence';
 import { AddWordSheetComponent } from '../../../vault/components/add-word-sheet/add-word-sheet.component';
+import { buildReviewPlayerHeader } from '../../application/build-review-player-header';
+import { ReviewPrefsService } from '../../services/review-prefs.service';
+import { shouldAutoplayFirstExample, shouldAutoplayReviewAnswer } from '../../application/review-audio-policy';
+import {ReviewFeedbackService} from '../../services/review-feedback.service';
+import {BottomSheetService} from '../../../../shared/components/bottom-sheet/bottom-sheet.service';
 
 const SLOW_RATE = 0.7;
 
@@ -51,9 +56,13 @@ export class ReviewPage {
   private readonly modalController = inject(ModalController);
   private readonly alertController = inject(AlertController);
   private readonly translate = inject(TranslateService);
+  private readonly reviewPrefs = inject(ReviewPrefsService);
+  private readonly feedback = inject(ReviewFeedbackService);
+  private readonly bottomSheet = inject(BottomSheetService);
+  private audioSequence = 0;
 
   constructor() {
-    addIcons({ closeOutline });
+    addIcons({ closeOutline, volumeHighOutline, volumeMuteOutline });
 
     // Reset per-card transient state whenever the user advances.
     effect(() => {
@@ -79,7 +88,23 @@ export class ReviewPage {
   readonly isTypingFocused = signal(false);
   readonly isViewingPrevious = computed(() => this.previousCardId() !== null);
   readonly isPronunciationLoading = this.wordAudio.isLoading;
+  readonly isAudioPlaying = this.wordAudio.isPlaying;
+  readonly audioPlaybackError = this.wordAudio.playbackError;
   readonly expandedSynonym = signal<number | null>(null);
+  readonly sessionMuted = signal(false);
+  private readonly currentViewSnapshot = signal<{
+    flipped: boolean;
+    typed: string;
+    typedResult: TypedAnswerEvaluation | null;
+    dontKnow: boolean;
+  } | null>(null);
+  private readonly lastCommittedView = signal<{
+    cardId: string;
+    typedResult: TypedAnswerEvaluation | null;
+    dontKnow: boolean;
+    rating: ReviewRating;
+  } | null>(null);
+  readonly historicalRating = computed(() => this.isViewingPrevious() ? this.lastCommittedView()?.rating ?? null : null);
 
   readonly currentCard = computed<ScheduledCard | null>(() => {
     const cardId = this.previousCardId() ?? this.reviewStore.presentation()?.cardId;
@@ -122,6 +147,11 @@ export class ReviewPage {
     this.reviewStore.totalOriginalCount(),
   ));
 
+  readonly playerHeader = computed(() => buildReviewPlayerHeader({
+    currentPosition: this.currentPosition(),
+    totalCards: this.reviewStore.totalOriginalCount(),
+  }));
+
 
   readonly suggestedRating = computed<ReviewRating | null>(
     () => this.dontKnowSelected() ? 'again' : this.typedResult()?.evaluation.suggestedRating ?? null,
@@ -151,17 +181,23 @@ export class ReviewPage {
 
   reveal(): void {
     this.isFlipped.set(true);
+    this.feedback.reveal();
+    void this.runRevealAutoplay();
   }
 
   checkTyped(): void {
     const card = this.currentCard();
     if (!card || !this.typed().trim()) return;
+    this.isTypingFocused.set(false);
     this.typedResult.set(this.answerEvaluator.evaluateTypedAnswer({
       answer: this.typed(),
       expectedWord: this.expectsGermanAnswer() ? card.content.back : card.content.front,
       expectedArticle: this.expectsGermanAnswer() ? card.content.article ?? null : null,
     }));
     this.isFlipped.set(true);
+    if (this.typedResult()?.evaluation.result === 'correct') this.feedback.correct();
+    else this.feedback.needsAttention();
+    void this.runRevealAutoplay();
   }
 
   toggleSynonym(i: number): void {
@@ -176,12 +212,15 @@ export class ReviewPage {
     const typedResult = this.typedResult();
     const isTyped = this.mode() === 'typing' && typedResult !== null;
     const finalRating = this.dontKnowSelected() ? 'again' : rating;
+    this.cancelAudio();
     const saved = await this.reviewStore.commitCurrentRating(finalRating, {
       reviewMode: isTyped ? 'typing' : 'recall',
       responseType: this.dontKnowSelected() ? 'dont_know' : isTyped ? 'typed_answer' : 'self_rated',
       answerEvaluation: isTyped ? typedResult.evaluation : undefined,
     });
     if (!saved) return;
+    this.lastCommittedView.set({cardId: card.id, typedResult, dontKnow: this.dontKnowSelected(), rating: finalRating});
+    this.feedback.ratingCommitted();
 
     if (this.reviewStore.operation().kind === 'completed') {
       void this.router.navigate([ReviewRoute.SUMMARY], { replaceUrl: true });
@@ -189,12 +228,16 @@ export class ReviewPage {
   }
 
   async dontKnow(): Promise<void> {
+    this.isTypingFocused.set(false);
     this.dontKnowSelected.set(true);
     this.isFlipped.set(true);
+    this.feedback.needsAttention();
+    void this.runRevealAutoplay();
   }
 
   async skipCard(): Promise<void> {
     if (this.isViewingPrevious()) return;
+    this.cancelAudio();
     if (!await this.reviewStore.skipCurrentCard()) return;
     if (this.reviewStore.operation().kind === 'completed') {
       void this.router.navigate([ReviewRoute.SUMMARY], { replaceUrl: true });
@@ -239,32 +282,104 @@ export class ReviewPage {
     await modal.present();
   }
 
+  async openCardActions(): Promise<void> {
+    if (this.isViewingPrevious() || this.reviewStore.isBusy()) return;
+    await this.bottomSheet.open(this.translate.instant('review.session.cardActions'), [
+      {
+        label: this.translate.instant('review.session.editCard'),
+        description: this.translate.instant('review.session.editCardHint'),
+        icon: 'create-outline',
+        handler: () => void this.openCardEditor(),
+      },
+      {
+        label: this.translate.instant('review.session.masterCard'),
+        description: this.translate.instant('review.session.masterCardHint'),
+        icon: 'star-outline',
+        handler: () => this.requestManualMastery(),
+      },
+      {label: this.translate.instant('common.cancel'), role: 'cancel'},
+    ]);
+  }
+
   showPrevious(): void {
     const cardId = this.reviewStore.lastReviewedCardId();
     if (!cardId) return;
+    this.cancelAudio();
+    this.currentViewSnapshot.set({
+      flipped: this.isFlipped(), typed: this.typed(), typedResult: this.typedResult(), dontKnow: this.dontKnowSelected(),
+    });
     this.previousCardId.set(cardId);
+    const committed = this.lastCommittedView();
+    this.typedResult.set(committed?.cardId === cardId ? committed.typedResult : null);
+    this.dontKnowSelected.set(committed?.cardId === cardId ? committed.dontKnow : false);
     this.isFlipped.set(true);
   }
 
   returnToCurrent(): void {
+    this.cancelAudio();
+    const snapshot = this.currentViewSnapshot();
     this.previousCardId.set(null);
-    this.isFlipped.set(false);
+    this.isFlipped.set(snapshot?.flipped ?? false);
+    this.typed.set(snapshot?.typed ?? '');
+    this.typedResult.set(snapshot?.typedResult ?? null);
+    this.dontKnowSelected.set(snapshot?.dontKnow ?? false);
+    this.currentViewSnapshot.set(null);
   }
 
   playAudio(): void {
+    if (this.sessionMuted()) return;
     const card = this.currentCard();
     if (!card) return;
     void this.wordAudio.playCard(card);
   }
 
   playSlow(): void {
+    if (this.sessionMuted()) return;
     const card = this.currentCard();
     if (!card) return;
     void this.wordAudio.playTarget(card.content.back, 'de-DE', SLOW_RATE);
   }
 
   playExample(sentence: string): void {
+    if (this.sessionMuted()) return;
     void this.wordAudio.play(sentence, 'de-DE');
+  }
+
+  toggleSessionMute(): void {
+    this.sessionMuted.update(muted => !muted);
+    this.cancelAudio();
+  }
+
+  @HostListener('document:visibilitychange')
+  onVisibilityChange(): void {
+    if (document.visibilityState !== 'visible') this.cancelAudio();
+  }
+
+  private cancelAudio(): void {
+    this.audioSequence++;
+    this.wordAudio.stop();
+  }
+
+  private async runRevealAutoplay(): Promise<void> {
+    const card = this.currentCard();
+    if (!card || this.isViewingPrevious()) return;
+    const connection = (navigator as Navigator & { connection?: { saveData?: boolean } }).connection;
+    const policy = {
+      mode: this.reviewPrefs.autoplay(),
+      muted: this.sessionMuted(),
+      documentVisible: document.visibilityState === 'visible',
+      saveData: connection?.saveData === true,
+    } as const;
+    if (!shouldAutoplayReviewAnswer(policy)) return;
+    const sequence = ++this.audioSequence;
+    const answer = `${card.content.article ? `${card.content.article} ` : ''}${card.content.back}`;
+    await new Promise(resolve => setTimeout(resolve, 300));
+    if (sequence !== this.audioSequence) return;
+    await this.wordAudio.playTarget(answer, 'de-DE');
+    if (!shouldAutoplayFirstExample(policy) || sequence !== this.audioSequence || !card.content.examples[0]) return;
+    await new Promise(resolve => setTimeout(resolve, 500));
+    if (sequence !== this.audioSequence) return;
+    await this.wordAudio.playTarget(card.content.examples[0].target, 'de-DE');
   }
 
   async requestExit(): Promise<void> {
@@ -289,6 +404,7 @@ export class ReviewPage {
   }
 
   private exitSession(): void {
+    this.cancelAudio();
     this.reviewStore.leaveSession();
     void this.router.navigate([ReviewRoute.HUB]);
   }

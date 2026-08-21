@@ -1,8 +1,9 @@
-import { ChangeDetectionStrategy, Component, ElementRef, input, model, output, viewChild } from '@angular/core';
+import { afterNextRender, ChangeDetectionStrategy, Component, ElementRef, input, model, output, viewChild } from '@angular/core';
 import { IonIcon } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
 import { checkmarkOutline } from 'ionicons/icons';
 import { TranslatePipe } from '@ngx-translate/core';
+import { canSubmitRecallAnswer, insertRecallCharacter } from '../../../../application/recall-answer';
 
 @Component({
   selector: 'lc-rv-front-type',
@@ -21,10 +22,15 @@ export class FrontTypeComponent {
   readonly dontKnow = output<void>();
   readonly focusChanged = output<boolean>();
 
-  readonly accents = ['ä', 'ö', 'ü', 'ß', 'Ä', 'Ö', 'Ü'] as const;
+  readonly accents = ['ä', 'ö', 'ü', 'ß'] as const;
 
   constructor() {
     addIcons({ checkmarkOutline });
+    afterNextRender(() => this.answerInput()?.nativeElement.focus({ preventScroll: true }));
+  }
+
+  canSubmit(): boolean {
+    return canSubmitRecallAnswer(this.typed());
   }
 
   onInput(event: Event): void {
@@ -36,13 +42,13 @@ export class FrontTypeComponent {
     const currentValue = this.typed();
     const selectionStart = inputElement?.selectionStart ?? currentValue.length;
     const selectionEnd = inputElement?.selectionEnd ?? selectionStart;
-    this.typed.set(`${currentValue.slice(0, selectionStart)}${ch}${currentValue.slice(selectionEnd)}`);
+    const inserted = insertRecallCharacter(currentValue, ch, { start: selectionStart, end: selectionEnd });
+    this.typed.set(inserted.answer);
     queueMicrotask(() => {
       const input = this.answerInput()?.nativeElement;
       if (!input) return;
-      const caretPosition = selectionStart + ch.length;
       input.focus({ preventScroll: true });
-      input.setSelectionRange(caretPosition, caretPosition);
+      input.setSelectionRange(inserted.caret, inserted.caret);
     });
   }
 
@@ -52,6 +58,6 @@ export class FrontTypeComponent {
 
   onEnter(event: Event): void {
     event.preventDefault();
-    this.check.emit();
+    if (this.canSubmit()) this.check.emit();
   }
 }

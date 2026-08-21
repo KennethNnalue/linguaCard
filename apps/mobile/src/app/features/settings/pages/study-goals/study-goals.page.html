@@ -35,9 +35,18 @@
             class="sg-chip"
             [class.sg-chip--active]="dailyGoal() === v"
             (click)="setDailyGoal(v)"
-          >{{ v }}</button>
+          ><strong>{{ v }}</strong><small>{{ dailyGoalLabelKey(v) | translate }}</small></button>
         }
       </div>
+      <div class="sg-daily-meta">
+        <span>{{ 'settings.goals.daily.estimate' | translate:{ minutes: dailyEstimateMinutes() } }}</span>
+        <span>{{ 'settings.goals.daily.appliesToday' | translate }}</span>
+      </div>
+      @if (updateStatus() !== 'idle') {
+        <p class="sg-save-state" role="status" aria-live="polite">
+          {{ (updateStatus() === 'saving' ? 'settings.goals.saving' : 'settings.goals.pendingSync') | translate }}
+        </p>
+      }
     </div>
     <div class="sg-note">{{ 'settings.goals.streakNote' | translate }}</div>
 

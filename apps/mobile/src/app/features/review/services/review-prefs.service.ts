@@ -1,5 +1,6 @@
 import {Injectable, signal} from '@angular/core';
 import type { RequestedPromptDirection, ReviewMode } from '../domain/review-domain';
+import type { ReviewAutoplayMode } from '../application/review-audio-policy';
 
 export type StudyMode = 'flip' | 'type';
 
@@ -18,8 +19,10 @@ export function toPromptDirection(direction: StudyDirection): RequestedPromptDir
 
 const MODE_KEY = 'lc-review-mode';
 const DIR_KEY = 'lc-review-dir';
+const AUTOPLAY_KEY = 'lc-review-autoplay';
 const VALID_MODES: readonly StudyMode[] = ['flip', 'type'];
 const VALID_DIRS: readonly StudyDirection[] = ['en-de', 'de-en', 'mixed'];
+const VALID_AUTOPLAY: readonly ReviewAutoplayMode[] = ['off', 'answer', 'answer_and_example'];
 
 /**
  * Holds the user's chosen study mode + prompt direction across the hub/custom →
@@ -30,9 +33,11 @@ const VALID_DIRS: readonly StudyDirection[] = ['en-de', 'de-en', 'mixed'];
 export class ReviewPrefsService {
   private readonly _mode = signal<StudyMode>(read(MODE_KEY, VALID_MODES, 'type'));
   private readonly _dir = signal<StudyDirection>(read(DIR_KEY, VALID_DIRS, 'en-de'));
+  private readonly _autoplay = signal<ReviewAutoplayMode>(read(AUTOPLAY_KEY, VALID_AUTOPLAY, 'off'));
 
   readonly mode = this._mode.asReadonly();
   readonly dir = this._dir.asReadonly();
+  readonly autoplay = this._autoplay.asReadonly();
 
   setMode(mode: StudyMode): void {
     this._mode.set(mode);
@@ -42,6 +47,11 @@ export class ReviewPrefsService {
   setDir(dir: StudyDirection): void {
     this._dir.set(dir);
     write(DIR_KEY, dir);
+  }
+
+  setAutoplay(mode: ReviewAutoplayMode): void {
+    this._autoplay.set(mode);
+    write(AUTOPLAY_KEY, mode);
   }
 }
 

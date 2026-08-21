@@ -14,6 +14,7 @@
       #answerInput
       class="ft-input"
       type="text"
+      autofocus
       [value]="typed()"
       (input)="onInput($event)"
       (focus)="focusChanged.emit(true)"
@@ -39,11 +40,19 @@
     }
   </div>
 
-  <button class="ft-cta" (click)="check.emit()">
+  <button
+    class="ft-cta"
+    [disabled]="!canSubmit()"
+    (pointerdown)="preserveInputFocus($event)"
+    (click)="check.emit()">
     <ion-icon name="checkmark-outline"></ion-icon>
     {{ 'review.session.checkAnswer' | translate }}
   </button>
-  <button class="ft-dont-know" type="button" (click)="dontKnow.emit()">
+  <button
+    class="ft-dont-know"
+    type="button"
+    (pointerdown)="preserveInputFocus($event)"
+    (click)="dontKnow.emit()">
     {{ 'review.session.dontKnow' | translate }}
   </button>
 </div>

@@ -19,18 +19,23 @@
 }
 
 .sheet-header {
-  @include u.flex-between;
+  display: grid;
+  grid-template-columns: 36px minmax(0, 1fr) 36px;
+  align-items: center;
   padding: t.$lc-space-2 t.$lc-space-4 t.$lc-space-3;
   border-bottom: 1px solid var(--lc-border);
 }
 
 .sheet-title {
-  @include u.lc-font('sm', t.$lc-font-weight-semibold);
-  color: var(--lc-text-hint);
-  letter-spacing: 0.04em;
+  grid-column: 2;
+  text-align: center;
+  @include u.lc-font('2xl', t.$lc-font-weight-semibold);
+  color: var(--lc-text-primary);
+  font-family: t.$lc-font-display;
 }
 
 .sheet-close {
+  grid-column: 3;
   @include u.flex-center;
   background: transparent;
   border: none;
@@ -76,12 +81,39 @@
   font-size: 20px;
   color: var(--lc-text-secondary);
   flex-shrink: 0;
-  width: 24px;
+  width: 44px;
+  height: 44px;
+  padding: 11px;
+  border-radius: 50%;
+  background: var(--lc-brand-light);
+  color: var(--lc-brand);
   text-align: center;
 
   .sheet-action--destructive & { color: #EF4444; }
 }
 
-.action-label {
+.action-copy {
   flex: 1;
+  display: grid;
+  gap: 2px;
+
+  small {
+    color: var(--lc-text-secondary);
+    @include u.lc-font('xs');
+  }
+}
+
+.action-label { color: var(--lc-text-primary); font-weight: t.$lc-font-weight-semibold; }
+.action-chevron { color: var(--lc-text-hint); font-size: 20px; }
+
+.sheet-cancel {
+  min-height: 52px;
+  margin: t.$lc-space-2 t.$lc-space-4;
+  border: 0;
+  border-top: 1px solid var(--lc-border);
+  background: transparent;
+  color: var(--lc-text-primary);
+  font-family: t.$lc-font-display;
+  @include u.lc-font('lg', t.$lc-font-weight-semibold);
+  @include u.touch-state;
 }

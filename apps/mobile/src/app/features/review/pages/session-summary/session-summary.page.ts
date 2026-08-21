@@ -10,6 +10,7 @@ import { SessionStatsService } from '../../shared/services/session-stats.service
 import { EngagementStore } from '../../../engagement/state/engagement.store';
 import { ReviewRoute } from '../../models/review.model';
 import { SessionCelebrationComponent } from '../../../engagement/components/session-celebration/session-celebration.component';
+import {ReviewFeedbackService} from '../../services/review-feedback.service';
 
 interface RatingBar {
   value: ReviewRating;
@@ -38,6 +39,7 @@ export class SessionSummaryPage implements OnInit {
   private readonly router = inject(Router);
   private readonly statsService = inject(SessionStatsService);
   private readonly engagementStore = inject(EngagementStore);
+  private readonly feedback = inject(ReviewFeedbackService);
 
   constructor() {
     addIcons({ checkmarkOutline, refreshOutline, sparklesOutline });
@@ -54,6 +56,7 @@ export class SessionSummaryPage implements OnInit {
       return;
     }
     void this.engagementStore.prepareSessionCelebration(session.id);
+    this.feedback.sessionComplete();
   }
 
   readonly reviewedCount = computed(() => {
@@ -86,6 +89,15 @@ export class SessionSummaryPage implements OnInit {
       count: counts[v],
       percent: Math.round((counts[v] / maxCount) * 100),
     }));
+  });
+
+  readonly outcomeBreakdown = computed(() => {
+    const ratings = Object.values(this.session()?.ratings ?? {});
+    return {
+      nailed: ratings.filter(rating => rating === 'good' || rating === 'easy').length,
+      learning: ratings.filter(rating => rating === 'hard').length,
+      revisit: ratings.filter(rating => rating === 'again').length,
+    };
   });
 
   private readonly nonMasteredCardIds = computed((): string[] => {

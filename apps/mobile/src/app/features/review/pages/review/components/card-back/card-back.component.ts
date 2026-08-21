@@ -1,31 +1,14 @@
-import { ChangeDetectionStrategy, Component, computed, input, output, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, effect, input, output, signal } from '@angular/core';
 import { IonIcon } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
-import { chevronDownOutline, createOutline, ellipsisVerticalOutline, volumeHighOutline } from 'ionicons/icons';
+import { chevronDownOutline, ellipsisVerticalOutline, volumeHighOutline } from 'ionicons/icons';
 import { TranslatePipe } from '@ngx-translate/core';
 import type { Card } from '@lingua-card/shared/domain';
 import { ArticleBadgeComponent } from '../../../../../../shared/components/article-badge/article-badge.component';
 import { HighlightWordPipe } from '../../../../shared/pipes/highlight-word.pipe';
-import { ARTICLE_GENDER_MAP } from '../../../../models/review.model';
 import { TypedAnswerFeedback } from '../../../../services/answer-evaluator.service';
-
-interface ResultBanner {
-  tint: 'correct' | 'close' | 'wrong';
-  icon: string;
-  verdictKey: string;
-  hasGenderNote: boolean;
-  genderNoteKey: string;
-  genderNoteParams: Record<string, unknown>;
-}
-
-const VERDICT_KEY = {
-  correct: 'review.type.correct',
-  gender: 'review.type.mindGender',
-  close: 'review.type.soClose',
-  wrong: 'review.type.notQuite',
-} as const;
-
-const VERDICT_ICON = { correct: '✓', close: '≈', wrong: '✕' } as const;
+import { buildReviewReveal } from '../../../../application/build-review-reveal';
+import { buildReviewEnrichment, nextReviewEnrichmentTab, ReviewEnrichmentTab } from '../../../../application/build-review-enrichment';
 
 @Component({
   selector: 'lc-rv-card-back',
@@ -39,65 +22,49 @@ export class CardBackComponent {
   readonly typedResult = input<TypedAnswerFeedback | null>(null);
   readonly expandedSynonym = input<number | null>(null);
   readonly isPronunciationLoading = input(false);
+  readonly isAudioPlaying = input(false);
+  readonly audioPlaybackError = input(false);
   readonly busy = input(false);
+  readonly readOnly = input(false);
 
   readonly toggleSynonym = output<number>();
   readonly playAudio = output<void>();
   readonly playExample = output<string>();
-  readonly manualMasteryRequested = output<void>();
-  readonly editRequested = output<void>();
-  readonly isActionsMenuOpen = signal(false);
+  readonly cardActionsRequested = output<void>();
+  readonly selectedTab = signal<ReviewEnrichmentTab | null>(null);
 
   constructor() {
-    addIcons({ chevronDownOutline, createOutline, ellipsisVerticalOutline, volumeHighOutline });
+    addIcons({ chevronDownOutline, ellipsisVerticalOutline, volumeHighOutline });
+    effect(() => {
+      const enrichment = buildReviewEnrichment(this.card().content);
+      this.selectedTab.set(enrichment.initialTab);
+    });
   }
 
-  readonly genderWord = computed(() => {
-    const c = this.card().content;
-    if (!c.article) return '';
-    return c.gender ?? ARTICLE_GENDER_MAP[c.article] ?? '';
-  });
+  readonly reveal = computed(() => buildReviewReveal(this.card().content.article, this.typedResult()));
+  readonly banner = computed(() => this.reveal().verdict);
+  readonly enrichment = computed(() => buildReviewEnrichment(this.card().content));
 
-  readonly banner = computed<ResultBanner | null>(() => {
-    const r = this.typedResult();
-    if (!r) return null;
+  selectTab(tab: ReviewEnrichmentTab): void {
+    if (this.enrichment().tabs.includes(tab)) this.selectedTab.set(tab);
+  }
 
-    let genderNoteKey = '';
-    let genderNoteParams: Record<string, unknown> = {};
-    if (r.outcome === 'gender') {
-      genderNoteKey = r.userArticle ? 'review.type.itsArticleNot' : 'review.type.dontForgetArticle';
-      genderNoteParams = { article: r.correctArticle, userArticle: r.userArticle };
-    } else if (r.outcome === 'close' && r.articleWrong) {
-      genderNoteKey = 'review.type.alsoArticle';
-      genderNoteParams = { article: r.correctArticle };
-    }
-
-    return {
-      tint: r.tint,
-      icon: VERDICT_ICON[r.tint],
-      verdictKey: VERDICT_KEY[r.outcome],
-      hasGenderNote: !!genderNoteKey,
-      genderNoteKey,
-      genderNoteParams,
-    };
-  });
+  onTabKeydown(event: KeyboardEvent): void {
+    if (event.key !== 'ArrowLeft' && event.key !== 'ArrowRight') return;
+    const current = this.selectedTab();
+    if (!current) return;
+    event.preventDefault();
+    const tablist = event.currentTarget instanceof HTMLElement ? event.currentTarget : null;
+    this.selectedTab.set(nextReviewEnrichmentTab(this.enrichment().tabs, current, event.key === 'ArrowRight' ? 1 : -1));
+    queueMicrotask(() => tablist?.querySelector<HTMLElement>('[role="tab"][aria-selected="true"]')?.focus());
+  }
 
   isSynonymExpanded(i: number): boolean {
     return this.expandedSynonym() === i;
   }
 
   toggleActionsMenu(): void {
-    if (this.busy()) return;
-    this.isActionsMenuOpen.update(open => !open);
-  }
-
-  requestManualMastery(): void {
-    this.isActionsMenuOpen.set(false);
-    this.manualMasteryRequested.emit();
-  }
-
-  requestEdit(): void {
-    this.isActionsMenuOpen.set(false);
-    this.editRequested.emit();
+    if (this.busy() || this.readOnly()) return;
+    this.cardActionsRequested.emit();
   }
 }

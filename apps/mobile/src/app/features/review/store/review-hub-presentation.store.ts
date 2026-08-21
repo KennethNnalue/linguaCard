@@ -3,9 +3,9 @@ import {signalStore, withComputed, withMethods} from '@ngrx/signals';
 import {EngagementStore} from '../../engagement/state/engagement.store';
 import {SettingsStore} from '../../settings/store/settings.store';
 import {CardStore} from '../../vault/store/card.store';
-import {MINUTES_PER_CARD_REVIEW} from '../models/review.model';
 import {ReviewFilterService} from '../services/review-filter.service';
 import {ReviewPrefsService, StudyMode} from '../services/review-prefs.service';
+import {estimateReviewMinutes} from '../application/estimate-review-time';
 
 export type ReviewHeroViewModel =
   | {kind: 'empty'}
@@ -13,10 +13,6 @@ export type ReviewHeroViewModel =
   | {kind: 'in-progress'; cards: number; minutes: number; completed: number; goal: number}
   | {kind: 'complete'; reviewed: number; optionalCards: number}
   | {kind: 'caught-up'; newAvailable: number};
-
-function estimateMinutes(cardCount: number): number {
-  return Math.max(1, Math.round(cardCount * MINUTES_PER_CARD_REVIEW));
-}
 
 export const ReviewHubPresentationStore = signalStore(
   {providedIn: 'root'},
@@ -56,7 +52,9 @@ export const ReviewHubPresentationStore = signalStore(
         if (available === 0) return {kind: 'caught-up', newAvailable: queue().newAvailable};
 
         const cardsInSession = Math.min(goal - completed, available);
-        const minutes = estimateMinutes(cardsInSession);
+        const reviewCards = Math.min(cardsInSession, queue().dueNow);
+        const newCards = Math.max(0, cardsInSession - reviewCards);
+        const minutes = estimateReviewMinutes({newCards, reviewCards, mode: prefs.mode()});
         return completed === 0
           ? {kind: 'not-started', cards: cardsInSession, minutes}
           : {kind: 'in-progress', cards: cardsInSession, minutes, completed, goal};

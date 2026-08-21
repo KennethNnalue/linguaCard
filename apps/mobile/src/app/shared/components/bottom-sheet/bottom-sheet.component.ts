@@ -1,10 +1,11 @@
 import {ChangeDetectionStrategy, Component, inject, signal} from '@angular/core';
 import {IonIcon, ModalController} from '@ionic/angular/standalone';
 import {addIcons} from 'ionicons';
-import {closeOutline, libraryOutline} from 'ionicons/icons';
+import {chevronForwardOutline, closeOutline, createOutline, libraryOutline, starOutline} from 'ionicons/icons';
 
 export interface BottomSheetAction {
   label: string;
+  description?: string;
   icon?: string;
   role?: 'cancel' | 'destructive';
   handler?: () => void;
@@ -32,7 +33,7 @@ export class BottomSheetComponent {
   private readonly modalCtrl = inject(ModalController);
 
   constructor() {
-    addIcons({closeOutline, libraryOutline});
+    addIcons({chevronForwardOutline, closeOutline, createOutline, libraryOutline, starOutline});
   }
 
   async select(action: BottomSheetAction): Promise<void> {

@@ -1,19 +1,32 @@
 <ion-header class="ion-no-border" [class.rv-keyboard-active]="isTypingFocused()">
   <ion-toolbar>
-    <div class="rv-nav">
-      <button class="rv-close" (click)="requestExit()" [attr.aria-label]="'review.session.goBackAriaLabel' | translate">
-        <ion-icon name="close-outline"></ion-icon>
-      </button>
+    @if (playerHeader(); as header) {
+      <div class="rv-nav">
+        <button class="rv-close" (click)="requestExit()" [attr.aria-label]="'review.session.goBackAriaLabel' | translate">
+          <ion-icon name="close-outline"></ion-icon>
+        </button>
+        <span class="rv-nav-count" [class.rv-nav-count--history]="isViewingPrevious()">
+          {{ (isViewingPrevious() ? 'review.session.previousReadOnlyHeader' : 'review.session.cardOf') | translate:{ n: header.currentPosition, total: header.totalCards } }}
+        </span>
+        <div class="rv-nav-tools">
+          @if (!isViewingPrevious()) { <span class="rv-nav-remaining">{{ header.remainingCards }}↑</span> }
+          <button class="rv-mute" type="button" [attr.aria-label]="(sessionMuted() ? 'review.session.unmuteAudio' : 'review.session.muteAudio') | translate" [attr.aria-pressed]="sessionMuted()" (click)="toggleSessionMute()">
+            <ion-icon [name]="sessionMuted() ? 'volume-mute-outline' : 'volume-high-outline'"></ion-icon>
+          </button>
+        </div>
+      </div>
       <div
         class="rv-prog-track"
         role="progressbar"
         [attr.aria-valuemin]="0"
-        [attr.aria-valuemax]="reviewStore.totalOriginalCount()"
-        [attr.aria-valuenow]="reviewStore.completedOriginalCount()">
-        <div class="rv-prog-fill" [style.width.%]="progressPercent()"></div>
+        [attr.aria-valuemax]="header.totalCards"
+        [attr.aria-valuenow]="header.currentPosition">
+        <div class="rv-prog-fill" [style.width.%]="header.progressPercent"></div>
+        @for (checkpoint of header.checkpoints; track checkpoint.positionPercent) {
+          <span class="rv-prog-checkpoint" [class.rv-prog-checkpoint--reached]="checkpoint.reached" [style.left.%]="checkpoint.positionPercent" aria-hidden="true"></span>
+        }
       </div>
-      <span class="rv-nav-count">{{ currentPosition() }} / {{ reviewStore.totalOriginalCount() }}</span>
-    </div>
+    }
   </ion-toolbar>
 </ion-header>
 
@@ -47,12 +60,14 @@
               [typedResult]="typedResult()?.feedback ?? null"
               [expandedSynonym]="expandedSynonym()"
               [isPronunciationLoading]="isPronunciationLoading()"
+              [isAudioPlaying]="isAudioPlaying()"
+              [audioPlaybackError]="audioPlaybackError()"
               [busy]="reviewStore.isBusy()"
+              [readOnly]="isViewingPrevious()"
               (toggleSynonym)="toggleSynonym($event)"
               (playAudio)="playAudio()"
               (playExample)="playExample($event)"
-              (manualMasteryRequested)="requestManualMastery()"
-              (editRequested)="openCardEditor()" />
+              (cardActionsRequested)="openCardActions()" />
           </div>
         }
       </div>
@@ -115,6 +130,7 @@
       [busy]="reviewStore.isBusy()"
       [canGoPrevious]="reviewStore.lastReviewedCardId() !== null && !isViewingPrevious()"
       [readOnly]="isViewingPrevious()"
+      [historicalRating]="historicalRating()"
       (rate)="submitRating($event)"
       (previous)="showPrevious()"
       (returnToCurrent)="returnToCurrent()"

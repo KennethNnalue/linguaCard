@@ -332,11 +332,11 @@ body.ion-palette-dark {
   // Warm cream surfaces remap to the app's dark surfaces; warm text lifts; the
   // pastel rating/result tints become dark-surface equivalents (mirrors the
   // existing --lc-rating-* dark derivation). Forest/leech/brass stay fixed.
-  --lc-rv-bg:           #111614;   // matches --lc-surface
-  --lc-rv-card:         #1E2924;   // matches --lc-card
-  --lc-rv-card-alt:     #1A231F;   // one step below card for alt rows
-  --lc-rv-inset:        #253028;   // segmented track / inset
-  --lc-rv-inset-soft:   #182019;   // synonym panel / input bg
+  --lc-rv-bg:           #0E1512;   // Review Player reference near-black green
+  --lc-rv-card:         #1A2923;   // Review Player reference deep forest surface
+  --lc-rv-card-alt:     #17231E;   // one step below card for alt rows
+  --lc-rv-inset:        #22302B;   // progress rail / segmented track
+  --lc-rv-inset-soft:   #121D18;   // fields and nested panels
   --lc-rv-border:       rgba(90, 191, 163, 0.16);
   --lc-rv-border-strong:rgba(90, 191, 163, 0.28);
   --lc-rv-text:         #E4F0EC;

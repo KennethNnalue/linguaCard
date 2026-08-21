@@ -764,8 +764,13 @@
       "playPronunciationBtn": "Воспроизвести произношение",
       "generatingAudio": "Генерация…",
       "playExampleAriaLabel": "Воспроизвести пример",
+      "muteAudio": "Отключить звук повторения",
+      "unmuteAudio": "Включить звук повторения",
+      "playingAudio": "Воспроизводится произношение",
+      "retryAudio": "Повторить загрузку произношения",
       "ratingPrompt": "Насколько хорошо вы знали это?",
       "previousBtn": "Предыдущая",
+      "previousReadOnlyHeader": "Предыдущая карточка · Только чтение",
       "skipBtn": "Пропустить",
       "allCaughtUpMsg": "Всё повторено!",
       "noDueCardsMsg": "Сейчас нет карточек к повторению.",
@@ -775,6 +780,12 @@
       "checkAnswer": "Проверить ответ",
       "dontKnow": "Не знаю",
       "examplesHeader": "Примеры предложений",
+      "usageExampleHeader": "Пример употребления",
+      "examplesTab": "Примеры",
+      "synonymsTab": "Синонимы",
+      "formsTab": "Формы",
+      "learningDetailsLabel": "Учебные сведения",
+      "singularLabel": "Единственное число",
       "listenAndRecall": "Слушайте и вспоминайте",
       "ratingLocked": "Оценка откроется после показа",
       "recallHint": "попробуйте вспомнить, прежде чем показывать",
@@ -844,6 +855,9 @@
       "recallRate": "Уровень припоминания",
       "seeTrickyWords": "Посмотрите {{count}} трудных слов сегодня в контексте",
       "sessionComplete": "Сессия завершена",
+      "nailed": "Усвоено",
+      "learning": "Изучается",
+      "revisit": "Повторить",
       "manuallyMastered": "Освоено вручную: {{count}}",
       "manuallyMasteredHint": "Удалены из будущих повторений"
     },
@@ -947,6 +961,12 @@
       "noCardsTitle": "Нет сложных карточек!",
       "encouragementMsg": "Вы отлично справляетесь. Так держать!"
     },
+    "audioAutoplay": {
+      "title": "Автовоспроизведение",
+      "off": "Выкл.",
+      "answer": "Только ответ",
+      "answer_and_example": "Ответ и пример употребления"
+    },
     "leeches": {
       "breakThrough": "Преодолейте все {{count}}",
       "emptySub": "Сейчас ничего упрямого — так держать.",
@@ -987,7 +1007,7 @@
       "correct": "Верно!",
       "dontForgetArticle": "Не забудьте артикль — это {{article}}",
       "itsArticleNot": "Это {{article}}, а не {{userArticle}}",
-      "mindGender": "Следите за родом",
+      "mindGender": "Обратите внимание на артикль",
       "notQuite": "Не совсем",
       "soClose": "Так близко"
     }
@@ -1288,8 +1308,15 @@
         "name": "Ежедневно",
         "desc": "Карточек в день для сохранения серии",
         "decreaseAria": "Уменьшить дневную цель",
-        "increaseAria": "Увеличить дневную цель"
+        "increaseAria": "Увеличить дневную цель",
+        "light": "Легко",
+        "regular": "Обычно",
+        "focused": "Интенсивно",
+        "estimate": "Около {{minutes}} минут в день",
+        "appliesToday": "Действует с сегодня"
       },
+      "saving": "Сохранение…",
+      "pendingSync": "Сохранено на устройстве · Ожидает синхронизации",
       "weekly": {
         "name": "Еженедельно",
         "desc": "Всего карточек за неделю",

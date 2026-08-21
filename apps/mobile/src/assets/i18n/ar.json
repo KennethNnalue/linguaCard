@@ -764,8 +764,13 @@
       "playPronunciationBtn": "تشغيل النطق",
       "generatingAudio": "جارٍ التوليد…",
       "playExampleAriaLabel": "تشغيل المثال",
+      "muteAudio": "كتم صوت المراجعة",
+      "unmuteAudio": "إلغاء كتم صوت المراجعة",
+      "playingAudio": "جارٍ تشغيل النطق",
+      "retryAudio": "إعادة محاولة صوت النطق",
       "ratingPrompt": "كم كنت تعرف هذه الكلمة؟",
       "previousBtn": "السابقة",
+      "previousReadOnlyHeader": "البطاقة السابقة · للقراءة فقط",
       "skipBtn": "تخطي",
       "allCaughtUpMsg": "لا شيء متأخر!",
       "noDueCardsMsg": "لا توجد بطاقات مستحقة للمراجعة الآن.",
@@ -775,6 +780,12 @@
       "checkAnswer": "تحقق من الإجابة",
       "dontKnow": "لا أعرف",
       "examplesHeader": "جُمل أمثلة",
+      "usageExampleHeader": "مثال الاستخدام",
+      "examplesTab": "أمثلة",
+      "synonymsTab": "مرادفات",
+      "formsTab": "صيغ",
+      "learningDetailsLabel": "تفاصيل التعلّم",
+      "singularLabel": "المفرد",
       "listenAndRecall": "استمع وتذكّر",
       "ratingLocked": "يُفتح التقييم بعد الكشف",
       "recallHint": "حاول تذكّرها قبل الكشف",
@@ -844,6 +855,9 @@
       "recallRate": "معدل التذكّر",
       "seeTrickyWords": "شاهد {{count}} كلمة صعبة اليوم في سياقها",
       "sessionComplete": "اكتملت الجلسة",
+      "nailed": "متقن",
+      "learning": "قيد التعلّم",
+      "revisit": "إعادة",
       "manuallyMastered": "تم إتقان {{count}} يدويًا",
       "manuallyMasteredHint": "تمت إزالتها من المراجعات المستقبلية"
     },
@@ -947,6 +961,12 @@
       "noCardsTitle": "لا توجد بطاقات صعبة!",
       "encouragementMsg": "أداؤك ممتاز. استمر!"
     },
+    "audioAutoplay": {
+      "title": "تشغيل الصوت تلقائيًا",
+      "off": "إيقاف",
+      "answer": "الإجابة فقط",
+      "answer_and_example": "الإجابة ومثال الاستخدام"
+    },
     "leeches": {
       "breakThrough": "تجاوز كل الـ {{count}}",
       "emptySub": "لا شيء عنيد الآن — واصل التقدّم.",
@@ -987,7 +1007,7 @@
       "correct": "صحيح!",
       "dontForgetArticle": "لا تنسَ أداة التعريف — إنها {{article}}",
       "itsArticleNot": "إنها {{article}}، وليست {{userArticle}}",
-      "mindGender": "انتبه للجنس",
+      "mindGender": "انتبه لأداة التعريف",
       "notQuite": "ليس تمامًا",
       "soClose": "قريب جدًا"
     }
@@ -1288,8 +1308,15 @@
         "name": "يومي",
         "desc": "بطاقات في اليوم للحفاظ على سلسلتك",
         "decreaseAria": "تقليل الهدف اليومي",
-        "increaseAria": "زيادة الهدف اليومي"
+        "increaseAria": "زيادة الهدف اليومي",
+        "light": "خفيف",
+        "regular": "منتظم",
+        "focused": "مكثف",
+        "estimate": "حوالي {{minutes}} دقيقة يوميًا",
+        "appliesToday": "يُطبّق من اليوم"
       },
+      "saving": "جارٍ الحفظ…",
+      "pendingSync": "محفوظ على هذا الجهاز · بانتظار المزامنة",
       "weekly": {
         "name": "أسبوعي",
         "desc": "إجمالي البطاقات المراجعة في الأسبوع",

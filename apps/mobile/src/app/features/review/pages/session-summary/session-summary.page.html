@@ -14,14 +14,18 @@
     }
 
     <!-- Stat tiles -->
-    <div class="ss-tiles">
+    <div class="ss-tiles ss-tiles--outcomes">
       <div class="ss-tile">
-        <span class="ss-tile-num ss-tile-num--recall">{{ recallRate() }}%</span>
-        <span class="ss-tile-lbl">{{ 'review.summary.recallRate' | translate }}</span>
+        <span class="ss-tile-num ss-tile-num--recall">{{ outcomeBreakdown().nailed }}</span>
+        <span class="ss-tile-lbl">{{ 'review.summary.nailed' | translate }}</span>
       </div>
       <div class="ss-tile">
-        <span class="ss-tile-num">{{ reviewedCount() }}</span>
-        <span class="ss-tile-lbl">{{ 'review.summary.cardsReviewedLabel' | translate }}</span>
+        <span class="ss-tile-num ss-tile-num--learning">{{ outcomeBreakdown().learning }}</span>
+        <span class="ss-tile-lbl">{{ 'review.summary.learning' | translate }}</span>
+      </div>
+      <div class="ss-tile">
+        <span class="ss-tile-num ss-tile-num--revisit">{{ outcomeBreakdown().revisit }}</span>
+        <span class="ss-tile-lbl">{{ 'review.summary.revisit' | translate }}</span>
       </div>
     </div>
 

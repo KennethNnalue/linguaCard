@@ -28,6 +28,7 @@ export class RatingFooterComponent {
   readonly automatic = input(false);
   readonly canGoPrevious = input(false);
   readonly readOnly = input(false);
+  readonly historicalRating = input<ReviewRating | null>(null);
   readonly busy = input(false);
 
   readonly rate = output<ReviewRating>();

@@ -10,14 +10,11 @@
 </div>
 
 @if (readOnly()) {
-  <div class="rf-locked">{{ 'review.session.previousReadOnly' | translate }}</div>
-} @else if (flipped() && automatic() && suggested(); as autoRating) {
-  <div class="rf-auto" role="status">
-    <span>{{ 'review.session.ratedAutomatically' | translate:{ rating: (ratingKey(autoRating) | translate) } }}</span>
-    <button type="button" (click)="alternativesVisible.set(!alternativesVisible())">
-      {{ 'review.session.changeRating' | translate }}
-    </button>
+  <div class="rf-locked">
+    {{ 'review.session.previousReadOnly' | translate }}
+    @if (historicalRating(); as rating) { · {{ ratingKey(rating) | translate }} }
   </div>
+} @else if (flipped() && automatic() && suggested(); as autoRating) {
   @if (alternativesVisible()) {
     <p class="rf-prompt">{{ 'review.session.chooseDifferentRating' | translate }}</p>
     <div class="rf-row">
@@ -33,9 +30,14 @@
       }
     </div>
   } @else {
-    <lc-button variant="filled-primary" size="lg" [fullWidth]="true" [loading]="busy()" (click)="acceptSuggested()">
-      {{ 'common.continue' | translate }}
-    </lc-button>
+    <div class="rf-auto" role="status">
+      <button class="rf-auto-rating rf-auto-rating--{{ ratingClass(autoRating) }}" type="button" (click)="alternativesVisible.set(true)">
+        {{ ratingKey(autoRating) | translate }}
+      </button>
+      <lc-button variant="filled-primary" size="md" [loading]="busy()" (click)="acceptSuggested()">
+        {{ 'common.continue' | translate }}
+      </lc-button>
+    </div>
   }
 } @else if (flipped()) {
   <p class="rf-prompt">{{ 'review.session.ratingPrompt' | translate }}</p>

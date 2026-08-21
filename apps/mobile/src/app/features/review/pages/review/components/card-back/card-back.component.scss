@@ -8,6 +8,7 @@
 }
 
 .cb-card {
+  position: relative;
   flex: 1;
   overflow-y: auto;
   -webkit-overflow-scrolling: touch;
@@ -19,22 +20,19 @@
 
 // ─── Result banner (type mode) ───────────────────────────────────────────────
 .cb-banner {
-  border: 1px solid transparent;
-  border-radius: t.$lc-radius-md;
-  padding: t.$lc-space-3 t.$lc-space-4;
-  margin-bottom: t.$lc-space-4;
+  border: 0;
+  padding: 0;
+  margin-bottom: t.$lc-space-3;
+  padding-right: 52px;
 
   &--correct {
-    background: var(--lc-rv-res-correct-bg);
-    border-color: var(--lc-rv-res-correct-bd);
+    background: transparent;
   }
   &--close {
-    background: var(--lc-rv-res-close-bg);
-    border-color: var(--lc-rv-res-close-bd);
+    background: transparent;
   }
   &--wrong {
-    background: var(--lc-rv-res-wrong-bg);
-    border-color: var(--lc-rv-res-wrong-bd);
+    background: transparent;
   }
 }
 
@@ -45,7 +43,7 @@
 }
 
 .cb-medallion {
-  @include u.circle(24px);
+  @include u.circle(22px);
   @include u.flex-center;
   @include u.lc-font('sm', t.$lc-font-weight-bold);
   color: var(--lc-rv-card);
@@ -56,7 +54,7 @@
 }
 
 .cb-verdict {
-  @include u.lc-font('2xl', t.$lc-font-weight-semibold);
+  @include u.lc-font('xl', t.$lc-font-weight-semibold);
   font-family: t.$lc-font-rv-display;
 
   &--correct { color: var(--lc-rv-verdict-correct); }
@@ -64,18 +62,15 @@
   &--wrong { color: var(--lc-rv-verdict-wrong); }
 }
 
-.cb-suggested {
-  margin-left: auto;
-  @include u.lc-font('xxs', t.$lc-font-weight-semibold);
-  font-family: t.$lc-font-rv-mono;
-  letter-spacing: 0.1em;
-  text-transform: uppercase;
-  color: var(--lc-rv-muted);
+.cb-attempt {
+  display: flex;
+  align-items: baseline;
+  flex-wrap: wrap;
+  gap: t.$lc-space-2;
+  margin-top: t.$lc-space-2;
 }
 
 .cb-you-lbl {
-  display: block;
-  margin-top: t.$lc-space-2;
   @include u.lc-font('xxs', t.$lc-font-weight-semibold);
   font-family: t.$lc-font-rv-mono;
   letter-spacing: 0.1em;
@@ -84,7 +79,9 @@
 }
 
 .cb-you {
-  @include u.lc-font('3xl', t.$lc-font-weight-medium);
+  min-width: 0;
+  margin: 0;
+  @include u.lc-font('lg', t.$lc-font-weight-medium);
   font-family: t.$lc-font-rv-display;
   white-space: pre-wrap;
   word-break: break-word;
@@ -93,13 +90,6 @@
 .cb-char {
   &--ok { color: var(--lc-rv-char-ok); }
   &--bad { color: var(--lc-rv-char-bad); }
-}
-
-.cb-gender-note {
-  margin-top: t.$lc-space-2;
-  @include u.lc-font('xs', t.$lc-font-weight-medium);
-  font-family: t.$lc-font-rv-body;
-  color: var(--lc-rv-hard-text);
 }
 
 // ─── Header ──────────────────────────────────────────────────────────────────
@@ -116,6 +106,10 @@
 }
 
 .cb-more {
+  position: absolute;
+  z-index: 2;
+  top: t.$lc-space-4;
+  right: t.$lc-space-4;
   @include u.circle(40px);
   @include u.flex-center;
   @include u.touch-state;
@@ -190,22 +184,57 @@
   flex-shrink: 0;
 }
 
-// ─── Article + gender ────────────────────────────────────────────────────────
+// ─── Article-aware answer surface ───────────────────────────────────────────
+.cb-answer-surface {
+  position: relative;
+  margin-top: t.$lc-space-3;
+  padding: t.$lc-space-5 t.$lc-space-5 t.$lc-space-4;
+  border: 1px solid var(--lc-rv-border);
+  border-radius: t.$lc-radius-lg;
+  background: var(--lc-rv-inset-soft);
+  text-align: center;
+
+  &--der { background: var(--lc-masc-bg); border-color: var(--lc-masc-border); }
+  &--die { background: var(--lc-fem-bg); border-color: var(--lc-fem-border); }
+  &--das { background: var(--lc-neut-bg); border-color: var(--lc-neut-border); }
+  &--neutral { background: var(--lc-rv-inset-soft); border-color: var(--lc-rv-border); }
+}
+
+.cb-answer-rule {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: t.$lc-space-2;
+  margin: t.$lc-space-4 auto 0;
+
+  &::before,
+  &::after {
+    content: '';
+    width: min(92px, 34%);
+    height: 1px;
+    background: color-mix(in srgb, var(--lc-rv-text) 28%, transparent);
+  }
+
+  span {
+    width: 5px;
+    height: 5px;
+    border-radius: 50%;
+    background: var(--lc-rv-brass-ink);
+    transform: rotate(45deg);
+  }
+}
+
 .cb-art-row {
   display: flex;
   align-items: center;
+  justify-content: center;
   gap: t.$lc-space-2;
-  margin-top: t.$lc-space-4;
-}
-
-.cb-gender {
-  @include u.lc-font('sm');
-  font-family: t.$lc-font-rv-body;
-  color: var(--lc-rv-text-soft);
 }
 
 .cb-ipa {
-  margin-left: auto;
+  position: absolute;
+  top: t.$lc-space-4;
+  right: t.$lc-space-4;
   @include u.lc-font('sm');
   font-family: t.$lc-font-rv-display;
   font-style: italic;
@@ -218,7 +247,7 @@
   font-family: t.$lc-font-rv-display;
   color: var(--lc-rv-text);
   line-height: 1.05;
-  margin-top: t.$lc-space-2;
+  margin-top: t.$lc-space-3;
 }
 
 .cb-trans {
@@ -234,9 +263,7 @@
   align-items: center;
   gap: t.$lc-space-2;
   margin-top: t.$lc-space-3;
-  background: var(--lc-rv-inset-soft);
-  border-radius: t.$lc-radius-sm;
-  padding: t.$lc-space-1 t.$lc-space-3;
+  padding: t.$lc-space-1 t.$lc-space-12 t.$lc-space-1 t.$lc-space-3;
 }
 
 .cb-plural-lbl {
@@ -255,17 +282,16 @@
 
 // ─── Pronunciation ───────────────────────────────────────────────────────────
 .cb-audio {
-  display: flex;
-  align-items: center;
-  gap: t.$lc-space-2;
-  width: 100%;
+  position: absolute;
+  right: t.$lc-space-3;
+  bottom: t.$lc-space-3;
+  @include u.circle(44px);
   @include u.flex-center;
   @include u.touch-state;
   min-height: 44px;
-  margin-top: t.$lc-space-4;
-  background: var(--lc-rv-text);
-  color: var(--lc-rv-card);
-  border-radius: t.$lc-radius-md;
+  background: color-mix(in srgb, var(--lc-rv-inset-soft) 78%, transparent);
+  color: var(--lc-rv-text);
+  border: 1px solid currentColor;
   @include u.lc-font('sm', t.$lc-font-weight-semibold);
   font-family: t.$lc-font-rv-body;
 
@@ -276,11 +302,9 @@
   &:disabled {
     opacity: 0.6;
   }
-}
 
-.cb-audio-dot {
-  @include u.circle(7px);
-  background: var(--lc-rv-mid-soft);
+  &--playing { box-shadow: 0 0 0 3px color-mix(in srgb, currentColor 22%, transparent); }
+  &--error { color: var(--lc-rv-verdict-wrong); }
 }
 
 .cb-audio-spinner {
@@ -297,6 +321,10 @@
   margin: t.$lc-space-4 0 t.$lc-space-3;
 }
 
+.cb-usage {
+  margin-top: t.$lc-space-4;
+}
+
 .cb-sec-hdr {
   @include u.lc-font('xxs', t.$lc-font-weight-semibold);
   font-family: t.$lc-font-rv-mono;
@@ -304,6 +332,81 @@
   text-transform: uppercase;
   color: var(--lc-rv-muted);
   margin-bottom: t.$lc-space-2;
+}
+
+.cb-tabs {
+  display: grid;
+  grid-auto-flow: column;
+  grid-auto-columns: 1fr;
+  border-bottom: 1px solid var(--lc-rv-border);
+}
+
+.cb-tab {
+  position: relative;
+  min-height: 44px;
+  padding: t.$lc-space-2;
+  border: 0;
+  background: transparent;
+  color: var(--lc-rv-muted);
+  font-family: t.$lc-font-rv-body;
+  @include u.lc-font('sm', t.$lc-font-weight-medium);
+  @include u.touch-state;
+
+  &::after {
+    content: '';
+    position: absolute;
+    right: t.$lc-space-2;
+    bottom: -1px;
+    left: t.$lc-space-2;
+    height: 2px;
+    border-radius: t.$lc-radius-full;
+    background: transparent;
+  }
+
+  &--active {
+    color: var(--lc-rv-mid);
+    &::after { background: currentColor; }
+  }
+
+  &:focus-visible {
+    outline: 2px solid var(--lc-rv-mid);
+    outline-offset: -2px;
+    border-radius: t.$lc-radius-sm;
+  }
+}
+
+.cb-tab-panel {
+  padding-top: t.$lc-space-4;
+  animation: cb-panel-in 160ms t.$lc-easing-standard both;
+}
+
+@keyframes cb-panel-in {
+  from { opacity: 0; transform: translateY(3px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.cb-forms {
+  overflow: hidden;
+  border: 1px solid var(--lc-rv-border);
+  border-radius: t.$lc-radius-md;
+  background: var(--lc-rv-inset-soft);
+}
+
+.cb-form-row {
+  display: grid;
+  grid-template-columns: minmax(80px, .7fr) minmax(0, 1.3fr);
+  align-items: baseline;
+  gap: t.$lc-space-3;
+  padding: t.$lc-space-3 t.$lc-space-4;
+  border-bottom: 1px solid var(--lc-rv-border);
+
+  &:last-child { border-bottom: 0; }
+  span { color: var(--lc-rv-muted); @include u.lc-font('xs', t.$lc-font-weight-semibold); text-transform: uppercase; letter-spacing: .08em; }
+  strong { color: var(--lc-rv-text); font-family: t.$lc-font-rv-display; @include u.lc-font('xl', t.$lc-font-weight-medium); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .cb-tab-panel { animation: none; }
 }
 
 // ─── Examples ────────────────────────────────────────────────────────────────

@@ -92,16 +92,20 @@
 }
 
 .ft-card--compact {
-  padding: t.$lc-space-3;
+  padding: t.$lc-space-2 t.$lc-space-4 t.$lc-space-3;
+  border-radius: 0;
+  box-shadow: none;
+  background: transparent;
 
   .ft-hdr { display: none; }
-  .ft-body { gap: t.$lc-space-2; padding: t.$lc-space-1 0 t.$lc-space-2; }
-  .ft-cue { display: none; }
-  .ft-prompt { @include u.lc-font('4xl', t.$lc-font-weight-semibold); }
+  .ft-body { flex: 0 0 auto; justify-content: flex-start; gap: t.$lc-space-3; padding: t.$lc-space-2 0; }
+  .ft-cue { display: block; align-self: flex-start; }
+  .ft-prompt { align-self: flex-start; text-align:left; @include u.lc-font('5xl', t.$lc-font-weight-semibold); }
   .ft-input { min-height: 54px; margin-top: 0; padding: t.$lc-space-2 t.$lc-space-3; @include u.lc-font('3xl', t.$lc-font-weight-medium); }
   .ft-accents { margin-top: 0; }
-  .ft-accent { width: 42px; min-height: 40px; }
-  .ft-cta { padding: t.$lc-space-3; @include u.lc-font('md', t.$lc-font-weight-bold); }
+  .ft-accents { justify-content:center; }
+  .ft-accent { min-width: 52px; min-height: 40px; }
+  .ft-cta { margin-top: t.$lc-space-2; padding: t.$lc-space-3; @include u.lc-font('md', t.$lc-font-weight-bold); }
   .ft-dont-know { margin-top: 0; padding: t.$lc-space-1 t.$lc-space-3; }
 }
 
@@ -146,6 +150,11 @@
   ion-icon {
     font-size: t.$lc-text-xl;
   }
+
+  &:disabled {
+    opacity: .45;
+    pointer-events: none;
+  }
 }
 
 .ft-dont-know {
@@ -156,4 +165,6 @@
   color: var(--lc-rv-text-soft);
   font-family: t.$lc-font-rv-body;
   @include u.lc-font('sm', t.$lc-font-weight-semibold);
+  border: 0;
+  background: transparent;
 }

@@ -63,6 +63,10 @@
           <span><strong>{{ (presentation.mode() === 'type' ? 'review.mode.type' : 'review.mode.flip') | translate }}</strong><small>{{ presentation.mode() === 'type' ? ('review.mode.recommended' | translate) : ('review.mode.flipSub' | translate) }}</small></span>
           <button (click)="changeMode()">{{ 'review.mode.change' | translate }}</button>
         </div>
+        <div class="rh-mode-summary rh-mode-summary--audio">
+          <span><strong>{{ 'review.audioAutoplay.title' | translate }}</strong><small>{{ autoplayLabelKey() | translate }}</small></span>
+          <button (click)="changeAutoplay()">{{ 'review.mode.change' | translate }}</button>
+        </div>
       }
     </section>
     }

@@ -19,8 +19,14 @@
         @if (action.icon) {
           <ion-icon [name]="action.icon" class="action-icon"></ion-icon>
         }
-        <span class="action-label">{{ action.label }}</span>
+        <span class="action-copy">
+          <strong class="action-label">{{ action.label }}</strong>
+          @if (action.description) { <small>{{ action.description }}</small> }
+        </span>
+        <ion-icon name="chevron-forward-outline" class="action-chevron"></ion-icon>
       </button>
+    } @else {
+      <button class="sheet-cancel" (click)="select(action)">{{ action.label }}</button>
     }
   }
 </div>

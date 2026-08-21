@@ -157,6 +157,12 @@ ion-header ion-toolbar {
   }
 }
 
+.rh-mode-summary--audio {
+  margin-top: 0;
+  border-top: 1px solid color-mix(in srgb, currentColor 16%, transparent);
+  border-radius: 0 0 var(--lc-radius-md) var(--lc-radius-md);
+}
+
 .rh-queue {
   margin-top: t.$lc-space-5;
   padding: t.$lc-space-4;

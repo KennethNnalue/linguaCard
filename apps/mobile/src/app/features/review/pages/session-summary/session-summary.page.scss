@@ -61,6 +61,8 @@ ion-content {
   gap: t.$lc-space-3;
 }
 
+.ss-tiles--outcomes .ss-tile { padding-inline: t.$lc-space-2; }
+
 .ss-tile {
   flex: 1;
   background: var(--lc-rv-card);
@@ -80,6 +82,9 @@ ion-content {
   &--recall {
     color: var(--lc-rv-mid);
   }
+
+  &--learning { color: var(--lc-rv-hard-text); }
+  &--revisit { color: var(--lc-rv-verdict-wrong); }
 }
 
 .ss-tile-lbl {

@@ -30,6 +30,7 @@ import {
 import {ReviewHubPresentationStore} from '../../store/review-hub-presentation.store';
 import {ButtonComponent} from '../../../../shared/ui/button/button.component';
 import {BottomSheetService} from '../../../../shared/components/bottom-sheet/bottom-sheet.service';
+import type {ReviewAutoplayMode} from '../../application/review-audio-policy';
 
 interface StudyModeOption {
   value: StudyMode;
@@ -114,6 +115,25 @@ export class ReviewHubPage {
         label: this.translate.instant('review.mode.flip'),
         handler: () => this.presentation.selectMode('flip'),
       },
+      {label: this.translate.instant('common.cancel'), role: 'cancel'},
+    ]);
+  }
+
+  readonly autoplay = this.prefs.autoplay;
+
+  autoplayLabelKey(): string {
+    return `review.audioAutoplay.${this.autoplay()}`;
+  }
+
+  async changeAutoplay(): Promise<void> {
+    const option = (mode: ReviewAutoplayMode) => ({
+      label: this.translate.instant(`review.audioAutoplay.${mode}`),
+      handler: () => this.prefs.setAutoplay(mode),
+    });
+    await this.bottomSheet.open(this.translate.instant('review.audioAutoplay.title'), [
+      option('off'),
+      option('answer'),
+      option('answer_and_example'),
       {label: this.translate.instant('common.cancel'), role: 'cancel'},
     ]);
   }

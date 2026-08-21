@@ -21,6 +21,8 @@
   color: var(--lc-rv-muted);
   min-height: 44px;
   padding: 0 t.$lc-space-2;
+  border: 0;
+  background: transparent;
 
   ion-icon {
     font-size: t.$lc-text-lg;
@@ -29,6 +31,34 @@
   &:disabled {
     opacity: 0.4;
   }
+}
+
+.rf-auto {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: t.$lc-space-3;
+  min-height: 48px;
+  color: var(--lc-rv-muted);
+  font-family: t.$lc-font-rv-body;
+  @include u.lc-font('xs', t.$lc-font-weight-medium);
+
+  lc-button { min-width: 132px; }
+}
+
+.rf-auto-rating {
+  min-height: 44px;
+  padding: 0 t.$lc-space-2;
+  border: 0;
+  background: transparent;
+  font-family: t.$lc-font-rv-mono;
+  @include u.lc-font('sm', t.$lc-font-weight-bold);
+  @include u.touch-state;
+
+  &--again { color: var(--lc-rv-again-text); }
+  &--hard { color: var(--lc-rv-hard-text); }
+  &--good { color: var(--lc-rv-good-text); }
+  &--easy { color: var(--lc-rv-mid); }
 }
 
 // ─── Rating prompt ───────────────────────────────────────────────────────────

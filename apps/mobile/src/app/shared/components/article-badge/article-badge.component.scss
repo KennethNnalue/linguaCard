@@ -13,7 +13,7 @@
   border: 1px solid transparent;
   white-space: nowrap;
 
-  &--der { background: t.$lc-masc-bg; color: t.$lc-masc-text; border-color: t.$lc-masc-border; }
-  &--die { background: t.$lc-fem-bg;  color: t.$lc-fem-text;  border-color: t.$lc-fem-border; }
-  &--das { background: t.$lc-neut-bg; color: t.$lc-neut-text; border-color: t.$lc-neut-border; }
+  &--der { background: var(--lc-masc-bg); color: var(--lc-masc-text); border-color: var(--lc-masc-border); }
+  &--die { background: var(--lc-fem-bg);  color: var(--lc-fem-text);  border-color: var(--lc-fem-border); }
+  &--das { background: var(--lc-neut-bg); color: var(--lc-neut-text); border-color: var(--lc-neut-border); }
 }

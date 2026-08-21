@@ -11,9 +11,10 @@ const GOAL_PROMPT_INTERVAL_MS = 7 * 24 * 60 * 60 * 1000;
 interface SettingsState {
   settings: UserSettings | null;
   loaded: boolean;
+  updateStatus: 'idle' | 'saving' | 'pending-sync';
 }
 
-const initial: SettingsState = { settings: null, loaded: false };
+const initial: SettingsState = { settings: null, loaded: false, updateStatus: 'idle' };
 
 export const SettingsStore = signalStore(
   { providedIn: 'root' },
@@ -35,7 +36,7 @@ export const SettingsStore = signalStore(
       async load(): Promise<void> {
         try {
           const settings = await firstValueFrom(api.get());
-          patchState(store, { settings, loaded: true });
+          patchState(store, { settings, loaded: true, updateStatus: 'idle' });
           // Sync device timezone after state is patched, using proper error handling
           // with offline queueing rather than a fire-and-forget Observable subscribe.
           if (settings.timezone === 'UTC') {
@@ -57,6 +58,7 @@ export const SettingsStore = signalStore(
       },
 
       async update(dto: UpdateUserSettingsDto): Promise<void> {
+        patchState(store, { updateStatus: 'saving' });
         const stamped: UpdateUserSettingsDto = { ...dto, clientUpdatedAt: new Date().toISOString() };
         const current = store.settings();
         if (current) {
@@ -74,18 +76,19 @@ export const SettingsStore = signalStore(
         }
         try {
           const saved = await firstValueFrom(api.update(stamped));
-          patchState(store, { settings: saved });
+          patchState(store, { settings: saved, updateStatus: 'idle' });
         } catch {
           // Offline or transient failure — queue for retry when connectivity returns.
           // The optimistic value stays in memory; the server will be updated on reconnect.
           await sync.enqueue({ type: 'PATCH_SETTINGS', payload: stamped });
+          patchState(store, { updateStatus: 'pending-sync' });
         }
       },
 
       // Called by SettingsSyncHandler and SettingsRefresher to apply a server
       // response without triggering another API write.
       setFromServer(settings: UserSettings): void {
-        patchState(store, { settings, loaded: true });
+        patchState(store, { settings, loaded: true, updateStatus: 'idle' });
       },
 
       dailyGoal(): number {

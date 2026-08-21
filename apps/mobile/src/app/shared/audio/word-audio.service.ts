@@ -16,6 +16,10 @@ export class WordAudioService {
   // incorrectly clearing the flag while others are still loading.
   private readonly _loadingKeys = signal(new Set<string>());
   readonly isLoading = computed(() => this._loadingKeys().size > 0);
+  private readonly _isPlaying = signal(false);
+  readonly isPlaying = this._isPlaying.asReadonly();
+  private readonly _playbackError = signal(false);
+  readonly playbackError = this._playbackError.asReadonly();
 
   // In-memory: cacheKey → audioUrl. Populated from API responses and device cache.
   private readonly _urlMap = new Map<string, string>();
@@ -102,7 +106,10 @@ export class WordAudioService {
     // A newer tap or a stop() superseded this one while resolving — abandon it.
     if (seq !== this._tapSeq) return;
     // HD genuinely unavailable — stay silent (no browser fallback by design).
-    if (!url) return;
+    if (!url) {
+      this._playbackError.set(true);
+      return;
+    }
 
     void this._playUrl(url, 1);
   }
@@ -138,26 +145,34 @@ export class WordAudioService {
    * autoplay unlock that `new Audio()` would require on iOS.
    */
   private _playUrl(url: string, rate: number): Promise<void> {
+    this.stop();
     return new Promise(resolve => {
       const player = this._ensurePlayer();
+      this._playbackError.set(false);
+      this._isPlaying.set(true);
       let settled = false;
       const cleanup = () => {
         if (settled) return;
         settled = true;
         player.removeEventListener('ended', cleanup);
-        player.removeEventListener('error', cleanup);
+        player.removeEventListener('error', fail);
         player.removeEventListener('lc-stop', cleanup);
+        this._isPlaying.set(false);
         resolve();
       };
+      const fail = () => {
+        this._playbackError.set(true);
+        cleanup();
+      };
       player.addEventListener('ended', cleanup, { once: true });
-      player.addEventListener('error', cleanup, { once: true });
+      player.addEventListener('error', fail, { once: true });
       // 'lc-stop' is dispatched by stop() so the promise resolves immediately
       // instead of hanging (pause() fires no standard event).
       player.addEventListener('lc-stop', cleanup, { once: true });
       player.src = url;
       player.currentTime = 0;
       player.playbackRate = rate;
-      player.play().catch(cleanup);
+      player.play().catch(fail);
     });
   }
 
@@ -203,7 +218,10 @@ export class WordAudioService {
    */
   async playTarget(text: string, language = 'de-DE', rate = 1): Promise<void> {
     const url = await this.resolveUrl(text, language);
-    if (!url) return; // unavailable → silent skip (no browser fallback by design)
+    if (!url) {
+      this._playbackError.set(true);
+      return;
+    }
     return this._playUrl(url, rate);
   }
 
@@ -327,12 +345,17 @@ export class WordAudioService {
 
       this.audioReadiness.markReady(cacheKey);
       return audioUrl;
-    } catch (err: any) {
+    } catch (err: unknown) {
       this.audioReadiness.markFailed(cacheKey);
+      const failure = err as {
+        status?: number;
+        headers?: { get?: (name: string) => string | null };
+        error?: { retryAfterMs?: number };
+      };
       // Unexpected HTTP error (network failure, 5xx, etc.)
-      if (err?.status === 429) {
-        const headerSecs = err?.headers?.get?.('Retry-After');
-        const bodyMs = err?.error?.retryAfterMs;
+      if (failure.status === 429) {
+        const headerSecs = failure.headers?.get?.('Retry-After');
+        const bodyMs = failure.error?.retryAfterMs;
         const retryAfterMs = headerSecs != null
           ? parseInt(String(headerSecs), 10) * 1000
           : (typeof bodyMs === 'number' ? bodyMs : 30_000);
@@ -359,6 +382,7 @@ export class WordAudioService {
       // prevents the playlist's concatMap inner observable from hanging forever.
       this._player.dispatchEvent(new Event('lc-stop'));
     }
+    this._isPlaying.set(false);
   }
 
   /**

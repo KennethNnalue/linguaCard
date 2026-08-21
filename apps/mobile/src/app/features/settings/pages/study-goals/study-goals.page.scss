@@ -131,3 +131,8 @@
 .sg-spacer {
   height: t.$lc-space-4;
 }
+.sg-chip strong,
+.sg-chip small { display: block; }
+.sg-chip small { margin-top: 2px; opacity: .72; font-size: 10px; }
+.sg-daily-meta { display:flex; justify-content:space-between; gap:12px; margin-top:12px; color:var(--lc-text-secondary); font-size:12px; }
+.sg-save-state { margin:10px 0 0; color:var(--lc-brand); font-size:12px; font-weight:700; }
