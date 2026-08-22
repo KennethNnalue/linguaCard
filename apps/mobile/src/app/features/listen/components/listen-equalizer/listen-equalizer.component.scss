@@ -15,17 +15,17 @@
 
 // ─── HERO — static decorative bars ──────────────────────────────────────────
 :host(.hero) {
-  height: 96px;
-  gap: 7px;
+  height: 72px;
+  gap: 5px;
   align-items: center;
   opacity: 0.85;
 }
-:host(.hero) .bar { width: 7px; transform-origin: center; }
-:host(.hero) .bar:nth-child(1) { height: 28px; }
-:host(.hero) .bar:nth-child(2) { height: 58px; }
-:host(.hero) .bar:nth-child(3) { height: 92px; }
-:host(.hero) .bar:nth-child(4) { height: 62px; }
-:host(.hero) .bar:nth-child(5) { height: 34px; }
+:host(.hero) .bar { width: 5px; transform-origin: center; }
+:host(.hero) .bar:nth-child(1) { height: 22px; }
+:host(.hero) .bar:nth-child(2) { height: 44px; }
+:host(.hero) .bar:nth-child(3) { height: 68px; }
+:host(.hero) .bar:nth-child(4) { height: 46px; }
+:host(.hero) .bar:nth-child(5) { height: 26px; }
 
 // ─── NAV — idle base heights ────────────────────────────────────────────────
 :host(.nav) { height: 14px; }

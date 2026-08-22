@@ -17,29 +17,32 @@ ion-content { --background: var(--lc-listen-bg); }
 ion-content::part(scroll) { height: 100%; }
 
 .nav {
-  @include u.flex-between;
-  min-height: clamp(68px, 8dvh, 92px);
-  padding: t.$lc-space-2 t.$lc-space-5;
+  display: grid;
+  grid-template-columns: 44px minmax(0, 1fr) 44px;
+  align-items: center;
+  min-height: clamp(60px, 7dvh, 76px);
+  padding: t.$lc-space-2 t.$lc-space-4;
   border-bottom: 1px solid rgba(167, 188, 174, 0.08);
 }
 
-.nav-btn,
-.nav-more {
+.nav-btn {
   @include u.flex-center;
-  @include u.circle(48px);
+  @include u.circle(44px);
   border: none;
   background: transparent;
   color: var(--lc-listen-text);
   @include u.touch-state;
 
-  svg { width: 25px; height: 25px; }
+  svg { width: 22px; height: 22px; }
 }
 
-.nav-more { color: var(--lc-listen-text-muted); }
+.nav-spacer { width: 44px; height: 44px; }
 
 .nav-title {
-  max-width: 68%;
-  @include u.lc-font('2xl', t.$lc-font-weight-semibold);
+  min-width: 0;
+  padding-inline: t.$lc-space-2;
+  @include u.lc-font('xl', t.$lc-font-weight-semibold);
+  text-align: center;
   color: var(--lc-listen-text);
   @include u.text-overflow;
 }
@@ -76,20 +79,20 @@ ion-content::part(scroll) { height: 100%; }
 }
 
 .content-stage {
-  display: flex;
-  flex-direction: column;
+  display: grid;
+  grid-template-rows: minmax(180px, 0.8fr) minmax(260px, 1.2fr);
   min-height: 0;
+  overflow: hidden;
 }
 
 lc-listen-word-card {
-  flex: 1 1 auto;
-  min-height: clamp(265px, 27dvh, 440px);
+  min-height: 0;
   border-radius: t.$lc-radius-lg t.$lc-radius-lg 0 0;
   box-shadow: none;
 }
 
 lc-listen-teleprompter {
-  flex: 0 0 auto;
+  min-height: 0;
   margin-top: -1px;
 }
 
@@ -123,14 +126,14 @@ lc-listen-teleprompter {
 
 .controls {
   display: grid;
-  gap: clamp(14px, 2dvh, 24px);
-  padding-top: clamp(16px, 2.2dvh, 28px);
+  gap: clamp(10px, 1.4dvh, 16px);
+  padding-top: clamp(10px, 1.5dvh, 18px);
 }
 
 .player-settings {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) clamp(64px, 14vw, 92px) clamp(64px, 14vw, 92px);
-  gap: t.$lc-space-3;
+  grid-template-columns: minmax(0, 1fr) clamp(54px, 12vw, 72px) clamp(54px, 12vw, 72px);
+  gap: t.$lc-space-2;
 }
 
 lc-listen-mode-selector { min-width: 0; }
@@ -138,15 +141,15 @@ lc-listen-mode-selector { min-width: 0; }
 .setting-button {
   @include u.flex-center;
   min-width: 0;
-  min-height: 56px;
+  min-height: 46px;
   border: 1px solid var(--lc-listen-border);
   border-radius: t.$lc-radius-md;
   background: var(--lc-listen-surface);
   color: var(--lc-listen-text);
-  @include u.lc-font('2xl', t.$lc-font-weight-semibold);
+  @include u.lc-font('lg', t.$lc-font-weight-semibold);
   @include u.touch-state;
 
-  svg { width: 27px; height: 27px; }
+  svg { width: 22px; height: 22px; }
 }
 
 lc-listen-transport { padding: 0 t.$lc-space-1; }

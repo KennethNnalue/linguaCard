@@ -8,7 +8,7 @@
   align-items: center;
   justify-content: center;
   overflow: hidden;
-  padding: clamp(28px, 4dvh, 56px) t.$lc-space-6;
+  padding: clamp(18px, 2.5dvh, 32px) t.$lc-space-5;
   background: var(--lc-listen-surface, var(--lc-card));
   border: 1px solid var(--lc-listen-border, var(--lc-border));
   border-radius: t.$lc-radius-lg;
@@ -33,24 +33,24 @@
 
 lc-article-badge {
   position: relative;
-  margin-bottom: clamp(24px, 3dvh, 40px);
+  margin-bottom: clamp(12px, 1.5dvh, 20px);
 }
 
 .word {
   position: relative;
   font-family: t.$lc-font-display;
-  font-size: clamp(48px, 10vw, 82px);
+  font-size: clamp(38px, 8vw, 60px);
   font-weight: t.$lc-font-weight-semibold;
   line-height: 1.2;
   text-align: center;
   color: var(--lc-listen-text, var(--lc-text-primary));
-  margin-bottom: clamp(20px, 2.6dvh, 34px);
+  margin-bottom: clamp(12px, 1.5dvh, 20px);
 }
 
 .translation {
   position: relative;
   font-family: t.$lc-font-display;
-  font-size: clamp(28px, 5vw, 42px);
+  font-size: clamp(22px, 4.5vw, 32px);
   font-style: italic;
   line-height: 1.2;
   text-align: center;

@@ -5,9 +5,7 @@
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><polyline points="6,9 12,15 18,9"/></svg>
       </button>
       <span class="nav-title">{{ listenStore.sourceLabel() }}</span>
-      <button type="button" class="nav-more" (click)="toggleQueue()" [attr.aria-label]="'listen.nowPlaying.queueAriaLabel' | translate">
-        <svg viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="5" r="1.5"/><circle cx="12" cy="12" r="1.5"/><circle cx="12" cy="19" r="1.5"/></svg>
-      </button>
+      <span class="nav-spacer" aria-hidden="true"></span>
     </div>
   </ion-toolbar>
 </ion-header>

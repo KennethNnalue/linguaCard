@@ -2,7 +2,8 @@
 @use 'theme/utils' as u;
 
 :host {
-  display: block;
+  display: grid;
+  grid-auto-rows: minmax(0, 1fr);
   overflow: hidden;
   border: 1px solid var(--lc-listen-border, var(--lc-border));
   border-radius: 0 0 t.$lc-radius-lg t.$lc-radius-lg;
@@ -14,15 +15,15 @@
   grid-template-columns: 32px 28px minmax(0, 1fr) 28px;
   align-items: start;
   gap: t.$lc-space-2;
-  min-height: clamp(72px, 7dvh, 96px);
-  padding: clamp(14px, 1.7dvh, 22px) clamp(16px, 3vw, 30px);
+  min-height: 0;
+  padding: clamp(9px, 1.2dvh, 14px) clamp(12px, 2.5vw, 22px);
   border-bottom: 1px solid var(--lc-listen-border, var(--lc-border));
 
   &:last-child { border-bottom: none; }
   &.played { opacity: 0.6; }
 }
 
-.row:nth-child(n + 3) { min-height: clamp(92px, 9dvh, 132px); }
+.row:nth-child(n + 3) { min-height: 0; }
 
 .sequence {
   position: relative;
@@ -53,7 +54,7 @@
 .text {
   min-width: 0;
   font-family: t.$lc-font-display;
-  font-size: clamp(19px, 4.5vw, 30px);
+  font-size: clamp(17px, 4vw, 24px);
   line-height: 1.35;
   overflow-wrap: anywhere;
   color: var(--lc-listen-text, var(--lc-text-primary));
