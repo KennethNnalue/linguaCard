@@ -9,11 +9,11 @@ export class ThemeService {
 
   initialize(): void {
     const saved = localStorage.getItem(STORAGE_KEY);
-    const prefersDark =
+    const useDarkTheme =
       saved !== null
         ? saved === 'dark'
-        : window.matchMedia('(prefers-color-scheme: dark)').matches;
-    this.apply(prefersDark);
+        : true;
+    this.apply(useDarkTheme);
   }
 
   toggle(): void {

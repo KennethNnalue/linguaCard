@@ -310,6 +310,3 @@ export const ARTICLE_GENDER_MAP: Record<string, string> = {
 export const MS_PER_DAY = 86_400_000;
 export const MS_PER_SECOND = 1_000;
 export const SECONDS_PER_MINUTE = 60;
-
-// Rough study-time estimate for the hub "≈ N min" hint (~5s per card).
-export const MINUTES_PER_CARD_REVIEW = 0.08;

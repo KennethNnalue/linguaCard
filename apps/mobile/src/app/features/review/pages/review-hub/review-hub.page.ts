@@ -21,11 +21,7 @@ import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { SessionDatePipe } from '../../shared/pipes/session-date.pipe';
 import { EngagementStore } from '../../../engagement/state/engagement.store';
 import { SettingsStore } from '../../../settings/store/settings.store';
-import {
-  MINUTES_PER_CARD_REVIEW,
-  ReviewSessionHistoryEntry,
-  ReviewRoute,
-} from '../../models/review.model';
+import {ReviewSessionHistoryEntry, ReviewRoute} from '../../models/review.model';
 import {ReviewHubPresentationStore} from '../../store/review-hub-presentation.store';
 import {ButtonComponent} from '../../../../shared/ui/button/button.component';
 import {BottomSheetService} from '../../../../shared/components/bottom-sheet/bottom-sheet.service';
@@ -82,10 +78,6 @@ export class ReviewHubPage {
   readonly attentionCount = computed(() => this.filterService.getStrugglingCount());
   readonly strugglingCount = this.attentionCount;
   readonly completedToday = this.engagementStore.completedToday;
-  readonly estMinutes = computed(() =>
-    Math.max(1, Math.round((this.dueTodayCount() * MINUTES_PER_CARD_REVIEW))),
-  );
-
   // ─── Mastery snapshot ───────────────────────────────────────────────────────
   readonly masteredCount = this.cardStore.masteredCount;
   readonly totalCount = this.cardStore.totalCount;

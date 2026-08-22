@@ -1,8 +1,9 @@
 import {computed, inject} from '@angular/core';
 import {signalStore, withComputed} from '@ngrx/signals';
 import {EngagementStore} from '../../engagement/state/engagement.store';
-import {MINUTES_PER_CARD_REVIEW} from '../../review/models/review.model';
+import {estimateReviewMinutes} from '../../review/application/estimate-review-time';
 import {ReviewFilterService} from '../../review/services/review-filter.service';
+import {ReviewPrefsService} from '../../review/services/review-prefs.service';
 import {ReviewStore} from '../../review/store/review.store';
 import {CardStore} from '../../vault/store/card.store';
 
@@ -16,16 +17,13 @@ export type HomeHeroViewModel =
   | {kind: 'complete'; reviewed: number; streak: number; action: 'keep-practicing'}
   | {kind: 'caught-up'; newAvailable: number; action: 'add-vocabulary' | 'learn-new'};
 
-function estimateMinutes(cardCount: number): number {
-  return Math.max(1, Math.round(cardCount * MINUTES_PER_CARD_REVIEW));
-}
-
 export const HomePresentationStore = signalStore(
   {providedIn: 'root'},
   withComputed(() => {
     const cards = inject(CardStore);
     const engagement = inject(EngagementStore);
     const reviewFilter = inject(ReviewFilterService);
+    const reviewPrefs = inject(ReviewPrefsService);
     const review = inject(ReviewStore);
 
     return {
@@ -54,7 +52,9 @@ export const HomePresentationStore = signalStore(
 
         const remaining = goal - completed;
         const cardsInSession = Math.min(remaining, available);
-        const minutes = estimateMinutes(cardsInSession);
+        const reviewCards = Math.min(cardsInSession, due);
+        const newCards = Math.max(0, cardsInSession - reviewCards);
+        const minutes = estimateReviewMinutes({newCards, reviewCards, mode: reviewPrefs.mode()});
 
         if (review.sessionHistory().length === 0 && completed === 0) {
           return {kind: 'first-review', cards: cardsInSession, minutes, action: 'start-review'};

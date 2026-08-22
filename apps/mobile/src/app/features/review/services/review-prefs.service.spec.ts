@@ -1,11 +1,11 @@
-import { createReviewSession } from '../domain/review-domain';
-import { applyCurrentReviewPreferences } from './review-prefs.service';
+import {createReviewSession} from '../domain/review-domain';
+import {applyCurrentReviewPreferences, ReviewPrefsService} from './review-prefs.service';
 
 describe('applyCurrentReviewPreferences', () => {
-  test('updates a resumable session mode without replacing its queue or progress', () => {
+  it('updates a resumable session mode without replacing its queue or progress', () => {
     const session = createReviewSession({
       id: 'session-1',
-      source: { kind: 'daily' },
+      source: {kind: 'daily'},
       mode: 'recall',
       direction: 'source_to_target',
       originalCardIds: ['card-1', 'card-2'],
@@ -23,5 +23,19 @@ describe('applyCurrentReviewPreferences', () => {
     expect(updated.completedOriginalCardIds).toEqual(session.completedOriginalCardIds);
     expect(updated.reviewAttemptCount).toBe(session.reviewAttemptCount);
     expect(updated).not.toBe(session);
+  });
+});
+
+describe('ReviewPrefsService', () => {
+  beforeEach(() => localStorage.clear());
+
+  it('defaults autoplay to the word and usage example', () => {
+    expect(new ReviewPrefsService().autoplay()).toBe('answer_and_example');
+  });
+
+  it('keeps a saved autoplay preference', () => {
+    localStorage.setItem('lc-review-autoplay', 'off');
+
+    expect(new ReviewPrefsService().autoplay()).toBe('off');
   });
 });
