@@ -6,6 +6,7 @@ import {
   CardAdministrationType,
   ScheduledCard,
 } from '@lingua-card/shared/domain';
+import { generateUuid } from '@lingua-card/shared/utils';
 import { CardStore } from '../../vault/store/card.store';
 import { AuthService } from '../../../core/services/auth.service';
 import { SyncService } from '../../../core/services/sync.service';
@@ -20,20 +21,20 @@ export class CardAdministrationService {
   private readonly localRepository = inject(ReviewLocalRepository);
 
   manuallyMaster(card: ScheduledCard): Promise<CardAdministrationResult> {
-    return this.execute(card, { commandId: crypto.randomUUID(), type: CardAdministrationType.MANUALLY_MASTER });
+    return this.execute(card, { commandId: generateUuid(), type: CardAdministrationType.MANUALLY_MASTER });
   }
 
   undoManualMastery(card: ScheduledCard): Promise<CardAdministrationResult> {
-    return this.execute(card, { commandId: crypto.randomUUID(), type: CardAdministrationType.UNDO_MANUAL_MASTERY });
+    return this.execute(card, { commandId: generateUuid(), type: CardAdministrationType.UNDO_MANUAL_MASTERY });
   }
 
   scheduleLeechRest(card: ScheduledCard): Promise<CardAdministrationResult> {
-    return this.execute(card, { commandId: crypto.randomUUID(), type: CardAdministrationType.SCHEDULE_LEECH_REST });
+    return this.execute(card, { commandId: generateUuid(), type: CardAdministrationType.SCHEDULE_LEECH_REST });
   }
 
   resetProgress(card: ScheduledCard): Promise<CardAdministrationResult> {
     return this.execute(card, {
-      commandId: crypto.randomUUID(),
+      commandId: generateUuid(),
       type: CardAdministrationType.RESET_PROGRESS,
       confirmHistoryRetention: true,
     });
@@ -42,7 +43,7 @@ export class CardAdministrationService {
   private async execute(card: ScheduledCard, command: CardAdministrationCommand): Promise<CardAdministrationResult> {
     const userId = this.auth.currentUser()?.id;
     if (!userId) throw new Error('A signed-in user is required to administer a card');
-    const result = applyCardAdministration(card.reviewState, command, new Date(), crypto.randomUUID());
+    const result = applyCardAdministration(card.reviewState, command, new Date(), generateUuid());
     await this.localRepository.administer(userId, { cardId: card.id, command }, result.nextState);
     this.cards.updateCard({ ...card, reviewState: result.nextState });
     try {

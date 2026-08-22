@@ -22,6 +22,7 @@ import {
 import { TranslateService, TranslatePipe } from '@ngx-translate/core';
 import type { ArticleType, Card, CardContent, ExampleSentence, Synonym, WordDictionaryEntry } from '@lingua-card/shared/domain';
 import { UpdateCardDto } from '@lingua-card/shared/dto';
+import { generateUuid } from '@lingua-card/shared/utils';
 import { WordAudioService } from '../../../../shared/audio/word-audio.service';
 import { AuthService } from '../../../../core/services/auth.service';
 import { LanguageService } from '../../../../core/services/language.service';
@@ -397,7 +398,7 @@ export class AddWordSheetComponent implements OnInit {
     const v = this.form.getRawValue();
     const examples: ExampleSentence[] = v.exampleTarget?.trim()
       ? [{
-          id: this.cardToEdit?.content.examples?.[0]?.id ?? crypto.randomUUID(),
+          id: this.cardToEdit?.content.examples?.[0]?.id ?? generateUuid(),
           target: v.exampleTarget.trim(),
           native: v.exampleNative?.trim() ?? '',
         }]

@@ -2,6 +2,7 @@ import { computed, inject, Injectable, signal } from '@angular/core';
 import { Preferences } from '@capacitor/preferences';
 import { Network } from '@capacitor/network';
 import { SyncStatus } from '@lingua-card/shared/domain';
+import { generateUuid } from '@lingua-card/shared/utils';
 import type { SyncHandler } from '../models/sync-handler.model';
 import type { DataRefresher } from '../models/data-refresher.model';
 import { AuthService } from './auth.service';
@@ -108,7 +109,7 @@ export class SyncService {
   async enqueue(op: Pick<SyncOperation, 'type' | 'payload'>): Promise<void> {
     const full: SyncOperation = {
       ...op,
-      id: crypto.randomUUID(),
+      id: generateUuid(),
       createdAt: new Date().toISOString(),
       retryCount: 0,
       status: 'pending',

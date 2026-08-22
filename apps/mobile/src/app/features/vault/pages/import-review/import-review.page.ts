@@ -24,6 +24,7 @@ import type {
   ParsedImportRow,
   WordDictionaryEntry,
 } from '@lingua-card/shared/domain';
+import { generateUuid } from '@lingua-card/shared/utils';
 import { LanguageService } from '../../../../core/services/language.service';
 import { CardApiService } from '../../services/card-api.service';
 import { CollectionApiService } from '../../services/collection-api.service';
@@ -361,7 +362,7 @@ export class ImportReviewPage implements OnInit {
       const examples: ExampleSentence[] = entry.examples.length
         ? entry.examples
         : row.exampleTarget
-          ? [{ id: crypto.randomUUID(), target: row.exampleTarget, native: row.exampleNative }]
+          ? [{ id: generateUuid(), target: row.exampleTarget, native: row.exampleNative }]
           : [];
       return {
         front: entry.translation,
@@ -379,7 +380,7 @@ export class ImportReviewPage implements OnInit {
     }
 
     const examples: ExampleSentence[] = row.exampleTarget
-      ? [{ id: crypto.randomUUID(), target: row.exampleTarget, native: row.exampleNative }]
+      ? [{ id: generateUuid(), target: row.exampleTarget, native: row.exampleNative }]
       : [];
     return {
       front: row.front,

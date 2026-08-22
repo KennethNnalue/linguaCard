@@ -9,6 +9,7 @@ import {
 } from '@ngrx/signals';
 import { catchError, firstValueFrom, Observable, of, tap } from 'rxjs';
 import { Card, ScheduledCard } from '@lingua-card/shared/domain';
+import { generateUuid } from '@lingua-card/shared/utils';
 import { CardApiService } from '../services/card-api.service';
 import { LocalDataService } from '../../../core/services/local-data.service';
 import { SyncService } from '../../../core/services/sync.service';
@@ -224,7 +225,7 @@ export const CardStore = signalStore(
        * Resolves to the server card when online, or temp card when offline.
        */
       createCard(dto: Omit<Card, 'id'>): Observable<ScheduledCard> {
-        const tempId = `temp_${crypto.randomUUID()}`;
+        const tempId = `temp_${generateUuid()}`;
         const tempCard: ScheduledCard = {
           ...dto,
           id: tempId,

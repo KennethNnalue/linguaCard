@@ -9,6 +9,7 @@ import {
 } from '@ngrx/signals';
 import { catchError, firstValueFrom, Observable, of, tap } from 'rxjs';
 import { Collection, CreateCollectionDto, UpdateCollectionDto } from '@lingua-card/shared/domain';
+import { generateUuid } from '@lingua-card/shared/utils';
 import { CollectionApiService } from '../services/collection-api.service';
 import { LocalDataService } from '../../../core/services/local-data.service';
 import { SyncService } from '../../../core/services/sync.service';
@@ -106,7 +107,7 @@ export const CollectionStore = signalStore(
       },
 
       createCollection(dto: CreateCollectionDto): Observable<Collection> {
-        const tempId = `temp_${crypto.randomUUID()}`;
+        const tempId = `temp_${generateUuid()}`;
         const now = new Date().toISOString();
         const tempCol: Collection = {
           id: tempId,

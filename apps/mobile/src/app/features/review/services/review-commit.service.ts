@@ -1,5 +1,6 @@
 import { inject, Injectable } from '@angular/core';
 import { ReviewRating, ScheduledCard } from '@lingua-card/shared/domain';
+import { generateUuid } from '@lingua-card/shared/utils';
 import { commitReview, PromptDirection, ReviewMode, ReviewResponseType } from '../domain/review-domain';
 import { PendingReviewCommit, schedulingStateFor, toPendingReviewCommit } from '../domain/review-persistence';
 import { ReviewLocalRepository } from './review-local.repository';
@@ -24,9 +25,9 @@ export class ReviewCommitService {
     const timestamp = Math.max(Date.now(), this.lastReviewTimestamp + 1);
     this.lastReviewTimestamp = timestamp;
     const committed = commitReview(schedulingStateFor(request.card), {
-      reviewId: crypto.randomUUID(),
-      eventId: crypto.randomUUID(),
-      attemptId: crypto.randomUUID(),
+      reviewId: generateUuid(),
+      eventId: generateUuid(),
+      attemptId: generateUuid(),
       sessionId: request.sessionId,
       reviewedAt: new Date(timestamp),
       reviewMode: request.reviewMode,

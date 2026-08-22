@@ -24,6 +24,7 @@ import {
   ImageExtractedWord,
   ParsedImportRow,
 } from '@lingua-card/shared/domain';
+import { generateUuid } from '@lingua-card/shared/utils';
 import { catchError, firstValueFrom, forkJoin, map, of, switchMap } from 'rxjs';
 import { CardApiService } from '../../../services/card-api.service';
 import { CollectionApiService } from '../../../services/collection-api.service';
@@ -395,7 +396,7 @@ export class ImageImportReviewPage implements OnInit {
       row.article === 'die' ? 'feminine' :
       row.article === 'das' ? 'neuter' : null;
     const examples: ExampleSentence[] = row.exampleTarget
-      ? [{ id: crypto.randomUUID(), target: row.exampleTarget, native: row.exampleNative }]
+      ? [{ id: generateUuid(), target: row.exampleTarget, native: row.exampleNative }]
       : [];
     return {
       front: row.front,

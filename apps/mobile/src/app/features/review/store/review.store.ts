@@ -1,6 +1,7 @@
 import { computed, inject } from '@angular/core';
 import { patchState, signalStore, withComputed, withMethods, withState } from '@ngrx/signals';
 import { ReviewRating, ScheduledCard } from '@lingua-card/shared/domain';
+import { generateUuid } from '@lingua-card/shared/utils';
 import { AuthService } from '../../../core/services/auth.service';
 import { LocalDataService } from '../../../core/services/local-data.service';
 import { SyncService } from '../../../core/services/sync.service';
@@ -288,7 +289,7 @@ export const ReviewStore = signalStore(
         const request = {
           source, limit, mode: toReviewMode(reviewPrefs.mode()), direction: toPromptDirection(reviewPrefs.dir()),
         };
-        const result = await sessionBuilder.start(request, new Date(), crypto.randomUUID());
+        const result = await sessionBuilder.start(request, new Date(), generateUuid());
         if (result.kind !== 'started') {
           patchState(store, {
             operation: result.kind === 'load_failed'
@@ -329,7 +330,7 @@ export const ReviewStore = signalStore(
           return availableCards.size === 0 ? { kind: 'empty_library' } : { kind: 'source_matched_nothing' };
         }
         const session = createReviewSession({
-          id: crypto.randomUUID(), source,
+          id: generateUuid(), source,
           mode: toReviewMode(reviewPrefs.mode()), direction: toPromptDirection(reviewPrefs.dir()),
           originalCardIds, startedAt: new Date(),
         });
