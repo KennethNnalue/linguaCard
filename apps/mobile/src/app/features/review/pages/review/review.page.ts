@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, HostListener, computed, effect, inject, signal, viewChild } from '@angular/core';
+import { ChangeDetectionStrategy, Component, HostListener, computed, effect, inject, input, signal, viewChild } from '@angular/core';
 import { AlertController, IonContent, IonHeader, IonIcon, IonToolbar, ModalController } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
 import { closeOutline, volumeHighOutline, volumeMuteOutline } from 'ionicons/icons';
@@ -46,6 +46,7 @@ const SLOW_RATE = 0.7;
   ],
 })
 export class ReviewPage {
+  readonly launchInTypingMode = input(false);
   private readonly typingFront = viewChild(FrontTypeComponent);
   private readonly cardStore = inject(CardStore);
   protected readonly reviewStore = inject(ReviewStore);
@@ -76,7 +77,8 @@ export class ReviewPage {
     });
   }
 
-  readonly mode = computed(() => this.reviewStore.session()?.definition.mode ?? null);
+  readonly mode = computed(() => this.reviewStore.session()?.definition.mode
+    ?? (this.launchInTypingMode() ? 'typing' : null));
   readonly isFlipped = signal(false);
   readonly typed = signal('');
   readonly typedResult = signal<TypedAnswerEvaluation | null>(null);
@@ -105,10 +107,6 @@ export class ReviewPage {
     rating: ReviewRating;
   } | null>(null);
   readonly historicalRating = computed(() => this.isViewingPrevious() ? this.lastCommittedView()?.rating ?? null : null);
-
-  ionViewDidEnter(): void {
-    if (this.mode() === 'typing') this.typingFront()?.focusInput();
-  }
 
   readonly currentCard = computed<ScheduledCard | null>(() => {
     const cardId = this.previousCardId() ?? this.reviewStore.presentation()?.cardId;

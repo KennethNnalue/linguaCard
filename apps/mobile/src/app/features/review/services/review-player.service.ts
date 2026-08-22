@@ -1,16 +1,16 @@
-import { inject, Injectable } from '@angular/core';
-import { ModalController } from '@ionic/angular/standalone';
-import { Router } from '@angular/router';
-import type { ScheduledCard } from '@lingua-card/shared/domain';
-import type { ReviewSessionSource } from '../domain/review-domain';
-import { ReviewPage } from '../pages/review/review.page';
-import { ReviewStore } from '../store/review.store';
-import { ReviewRoute } from '../models/review.model';
-import { Capacitor } from '@capacitor/core';
-import { Keyboard } from '@capacitor/keyboard';
-import { ReviewPrefsService } from './review-prefs.service';
+import {inject, Injectable} from '@angular/core';
+import {ModalController} from '@ionic/angular/standalone';
+import {Router} from '@angular/router';
+import type {ScheduledCard} from '@lingua-card/shared/domain';
+import type {ReviewSessionSource} from '../domain/review-domain';
+import {ReviewPage} from '../pages/review/review.page';
+import {ReviewStore} from '../store/review.store';
+import {ReviewRoute} from '../models/review.model';
+import {Capacitor} from '@capacitor/core';
+import {Keyboard} from '@capacitor/keyboard';
+import {ReviewPrefsService} from './review-prefs.service';
 
-@Injectable({ providedIn: 'root' })
+@Injectable({providedIn: 'root'})
 export class ReviewPlayerService {
   private readonly modalController = inject(ModalController);
   private readonly reviewStore = inject(ReviewStore);
@@ -19,53 +19,69 @@ export class ReviewPlayerService {
 
   async open(cards: readonly ScheduledCard[], source: ReviewSessionSource): Promise<boolean> {
     if (cards.length === 0) return false;
-    const focusBridge = this.captureIosTypingFocus();
-    try {
+    return this.launch(async () => {
       const result = await this.reviewStore.startSessionForCards(source, cards.map(card => card.id));
-      if (result.kind !== 'started') return false;
-      return await this.present(focusBridge);
-    } finally {
-      focusBridge?.remove();
-    }
+      return result.kind === 'started';
+    });
   }
 
   async openSource(source: ReviewSessionSource, limit: number): Promise<boolean> {
-    const focusBridge = this.captureIosTypingFocus();
-    try {
+    return this.launch(async () => {
       const result = await this.reviewStore.startSession(source, limit);
-      if (result.kind !== 'started') return false;
-      return await this.present(focusBridge);
-    } finally {
-      focusBridge?.remove();
-    }
+      return result.kind === 'started';
+    });
   }
 
   async resume(sessionId: string): Promise<boolean> {
+    return this.launch(() => this.reviewStore.resumeSession(sessionId));
+  }
+
+  private async launch(startSession: () => Promise<boolean>): Promise<boolean> {
     const focusBridge = this.captureIosTypingFocus();
     try {
-      if (!await this.reviewStore.resumeSession(sessionId)) return false;
-      return await this.present(focusBridge);
+      return await this.present(focusBridge, startSession);
     } finally {
       focusBridge?.remove();
     }
   }
 
-  private async present(focusBridge: HTMLInputElement | null): Promise<boolean> {
+  private async present(focusBridge: HTMLInputElement | null, startSession: () => Promise<boolean>): Promise<boolean> {
+    const launchInTypingMode = this.reviewPrefs.mode() === 'type';
     const modal = await this.modalController.create({
       component: ReviewPage,
+      componentProps: {launchInTypingMode},
       cssClass: 'lc-review-player-modal',
       backdropDismiss: false,
       keyboardClose: false,
+      // iOS must keep the user-gesture input focused while the first card loads;
+      // Ionic's focus trap would move focus and dismiss the software keyboard.
+      focusTrap: focusBridge === null,
     });
     const stopTrackingViewport = this.trackVisibleViewport(modal);
+    let disconnectKeyboardBridge: () => void = () => undefined;
     let completed = false;
     try {
-      await modal.present();
-      await this.prepareTypingInput(modal);
-      focusBridge?.remove();
+      const presenting = modal.present();
+      if (focusBridge) {
+        const typingInput = await this.findTypingInput(modal);
+        if (typingInput) {
+          disconnectKeyboardBridge = this.connectIosKeyboardBridge(modal, focusBridge, typingInput);
+        } else {
+          focusBridge.remove();
+          modal.focusTrap = true;
+        }
+      }
+      const sessionStarted = startSession();
+      await presenting;
+      if (!focusBridge) await this.prepareTypingInput(modal, launchInTypingMode);
+      if (!await sessionStarted) {
+        await modal.dismiss(undefined, 'session-unavailable');
+        return false;
+      }
       const result = await modal.onWillDismiss<{ completed?: boolean }>();
       completed = result.data?.completed === true;
     } finally {
+      disconnectKeyboardBridge();
       stopTrackingViewport();
       await this.restoreKeyboardBehavior();
     }
@@ -73,12 +89,12 @@ export class ReviewPlayerService {
     return completed;
   }
 
-  private async prepareTypingInput(modal: HTMLIonModalElement): Promise<void> {
-    if (this.reviewStore.session()?.definition.mode !== 'typing') return;
+  private async prepareTypingInput(modal: HTMLIonModalElement, launchInTypingMode: boolean): Promise<void> {
+    if (!launchInTypingMode) return;
     const input = await this.findTypingInput(modal);
     if (!input) return;
     if (Capacitor.isNativePlatform()) {
-      await Keyboard.setScroll({ isDisabled: true }).catch(() => undefined);
+      await Keyboard.setScroll({isDisabled: true}).catch(() => undefined);
     }
     input.focus();
     if (Capacitor.getPlatform() === 'android') {
@@ -95,9 +111,52 @@ export class ReviewPlayerService {
     return null;
   }
 
+  private connectIosKeyboardBridge(
+    modal: HTMLIonModalElement,
+    bridge: HTMLInputElement,
+    typingInput: HTMLInputElement,
+  ): () => void {
+    let connected = true;
+    const disconnect = () => {
+      if (!connected) return;
+      connected = false;
+      bridge.removeEventListener('input', mirrorInput);
+      bridge.removeEventListener('keydown', forwardEnter);
+      bridge.removeEventListener('blur', disconnect);
+      typingInput.removeEventListener('focus', disconnect);
+      modal.removeEventListener('click', finishTyping);
+      bridge.remove();
+      modal.focusTrap = true;
+    };
+    const mirrorInput = () => {
+      typingInput.value = bridge.value;
+      typingInput.dispatchEvent(new Event('input', {bubbles: true}));
+    };
+    const forwardEnter = (event: KeyboardEvent) => {
+      if (event.key !== 'Enter') return;
+      const forwarded = new KeyboardEvent('keydown', {
+        key: 'Enter',
+        code: 'Enter',
+        bubbles: true,
+        cancelable: true,
+      });
+      if (!typingInput.dispatchEvent(forwarded)) event.preventDefault();
+    };
+    const finishTyping = (event: Event) => {
+      if (!(event.target instanceof Element)) return;
+      if (event.target.closest('.ft-cta, .ft-dont-know')) disconnect();
+    };
+    bridge.addEventListener('input', mirrorInput);
+    bridge.addEventListener('keydown', forwardEnter);
+    bridge.addEventListener('blur', disconnect);
+    typingInput.addEventListener('focus', disconnect);
+    modal.addEventListener('click', finishTyping);
+    return disconnect;
+  }
+
   private async restoreKeyboardBehavior(): Promise<void> {
     if (!Capacitor.isNativePlatform()) return;
-    await Keyboard.setScroll({ isDisabled: false }).catch(() => undefined);
+    await Keyboard.setScroll({isDisabled: false}).catch(() => undefined);
   }
 
   private captureIosTypingFocus(): HTMLInputElement | null {
@@ -109,7 +168,7 @@ export class ReviewPlayerService {
     input.setAttribute('aria-hidden', 'true');
     input.setAttribute('autocomplete', 'off');
     document.body.append(input);
-    input.focus({ preventScroll: true });
+    input.focus({preventScroll: true});
     return input;
   }
 
@@ -140,7 +199,7 @@ export class ReviewPlayerService {
       modal.style.removeProperty('--review-player-visible-height');
       document.documentElement.classList.remove('lc-review-player-open');
       document.body.classList.remove('lc-review-player-open');
-      window.scrollTo({ top: initialScrollY, left: 0, behavior: 'instant' });
+      window.scrollTo({top: initialScrollY, left: 0, behavior: 'instant'});
     };
   }
 

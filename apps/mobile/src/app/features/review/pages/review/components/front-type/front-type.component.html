@@ -24,7 +24,7 @@
       autocorrect="off"
       autocomplete="off"
       spellcheck="false"
-      [attr.placeholder]="(expectsGermanAnswer() ? 'review.session.typePlaceholder' : 'review.session.typeTranslationPlaceholder') | translate" />
+      [attr.placeholder]="(expectsGermanAnswer() ? 'review.session.typePlaceholder' : 'review.session.typeTranslationPlaceholder') | translate"/>
 
     @if (expectsGermanAnswer()) {
       <div class="ft-accents">
@@ -34,7 +34,8 @@
             type="button"
             [attr.aria-label]="'review.session.insertCharacter' | translate:{ character: a }"
             (pointerdown)="preserveInputFocus($event)"
-            (click)="append(a)">{{ a }}</button>
+            (click)="append(a)">{{ a }}
+          </button>
         }
       </div>
     }

@@ -96,8 +96,14 @@ ion-header ion-toolbar {
   color: var(--lc-rv-text-soft);
   font-size: t.$lc-text-xl;
 
-  &[aria-pressed='true'] { color: var(--lc-rv-brass-ink); }
-  &:focus-visible { outline: 2px solid var(--lc-rv-mid); outline-offset: -2px; }
+  &[aria-pressed='true'] {
+    color: var(--lc-rv-brass-ink);
+  }
+
+  &:focus-visible {
+    outline: 2px solid var(--lc-rv-mid);
+    outline-offset: -2px;
+  }
 }
 
 // ─── Progress bar ────────────────────────────────────────────────────────────
@@ -152,11 +158,19 @@ ion-header ion-toolbar {
   animation: rv-goal-beyond-in 300ms t.$lc-easing-standard both;
 }
 
-.rv-goal-exceeded-icon { font-size: t.$lc-text-lg; }
+.rv-goal-exceeded-icon {
+  font-size: t.$lc-text-lg;
+}
 
 @keyframes rv-goal-beyond-in {
-  from { opacity: 0; transform: translateY(-3px) scale(.96); }
-  to { opacity: 1; transform: translateY(0) scale(1); }
+  from {
+    opacity: 0;
+    transform: translateY(-3px) scale(.96);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
 }
 
 .rv-points {
@@ -173,12 +187,20 @@ ion-header ion-toolbar {
 }
 
 @keyframes rv-points-in {
-  from { opacity: 0; transform: translateY(-4px) scale(.96); }
-  to { opacity: 1; transform: translateY(0) scale(1); }
+  from {
+    opacity: 0;
+    transform: translateY(-4px) scale(.96);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .rv-points { animation: none; }
+  .rv-points {
+    animation: none;
+  }
 }
 
 // ─── Card scene ──────────────────────────────────────────────────────────────
@@ -216,13 +238,25 @@ ion-header ion-toolbar {
 }
 
 @keyframes rv-card-enter {
-  from { opacity: 0; transform: translateX(16px) scale(.99); }
-  to { opacity: 1; transform: translateX(0) scale(1); }
+  from {
+    opacity: 0;
+    transform: translateX(16px) scale(.99);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0) scale(1);
+  }
 }
 
 @keyframes rv-card-reveal {
-  from { opacity: 0; transform: perspective(900px) rotateY(-8deg) scale(.985); }
-  to { opacity: 1; transform: perspective(900px) rotateY(0) scale(1); }
+  from {
+    opacity: 0;
+    transform: perspective(900px) rotateY(-8deg) scale(.985);
+  }
+  to {
+    opacity: 1;
+    transform: perspective(900px) rotateY(0) scale(1);
+  }
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -238,8 +272,12 @@ ion-header ion-toolbar {
 }
 
 @keyframes rv-card-fade {
-  from { opacity: 0; }
-  to { opacity: 1; }
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
 }
 
 // ─── Footer ──────────────────────────────────────────────────────────────────
@@ -248,19 +286,28 @@ ion-header ion-toolbar {
   background: var(--lc-rv-bg);
   border-top: 1px solid var(--lc-rv-border);
 
-  > * { display: block; width: min(100%, 528px); margin-inline: auto; }
+  > * {
+    display: block;
+    width: min(100%, 528px);
+    margin-inline: auto;
+  }
 }
 
-.rv-footer--keyboard { display: none; }
+.rv-footer--keyboard {
+  display: none;
+}
 
 ion-header.rv-keyboard-active {
   .rv-nav {
-    padding-top: calc(env(safe-area-inset-top, 0px) + 2px);
+    padding-top: calc(env(safe-area-inset-top, 0px));
     padding-bottom: 2px;
   }
+
   .rv-goal-progress,
   .rv-goal-exceeded,
-  .rv-points { display: none; }
+  .rv-points {
+    display: none;
+  }
 }
 
 ion-content.rv-keyboard-active .rv-scene {
@@ -345,7 +392,9 @@ ion-content.rv-keyboard-active {
   @include u.lc-font('sm', t.$lc-font-weight-bold);
   @include u.touch-state;
 
-  &:disabled { opacity: .58; }
+  &:disabled {
+    opacity: .58;
+  }
 }
 
 .rv-dialog-secondary {
@@ -379,31 +428,60 @@ ion-content.rv-keyboard-active {
     @include u.lc-font('5xl', t.$lc-font-weight-semibold);
   }
 
-  span { font-family: t.$lc-font-rv-display; @include u.lc-font('2xl'); }
-  small { color: t.$lc-rv-on-hero-soft; font-family: t.$lc-font-rv-body; @include u.lc-font('sm'); }
+  span {
+    font-family: t.$lc-font-rv-display;
+    @include u.lc-font('2xl');
+  }
+
+  small {
+    color: t.$lc-rv-on-hero-soft;
+    font-family: t.$lc-font-rv-body;
+    @include u.lc-font('sm');
+  }
 }
 
 @keyframes rv-dialog-in {
-  from { opacity: 0; transform: translateY(16px) scale(.98); }
-  to { opacity: 1; transform: translateY(0) scale(1); }
+  from {
+    opacity: 0;
+    transform: translateY(16px) scale(.98);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
 }
 
 @keyframes rv-feedback-in {
-  from { opacity: 0; }
-  to { opacity: 1; }
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
 }
 
 @keyframes rv-seal-in {
-  0% { opacity: 0; transform: scale(.55) rotate(-8deg); }
-  65% { opacity: 1; transform: scale(1.1) rotate(2deg); }
-  100% { opacity: 1; transform: scale(1) rotate(0); }
+  0% {
+    opacity: 0;
+    transform: scale(.55) rotate(-8deg);
+  }
+  65% {
+    opacity: 1;
+    transform: scale(1.1) rotate(2deg);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1) rotate(0);
+  }
 }
 
 @media (prefers-reduced-motion: reduce) {
   .rv-dialog,
   .rv-mastery-feedback,
   .rv-mastery-feedback .rv-mastery-seal,
-  .rv-goal-exceeded { animation: none; }
+  .rv-goal-exceeded {
+    animation: none;
+  }
 }
 
 // ─── Empty state ─────────────────────────────────────────────────────────────
@@ -442,8 +520,17 @@ ion-content.rv-keyboard-active {
 }
 
 @media (max-width: 359px) {
-  .rv-nav { grid-template-columns: 44px minmax(0, 1fr) 72px; padding-inline: t.$lc-space-3; }
-  .rv-scene { padding-inline: t.$lc-space-3; }
-  .rv-footer { padding-inline: t.$lc-space-3; }
-  .rv-nav-count { @include u.lc-font('md', t.$lc-font-weight-medium); }
+  .rv-nav {
+    grid-template-columns: 44px minmax(0, 1fr) 72px;
+    padding-inline: t.$lc-space-3;
+  }
+  .rv-scene {
+    padding-inline: t.$lc-space-3;
+  }
+  .rv-footer {
+    padding-inline: t.$lc-space-3;
+  }
+  .rv-nav-count {
+    @include u.lc-font('md', t.$lc-font-weight-medium);
+  }
 }

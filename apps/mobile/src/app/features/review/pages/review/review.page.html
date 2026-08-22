@@ -31,23 +31,42 @@
 </ion-header>
 
 <ion-content [class.rv-keyboard-active]="mode() === 'typing' && !isFlipped()">
-  @if (reviewStore.presentation()) {
+  @if (mode() === 'typing') {
+    <div class="rv-scene" [class.rv-scene--revealed]="isFlipped()">
+      <div class="rv-card-stage" [class.rv-card-stage--front]="!isFlipped()" [class.rv-card-stage--back]="isFlipped()">
+        <lc-rv-front-type
+          [class.rv-typing-front--inactive]="isFlipped()"
+          [attr.aria-hidden]="isFlipped()"
+          [prompt]="flipPrompt()"
+          [expectsGermanAnswer]="expectsGermanAnswer()"
+          [compact]="true"
+          [typed]="typed()"
+          (typedChange)="typed.set($event)"
+          (focusChanged)="isTypingFocused.set($event)"
+          (check)="checkTyped()"
+          (dontKnow)="dontKnow()" />
+        @if (isFlipped() && currentCard(); as card) {
+          <lc-rv-card-back
+            [card]="card"
+            [typedResult]="typedResult()?.feedback ?? null"
+            [expandedSynonym]="expandedSynonym()"
+            [isPronunciationLoading]="isPronunciationLoading()"
+            [isAudioPlaying]="isAudioPlaying()"
+            [audioPlaybackError]="audioPlaybackError()"
+            [busy]="reviewStore.isBusy()"
+            [readOnly]="isViewingPrevious()"
+            (toggleSynonym)="toggleSynonym($event)"
+            (playAudio)="playAudio()"
+            (playExample)="playExample($event)"
+            (cardActionsRequested)="openCardActions()" />
+        }
+      </div>
+    </div>
+  } @else if (reviewStore.presentation()) {
     @if (currentCard(); as card) {
       <div class="rv-scene" [class.rv-scene--revealed]="isFlipped()">
         <div class="rv-card-stage" [class.rv-card-stage--front]="!isFlipped()" [class.rv-card-stage--back]="isFlipped()">
-          @if (mode() === 'typing') {
-            <lc-rv-front-type
-              [class.rv-typing-front--inactive]="isFlipped()"
-              [attr.aria-hidden]="isFlipped()"
-              [prompt]="flipPrompt()"
-              [expectsGermanAnswer]="expectsGermanAnswer()"
-              [compact]="true"
-              [typed]="typed()"
-              (typedChange)="typed.set($event)"
-              (focusChanged)="isTypingFocused.set($event)"
-              (check)="checkTyped()"
-              (dontKnow)="dontKnow()" />
-          } @else if (!isFlipped()) {
+          @if (!isFlipped()) {
             <lc-rv-front-flip [prompt]="flipPrompt()" [cue]="flipCue()" [hint]="flipHint()" (reveal)="reveal()" />
           }
           @if (isFlipped()) {
