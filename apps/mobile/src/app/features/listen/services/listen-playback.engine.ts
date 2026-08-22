@@ -3,13 +3,17 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { concatMap, from, map, Subject, timer } from 'rxjs';
 import {
   AudioSegment,
-  Card,
   PlaybackScript,
   PlayerSettings,
   PlayerStatus,
 } from '@lingua-card/shared/domain';
 import { WordAudioService } from '../../../shared/audio/word-audio.service';
-import { LISTEN_PREFETCH_WINDOW, ListenState, OfflineDownloadStatus, SilenceDuration } from '../models/listen.models';
+import {
+  LISTEN_PREFETCH_WINDOW,
+  OfflineDownloadStatus,
+  SilenceDuration,
+  VocabularyPlaylistItem,
+} from '../models/listen.models';
 
 interface TaggedSegment {
   segment: AudioSegment;
@@ -23,15 +27,24 @@ interface TaggedSegment {
  */
 export interface PlaybackHost {
   currentScript: () => PlaybackScript | null;
+  scriptAt: (index: number) => PlaybackScript | null;
   currentSegment: () => AudioSegment | null;
   status: () => PlayerStatus;
   settings: () => PlayerSettings;
-  queue: () => Card[];
+  queue: () => VocabularyPlaylistItem[];
   cardIndex: () => number;
   segmentIndex: () => number;
   downloadStatus: () => OfflineDownloadStatus;
-  patch: (state: Partial<ListenState>) => void;
+  patch: (state: PlaybackStatePatch) => void;
   saveSession: () => void;
+}
+
+export interface PlaybackStatePatch {
+  cardIndex?: number;
+  segmentIndex?: number;
+  status?: PlayerStatus;
+  errorMessage?: string | null;
+  downloadStatus?: OfflineDownloadStatus;
 }
 
 /**
@@ -158,27 +171,17 @@ export class ListenPlaybackEngine {
   }
 
   // ── Prefetch ──────────────────────────────────────────────────────────────
-  // Pre-warm TARGET-language audio for a sliding window of upcoming cards only —
-  // never the whole queue — so we don't generate audio for cards never reached.
-  // Native audio is Web Speech (not prefetched). Cleared when the queue rebuilds.
+  // Pre-warm every spoken segment in a sliding window so target and native audio
+  // are equally reliable when the sequence reaches them.
 
   resetPrefetch(): void {
     this.prefetchedIndices.clear();
   }
 
-  /**
-   * Target-language audio items actually played for a card under the current
-   * mode: the headword always; the first example only in examples/deepDive (in
-   * compact mode the example is never spoken, so warming it would waste TTS).
-   */
-  targetItemsForCard(c: Card): { text: string; language: string }[] {
-    const word = c.content.article ? `${c.content.article} ${c.content.back}` : c.content.back;
-    const items = [{ text: word, language: 'de-DE' }];
-    if (this.host.settings().playMode !== 'compact') {
-      const ex = c.content.examples?.[0];
-      if (ex?.target) items.push({ text: ex.target, language: 'de-DE' });
-    }
-    return items;
+  audioItemsForScript(script: PlaybackScript): { text: string; language: string }[] {
+    return script.segments
+      .filter(segment => segment.type !== 'silence')
+      .map(segment => ({ text: segment.text, language: segment.language }));
   }
 
   /** Fire-and-forget warm of the sliding window ahead of the cursor. */
@@ -206,36 +209,23 @@ export class ListenPlaybackEngine {
     for (let i = Math.max(0, startIdx); i < end; i++) {
       if (this.prefetchedIndices.has(i)) continue;
       this.prefetchedIndices.add(i);
-      const c = queue[i];
-      if (!c) continue;
-      items.push(...this.targetItemsForCard(c));
+      const cardScript = this.host.scriptAt(i);
+      if (cardScript) items.push(...this.audioItemsForScript(cardScript));
     }
     return items;
   }
 
-  /**
-   * How long to hold a (silent) native-translation segment on screen, scaled by
-   * text length and the current playback speed. Clamped so very short or very
-   * long translations stay within a comfortable reading window.
-   */
-  private nativeReadMs(text: string, rate: number): number {
-    const base = 600 + text.length * 45;
-    return Math.round(Math.min(4000, Math.max(900, base)) / Math.max(0.5, rate));
-  }
-
-  /**
-   * Download the whole queue's TARGET-language audio to the device for offline
-   * playback. Reuses the cache-first preWarm (persists to the device). Native
-   * audio stays Web Speech (already offline). Downloads exactly what the current
-   * mode plays, so example audio isn't fetched in compact mode.
-   */
+  /** Download every spoken segment in the compiled queue for offline playback. */
   async downloadQueueForOffline(): Promise<void> {
     if (this.host.downloadStatus() === 'downloading') return;
     const queue = this.host.queue();
     if (!queue.length) return;
 
     this.host.patch({ downloadStatus: 'downloading' });
-    const items = queue.flatMap(c => this.targetItemsForCard(c));
+    const items = queue.flatMap((_item, index) => {
+      const script = this.host.scriptAt(index);
+      return script ? this.audioItemsForScript(script) : [];
+    });
     try {
       await this.wordAudio.preWarm(items);
       // The whole queue is now warm — keep the sliding prefetch from redoing it.
@@ -281,16 +271,9 @@ export class ListenPlaybackEngine {
           }
           // Read speed live so a mid-session change takes effect from the next segment.
           const rate = this.host.settings().speed;
-          // Target language → HD-only pipeline (never Web Speech).
-          if (segment.lang === 'de') {
-            return from(this.wordAudio.playTarget(segment.text, 'de-DE', rate)).pipe(
-              map(() => generation),
-            );
-          }
-          // Native translation is shown on screen but NOT spoken — hold a silent
-          // read-beat (scaled by text length and playback speed) so the learner has
-          // time to read it before the sequence advances.
-          return timer(this.nativeReadMs(segment.text, rate)).pipe(map(() => generation));
+          return from(this.wordAudio.playRequired(segment.text, segment.language, rate)).pipe(
+            map(() => generation),
+          );
         }),
         takeUntilDestroyed(this.destroyRef),
       )
@@ -326,10 +309,10 @@ export class ListenPlaybackEngine {
             }
           }
         },
-        error: (err: unknown) => {
+        error: (error: unknown) => {
           this.host.patch({
             status: 'error',
-            errorMessage: (err as Error)?.message ?? 'Audio failed',
+            errorMessage: error instanceof Error ? error.message : 'Audio failed',
           });
         },
       });

@@ -1127,18 +1127,15 @@
   },
   "listen": {
     "main": {
-      "pageTitle": "Listen & Learn"
+      "pageTitle": "Listen"
     },
     "playlistMode": {
-      "compactLabel": "Compact",
-      "compactDesc": "Word + meaning",
-      "examplesLabel": "Examples",
-      "examplesDesc": "Full sentences",
-      "deepDiveLabel": "Deep Dive",
-      "deepDiveDesc": "+ grammar tip",
-      "compactModeBadge": "Compact mode",
-      "examplesModeBadge": "Examples mode",
-      "deepDiveModeBadge": "Deep Dive mode"
+      "wordsLabel": "Words",
+      "wordsDesc": "German + English",
+      "wordsWithExamplesLabel": "Words + examples",
+      "wordsWithExamplesDesc": "Both languages",
+      "wordsModeBadge": "Words mode",
+      "wordsWithExamplesModeBadge": "Words + examples mode"
     },
     "card": {
       "collectionPrefix": "Collection:"
@@ -1151,8 +1148,9 @@
       "preparingAudio": "Preparing audio…",
       "retryBtn": "Retry",
       "skipCard": "Skip this card",
-      "grammarTipLabel": "Grammar tip",
-      "minLeft": "~{{mins}} min left"
+      "minLeft": "~{{mins}} min left",
+      "of": "of",
+      "queueAriaLabel": "Open playback queue"
     },
     "transport": {
       "shuffleAriaLabel": "Shuffle",
@@ -1178,7 +1176,11 @@
       "playBtn": "Play",
       "shuffleBtn": "Shuffle",
       "playlistTypeSection": "Playlist type",
-      "subline": "~{{mins}} min · {{mode}} mode"
+      "subline": "~{{mins}} min · {{mode}} mode",
+      "readyLabel": "READY TO PLAY",
+      "languageDirection": "German → English",
+      "whatToHearSection": "What to hear",
+      "playCountBtn": "Play {{count}} words"
     },
     "controls": {
       "speedSection": "Speed"
@@ -1192,7 +1194,10 @@
       "hdReadyTitle": "HD audio ready offline",
       "download": "Download",
       "downloading": "Downloading…",
-      "downloaded": "Saved offline"
+      "downloaded": "Saved offline",
+      "aboutDuration": "about {{mins}} min",
+      "offline": "Offline",
+      "upNext": "Up next"
     },
     "sourceSheet": {
       "title": "Choose a playlist source"

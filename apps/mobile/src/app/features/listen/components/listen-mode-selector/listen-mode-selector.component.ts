@@ -5,7 +5,7 @@ import { PlayModeOption } from '../../models/listen.models';
 
 /**
  * Playlist-mode selector.
- * - `variant="grid"`: 3 icon cards with title + description (hub).
+ * - `variant="grid"`: icon cards with title + description (hub).
  * - `variant="tabs"`: compact pill tabs (player).
  */
 @Component({

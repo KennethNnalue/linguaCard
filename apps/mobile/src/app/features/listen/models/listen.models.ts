@@ -1,4 +1,11 @@
-import { PlaybackScript, PlayMode, PlayerSettings, PlayerStatus, ScheduledCard } from '@lingua-card/shared/domain';
+import {
+  ArticleType,
+  PlaybackScript,
+  PlayMode,
+  PlayerSettings,
+  PlayerStatus,
+  ScheduledCard,
+} from '@lingua-card/shared/domain';
 
 // ─── Storage Keys ─────────────────────────────────────────────────────────────
 
@@ -41,16 +48,18 @@ export interface PlayModeOption {
 }
 
 export const PLAY_MODE_OPTIONS: PlayModeOption[] = [
-  { value: 'compact',  labelKey: 'listen.playlistMode.compactLabel',  descKey: 'listen.playlistMode.compactDesc' },
-  { value: 'examples', labelKey: 'listen.playlistMode.examplesLabel', descKey: 'listen.playlistMode.examplesDesc' },
-  { value: 'deepDive', labelKey: 'listen.playlistMode.deepDiveLabel', descKey: 'listen.playlistMode.deepDiveDesc' },
+  { value: 'words', labelKey: 'listen.playlistMode.wordsLabel', descKey: 'listen.playlistMode.wordsDesc' },
+  {
+    value: 'wordsWithExamples',
+    labelKey: 'listen.playlistMode.wordsWithExamplesLabel',
+    descKey: 'listen.playlistMode.wordsWithExamplesDesc',
+  },
 ];
 
 /** i18n keys for the mode badge shown on the Session Complete screen. */
 export const PlayModeLabelKey: Record<PlayMode, string> = {
-  compact:  'listen.playlistMode.compactModeBadge',
-  examples: 'listen.playlistMode.examplesModeBadge',
-  deepDive: 'listen.playlistMode.deepDiveModeBadge',
+  words: 'listen.playlistMode.wordsModeBadge',
+  wordsWithExamples: 'listen.playlistMode.wordsWithExamplesModeBadge',
 };
 
 // ─── Silence Durations (ms) ───────────────────────────────────────────────────
@@ -82,7 +91,7 @@ export const MIN_ESTIMATED_MINUTES = 1;
 // ─── Default Settings ─────────────────────────────────────────────────────────
 
 export const DEFAULT_LISTEN_SETTINGS: PlayerSettings = {
-  playMode: 'examples',
+  playMode: 'wordsWithExamples',
   speed: 1,
   shuffle: false,
   repeat: false,
@@ -92,15 +101,75 @@ export const DEFAULT_LISTEN_SETTINGS: PlayerSettings = {
 
 export interface SessionSnapshot {
   cardIndex: number;
-  queue: ScheduledCard[];
+  queue: VocabularyPlaylistItem[];
   sourceLabel: string;
+  playlistId: string;
+  languages: VocabularyPlaylistLanguages;
+}
+
+export interface VocabularyPlaylistLanguages {
+  target: string;
+  native: string;
+}
+
+export interface VocabularyExamplePair {
+  target: string;
+  native: string;
+}
+
+export interface VocabularyPlaylistItem {
+  id: string;
+  article: ArticleType;
+  target: string;
+  native: string;
+  example: VocabularyExamplePair | null;
+  categoryIds: readonly string[];
+  learningStage: string;
+}
+
+export type VocabularyPlaylistSource =
+  | { kind: 'due' }
+  | { kind: 'all' }
+  | { kind: 'struggling' }
+  | { kind: 'collection'; collectionId: string }
+  | { kind: 'custom'; sourceId: string };
+
+export interface VocabularyPlaylistRequest {
+  playlistId: string;
+  title: string;
+  source: VocabularyPlaylistSource;
+  languages: VocabularyPlaylistLanguages;
+  items: readonly VocabularyPlaylistItem[];
+  initialMode?: PlayMode;
+}
+
+export const DEFAULT_PLAYLIST_LANGUAGES: VocabularyPlaylistLanguages = {
+  target: 'de-DE',
+  native: 'en-US',
+};
+
+export function toVocabularyPlaylistItem(card: ScheduledCard): VocabularyPlaylistItem {
+  const firstExample = card.content.examples?.[0];
+  return {
+    id: card.id,
+    article: card.content.article,
+    target: card.content.back,
+    native: card.content.front,
+    example: firstExample
+      ? { target: firstExample.target, native: firstExample.native }
+      : null,
+    categoryIds: [...card.categoryIds],
+    learningStage: card.reviewState.stage,
+  };
 }
 
 export interface ListenState {
+  playlistId: string;
+  languages: VocabularyPlaylistLanguages;
   sourceLabel: string;
   selectedSource: ListenSourceKey;
-  rawQueue: ScheduledCard[];
-  queue: ScheduledCard[];
+  rawQueue: VocabularyPlaylistItem[];
+  queue: VocabularyPlaylistItem[];
   scripts: PlaybackScript[];
   cardIndex: number;
   segmentIndex: number;

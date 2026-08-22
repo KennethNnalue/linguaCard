@@ -1,17 +1,10 @@
-<div class="row prev" [class.empty]="!prev()">
-  @if (prev(); as p) { {{ p.text }} }
-</div>
-
-<div class="row current" [class.empty]="!current()">
-  @if (current(); as c) {
-    <span class="dot" aria-hidden="true"></span>
-    <div class="col">
-      <div class="text">{{ c.text }}</div>
-      <div class="lang">{{ c.langLabel }}</div>
-    </div>
-  }
-</div>
-
-<div class="row next" [class.empty]="!next()">
-  @if (next(); as n) { {{ n.text }} }
-</div>
+@for (segment of segments(); track $index; let index = $index) {
+  <div class="row" [class.played]="segment.cls === 'played'" [class.current]="segment.cls === 'playing'">
+    <span class="sequence">{{ index + 1 }}</span>
+    <span class="lang">{{ segment.langLabel }}</span>
+    <span class="text">{{ segment.text }}</span>
+    @if (segment.cls === 'playing') {
+      <span class="speaking" aria-hidden="true"><i></i><i></i><i></i><i></i></span>
+    }
+  </div>
+}

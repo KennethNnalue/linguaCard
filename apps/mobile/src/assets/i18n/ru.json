@@ -839,7 +839,34 @@
       "freezeEarned": "Заморозка серии получена",
       "freezeEarnProgress": "{{current}}/{{target}} дней с целью до следующей заморозки",
       "freezeCapacity": "Доступен максимум: 2 заморозки",
-      "progress": { "back": "Назад", "kicker": "Ваш ритм", "title": "Прогресс", "currentStreak": "Текущая серия", "bestStreak": "Рекорд: {{count}} дн.", "freezesReady": "Заморозки", "usedRecently": "Недавно использовано: {{count}}", "lastDays": "Последние 14 дней", "lastDaysHint": "История целей и защиты серии", "safe": "Сегодня защищено", "atRisk": "Под угрозой", "buildStreak": "Начните серию", "goalMet": "Цель выполнена", "protected": "Защищено", "missed": "Пропущено", "open": "Сегодня", "untracked": "До начала", "loading": "Загружаем прогресс…", "loadError": "Не удалось загрузить прогресс.", "retry": "Повторить", "emptyTitle": "Ваш ритм начинается сегодня", "emptyHint": "Выполните первую дневную цель, чтобы начать историю прогресса.", "learningPoints": "Баллы обучения", "pointsHint": "За ежедневные повторы, цели и освоение", "howFreezesWork": "Как работает заморозка", "freezeExplanation": "Если вы пропустите полный день, доступная заморозка автоматически защитит серию. Она не добавляет повторы или баллы обучения." }
+      "progress": {
+        "back": "Назад",
+        "kicker": "Ваш ритм",
+        "title": "Прогресс",
+        "currentStreak": "Текущая серия",
+        "bestStreak": "Рекорд: {{count}} дн.",
+        "freezesReady": "Заморозки",
+        "usedRecently": "Недавно использовано: {{count}}",
+        "lastDays": "Последние 14 дней",
+        "lastDaysHint": "История целей и защиты серии",
+        "safe": "Сегодня защищено",
+        "atRisk": "Под угрозой",
+        "buildStreak": "Начните серию",
+        "goalMet": "Цель выполнена",
+        "protected": "Защищено",
+        "missed": "Пропущено",
+        "open": "Сегодня",
+        "untracked": "До начала",
+        "loading": "Загружаем прогресс…",
+        "loadError": "Не удалось загрузить прогресс.",
+        "retry": "Повторить",
+        "emptyTitle": "Ваш ритм начинается сегодня",
+        "emptyHint": "Выполните первую дневную цель, чтобы начать историю прогресса.",
+        "learningPoints": "Баллы обучения",
+        "pointsHint": "За ежедневные повторы, цели и освоение",
+        "howFreezesWork": "Как работает заморозка",
+        "freezeExplanation": "Если вы пропустите полный день, доступная заморозка автоматически защитит серию. Она не добавляет повторы или баллы обучения."
+      }
     },
     "summary": {
       "backAriaLabel": "Назад в хранилище",
@@ -1030,7 +1057,11 @@
       "playBtn": "Воспроизвести",
       "shuffleBtn": "Перемешать",
       "playlistTypeSection": "Тип плейлиста",
-      "subline": "~{{mins}} мин · режим {{mode}}"
+      "subline": "~{{mins}} мин · режим {{mode}}",
+      "readyLabel": "READY TO PLAY",
+      "languageDirection": "German → English",
+      "whatToHearSection": "What to hear",
+      "playCountBtn": "Play {{count}} words"
     },
     "controls": {
       "speedSection": "Скорость"
@@ -1044,7 +1075,10 @@
       "hdReadyTitle": "HD-аудио доступно офлайн",
       "download": "Скачать",
       "downloading": "Загрузка…",
-      "downloaded": "Сохранено офлайн"
+      "downloaded": "Сохранено офлайн",
+      "aboutDuration": "about {{mins}} min",
+      "offline": "Offline",
+      "upNext": "Up next"
     },
     "sourceSheet": {
       "title": "Выберите источник плейлиста"
@@ -1067,19 +1101,17 @@
       "preparingAudio": "Подготовка аудио…",
       "retryBtn": "Повторить",
       "skipCard": "Пропустить эту карточку",
-      "grammarTipLabel": "Совет по грамматике",
-      "minLeft": "~{{mins}} мин осталось"
+      "minLeft": "~{{mins}} мин осталось",
+      "of": "of",
+      "queueAriaLabel": "Выберите источник плейлиста"
     },
     "playlistMode": {
-      "compactLabel": "Компактно",
-      "compactDesc": "Слово + значение",
-      "examplesLabel": "Примеры",
-      "examplesDesc": "Полные предложения",
-      "deepDiveLabel": "Углублённо",
-      "deepDiveDesc": "+ грамматическая подсказка",
-      "compactModeBadge": "Компактный режим",
-      "examplesModeBadge": "Режим примеров",
-      "deepDiveModeBadge": "Углублённый режим"
+      "wordsLabel": "Компактно",
+      "wordsDesc": "Слово + значение",
+      "wordsWithExamplesLabel": "Примеры",
+      "wordsWithExamplesDesc": "Полные предложения",
+      "wordsModeBadge": "Компактный режим",
+      "wordsWithExamplesModeBadge": "Режим примеров"
     },
     "card": {
       "collectionPrefix": "Коллекция:"
@@ -1547,7 +1579,15 @@
     },
     "plural": "Множественное число",
     "masteryProgress": "Прогресс освоения",
-    "manualMastery": { "title": "Освоено вручную", "hint": "Исключено из запланированных повторений", "undoTitle": "Вернуть карточку в повторения?", "undoMessage": "«{{word}}» вернётся в запланированные повторения. Предыдущий прогресс восстановится с интервалом не более семи дней.", "undoButton": "Отменить освоение", "saving": "Сохранение…", "error": "Не удалось изменить статус. Повторите попытку." },
+    "manualMastery": {
+      "title": "Освоено вручную",
+      "hint": "Исключено из запланированных повторений",
+      "undoTitle": "Вернуть карточку в повторения?",
+      "undoMessage": "«{{word}}» вернётся в запланированные повторения. Предыдущий прогресс восстановится с интервалом не более семи дней.",
+      "undoButton": "Отменить освоение",
+      "saving": "Сохранение…",
+      "error": "Не удалось изменить статус. Повторите попытку."
+    },
     "level": "Уровень {{level}} — {{label}}",
     "stats": {
       "reviews": "Повторений",

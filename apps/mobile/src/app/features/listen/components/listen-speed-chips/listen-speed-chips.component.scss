@@ -21,16 +21,17 @@
   padding: 5px 13px;
   border-radius: t.$lc-radius-full;
   border: 1px solid var(--lc-border);
-  background: var(--lc-card);
-  color: var(--lc-text-secondary);
+  min-height: 36px;
+  background: var(--lc-listen-surface, var(--lc-card));
+  color: var(--lc-listen-text-muted, var(--lc-text-secondary));
   cursor: pointer;
   transition: background var(--lc-transition-fast), color var(--lc-transition-fast),
     border-color var(--lc-transition-fast);
   @include u.touch-state;
 
   &.active {
-    border-color: var(--lc-brand);
-    background: var(--lc-brand);
-    color: var(--lc-text-inverse);
+    border-color: color-mix(in srgb, var(--lc-rv-brass-ink) 45%, var(--lc-listen-border));
+    background: var(--lc-listen-surface-active, var(--lc-brand-light));
+    color: var(--lc-listen-text, var(--lc-text-primary));
   }
 }

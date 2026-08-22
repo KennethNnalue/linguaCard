@@ -2,90 +2,86 @@
 @use 'theme/utils' as u;
 
 :host {
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  flex: 1;
+  display: block;
+  overflow: hidden;
+  border: 1px solid var(--lc-listen-border, var(--lc-border));
+  border-radius: 0 0 t.$lc-radius-lg t.$lc-radius-lg;
+  background: var(--lc-listen-surface, var(--lc-card));
 }
 
 .row {
-  transition: opacity 0.3s ease;
+  display: grid;
+  grid-template-columns: 32px 28px minmax(0, 1fr) 28px;
+  align-items: start;
+  gap: t.$lc-space-2;
+  min-height: clamp(72px, 7dvh, 96px);
+  padding: clamp(14px, 1.7dvh, 22px) clamp(16px, 3vw, 30px);
+  border-bottom: 1px solid var(--lc-listen-border, var(--lc-border));
+
+  &:last-child { border-bottom: none; }
+  &.played { opacity: 0.6; }
 }
 
-// ─── Previous (played) line ─────────────────────────────────────────────────
-.prev {
-  text-align: center;
-  padding: t.$lc-space-2 t.$lc-space-3;
-  font-size: 13px;
-  font-style: italic;
-  line-height: 1.55;
-  color: var(--lc-text-hint);
-  opacity: 0.6;
+.row:nth-child(n + 3) { min-height: clamp(92px, 9dvh, 132px); }
 
-  &.empty { opacity: 0; }
+.sequence {
+  position: relative;
+  @include u.flex-center;
+  @include u.circle(28px);
+  border: 1px solid var(--lc-listen-border, var(--lc-border));
+  background: var(--lc-listen-surface, var(--lc-card));
+  color: var(--lc-listen-text-muted, var(--lc-text-hint));
 }
 
-// ─── Current (playing) line ─────────────────────────────────────────────────
-.current {
-  display: flex;
-  align-items: flex-start;
-  gap: 11px;
-  margin: t.$lc-space-1 0;
-  padding: t.$lc-space-3 + 2px t.$lc-space-4;
-  border-radius: 16px;
-  background: var(--lc-card);
-  border: 1px solid var(--lc-border);
-
-  &.empty {
-    opacity: 0;
-    background: transparent;
-    border-color: transparent;
-  }
-}
-
-.dot {
-  @include u.circle(9px);
-  margin-top: 6px;
-  background: var(--lc-ss-mint);
-}
-
-:host(.playing) .current:not(.empty) .dot {
-  animation: pulse-dot 1.1s ease-in-out infinite;
-}
-
-.col { flex: 1; }
-
-.text {
-  @include u.lc-font('xl', t.$lc-font-weight-medium);
-  line-height: 1.55;
-  color: var(--lc-text-primary);
-  margin-bottom: t.$lc-space-1;
+.row:not(:last-child) .sequence::after {
+  content: '';
+  position: absolute;
+  top: 27px;
+  left: 50%;
+  width: 1px;
+  height: clamp(62px, 7dvh, 92px);
+  background: var(--lc-listen-border, var(--lc-border));
 }
 
 .lang {
-  font-size: 9px;
+  padding-top: 5px;
+  font-size: t.$lc-text-xxs;
   font-weight: t.$lc-font-weight-bold;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-  color: var(--lc-brand-mid);
+  color: var(--lc-listen-text-muted, var(--lc-text-hint));
 }
 
-// ─── Next (upcoming) line ───────────────────────────────────────────────────
-.next {
-  text-align: center;
-  padding: t.$lc-space-2 t.$lc-space-3;
-  font-size: 13px;
-  line-height: 1.55;
-  color: var(--lc-text-secondary);
-
-  &.empty { opacity: 0; }
+.text {
+  min-width: 0;
+  font-family: t.$lc-font-display;
+  font-size: clamp(19px, 4.5vw, 30px);
+  line-height: 1.35;
+  overflow-wrap: anywhere;
+  color: var(--lc-listen-text, var(--lc-text-primary));
 }
 
-@keyframes pulse-dot {
-  0%, 100% { opacity: 1; transform: scale(1); }
-  50% { opacity: 0.5; transform: scale(0.75); }
+.current .sequence { border-color: var(--lc-listen-speaking); color: var(--lc-listen-speaking); }
+
+.speaking {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  height: 24px;
+
+  i {
+    width: 3px;
+    height: 10px;
+    border-radius: 2px;
+    background: var(--lc-listen-speaking);
+    animation: speak 0.8s ease-in-out infinite alternate;
+  }
+
+  i:nth-child(2) { height: 20px; animation-delay: 0.15s; }
+  i:nth-child(3) { height: 14px; animation-delay: 0.3s; }
+  i:nth-child(4) { height: 22px; animation-delay: 0.45s; }
 }
+
+@keyframes speak { to { transform: scaleY(0.45); opacity: 0.65; } }
 
 @media (prefers-reduced-motion: reduce) {
-  :host(.playing) .current:not(.empty) .dot { animation: none; }
+  .speaking i { animation: none; }
 }

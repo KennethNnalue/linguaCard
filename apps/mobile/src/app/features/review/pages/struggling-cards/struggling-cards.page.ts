@@ -6,8 +6,8 @@ import {ReviewPlayerService} from '../../services/review-player.service';
 import {ReviewFilterService} from '../../services/review-filter.service';
 import {ReviewRoute} from '../../models/review.model';
 import {WordRowComponent} from '../../../vault/components/word-row/word-row.component';
-import {ListenStore} from '../../../listen/store/listen.store';
-import {ListenSourceLabel} from '../../../listen/models/listen.models';
+import {DEFAULT_PLAYLIST_LANGUAGES, ListenSourceLabel, toVocabularyPlaylistItem} from '../../../listen/models/listen.models';
+import {VocabularyPlayerService} from '../../../listen/services/vocabulary-player.service';
 import {isDue} from '../../domain/review-status';
 
 @Component({
@@ -20,7 +20,7 @@ import {isDue} from '../../domain/review-status';
 export class StrugglingCardsPage {
   private readonly filterService = inject(ReviewFilterService);
   private readonly reviewPlayer = inject(ReviewPlayerService);
-  private readonly listenStore = inject(ListenStore);
+  private readonly vocabularyPlayer = inject(VocabularyPlayerService);
   private readonly router = inject(Router);
 
   readonly strugglingCards = computed(() => this.filterService.getStrugglingCards());
@@ -37,8 +37,13 @@ export class StrugglingCardsPage {
   startListen(): void {
     const queue = this.strugglingCards();
     if (!queue.length) return;
-    this.listenStore.loadQueue(queue, ListenSourceLabel.Struggling);
-    void this.router.navigate(['/listen']);
+    void this.vocabularyPlayer.open({
+      playlistId: 'struggling',
+      title: ListenSourceLabel.Struggling,
+      source: { kind: 'struggling' },
+      languages: DEFAULT_PLAYLIST_LANGUAGES,
+      items: queue.map(toVocabularyPlaylistItem),
+    });
   }
 
   openWordDetail(card: { id: string }): void {

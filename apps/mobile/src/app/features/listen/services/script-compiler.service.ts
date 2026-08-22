@@ -1,37 +1,63 @@
 import { Injectable } from '@angular/core';
-import { AudioSegment, Card, PlaybackScript, PlayMode } from '@lingua-card/shared/domain';
-import { SilenceDuration } from '../models/listen.models';
+import { AudioSegment, PlaybackScript, PlayMode } from '@lingua-card/shared/domain';
+import {
+  SilenceDuration,
+  VocabularyPlaylistItem,
+  VocabularyPlaylistLanguages,
+} from '../models/listen.models';
 
 @Injectable({ providedIn: 'root' })
 export class ScriptCompilerService {
-  compile(card: Card, mode: PlayMode): PlaybackScript {
+  compile(
+    item: VocabularyPlaylistItem,
+    mode: PlayMode,
+    languages: VocabularyPlaylistLanguages,
+  ): PlaybackScript {
     const segments: AudioSegment[] = [];
 
-    const articleWord = card.content.article
-      ? `${card.content.article} ${card.content.back}`
-      : card.content.back;
+    const articleWord = item.article ? `${item.article} ${item.target}` : item.target;
 
-    segments.push({ type: 'word_target', text: articleWord, lang: 'de' });
-    segments.push({ type: 'silence', text: '', lang: 'de', durationMs: SilenceDuration.AfterWord });
-    segments.push({ type: 'word_native', text: card.content.front, lang: 'en' });
+    segments.push({ type: 'word_target', text: articleWord, language: languages.target });
+    segments.push({
+      type: 'silence',
+      text: '',
+      language: languages.target,
+      durationMs: SilenceDuration.AfterWord,
+    });
+    segments.push({ type: 'word_native', text: item.native, language: languages.native });
 
-    if (mode === 'examples' || mode === 'deepDive') {
-      const example = card.content.examples?.[0];
-      if (example) {
-        segments.push({ type: 'silence', text: '', lang: 'de', durationMs: SilenceDuration.BeforeExample });
-        segments.push({ type: 'example_target', text: example.target, lang: 'de' });
-        segments.push({ type: 'silence', text: '', lang: 'de', durationMs: SilenceDuration.BetweenExample });
-        segments.push({ type: 'example_native', text: example.native, lang: 'en' });
-      }
+    if (mode === 'wordsWithExamples' && item.example) {
+      segments.push({
+        type: 'silence',
+        text: '',
+        language: languages.target,
+        durationMs: SilenceDuration.BeforeExample,
+      });
+      segments.push({
+        type: 'example_target',
+        text: item.example.target,
+        language: languages.target,
+      });
+      segments.push({
+        type: 'silence',
+        text: '',
+        language: languages.target,
+        durationMs: SilenceDuration.BetweenExample,
+      });
+      segments.push({
+        type: 'example_native',
+        text: item.example.native,
+        language: languages.native,
+      });
     }
 
-    if (mode === 'deepDive' && card.content.notes) {
-      segments.push({ type: 'silence', text: '', lang: 'en', durationMs: SilenceDuration.BeforeGrammarTip });
-      segments.push({ type: 'grammar_tip', text: card.content.notes, lang: 'en' });
-    }
+    segments.push({
+      type: 'silence',
+      text: '',
+      language: languages.target,
+      durationMs: SilenceDuration.AfterCard,
+    });
 
-    segments.push({ type: 'silence', text: '', lang: 'de', durationMs: SilenceDuration.AfterCard });
-
-    return { cardId: card.id, segments };
+    return { cardId: item.id, segments };
   }
 }

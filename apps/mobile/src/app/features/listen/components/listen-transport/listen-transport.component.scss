@@ -17,33 +17,40 @@ button {
 
 // Shuffle / repeat
 .ctrl {
-  @include u.circle(46px);
-  color: var(--lc-text-hint);
+  @include u.circle(clamp(52px, 11vw, 70px));
+  border: 1px solid var(--lc-listen-border, var(--lc-border));
+  color: var(--lc-listen-text-muted, var(--lc-text-hint));
   transition: color var(--lc-transition-fast);
 
-  svg { width: 22px; height: 22px; }
+  svg { width: 26px; height: 26px; }
 
-  &.active { color: var(--lc-brand); }
+  &.active { color: var(--lc-rv-brass-ink); }
 }
 
 // Previous / next
 .nav-btn {
-  @include u.circle(50px);
-  background: var(--lc-card);
-  border: 1px solid var(--lc-border);
-  color: var(--lc-text-primary);
+  @include u.circle(clamp(60px, 12vw, 78px));
+  background: var(--lc-listen-surface, var(--lc-card));
+  border: 1px solid var(--lc-listen-border, var(--lc-border));
+  color: var(--lc-listen-text, var(--lc-text-primary));
 
-  svg { width: 19px; height: 19px; }
+  svg { width: 25px; height: 25px; }
 }
 
 // Play / pause
 .play {
-  @include u.circle(66px);
-  background: var(--lc-brand);
-  color: var(--lc-text-inverse);
+  @include u.circle(clamp(82px, 17vw, 112px));
+  background: var(--lc-listen-text, var(--lc-text-inverse));
+  color: #13241c;
   box-shadow: var(--lc-shadow-float);
 
-  svg { width: 24px; height: 24px; }
+  svg { width: 34px; height: 34px; }
 
   &.error { background: var(--lc-fem-text); }
+}
+
+@media (max-height: 760px) {
+  .ctrl { @include u.circle(46px); }
+  .nav-btn { @include u.circle(54px); }
+  .play { @include u.circle(72px); }
 }

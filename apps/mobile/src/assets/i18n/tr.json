@@ -839,7 +839,34 @@
       "freezeEarned": "Seri dondurması kazanıldı",
       "freezeEarnProgress": "Sonraki dondurma için {{current}}/{{target}} hedef günü",
       "freezeCapacity": "En fazla 2 dondurma hazır",
-      "progress": { "back": "Geri", "kicker": "Ritmin", "title": "İlerleme", "currentStreak": "Mevcut seri", "bestStreak": "En iyi: {{count}} gün", "freezesReady": "Hazır dondurmalar", "usedRecently": "Yakın zamanda {{count}} kullanıldı", "lastDays": "Son 14 gün", "lastDaysHint": "Hedef ve seri koruma geçmişi", "safe": "Bugün güvende", "atRisk": "Risk altında", "buildStreak": "Serini oluştur", "goalMet": "Hedef tamamlandı", "protected": "Korundu", "missed": "Kaçırıldı", "open": "Açık", "untracked": "Başlamadan önce", "loading": "İlerlemen yükleniyor…", "loadError": "İlerlemen yüklenemedi.", "retry": "Tekrar dene", "emptyTitle": "Ritmin bugün başlıyor", "emptyHint": "İlerleme geçmişini başlatmak için ilk günlük hedefini tamamla.", "learningPoints": "Öğrenme Puanları", "pointsHint": "Günlük tekrarlar, hedefler ve ustalıktan kazanılır", "howFreezesWork": "Dondurmalar nasıl çalışır", "freezeExplanation": "Tam bir günü kaçırırsan mevcut bir dondurma serini otomatik olarak korur. Tekrar veya Öğrenme Puanı eklemez." }
+      "progress": {
+        "back": "Geri",
+        "kicker": "Ritmin",
+        "title": "İlerleme",
+        "currentStreak": "Mevcut seri",
+        "bestStreak": "En iyi: {{count}} gün",
+        "freezesReady": "Hazır dondurmalar",
+        "usedRecently": "Yakın zamanda {{count}} kullanıldı",
+        "lastDays": "Son 14 gün",
+        "lastDaysHint": "Hedef ve seri koruma geçmişi",
+        "safe": "Bugün güvende",
+        "atRisk": "Risk altında",
+        "buildStreak": "Serini oluştur",
+        "goalMet": "Hedef tamamlandı",
+        "protected": "Korundu",
+        "missed": "Kaçırıldı",
+        "open": "Açık",
+        "untracked": "Başlamadan önce",
+        "loading": "İlerlemen yükleniyor…",
+        "loadError": "İlerlemen yüklenemedi.",
+        "retry": "Tekrar dene",
+        "emptyTitle": "Ritmin bugün başlıyor",
+        "emptyHint": "İlerleme geçmişini başlatmak için ilk günlük hedefini tamamla.",
+        "learningPoints": "Öğrenme Puanları",
+        "pointsHint": "Günlük tekrarlar, hedefler ve ustalıktan kazanılır",
+        "howFreezesWork": "Dondurmalar nasıl çalışır",
+        "freezeExplanation": "Tam bir günü kaçırırsan mevcut bir dondurma serini otomatik olarak korur. Tekrar veya Öğrenme Puanı eklemez."
+      }
     },
     "summary": {
       "backAriaLabel": "Kasaya dön",
@@ -1030,7 +1057,11 @@
       "playBtn": "Oynat",
       "shuffleBtn": "Karıştır",
       "playlistTypeSection": "Çalma listesi türü",
-      "subline": "~{{mins}} dk · {{mode}} modu"
+      "subline": "~{{mins}} dk · {{mode}} modu",
+      "readyLabel": "READY TO PLAY",
+      "languageDirection": "German → English",
+      "whatToHearSection": "What to hear",
+      "playCountBtn": "Play {{count}} words"
     },
     "controls": {
       "speedSection": "Hız"
@@ -1044,7 +1075,10 @@
       "hdReadyTitle": "HD ses çevrimdışı hazır",
       "download": "İndir",
       "downloading": "İndiriliyor…",
-      "downloaded": "Çevrimdışı kaydedildi"
+      "downloaded": "Çevrimdışı kaydedildi",
+      "aboutDuration": "about {{mins}} min",
+      "offline": "Offline",
+      "upNext": "Up next"
     },
     "sourceSheet": {
       "title": "Çalma listesi kaynağı seçin"
@@ -1067,19 +1101,17 @@
       "preparingAudio": "Ses hazırlanıyor…",
       "retryBtn": "Tekrar dene",
       "skipCard": "Bu kartı atla",
-      "grammarTipLabel": "Gramer ipucu",
-      "minLeft": "~{{mins}} dk kaldı"
+      "minLeft": "~{{mins}} dk kaldı",
+      "of": "of",
+      "queueAriaLabel": "Çalma listesi kaynağı seçin"
     },
     "playlistMode": {
-      "compactLabel": "Kompakt",
-      "compactDesc": "Kelime + anlam",
-      "examplesLabel": "Örnekler",
-      "examplesDesc": "Tam cümleler",
-      "deepDiveLabel": "Derinlemesine",
-      "deepDiveDesc": "+ dilbilgisi ipucu",
-      "compactModeBadge": "Kompakt mod",
-      "examplesModeBadge": "Örnekler modu",
-      "deepDiveModeBadge": "Derinlemesine mod"
+      "wordsLabel": "Kompakt",
+      "wordsDesc": "Kelime + anlam",
+      "wordsWithExamplesLabel": "Örnekler",
+      "wordsWithExamplesDesc": "Tam cümleler",
+      "wordsModeBadge": "Kompakt mod",
+      "wordsWithExamplesModeBadge": "Örnekler modu"
     },
     "card": {
       "collectionPrefix": "Koleksiyon:"
@@ -1547,7 +1579,15 @@
     },
     "plural": "Çoğul",
     "masteryProgress": "Ustalık İlerlemesi",
-    "manualMastery": { "title": "Manuel olarak ustalaşıldı", "hint": "Planlanmış tekrarlardan çıkarıldı", "undoTitle": "Bu kart tekrar edilsin mi?", "undoMessage": "“{{word}}” planlanmış tekrarlara dönecek. Önceki ilerlemesi en fazla yedi günlük aralıkla geri yüklenecek.", "undoButton": "Ustalığı geri al", "saving": "Kaydediliyor…", "error": "Ustalık değiştirilemedi. Tekrar deneyin." },
+    "manualMastery": {
+      "title": "Manuel olarak ustalaşıldı",
+      "hint": "Planlanmış tekrarlardan çıkarıldı",
+      "undoTitle": "Bu kart tekrar edilsin mi?",
+      "undoMessage": "“{{word}}” planlanmış tekrarlara dönecek. Önceki ilerlemesi en fazla yedi günlük aralıkla geri yüklenecek.",
+      "undoButton": "Ustalığı geri al",
+      "saving": "Kaydediliyor…",
+      "error": "Ustalık değiştirilemedi. Tekrar deneyin."
+    },
     "level": "Seviye {{level}} — {{label}}",
     "stats": {
       "reviews": "Tekrarlar",

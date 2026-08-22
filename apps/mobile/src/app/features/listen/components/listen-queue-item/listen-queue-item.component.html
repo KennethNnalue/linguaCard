@@ -1,39 +1,11 @@
 <div class="body">
   <div class="word-row">
-    @if (card().content.article) {
-      <lc-article-badge [article]="card().content.article" />
+    <span class="position">{{ position() }}</span>
+    @if (item().article) {
+      <lc-article-badge [article]="item().article" />
     }
-    <span class="word">{{ card().content.back }}</span>
-  </div>
-
-  <div class="translation">{{ card().content.front }}</div>
-
-  @if (playMode() === 'deepDive') {
-    @let plural = card().content.plural;
-    @let syn = card().content.synonyms[0];
-    @if (plural || syn) {
-      <div class="extra">
-        @if (plural) {
-          <span><strong>Pl.</strong> {{ plural }}</span>
-        }
-        @if (syn) {
-          @if (plural) { <span class="sep">·</span> }
-          <span><strong>syn.</strong> {{ syn.article ? syn.article + ' ' : '' }}{{ syn.word }}</span>
-        }
-      </div>
-    }
-  }
-
-  <div class="meta">
-    @if (categoryLabel()) {
-      <span class="cat">{{ categoryLabel() }}</span>
-    }
-    <span class="status">{{ card().reviewState.stage }}</span>
-    @if (hdReady()) {
-      <span class="hd" [title]="'listen.queue.hdReadyTitle' | translate">
-        <span class="hd-dot" aria-hidden="true"></span>HD
-      </span>
-    }
+    <span class="word">{{ item().article }} {{ item().target }}</span>
+    <span class="translation">{{ item().native }}</span>
   </div>
 </div>
 

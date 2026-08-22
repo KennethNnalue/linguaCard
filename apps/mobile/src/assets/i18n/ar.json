@@ -839,7 +839,34 @@
       "freezeEarned": "حصلت على تجميد للسلسلة",
       "freezeEarnProgress": "{{current}}/{{target}} أيام أهداف نحو التجميد التالي",
       "freezeCapacity": "الحد الأقصى: تجميدان متاحان",
-      "progress": { "back": "رجوع", "kicker": "إيقاعك", "title": "التقدم", "currentStreak": "السلسلة الحالية", "bestStreak": "الأفضل: {{count}} يومًا", "freezesReady": "مرات التجميد المتاحة", "usedRecently": "استُخدم {{count}} مؤخرًا", "lastDays": "آخر 14 يومًا", "lastDaysHint": "سجل الأهداف وحماية السلسلة", "safe": "آمنة اليوم", "atRisk": "معرضة للخطر", "buildStreak": "ابدأ سلسلتك", "goalMet": "اكتمل الهدف", "protected": "محمي", "missed": "فائت", "open": "مفتوح", "untracked": "قبل أن تبدأ", "loading": "جارٍ تحميل تقدمك…", "loadError": "تعذر تحميل تقدمك.", "retry": "حاول مجددًا", "emptyTitle": "يبدأ إيقاعك اليوم", "emptyHint": "أكمل هدفك اليومي الأول لبدء سجل تقدمك.", "learningPoints": "نقاط التعلم", "pointsHint": "تُكتسب من المراجعات اليومية والأهداف والإتقان", "howFreezesWork": "كيف يعمل التجميد", "freezeExplanation": "إذا فاتك يوم كامل، يحمي تجميد متاح سلسلتك تلقائيًا. لا يضيف مراجعات أو نقاط تعلم." }
+      "progress": {
+        "back": "رجوع",
+        "kicker": "إيقاعك",
+        "title": "التقدم",
+        "currentStreak": "السلسلة الحالية",
+        "bestStreak": "الأفضل: {{count}} يومًا",
+        "freezesReady": "مرات التجميد المتاحة",
+        "usedRecently": "استُخدم {{count}} مؤخرًا",
+        "lastDays": "آخر 14 يومًا",
+        "lastDaysHint": "سجل الأهداف وحماية السلسلة",
+        "safe": "آمنة اليوم",
+        "atRisk": "معرضة للخطر",
+        "buildStreak": "ابدأ سلسلتك",
+        "goalMet": "اكتمل الهدف",
+        "protected": "محمي",
+        "missed": "فائت",
+        "open": "مفتوح",
+        "untracked": "قبل أن تبدأ",
+        "loading": "جارٍ تحميل تقدمك…",
+        "loadError": "تعذر تحميل تقدمك.",
+        "retry": "حاول مجددًا",
+        "emptyTitle": "يبدأ إيقاعك اليوم",
+        "emptyHint": "أكمل هدفك اليومي الأول لبدء سجل تقدمك.",
+        "learningPoints": "نقاط التعلم",
+        "pointsHint": "تُكتسب من المراجعات اليومية والأهداف والإتقان",
+        "howFreezesWork": "كيف يعمل التجميد",
+        "freezeExplanation": "إذا فاتك يوم كامل، يحمي تجميد متاح سلسلتك تلقائيًا. لا يضيف مراجعات أو نقاط تعلم."
+      }
     },
     "summary": {
       "backAriaLabel": "العودة للخزنة",
@@ -1030,7 +1057,11 @@
       "playBtn": "تشغيل",
       "shuffleBtn": "خلط",
       "playlistTypeSection": "نوع قائمة التشغيل",
-      "subline": "~{{mins}} دقيقة · وضع {{mode}}"
+      "subline": "~{{mins}} دقيقة · وضع {{mode}}",
+      "readyLabel": "READY TO PLAY",
+      "languageDirection": "German → English",
+      "whatToHearSection": "What to hear",
+      "playCountBtn": "Play {{count}} words"
     },
     "controls": {
       "speedSection": "السرعة"
@@ -1044,7 +1075,10 @@
       "hdReadyTitle": "صوت عالي الجودة متاح دون اتصال",
       "download": "تنزيل",
       "downloading": "جارٍ التنزيل…",
-      "downloaded": "محفوظ دون اتصال"
+      "downloaded": "محفوظ دون اتصال",
+      "aboutDuration": "about {{mins}} min",
+      "offline": "Offline",
+      "upNext": "Up next"
     },
     "sourceSheet": {
       "title": "اختر مصدر قائمة التشغيل"
@@ -1067,19 +1101,17 @@
       "preparingAudio": "جارٍ تجهيز الصوت…",
       "retryBtn": "إعادة المحاولة",
       "skipCard": "تخطي هذه البطاقة",
-      "grammarTipLabel": "نصيحة النحو",
-      "minLeft": "~{{mins}} دقيقة متبقية"
+      "minLeft": "~{{mins}} دقيقة متبقية",
+      "of": "of",
+      "queueAriaLabel": "اختر مصدر قائمة التشغيل"
     },
     "playlistMode": {
-      "compactLabel": "مختصر",
-      "compactDesc": "كلمة + معنى",
-      "examplesLabel": "أمثلة",
-      "examplesDesc": "جمل كاملة",
-      "deepDiveLabel": "تعمق",
-      "deepDiveDesc": "+ نصيحة نحوية",
-      "compactModeBadge": "الوضع المختصر",
-      "examplesModeBadge": "وضع الأمثلة",
-      "deepDiveModeBadge": "الوضع المتعمق"
+      "wordsLabel": "مختصر",
+      "wordsDesc": "كلمة + معنى",
+      "wordsWithExamplesLabel": "أمثلة",
+      "wordsWithExamplesDesc": "جمل كاملة",
+      "wordsModeBadge": "الوضع المختصر",
+      "wordsWithExamplesModeBadge": "وضع الأمثلة"
     },
     "card": {
       "collectionPrefix": "المجموعة:"
@@ -1547,7 +1579,15 @@
     },
     "plural": "الجمع",
     "masteryProgress": "تقدم الإتقان",
-    "manualMastery": { "title": "تم الإتقان يدويًا", "hint": "مستبعدة من المراجعات المجدولة", "undoTitle": "إعادة البطاقة إلى المراجعة؟", "undoMessage": "ستعود «{{word}}» إلى المراجعات المجدولة، مع استعادة التقدم السابق بفاصل أقصاه سبعة أيام.", "undoButton": "التراجع عن الإتقان", "saving": "جارٍ الحفظ…", "error": "تعذر تغيير حالة الإتقان. حاول مرة أخرى." },
+    "manualMastery": {
+      "title": "تم الإتقان يدويًا",
+      "hint": "مستبعدة من المراجعات المجدولة",
+      "undoTitle": "إعادة البطاقة إلى المراجعة؟",
+      "undoMessage": "ستعود «{{word}}» إلى المراجعات المجدولة، مع استعادة التقدم السابق بفاصل أقصاه سبعة أيام.",
+      "undoButton": "التراجع عن الإتقان",
+      "saving": "جارٍ الحفظ…",
+      "error": "تعذر تغيير حالة الإتقان. حاول مرة أخرى."
+    },
     "level": "المستوى {{level}} — {{label}}",
     "stats": {
       "reviews": "المراجعات",

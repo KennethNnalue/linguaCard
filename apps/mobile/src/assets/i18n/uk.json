@@ -839,7 +839,34 @@
       "freezeEarned": "Заморозку серії отримано",
       "freezeEarnProgress": "{{current}}/{{target}} днів із ціллю до наступної заморозки",
       "freezeCapacity": "Доступний максимум: 2 заморозки",
-      "progress": { "back": "Назад", "kicker": "Ваш ритм", "title": "Прогрес", "currentStreak": "Поточна серія", "bestStreak": "Рекорд: {{count}} дн.", "freezesReady": "Заморозки", "usedRecently": "Нещодавно використано: {{count}}", "lastDays": "Останні 14 днів", "lastDaysHint": "Історія цілей і захисту серії", "safe": "Сьогодні захищено", "atRisk": "Під загрозою", "buildStreak": "Почніть серію", "goalMet": "Ціль виконано", "protected": "Захищено", "missed": "Пропущено", "open": "Сьогодні", "untracked": "До початку", "loading": "Завантажуємо прогрес…", "loadError": "Не вдалося завантажити прогрес.", "retry": "Повторити", "emptyTitle": "Ваш ритм починається сьогодні", "emptyHint": "Виконайте першу денну ціль, щоб почати історію прогресу.", "learningPoints": "Бали навчання", "pointsHint": "За щоденні повторення, цілі й опанування", "howFreezesWork": "Як працює заморозка", "freezeExplanation": "Якщо ви пропустите повний день, доступна заморозка автоматично захистить серію. Вона не додає повторення чи бали навчання." }
+      "progress": {
+        "back": "Назад",
+        "kicker": "Ваш ритм",
+        "title": "Прогрес",
+        "currentStreak": "Поточна серія",
+        "bestStreak": "Рекорд: {{count}} дн.",
+        "freezesReady": "Заморозки",
+        "usedRecently": "Нещодавно використано: {{count}}",
+        "lastDays": "Останні 14 днів",
+        "lastDaysHint": "Історія цілей і захисту серії",
+        "safe": "Сьогодні захищено",
+        "atRisk": "Під загрозою",
+        "buildStreak": "Почніть серію",
+        "goalMet": "Ціль виконано",
+        "protected": "Захищено",
+        "missed": "Пропущено",
+        "open": "Сьогодні",
+        "untracked": "До початку",
+        "loading": "Завантажуємо прогрес…",
+        "loadError": "Не вдалося завантажити прогрес.",
+        "retry": "Повторити",
+        "emptyTitle": "Ваш ритм починається сьогодні",
+        "emptyHint": "Виконайте першу денну ціль, щоб почати історію прогресу.",
+        "learningPoints": "Бали навчання",
+        "pointsHint": "За щоденні повторення, цілі й опанування",
+        "howFreezesWork": "Як працює заморозка",
+        "freezeExplanation": "Якщо ви пропустите повний день, доступна заморозка автоматично захистить серію. Вона не додає повторення чи бали навчання."
+      }
     },
     "summary": {
       "backAriaLabel": "Назад до сховища",
@@ -1030,7 +1057,11 @@
       "playBtn": "Відтворити",
       "shuffleBtn": "Перемішати",
       "playlistTypeSection": "Тип плейлиста",
-      "subline": "~{{mins}} хв · режим {{mode}}"
+      "subline": "~{{mins}} хв · режим {{mode}}",
+      "readyLabel": "READY TO PLAY",
+      "languageDirection": "German → English",
+      "whatToHearSection": "What to hear",
+      "playCountBtn": "Play {{count}} words"
     },
     "controls": {
       "speedSection": "Швидкість"
@@ -1044,7 +1075,10 @@
       "hdReadyTitle": "HD-аудіо доступне офлайн",
       "download": "Завантажити",
       "downloading": "Завантаження…",
-      "downloaded": "Збережено офлайн"
+      "downloaded": "Збережено офлайн",
+      "aboutDuration": "about {{mins}} min",
+      "offline": "Offline",
+      "upNext": "Up next"
     },
     "sourceSheet": {
       "title": "Оберіть джерело плейлиста"
@@ -1067,19 +1101,17 @@
       "preparingAudio": "Підготовка аудіо…",
       "retryBtn": "Спробувати знову",
       "skipCard": "Пропустити цю картку",
-      "grammarTipLabel": "Поради з граматики",
-      "minLeft": "~{{mins}} хв залишилось"
+      "minLeft": "~{{mins}} хв залишилось",
+      "of": "of",
+      "queueAriaLabel": "Оберіть джерело плейлиста"
     },
     "playlistMode": {
-      "compactLabel": "Компактно",
-      "compactDesc": "Слово + значення",
-      "examplesLabel": "Приклади",
-      "examplesDesc": "Повні речення",
-      "deepDiveLabel": "Поглиблено",
-      "deepDiveDesc": "+ граматична порада",
-      "compactModeBadge": "Компактний режим",
-      "examplesModeBadge": "Режим прикладів",
-      "deepDiveModeBadge": "Поглиблений режим"
+      "wordsLabel": "Компактно",
+      "wordsDesc": "Слово + значення",
+      "wordsWithExamplesLabel": "Приклади",
+      "wordsWithExamplesDesc": "Повні речення",
+      "wordsModeBadge": "Компактний режим",
+      "wordsWithExamplesModeBadge": "Режим прикладів"
     },
     "card": {
       "collectionPrefix": "Колекція:"
@@ -1547,7 +1579,15 @@
     },
     "plural": "Множина",
     "masteryProgress": "Прогрес засвоєння",
-    "manualMastery": { "title": "Опановано вручну", "hint": "Виключено із запланованих повторень", "undoTitle": "Повернути картку до повторень?", "undoMessage": "«{{word}}» повернеться до запланованих повторень. Попередній прогрес відновиться з інтервалом не більше семи днів.", "undoButton": "Скасувати опанування", "saving": "Збереження…", "error": "Не вдалося змінити статус. Спробуйте ще раз." },
+    "manualMastery": {
+      "title": "Опановано вручну",
+      "hint": "Виключено із запланованих повторень",
+      "undoTitle": "Повернути картку до повторень?",
+      "undoMessage": "«{{word}}» повернеться до запланованих повторень. Попередній прогрес відновиться з інтервалом не більше семи днів.",
+      "undoButton": "Скасувати опанування",
+      "saving": "Збереження…",
+      "error": "Не вдалося змінити статус. Спробуйте ще раз."
+    },
     "level": "Рівень {{level}} — {{label}}",
     "stats": {
       "reviews": "Повторень",

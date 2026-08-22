@@ -1,111 +1,88 @@
 <ion-header class="ion-no-border">
   <ion-toolbar>
     <div class="nav">
-      <button
-        type="button"
-        class="nav-btn"
-        (click)="goBack()"
-        [attr.aria-label]="'common.back' | translate">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-          <polyline points="15,18 9,12 15,6"/>
-        </svg>
+      <button type="button" class="nav-btn" (click)="goBack()" [attr.aria-label]="'common.back' | translate">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><polyline points="6,9 12,15 18,9"/></svg>
       </button>
-
-      <div class="nav-center">
-        <lc-listen-equalizer variant="nav" [active]="isPlaying()" />
-        <span class="nav-title">{{ 'listen.nowPlaying.pageTitle' | translate }}</span>
-      </div>
-
-      <span class="nav-spacer"></span>
+      <span class="nav-title">{{ listenStore.sourceLabel() }}</span>
+      <button type="button" class="nav-more" (click)="toggleQueue()" [attr.aria-label]="'listen.nowPlaying.queueAriaLabel' | translate">
+        <svg viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="5" r="1.5"/><circle cx="12" cy="12" r="1.5"/><circle cx="12" cy="19" r="1.5"/></svg>
+      </button>
     </div>
   </ion-toolbar>
 </ion-header>
 
 <ion-content [scrollY]="false">
-  <div class="player">
+  <main class="player">
+    <section class="progress-header">
+      <span>{{ listenStore.cardIndex() + 1 }} {{ 'listen.nowPlaying.of' | translate }} {{ listenStore.queue().length }}</span>
+      <div class="progress-track"><div class="progress-fill" [style.width.%]="progressPercent()"></div></div>
+      <span>{{ 'listen.nowPlaying.minLeft' | translate:{ mins: listenStore.estimatedMinutes() } }}</span>
+    </section>
 
-    <lc-listen-word-card
-      class="word-card"
-      [card]="listenStore.currentCard()"
-      [index]="listenStore.cardIndex()"
-      [total]="listenStore.queue().length" />
+    <section class="content-stage">
+      <lc-listen-word-card
+        [card]="listenStore.currentCard()" />
 
-    <div class="stage">
-      <lc-listen-teleprompter
-        [prev]="teleprompter().prev"
-        [current]="teleprompter().current"
-        [next]="teleprompter().next"
-        [playing]="isPlaying()" />
+      <lc-listen-teleprompter [segments]="segmentViewModels()" [playing]="isPlaying()" />
+    </section>
 
-      @if (grammarNote()) {
-        <div class="grammar">
-          <svg class="bulb" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
-            <path d="M9 21h6v-1H9v1zm3-19a7 7 0 0 0-4 12.74V17a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1v-2.26A7 7 0 0 0 12 2z"/>
-          </svg>
-          <span class="grammar-text">
-            <strong>{{ 'listen.nowPlaying.grammarTipLabel' | translate }}:</strong> {{ grammarNote() }}
-          </span>
-        </div>
-      }
+    @if (isPreparing()) {
+      <div class="status-pill" role="status"><ion-spinner name="dots" />{{ 'listen.nowPlaying.preparingAudio' | translate }}</div>
+    }
 
-      @if (isPreparing()) {
-        <div class="preparing-pill">
-          <ion-spinner name="dots" />
-          <span class="preparing-text">{{ 'listen.nowPlaying.preparingAudio' | translate }}</span>
-        </div>
-      }
-
-      @if (isError()) {
-        <div class="error-pill">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
-            <circle cx="12" cy="12" r="10"/>
-            <line x1="12" y1="8" x2="12" y2="12"/>
-            <line x1="12" y1="16" x2="12.01" y2="16"/>
-          </svg>
-          <span class="error-text">{{ 'listen.nowPlaying.audioUnavailable' | translate }}</span>
-          <button type="button" class="error-retry" (click)="retry()">{{ 'listen.nowPlaying.retryBtn' | translate }}</button>
-        </div>
-        <button type="button" class="skip-link" (click)="skipCard()">{{ 'listen.nowPlaying.skipCard' | translate }}</button>
-      }
-    </div>
-
-    <!-- Progress -->
-    <div class="progress">
-      <div class="progress-track">
-        <div class="progress-fill" [style.width.%]="progressPercent()"></div>
+    @if (isError()) {
+      <div class="error-pill" role="alert">
+        <span>{{ 'listen.nowPlaying.audioUnavailable' | translate }}</span>
+        <button type="button" (click)="retry()">{{ 'listen.nowPlaying.retryBtn' | translate }}</button>
+        <button type="button" (click)="skipCard()">{{ 'listen.nowPlaying.skipCard' | translate }}</button>
       </div>
-      <div class="progress-labels">
-        <span>{{ listenStore.cardIndex() + 1 }} / {{ listenStore.queue().length }}</span>
-        <span>{{ 'listen.nowPlaying.minLeft' | translate:{ mins: listenStore.estimatedMinutes() } }}</span>
+    }
+
+    <section class="controls">
+      <div class="player-settings">
+        <lc-listen-mode-selector
+          variant="tabs"
+          [modes]="MODES"
+          [active]="listenStore.playMode()"
+          (modeChange)="setMode($event)" />
+        <button type="button" class="setting-button speed-button" (click)="cycleSpeed()" [attr.aria-label]="'listen.controls.speedSection' | translate">
+          {{ listenStore.speed() }}×
+        </button>
+        <button type="button" class="setting-button queue-button" (click)="toggleQueue()" [attr.aria-label]="'listen.nowPlaying.queueAriaLabel' | translate">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><line x1="9" y1="6" x2="21" y2="6"/><line x1="9" y1="12" x2="21" y2="12"/><line x1="9" y1="18" x2="21" y2="18"/><circle cx="4" cy="6" r="1"/><circle cx="4" cy="12" r="1"/><circle cx="4" cy="18" r="1"/></svg>
+        </button>
       </div>
-    </div>
 
-    <!-- Mode tabs -->
-    <lc-listen-mode-selector
-      class="mode-tabs"
-      variant="tabs"
-      [modes]="MODES"
-      [active]="listenStore.playMode()"
-      (modeChange)="setMode($event)" />
+      <lc-listen-transport
+        [playing]="isPlaying()"
+        [error]="isError()"
+        [shuffled]="listenStore.isShuffled()"
+        [repeat]="listenStore.isRepeat()"
+        (togglePlay)="togglePlay()"
+        (next)="next()"
+        (previous)="previous()"
+        (toggleShuffle)="toggleShuffle()"
+        (toggleRepeat)="toggleRepeat()" />
+    </section>
+  </main>
 
-    <!-- Speed -->
-    <lc-listen-speed-chips
-      class="speed"
-      [speeds]="SPEEDS"
-      [active]="listenStore.speed()"
-      (speedChange)="setSpeed($event)" />
-
-    <!-- Transport -->
-    <lc-listen-transport
-      class="transport"
-      [playing]="isPlaying()"
-      [error]="isError()"
-      [shuffled]="listenStore.isShuffled()"
-      [repeat]="listenStore.isRepeat()"
-      (togglePlay)="togglePlay()"
-      (next)="next()"
-      (previous)="previous()"
-      (toggleShuffle)="toggleShuffle()"
-      (toggleRepeat)="toggleRepeat()" />
-  </div>
+  @if (queueOpen()) {
+    <div class="queue-scrim" (click)="toggleQueue()"></div>
+    <aside class="queue-sheet" role="dialog" [attr.aria-label]="'listen.nowPlaying.queueAriaLabel' | translate">
+      <div class="queue-sheet-header">
+        <strong>{{ 'listen.queue.headerLabel' | translate }} ({{ listenStore.queue().length }})</strong>
+        <button type="button" (click)="toggleQueue()" [attr.aria-label]="'common.close' | translate">×</button>
+      </div>
+      <div class="queue-sheet-list">
+        @for (item of listenStore.queue(); track item.id; let index = $index) {
+          <div class="queue-sheet-item" [class.current]="index === listenStore.cardIndex()">
+            <span>{{ index + 1 }}</span>
+            <strong>{{ item.article }} {{ item.target }}</strong>
+            <span>{{ item.native }}</span>
+          </div>
+        }
+      </div>
+    </aside>
+  }
 </ion-content>

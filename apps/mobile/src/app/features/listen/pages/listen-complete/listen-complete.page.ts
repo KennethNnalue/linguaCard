@@ -30,7 +30,7 @@ export class ListenCompletePage {
   });
 
   readonly playModeLabelKey = computed(
-    () => PlayModeLabelKey[this.listenStore.playMode()] ?? PlayModeLabelKey.examples,
+    () => PlayModeLabelKey[this.listenStore.playMode()] ?? PlayModeLabelKey.wordsWithExamples,
   );
 
   listenAgain(): void {

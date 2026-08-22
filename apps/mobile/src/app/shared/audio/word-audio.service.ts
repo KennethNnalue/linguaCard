@@ -225,6 +225,15 @@ export class WordAudioService {
     return this._playUrl(url, rate);
   }
 
+  async playRequired(text: string, language: string, rate = 1): Promise<void> {
+    const url = await this.resolveUrl(text, language);
+    if (!url) {
+      this._playbackError.set(true);
+      throw new Error('Audio is unavailable for this phrase');
+    }
+    return this._playUrl(url, rate);
+  }
+
   /**
    * Returns true if the audio URL for this text is already in the in-memory
    * cache for this session. Used by UI components to show a "ready" indicator

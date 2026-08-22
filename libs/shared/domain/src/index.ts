@@ -8,10 +8,10 @@ export type ReviewRating = 'again' | 'hard' | 'good' | 'easy';
 export type ThemeMode = 'light' | 'dark' | 'system';
 export type OnboardingMotivation = 'travel' | 'work' | 'family' | 'culture' | 'exams';
 export type OnboardingLevel = 'beginner' | 'some' | 'intermediate';
-export type PlaylistType = 'word-meaning' | 'examples-only' | 'deep-dive';
+export type PlaylistType = 'words' | 'words-with-examples';
 export type ReviewMode = 'flashcard' | 'listen' | 'cloze' | 'write';
 export type SyncStatus = 'synced' | 'pending' | 'syncing' | 'error';
-export type PlayMode = 'compact' | 'examples' | 'deepDive';
+export type PlayMode = 'words' | 'wordsWithExamples';
 export type PlayerStatus = 'idle' | 'loading' | 'playing' | 'paused' | 'error' | 'complete';
 
 export const STREAK_FREEZE_GOAL_INTERVAL = 7;
@@ -107,13 +107,12 @@ export type SegmentType =
   | 'word_native'
   | 'example_target'
   | 'example_native'
-  | 'grammar_tip'
   | 'silence';
 
 export interface AudioSegment {
   type: SegmentType;
   text: string;
-  lang: 'de' | 'en';
+  language: string;
   durationMs?: number;
 }
 

@@ -31,6 +31,8 @@ import {addIcons} from 'ionicons';
 import {shareOutline, trashOutline, closeCircleOutline, syncOutline} from 'ionicons/icons';
 import {ShareSheetComponent} from '../../../sharing/components/share-sheet/share-sheet.component';
 import {ShareApiService} from '../../../sharing/services/share-api.service';
+import {VocabularyPlayerService} from '../../../listen/services/vocabulary-player.service';
+import {DEFAULT_PLAYLIST_LANGUAGES, toVocabularyPlaylistItem} from '../../../listen/models/listen.models';
 
 @Component({
   selector: 'lc-collection-detail',
@@ -58,6 +60,7 @@ export class CollectionDetailPage implements OnInit {
   private readonly translate = inject(TranslateService);
   private readonly cardStore = inject(CardStore);
   private readonly shareApi = inject(ShareApiService);
+  private readonly vocabularyPlayer = inject(VocabularyPlayerService);
 
   // Derived from the global CardStore — automatically reflects edits and deletes
   // made from word-detail without any manual reload.
@@ -270,7 +273,13 @@ export class CollectionDetailPage implements OnInit {
   startListen(): void {
     const col = this.collection();
     if (!col) return;
-    this.router.navigate(['/listen'], {queryParams: {collectionId: col.id, collectionName: col.name}});
+    void this.vocabularyPlayer.open({
+      playlistId: `collection:${col.id}`,
+      title: col.name,
+      source: { kind: 'collection', collectionId: col.id },
+      languages: DEFAULT_PLAYLIST_LANGUAGES,
+      items: this.allCards().map(toVocabularyPlaylistItem),
+    });
   }
 
   async openAddWord(): Promise<void> {
