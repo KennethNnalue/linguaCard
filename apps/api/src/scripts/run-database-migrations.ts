@@ -10,7 +10,12 @@ function openDeploymentPort(): Promise<Server | null> {
   const port = Number(rawPort);
   if (!Number.isInteger(port) || port < 1) throw new Error(`Invalid PORT value: ${rawPort}`);
 
-  const server = createServer((_request, response) => {
+  const server = createServer((request, response) => {
+    if (request.url === '/api/v1/health') {
+      response.writeHead(200, { 'content-type': 'application/json' });
+      response.end(JSON.stringify({ status: 'migrating' }));
+      return;
+    }
     response.writeHead(503, { 'content-type': 'application/json', 'retry-after': '10' });
     response.end(JSON.stringify({ status: 'migrating' }));
   });
