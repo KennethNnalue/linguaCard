@@ -7,12 +7,14 @@ import { WordAudioController } from './word-audio.controller';
 import { SynonymAudioPrefetchService } from './synonym-audio-prefetch.service';
 import { AiModule } from '../ai/ai.module';
 import { SubscriptionsModule } from '../subscriptions/subscriptions.module';
+import { VocabularyModule } from '../vocabulary/vocabulary.module';
 
 @Module({
   imports: [
     TypeOrmModule.forFeature([WordAudioEntity]),
     forwardRef(() => AiModule),
     SubscriptionsModule,
+    VocabularyModule,
   ],
   controllers: [WordAudioController],
   providers: [WordAudioRepository, WordAudioService, SynonymAudioPrefetchService],

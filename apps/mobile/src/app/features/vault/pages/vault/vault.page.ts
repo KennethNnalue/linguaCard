@@ -1,23 +1,24 @@
-import {ChangeDetectionStrategy, Component, computed, effect, inject, OnDestroy, OnInit, signal} from '@angular/core';
+import {ChangeDetectionStrategy, Component, computed, inject, OnDestroy, OnInit, signal} from '@angular/core';
 import {ActivatedRoute, Router} from '@angular/router';
 import {IonContent, IonRefresher, IonRefresherContent, ModalController} from '@ionic/angular/standalone';
 import {TranslatePipe, TranslateService} from '@ngx-translate/core';
-import type {Card, CefrLevel, Collection, PlatformCollectionSummary} from '@lingua-card/shared/domain';
+import type {Card, CardView, CefrLevel, CollectionSummaryView, PlatformCollectionSummary} from '@lingua-card/shared/domain';
 import {CardStore} from '../../store/card.store';
 import {CollectionStore} from '../../store/collection.store';
 import {PlatformCollectionStore} from '../../store/platform-collection.store';
 import {SyncService} from '../../../../core/services/sync.service';
 import {EngagementStore} from '../../../engagement/state/engagement.store';
-import {isDue, isMastered, isNew, stageIndicator} from '../../../review/domain/review-status';
+import {stageIndicator} from '../../../review/domain/review-status';
 import {AddWordSheetComponent} from '../../components/add-word-sheet/add-word-sheet.component';
 import {AssignCollectionSheetComponent} from '../../components/assign-collection-sheet/assign-collection-sheet.component';
-import {WordRowComponent} from '../../components/word-row/word-row.component';
 import {SpeedDialFabComponent} from '../../../../shared/components/speed-dial-fab/speed-dial-fab.component';
 import {BottomSheetService} from '../../../../shared/components/bottom-sheet/bottom-sheet.service';
 import {ImportPage} from '../import/import.page';
 import {ReviewFilterService} from '../../../review/services/review-filter.service';
 import {ReviewPlayerService} from '../../../review/services/review-player.service';
 import {SettingsStore} from '../../../settings/store/settings.store';
+import {VaultV2Store} from '../../store/vault-v2.store';
+import {CollectionCoverComponent} from '../../components/collection-cover/collection-cover.component';
 
 type VaultView = 'home' | 'index' | 'explore' | 'collections';
 type MasteryFilter = 'all' | 'due' | 'new' | 'mastered';
@@ -45,9 +46,9 @@ const EMPTY_COUNTS: CollectionCounts = {cardCount: 0, dueCount: 0, masteredCount
     IonContent,
     IonRefresher,
     IonRefresherContent,
-    WordRowComponent,
     SpeedDialFabComponent,
     TranslatePipe,
+    CollectionCoverComponent,
   ],
 })
 export class VaultPage implements OnInit, OnDestroy {
@@ -64,6 +65,7 @@ export class VaultPage implements OnInit, OnDestroy {
   private readonly reviewPlayer = inject(ReviewPlayerService);
   private readonly filterService = inject(ReviewFilterService);
   private readonly settingsStore = inject(SettingsStore);
+  readonly vaultStore = inject(VaultV2Store);
 
   constructor() {
     // Curated Explore content is lazy in the store — load it the first time the
@@ -71,20 +73,13 @@ export class VaultPage implements OnInit, OnDestroy {
     if (!this.platformStore.hasEverLoaded()) {
       this.platformStore.loadCollections();
     }
-    // If the selected topic disappears from the results (level/search change),
-    // drop it so the rail/grid don't show an empty stale selection.
-    effect(() => {
-      const topic = this.selectedTopic();
-      if (topic && !this.exploreTopics().includes(topic)) {
-        this.selectedTopic.set(null);
-      }
-    });
   }
 
   ngOnInit(): void {
     // The Vault may be the first page shown (deep link / tab restore); the streak
     // store has no auto-load, so refresh it here rather than depending on Home.
     void this.engagementStore.loadEngagement();
+    this.vaultStore.loadActiveVault();
     // Start each visit with a clean search so a stale query can't filter the
     // shared CardStore / PlatformCollectionStore from a previous session.
     this.applyCollectionSearch('');
@@ -112,7 +107,6 @@ export class VaultPage implements OnInit, OnDestroy {
   /** Explore (curated platform collections) — mirrors the Story home rail/grid. */
   readonly exploreLevel = this.platformStore.selectedLevel;
   readonly exploreLoading = this.platformStore.isLoading;
-  readonly selectedTopic = signal<string | null>(null);
 
   readonly levelFilters: ReadonlyArray<{ value: CefrLevel | 'all'; label: string }> = [
     {value: 'all', label: 'All'},
@@ -130,28 +124,15 @@ export class VaultPage implements OnInit, OnDestroy {
     return cols.filter(c => c.name.toLowerCase().includes(q));
   });
 
-  readonly exploreTopics = computed(() => {
-    const topics = new Set<string>();
-    for (const c of this.platformStore.visible()) topics.add(c.topic);
-    return [...topics];
-  });
-
-  /** Topic-filtered platform sets (the store already applies level + search). */
-  private readonly exploreFiltered = computed(() => {
-    const topic = this.selectedTopic();
-    const list = this.platformStore.visible();
-    return topic ? list.filter(c => c.topic === topic) : list;
-  });
-
   /** Rail preview on the home (capped) vs. the full in-page Explore grid. */
-  readonly exploreCards = computed(() => this.exploreFiltered().slice(0, 12));
-  readonly exploreAll = computed(() => this.exploreFiltered());
+  readonly exploreCards = computed(() => this.platformStore.visible().slice(0, 12));
+  readonly exploreAll = this.platformStore.visible;
 
   // ─── Library data ──────────────────────────────────────────────────────────
-  readonly loading = computed(() => this.cardStore.isLoading() && this.cardStore.cards().length === 0);
-  readonly totalCount = this.cardStore.totalCount;
-  readonly collections = this.collectionStore.collections;
-  readonly collectionsLoading = this.collectionStore.isLoading;
+  readonly loading = this.vaultStore.isLearningItemsLoading;
+  readonly totalCount = computed(() => this.vaultStore.vault()?.allWords.itemCount ?? 0);
+  readonly collections = computed(() => this.vaultStore.vault()?.collections ?? []);
+  readonly collectionsLoading = this.vaultStore.isVaultLoading;
   readonly collectionCount = computed(() => this.collections().length);
   readonly dayStreak = this.engagementStore.dayStreak;
 
@@ -159,10 +140,10 @@ export class VaultPage implements OnInit, OnDestroy {
   private readonly counts = computed(() => {
     const now = new Date();
     let due = 0, fresh = 0, mastered = 0;
-    for (const c of this.cardStore.cards()) {
-      if (isDue(c, now)) due++;
-      if (isNew(c)) fresh++;
-      if (isMastered(c)) mastered++;
+    for (const c of this.vaultStore.learningItems()) {
+      if (this.isViewDue(c, now)) due++;
+      if (c.reviewState.stage === 'new') fresh++;
+      if (c.reviewState.stage === 'mastered') mastered++;
     }
     return {due, fresh, mastered};
   });
@@ -173,7 +154,7 @@ export class VaultPage implements OnInit, OnDestroy {
 
   /** Stacked mastery distribution (6 segments, levels 0–5). */
   readonly distSegments = computed<MasterySegment[]>(() => {
-    const cards = this.cardStore.cards();
+    const cards = this.vaultStore.learningItems();
     const total = cards.length || 1;
     const buckets = [0, 0, 0, 0, 0, 0];
     for (const c of cards) buckets[stageIndicator(c.reviewState.stage)]++;
@@ -186,32 +167,36 @@ export class VaultPage implements OnInit, OnDestroy {
 
   /** Weighted mastery progress across all six levels (0–100). */
   readonly masteryPct = computed(() => {
-    const cards = this.cardStore.cards();
+    const cards = this.vaultStore.learningItems();
     if (cards.length === 0) return 0;
     const weighted = cards.reduce((sum, c) => sum + stageIndicator(c.reviewState.stage), 0);
     return Math.round((weighted / (cards.length * 5)) * 100);
   });
 
   // ─── Word index ──────────────────────────────────────────────────────────────
+  readonly wordQuery = signal('');
   readonly indexCards = computed(() => {
-    const cards = this.cardStore.filteredCards();
+    const query = this.wordQuery().trim().toLocaleLowerCase();
+    const cards = this.vaultStore.learningItems().filter(item => !query
+      || item.lexeme.text.toLocaleLowerCase().includes(query)
+      || item.localization.translation.toLocaleLowerCase().includes(query));
     const now = new Date();
     switch (this.masteryFilter()) {
-      case 'due': return cards.filter(c => isDue(c, now));
-      case 'new': return cards.filter(isNew);
-      case 'mastered': return cards.filter(isMastered);
+      case 'due': return cards.filter(c => this.isViewDue(c, now));
+      case 'new': return cards.filter(c => c.reviewState.stage === 'new');
+      case 'mastered': return cards.filter(c => c.reviewState.stage === 'mastered');
       default: return cards;
     }
   });
 
   // ─── Navigation between library and index ────────────────────────────────────
   openIndex(): void {
-    this.cardStore.setSearch(''); // start the index with a clean query
+    this.wordQuery.set('');
     this.view.set('index');
   }
 
   goHome(): void {
-    this.cardStore.setSearch(''); // don't leak the index query back to the home
+    this.wordQuery.set('');
     this.view.set('home');
   }
 
@@ -238,10 +223,6 @@ export class VaultPage implements OnInit, OnDestroy {
   // ─── Explore (platform collections) ──────────────────────────────────────────
   setExploreLevel(level: CefrLevel | 'all'): void {
     this.platformStore.setLevel(level);
-  }
-
-  setTopic(topic: string | null): void {
-    this.selectedTopic.set(topic);
   }
 
   /** "See all" — expand the Explore rail into the full in-page grid (no navigation). */
@@ -271,7 +252,7 @@ export class VaultPage implements OnInit, OnDestroy {
 
   onSearch(event: Event): void {
     const value = (event.target as HTMLInputElement).value ?? '';
-    this.cardStore.setSearch(value);
+    this.wordQuery.set(value);
   }
 
   // ─── Entry points ─────────────────────────────────────────────────────────────
@@ -284,11 +265,11 @@ export class VaultPage implements OnInit, OnDestroy {
     void this.router.navigateByUrl('/listen');
   }
 
-  openDetail(card: Card): void {
+  openDetail(card: CardView): void {
     void this.router.navigate(['/vault', card.id]);
   }
 
-  openCollectionDetail(col: Collection): void {
+  openCollectionDetail(col: CollectionSummaryView): void {
     void this.router.navigate(['/vault/collections', col.id]);
   }
 
@@ -345,6 +326,8 @@ export class VaultPage implements OnInit, OnDestroy {
 
   async handleRefresh(event: Event): Promise<void> {
     await this.syncService.forceSync();
+    this.vaultStore.loadActiveVault();
+    this.platformStore.loadCollections();
     (event.target as HTMLIonRefresherElement).complete();
   }
 
@@ -356,23 +339,17 @@ export class VaultPage implements OnInit, OnDestroy {
    * the hero total, and the detail stats can never disagree. (CollectionStore's
    * server counts are not used for display to avoid a second source of truth.)
    */
-  private readonly cardsByCollection = computed(() => {
-    const now = new Date();
-    const map = new Map<string, CollectionCounts>();
-    for (const c of this.cardStore.cards()) {
-      const id = c.collectionId;
-      if (!id) continue;
-      const e = map.get(id) ?? {cardCount: 0, dueCount: 0, masteredCount: 0};
-      e.cardCount++;
-      if (isDue(c, now)) e.dueCount++;
-      if (isMastered(c)) e.masteredCount++;
-      map.set(id, e);
-    }
-    return map;
-  });
-
   statsFor(id: string): CollectionCounts {
-    return this.cardsByCollection().get(id) ?? EMPTY_COUNTS;
+    const collection = this.collections().find(item => item.id === id);
+    return collection ? {
+      cardCount: collection.itemCount,
+      dueCount: collection.dueCount,
+      masteredCount: collection.masteredCount,
+    } : EMPTY_COUNTS;
+  }
+
+  coverSeedFor(collection: CollectionSummaryView): string {
+    return collection.coverSeed || collection.name;
   }
 
   coverClassFor(id: string): string {
@@ -394,5 +371,13 @@ export class VaultPage implements OnInit, OnDestroy {
     if (ratio >= 0.5) return 'high';
     if (ratio >= 0.2) return 'medium';
     return 'none';
+  }
+
+  private isViewDue(item: CardView, now: Date): boolean {
+    if (!item.reviewState.dueAt) return false;
+    return item.reviewState.stage !== 'new'
+      && item.reviewState.stage !== 'mastered'
+      && item.reviewState.masterySource !== 'manual'
+      && new Date(item.reviewState.dueAt).getTime() <= now.getTime();
   }
 }

@@ -12,6 +12,7 @@ import type {
   AdminImportCollectionJsonResult,
   AdminImportStoryResult,
   AdminPlatformCollectionListItem,
+  AdminPlatformCollectionWordItem,
   AdminPlatformStoryListItem,
   CefrLevel,
   GeneratedPlatformStory,
@@ -158,6 +159,10 @@ OUTPUT — valid JSON ONLY, no markdown fences, no commentary:
   readonly togglingId = signal<string | null>(null);
   readonly settingCategoryId = signal<string | null>(null);
   readonly deletingCollectionId = signal<string | null>(null);
+  readonly editingCollectionId = signal<string | null>(null);
+  readonly collectionWords = signal<AdminPlatformCollectionWordItem[]>([]);
+  readonly collectionWordsLoading = signal(false);
+  readonly mutatingCollectionWord = signal(false);
 
   readonly stories = signal<AdminPlatformStoryListItem[]>([]);
   readonly storiesLoading = signal(false);
@@ -209,6 +214,54 @@ OUTPUT — valid JSON ONLY, no markdown fences, no commentary:
         void this._toast(`"${item.title}" ${next ? 'published' : 'unpublished'}`, 'success');
       },
       error: () => { this.togglingId.set(null); void this._toast('Toggle failed', 'danger'); },
+    });
+  }
+
+  toggleCollectionEditor(item: AdminPlatformCollectionListItem): void {
+    if (this.editingCollectionId() === item.id) {
+      this.editingCollectionId.set(null);
+      this.collectionWords.set([]);
+      return;
+    }
+    this.editingCollectionId.set(item.id);
+    this.collectionWords.set([]);
+    this.collectionWordsLoading.set(true);
+    this.adminApi.listCollectionWords(item.id).pipe(takeUntilDestroyed(this._destroyRef)).subscribe({
+      next: words => { this.collectionWords.set(words); this.collectionWordsLoading.set(false); },
+      error: () => { this.collectionWordsLoading.set(false); void this._toast('Failed to load collection words', 'danger'); },
+    });
+  }
+
+  moveCollectionWord(collection: AdminPlatformCollectionListItem, index: number, direction: -1 | 1): void {
+    if (collection.isPublished || this.mutatingCollectionWord()) return;
+    const destination = index + direction;
+    const current = this.collectionWords();
+    if (destination < 0 || destination >= current.length) return;
+    const reordered = [...current];
+    [reordered[index], reordered[destination]] = [reordered[destination], reordered[index]];
+    this.mutatingCollectionWord.set(true);
+    this.adminApi.reorderCollectionWords(collection.id, reordered.map(word => word.id))
+      .pipe(takeUntilDestroyed(this._destroyRef)).subscribe({
+        next: () => {
+          this.collectionWords.set(reordered.map((word, position) => ({ ...word, position })));
+          this.mutatingCollectionWord.set(false);
+        },
+        error: () => { this.mutatingCollectionWord.set(false); void this._toast('Could not reorder words', 'danger'); },
+      });
+  }
+
+  removeCollectionWord(collection: AdminPlatformCollectionListItem, word: AdminPlatformCollectionWordItem): void {
+    if (collection.isPublished || this.mutatingCollectionWord()) return;
+    this.mutatingCollectionWord.set(true);
+    this.adminApi.removeCollectionWord(collection.id, word.id).pipe(takeUntilDestroyed(this._destroyRef)).subscribe({
+      next: () => {
+        this.collectionWords.update(words => words.filter(item => item.id !== word.id).map((item, position) => ({ ...item, position })));
+        this.collections.update(items => items.map(item => item.id === collection.id
+          ? { ...item, wordCount: Math.max(0, item.wordCount - 1), dictionaryLinked: Math.max(0, item.dictionaryLinked - 1), status: 'draft' }
+          : item));
+        this.mutatingCollectionWord.set(false);
+      },
+      error: () => { this.mutatingCollectionWord.set(false); void this._toast('Could not remove word', 'danger'); },
     });
   }
 
@@ -426,6 +479,8 @@ OUTPUT — valid JSON ONLY, no markdown fences, no commentary:
   }
 
   goBack(): void { this.router.navigate(['/home']); }
+
+  openV2Import(): void { void this.router.navigate(['/admin/import/v2']); }
 
   private _parseWordList(raw: string): RawWordInput[] {
     return raw

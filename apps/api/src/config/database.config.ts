@@ -28,6 +28,15 @@ import { DailyProgressEntity } from '../engagement/entities/daily-progress.entit
 import { RewardTransactionEntity } from '../engagement/entities/reward-transaction.entity';
 import { StreakFreezeTransactionEntity } from '../engagement/entities/streak-freeze-transaction.entity';
 import { CreateEngagementTables1760000000000 } from '../engagement/migration/CreateEngagementTables';
+import { VOCABULARY_ENTITIES } from '../vocabulary/vocabulary.module';
+import { CreateMultilingualVocabulary1787436000000 } from '../vocabulary/migration/CreateMultilingualVocabulary';
+import { LEARNING_ITEM_ENTITIES } from '../learning-items/learning-items.module';
+import { CreateLearningItems1787437000000 } from '../learning-items/migration/CreateLearningItems';
+import { PlatformCollectionImportEntity } from '../admin/platform-collection-import.entity';
+import { CreatePlatformCollectionImports1787438000000 } from '../admin/migration/CreatePlatformCollectionImports';
+import { AddPlatformCollectionVocabulary1787439000000 } from '../admin/migration/AddPlatformCollectionVocabulary';
+import { BackfillCanonicalLearningItems1787440000000 } from '../learning-items/migration/BackfillCanonicalLearningItems';
+import { ReconcileCanonicalLearningItems1787441000000 } from '../learning-items/migration/ReconcileCanonicalLearningItems';
 
 export default registerAs('database', (): TypeOrmModuleOptions => ({
   type: 'postgres',
@@ -35,8 +44,8 @@ export default registerAs('database', (): TypeOrmModuleOptions => ({
   ssl: process.env['NODE_ENV'] === 'production'
     ? { rejectUnauthorized: false }
     : false,
-  entities: [UserEntity, CardEntity, ReviewSchedulingEntity, CollectionEntity, CategoryEntity, StoryEntity, WordAudioEntity, SubscriptionEntity, ReviewSessionEntity, ReviewCommitEntity, CardAdministrationEventEntity, PlatformStoryEntity, UserStoryProgressEntity, UserSettingsEntity, PushSubscriptionEntity, WordDictionaryEntity, PlatformCollectionEntity, PlatformCollectionWordEntity, DiscountCodeEntity, DiscountRedemptionEntity, ShareEntity, ShareSyncLinkEntity, EngagementProcessedEventEntity, DailyReviewCardEntity, DailyProgressEntity, RewardTransactionEntity, StreakFreezeTransactionEntity],
-  migrations: [CreateEngagementTables1760000000000],
+  entities: [UserEntity, CardEntity, ReviewSchedulingEntity, CollectionEntity, CategoryEntity, StoryEntity, WordAudioEntity, SubscriptionEntity, ReviewSessionEntity, ReviewCommitEntity, CardAdministrationEventEntity, PlatformStoryEntity, UserStoryProgressEntity, UserSettingsEntity, PushSubscriptionEntity, WordDictionaryEntity, PlatformCollectionEntity, PlatformCollectionWordEntity, PlatformCollectionImportEntity, DiscountCodeEntity, DiscountRedemptionEntity, ShareEntity, ShareSyncLinkEntity, EngagementProcessedEventEntity, DailyReviewCardEntity, DailyProgressEntity, RewardTransactionEntity, StreakFreezeTransactionEntity, ...VOCABULARY_ENTITIES, ...LEARNING_ITEM_ENTITIES],
+  migrations: [CreateEngagementTables1760000000000, CreateMultilingualVocabulary1787436000000, CreateLearningItems1787437000000, CreatePlatformCollectionImports1787438000000, AddPlatformCollectionVocabulary1787439000000, BackfillCanonicalLearningItems1787440000000, ReconcileCanonicalLearningItems1787441000000],
   migrationsRun: true,
   synchronize: process.env['TYPEORM_SYNCHRONIZE'] === 'true' && process.env['NODE_ENV'] !== 'production',
   logging: process.env['NODE_ENV'] !== 'production',

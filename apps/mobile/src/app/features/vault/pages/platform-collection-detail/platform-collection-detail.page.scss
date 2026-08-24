@@ -17,6 +17,12 @@
   &.cover-6 { background: t.$lc-vx-cover-6; }
 }
 
+.cover-artwork {
+  position: absolute;
+  inset: 0;
+  display: block;
+}
+
 .cover-glow {
   position: absolute;
   top: -40px;

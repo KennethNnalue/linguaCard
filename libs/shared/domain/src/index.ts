@@ -481,6 +481,78 @@ export interface Collection {
   updatedAt: string;
 }
 
+// ─── MULTILINGUAL V2 READ MODELS ─────────────────────────────────────────────
+
+export interface LearningContextView {
+  id: string;
+  sourceLanguage: LanguageCode;
+  targetLanguage: LanguageCode;
+  isActive: boolean;
+}
+
+export interface CardView {
+  id: string;
+  learningContextId: string;
+  sourceLanguage: LanguageCode;
+  targetLanguage: LanguageCode;
+  lexeme: {
+    id: string;
+    text: string;
+    partOfSpeech: string;
+    grammar: Record<string, unknown>;
+    phonetic: string | null;
+  };
+  localization: {
+    language: LanguageCode;
+    translation: string;
+    definition: string | null;
+  };
+  examples: Array<{
+    id: string;
+    targetText: string;
+    sourceText: string | null;
+  }>;
+  personalNote: string;
+  reviewState: ReviewSchedulingState;
+  collectionIds: string[];
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface CursorPage<T> {
+  items: T[];
+  nextCursor: string | null;
+}
+
+export interface CollectionSummaryView {
+  id: string;
+  learningContextId: string;
+  name: string;
+  description: string;
+  coverSeed: string;
+  coverImageUrl: string | null;
+  level: string | null;
+  topic: string | null;
+  itemCount: number;
+  masteredCount: number;
+  dueCount: number;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface VaultView {
+  learningContext: LearningContextView;
+  allWords: {
+    itemCount: number;
+    dueCount: number;
+    masteredPercentage: number;
+  };
+  collections: CollectionSummaryView[];
+  platformCollections: {
+    availableCount: number;
+  };
+}
+
 // ─── USER ─────────────────────────────────────────────────────────────────────
 
 export interface User {
@@ -1260,18 +1332,133 @@ export interface AdminImportCollectionJsonResult {
   audioLinked: number;
 }
 
+export interface AdminPlatformCollectionImportPayload {
+  schemaVersion: 2;
+  fileName?: string;
+  collection: {
+    externalId: string;
+    title: string;
+    description: string;
+    sourceLanguage: string;
+    targetLanguage: string;
+    level: CefrLevel;
+    topic: CollectionTopic;
+    cover: { mode: 'derived' };
+  };
+  items: Array<{
+    position: number;
+    lexeme: {
+      text: string;
+      partOfSpeech: 'noun' | 'verb' | 'adjective' | 'adverb' | 'other';
+      grammar: { article: string | null; gender: string | null; plurals: string[] };
+      phonetic: string | null;
+      cefrLevel: CefrLevel | null;
+    };
+    localization: { language: string; translation: string; definition: string | null };
+    examples: Array<{ targetText: string; sourceText: string }>;
+  }>;
+}
+
+export interface AdminPlatformCollectionImportConflict {
+  code: 'duplicate-position' | 'duplicate-lexeme' | 'translation-mismatch' | 'existing-content-conflict' | 'invalid-grammar' | 'external-id-conflict';
+  itemIndex: number;
+  pointer: string;
+  severity: 'error';
+  message: string;
+  remediation: string;
+}
+
+export interface AdminPlatformCollectionImportPreview {
+  fingerprint: string;
+  status: 'valid' | 'conflicts';
+  fileName: string;
+  schemaVersion: 2;
+  sourceLanguage: string;
+  targetLanguage: string;
+  counts: {
+    items: number;
+    reused: number;
+    new: number;
+    conflicts: number;
+  };
+  readiness: {
+    metadataReady: boolean;
+    lexemesResolved: number;
+    localizationsReady: number;
+    targetAudioReady: number;
+    targetAudioRequired: number;
+  };
+  conflicts: AdminPlatformCollectionImportConflict[];
+  collection: {
+    title: string;
+    level: CefrLevel;
+    topic: CollectionTopic;
+    coverSeed: string;
+    status: 'draft';
+  };
+}
+
+export interface AdminCreatePlatformCollectionImportDto {
+  fingerprint: string;
+  payload: AdminPlatformCollectionImportPayload;
+}
+
+export interface AdminPlatformCollectionImportResult {
+  importId: string;
+  collectionId: string | null;
+  title: string;
+  status: 'processing' | 'completed' | 'needs_attention';
+  inserted: number;
+  reused: number;
+  audioLinked: number;
+}
+
+export interface AdminPlatformCollectionImportStatus {
+  importId: string;
+  fingerprint: string;
+  status: 'processing' | 'completed' | 'needs_attention' | 'failed';
+  collectionId: string | null;
+  title: string;
+  inserted: number;
+  reused: number;
+  audioLinked: number;
+  error: string | null;
+  stage: 'queued' | 'resolve_vocabulary' | 'prepare_audio' | 'commit_collection' | 'complete' | 'failed';
+  processedItems: number;
+  totalItems: number;
+  rowErrors: Array<{ itemIndex: number | null; message: string }>;
+}
+
 export interface AdminPlatformCollectionListItem {
   id: string;
   title: string;
   emoji: string | null;
   level: string;
   topic: string;
+  sourceLanguage: LanguageCode;
+  targetLanguage: LanguageCode;
+  status: 'draft' | 'needs_attention' | 'ready_to_publish' | 'published' | 'failed';
   wordCount: number;
   dictionaryLinked: number;
   isPublished: boolean;
   /** Admin-set story category for deterministic story pairing (LC-414). */
   storyCategory: string | null;
   createdAt: string;
+  updatedAt: string;
+}
+
+export interface AdminPlatformCollectionWordItem {
+  id: string;
+  dictionaryWordId: string;
+  lexemeId: string | null;
+  position: number;
+  targetText: string;
+  translation: string;
+  localizationReady: boolean;
+}
+
+export interface AdminReorderPlatformCollectionWordsDto {
+  itemIds: string[];
 }
 
 export interface AdminPlatformStoryListItem {
@@ -1302,11 +1489,15 @@ export type PlatformCollectionAdoptionStatus = 'not-adopted' | 'adopted';
 export interface PlatformCollectionSummary {
   id: string;
   title: string;
+  sourceLanguage: LanguageCode;
+  targetLanguage: LanguageCode;
+  coverSeed: string;
+  coverImageUrl: string | null;
   emoji: string | null;
   level: CefrLevel;
   topic: string;
   wordCount: number;
-  /** Exact count of this set's words that already exist in the user's vault (dictionaryWordId join). */
+  /** Exact count of this set's shared lexemes already learned in the active context. */
   knownCount: number;
   adoptionStatus: PlatformCollectionAdoptionStatus;
   /** ID of the user's Collection entity if already adopted, null otherwise. */

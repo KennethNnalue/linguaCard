@@ -9,6 +9,7 @@ import { WordDictionaryModule } from '../word-dictionary/word-dictionary.module'
 import { PlatformStoriesModule } from '../platform-stories/platform-stories.module';
 import { PlatformCollectionsService } from './platform-collections.service';
 import { PlatformCollectionsController } from './platform-collections.controller';
+import { LearningContextEntity } from '../learning-items/entities/learning-context.entity';
 
 @Module({
   imports: [
@@ -17,6 +18,7 @@ import { PlatformCollectionsController } from './platform-collections.controller
       PlatformCollectionWordEntity,
       CollectionEntity,
       CardEntity,
+      LearningContextEntity,
     ]),
     forwardRef(() => AuthModule),
     WordDictionaryModule,

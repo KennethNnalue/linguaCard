@@ -1,5 +1,5 @@
 import { AppNotificationService } from '@lingua-card/mobile/notifications';
-import {Component, computed, effect, inject, OnInit, signal} from '@angular/core';
+import {Component, computed, inject, OnInit, signal} from '@angular/core';
 import {ActivatedRoute, Router} from '@angular/router';
 import {
   ActionSheetButton,
@@ -9,22 +9,17 @@ import {
   ModalController,
   } from '@ionic/angular/standalone';
 import {TranslateService, TranslatePipe} from '@ngx-translate/core';
-import {Card, Collection} from '@lingua-card/shared/domain';
-import {isDue, isMastered} from '../../../review/domain/review-status';
+import {Card, CardView, Collection, ScheduledCard} from '@lingua-card/shared/domain';
 import {firstValueFrom} from 'rxjs';
 import {CollectionApiService} from '../../services/collection-api.service';
 import {CardStore} from '../../store/card.store';
-import {CategoryStore} from '../../store/category.store';
 import {CollectionStore} from '../../store/collection.store';
 import {AddWordSheetComponent} from '../../components/add-word-sheet/add-word-sheet.component';
-import {getCategoryName} from '../../../../shared/helpers/helpers';
 import {FabButtonComponent} from '../../../../shared/components/fab-button/fab-button.component';
 import {ReviewFilterService} from '../../../review/services/review-filter.service';
 import {ReviewPlayerService} from '../../../review/services/review-player.service';
-import {WordRowComponent} from '../../components/word-row/word-row.component';
 import {WordAudioService} from '../../../../shared/audio/word-audio.service';
 import {AudioReadinessStore} from '../../../../shared/audio/audio-readiness.store';
-import {CollectionAudioPrefetchService} from '../../../../shared/audio/collection-audio-prefetch.service';
 import {normalizeForAudio} from '../../../../shared/audio/normalize';
 import {ImageImportApiService} from '../../import/services/image-import-api.service';
 import {addIcons} from 'ionicons';
@@ -32,21 +27,22 @@ import {shareOutline, trashOutline, closeCircleOutline, syncOutline} from 'ionic
 import {ShareSheetComponent} from '../../../sharing/components/share-sheet/share-sheet.component';
 import {ShareApiService} from '../../../sharing/services/share-api.service';
 import {VocabularyPlayerService} from '../../../listen/services/vocabulary-player.service';
-import {DEFAULT_PLAYLIST_LANGUAGES, toVocabularyPlaylistItem} from '../../../listen/models/listen.models';
+import {toVocabularyPlaylistItem} from '../../../listen/models/listen.models';
+import {VaultV2Store} from '../../store/vault-v2.store';
+import {CollectionCoverComponent} from '../../components/collection-cover/collection-cover.component';
 
 @Component({
   selector: 'lc-collection-detail',
   standalone: true,
   templateUrl: './collection-detail.page.html',
   styleUrls: ['./collection-detail.page.scss'],
-  imports: [IonContent, FabButtonComponent, WordRowComponent, TranslatePipe],
+  imports: [IonContent, FabButtonComponent, TranslatePipe, CollectionCoverComponent],
 })
 export class CollectionDetailPage implements OnInit {
   private readonly route = inject(ActivatedRoute);
   private readonly router = inject(Router);
   private readonly collectionApi = inject(CollectionApiService);
   private readonly collectionStore = inject(CollectionStore);
-  private readonly categoryStore = inject(CategoryStore);
   private readonly modalCtrl = inject(ModalController);
   private readonly alertCtrl = inject(AlertController);
   private readonly actionSheetCtrl = inject(ActionSheetController);
@@ -55,12 +51,12 @@ export class CollectionDetailPage implements OnInit {
   private readonly reviewPlayer = inject(ReviewPlayerService);
   private readonly wordAudio = inject(WordAudioService);
   private readonly audioReadiness = inject(AudioReadinessStore);
-  private readonly audioPrefetch = inject(CollectionAudioPrefetchService);
   private readonly importApi = inject(ImageImportApiService);
   private readonly translate = inject(TranslateService);
   private readonly cardStore = inject(CardStore);
   private readonly shareApi = inject(ShareApiService);
   private readonly vocabularyPlayer = inject(VocabularyPlayerService);
+  readonly vaultStore = inject(VaultV2Store);
 
   // Derived from the global CardStore — automatically reflects edits and deletes
   // made from word-detail without any manual reload.
@@ -72,30 +68,17 @@ export class CollectionDetailPage implements OnInit {
   readonly allCards = computed(() => {
     const id = this.collectionId();
     if (!id) return [];
-    return this.cardStore.cards().filter(c => c.collectionId === id);
+    return this.vaultStore.learningItems().filter(item => item.collectionIds.includes(id));
   });
-  readonly activeCategoryId = signal<string | null>(null);
   readonly loading = signal(true);
   readonly isSynced = signal(false);
 
-  readonly categories = this.categoryStore.categories;
-
-  readonly categoryIds = computed(() => {
-    const cards = this.allCards();
-    return [...new Set(cards.flatMap(c => c.categoryIds))];
-  });
-
-  readonly filteredCards = computed(() => {
-    const catId = this.activeCategoryId();
-    const cards = this.allCards();
-    return catId ? cards.filter(c => c.categoryIds.includes(catId)) : cards;
-  });
 
   readonly wordCount = computed(() => this.allCards().length);
 
   readonly dueCount = computed(() => {
     const now = new Date();
-    return this.allCards().filter(c => isDue(c, now)).length;
+    return this.allCards().filter(item => this.isViewDue(item, now)).length;
   });
 
   readonly pendingGhosts = computed(() => {
@@ -117,11 +100,11 @@ export class CollectionDetailPage implements OnInit {
   private readonly _audioCacheKeys = computed(() => {
     const keys: string[] = [];
     for (const c of this.allCards()) {
-      const wordText = (c.content.article ? `${c.content.article} ` : '') + c.content.back;
-      keys.push(`wa-de-DE-${normalizeForAudio(wordText, 'de-DE')}`);
-      for (const ex of c.content.examples ?? []) {
-        if (ex.target?.trim()) {
-          keys.push(`wa-de-DE-${normalizeForAudio(ex.target.trim(), 'de-DE')}`);
+      const locale = this.targetLocale();
+      keys.push(`wa-${locale}-${normalizeForAudio(c.lexeme.text, locale)}`);
+      for (const ex of c.examples) {
+        if (ex.targetText.trim()) {
+          keys.push(`wa-${locale}-${normalizeForAudio(ex.targetText.trim(), locale)}`);
         }
       }
     }
@@ -139,7 +122,7 @@ export class CollectionDetailPage implements OnInit {
   });
 
   readonly masteredCount = computed(() =>
-    this.allCards().filter(isMastered).length,
+    this.allCards().filter(item => item.reviewState.stage === 'mastered').length,
   );
 
   readonly progressPercent = computed(() => {
@@ -157,35 +140,16 @@ export class CollectionDetailPage implements OnInit {
     return `cover-${(Math.abs(hash) % 6) + 1}`;
   });
 
-  /** Topical eyebrow over the collection name (first category, else a generic label). */
-  readonly eyebrow = computed(() => {
-    const first = this.categoryIds()[0];
-    return first
-      ? getCategoryName(first, this.categories())
-      : this.translate.instant('vault.lexicon.collectionEyebrow');
-  });
-
-  protected readonly getCategoryName = getCategoryName;
-
-  private _audioPrefetched = false;
+  readonly eyebrow = computed(() => this.translate.instant('vault.lexicon.collectionEyebrow'));
 
   constructor() {
     addIcons({shareOutline, trashOutline, closeCircleOutline, syncOutline});
-
-    // Trigger audio prefetch once, the first time cards for this collection are
-    // available in the store. Runs in the injection context so effect() is valid.
-    effect(() => {
-      const cards = this.allCards();
-      if (cards.length > 0 && !this._audioPrefetched) {
-        this._audioPrefetched = true;
-        this.audioPrefetch.prefetchCollection(cards);
-      }
-    });
   }
 
   ngOnInit(): void {
     const id = this.route.snapshot.paramMap.get('id')!;
     this.collectionId.set(id);
+    this.vaultStore.loadActiveVault();
 
     // Prefer the store (already cached) to avoid an extra API call on every open.
     // Fall back to the API only when the collection is absent (deep-link / fresh device).
@@ -267,7 +231,7 @@ export class CollectionDetailPage implements OnInit {
   startReview(): void {
     const col = this.collection();
     if (!col) return;
-    void this.reviewPlayer.open(this.allCards(), { kind: 'collection', collectionId: col.id });
+    void this.reviewPlayer.open(this.reviewCards(), { kind: 'collection', collectionId: col.id });
   }
 
   startListen(): void {
@@ -277,8 +241,11 @@ export class CollectionDetailPage implements OnInit {
       playlistId: `collection:${col.id}`,
       title: col.name,
       source: { kind: 'collection', collectionId: col.id },
-      languages: DEFAULT_PLAYLIST_LANGUAGES,
-      items: this.allCards().map(toVocabularyPlaylistItem),
+      languages: {
+        target: this.targetLocale(),
+        native: this.sourceLocale(),
+      },
+      items: this.reviewCards().map(toVocabularyPlaylistItem),
     });
   }
 
@@ -435,21 +402,71 @@ export class CollectionDetailPage implements OnInit {
     await alert.present();
   }
 
-  setCategory(id: string | null): void {
-    this.activeCategoryId.set(id);
-  }
-
-  openDetail(card: Card): void {
+  openDetail(card: CardView): void {
     this.router.navigate(['/vault', card.id]);
   }
 
-  playAudio(card: Card): void {
-    void this.wordAudio.playCard(card);
+  coverSeed(): string {
+    return this.vaultStore.vault()?.collections.find(item => item.id === this.collectionId())?.coverSeed
+      ?? this.collection()?.name
+      ?? '';
   }
 
-  getAudioStatus(card: Card) {
-    const text = (card.content.article ? `${card.content.article} ` : '') + card.content.back;
-    const key = `wa-de-DE-${normalizeForAudio(text, 'de-DE')}`;
-    return this.audioReadiness.statusFor(key);
+  private reviewCards(): ScheduledCard[] {
+    return this.allCards().map(item => this.toScheduledCard(item));
+  }
+
+  private toScheduledCard(item: CardView): ScheduledCard {
+    const grammar = item.lexeme.grammar as { article?: Card['content']['article']; gender?: Card['content']['gender']; plurals?: string[] };
+    return {
+      id: item.id,
+      deckId: '',
+      collectionId: this.collectionId(),
+      userId: '',
+      contextId: item.learningContextId,
+      dictionaryWordId: null,
+      content: {
+        front: item.localization.translation,
+        back: item.lexeme.text,
+        article: grammar.article ?? null,
+        gender: grammar.gender ?? null,
+        plural: grammar.plurals?.[0] ?? null,
+        examples: item.examples.map(example => ({
+          id: example.id,
+          target: example.targetText,
+          native: example.sourceText ?? '',
+        })),
+        synonyms: [],
+        notes: item.personalNote,
+        imageUrl: null,
+        phonetic: item.lexeme.phonetic,
+      },
+      categoryIds: [],
+      tags: [],
+      createdAt: item.createdAt,
+      updatedAt: item.updatedAt,
+      version: 1,
+      reviewState: item.reviewState,
+    };
+  }
+
+  private targetLocale(): string {
+    const language = this.vaultStore.vault()?.learningContext.targetLanguage ?? 'de';
+    const locales: Record<string, string> = { de: 'de-DE', en: 'en-US', es: 'es-ES', ar: 'ar-SA' };
+    return locales[language] ?? language;
+  }
+
+  private sourceLocale(): string {
+    const language = this.vaultStore.vault()?.learningContext.sourceLanguage ?? 'en';
+    const locales: Record<string, string> = { de: 'de-DE', en: 'en-US', es: 'es-ES', ar: 'ar-SA' };
+    return locales[language] ?? language;
+  }
+
+  private isViewDue(item: CardView, now: Date): boolean {
+    if (!item.reviewState.dueAt) return false;
+    return item.reviewState.stage !== 'new'
+      && item.reviewState.stage !== 'mastered'
+      && item.reviewState.masterySource !== 'manual'
+      && new Date(item.reviewState.dueAt).getTime() <= now.getTime();
   }
 }

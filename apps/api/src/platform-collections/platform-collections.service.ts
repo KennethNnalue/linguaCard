@@ -13,6 +13,7 @@ import type {
   Collection,
   StoryDifficulty,
   StoryCategory,
+  LanguageCode,
 } from '@lingua-card/shared/domain';
 import { PlatformCollectionEntity } from '../admin/platform-collection.entity';
 import { PlatformCollectionWordEntity } from '../admin/platform-collection-word.entity';
@@ -20,6 +21,7 @@ import { WordDictionaryRepository } from '../word-dictionary/word-dictionary.rep
 import { PlatformStoriesService } from '../platform-stories/platform-stories.service';
 import { CollectionEntity } from '../collections/collection.entity';
 import { CardEntity } from '../cards/card.entity';
+import { LearningContextEntity } from '../learning-items/entities/learning-context.entity';
 
 @Injectable()
 export class PlatformCollectionsService {
@@ -32,13 +34,20 @@ export class PlatformCollectionsService {
     private readonly userCollectionRepo: Repository<CollectionEntity>,
     @InjectRepository(CardEntity)
     private readonly cardRepo: Repository<CardEntity>,
+    @InjectRepository(LearningContextEntity)
+    private readonly learningContextRepo: Repository<LearningContextEntity>,
     private readonly dictRepo: WordDictionaryRepository,
     private readonly storiesService: PlatformStoriesService,
   ) {}
 
   async findAll(userId: string): Promise<PlatformCollectionListResponse> {
+    const context = await this.activeLearningContext(userId);
     const collections = await this.collectionRepo.find({
-      where: { isPublished: true },
+      where: {
+        isPublished: true,
+        sourceLanguage: context.sourceLanguage,
+        targetLanguage: context.targetLanguage,
+      },
       order: { createdAt: 'ASC' },
     });
 
@@ -53,11 +62,12 @@ export class PlatformCollectionsService {
       await this.collectionRepo.manager.query(
         `SELECT pcw."platformCollectionId", COUNT(*)::int AS known
          FROM platform_collection_words pcw
-         JOIN cards c ON c."dictionaryWordId" = pcw."dictionaryWordId"
-           AND c."userId" = $1
+         JOIN learning_items item ON item."lexemeId" = pcw."lexemeId"
+           AND item."userId" = $1
+           AND item."learningContextId" = $3
          WHERE pcw."platformCollectionId" = ANY($2::text[])
          GROUP BY pcw."platformCollectionId"`,
-        [userId, ids],
+        [userId, ids, context.id],
       );
     const knownMap = new Map(knownRows.map(r => [r.platformCollectionId, r.known]));
 
@@ -82,6 +92,10 @@ export class PlatformCollectionsService {
       return {
         id: c.id,
         title: c.title,
+        sourceLanguage: c.sourceLanguage as LanguageCode,
+        targetLanguage: c.targetLanguage as LanguageCode,
+        coverSeed: c.coverSeed ?? c.externalId ?? c.title,
+        coverImageUrl: c.coverImageUrl,
         emoji: c.emoji,
         level,
         topic: c.topic,
@@ -96,7 +110,13 @@ export class PlatformCollectionsService {
   }
 
   async findOne(userId: string, id: string): Promise<PlatformCollectionDetail> {
-    const collection = await this.collectionRepo.findOneBy({ id, isPublished: true });
+    const context = await this.activeLearningContext(userId);
+    const collection = await this.collectionRepo.findOneBy({
+      id,
+      isPublished: true,
+      sourceLanguage: context.sourceLanguage,
+      targetLanguage: context.targetLanguage,
+    });
     if (!collection) throw new NotFoundException(`Platform collection ${id} not found`);
 
     // Fetch word rows ordered by position
@@ -111,13 +131,15 @@ export class PlatformCollectionsService {
     const dictMap = new Map(dictEntries.map(e => [e.id, e]));
 
     // Known set for this user
-    const knownRows: Array<{ dictionaryWordId: string }> =
+    const knownRows: Array<{ lexemeId: string }> =
       await this.collectionRepo.manager.query(
-        `SELECT "dictionaryWordId" FROM cards
-         WHERE "userId" = $1 AND "dictionaryWordId" = ANY($2::text[])`,
-        [userId, dictIds],
+        `SELECT item."lexemeId" FROM learning_items item
+         WHERE item."userId" = $1
+           AND item."learningContextId" = $2
+           AND item."lexemeId" = ANY($3::text[])`,
+        [userId, context.id, wordRows.flatMap(row => row.lexemeId ? [row.lexemeId] : [])],
       );
-    const knownSet = new Set(knownRows.map(r => r.dictionaryWordId));
+    const knownSet = new Set(knownRows.map(r => r.lexemeId));
 
     const knownCount = knownSet.size;
 
@@ -140,7 +162,7 @@ export class PlatformCollectionsService {
         cefrLevel: (e?.cefrLevel as CefrLevel | null) ?? null,
         exampleTarget: e?.examples?.[0]?.target ?? null,
         exampleNative: e?.examples?.[0]?.native ?? null,
-        knownToUser: knownSet.has(w.dictionaryWordId),
+        knownToUser: Boolean(w.lexemeId && knownSet.has(w.lexemeId)),
       };
     });
 
@@ -157,6 +179,10 @@ export class PlatformCollectionsService {
     return {
       id: collection.id,
       title: collection.title,
+      sourceLanguage: collection.sourceLanguage as LanguageCode,
+      targetLanguage: collection.targetLanguage as LanguageCode,
+      coverSeed: collection.coverSeed ?? collection.externalId ?? collection.title,
+      coverImageUrl: collection.coverImageUrl,
       emoji: collection.emoji,
       level: collection.level as CefrLevel,
       topic: collection.topic,
@@ -170,7 +196,13 @@ export class PlatformCollectionsService {
   }
 
   async adopt(userId: string, platformCollectionId: string): Promise<AdoptPlatformCollectionResult> {
-    const platform = await this.collectionRepo.findOneBy({ id: platformCollectionId, isPublished: true });
+    const context = await this.activeLearningContext(userId);
+    const platform = await this.collectionRepo.findOneBy({
+      id: platformCollectionId,
+      isPublished: true,
+      sourceLanguage: context.sourceLanguage,
+      targetLanguage: context.targetLanguage,
+    });
     if (!platform) throw new NotFoundException(`Platform collection ${platformCollectionId} not found`);
 
     // Idempotent: if already adopted, return existing with live counts
@@ -192,7 +224,19 @@ export class PlatformCollectionsService {
     const dictEntries = await this.dictRepo.findByIds(dictIds);
     const dictMap = new Map(dictEntries.map(e => [e.id, e]));
 
-    // Dedup primary: dictionaryWordId exact match
+    const lexemeIds = [...new Set(wordRows.flatMap(row => row.lexemeId ? [row.lexemeId] : []))];
+    // A user's vocabulary identity is the shared lexeme within the active learning
+    // context. Dictionary rows are source-language projections and are not identity.
+    const learnedLexemes: Array<{ lexemeId: string }> = lexemeIds.length
+      ? await this.cardRepo.manager.query(
+        `SELECT "lexemeId" FROM learning_items
+         WHERE "userId" = $1 AND "learningContextId" = $2 AND "lexemeId" = ANY($3::text[])`,
+        [userId, context.id, lexemeIds],
+      )
+      : [];
+    const learnedLexemeSet = new Set(learnedLexemes.map(row => row.lexemeId));
+
+    // Compatibility for platform rows which have not yet received a lexeme mapping.
     const linkedIds: Array<{ dictionaryWordId: string }> = await this.cardRepo.manager.query(
       `SELECT "dictionaryWordId" FROM cards
        WHERE "userId" = $1 AND "dictionaryWordId" = ANY($2::text[])`,
@@ -227,6 +271,9 @@ export class PlatformCollectionsService {
         emoji: platform.emoji ?? '📚',
         colour: '#2D5A4E',
         contextId: 'german-vocab',
+        learningContextId: context.id,
+        coverSeed: platform.coverSeed ?? platform.externalId ?? platform.title,
+        coverImageUrl: platform.coverImageUrl,
         cardCount: 0,
         masteredCount: 0,
         dueCount: 0,
@@ -245,7 +292,9 @@ export class PlatformCollectionsService {
         if (!e) { skippedCount++; continue; }
 
         const lemmaLower = e.lemmaKey.toLowerCase().trim();
-        if (linkedSet.has(wr.dictionaryWordId) || legacySet.has(lemmaLower)) {
+        if ((wr.lexemeId && learnedLexemeSet.has(wr.lexemeId))
+            || (!wr.lexemeId && linkedSet.has(wr.dictionaryWordId))
+            || legacySet.has(lemmaLower)) {
           skippedCount++;
           continue;
         }
@@ -284,8 +333,29 @@ export class PlatformCollectionsService {
       }
       addedCount = newCards.length;
 
-      // Update cardCount accurately before returning
-      userCol.cardCount = addedCount;
+      // Card projection triggers create learning items for newly inserted cards.
+      // Attach both new and previously learned lexemes to this collection so
+      // adoption never duplicates user vocabulary and never drops reused words.
+      if (lexemeIds.length) {
+        await manager.query(
+          `INSERT INTO user_collection_items ("collectionId", "learningItemId", position)
+           SELECT $1, item.id, platform_item.position
+           FROM platform_collection_words platform_item
+           JOIN learning_items item
+             ON item."lexemeId" = platform_item."lexemeId"
+            AND item."userId" = $2
+            AND item."learningContextId" = $3
+           WHERE platform_item."platformCollectionId" = $4
+           ON CONFLICT ("collectionId", "learningItemId") DO NOTHING`,
+          [colId, userId, context.id, platformCollectionId],
+        );
+      }
+
+      const membershipCounts: Array<{ count: number }> = await manager.query(
+        `SELECT COUNT(*)::int AS count FROM user_collection_items WHERE "collectionId" = $1`,
+        [colId],
+      );
+      userCol.cardCount = membershipCounts[0]?.count ?? addedCount;
       return manager.save(userCol);
     });
 
@@ -349,5 +419,11 @@ export class PlatformCollectionsService {
 
   private emptyLevelCounts(): Record<CefrLevel, number> {
     return { A1: 0, A2: 0, B1: 0, B2: 0, C1: 0 };
+  }
+
+  private async activeLearningContext(userId: string): Promise<LearningContextEntity> {
+    const context = await this.learningContextRepo.findOneBy({ userId, isActive: true });
+    if (!context) throw new NotFoundException('No active learning context found');
+    return context;
   }
 }

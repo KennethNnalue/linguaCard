@@ -34,17 +34,6 @@
           </div>
         }
 
-        @if (categoryName() || word.tags.length) {
-          <div class="pills">
-            @if (categoryName()) {
-              <span class="pill">{{ categoryName() }}</span>
-            }
-            @for (tag of word.tags; track tag) {
-              <span class="pill">{{ tag }}</span>
-            }
-          </div>
-        }
-
         <button class="listen-btn" (click)="playPronunciation()" [disabled]="isPronunciationLoading()">
           @if (isPronunciationLoading()) {
             <span class="listen-spinner"></span>

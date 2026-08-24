@@ -146,7 +146,7 @@
         <!-- /hero + all-words -->
 
         <!-- Explore — curated platform collections (mirrors Story home) -->
-        @if (exploreLoading() || exploreCards().length > 0 || exploreTopics().length > 0) {
+        @if (exploreLoading() || exploreCards().length > 0) {
           <div class="section-head section-head--explore">
             <div>
               <h2 class="section-title">{{ 'vault.explore.title' | translate }}</h2>
@@ -170,19 +170,6 @@
             }
           </div>
 
-          @if (exploreTopics().length > 0) {
-            <div class="chips chips--explore">
-              <button class="chip" [class.chip--active]="selectedTopic() === null" (click)="setTopic(null)">
-                {{ 'vault.filter.allLabel' | translate }}
-              </button>
-              @for (topic of exploreTopics(); track topic) {
-                <button class="chip" [class.chip--active]="selectedTopic() === topic" (click)="setTopic(topic)">
-                  {{ topic }}
-                </button>
-              }
-            </div>
-          }
-
           <div class="rail">
             @if (exploreLoading() && exploreCards().length === 0) {
               @for (i of [1, 2, 3]; track i) {
@@ -191,7 +178,8 @@
             } @else {
               @for (c of exploreCards(); track c.id) {
                 <button class="cover-card" (click)="openPlatformDetail(c)">
-                  <span class="cover-art" [class]="coverClassFor(c.id)">
+                  <span class="cover-art">
+                    <lc-collection-cover [name]="c.title" [seed]="c.coverSeed" />
                     <span class="cover-level">{{ c.level }}</span>
                     @if (c.emoji) {
                       <span class="cover-emoji-art">{{ c.emoji }}</span>
@@ -202,7 +190,7 @@
                   </span>
                   <span class="cover-body">
                     <span class="cover-title">{{ c.title }}</span>
-                    <span class="cover-meta">{{ c.wordCount }} {{ 'common.words' | translate }} · {{ c.topic }}</span>
+                    <span class="cover-meta">{{ c.wordCount }} {{ 'common.words' | translate }}</span>
                   </span>
                 </button>
               } @empty {
@@ -240,8 +228,8 @@
               @let s = statsFor(col.id);
               @let urgency = urgencyLevel(s);
               <button class="col-card" (click)="openCollectionDetail(col)">
-                <span class="col-cover" [class]="coverClassFor(col.id)">
-                  <span class="col-emoji">{{ col.emoji }}</span>
+                <span class="col-cover">
+                  <lc-collection-cover [name]="col.name" [seed]="coverSeedFor(col)" />
                 </span>
                 <span class="col-body">
                   <span class="col-top">
@@ -333,7 +321,13 @@
             }
           } @else {
             @for (card of indexCards(); track card.id) {
-              <lc-word-row [card]="card" (rowClick)="openDetail(card)"/>
+              <button class="index-word-row" type="button" (click)="openDetail(card)">
+                <span class="index-word-copy">
+                  <strong>{{ card.lexeme.text }}</strong>
+                  <small>{{ card.localization.translation }}</small>
+                </span>
+                <span class="index-word-stage">{{ card.reviewState.stage }}</span>
+              </button>
             } @empty {
               <div class="empty">
                 <span class="empty-icon">🔍</span>
@@ -385,18 +379,6 @@
             }
           </div>
 
-          @if (exploreTopics().length > 0) {
-            <div class="chips chips--explore">
-              <button class="chip" [class.chip--active]="selectedTopic() === null" (click)="setTopic(null)">
-                {{ 'vault.filter.allLabel' | translate }}
-              </button>
-              @for (topic of exploreTopics(); track topic) {
-                <button class="chip" [class.chip--active]="selectedTopic() === topic" (click)="setTopic(topic)">
-                  {{ topic }}
-                </button>
-              }
-            </div>
-          }
         </div>
 
         <div class="grid">
@@ -407,7 +389,8 @@
           } @else {
             @for (c of exploreAll(); track c.id) {
               <button class="cover-card cover-card--grid" (click)="openPlatformDetail(c)">
-                <span class="cover-art" [class]="coverClassFor(c.id)">
+                <span class="cover-art">
+                  <lc-collection-cover [name]="c.title" [seed]="c.coverSeed" />
                   <span class="cover-level">{{ c.level }}</span>
                   @if (c.emoji) {
                     <span class="cover-emoji-art">{{ c.emoji }}</span>
@@ -418,7 +401,7 @@
                 </span>
                 <span class="cover-body">
                   <span class="cover-title">{{ c.title }}</span>
-                  <span class="cover-meta">{{ c.wordCount }} {{ 'common.words' | translate }} · {{ c.topic }}</span>
+                  <span class="cover-meta">{{ c.wordCount }} {{ 'common.words' | translate }}</span>
                 </span>
               </button>
             } @empty {
@@ -451,10 +434,8 @@
           @for (col of collections(); track col.id) {
             @let s = statsFor(col.id);
             <button class="cover-card cover-card--grid" (click)="openCollectionDetail(col)">
-              <span class="cover-art" [class]="coverClassFor(col.id)">
-                @if (col.emoji) {
-                  <span class="cover-emoji-art">{{ col.emoji }}</span>
-                }
+              <span class="cover-art">
+                <lc-collection-cover [name]="col.name" [seed]="coverSeedFor(col)" />
                 @if (s.dueCount > 0) {
                   <span class="cover-due-badge">{{ s.dueCount }} {{ 'common.due' | translate }}</span>
                 }

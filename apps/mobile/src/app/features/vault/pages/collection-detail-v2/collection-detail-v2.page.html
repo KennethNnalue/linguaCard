@@ -1,0 +1,46 @@
+<ion-content [fullscreen]="true" class="screen">
+  <main class="panel">
+    @if (collection(); as data) {
+      <header class="hero">
+        <lc-collection-cover [name]="data.name" [seed]="data.coverSeed" />
+        <button class="back" type="button" (click)="goBack()" aria-label="Back">‹</button>
+        <div class="hero-copy">
+          <p>{{ languagePair() }}</p>
+          <h1>{{ data.name }}</h1>
+        </div>
+      </header>
+
+      <section class="stats">
+        <span><strong>{{ data.itemCount }}</strong><small>Words</small></span>
+        <span><strong>{{ data.dueCount }}</strong><small>Due</small></span>
+        <span><strong>{{ data.itemCount ? ((data.masteredCount / data.itemCount) * 100).toFixed(0) : 0 }}%</strong><small>Mastered</small></span>
+      </section>
+
+      <div class="actions">
+        <button class="review" type="button" (click)="startReview()">▶ Review</button>
+        <button class="listen" type="button" (click)="startListen()">♫ Listen</button>
+      </div>
+
+      <label class="search">
+        <span aria-hidden="true">⌕</span>
+        <input type="search" [value]="query()" (input)="updateQuery($event)" placeholder="Search this collection" />
+      </label>
+
+      <div class="word-list">
+        @for (item of filteredCards(); track item.id) {
+          <article class="word-row">
+            <span>
+              <strong>{{ item.lexeme.text }}</strong>
+              <small>{{ item.localization.translation || 'Translation preparing' }}</small>
+            </span>
+            <button type="button" (click)="playWord(item)" [attr.aria-label]="'Play ' + item.lexeme.text">▶</button>
+          </article>
+        } @empty {
+          <p class="empty">No words match this search.</p>
+        }
+      </div>
+    } @else if (store.isVaultLoading()) {
+      <div class="loading"></div>
+    }
+  </main>
+</ion-content>

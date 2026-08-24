@@ -9,6 +9,7 @@ import type {
   AdminImportStoryDto,
   AdminImportStoryResult,
   AdminPlatformCollectionListItem,
+  AdminPlatformCollectionWordItem,
   AdminPlatformStoryListItem,
   AdminSetStoryCategoryDto,
   AdminDiscountCodeListItem,
@@ -24,6 +25,18 @@ export class AdminApiService {
 
   listCollections(): Observable<AdminPlatformCollectionListItem[]> {
     return this.http.get<AdminPlatformCollectionListItem[]>(`${this.apiUrl}/platform-collections`);
+  }
+
+  listCollectionWords(id: string): Observable<AdminPlatformCollectionWordItem[]> {
+    return this.http.get<AdminPlatformCollectionWordItem[]>(`${this.apiUrl}/platform-collections/${id}/words`);
+  }
+
+  reorderCollectionWords(id: string, itemIds: string[]): Observable<void> {
+    return this.http.patch<void>(`${this.apiUrl}/platform-collections/${id}/words/order`, { itemIds });
+  }
+
+  removeCollectionWord(id: string, itemId: string): Observable<void> {
+    return this.http.delete<void>(`${this.apiUrl}/platform-collections/${id}/words/${itemId}`);
   }
 
   listStories(): Observable<AdminPlatformStoryListItem[]> {

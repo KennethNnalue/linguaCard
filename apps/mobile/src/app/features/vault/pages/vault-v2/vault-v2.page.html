@@ -1,0 +1,127 @@
+<ion-content [fullscreen]="true" class="screen">
+  <ion-refresher slot="fixed" (ionRefresh)="refresh($event)">
+    <ion-refresher-content></ion-refresher-content>
+  </ion-refresher>
+
+  <main class="vault-shell">
+    @if (wordsOpen()) {
+      <header class="index-head">
+        <button type="button" (click)="wordsOpen.set(false)" aria-label="Back">‹</button>
+        <div><small>{{ languagePair() }}</small><h1>All Words</h1></div>
+        <b>{{ filteredWords().length }}</b>
+      </header>
+      <label class="search search--wide">
+        <span aria-hidden="true">⌕</span>
+        <input type="search" [value]="query()" (input)="updateQuery($event)" placeholder="Search your words" />
+      </label>
+      <div class="word-index">
+        @for (item of filteredWords(); track item.id) {
+          <button type="button" (click)="openWord(item.id)">
+            <span><strong>{{ item.lexeme.text }}</strong><small>{{ item.localization.translation }}</small></span>
+            <span>›</span>
+          </button>
+        }
+      </div>
+    } @else {
+      <header class="page-head">
+        <div><small>{{ languagePair() }}</small><h1>Vault</h1></div>
+        <button class="search-toggle" type="button" (click)="searchOpen.set(!searchOpen())" aria-label="Search">⌕</button>
+      </header>
+
+      @if (searchOpen()) {
+        <label class="search search--wide">
+          <span aria-hidden="true">⌕</span>
+          <input type="search" [value]="query()" (input)="updateQuery($event)" placeholder="Search words and collections" />
+        </label>
+      }
+
+      @if (vault(); as data) {
+        <section class="review-hero">
+          <div class="hero-top">
+            <span>Ready to review</span>
+            <span class="streak">● {{ dayStreak() }}-day streak</span>
+          </div>
+          <div class="due-line"><strong>{{ data.allWords.dueCount }}</strong><em>words due</em></div>
+          <p>Across {{ data.collections.length }} collections · best studied now</p>
+          <div class="distribution">
+            @for (segment of stageDistribution(); track segment.stage) {
+              <span [class]="'stage-' + segment.stage" [style.width.%]="segment.width"></span>
+            }
+          </div>
+          <div class="progress-copy"><span>{{ data.allWords.masteredPercentage }}% mastered</span><b>{{ data.allWords.masteredPercentage }}%</b></div>
+          <div class="hero-actions">
+            <button class="start" type="button" (click)="startReview()">▶ Start review</button>
+            <button class="listen" type="button" (click)="startListen()">♫ Listen</button>
+          </div>
+        </section>
+
+        <button class="all-words" type="button" (click)="wordsOpen.set(true)">
+          <span class="list-icon">☷</span>
+          <span><strong>All Words</strong><small>Browse & search your full index</small></span>
+          <b>{{ data.allWords.itemCount }}</b><i>›</i>
+        </button>
+
+        <nav class="level-tabs" aria-label="Collection level">
+          @for (level of levelFilters; track level) {
+            <button type="button" [class.active]="selectedLevel() === level" (click)="setLevel(level)">
+              {{ level === 'all' ? 'All' : level }}
+            </button>
+          }
+        </nav>
+
+        <section class="collection-section">
+          <div class="section-head">
+            <div><h2>Explore</h2><small>Curated by LinguaCard</small></div>
+            <button type="button" (click)="showAllPlatform.set(!showAllPlatform())">{{ showAllPlatform() ? 'Show less' : 'See all' }} ›</button>
+          </div>
+          <div class="topic-chips">
+            <button type="button" [class.active]="selectedTopic() === null" (click)="setTopic(null)">All</button>
+            @for (topic of topics(); track topic) {
+              <button type="button" [class.active]="selectedTopic() === topic" (click)="setTopic(topic)">{{ topic }}</button>
+            }
+          </div>
+          <div class="collection-rail" [class.collection-grid]="showAllPlatform()">
+            @for (collection of platformCollections(); track collection.id) {
+              <button class="cover-card" type="button" (click)="openPlatformCollection(collection)">
+                <span class="cover-art">
+                  <lc-collection-cover [name]="collection.title" [seed]="collection.id" />
+                  <span class="level-badge">{{ collection.level }}</span>
+                  @if (collection.adoptionStatus === 'adopted') { <span class="owned">✓</span> }
+                </span>
+                <span class="cover-copy"><strong>{{ collection.title }}</strong><small>{{ platformMeta(collection) }}</small></span>
+              </button>
+            } @empty { <p class="empty">No curated collections at this level.</p> }
+          </div>
+        </section>
+
+        <section class="collection-section personal">
+          <div class="section-head">
+            <div><h2>My collections</h2><small>{{ data.collections.length }} shelves</small></div>
+            <button type="button" (click)="showAllPersonal.set(!showAllPersonal())">{{ showAllPersonal() ? 'Show less' : 'See all' }} ›</button>
+          </div>
+          <div class="personal-list">
+            @for (collection of personalCollections(); track collection.id) {
+              <article class="personal-card">
+                <button class="personal-main" type="button" (click)="openCollection(collection)">
+                  <span class="personal-cover"><lc-collection-cover [name]="collection.name" [seed]="collection.coverSeed" /></span>
+                  <span class="personal-copy">
+                    <span><strong>{{ collection.name }}</strong>@if (collection.level) { <b>{{ collection.level }}</b> }</span>
+                    <small>{{ collectionMeta(collection) }}</small>
+                    <i><span [style.width.%]="collection.itemCount ? (collection.masteredCount / collection.itemCount) * 100 : 0"></span></i>
+                  </span>
+                </button>
+                @if (collection.dueCount > 0) {
+                  <button class="due-action" type="button" (click)="reviewCollection(collection.id)">
+                    {{ collection.dueCount }} due<br><b>Review ›</b>
+                  </button>
+                }
+              </article>
+            } @empty { <p class="empty">No personal collections at this level.</p> }
+          </div>
+        </section>
+      } @else {
+        <div class="loading-card"></div>
+      }
+    }
+  </main>
+</ion-content>

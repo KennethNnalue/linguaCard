@@ -12,11 +12,13 @@ import {
 import { AuthService } from '../../../../core/services/auth.service';
 import { PickedImage } from '../../../../shared/image/image.model';
 import { environment } from '../../../../../environments/environment';
+import { VaultV2Store } from '../../store/vault-v2.store';
 
 @Injectable({ providedIn: 'root' })
 export class ImageImportApiService {
   private readonly http = inject(HttpClient);
   private readonly auth = inject(AuthService);
+  private readonly vaultStore = inject(VaultV2Store);
   private readonly base = `${environment.apiUrl}/import`;
 
   /** Legacy single-pass endpoint — used as fallback */
@@ -24,8 +26,8 @@ export class ImageImportApiService {
     const body: ImageImportRequest = {
       imageBase64: image.base64,
       mimeType:    image.mimeType,
-      targetLanguage: 'de',
-      nativeLanguage: 'en',
+      targetLanguage: this.activeLanguages().targetLanguage,
+      nativeLanguage: this.activeLanguages().sourceLanguage,
       userId:      this.auth.currentUser()!.id,
       contextId:   'german-vocab',
     };
@@ -37,8 +39,8 @@ export class ImageImportApiService {
     const body: ImageImportRequest = {
       imageBase64: image.base64,
       mimeType:    image.mimeType,
-      targetLanguage: 'de',
-      nativeLanguage: 'en',
+      targetLanguage: this.activeLanguages().targetLanguage,
+      nativeLanguage: this.activeLanguages().sourceLanguage,
       userId:      this.auth.currentUser()!.id,
       contextId:   'german-vocab',
     };
@@ -63,5 +65,13 @@ export class ImageImportApiService {
       pendingWords: RawExtractedWord[];
       isComplete: boolean;
     }>(`${this.base}/complete/${collectionId}`, {});
+  }
+
+  activeLanguages(): { sourceLanguage: string; targetLanguage: string } {
+    const context = this.vaultStore.vault()?.learningContext;
+    return {
+      sourceLanguage: context?.sourceLanguage ?? 'en',
+      targetLanguage: context?.targetLanguage ?? 'de',
+    };
   }
 }

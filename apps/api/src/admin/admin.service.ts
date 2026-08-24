@@ -1,6 +1,6 @@
-import { Injectable, Logger, NotFoundException } from '@nestjs/common';
+import { ConflictException, Injectable, Logger, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { In, Repository } from 'typeorm';
+import { In, IsNull, Repository } from 'typeorm';
 import { randomUUID } from 'crypto';
 import { PlatformCollectionEntity } from './platform-collection.entity';
 import { PlatformCollectionWordEntity } from './platform-collection-word.entity';
@@ -9,6 +9,7 @@ import { UserStoryProgressEntity } from '../platform-stories/user-story-progress
 import { WordDictionaryEntity } from '../word-dictionary/word-dictionary.entity';
 import { WordDictionaryService } from '../word-dictionary/word-dictionary.service';
 import { WordAudioService } from '../word-audio/word-audio.service';
+import { PlatformCollectionImportEntity } from './platform-collection-import.entity';
 import { StoryAudioService } from '../stories/story-audio.service';
 import type {
   AdminImportCollectionDto,
@@ -18,6 +19,7 @@ import type {
   AdminImportStoryDto,
   AdminImportStoryResult,
   AdminPlatformCollectionListItem,
+  AdminPlatformCollectionWordItem,
   AdminPlatformStoryListItem,
   StoryKeyword,
 } from '@lingua-card/shared/domain';
@@ -35,6 +37,8 @@ export class AdminService {
     private readonly storyProgressRepo: Repository<UserStoryProgressEntity>,
     @InjectRepository(WordDictionaryEntity)
     private readonly dictRepo: Repository<WordDictionaryEntity>,
+    @InjectRepository(PlatformCollectionImportEntity)
+    private readonly importRepo: Repository<PlatformCollectionImportEntity>,
     private readonly dictionary: WordDictionaryService,
     private readonly wordAudio: WordAudioService,
     private readonly storyAudio: StoryAudioService,
@@ -355,6 +359,8 @@ export class AdminService {
         [ids],
       );
     const reuseMap = new Map(reuseCounts.map(r => [r.platformCollectionId, r.reused]));
+    const imports = await this.importRepo.findBy({ collectionId: In(ids) });
+    const importStatus = new Map(imports.map(record => [record.collectionId, record.status]));
 
     return collections.map(c => ({
       id: c.id,
@@ -362,19 +368,114 @@ export class AdminService {
       emoji: c.emoji,
       level: c.level,
       topic: c.topic,
+      sourceLanguage: c.sourceLanguage as AdminPlatformCollectionListItem['sourceLanguage'],
+      targetLanguage: c.targetLanguage as AdminPlatformCollectionListItem['targetLanguage'],
+      status: c.isPublished ? 'published' : (importStatus.get(c.id) ?? c.status) as AdminPlatformCollectionListItem['status'],
       wordCount: c.wordCount,
       dictionaryLinked: reuseMap.get(c.id) ?? 0,
       isPublished: c.isPublished,
       storyCategory: c.storyCategory ?? null,
       createdAt: c.createdAt instanceof Date ? c.createdAt.toISOString() : String(c.createdAt),
+      updatedAt: c.updatedAt instanceof Date ? c.updatedAt.toISOString() : String(c.updatedAt),
     }));
   }
 
   async setPublished(id: string, isPublished: boolean): Promise<void> {
     const entity = await this.collectionRepo.findOneBy({ id });
     if (!entity) throw new NotFoundException(`Platform collection ${id} not found`);
+    if (isPublished) {
+      const importRecord = await this.importRepo.findOneBy({ collectionId: id });
+      if (importRecord && importRecord.status !== 'ready_to_publish') {
+        throw new ConflictException('Collection cannot be published until localization and target audio are ready');
+      }
+      const unresolved = await this.wordRepo.countBy({ platformCollectionId: id, lexemeId: IsNull() });
+      if (unresolved > 0) {
+        throw new ConflictException('Collection cannot be published while vocabulary items are unresolved');
+      }
+    }
     entity.isPublished = isPublished;
+    entity.status = isPublished ? 'published' : 'draft';
+    entity.publishedAt = isPublished ? new Date() : null;
     await this.collectionRepo.save(entity);
+  }
+
+  async listCollectionWords(id: string): Promise<AdminPlatformCollectionWordItem[]> {
+    const collection = await this.collectionRepo.findOneBy({ id });
+    if (!collection) throw new NotFoundException(`Platform collection ${id} not found`);
+
+    const rows: Array<{
+      id: string; dictionaryWordId: string; lexemeId: string | null; position: number;
+      targetText: string; translation: string | null; localizationStatus: string | null;
+    }> = await this.wordRepo.manager.query(
+      `SELECT pcw.id,
+              pcw."dictionaryWordId",
+              pcw."lexemeId",
+              pcw.position,
+              COALESCE(l."displayText", wd."displayText") AS "targetText",
+              COALESCE(ll.translation, wd.translation) AS translation,
+              ll.status AS "localizationStatus"
+       FROM platform_collection_words pcw
+       JOIN word_dictionary wd ON wd.id = pcw."dictionaryWordId"
+       LEFT JOIN lexemes l ON l.id = pcw."lexemeId"
+       LEFT JOIN LATERAL (
+         SELECT localization.translation, localization.status
+         FROM lexeme_localizations localization
+         WHERE localization."lexemeId" = pcw."lexemeId"
+           AND localization.language = $2
+           AND localization."isActive" = true
+         ORDER BY localization."contentVersion" DESC
+         LIMIT 1
+       ) ll ON true
+       WHERE pcw."platformCollectionId" = $1
+       ORDER BY pcw.position ASC, pcw."createdAt" ASC`,
+      [id, collection.sourceLanguage],
+    );
+
+    return rows.map(row => ({
+      id: row.id,
+      dictionaryWordId: row.dictionaryWordId,
+      lexemeId: row.lexemeId,
+      position: row.position,
+      targetText: row.targetText,
+      translation: row.translation ?? '',
+      localizationReady: row.lexemeId !== null && row.localizationStatus === 'ready',
+    }));
+  }
+
+  async removeCollectionWord(collectionId: string, itemId: string): Promise<void> {
+    const collection = await this.collectionRepo.findOneBy({ id: collectionId });
+    if (!collection) throw new NotFoundException(`Platform collection ${collectionId} not found`);
+    if (collection.isPublished) throw new ConflictException('Unpublish the collection before editing its vocabulary');
+
+    const item = await this.wordRepo.findOneBy({ id: itemId, platformCollectionId: collectionId });
+    if (!item) throw new NotFoundException(`Collection word ${itemId} not found`);
+    await this.wordRepo.manager.transaction(async manager => {
+      await manager.delete(PlatformCollectionWordEntity, { id: itemId, platformCollectionId: collectionId });
+      const remaining = await manager.find(PlatformCollectionWordEntity, {
+        where: { platformCollectionId: collectionId }, order: { position: 'ASC', createdAt: 'ASC' },
+      });
+      await Promise.all(remaining.map((word, position) => manager.update(PlatformCollectionWordEntity, word.id, { position })));
+      await manager.update(PlatformCollectionEntity, collectionId, { wordCount: remaining.length, status: 'draft' });
+    });
+  }
+
+  async reorderCollectionWords(collectionId: string, itemIds: string[]): Promise<void> {
+    const collection = await this.collectionRepo.findOneBy({ id: collectionId });
+    if (!collection) throw new NotFoundException(`Platform collection ${collectionId} not found`);
+    if (collection.isPublished) throw new ConflictException('Unpublish the collection before editing its vocabulary');
+    if (!Array.isArray(itemIds) || itemIds.some(itemId => typeof itemId !== 'string' || !itemId)) {
+      throw new ConflictException('Word order must be an array of item IDs');
+    }
+    if (new Set(itemIds).size !== itemIds.length) throw new ConflictException('Word order contains duplicate item IDs');
+
+    const existing = await this.wordRepo.findBy({ platformCollectionId: collectionId });
+    const expected = new Set(existing.map(item => item.id));
+    if (itemIds.length !== existing.length || itemIds.some(itemId => !expected.has(itemId))) {
+      throw new ConflictException('Word order must contain every collection item exactly once');
+    }
+    await this.wordRepo.manager.transaction(async manager => {
+      await Promise.all(itemIds.map((itemId, position) => manager.update(PlatformCollectionWordEntity, itemId, { position })));
+    });
   }
 
   async setStoryCategory(id: string, storyCategory: string | null): Promise<void> {
@@ -402,10 +503,22 @@ export class AdminService {
   async deleteCollection(id: string): Promise<void> {
     const entity = await this.collectionRepo.findOneBy({ id });
     if (!entity) throw new NotFoundException(`Platform collection ${id} not found`);
+    if (entity.isPublished || entity.status === 'published') {
+      throw new ConflictException('Unpublish the collection before deleting it');
+    }
+    const references: Array<{ count: number }> = await this.collectionRepo.manager.query(
+      `SELECT COUNT(*)::int AS count FROM collections WHERE "sourcePlatformCollectionId" = $1`,
+      [id],
+    );
+    if (Number(references[0]?.count ?? 0) > 0) {
+      throw new ConflictException('This collection has been adopted by learners and cannot be deleted; keep it unpublished instead');
+    }
     // Remove member word links, then detach any stories paired to this collection.
-    await this.wordRepo.delete({ platformCollectionId: id });
-    await this.storyRepo.update({ platformCollectionId: id }, { platformCollectionId: null });
-    await this.collectionRepo.delete({ id });
+    await this.collectionRepo.manager.transaction(async manager => {
+      await manager.delete(PlatformCollectionWordEntity, { platformCollectionId: id });
+      await manager.update(PlatformStoryEntity, { platformCollectionId: id }, { platformCollectionId: null });
+      await manager.delete(PlatformCollectionEntity, { id });
+    });
   }
 
   async deleteStory(id: string): Promise<void> {

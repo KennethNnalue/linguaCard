@@ -5,7 +5,7 @@
         <ion-icon name="arrow-back-outline"></ion-icon>
       </button>
       <span class="adm-title lc-display">{{ 'admin.import.pageTitle' | translate }}</span>
-      <div class="adm-nav-spacer"></div>
+      <button class="adm-refresh-btn" type="button" (click)="openV2Import()">V2 import</button>
     </div>
   </ion-toolbar>
 </ion-header>
@@ -269,6 +269,8 @@
               <div class="adm-coll-title">{{ item.title }}</div>
               <div class="adm-coll-meta">
                 <span class="adm-lvl-badge">{{ item.level }}</span>
+                <span>{{ item.sourceLanguage.toUpperCase() }} → {{ item.targetLanguage.toUpperCase() }}</span>
+                <span>{{ item.status.replace('_', ' ') }}</span>
                 <span>{{ item.wordCount }} words</span>
                 <span>{{ item.dictionaryLinked }} linked</span>
                 <span class="adm-coll-id">{{ item.id.slice(0, 8) }}</span>
@@ -289,6 +291,9 @@
               </div>
             </div>
             <div class="adm-coll-actions">
+              <button class="adm-publish-btn" (click)="toggleCollectionEditor(item)">
+                {{ editingCollectionId() === item.id ? 'Close' : 'Words' }}
+              </button>
               <button
                 class="adm-publish-btn"
                 [class.adm-publish-btn--live]="item.isPublished"
@@ -307,6 +312,36 @@
               </button>
             </div>
           </div>
+          @if (editingCollectionId() === item.id) {
+            <div class="adm-word-editor">
+              @if (item.isPublished) {
+                <p class="adm-word-editor__notice">Unpublish this collection before removing or reordering words.</p>
+              }
+              @if (collectionWordsLoading()) {
+                <div class="adm-manage-empty">Loading words…</div>
+              } @else {
+                @for (word of collectionWords(); track word.id; let index = $index) {
+                  <div class="adm-word-row">
+                    <span class="adm-word-row__position">{{ index + 1 }}</span>
+                    <span class="adm-word-row__content">
+                      <strong>{{ word.targetText }}</strong>
+                      <small>{{ word.translation }}</small>
+                    </span>
+                    <span class="adm-word-row__readiness" [class.adm-word-row__readiness--missing]="!word.localizationReady">
+                      {{ word.localizationReady ? 'Ready' : 'Needs attention' }}
+                    </span>
+                    <button type="button" (click)="moveCollectionWord(item, index, -1)" [disabled]="item.isPublished || index === 0 || mutatingCollectionWord()" aria-label="Move word up">↑</button>
+                    <button type="button" (click)="moveCollectionWord(item, index, 1)" [disabled]="item.isPublished || index === collectionWords().length - 1 || mutatingCollectionWord()" aria-label="Move word down">↓</button>
+                    <button type="button" class="adm-delete-btn" (click)="removeCollectionWord(item, word)" [disabled]="item.isPublished || mutatingCollectionWord()" aria-label="Remove word">
+                      <ion-icon name="trash-outline"></ion-icon>
+                    </button>
+                  </div>
+                } @empty {
+                  <div class="adm-manage-empty">This collection has no words.</div>
+                }
+              }
+            </div>
+          }
         }
 
         @if (!collectionsLoading() && !collections().length) {

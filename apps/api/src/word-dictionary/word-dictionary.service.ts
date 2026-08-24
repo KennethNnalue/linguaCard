@@ -12,6 +12,8 @@ import { WordDictionaryEntity } from './word-dictionary.entity';
 import { normalizeLemma } from './normalize-lemma';
 import { WordEnrichService } from '../import/word-enrich.service';
 import { WordAudioService } from '../word-audio/word-audio.service';
+import { LegacyVocabularyProjectionService } from '../vocabulary/services/legacy-vocabulary-projection.service';
+import { legacyDictionaryEntryToProjectionInput } from './legacy-vocabulary.mapper';
 
 const BATCH_SIZE = 10;
 const INTER_BATCH_DELAY_MS = 3_500;
@@ -38,6 +40,7 @@ export class WordDictionaryService {
     private readonly repo: WordDictionaryRepository,
     private readonly enrich: WordEnrichService,
     private readonly wordAudio: WordAudioService,
+    private readonly vocabularyProjection: LegacyVocabularyProjectionService,
   ) {}
 
   async lookup(
@@ -60,18 +63,25 @@ export class WordDictionaryService {
     nativeLang = normaliseLang(nativeLang);
     const key = normalizeLemma(raw.back, raw.article);
     const hit = await this.repo.findByKey(key, targetLang, nativeLang);
-    if (hit) return { entry: this.toModel(hit), reused: true };
+    if (hit) {
+      await this.projectToMultilingualVocabulary(hit);
+      return { entry: this.toModel(hit), reused: true };
+    }
 
     const inflightKey = `${targetLang}:${nativeLang}:${key}`;
     const running = this.inflight.get(inflightKey);
     if (running) {
-      return { entry: this.toModel(await running), reused: true };
+      const entity = await running;
+      await this.projectToMultilingualVocabulary(entity);
+      return { entry: this.toModel(entity), reused: true };
     }
 
     const gen = this.enrichAndPersist(raw, key, targetLang, nativeLang);
     this.inflight.set(inflightKey, gen);
     try {
-      return { entry: this.toModel(await gen), reused: false };
+      const entity = await gen;
+      await this.projectToMultilingualVocabulary(entity);
+      return { entry: this.toModel(entity), reused: false };
     } finally {
       this.inflight.delete(inflightKey);
     }
@@ -103,7 +113,10 @@ export class WordDictionaryService {
     const key = normalizeLemma(word.back, word.article);
 
     const existing = await this.repo.findByKey(key, targetLang, nativeLang);
-    if (existing) return existing;
+    if (existing) {
+      await this.projectToMultilingualVocabulary(existing);
+      return existing;
+    }
 
     const audio = await this.wordAudio.resolve(
       word.article ? `${word.article} ${word.back}` : word.back,
@@ -143,7 +156,9 @@ export class WordDictionaryService {
       model: null,
     });
 
-    return this.repo.upsertOnConflict(entity);
+    const saved = await this.repo.upsertOnConflict(entity);
+    await this.projectToMultilingualVocabulary(saved);
+    return saved;
   }
 
   /** Pure DB read — never calls AI. Returns only words already in the dictionary. */
@@ -201,6 +216,12 @@ export class WordDictionaryService {
       : [];
 
     await this.linkAudioForAll([...hits, ...enrichedEntities], targetLang);
+    await this.vocabularyProjection.projectMany(
+      [...hits, ...enrichedEntities].map(entity => ({
+        input: legacyDictionaryEntryToProjectionInput(entity),
+        legacyDictionaryWordId: entity.id,
+      })),
+    );
 
     const entityByKey = new Map<string, WordDictionaryEntity>();
     for (const e of hits) entityByKey.set(e.lemmaKey, e);
@@ -320,6 +341,12 @@ export class WordDictionaryService {
       model: e.model,
       enrichedAt: e.enrichedAt.toISOString(),
     };
+  }
+
+  private projectToMultilingualVocabulary(entity: WordDictionaryEntity): Promise<void> {
+    return this.vocabularyProjection
+      .project(legacyDictionaryEntryToProjectionInput(entity), entity.id)
+      .then(() => undefined);
   }
 
   getStats(): { totalRequested: number; totalReused: number; totalEnriched: number; cacheHitRate: number; tokensSaved: number; dictionarySize?: number; note: string } {

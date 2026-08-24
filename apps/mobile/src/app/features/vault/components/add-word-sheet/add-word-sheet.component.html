@@ -189,49 +189,6 @@
       }
     </div>
 
-    <!-- Category -->
-    <div class="aw-field">
-      <p class="aw-lbl">{{ 'addWord.category.label' | translate }}</p>
-      <div class="aw-chip-row">
-        @for (cat of categories(); track cat.id) {
-          <button
-            type="button"
-            class="aw-cat-chip"
-            [class.aw-cat-chip--selected]="form.get('categoryId')?.value === cat.id"
-            (click)="selectCategory(cat.id)">
-            {{ cat.name }}
-          </button>
-        }
-        <button
-          type="button"
-          class="aw-cat-chip aw-cat-chip--new"
-          [class.aw-cat-chip--selected]="showNewCategoryInput()"
-          (click)="toggleNewCategoryInput()">
-          <ion-icon [name]="showNewCategoryInput() ? 'close-outline' : 'add-outline'"></ion-icon>
-          {{ (showNewCategoryInput() ? 'addWord.category.cancelButton' : 'addWord.category.newButton') | translate }}
-        </button>
-      </div>
-      @if (showNewCategoryInput()) {
-        <div class="aw-new-cat-row">
-          <input
-            class="aw-input aw-input--grow"
-            type="text"
-            [placeholder]="'addWord.newCategory.placeholder' | translate"
-            [value]="newCategoryName()"
-            (input)="newCategoryName.set($any($event.target).value)"
-            (keyup.enter)="addNewCategory()"
-            autocomplete="off" />
-          <button
-            type="button"
-            class="aw-new-cat-add-btn"
-            [disabled]="!newCategoryName().trim()"
-            (click)="addNewCategory()">
-            {{ 'addWord.newCategory.addButton' | translate }}
-          </button>
-        </div>
-      }
-    </div>
-
     <!-- Example sentence -->
     <div class="aw-field">
       <p class="aw-lbl">{{ 'addWord.examples.label' | translate }}</p>

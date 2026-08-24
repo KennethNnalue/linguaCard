@@ -15,6 +15,10 @@ export class PlatformCollectionWordEntity {
   @Column()
   dictionaryWordId!: string;
 
+  @Index('idx_pcw_lexeme')
+  @Column({ type: 'varchar', nullable: true })
+  lexemeId!: string | null;
+
   @Column({ default: 0 })
   position!: number;
 

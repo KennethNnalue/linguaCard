@@ -67,9 +67,9 @@ export class WordAudioService {
    * Play AI pronunciation for a card's word.
    * Builds text from article + back, then resolves via the word audio registry.
    */
-  async playCard(card: Card): Promise<void> {
+  async playCard(card: Card, language = 'de-DE'): Promise<void> {
     const text = (card.content.article ? `${card.content.article} ` : '') + card.content.back;
-    await this.play(text, 'de-DE');
+    await this.play(text, language);
   }
 
   /**

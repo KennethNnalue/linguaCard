@@ -13,18 +13,17 @@ import {
 } from 'ionicons/icons';
 import {LanguageService} from '../../../../core/services/language.service';
 import {CardStore} from '../../store/card.store';
-import {CategoryStore} from '../../store/category.store';
 import {CollectionStore} from '../../store/collection.store';
 import {CardApiService} from '../../services/card-api.service';
 import {WordAudioService} from '../../../../shared/audio/word-audio.service';
 import {AudioReadinessStore} from '../../../../shared/audio/audio-readiness.store';
 import {ArticleBadgeComponent} from '../../../../shared/components/article-badge/article-badge.component';
 import {AddWordSheetComponent} from '../../components/add-word-sheet/add-word-sheet.component';
-import {getCategoryName} from '../../../../shared/helpers/helpers';
 import {normalizeForAudio} from '../../../../shared/audio/normalize';
 import {stageIndicator} from '../../../review/domain/review-status';
 import {MASTERY_LABEL_KEYS} from '../../../review/models/review.model';
 import {CardAdministrationService} from '../../../review/services/card-administration.service';
+import {VaultV2Store} from '../../store/vault-v2.store';
 
 @Component({
   selector: 'lc-word-detail',
@@ -35,7 +34,6 @@ import {CardAdministrationService} from '../../../review/services/card-administr
 })
 export class WordDetailComponent {
   private readonly cardStore = inject(CardStore);
-  private readonly categoryStore = inject(CategoryStore);
   private readonly collectionStore = inject(CollectionStore);
   private readonly cardApi = inject(CardApiService);
   private readonly wordAudio = inject(WordAudioService);
@@ -48,6 +46,7 @@ export class WordDetailComponent {
   private readonly translate = inject(TranslateService);
   private readonly languageService = inject(LanguageService);
   private readonly cardAdministration = inject(CardAdministrationService);
+  private readonly vaultStore = inject(VaultV2Store);
   readonly administrationState = signal<'idle' | 'saving' | 'error'>('idle');
 
   constructor() {
@@ -68,7 +67,6 @@ export class WordDetailComponent {
     () => this.cardStore.cards().find((c) => c.id === this.cardId()) ?? null,
   );
 
-  readonly categories = this.categoryStore.categories;
 
   readonly masteryLevel = computed(() => stageIndicator(this.card()?.reviewState.stage ?? 'new'));
   readonly isManuallyMastered = computed(() => this.card()?.reviewState.masterySource === 'manual');
@@ -124,11 +122,6 @@ export class WordDetailComponent {
     return `${Math.round((successful / state.totalReviewCount) * 100)}%`;
   });
 
-  readonly categoryName = computed(() => {
-    const id = this.card()?.categoryIds?.[0];
-    return id ? getCategoryName(id, this.categories()) : '';
-  });
-
   readonly synonyms = computed(() => this.card()?.content.synonyms ?? []);
 
   // Accordion: only one synonym open at a time. null = all collapsed.
@@ -143,12 +136,12 @@ export class WordDetailComponent {
   }
 
   playSynonymExample(sentence: string): void {
-    void this.wordAudio.play(sentence, 'de-DE');
+    void this.wordAudio.play(sentence, this.targetLocale());
   }
 
   playPlural(): void {
     const plural = this.card()?.content.plural;
-    if (plural) void this.wordAudio.play(plural, 'de-DE');
+    if (plural) void this.wordAudio.play(plural, this.targetLocale());
   }
 
   goBack(): void {
@@ -162,7 +155,8 @@ export class WordDetailComponent {
     const card = this.card();
     if (!card) return '';
     const text = (card.content.article ? `${card.content.article} ` : '') + card.content.back;
-    return `wa-de-DE-${normalizeForAudio(text, 'de-DE')}`;
+    const locale = this.targetLocale();
+    return `wa-${locale}-${normalizeForAudio(text, locale)}`;
   });
 
   /** 'ready' | 'pending' | 'failed' | 'unknown' — drives the readiness dot. */
@@ -176,11 +170,11 @@ export class WordDetailComponent {
   playPronunciation(): void {
     const card = this.card();
     if (!card) return;
-    void this.wordAudio.playCard(card);
+    void this.wordAudio.playCard(card, this.targetLocale());
   }
 
   playExample(sentence: string): void {
-    void this.wordAudio.play(sentence, 'de-DE');
+    void this.wordAudio.play(sentence, this.targetLocale());
   }
 
   async openEdit(): Promise<void> {
@@ -207,6 +201,12 @@ export class WordDetailComponent {
       ],
     });
     await alert.present();
+  }
+
+  private targetLocale(): string {
+    const language = this.vaultStore.vault()?.learningContext.targetLanguage ?? 'de';
+    const locales: Record<string, string> = { de: 'de-DE', en: 'en-US', es: 'es-ES', ar: 'ar-SA' };
+    return locales[language] ?? language;
   }
 
   async confirmUndoManualMastery(): Promise<void> {

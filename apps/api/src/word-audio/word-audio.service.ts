@@ -14,12 +14,34 @@ import { WordAudioEntity } from './word-audio.entity';
 import { normalizeForAudio, audioStorageHash } from './normalize';
 import { buildWordSsml } from './ssml-builder';
 import { audioContentTypeFor, audioExtFor } from '../common/audio/audio-format';
+import { LegacySpeechAssetProjectionService } from '../vocabulary/services/legacy-speech-asset-projection.service';
 
 const BATCH_CONCURRENCY = 5;
 
 // How long to wait before retrying a previously-failed generation.
 // Prevents a consistently-failing word from hammering the TTS API on every tap.
 const FAILED_RETRY_COOLDOWN_MS = 5 * 60 * 1000; // 5 minutes
+
+function isRecord(value: unknown): value is Record<string, unknown> {
+  return typeof value === 'object' && value !== null;
+}
+
+function readNumber(value: unknown, key: string): number | undefined {
+  if (!isRecord(value)) return undefined;
+  const candidate = value[key];
+  return typeof candidate === 'number' ? candidate : undefined;
+}
+
+function readNestedNumber(value: unknown, parentKey: string, key: string): number | undefined {
+  if (!isRecord(value)) return undefined;
+  return readNumber(value[parentKey], key);
+}
+
+function readString(value: unknown, key: string): string | undefined {
+  if (!isRecord(value)) return undefined;
+  const candidate = value[key];
+  return typeof candidate === 'string' ? candidate : undefined;
+}
 
 @Injectable()
 export class WordAudioService {
@@ -33,6 +55,7 @@ export class WordAudioService {
     private readonly tts: GoogleCloudTTSAdapter,
     private readonly gemini: GeminiAdapter,
     private readonly storage: StorageService,
+    private readonly speechAssetProjection: LegacySpeechAssetProjectionService,
   ) {}
 
   async resolve(
@@ -49,12 +72,14 @@ export class WordAudioService {
     // row, then both attempt to insert and one hits the UNIQUE constraint.
     if (this.inflightGenerations.has(inflightKey)) {
       const entity = await this.inflightGenerations.get(inflightKey)!;
+      await this.projectToSpeechAsset(entity);
       return { wordAudio: this.toModel(entity), cached: true };
     }
 
     const existing = await this.repo.findByNormalizedText(normalizedText, language);
 
     if (existing?.status === 'ready') {
+      await this.projectToSpeechAsset(existing);
       return { wordAudio: this.toModel(existing), cached: true };
     }
 
@@ -87,12 +112,14 @@ export class WordAudioService {
     this.inflightGenerations.set(inflightKey, generation);
     try {
       const entity = await generation;
+      await this.projectToSpeechAsset(entity);
       return { wordAudio: this.toModel(entity), cached: false };
-    } catch (err: any) {
+    } catch (error: unknown) {
       // Return a graceful 200 with the pending entity so the client can fall back.
       // Include retryAfterMs so the client knows when to try again.
       const pending = await this.repo.findByNormalizedText(normalizedText, language);
-      const retryAfterMs: number | undefined = err?.response?.retryAfterMs ?? err?.retryAfterMs;
+      const retryAfterMs =
+        readNestedNumber(error, 'response', 'retryAfterMs') ?? readNumber(error, 'retryAfterMs');
       return {
         wordAudio: this.toModel(pending ?? this._emptyModel(normalizedText, text, language)),
         cached: false,
@@ -166,7 +193,7 @@ export class WordAudioService {
       existingArrays.flat().map(e => [`${e.language}:${e.normalizedText}`, e]),
     );
 
-    const results: WordAudioResolveResponse[] = [];
+    const resultMap = new Map<string, WordAudioResolveResponse>();
     let generated = 0;
     let reused = 0;
 
@@ -178,16 +205,16 @@ export class WordAudioService {
       for (const n of normalized) {
         const e = existingMap.get(`${n.language}:${n.normalizedText}`);
         if (e?.status === 'ready') {
-          results.push({ wordAudio: this.toModel(e), cached: true });
+          resultMap.set(`${n.language}:${n.normalizedText}`, { wordAudio: this.toModel(e), cached: true });
           reused++;
         } else {
-          results.push({
+          resultMap.set(`${n.language}:${n.normalizedText}`, {
             wordAudio: this.toModel(e ?? this._emptyModel(n.normalizedText, n.original.text, n.language)),
             cached: false,
           });
         }
       }
-      return { results, generated: 0, reused };
+      return { results: normalized.map(n => resultMap.get(`${n.language}:${n.normalizedText}`)!), generated: 0, reused };
     }
 
     // 'ready'   → return immediately, no generation needed
@@ -206,7 +233,7 @@ export class WordAudioService {
     });
 
     for (const n of alreadyHandled) {
-      results.push({ wordAudio: this.toModel(existingMap.get(`${n.language}:${n.normalizedText}`)!), cached: true });
+      resultMap.set(`${n.language}:${n.normalizedText}`, { wordAudio: this.toModel(existingMap.get(`${n.language}:${n.normalizedText}`)!), cached: true });
       reused++;
     }
 
@@ -216,16 +243,29 @@ export class WordAudioService {
       const settled = await Promise.allSettled(
         chunk.map(n => this.resolve(n.original.text, n.language, opts)),
       );
-      for (const result of settled) {
+      for (let resultIndex = 0; resultIndex < settled.length; resultIndex++) {
+        const result = settled[resultIndex];
+        const normalizedWord = chunk[resultIndex];
+        const key = `${normalizedWord.language}:${normalizedWord.normalizedText}`;
         if (result.status === 'fulfilled') {
-          results.push(result.value);
+          resultMap.set(key, result.value);
           if (!result.value.cached) generated++;
           else reused++;
+        } else {
+          this.logger.warn(`Audio batch item failed for ${key}: ${readString(result.reason, 'message') ?? 'unknown error'}`);
+          resultMap.set(key, {
+            wordAudio: this.toModel(this._emptyModel(normalizedWord.normalizedText, normalizedWord.original.text, normalizedWord.language)),
+            cached: false,
+          });
         }
       }
     }
 
-    return { results, generated, reused };
+    return {
+      results: normalized.map(n => resultMap.get(`${n.language}:${n.normalizedText}`)!),
+      generated,
+      reused,
+    };
   }
 
   async findById(id: string): Promise<WordAudio | null> {
@@ -248,18 +288,16 @@ export class WordAudioService {
       const speech = await this.tts.generateSpeech({ text: displayText, language, ssml });
       return { audioBuffer: speech.audioBuffer, durationMs: speech.durationMs, mimeType: 'audio/mpeg' };
     } catch (primaryErr: unknown) {
-      const err = primaryErr as any;
-
       // ServiceUnavailableException from the adapter means the key is not configured —
       // this is a deployment config error, not a transient outage. Log loudly and re-throw
       // so the problem is visible rather than silently degrading to Gemini TTS indefinitely.
-      if (err instanceof ServiceUnavailableException) {
+      if (primaryErr instanceof ServiceUnavailableException) {
         this.logger.error(
           'Google Cloud TTS is not configured (GOOGLE_CLOUD_TTS_KEY_BASE64 missing or invalid). ' +
           'Fix the environment variable — not falling back to Gemini for config errors.',
-          err,
+          primaryErr,
         );
-        throw err;
+        throw primaryErr;
       }
 
       // gRPC transient codes that warrant a Gemini fallback:
@@ -267,18 +305,19 @@ export class WordAudioService {
       //   8  = RESOURCE_EXHAUSTED (quota)
       //   14 = UNAVAILABLE
       const transientGrpcCodes = new Set([4, 8, 14]);
-      const isTransient = transientGrpcCodes.has(err?.code);
+      const errorCode = readNumber(primaryErr, 'code');
+      const isTransient = errorCode !== undefined && transientGrpcCodes.has(errorCode);
 
       if (!isTransient) {
         this.logger.error(
-          `Google Cloud TTS failed with non-transient error (code=${err?.code}): ${err?.message}`,
-          err,
+          `Google Cloud TTS failed with non-transient error (code=${errorCode}): ${readString(primaryErr, 'message')}`,
+          primaryErr,
         );
         throw primaryErr;
       }
 
       this.logger.warn(
-        `Google Cloud TTS transient error (gRPC code=${err?.code}) — falling back to Gemini TTS`,
+        `Google Cloud TTS transient error (gRPC code=${errorCode}) — falling back to Gemini TTS`,
       );
     }
 
@@ -337,16 +376,17 @@ export class WordAudioService {
       entity.durationMs  = speech.durationMs;
       entity.status      = 'ready';
       return await this.repo.save(entity);
-    } catch (err: any) {
-      this.logger.warn(`TTS generation failed for "${displayText}":`, err);
+    } catch (error: unknown) {
+      this.logger.warn(`TTS generation failed for "${displayText}":`, error);
 
-      const is429 = err?.status === 429 || err?.response?.statusCode === 429;
+      const is429 =
+        readNumber(error, 'status') === 429 || readNestedNumber(error, 'response', 'statusCode') === 429;
       if (!is429) {
         entity.status    = 'failed';
         entity.failedAt  = new Date();
         await this.repo.save(entity);
       }
-      throw err;
+      throw error;
     }
   }
 
@@ -363,5 +403,17 @@ export class WordAudioService {
       createdAt: e.createdAt instanceof Date ? e.createdAt.toISOString() : String(e.createdAt),
       updatedAt: e.updatedAt instanceof Date ? e.updatedAt.toISOString() : String(e.updatedAt),
     };
+  }
+
+  private projectToSpeechAsset(entity: WordAudioEntity): Promise<void> {
+    return this.speechAssetProjection.project({
+      language: entity.language,
+      text: entity.displayText,
+      audioUrl: entity.audioUrl,
+      storagePath: entity.storagePath,
+      durationMs: entity.durationMs,
+      status: entity.status,
+      failedAt: entity.failedAt,
+    });
   }
 }

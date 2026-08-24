@@ -5,11 +5,15 @@ import {
   MOCK_CARDS,
   MOCK_COLLECTIONS,
   MOCK_CATEGORIES,
+  MOCK_USER,
 } from '@lingua-card/shared/testing';
+import { ConfigService } from '@nestjs/config';
+import * as bcrypt from 'bcrypt';
 import { CardEntity } from '../cards/card.entity';
 import { CollectionEntity } from '../collections/collection.entity';
 import { CategoryEntity } from '../categories/category.entity';
 import { createNewReviewScheduling } from '../review/review-scheduling.entity';
+import { UserEntity } from '../auth/user.entity';
 
 @Injectable()
 export class SeedService implements OnApplicationBootstrap {
@@ -22,12 +26,34 @@ export class SeedService implements OnApplicationBootstrap {
     private readonly collections: Repository<CollectionEntity>,
     @InjectRepository(CategoryEntity)
     private readonly categories: Repository<CategoryEntity>,
+    @InjectRepository(UserEntity)
+    private readonly users: Repository<UserEntity>,
+    private readonly config: ConfigService,
   ) {}
 
   async onApplicationBootstrap(): Promise<void> {
+    if (this.config.get<string>('NODE_ENV') === 'production') return;
+    await this.seedUser();
     await this.seedCategories();
     await this.seedCollections();
     await this.seedCards();
+  }
+
+  private async seedUser(): Promise<void> {
+    const existing = await this.users.findOneBy({ id: MOCK_USER.id });
+    if (existing && existing.passwordHash !== '!disabled-migrated-demo-account') return;
+    const passwordHash = await bcrypt.hash('password123', 10);
+    await this.users.save(existing
+      ? { ...existing, email: MOCK_USER.email, name: MOCK_USER.name, passwordHash, avatarInitials: MOCK_USER.avatarInitials }
+      : this.users.create({
+        id: MOCK_USER.id,
+        email: MOCK_USER.email,
+        name: MOCK_USER.name,
+        passwordHash,
+        avatarInitials: MOCK_USER.avatarInitials,
+        isAdmin: false,
+      }));
+    this.logger.log('Seeded development demo user');
   }
 
   private async seedCategories(): Promise<void> {

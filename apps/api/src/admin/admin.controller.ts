@@ -10,6 +10,8 @@ import type {
   AdminImportStoryDto,
   AdminImportStoryResult,
   AdminPlatformCollectionListItem,
+  AdminPlatformCollectionWordItem,
+  AdminReorderPlatformCollectionWordsDto,
   AdminPlatformStoryListItem,
   AdminPublishToggleDto,
   AdminSetStoryCategoryDto,
@@ -23,6 +25,26 @@ export class AdminController {
   @Get('platform-collections')
   listCollections(): Promise<AdminPlatformCollectionListItem[]> {
     return this.adminService.listCollections();
+  }
+
+  @Get('platform-collections/:id/words')
+  listCollectionWords(@Param('id') id: string): Promise<AdminPlatformCollectionWordItem[]> {
+    return this.adminService.listCollectionWords(id);
+  }
+
+  @Patch('platform-collections/:id/words/order')
+  @HttpCode(204)
+  reorderCollectionWords(
+    @Param('id') id: string,
+    @Body() dto: AdminReorderPlatformCollectionWordsDto,
+  ): Promise<void> {
+    return this.adminService.reorderCollectionWords(id, dto.itemIds);
+  }
+
+  @Delete('platform-collections/:id/words/:itemId')
+  @HttpCode(204)
+  removeCollectionWord(@Param('id') id: string, @Param('itemId') itemId: string): Promise<void> {
+    return this.adminService.removeCollectionWord(id, itemId);
   }
 
   @Get('platform-stories')

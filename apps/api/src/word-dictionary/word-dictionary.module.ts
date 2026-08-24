@@ -6,12 +6,14 @@ import { WordDictionaryService } from './word-dictionary.service';
 import { WordDictionaryController } from './word-dictionary.controller';
 import { ImportModule } from '../import/import.module';
 import { WordAudioModule } from '../word-audio/word-audio.module';
+import { VocabularyModule } from '../vocabulary/vocabulary.module';
 
 @Module({
   imports: [
     TypeOrmModule.forFeature([WordDictionaryEntity]),
     forwardRef(() => ImportModule),
     WordAudioModule,
+    VocabularyModule,
   ],
   controllers: [WordDictionaryController],
   providers: [WordDictionaryRepository, WordDictionaryService],

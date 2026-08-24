@@ -20,6 +20,7 @@ const config: Config = {
     '@lingua-card/shared/dto': '<rootDir>/libs/shared/dto/src/index.ts',
     '@lingua-card/shared/utils': '<rootDir>/libs/shared/utils/src/index.ts',
     '@lingua-card/shared/testing': '<rootDir>/libs/shared/testing/src/index.ts',
+    '@lingua-card/mobile/notifications': '<rootDir>/apps/mobile/src/app/core/services/app-notification.service.ts',
   },
   testEnvironment: 'jsdom',
 };

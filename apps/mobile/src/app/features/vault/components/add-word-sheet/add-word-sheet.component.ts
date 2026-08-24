@@ -28,7 +28,7 @@ import { AuthService } from '../../../../core/services/auth.service';
 import { LanguageService } from '../../../../core/services/language.service';
 import { CardStore } from '../../store/card.store';
 import { CardApiService } from '../../services/card-api.service';
-import { CategoryStore } from '../../store/category.store';
+import { VaultV2Store } from '../../store/vault-v2.store';
 import { CollectionStore } from '../../store/collection.store';
 import { AssignCollectionSheetComponent } from '../assign-collection-sheet/assign-collection-sheet.component';
 import { CardDedupService } from '../../../../shared/dedup/card-dedup.service';
@@ -55,7 +55,7 @@ function makeSynonymGroup(s?: Partial<Synonym>): FormGroup {
   imports: [IonHeader, IonToolbar, IonContent, IonIcon, ReactiveFormsModule, TranslatePipe],
 })
 export class AddWordSheetComponent implements OnInit {
-  private readonly categoryStore = inject(CategoryStore);
+  private readonly vaultStore = inject(VaultV2Store);
   private readonly collectionStore = inject(CollectionStore);
   private readonly wordAudio = inject(WordAudioService);
   private readonly authService = inject(AuthService);
@@ -83,7 +83,6 @@ export class AddWordSheetComponent implements OnInit {
     back:          new FormControl('', [Validators.required]),
     article:       new FormControl<ArticleType | null>(null),
     plural:        new FormControl(''),
-    categoryId:    new FormControl(''),
     collectionId:  new FormControl<string | null>(null, [Validators.required]),
     exampleTarget: new FormControl(''),
     exampleNative: new FormControl(''),
@@ -138,14 +137,11 @@ export class AddWordSheetComponent implements OnInit {
 
   // ─── Local state ───────────────────────────────────────────────────────────
 
-  readonly categories = this.categoryStore.categories;
   readonly saving = signal(false);
   readonly generating = signal(false);
   readonly articles: ArticleType[] = ['der', 'die', 'das'];
   readonly duplicateCard = signal<Card | null>(null);
   readonly suppressDuplicateWarning = signal(false);
-  readonly showNewCategoryInput = signal(false);
-  readonly newCategoryName = signal('');
   readonly expandedSynonymIdx = signal<number | null>(null);
   /** Set when autoGenerate finds a dictionary hit — no AI call was made. */
   readonly fromLibrary = signal<WordDictionaryEntry | null>(null);
@@ -162,7 +158,6 @@ export class AddWordSheetComponent implements OnInit {
         back:          c.back,
         article:       c.article ?? null,
         plural:        c.plural ?? '',
-        categoryId:    card.categoryIds?.[0] ?? '',
         collectionId:  card.collectionId ?? null,
         exampleTarget: ex?.target ?? '',
         exampleNative: ex?.native ?? '',
@@ -224,36 +219,6 @@ export class AddWordSheetComponent implements OnInit {
     this._article.set(art);
   }
 
-  // ─── Category ──────────────────────────────────────────────────────────────
-
-  selectCategory(id: string): void {
-    const current = this.form.get('categoryId')!.value;
-    this.form.patchValue({ categoryId: current === id ? '' : id });
-  }
-
-  toggleNewCategoryInput(): void {
-    this.showNewCategoryInput.update(v => !v);
-    if (!this.showNewCategoryInput()) this.newCategoryName.set('');
-  }
-
-  addNewCategory(): void {
-    const name = this.newCategoryName().trim();
-    if (!name) return;
-    this.categoryStore.createCategory({ name });
-    const categories = this.categoryStore.categories;
-    const before = new Set(categories().map(c => c.id));
-    const check = setInterval(() => {
-      const added = categories().find(c => !before.has(c.id));
-      if (added) {
-        clearInterval(check);
-        this.form.patchValue({ categoryId: added.id });
-        this.newCategoryName.set('');
-        this.showNewCategoryInput.set(false);
-      }
-    }, 100);
-    setTimeout(() => clearInterval(check), 5000);
-  }
-
   // ─── Auto-generate (LC-137 / LC-WD10) ────────────────────────────────────
 
   autoGenerate(): void {
@@ -265,7 +230,7 @@ export class AddWordSheetComponent implements OnInit {
 
     const article = this.form.get('article')!.value ?? null;
 
-    this.dictionaryApi.lookup(back, article).pipe(
+    this.dictionaryApi.lookup(back, article, this.targetLocale(), this.sourceLanguage()).pipe(
       takeUntilDestroyed(this.destroyRef),
       switchMap(({ entry }) => {
         if (entry) {
@@ -274,8 +239,8 @@ export class AddWordSheetComponent implements OnInit {
         return this.enrichOneApi.enrich({
           back,
           article: article as 'der' | 'die' | 'das' | null,
-          targetLanguage: 'de',
-          nativeLanguage: 'en',
+          targetLanguage: this.targetLanguage(),
+          nativeLanguage: this.sourceLanguage(),
         }).pipe(switchMap(result => of({ fromAI: result })));
       }),
     ).subscribe({
@@ -385,7 +350,7 @@ export class AddWordSheetComponent implements OnInit {
     const word = this._back()?.trim();
     if (!word) return;
     const article = this.form.get('article')!.value;
-    void this.wordAudio.play(article ? `${article} ${word}` : word, 'de-DE');
+    void this.wordAudio.play(article ? `${article} ${word}` : word, this.targetLocale());
   }
 
   // ─── Save ──────────────────────────────────────────────────────────────────
@@ -431,10 +396,8 @@ export class AddWordSheetComponent implements OnInit {
       dictionaryWordId: dictEntry?.id ?? card?.content.dictionaryWordId ?? null,
     };
 
-    const categoryIds = v.categoryId ? [v.categoryId] : [];
-
     if (this.isEditing) {
-      this.cardApi.update(card!.id, { content, categoryIds, collectionId: v.collectionId ?? null } satisfies UpdateCardDto).subscribe({
+      this.cardApi.update(card!.id, { content, categoryIds: [], collectionId: v.collectionId ?? null } satisfies UpdateCardDto).subscribe({
         next: updated => {
           this.cardStore.updateCard(updated);
           this.saving.set(false);
@@ -453,7 +416,7 @@ export class AddWordSheetComponent implements OnInit {
       userId,
       contextId: 'german-vocab',
       content,
-      categoryIds,
+      categoryIds: [],
       tags: [],
       createdAt: now,
       updatedAt: now,
@@ -486,5 +449,19 @@ export class AddWordSheetComponent implements OnInit {
   navigateToImport(): void {
     this.modalCtrl.dismiss();
     this.router.navigate(['/vault/import']);
+  }
+
+  private targetLanguage(): string {
+    return this.vaultStore.vault()?.learningContext.targetLanguage ?? 'de';
+  }
+
+  private sourceLanguage(): string {
+    return this.vaultStore.vault()?.learningContext.sourceLanguage ?? 'en';
+  }
+
+  private targetLocale(): string {
+    const language = this.targetLanguage();
+    const locales: Record<string, string> = { de: 'de-DE', en: 'en-US', es: 'es-ES', ar: 'ar-SA' };
+    return locales[language] ?? language;
   }
 }

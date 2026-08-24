@@ -29,6 +29,8 @@ import { SharesModule } from './shares/shares.module';
 import databaseConfig from './config/database.config';
 import { aiConfig } from './config/ai.config';
 import { EngagementModule } from './engagement/engagement.module';
+import { VocabularyModule } from './vocabulary/vocabulary.module';
+import { LearningItemsModule } from './learning-items/learning-items.module';
 
 @Module({
   imports: [
@@ -64,6 +66,8 @@ import { EngagementModule } from './engagement/engagement.module';
     SettingsModule,
     PushModule,
     WordDictionaryModule,
+    VocabularyModule,
+    LearningItemsModule,
     AdminModule,
     PlatformCollectionsModule,
     DiscountCodesModule,

@@ -1,22 +1,22 @@
-import { ChangeDetectionStrategy, Component, computed, effect, inject } from '@angular/core';
-import { ActivatedRoute, Router } from '@angular/router';
-import { NavController } from '@ionic/angular';
-import { IonContent, IonHeader, IonToolbar, ModalController, ViewWillEnter } from '@ionic/angular/standalone';
-import { PlayMode } from '@lingua-card/shared/domain';
-import { TranslatePipe, TranslateService } from '@ngx-translate/core';
-import { CollectionStore } from '../../../vault/store/collection.store';
-import { ListenStore } from '../../store/listen.store';
-import { WordAudioService } from '../../../../shared/audio/word-audio.service';
-import { EmptyStateComponent } from '../../../../shared/ui/empty-state/empty-state.component';
-import { PlaylistSourceSheetComponent } from '../../components/playlist-source-sheet/playlist-source-sheet.component';
-import { ListenEqualizerComponent } from '../../components/listen-equalizer/listen-equalizer.component';
-import { ListenModeSelectorComponent } from '../../components/listen-mode-selector/listen-mode-selector.component';
-import { ListenQueueItemComponent } from '../../components/listen-queue-item/listen-queue-item.component';
+import {ChangeDetectionStrategy, Component, computed, effect, inject} from '@angular/core';
+import {ActivatedRoute, Router} from '@angular/router';
+import {NavController} from '@ionic/angular';
+import {IonContent, IonHeader, IonToolbar, ModalController, ViewWillEnter} from '@ionic/angular/standalone';
+import {PlayMode} from '@lingua-card/shared/domain';
+import {TranslatePipe, TranslateService} from '@ngx-translate/core';
+import {CollectionStore} from '../../../vault/store/collection.store';
+import {ListenStore} from '../../store/listen.store';
+import {WordAudioService} from '../../../../shared/audio/word-audio.service';
+import {EmptyStateComponent} from '../../../../shared/ui/empty-state/empty-state.component';
+import {PlaylistSourceSheetComponent} from '../../components/playlist-source-sheet/playlist-source-sheet.component';
+import {ListenEqualizerComponent} from '../../components/listen-equalizer/listen-equalizer.component';
+import {ListenModeSelectorComponent} from '../../components/listen-mode-selector/listen-mode-selector.component';
+import {ListenQueueItemComponent} from '../../components/listen-queue-item/listen-queue-item.component';
 import {
   LISTEN_SPEEDS_EXTENDED,
   PLAY_MODE_OPTIONS,
-  PLAYLIST_SOURCE_SHEET_CSS_CLASS,
   PlaybackSpeed,
+  PLAYLIST_SOURCE_SHEET_CSS_CLASS,
 } from '../../models/listen.models';
 
 @Component({
@@ -40,7 +40,7 @@ export class ListenComponent implements ViewWillEnter {
   private readonly route = inject(ActivatedRoute);
   private readonly wordAudio = inject(WordAudioService);
   private readonly translate = inject(TranslateService);
-  private readonly navController = inject(NavController);
+  private readonly = inject(NavController);
 
   readonly MODES = PLAY_MODE_OPTIONS;
   readonly SPEEDS = LISTEN_SPEEDS_EXTENDED;
@@ -74,7 +74,7 @@ export class ListenComponent implements ViewWillEnter {
         ?? 'Collection';
       const prefix = this.translate.instant('listen.card.collectionPrefix');
       this.listenStore.loadCollectionCards(collectionId, `${prefix} ${colName}`);
-      this.router.navigate([], { replaceUrl: true, queryParams: {} });
+      this.router.navigate([], {replaceUrl: true, queryParams: {}});
     }
   }
 
@@ -89,22 +89,26 @@ export class ListenComponent implements ViewWillEnter {
     await modal.present();
   }
 
+  goHome(): void {
+    void this.router.navigateByUrl('/');
+  }
+
   play(): void {
-    this.listenStore.start({ shuffle: false });
+    this.listenStore.start({shuffle: false});
     this.router.navigate(['/listen/now-playing']);
   }
 
   shuffle(): void {
-    this.listenStore.start({ shuffle: true });
+    this.listenStore.start({shuffle: true});
     this.router.navigate(['/listen/now-playing']);
   }
 
   setMode(mode: PlayMode): void {
-    this.listenStore.updateSettings({ playMode: mode });
+    this.listenStore.updateSettings({playMode: mode});
   }
 
   setSpeed(speed: PlaybackSpeed): void {
-    this.listenStore.updateSettings({ speed });
+    this.listenStore.updateSettings({speed});
   }
 
   playItemAudio(index: number): void {
@@ -124,7 +128,4 @@ export class ListenComponent implements ViewWillEnter {
     this.setSpeed(next);
   }
 
-  goBack(): void {
-    this.navController.back();
-  }
 }

@@ -105,8 +105,8 @@ export class ImageProcessingPage implements OnInit, OnDestroy {
       enrichResult = await firstValueFrom(
         this.imageImportApi.enrichWords({
           rawWords: extraction.rawWords,
-          targetLanguage: 'de',
-          nativeLanguage: 'en',
+          targetLanguage: this.imageImportApi.activeLanguages().targetLanguage,
+          nativeLanguage: this.imageImportApi.activeLanguages().sourceLanguage,
         }),
       );
     } catch {

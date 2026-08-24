@@ -13,7 +13,8 @@
   @if (detail(); as d) {
 
     <!-- Cover hero -->
-    <header class="cover" [class]="coverClass()">
+    <header class="cover">
+      <lc-collection-cover class="cover-artwork" [name]="d.title" [seed]="d.coverSeed" />
       <span class="cover-glow"></span>
       <div class="cover-nav">
         <button class="cover-btn" (click)="goBack()" [attr.aria-label]="'platformCollectionDetail.nav.backAria' | translate">
@@ -23,7 +24,6 @@
         <span class="cover-btn-spacer"></span>
       </div>
       <div class="cover-id">
-        <span class="cover-emoji">{{ d.emoji ?? '📚' }}</span>
         <div>
           <div class="cover-eyebrow">{{ d.level }} · {{ d.topic }}</div>
           <h1 class="cover-name">{{ d.title }}</h1>

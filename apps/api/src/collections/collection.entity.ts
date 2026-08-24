@@ -28,6 +28,16 @@ export class CollectionEntity {
   @Column()
   contextId!: string;
 
+  @Index('idx_collections_learningContextId')
+  @Column({ type: 'varchar', nullable: true, default: null })
+  learningContextId!: string | null;
+
+  @Column({ type: 'varchar', length: 200, nullable: true, default: null })
+  coverSeed!: string | null;
+
+  @Column({ type: 'varchar', length: 1000, nullable: true, default: null })
+  coverImageUrl!: string | null;
+
   @Column({ default: 0 })
   cardCount!: number;
 

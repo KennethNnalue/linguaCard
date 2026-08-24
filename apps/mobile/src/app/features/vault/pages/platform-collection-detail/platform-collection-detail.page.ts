@@ -17,13 +17,14 @@ import { PlatformCollectionStore } from '../../store/platform-collection.store';
 import { ArticleBadgeComponent } from '../../../../shared/components/article-badge/article-badge.component';
 import { WordAudioService } from '../../../../shared/audio/word-audio.service';
 import { GenerateStorySheetComponent } from '../../../stories/components/generate-story-sheet/generate-story-sheet.component';
+import { CollectionCoverComponent } from '../../components/collection-cover/collection-cover.component';
 
 @Component({
   selector: 'lc-platform-collection-detail',
   templateUrl: './platform-collection-detail.page.html',
   styleUrls: ['./platform-collection-detail.page.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [IonContent, IonIcon, ArticleBadgeComponent, TranslatePipe],
+  imports: [IonContent, IonIcon, ArticleBadgeComponent, TranslatePipe, CollectionCoverComponent],
 })
 export class PlatformCollectionDetailPage {
   private readonly router = inject(Router);
@@ -66,7 +67,9 @@ export class PlatformCollectionDetailPage {
 
   playWord(w: PlatformCollectionWordView): void {
     const text = (w.article ? `${w.article} ` : '') + w.displayText;
-    void this.wordAudio.play(text, 'de-DE');
+    const localeByLanguage: Record<string, string> = { de: 'de-DE', en: 'en-US', es: 'es-ES', ar: 'ar-SA' };
+    const targetLanguage = this.detail()?.targetLanguage ?? 'de';
+    void this.wordAudio.play(text, localeByLanguage[targetLanguage] ?? targetLanguage);
   }
 
   constructor() {

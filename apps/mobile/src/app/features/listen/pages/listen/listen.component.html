@@ -1,12 +1,19 @@
 <ion-header class="ion-no-border">
   <ion-toolbar>
     <div class="nav">
-      <button type="button" class="nav-icon" (click)="goBack()" [attr.aria-label]="'common.back' | translate">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><polyline points="15,18 9,12 15,6"/></svg>
+      <button type="button" class="nav-icon" (click)="goHome()" [attr.aria-label]="'common.back' | translate">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round">
+          <polyline points="15,18 9,12 15,6"/>
+        </svg>
       </button>
       <h1>{{ 'listen.main.pageTitle' | translate }}</h1>
-      <button type="button" class="nav-icon" (click)="openSourceSheet()" [attr.aria-label]="'listen.sourceSheet.title' | translate">
-        <svg viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="5" r="1.5"/><circle cx="12" cy="12" r="1.5"/><circle cx="12" cy="19" r="1.5"/></svg>
+      <button type="button" class="nav-icon" (click)="openSourceSheet()"
+              [attr.aria-label]="'listen.sourceSheet.title' | translate">
+        <svg viewBox="0 0 24 24" fill="currentColor">
+          <circle cx="12" cy="5" r="1.5"/>
+          <circle cx="12" cy="12" r="1.5"/>
+          <circle cx="12" cy="19" r="1.5"/>
+        </svg>
       </button>
     </div>
   </ion-toolbar>
@@ -15,12 +22,22 @@
 <ion-content>
   <main class="listen-page">
     <button type="button" class="source-card" (click)="openSourceSheet()">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="16" rx="2"/><line x1="16" y1="3" x2="16" y2="7"/><line x1="8" y1="3" x2="8" y2="7"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"
+           stroke-linejoin="round">
+        <rect x="3" y="5" width="18" height="16" rx="2"/>
+        <line x1="16" y1="3" x2="16" y2="7"/>
+        <line x1="8" y1="3" x2="8" y2="7"/>
+        <line x1="3" y1="10" x2="21" y2="10"/>
+      </svg>
       <span class="source-copy">
         <strong>{{ listenStore.sourceLabel() }}</strong>
-        <span>{{ queueCount() }} {{ 'common.words' | translate }} · {{ 'listen.queue.aboutDuration' | translate:{ mins: listenStore.estimatedMinutes() } }}</span>
+        <span>{{ queueCount() }} {{ 'common.words' | translate }}
+          · {{ 'listen.queue.aboutDuration' | translate:{mins: listenStore.estimatedMinutes()} }}</span>
       </span>
-      <svg class="chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><polyline points="6,9 12,15 18,9"/></svg>
+      <svg class="chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+           stroke-linecap="round">
+        <polyline points="6,9 12,15 18,9"/>
+      </svg>
     </button>
 
     <section class="session-card">
@@ -31,21 +48,30 @@
       </div>
       <div class="hero-audio-art" aria-hidden="true">
         <svg class="headphones" viewBox="0 0 220 190" fill="none">
-          <path d="M34 99V87C34 42 68 13 110 13s76 29 76 74v12" />
-          <path d="M44 99V87c0-38 29-64 66-64s66 26 66 64v12" />
-          <rect x="19" y="92" width="35" height="77" rx="17.5" />
-          <rect x="166" y="92" width="35" height="77" rx="17.5" />
-          <path d="M19 112H13c-7 0-12 6-12 13v14c0 8 5 13 12 13h6M201 112h6c7 0 12 6 12 13v14c0 8-5 13-12 13h-6" />
+          <path d="M34 99V87C34 42 68 13 110 13s76 29 76 74v12"/>
+          <path d="M44 99V87c0-38 29-64 66-64s66 26 66 64v12"/>
+          <rect x="19" y="92" width="35" height="77" rx="17.5"/>
+          <rect x="166" y="92" width="35" height="77" rx="17.5"/>
+          <path d="M19 112H13c-7 0-12 6-12 13v14c0 8 5 13 12 13h6M201 112h6c7 0 12 6 12 13v14c0 8-5 13-12 13h-6"/>
         </svg>
-        <lc-listen-equalizer variant="hero" />
+        <lc-listen-equalizer variant="hero"/>
       </div>
       <div class="session-actions">
         <button type="button" class="primary-play" (click)="play()" [disabled]="!queueCount()">
-          <svg viewBox="0 0 24 24" fill="currentColor"><polygon points="7,3 21,12 7,21"/></svg>
+          <svg viewBox="0 0 24 24" fill="currentColor">
+            <polygon points="7,3 21,12 7,21"/>
+          </svg>
           {{ 'listen.hero.playBtn' | translate }}
         </button>
-        <button type="button" class="shuffle" (click)="shuffle()" [disabled]="!queueCount()" [attr.aria-label]="'listen.transport.shuffleAriaLabel' | translate">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><polyline points="16,3 21,3 21,8"/><line x1="4" y1="20" x2="21" y2="3"/><polyline points="21,16 21,21 16,21"/><line x1="4" y1="4" x2="9" y2="9"/></svg>
+        <button type="button" class="shuffle" (click)="shuffle()" [disabled]="!queueCount()"
+                [attr.aria-label]="'listen.transport.shuffleAriaLabel' | translate">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"
+               stroke-linejoin="round">
+            <polyline points="16,3 21,3 21,8"/>
+            <line x1="4" y1="20" x2="21" y2="3"/>
+            <polyline points="21,16 21,21 16,21"/>
+            <line x1="4" y1="4" x2="9" y2="9"/>
+          </svg>
         </button>
       </div>
     </section>
@@ -56,21 +82,28 @@
         variant="grid"
         [modes]="MODES"
         [active]="listenStore.playMode()"
-        (modeChange)="setMode($event)" />
+        (modeChange)="setMode($event)"/>
     </section>
 
     <section class="settings-grid">
       <button type="button" class="setting-card" (click)="cycleSpeed()">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
-          <path d="M4.9 19a9 9 0 1 1 14.2 0"/><path d="m12 14 4-5"/><path d="M12 3v2M4.2 7.2l1.5 1.3M19.8 7.2l-1.5 1.3M3 14h2M19 14h2"/>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"
+             stroke-linejoin="round">
+          <path d="M4.9 19a9 9 0 1 1 14.2 0"/>
+          <path d="m12 14 4-5"/>
+          <path d="M12 3v2M4.2 7.2l1.5 1.3M19.8 7.2l-1.5 1.3M3 14h2M19 14h2"/>
         </svg>
         <span>{{ 'listen.controls.speedSection' | translate }}</span>
         <strong>{{ listenStore.speed() }}×</strong>
         <span class="setting-chevron">›</span>
       </button>
-      <button type="button" class="setting-card" (click)="downloadOffline()" [disabled]="listenStore.downloadStatus() === 'downloading'">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
-          <path d="M12 3v12"/><path d="m7 10 5 5 5-5"/><path d="M5 20h14"/>
+      <button type="button" class="setting-card" (click)="downloadOffline()"
+              [disabled]="listenStore.downloadStatus() === 'downloading'">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"
+             stroke-linejoin="round">
+          <path d="M12 3v12"/>
+          <path d="m7 10 5 5 5-5"/>
+          <path d="M5 20h14"/>
         </svg>
         <span>{{ 'listen.queue.offline' | translate }}</span>
         @if (listenStore.downloadStatus() === 'done') {
@@ -83,11 +116,12 @@
     <section class="queue-section">
       <h2>{{ 'listen.queue.upNext' | translate }}</h2>
       @if (!queueCount()) {
-        <lc-empty-state icon="🎧" [title]="'listen.queue.emptyTitle' | translate" [subtitle]="'listen.queue.emptyDesc' | translate" />
+        <lc-empty-state icon="🎧" [title]="'listen.queue.emptyTitle' | translate"
+                        [subtitle]="'listen.queue.emptyDesc' | translate"/>
       } @else {
         <div class="queue-list">
           @for (item of queuePreview(); track item.id; let index = $index) {
-            <lc-listen-queue-item [item]="item" [position]="index + 1" (preview)="playItemAudio(index)" />
+            <lc-listen-queue-item [item]="item" [position]="index + 1" (preview)="playItemAudio(index)"/>
           }
         </div>
       }
@@ -97,8 +131,10 @@
   @if (queueCount()) {
     <div class="sticky-cta">
       <button type="button" (click)="play()">
-        <svg viewBox="0 0 24 24" fill="currentColor"><polygon points="7,3 21,12 7,21"/></svg>
-        {{ 'listen.hero.playCountBtn' | translate:{ count: queueCount() } }}
+        <svg viewBox="0 0 24 24" fill="currentColor">
+          <polygon points="7,3 21,12 7,21"/>
+        </svg>
+        {{ 'listen.hero.playCountBtn' | translate:{count: queueCount()} }}
       </button>
     </div>
   }

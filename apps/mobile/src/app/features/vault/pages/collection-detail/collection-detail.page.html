@@ -1,7 +1,8 @@
 <ion-content [fullscreen]="true" class="cd-content">
 
   <!-- Cover hero -->
-  <header class="cover" [class]="coverClass()">
+  <header class="cover">
+    <lc-collection-cover class="cover-artwork" [name]="collection()?.name ?? ''" [seed]="coverSeed()" />
     <span class="cover-glow"></span>
     <div class="cover-nav">
       <button class="cover-btn" (click)="goBack()" [attr.aria-label]="'collectionDetail.nav.backAria' | translate">
@@ -12,7 +13,6 @@
       </button>
     </div>
     <div class="cover-id">
-      <span class="cover-emoji">{{ collection()?.emoji ?? '📚' }}</span>
       <div>
         <div class="cover-eyebrow">{{ eyebrow() }}</div>
         <h1 class="cover-name" [class.cover-name--completed]="justCompleted()">{{ collection()?.name ?? '' }}</h1>
@@ -83,20 +83,6 @@
     </div>
   }
 
-  <!-- Category chips -->
-  @if (categoryIds().length > 0) {
-    <div class="chips">
-      <button class="chip" [class.chip--active]="!activeCategoryId()" (click)="setCategory(null)">
-        {{ 'vault.filter.allLabel' | translate }} {{ allCards().length }}
-      </button>
-      @for (catId of categoryIds(); track catId) {
-        <button class="chip" [class.chip--active]="activeCategoryId() === catId" (click)="setCategory(catId)">
-          {{ getCategoryName(catId, categories()) }}
-        </button>
-      }
-    </div>
-  }
-
   <!-- Word list -->
   <div class="word-list">
     @if (loading()) {
@@ -104,8 +90,14 @@
         <div class="row-skeleton"></div>
       }
     } @else {
-      @for (card of filteredCards(); track card.id) {
-        <lc-word-row [card]="card" (rowClick)="openDetail(card)" />
+      @for (card of allCards(); track card.id) {
+        <button class="detail-word-row" type="button" (click)="openDetail(card)">
+          <span>
+            <strong>{{ card.lexeme.text }}</strong>
+            <small>{{ card.localization.translation }}</small>
+          </span>
+          <em>{{ card.reviewState.stage }}</em>
+        </button>
       } @empty {
         <div class="empty">
           <span class="empty-icon">📖</span>
