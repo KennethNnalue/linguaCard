@@ -27,7 +27,10 @@ function openDeploymentPort(): Promise<Server | null> {
       response.setHeader('vary', 'Origin');
     }
     if (request.url === '/api/v1/health') {
-      response.writeHead(200, { 'content-type': 'application/json' });
+      response.writeHead(503, {
+        'content-type': 'application/json',
+        'retry-after': '10',
+      });
       response.end(JSON.stringify({ status: 'migrating' }));
       return;
     }

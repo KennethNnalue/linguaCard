@@ -41,6 +41,7 @@ interface UnlinkedLegacyCardRow {
   id: string;
   userId: string;
   collectionId: string | null;
+  dictionaryWordId: string | null;
   content: CardContent;
   createdAt: Date;
   updatedAt: Date;
@@ -170,50 +171,80 @@ export class BackfillCanonicalLearningItems1787440000000 implements MigrationInt
     `);
 
     const unlinkedCards = await queryRunner.query(`
-      SELECT id, "userId", "collectionId", content, "createdAt", "updatedAt"
+      SELECT id, "userId", "collectionId", "dictionaryWordId", content, "createdAt", "updatedAt"
       FROM cards card
-      WHERE card."contextId" = 'german-vocab' AND card."dictionaryWordId" IS NULL
+      WHERE card."contextId" = 'german-vocab'
+        AND (
+          card."dictionaryWordId" IS NULL
+          OR NOT EXISTS (
+            SELECT 1 FROM legacy_dictionary_lexemes mapping
+            WHERE mapping."dictionaryWordId" = card."dictionaryWordId"
+          )
+        )
         AND EXISTS (SELECT 1 FROM users owner WHERE owner.id = card."userId")
       ORDER BY "createdAt", id
     `) as UnlinkedLegacyCardRow[];
     for (const card of unlinkedCards) {
-      const article = card.content.article ?? null;
-      const identity = identityService.createIdentity({
-        language: 'de',
-        text: card.content.back,
-        partOfSpeech: article ? 'noun' : 'other',
-        grammar: {
-          article,
-          gender: card.content.gender ?? null,
-          plurals: card.content.plural ? [card.content.plural] : [],
-        },
-      });
-      const proposedLexemeId = stableResourceId(
-        'lexeme', identity.language, identity.normalizedLemma,
-        identity.partOfSpeech, identity.grammarDiscriminator,
-      );
-      await queryRunner.query(`
-        INSERT INTO lexemes
-          (id, language, "normalizedLemma", "displayText", "partOfSpeech",
-           "grammarDiscriminator", grammar, phonetic, "cefrLevel", source, model)
-        VALUES ($1,$2,$3,$4,$5,$6,$7::jsonb,$8,NULL,'legacy-card',NULL)
-        ON CONFLICT (language, "normalizedLemma", "partOfSpeech", "grammarDiscriminator") DO NOTHING
-      `, [
-        proposedLexemeId, identity.language, identity.normalizedLemma, identity.displayText,
-        identity.partOfSpeech, identity.grammarDiscriminator,
-        JSON.stringify({
-          article,
-          gender: card.content.gender ?? null,
-          plurals: card.content.plural ? [card.content.plural] : [],
-        }),
-        card.content.phonetic ?? null,
-      ]);
-      const lexemes: Array<{ id: string }> = await queryRunner.query(`
-        SELECT id FROM lexemes
-        WHERE language = $1 AND "normalizedLemma" = $2
-          AND "partOfSpeech" = $3 AND "grammarDiscriminator" = $4
-      `, [identity.language, identity.normalizedLemma, identity.partOfSpeech, identity.grammarDiscriminator]);
-      const lexemeId = lexemes[0].id;
+      const existingMappings: Array<{ lexemeId: string }> = card.dictionaryWordId
+        ? await queryRunner.query(`
+            SELECT "lexemeId" FROM legacy_dictionary_lexemes
+            WHERE "dictionaryWordId" = $1
+          `, [card.dictionaryWordId])
+        : [];
+      let lexemeId = existingMappings[0]?.lexemeId;
+
+      if (!lexemeId) {
+        const article = card.content.article ?? null;
+        const identity = identityService.createIdentity({
+          language: 'de',
+          text: card.content.back,
+          partOfSpeech: article ? 'noun' : 'other',
+          grammar: {
+            article,
+            gender: card.content.gender ?? null,
+            plurals: card.content.plural ? [card.content.plural] : [],
+          },
+        });
+        const proposedLexemeId = stableResourceId(
+          'lexeme', identity.language, identity.normalizedLemma,
+          identity.partOfSpeech, identity.grammarDiscriminator,
+        );
+        await queryRunner.query(`
+          INSERT INTO lexemes
+            (id, language, "normalizedLemma", "displayText", "partOfSpeech",
+             "grammarDiscriminator", grammar, phonetic, "cefrLevel", source, model)
+          VALUES ($1,$2,$3,$4,$5,$6,$7::jsonb,$8,NULL,'legacy-card',NULL)
+          ON CONFLICT (language, "normalizedLemma", "partOfSpeech", "grammarDiscriminator") DO NOTHING
+        `, [
+          proposedLexemeId, identity.language, identity.normalizedLemma, identity.displayText,
+          identity.partOfSpeech, identity.grammarDiscriminator,
+          JSON.stringify({
+            article,
+            gender: card.content.gender ?? null,
+            plurals: card.content.plural ? [card.content.plural] : [],
+          }),
+          card.content.phonetic ?? null,
+        ]);
+        const lexemes: Array<{ id: string }> = await queryRunner.query(`
+          SELECT id FROM lexemes
+          WHERE language = $1 AND "normalizedLemma" = $2
+            AND "partOfSpeech" = $3 AND "grammarDiscriminator" = $4
+        `, [identity.language, identity.normalizedLemma, identity.partOfSpeech, identity.grammarDiscriminator]);
+        lexemeId = lexemes[0].id;
+
+        if (card.dictionaryWordId) {
+          await queryRunner.query(`
+            INSERT INTO legacy_dictionary_lexemes ("dictionaryWordId", "lexemeId")
+            VALUES ($1, $2)
+            ON CONFLICT ("dictionaryWordId") DO NOTHING
+          `, [card.dictionaryWordId, lexemeId]);
+          const persistedMappings: Array<{ lexemeId: string }> = await queryRunner.query(`
+            SELECT "lexemeId" FROM legacy_dictionary_lexemes
+            WHERE "dictionaryWordId" = $1
+          `, [card.dictionaryWordId]);
+          lexemeId = persistedMappings[0].lexemeId;
+        }
+      }
       await queryRunner.query(`
         INSERT INTO lexeme_localizations
           (id, "lexemeId", language, translation, definition, synonyms, status,
