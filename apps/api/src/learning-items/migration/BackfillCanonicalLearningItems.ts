@@ -317,6 +317,18 @@ export class BackfillCanonicalLearningItems1787440000000 implements MigrationInt
     if (Number(unresolved[0]?.count ?? 0) > 0) {
       throw new Error(`Canonical learning-item backfill left ${unresolved[0].count} dictionary-linked cards unresolved`);
     }
+
+    await queryRunner.query(`
+      CREATE TABLE IF NOT EXISTS data_migration_markers (
+        key varchar PRIMARY KEY,
+        "completedAt" timestamptz NOT NULL DEFAULT now()
+      )
+    `);
+    await queryRunner.query(`
+      INSERT INTO data_migration_markers (key)
+      VALUES ('canonical-learning-items-v2')
+      ON CONFLICT (key) DO UPDATE SET "completedAt" = now()
+    `);
   }
 
   async down(): Promise<void> {

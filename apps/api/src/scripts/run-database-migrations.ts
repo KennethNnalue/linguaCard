@@ -4,6 +4,13 @@ import { createServer, type Server } from 'node:http';
 import { DataSource, type DataSourceOptions } from 'typeorm';
 import databaseConfig from '../config/database.config';
 
+function configuredCorsOrigins(): readonly string[] {
+  return process.env['CORS_ORIGIN']
+    ?.split(',')
+    .map(origin => origin.trim())
+    .filter(Boolean) ?? [];
+}
+
 function openDeploymentPort(): Promise<Server | null> {
   const rawPort = process.env['PORT'];
   if (!rawPort) return Promise.resolve(null);
@@ -11,13 +18,26 @@ function openDeploymentPort(): Promise<Server | null> {
   if (!Number.isInteger(port) || port < 1) throw new Error(`Invalid PORT value: ${rawPort}`);
 
   const server = createServer((request, response) => {
+    const origin = request.headers.origin;
+    if (origin && configuredCorsOrigins().includes(origin)) {
+      response.setHeader('access-control-allow-origin', origin);
+      response.setHeader('access-control-allow-credentials', 'true');
+      response.setHeader('access-control-allow-headers', request.headers['access-control-request-headers'] ?? 'authorization, content-type');
+      response.setHeader('access-control-allow-methods', 'GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS');
+      response.setHeader('vary', 'Origin');
+    }
     if (request.url === '/api/v1/health') {
       response.writeHead(200, { 'content-type': 'application/json' });
       response.end(JSON.stringify({ status: 'migrating' }));
       return;
     }
+    if (request.method === 'OPTIONS') {
+      response.writeHead(204);
+      response.end();
+      return;
+    }
     response.writeHead(503, { 'content-type': 'application/json', 'retry-after': '10' });
-    response.end(JSON.stringify({ status: 'migrating' }));
+    response.end(JSON.stringify({ status: 'migrating', message: 'Database migration is still in progress' }));
   });
   return new Promise((resolve, reject) => {
     server.once('error', reject);
@@ -47,7 +67,9 @@ async function runDatabaseMigrations(): Promise<void> {
   } as DataSourceOptions);
 
   try {
+    console.log('Connecting to the database for migrations.');
     await dataSource.initialize();
+    console.log('Database connection established; checking schema baseline.');
     const baseline: Array<{ hasUsers: boolean; applicationTableCount: number }> = await dataSource.query(`
       SELECT
         to_regclass('public.users') IS NOT NULL AS "hasUsers",
@@ -63,7 +85,8 @@ async function runDatabaseMigrations(): Promise<void> {
       // synchronization is safe only for a completely empty database bootstrap.
       await dataSource.synchronize(false);
     }
-    const migrations = await dataSource.runMigrations({ transaction: 'all' });
+    console.log('Schema baseline is ready; applying pending TypeORM migrations.');
+    const migrations = await dataSource.runMigrations({ transaction: 'each' });
     console.log(`Database migrations complete: ${migrations.length} applied.`);
   } finally {
     if (dataSource.isInitialized) await dataSource.destroy();
