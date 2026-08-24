@@ -1,20 +1,48 @@
 import 'reflect-metadata';
 import { ConfigModule } from '@nestjs/config';
+import { createServer, type Server } from 'node:http';
 import { DataSource, type DataSourceOptions } from 'typeorm';
 import databaseConfig from '../config/database.config';
+
+function openDeploymentPort(): Promise<Server | null> {
+  const rawPort = process.env['PORT'];
+  if (!rawPort) return Promise.resolve(null);
+  const port = Number(rawPort);
+  if (!Number.isInteger(port) || port < 1) throw new Error(`Invalid PORT value: ${rawPort}`);
+
+  const server = createServer((_request, response) => {
+    response.writeHead(503, { 'content-type': 'application/json', 'retry-after': '10' });
+    response.end(JSON.stringify({ status: 'migrating' }));
+  });
+  return new Promise((resolve, reject) => {
+    server.once('error', reject);
+    server.listen(port, '0.0.0.0', () => {
+      console.log(`Migration readiness server listening on port ${port}.`);
+      resolve(server);
+    });
+  });
+}
+
+function closeDeploymentPort(server: Server | null): Promise<void> {
+  if (!server) return Promise.resolve();
+  return new Promise((resolve, reject) => {
+    server.close(error => error ? reject(error) : resolve());
+  });
+}
 
 async function runDatabaseMigrations(): Promise<void> {
   ConfigModule.forRoot({
     envFilePath: ['apps/api/.env', '.env', '../../.env'],
   });
+  const deploymentServer = await openDeploymentPort();
   const options = databaseConfig();
   const dataSource = new DataSource({
     ...options,
     migrationsRun: false,
   } as DataSourceOptions);
 
-  await dataSource.initialize();
   try {
+    await dataSource.initialize();
     const baseline: Array<{ hasUsers: boolean; applicationTableCount: number }> = await dataSource.query(`
       SELECT
         to_regclass('public.users') IS NOT NULL AS "hasUsers",
@@ -33,7 +61,8 @@ async function runDatabaseMigrations(): Promise<void> {
     const migrations = await dataSource.runMigrations({ transaction: 'all' });
     console.log(`Database migrations complete: ${migrations.length} applied.`);
   } finally {
-    await dataSource.destroy();
+    if (dataSource.isInitialized) await dataSource.destroy();
+    await closeDeploymentPort(deploymentServer);
   }
 }
 
