@@ -35,8 +35,6 @@ import { CreateLearningItems1787437000000 } from '../learning-items/migration/Cr
 import { PlatformCollectionImportEntity } from '../admin/platform-collection-import.entity';
 import { CreatePlatformCollectionImports1787438000000 } from '../admin/migration/CreatePlatformCollectionImports';
 import { AddPlatformCollectionVocabulary1787439000000 } from '../admin/migration/AddPlatformCollectionVocabulary';
-import { BackfillCanonicalLearningItems1787440000000 } from '../learning-items/migration/BackfillCanonicalLearningItems';
-import { ReconcileCanonicalLearningItems1787441000000 } from '../learning-items/migration/ReconcileCanonicalLearningItems';
 
 export default registerAs('database', (): TypeOrmModuleOptions => ({
   type: 'postgres',
@@ -45,7 +43,7 @@ export default registerAs('database', (): TypeOrmModuleOptions => ({
     ? { rejectUnauthorized: false }
     : false,
   entities: [UserEntity, CardEntity, ReviewSchedulingEntity, CollectionEntity, CategoryEntity, StoryEntity, WordAudioEntity, SubscriptionEntity, ReviewSessionEntity, ReviewCommitEntity, CardAdministrationEventEntity, PlatformStoryEntity, UserStoryProgressEntity, UserSettingsEntity, PushSubscriptionEntity, WordDictionaryEntity, PlatformCollectionEntity, PlatformCollectionWordEntity, PlatformCollectionImportEntity, DiscountCodeEntity, DiscountRedemptionEntity, ShareEntity, ShareSyncLinkEntity, EngagementProcessedEventEntity, DailyReviewCardEntity, DailyProgressEntity, RewardTransactionEntity, StreakFreezeTransactionEntity, ...VOCABULARY_ENTITIES, ...LEARNING_ITEM_ENTITIES],
-  migrations: [CreateEngagementTables1760000000000, CreateMultilingualVocabulary1787436000000, CreateLearningItems1787437000000, CreatePlatformCollectionImports1787438000000, AddPlatformCollectionVocabulary1787439000000, BackfillCanonicalLearningItems1787440000000, ReconcileCanonicalLearningItems1787441000000],
+  migrations: [CreateEngagementTables1760000000000, CreateMultilingualVocabulary1787436000000, CreateLearningItems1787437000000, CreatePlatformCollectionImports1787438000000, AddPlatformCollectionVocabulary1787439000000],
   synchronize: process.env['TYPEORM_SYNCHRONIZE'] === 'true' && process.env['NODE_ENV'] !== 'production',
   logging: process.env['NODE_ENV'] !== 'production',
 }));

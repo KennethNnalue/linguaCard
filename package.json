@@ -19,6 +19,8 @@
     "migrate:review-scheduling": "nx build api && node dist/api/apps/api/src/scripts/migrate-review-scheduling.js",
     "migrate:engagement": "npm run build:api && node dist/api/apps/api/src/scripts/migrate-engagement.js",
     "backfill:multilingual-vocabulary": "npx ts-node -r tsconfig-paths/register --project apps/api/tsconfig.json apps/api/src/scripts/backfill-multilingual-vocabulary.ts",
+    "backfill:canonical-learning-items": "node dist/api/apps/api/src/scripts/backfill-multilingual-vocabulary.js",
+    "validate:canonical-learning-items": "node dist/api/apps/api/src/scripts/backfill-multilingual-vocabulary.js --validate-only",
     "build:web": "node scripts/set-env.mjs && ng build --project=mobile --configuration=production",
     "test": "jest",
     "test:watch": "jest --watch",
