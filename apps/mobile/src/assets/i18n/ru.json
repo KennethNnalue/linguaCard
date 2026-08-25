@@ -400,7 +400,8 @@
       "minLabel": "мин"
     },
     "footer": {
-      "openButton": "Открыть в «Мои наборы»",
+      "openButton": "Открыть в «Моих коллекциях»",
+      "addToCollectionsButton": "+ Добавить в мои коллекции",
       "getButton": "+ Добавить",
       "getNewButton": "+ Добавить новые слова",
       "addingLabel": "Добавление…",

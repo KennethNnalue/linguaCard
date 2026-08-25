@@ -401,6 +401,7 @@
     },
     "footer": {
       "openButton": "فتح في مجموعاتي",
+      "addToCollectionsButton": "+ إضافة إلى مجموعاتي",
       "getButton": "+ إضافة",
       "getNewButton": "+ إضافة كلمات جديدة",
       "addingLabel": "جارٍ الإضافة…",

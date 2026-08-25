@@ -16,6 +16,7 @@ import type {
   AdminPlatformStoryListItem,
   AdminPublishToggleDto,
   AdminSetStoryCategoryDto,
+  AdminUpdatePlatformCollectionDto,
 } from '@lingua-card/shared/domain';
 
 @Controller('admin')
@@ -72,6 +73,14 @@ export class AdminController {
     @Body() dto: AdminPublishToggleDto,
   ): Promise<void> {
     await this.adminService.setPublished(id, dto.isPublished);
+  }
+
+  @Patch('platform-collections/:id')
+  updateCollection(
+    @Param('id') id: string,
+    @Body() dto: AdminUpdatePlatformCollectionDto,
+  ): Promise<AdminPlatformCollectionListItem> {
+    return this.adminService.updateCollection(id, dto);
   }
 
   @Patch('platform-collections/:id/story-category')

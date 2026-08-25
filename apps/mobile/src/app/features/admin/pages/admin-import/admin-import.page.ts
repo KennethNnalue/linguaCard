@@ -215,6 +215,12 @@ OUTPUT — valid JSON ONLY, no markdown fences, no commentary:
   readonly settingCategoryId = signal<string | null>(null);
   readonly deletingCollectionId = signal<string | null>(null);
   readonly editingCollectionId = signal<string | null>(null);
+  readonly editingMetadataId = signal<string | null>(null);
+  readonly editTitle = signal('');
+  readonly editLevel = signal<CefrLevel>('A1');
+  readonly editCover = signal<File | null>(null);
+  readonly editCoverPreview = signal<string | null>(null);
+  readonly savingMetadataId = signal<string | null>(null);
   readonly collectionWords = signal<AdminPlatformCollectionWordItem[]>([]);
   readonly collectionWordsLoading = signal(false);
   readonly mutatingCollectionWord = signal(false);
@@ -306,6 +312,74 @@ OUTPUT — valid JSON ONLY, no markdown fences, no commentary:
       error: () => {
         this.collectionWordsLoading.set(false);
         void this._toast('Failed to load collection words', 'danger');
+      },
+    });
+  }
+
+  startEditingMetadata(item: AdminPlatformCollectionListItem): void {
+    if (this.editingMetadataId() === item.id) {
+      this.cancelEditingMetadata();
+      return;
+    }
+    this.editingMetadataId.set(item.id);
+    this.editTitle.set(item.title);
+    this.editLevel.set(this.isCefrLevel(item.level) ? item.level : 'A1');
+    this.editCover.set(null);
+    this.editCoverPreview.set(item.coverImageUrl);
+  }
+
+  cancelEditingMetadata(): void {
+    this.editingMetadataId.set(null);
+    this.editCover.set(null);
+    this.editCoverPreview.set(null);
+  }
+
+  updateEditTitle(event: Event): void {
+    const input = event.target;
+    if (input instanceof HTMLInputElement) this.editTitle.set(input.value);
+  }
+
+  updateEditLevel(event: Event): void {
+    const select = event.target;
+    if (select instanceof HTMLSelectElement && this.isCefrLevel(select.value)) this.editLevel.set(select.value);
+  }
+
+  selectEditCover(event: Event): void {
+    const input = event.target;
+    if (!(input instanceof HTMLInputElement)) return;
+    const file = input.files?.[0] ?? null;
+    this.editCover.set(file);
+    if (!file) return;
+    const reader = new FileReader();
+    reader.addEventListener('load', () => {
+      this.editCoverPreview.set(typeof reader.result === 'string' ? reader.result : null);
+    }, {once: true});
+    reader.readAsDataURL(file);
+  }
+
+  saveCollectionMetadata(item: AdminPlatformCollectionListItem): void {
+    const title = this.editTitle().trim();
+    if (!title || this.savingMetadataId()) return;
+    this.savingMetadataId.set(item.id);
+    this.adminApi.updateCollection(item.id, {title, level: this.editLevel()}).pipe(
+      concatMap(updated => {
+        const cover = this.editCover();
+        if (!cover) return of(updated);
+        return this.adminApi.uploadCollectionCover(item.id, cover).pipe(
+          map(result => ({...updated, coverImageUrl: result.coverImageUrl})),
+        );
+      }),
+      takeUntilDestroyed(this._destroyRef),
+    ).subscribe({
+      next: updated => {
+        this.collections.update(items => items.map(collection => collection.id === item.id ? updated : collection));
+        this.savingMetadataId.set(null);
+        this.cancelEditingMetadata();
+        void this._toast(`“${updated.title}” updated`, 'success');
+      },
+      error: error => {
+        this.savingMetadataId.set(null);
+        void this._toast(this.apiErrorMessage(error, 'Collection update failed'), 'danger');
       },
     });
   }

@@ -400,7 +400,8 @@
       "minLabel": "хв"
     },
     "footer": {
-      "openButton": "Відкрити в Моїх наборах",
+      "openButton": "Відкрити в Моїх колекціях",
+      "addToCollectionsButton": "+ Додати до моїх колекцій",
       "getButton": "+ Отримати",
       "getNewButton": "+ Отримати нові слова",
       "addingLabel": "Додавання…",

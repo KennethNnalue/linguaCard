@@ -84,7 +84,7 @@
             @for (collection of platformCollections(); track collection.id) {
               <button class="cover-card" type="button" (click)="openPlatformCollection(collection)">
                 <span class="cover-art">
-                  <lc-collection-cover [name]="collection.title" [seed]="collection.id" />
+                  <lc-collection-cover [name]="collection.title" [seed]="collection.coverSeed" [imageUrl]="collection.coverImageUrl" />
                   <span class="level-badge">{{ collection.level }}</span>
                   @if (collection.adoptionStatus === 'adopted') { <span class="owned">✓</span> }
                 </span>
@@ -103,7 +103,7 @@
             @for (collection of personalCollections(); track collection.id) {
               <article class="personal-card">
                 <button class="personal-main" type="button" (click)="openCollection(collection)">
-                  <span class="personal-cover"><lc-collection-cover [name]="collection.name" [seed]="collection.coverSeed" /></span>
+                  <span class="personal-cover"><lc-collection-cover [name]="collection.name" [seed]="collection.coverSeed" [imageUrl]="collection.coverImageUrl" /></span>
                   <span class="personal-copy">
                     <span><strong>{{ collection.name }}</strong>@if (collection.level) { <b>{{ collection.level }}</b> }</span>
                     <small>{{ collectionMeta(collection) }}</small>

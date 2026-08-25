@@ -179,7 +179,7 @@
               @for (c of exploreCards(); track c.id) {
                 <button class="cover-card" (click)="openPlatformDetail(c)">
                   <span class="cover-art">
-                    <lc-collection-cover [name]="c.title" [seed]="c.coverSeed" />
+                    <lc-collection-cover [name]="c.title" [seed]="c.coverSeed" [imageUrl]="c.coverImageUrl" />
                     <span class="cover-level">{{ c.level }}</span>
                     @if (c.emoji) {
                       <span class="cover-emoji-art">{{ c.emoji }}</span>
@@ -229,7 +229,7 @@
               @let urgency = urgencyLevel(s);
               <button class="col-card" (click)="openCollectionDetail(col)">
                 <span class="col-cover">
-                  <lc-collection-cover [name]="col.name" [seed]="coverSeedFor(col)" />
+                  <lc-collection-cover [name]="col.name" [seed]="coverSeedFor(col)" [imageUrl]="col.coverImageUrl" />
                 </span>
                 <span class="col-body">
                   <span class="col-top">
@@ -390,7 +390,7 @@
             @for (c of exploreAll(); track c.id) {
               <button class="cover-card cover-card--grid" (click)="openPlatformDetail(c)">
                 <span class="cover-art">
-                  <lc-collection-cover [name]="c.title" [seed]="c.coverSeed" />
+                  <lc-collection-cover [name]="c.title" [seed]="c.coverSeed" [imageUrl]="c.coverImageUrl" />
                   <span class="cover-level">{{ c.level }}</span>
                   @if (c.emoji) {
                     <span class="cover-emoji-art">{{ c.emoji }}</span>
@@ -435,7 +435,7 @@
             @let s = statsFor(col.id);
             <button class="cover-card cover-card--grid" (click)="openCollectionDetail(col)">
               <span class="cover-art">
-                <lc-collection-cover [name]="col.name" [seed]="coverSeedFor(col)" />
+                <lc-collection-cover [name]="col.name" [seed]="coverSeedFor(col)" [imageUrl]="col.coverImageUrl" />
                 @if (s.dueCount > 0) {
                   <span class="cover-due-badge">{{ s.dueCount }} {{ 'common.due' | translate }}</span>
                 }

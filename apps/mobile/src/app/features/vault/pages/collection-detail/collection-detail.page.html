@@ -2,7 +2,7 @@
 
   <!-- Cover hero -->
   <header class="cover">
-    <lc-collection-cover class="cover-artwork" [name]="collection()?.name ?? ''" [seed]="coverSeed()" />
+    <lc-collection-cover class="cover-artwork" [name]="collection()?.name ?? ''" [seed]="coverSeed()" [imageUrl]="collection()?.coverImageUrl ?? null" />
     <span class="cover-glow"></span>
     <div class="cover-nav">
       <button class="cover-btn" (click)="goBack()" [attr.aria-label]="'collectionDetail.nav.backAria' | translate">

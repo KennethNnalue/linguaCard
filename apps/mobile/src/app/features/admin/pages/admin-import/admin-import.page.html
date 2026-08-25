@@ -313,6 +313,9 @@
               </div>
             </div>
             <div class="adm-coll-actions">
+              <button class="adm-publish-btn" (click)="startEditingMetadata(item)">
+                {{ editingMetadataId() === item.id ? 'Cancel' : 'Edit' }}
+              </button>
               <button class="adm-publish-btn" (click)="toggleCollectionEditor(item)">
                 {{ editingCollectionId() === item.id ? 'Close' : 'Words' }}
               </button>
@@ -334,6 +337,39 @@
               </button>
             </div>
           </div>
+          @if (editingMetadataId() === item.id) {
+            <div class="adm-metadata-editor">
+              <label class="adm-image-upload adm-image-upload--compact">
+                @if (editCoverPreview(); as preview) {
+                  <img [src]="preview" alt="Updated collection thumbnail preview" />
+                } @else {
+                  <span>＋</span>
+                }
+                <span>{{ editCoverPreview() ? 'Replace thumbnail' : 'Add thumbnail' }}</span>
+                <input type="file" accept="image/jpeg,image/png,image/webp" (change)="selectEditCover($event)" />
+              </label>
+              <label class="adm-field">
+                <span class="adm-label">Title</span>
+                <input class="adm-input" [value]="editTitle()" (input)="updateEditTitle($event)" />
+              </label>
+              <label class="adm-field">
+                <span class="adm-label">Level</span>
+                <select class="adm-select" [value]="editLevel()" (change)="updateEditLevel($event)">
+                  @for (level of levels; track level) { <option [value]="level">{{ level }}</option> }
+                </select>
+              </label>
+              <div class="adm-metadata-editor__actions">
+                <button type="button" class="adm-publish-btn" (click)="cancelEditingMetadata()">Cancel</button>
+                <button
+                  type="button"
+                  class="adm-publish-btn adm-publish-btn--live"
+                  [disabled]="!editTitle().trim() || savingMetadataId() === item.id"
+                  (click)="saveCollectionMetadata(item)">
+                  {{ savingMetadataId() === item.id ? 'Saving…' : 'Save changes' }}
+                </button>
+              </div>
+            </div>
+          }
           @if (editingCollectionId() === item.id) {
             <div class="adm-word-editor">
               @if (item.isPublished) {

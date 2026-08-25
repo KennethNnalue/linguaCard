@@ -2,7 +2,7 @@
   <main class="panel">
     @if (collection(); as data) {
       <header class="hero">
-        <lc-collection-cover [name]="data.name" [seed]="data.coverSeed" />
+        <lc-collection-cover [name]="data.name" [seed]="data.coverSeed" [imageUrl]="data.coverImageUrl" />
         <button class="back" type="button" (click)="goBack()" aria-label="Back">‹</button>
         <div class="hero-copy">
           <p>{{ languagePair() }}</p>

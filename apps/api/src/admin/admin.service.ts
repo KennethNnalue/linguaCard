@@ -13,6 +13,7 @@ import { PlatformCollectionImportEntity } from './platform-collection-import.ent
 import { StoryAudioService } from '../stories/story-audio.service';
 import { StorageService } from '../storage/storage.service';
 import { LegacyDictionaryLexemeEntity } from '../vocabulary/entities/legacy-dictionary-lexeme.entity';
+import { CollectionEntity } from '../collections/collection.entity';
 import type {
   AdminImportCollectionDto,
   AdminImportCollectionResult,
@@ -23,6 +24,7 @@ import type {
   AdminPlatformCollectionListItem,
   AdminPlatformCollectionWordItem,
   AdminPlatformStoryListItem,
+  AdminUpdatePlatformCollectionDto,
   StoryKeyword,
 } from '@lingua-card/shared/domain';
 
@@ -418,8 +420,31 @@ export class AdminService {
     const extension = contentType === 'image/png' ? 'png' : contentType === 'image/webp' ? 'webp' : 'jpg';
     const coverImageUrl = await this.storage.upload(buffer, `collection-covers/${id}.${extension}`, contentType);
     collection.coverImageUrl = coverImageUrl;
-    await this.collectionRepo.save(collection);
+    await this.collectionRepo.manager.transaction(async manager => {
+      await manager.save(PlatformCollectionEntity, collection);
+      await manager.update(CollectionEntity, { sourcePlatformCollectionId: id }, { coverImageUrl });
+    });
     return { coverImageUrl };
+  }
+
+  async updateCollection(
+    id: string,
+    dto: AdminUpdatePlatformCollectionDto,
+  ): Promise<AdminPlatformCollectionListItem> {
+    const title = dto.title?.trim();
+    if (!title) throw new BadRequestException('title must be a non-empty string');
+    if (!['A1', 'A2', 'B1', 'B2', 'C1'].includes(dto.level)) {
+      throw new BadRequestException('level must be one of A1, A2, B1, B2, or C1');
+    }
+    const collection = await this.collectionRepo.findOneBy({ id });
+    if (!collection) throw new NotFoundException(`Platform collection ${id} not found`);
+    collection.title = title;
+    collection.topic = title;
+    collection.level = dto.level;
+    await this.collectionRepo.save(collection);
+    const updated = (await this.listCollections()).find(item => item.id === id);
+    if (!updated) throw new NotFoundException(`Platform collection ${id} not found`);
+    return updated;
   }
 
   async setPublished(id: string, isPublished: boolean): Promise<void> {

@@ -464,6 +464,8 @@ export interface Collection {
   emoji: string;
   colour: string;
   contextId: string;
+  coverSeed?: string | null;
+  coverImageUrl?: string | null;
   cardCount: number;
   masteredCount: number;
   dueCount: number;
@@ -1481,6 +1483,11 @@ export interface AdminPublishToggleDto {
 export interface AdminSetStoryCategoryDto {
   /** Enum value matching StoryCategory, or null to clear the pairing. */
   storyCategory: string | null;
+}
+
+export interface AdminUpdatePlatformCollectionDto {
+  title: string;
+  level: CefrLevel;
 }
 
 // ─── PLATFORM COLLECTIONS — PUBLIC (LC-403a) ─────────────────────────────────

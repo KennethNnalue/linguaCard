@@ -400,7 +400,8 @@
       "minLabel": "dk"
     },
     "footer": {
-      "openButton": "Setlerimde Aç",
+      "openButton": "Koleksiyonlarımda Aç",
+      "addToCollectionsButton": "+ Koleksiyonlarıma Ekle",
       "getButton": "+ Al",
       "getNewButton": "+ Yeni kelimeleri al",
       "addingLabel": "Ekleniyor…",

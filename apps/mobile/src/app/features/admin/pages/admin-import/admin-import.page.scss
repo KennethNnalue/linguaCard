@@ -375,6 +375,27 @@
   }
 }
 
+.adm-metadata-editor {
+  display: grid;
+  grid-template-columns: minmax(180px, 1fr) minmax(180px, 2fr) minmax(100px, 1fr) auto;
+  gap: t.$lc-space-3;
+  align-items: end;
+  margin: -8px 0 12px;
+  padding: t.$lc-space-3;
+  border: 1px solid var(--lc-border);
+  border-top: 0;
+  border-radius: 0 0 t.$lc-radius-md t.$lc-radius-md;
+  background: var(--lc-surface);
+
+  &__actions { display: flex; gap: t.$lc-space-2; padding-bottom: 1px; }
+}
+
+.adm-image-upload--compact { padding: t.$lc-space-2; }
+
+@media (max-width: 800px) {
+  .adm-metadata-editor { grid-template-columns: 1fr; align-items: stretch; }
+}
+
 .adm-word-row {
   display: grid;
   grid-template-columns: 24px minmax(100px, 1fr) auto 30px 30px 34px;

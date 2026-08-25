@@ -24,7 +24,7 @@
         <p class="seed-tag">★ {{ 'onboarding.seed.recommended' | translate }}</p>
         <div class="seed-card">
           <div class="seed-cover">
-            {{ col.emoji ?? '📚' }}
+            <lc-collection-cover [name]="col.title" [seed]="col.coverSeed" [imageUrl]="col.coverImageUrl" />
           </div>
           <div class="seed-body">
             <div class="seed-name">{{ col.title }}</div>

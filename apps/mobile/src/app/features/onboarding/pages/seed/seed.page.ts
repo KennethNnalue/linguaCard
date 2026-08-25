@@ -8,6 +8,7 @@ import { PlatformCollectionStore } from '../../../vault/store/platform-collectio
 import { AddWordSheetComponent } from '../../../vault/components/add-word-sheet/add-word-sheet.component';
 import { ImportPage } from '../../../vault/pages/import/import.page';
 import { CardStore } from '../../../vault/store/card.store';
+import { CollectionCoverComponent } from '../../../vault/components/collection-cover/collection-cover.component';
 
 const LEVEL_TO_CEFR: Record<OnboardingLevel, CefrLevel> = {
   beginner: 'A1',
@@ -20,7 +21,7 @@ const LEVEL_TO_CEFR: Record<OnboardingLevel, CefrLevel> = {
   templateUrl: './seed.page.html',
   styleUrls: ['./seed.page.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [IonContent, IonSpinner, TranslatePipe, OnboardingShellComponent],
+  imports: [IonContent, IonSpinner, TranslatePipe, OnboardingShellComponent, CollectionCoverComponent],
 })
 export class SeedPage {
   readonly store = inject(OnboardingStore);

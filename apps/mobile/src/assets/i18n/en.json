@@ -408,7 +408,8 @@
       "minLabel": "min"
     },
     "footer": {
-      "openButton": "Open in My Sets",
+      "openButton": "Open in My Collections",
+      "addToCollectionsButton": "+ Add to My Collections",
       "getButton": "+ Get",
       "getNewButton": "+ Get new words",
       "addingLabel": "Adding…",

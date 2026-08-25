@@ -400,7 +400,8 @@
       "minLabel": "min"
     },
     "footer": {
-      "openButton": "Abrir en Mis sets",
+      "openButton": "Abrir en Mis colecciones",
+      "addToCollectionsButton": "+ Añadir a Mis colecciones",
       "getButton": "+ Obtener",
       "getNewButton": "+ Obtener palabras nuevas",
       "addingLabel": "Añadiendo…",

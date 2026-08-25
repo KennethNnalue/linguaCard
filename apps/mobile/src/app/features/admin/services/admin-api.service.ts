@@ -12,6 +12,7 @@ import type {
   AdminPlatformCollectionWordItem,
   AdminPlatformStoryListItem,
   AdminSetStoryCategoryDto,
+  AdminUpdatePlatformCollectionDto,
   AdminDiscountCodeListItem,
   AdminGenerateDiscountCodeDto,
   AdminSetDiscountCodeActiveDto,
@@ -72,6 +73,13 @@ export class AdminApiService {
     const formData = new FormData();
     formData.append('image', image);
     return this.http.post<{ coverImageUrl: string }>(`${this.apiUrl}/platform-collections/${id}/cover`, formData);
+  }
+
+  updateCollection(
+    id: string,
+    dto: AdminUpdatePlatformCollectionDto,
+  ): Observable<AdminPlatformCollectionListItem> {
+    return this.http.patch<AdminPlatformCollectionListItem>(`${this.apiUrl}/platform-collections/${id}`, dto);
   }
 
   importStory(dto: AdminImportStoryDto): Observable<AdminImportStoryResult> {

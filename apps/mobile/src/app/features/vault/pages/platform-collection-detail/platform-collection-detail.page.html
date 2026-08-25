@@ -14,7 +14,7 @@
 
     <!-- Cover hero -->
     <header class="cover">
-      <lc-collection-cover class="cover-artwork" [name]="d.title" [seed]="d.coverSeed" />
+      <lc-collection-cover class="cover-artwork" [name]="d.title" [seed]="d.coverSeed" [imageUrl]="d.coverImageUrl" />
       <span class="cover-glow"></span>
       <div class="cover-nav">
         <button class="cover-btn" (click)="goBack()" [attr.aria-label]="'platformCollectionDetail.nav.backAria' | translate">
@@ -60,10 +60,8 @@
             @if (adoptingId() === d.id) {
               <span class="spinner"></span>
               {{ 'platformCollectionDetail.footer.addingLabel' | translate }}
-            } @else if (newCount() > 0) {
-              {{ 'platformCollectionDetail.footer.getNewButton' | translate:{ count: newCount() } }}
             } @else {
-              {{ 'platformCollectionDetail.footer.getButton' | translate }}
+              {{ 'platformCollectionDetail.footer.addToCollectionsButton' | translate }}
             }
           </button>
         }

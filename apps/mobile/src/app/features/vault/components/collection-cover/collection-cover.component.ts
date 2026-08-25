@@ -4,8 +4,12 @@ import { ChangeDetectionStrategy, Component, computed, input } from '@angular/co
   selector: 'lc-collection-cover',
   template: `
     <span class="cover" [class]="paletteClass()">
-      <span class="mark" aria-hidden="true"></span>
-      <span class="initial" aria-hidden="true">{{ initial() }}</span>
+      @if (imageUrl()) {
+        <img class="image" [src]="imageUrl()" alt="" />
+      } @else {
+        <span class="mark" aria-hidden="true"></span>
+        <span class="initial" aria-hidden="true">{{ initial() }}</span>
+      }
     </span>
   `,
   styleUrls: ['./collection-cover.component.scss'],
@@ -18,6 +22,7 @@ import { ChangeDetectionStrategy, Component, computed, input } from '@angular/co
 export class CollectionCoverComponent {
   readonly name = input.required<string>();
   readonly seed = input.required<string>();
+  readonly imageUrl = input<string | null>(null);
 
   readonly initial = computed(() => Array.from(this.name().trim())[0]?.toLocaleUpperCase() ?? '•');
   readonly paletteClass = computed(() => {
