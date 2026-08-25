@@ -20,6 +20,7 @@ import { LexemeLocalizationEntity } from '../vocabulary/entities/lexeme-localiza
 import { SpeechAssetEntity } from '../vocabulary/entities/speech-asset.entity';
 import { VocabularyModule } from '../vocabulary/vocabulary.module';
 import { PlatformCollectionImportRepository } from './platform-collection-import.repository';
+import { StorageService } from '../storage/storage.service';
 
 @Module({
   imports: [
@@ -42,7 +43,7 @@ import { PlatformCollectionImportRepository } from './platform-collection-import
     forwardRef(() => AuthModule),
   ],
   controllers: [AdminController, PlatformCollectionImportController],
-  providers: [AdminService, PlatformCollectionImportService, PlatformCollectionImportRepository],
+  providers: [AdminService, PlatformCollectionImportService, PlatformCollectionImportRepository, StorageService],
   exports: [AdminService],
 })
 export class AdminModule {}

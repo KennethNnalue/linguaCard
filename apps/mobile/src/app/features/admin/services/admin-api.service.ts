@@ -68,6 +68,12 @@ export class AdminApiService {
     return this.http.post<AdminImportCollectionJsonResult>(`${this.apiUrl}/platform-collections/import-json`, dto);
   }
 
+a  uploadCollectionCover(id: string, image: File): Observable<{ coverImageUrl: string }> {
+    const formData = new FormData();
+    formData.append('image', image);
+    return this.http.post<{ coverImageUrl: string }>(`${this.apiUrl}/platform-collections/${id}/cover`, formData);
+  }
+
   importStory(dto: AdminImportStoryDto): Observable<AdminImportStoryResult> {
     return this.http.post<AdminImportStoryResult>(`${this.apiUrl}/platform-stories/import`, dto);
   }

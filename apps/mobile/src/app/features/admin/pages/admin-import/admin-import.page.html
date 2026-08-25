@@ -5,7 +5,7 @@
         <ion-icon name="arrow-back-outline"></ion-icon>
       </button>
       <span class="adm-title lc-display">{{ 'admin.import.pageTitle' | translate }}</span>
-      <button class="adm-refresh-btn" type="button" (click)="openV2Import()">V2 import</button>
+      <span class="adm-nav-spacer"></span>
     </div>
   </ion-toolbar>
 </ion-header>
@@ -17,15 +17,9 @@
     <div class="adm-tabs">
       <button
         class="adm-tab"
-        [class.adm-tab--active]="activeTab() === 'collection'"
-        (click)="switchTab('collection')">
-        {{ 'admin.import.tabs.wordList' | translate }}
-      </button>
-      <button
-        class="adm-tab"
-        [class.adm-tab--active]="activeTab() === 'json'"
-        (click)="switchTab('json')">
-        {{ 'admin.import.tabs.json' | translate }}
+        [class.adm-tab--active]="activeTab() === 'upload'"
+        (click)="switchTab('upload')">
+        Upload collection
       </button>
       <button
         class="adm-tab"
@@ -35,14 +29,36 @@
       </button>
       <button
         class="adm-tab"
-        [class.adm-tab--active]="activeTab() === 'manage'"
-        (click)="switchTab('manage')">
-        {{ 'admin.import.tabs.collections' | translate }}
+        [class.adm-tab--active]="activeTab() === 'collections'"
+        (click)="switchTab('collections')">
+        Collections
+      </button>
+      <button
+        class="adm-tab"
+        [class.adm-tab--active]="activeTab() === 'stories'"
+        (click)="switchTab('stories')">
+        Stories
       </button>
     </div>
 
+    @if (activeTab() === 'upload') {
+      <div class="adm-import-mode" aria-label="Collection input type">
+        <button type="button" [class.adm-import-mode--active]="importMode() === 'words'" (click)="selectImportMode('words')">Word list</button>
+        <button type="button" [class.adm-import-mode--active]="importMode() === 'json'" (click)="selectImportMode('json')">JSON</button>
+      </div>
+      <label class="adm-image-upload">
+        @if (collectionImagePreview(); as preview) {
+          <img [src]="preview" alt="Collection thumbnail preview" />
+        } @else {
+          <span>＋</span>
+        }
+        <span>{{ collectionImage() ? 'Change thumbnail' : 'Add collection thumbnail' }}</span>
+        <input type="file" accept="image/jpeg,image/png,image/webp" (change)="selectCollectionImage($event)" />
+      </label>
+    }
+
     <!-- ─── COLLECTION IMPORT ──────────────────────────────────────────── -->
-    @if (activeTab() === 'collection') {
+    @if (activeTab() === 'upload' && importMode() === 'words') {
       <form [formGroup]="collectionForm" (ngSubmit)="importCollection()">
 
         <div class="adm-field">
@@ -50,24 +66,13 @@
           <input class="adm-input" formControlName="title" placeholder="e.g. Food & Drink A1" />
         </div>
 
-        <div class="adm-row">
-          <div class="adm-field adm-field--half">
+        <div class="adm-field">
             <label class="adm-label">{{ 'admin.import.fields.level' | translate }}</label>
             <select class="adm-select" formControlName="level">
               @for (lvl of levels; track lvl) {
                 <option [value]="lvl">{{ lvl }}</option>
               }
             </select>
-          </div>
-          <div class="adm-field adm-field--half">
-            <label class="adm-label">{{ 'admin.import.fields.emoji' | translate }}</label>
-            <input class="adm-input" formControlName="emoji" placeholder="🍎" maxlength="4" />
-          </div>
-        </div>
-
-        <div class="adm-field">
-          <label class="adm-label">{{ 'admin.import.fields.topic' | translate }}</label>
-          <input class="adm-input" formControlName="topic" placeholder="e.g. Food & Drink" />
         </div>
 
         <div class="adm-field">
@@ -107,7 +112,7 @@
     }
 
     <!-- ─── JSON COLLECTION IMPORT ──────────────────────────────────────── -->
-    @if (activeTab() === 'json') {
+    @if (activeTab() === 'upload' && importMode() === 'json') {
       <form [formGroup]="jsonForm" (ngSubmit)="importJson()">
 
         <div class="adm-prompt-box">
@@ -121,28 +126,22 @@
         </div>
 
         <div class="adm-field">
+          <label class="adm-label">JSON file</label>
+          <input class="adm-input" type="file" accept="application/json,.json" (change)="selectJsonFile($event)" />
+        </div>
+
+        <div class="adm-field">
           <label class="adm-label">{{ 'admin.import.fields.title' | translate }}</label>
           <input class="adm-input" formControlName="title" placeholder="e.g. Food & Drink A1" />
         </div>
 
-        <div class="adm-row">
-          <div class="adm-field adm-field--half">
+        <div class="adm-field">
             <label class="adm-label">{{ 'admin.import.fields.level' | translate }}</label>
             <select class="adm-select" formControlName="level">
               @for (lvl of levels; track lvl) {
                 <option [value]="lvl">{{ lvl }}</option>
               }
             </select>
-          </div>
-          <div class="adm-field adm-field--half">
-            <label class="adm-label">{{ 'admin.import.fields.emoji' | translate }}</label>
-            <input class="adm-input" formControlName="emoji" placeholder="🍎" maxlength="4" />
-          </div>
-        </div>
-
-        <div class="adm-field">
-          <label class="adm-label">{{ 'admin.import.fields.topic' | translate }}</label>
-          <input class="adm-input" formControlName="topic" placeholder="e.g. Food & Drink" />
         </div>
 
         <div class="adm-field">
@@ -248,8 +247,10 @@
     }
 
     <!-- ─── MANAGE COLLECTIONS ──────────────────────────────────────────── -->
-    @if (activeTab() === 'manage') {
+    @if (activeTab() === 'collections' || activeTab() === 'stories') {
       <div class="adm-manage">
+
+        @if (activeTab() === 'collections') {
 
         <div class="adm-manage-header">
           <span class="adm-manage-count">{{ collections().length }} collections</span>
@@ -264,7 +265,13 @@
 
         @for (item of collections(); track item.id) {
           <div class="adm-coll-row" [class.adm-coll-row--published]="item.isPublished">
-            <div class="adm-coll-emoji">{{ item.emoji ?? '📚' }}</div>
+            <div class="adm-coll-thumbnail">
+              @if (item.coverImageUrl) {
+                <img [src]="item.coverImageUrl" [alt]="item.title + ' thumbnail'" />
+              } @else {
+                <span>▦</span>
+              }
+            </div>
             <div class="adm-coll-body">
               <div class="adm-coll-title">{{ item.title }}</div>
               <div class="adm-coll-meta">
@@ -347,7 +354,9 @@
         @if (!collectionsLoading() && !collections().length) {
           <div class="adm-manage-empty">{{ 'admin.import.status.noCollections' | translate }}</div>
         }
+        }
 
+        @if (activeTab() === 'stories') {
         <div class="adm-manage-header">
           <span class="adm-manage-count">{{ stories().length }} stories</span>
           <button class="adm-refresh-btn" (click)="loadStories()" [disabled]="storiesLoading()">
@@ -401,6 +410,7 @@
 
         @if (!storiesLoading() && !stories().length) {
           <div class="adm-manage-empty">No stories yet.</div>
+        }
         }
 
       </div>

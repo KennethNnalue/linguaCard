@@ -11,6 +11,7 @@ import { WordDictionaryService } from '../word-dictionary/word-dictionary.servic
 import { WordAudioService } from '../word-audio/word-audio.service';
 import { PlatformCollectionImportEntity } from './platform-collection-import.entity';
 import { StoryAudioService } from '../stories/story-audio.service';
+import { StorageService } from '../storage/storage.service';
 import type {
   AdminImportCollectionDto,
   AdminImportCollectionResult,
@@ -42,6 +43,7 @@ export class AdminService {
     private readonly dictionary: WordDictionaryService,
     private readonly wordAudio: WordAudioService,
     private readonly storyAudio: StoryAudioService,
+    private readonly storage: StorageService,
   ) {}
 
   private readonly logger = new Logger(AdminService.name);
@@ -148,9 +150,9 @@ export class AdminService {
     const collection = this.collectionRepo.create({
       id: collectionId,
       title: dto.title,
-      emoji: dto.emoji ?? null,
+      emoji: null,
       level: dto.level,
-      topic: dto.topic,
+      topic: dto.topic ?? dto.title,
       isPublished: false,
       wordCount: wordRows.length,
     });
@@ -167,9 +169,9 @@ export class AdminService {
     const collection = this.collectionRepo.create({
       id: collectionId,
       title: dto.title,
-      emoji: dto.emoji ?? null,
+      emoji: null,
       level: dto.level,
-      topic: dto.topic,
+      topic: dto.topic ?? dto.title,
       isPublished: false,
       wordCount: batchResult.entries.length,
     });
@@ -366,6 +368,7 @@ export class AdminService {
       id: c.id,
       title: c.title,
       emoji: c.emoji,
+      coverImageUrl: c.coverImageUrl,
       level: c.level,
       topic: c.topic,
       sourceLanguage: c.sourceLanguage as AdminPlatformCollectionListItem['sourceLanguage'],
@@ -378,6 +381,20 @@ export class AdminService {
       createdAt: c.createdAt instanceof Date ? c.createdAt.toISOString() : String(c.createdAt),
       updatedAt: c.updatedAt instanceof Date ? c.updatedAt.toISOString() : String(c.updatedAt),
     }));
+  }
+
+  async uploadCollectionCover(
+    id: string,
+    buffer: Buffer,
+    contentType: string,
+  ): Promise<{ coverImageUrl: string }> {
+    const collection = await this.collectionRepo.findOneBy({ id });
+    if (!collection) throw new NotFoundException(`Platform collection ${id} not found`);
+    const extension = contentType === 'image/png' ? 'png' : contentType === 'image/webp' ? 'webp' : 'jpg';
+    const coverImageUrl = await this.storage.upload(buffer, `collection-covers/${id}.${extension}`, contentType);
+    collection.coverImageUrl = coverImageUrl;
+    await this.collectionRepo.save(collection);
+    return { coverImageUrl };
   }
 
   async setPublished(id: string, isPublished: boolean): Promise<void> {

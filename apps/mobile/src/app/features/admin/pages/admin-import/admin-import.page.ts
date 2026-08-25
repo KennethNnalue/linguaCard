@@ -1,15 +1,23 @@
-import { AppNotificationService } from '@lingua-card/mobile/notifications';
-import { ChangeDetectionStrategy, Component, DestroyRef, inject, signal } from '@angular/core';
-import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
-import { Router } from '@angular/router';
-import { AlertController, IonContent, IonHeader, IonIcon, IonToolbar } from '@ionic/angular/standalone';
-import { addIcons } from 'ionicons';
-import { arrowBackOutline, cloudUploadOutline, eyeOutline, eyeOffOutline, sparklesOutline, trashOutline, volumeHighOutline } from 'ionicons/icons';
+import {AppNotificationService} from '@lingua-card/mobile/notifications';
+import {ChangeDetectionStrategy, Component, DestroyRef, inject, signal} from '@angular/core';
+import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
+import {FormControl, FormGroup, ReactiveFormsModule, Validators} from '@angular/forms';
+import {Router} from '@angular/router';
+import {AlertController, IonContent, IonHeader, IonIcon, IonToolbar} from '@ionic/angular/standalone';
+import {addIcons} from 'ionicons';
+import {
+  arrowBackOutline,
+  cloudUploadOutline,
+  eyeOffOutline,
+  eyeOutline,
+  sparklesOutline,
+  trashOutline,
+  volumeHighOutline
+} from 'ionicons/icons';
 import type {
-  AdminImportCollectionResult,
   AdminImportCollectionJsonDto,
   AdminImportCollectionJsonResult,
+  AdminImportCollectionResult,
   AdminImportStoryResult,
   AdminPlatformCollectionListItem,
   AdminPlatformCollectionWordItem,
@@ -19,9 +27,10 @@ import type {
   RawWordInput,
   StoryCategory,
 } from '@lingua-card/shared/domain';
-import { STORY_CATEGORIES } from '@lingua-card/shared/domain';
-import { TranslatePipe } from '@ngx-translate/core';
-import { AdminApiService } from '../../services/admin-api.service';
+import {STORY_CATEGORIES} from '@lingua-card/shared/domain';
+import {TranslatePipe} from '@ngx-translate/core';
+import {catchError, concatMap, map, Observable, of} from 'rxjs';
+import {AdminApiService} from '../../services/admin-api.service';
 
 @Component({
   selector: 'lc-admin-import',
@@ -40,8 +49,6 @@ export class AdminImportPage {
   readonly collectionForm = new FormGroup({
     title: new FormControl('', [Validators.required]),
     level: new FormControl<CefrLevel>('A1', [Validators.required]),
-    topic: new FormControl('', [Validators.required]),
-    emoji: new FormControl(''),
     wordListRaw: new FormControl('', [Validators.required]),
   });
 
@@ -55,27 +62,24 @@ export class AdminImportPage {
   readonly jsonForm = new FormGroup({
     title: new FormControl('', [Validators.required]),
     level: new FormControl<CefrLevel>('A1', [Validators.required]),
-    topic: new FormControl('', [Validators.required]),
-    emoji: new FormControl(''),
     wordsJson: new FormControl('', [Validators.required]),
   });
 
   readonly promptCopied = signal(false);
   readonly storyPromptCopied = signal(false);
 
-  readonly enrichmentPrompt = `You are a German vocabulary enrichment engine for a language-learning app.
+  readonly enrichmentPrompt
+    = `You are a German vocabulary enrichment engine for a language-learning app.
 
 I will give you a list of German words. For each word, return a JSON array where every element follows this exact shape:
 
 {
-  "back": "Apfel",              // German word, capitalised correctly (noun = Capital)
-  "front": "apple",             // English translation, concise
-  "article": "der",             // "der" | "die" | "das" | null (null for verbs/adjectives)
-  "plural": "die Äpfel",        // full plural form with article, or null
-  "phonetic": "ˈapfəl",        // IPA, or null if unsure
-  "cefrLevel": "A1",            // A1 | A2 | B1 | B2 | C1
-  "categoryName": "Food",       // one-word topic category in English
-  "wordType": "noun",           // noun | verb | adjective | adverb | other
+  "back": "Apfel",
+  "front": "apple",
+  "article": "der",
+  "plural": "Äpfel",
+  "cefrLevel": "A1",
+  "wordType": "noun",
   "examples": [
     {
       "target": "Der Apfel ist rot.",
@@ -94,16 +98,60 @@ I will give you a list of German words. For each word, return a JSON array where
 }
 
 RULES
+
 1. Output ONLY a valid JSON array — no markdown, no commentary, no code fences.
-2. Every object must have at minimum: back, front, article, wordType.
-3. Provide exactly 1 example sentence per word. Keep it natural, not textbook-stilted.
-4. Provide 2–3 synonyms where they exist; empty array [] if none.
-5. article is null for verbs, adjectives, adverbs.
-6. cefrLevel must reflect common usage difficulty, not just word length.
-7. categoryName must be a single English word (e.g. Food, Travel, Work, Home, Body, Nature).
+
+2. Every object must contain:
+   "back", "front", "article", "plural", "cefrLevel", "wordType", "examples", and "synonyms".
+
+3. "back" must contain the correctly written German word.
+   - Capitalise German nouns correctly.
+   - Use the infinitive form for verbs unless the supplied word clearly requires another form.
+
+4. "front" must be a concise and accurate English translation.
+
+5. "article" must be:
+   - "der", "die", or "das" for nouns.
+   - null for verbs, adjectives, adverbs, and other words that do not take an article.
+
+6. "plural" must contain ONLY the plural word, without an article.
+   - Example: "Äpfel", not "die Äpfel".
+   - Use null when no plural is applicable.
+
+7. "cefrLevel" must be one of:
+   "A1", "A2", "B1", "B2", "C1".
+   Base the level on common usage difficulty and when the word is typically useful to a German learner.
+
+8. "wordType" must be one of:
+   "noun", "verb", "adjective", "adverb", "other".
+
+9. Provide exactly 1 example sentence per word.
+   - The sentence must be natural and idiomatic German.
+   - It should clearly demonstrate the meaning of the word.
+   - Avoid unnatural or overly textbook-like sentences.
+   - "target" contains the German sentence.
+   - "native" contains the natural English translation.
+
+10. Every word MUST have at least 1 synonym or closely related usable equivalent.
+    - "synonyms" must NEVER be an empty array.
+    - Prefer 2–3 synonyms when good equivalents exist.
+    - If there is no exact synonym, provide the closest natural German equivalent or closely related word that helps a learner understand or remember the meaning.
+    - Never invent a nonexistent or misleading synonym just to satisfy this rule.
+
+11. Every synonym object must contain:
+    - "word": German synonym or closest equivalent.
+    - "article": "der", "die", or "das" if the synonym is a noun; otherwise null.
+    - "translation": concise English meaning.
+    - "example": one natural German sentence using the synonym.
+    - "exampleNative": natural English translation of that sentence.
+
+12. Preserve the semantic meaning of the original word.
+    If a German word has multiple meanings, use the most common everyday meaning unless the supplied context clearly indicates another meaning.
+
+13. Do not add fields that are not part of the defined JSON structure.
 
 WORD LIST:
-(paste your words here, one per line — with or without articles)`;
+(paste your German words here, one per line — with or without articles)`;
 
   readonly storyPrompt = `ROLE: You are a German-language curriculum writer producing a CANONICAL platform story for a vocabulary app. This story will be shown to MANY learners, so it must be correct, natural, and tightly scoped to the supplied word list.
 
@@ -152,7 +200,10 @@ OUTPUT — valid JSON ONLY, no markdown fences, no commentary:
   readonly lastJsonResult = signal<AdminImportCollectionJsonResult | null>(null);
 
   readonly levels: CefrLevel[] = ['A1', 'A2', 'B1', 'B2', 'C1'];
-  readonly activeTab = signal<'collection' | 'json' | 'story' | 'manage'>('collection');
+  readonly activeTab = signal<'upload' | 'story' | 'collections' | 'stories'>('upload');
+  readonly importMode = signal<'words' | 'json'>('words');
+  readonly collectionImage = signal<File | null>(null);
+  readonly collectionImagePreview = signal<string | null>(null);
 
   readonly collections = signal<AdminPlatformCollectionListItem[]>([]);
   readonly collectionsLoading = signal(false);
@@ -173,15 +224,29 @@ OUTPUT — valid JSON ONLY, no markdown fences, no commentary:
   readonly storyCategories = STORY_CATEGORIES;
 
   constructor() {
-    addIcons({ arrowBackOutline, cloudUploadOutline, sparklesOutline, eyeOutline, eyeOffOutline, trashOutline, volumeHighOutline });
+    addIcons({
+      arrowBackOutline,
+      cloudUploadOutline,
+      sparklesOutline,
+      eyeOutline,
+      eyeOffOutline,
+      trashOutline,
+      volumeHighOutline
+    });
   }
 
   loadCollections(): void {
     if (this.collectionsLoading()) return;
     this.collectionsLoading.set(true);
     this.adminApi.listCollections().pipe(takeUntilDestroyed(this._destroyRef)).subscribe({
-      next: items => { this.collections.set(items); this.collectionsLoading.set(false); },
-      error: () => { this.collectionsLoading.set(false); void this._toast('Failed to load collections', 'danger'); },
+      next: items => {
+        this.collections.set(items);
+        this.collectionsLoading.set(false);
+      },
+      error: () => {
+        this.collectionsLoading.set(false);
+        void this._toast('Failed to load collections', 'danger');
+      },
     });
   }
 
@@ -193,7 +258,7 @@ OUTPUT — valid JSON ONLY, no markdown fences, no commentary:
       next: () => {
         this.settingCategoryId.set(null);
         this.collections.update(list =>
-          list.map(c => c.id === item.id ? { ...c, storyCategory } : c),
+          list.map(c => c.id === item.id ? {...c, storyCategory} : c),
         );
       },
       error: () => {
@@ -210,10 +275,13 @@ OUTPUT — valid JSON ONLY, no markdown fences, no commentary:
     this.adminApi.setPublished(item.id, next).pipe(takeUntilDestroyed(this._destroyRef)).subscribe({
       next: () => {
         this.togglingId.set(null);
-        this.collections.update(list => list.map(c => c.id === item.id ? { ...c, isPublished: next } : c));
+        this.collections.update(list => list.map(c => c.id === item.id ? {...c, isPublished: next} : c));
         void this._toast(`"${item.title}" ${next ? 'published' : 'unpublished'}`, 'success');
       },
-      error: () => { this.togglingId.set(null); void this._toast('Toggle failed', 'danger'); },
+      error: () => {
+        this.togglingId.set(null);
+        void this._toast('Toggle failed', 'danger');
+      },
     });
   }
 
@@ -227,8 +295,14 @@ OUTPUT — valid JSON ONLY, no markdown fences, no commentary:
     this.collectionWords.set([]);
     this.collectionWordsLoading.set(true);
     this.adminApi.listCollectionWords(item.id).pipe(takeUntilDestroyed(this._destroyRef)).subscribe({
-      next: words => { this.collectionWords.set(words); this.collectionWordsLoading.set(false); },
-      error: () => { this.collectionWordsLoading.set(false); void this._toast('Failed to load collection words', 'danger'); },
+      next: words => {
+        this.collectionWords.set(words);
+        this.collectionWordsLoading.set(false);
+      },
+      error: () => {
+        this.collectionWordsLoading.set(false);
+        void this._toast('Failed to load collection words', 'danger');
+      },
     });
   }
 
@@ -242,12 +316,15 @@ OUTPUT — valid JSON ONLY, no markdown fences, no commentary:
     this.mutatingCollectionWord.set(true);
     this.adminApi.reorderCollectionWords(collection.id, reordered.map(word => word.id))
       .pipe(takeUntilDestroyed(this._destroyRef)).subscribe({
-        next: () => {
-          this.collectionWords.set(reordered.map((word, position) => ({ ...word, position })));
-          this.mutatingCollectionWord.set(false);
-        },
-        error: () => { this.mutatingCollectionWord.set(false); void this._toast('Could not reorder words', 'danger'); },
-      });
+      next: () => {
+        this.collectionWords.set(reordered.map((word, position) => ({...word, position})));
+        this.mutatingCollectionWord.set(false);
+      },
+      error: () => {
+        this.mutatingCollectionWord.set(false);
+        void this._toast('Could not reorder words', 'danger');
+      },
+    });
   }
 
   removeCollectionWord(collection: AdminPlatformCollectionListItem, word: AdminPlatformCollectionWordItem): void {
@@ -255,13 +332,24 @@ OUTPUT — valid JSON ONLY, no markdown fences, no commentary:
     this.mutatingCollectionWord.set(true);
     this.adminApi.removeCollectionWord(collection.id, word.id).pipe(takeUntilDestroyed(this._destroyRef)).subscribe({
       next: () => {
-        this.collectionWords.update(words => words.filter(item => item.id !== word.id).map((item, position) => ({ ...item, position })));
+        this.collectionWords.update(words => words.filter(item => item.id !== word.id).map((item, position) => ({
+          ...item,
+          position
+        })));
         this.collections.update(items => items.map(item => item.id === collection.id
-          ? { ...item, wordCount: Math.max(0, item.wordCount - 1), dictionaryLinked: Math.max(0, item.dictionaryLinked - 1), status: 'draft' }
+          ? {
+            ...item,
+            wordCount: Math.max(0, item.wordCount - 1),
+            dictionaryLinked: Math.max(0, item.dictionaryLinked - 1),
+            status: 'draft'
+          }
           : item));
         this.mutatingCollectionWord.set(false);
       },
-      error: () => { this.mutatingCollectionWord.set(false); void this._toast('Could not remove word', 'danger'); },
+      error: () => {
+        this.mutatingCollectionWord.set(false);
+        void this._toast('Could not remove word', 'danger');
+      },
     });
   }
 
@@ -269,8 +357,14 @@ OUTPUT — valid JSON ONLY, no markdown fences, no commentary:
     if (this.storiesLoading()) return;
     this.storiesLoading.set(true);
     this.adminApi.listStories().pipe(takeUntilDestroyed(this._destroyRef)).subscribe({
-      next: items => { this.stories.set(items); this.storiesLoading.set(false); },
-      error: () => { this.storiesLoading.set(false); void this._toast('Failed to load stories', 'danger'); },
+      next: items => {
+        this.stories.set(items);
+        this.storiesLoading.set(false);
+      },
+      error: () => {
+        this.storiesLoading.set(false);
+        void this._toast('Failed to load stories', 'danger');
+      },
     });
   }
 
@@ -280,7 +374,7 @@ OUTPUT — valid JSON ONLY, no markdown fences, no commentary:
       header: 'Delete collection?',
       message: `Permanently delete "${item.title}" and its ${item.wordCount} word links? Paired stories are kept but detached. This cannot be undone.`,
       buttons: [
-        { text: 'Cancel', role: 'cancel' },
+        {text: 'Cancel', role: 'cancel'},
         {
           text: 'Delete',
           role: 'destructive',
@@ -292,7 +386,10 @@ OUTPUT — valid JSON ONLY, no markdown fences, no commentary:
                 this.collections.update(list => list.filter(c => c.id !== item.id));
                 void this._toast(`"${item.title}" deleted`, 'success');
               },
-              error: () => { this.deletingCollectionId.set(null); void this._toast('Delete failed', 'danger'); },
+              error: () => {
+                this.deletingCollectionId.set(null);
+                void this._toast('Delete failed', 'danger');
+              },
             });
           },
         },
@@ -307,7 +404,7 @@ OUTPUT — valid JSON ONLY, no markdown fences, no commentary:
       header: 'Delete story?',
       message: `Permanently delete "${item.title}" and all reader progress for it? This cannot be undone.`,
       buttons: [
-        { text: 'Cancel', role: 'cancel' },
+        {text: 'Cancel', role: 'cancel'},
         {
           text: 'Delete',
           role: 'destructive',
@@ -319,7 +416,10 @@ OUTPUT — valid JSON ONLY, no markdown fences, no commentary:
                 this.stories.update(list => list.filter(s => s.id !== item.id));
                 void this._toast(`"${item.title}" deleted`, 'success');
               },
-              error: () => { this.deletingStoryId.set(null); void this._toast('Delete failed', 'danger'); },
+              error: () => {
+                this.deletingStoryId.set(null);
+                void this._toast('Delete failed', 'danger');
+              },
             });
           },
         },
@@ -341,7 +441,10 @@ OUTPUT — valid JSON ONLY, no markdown fences, no commentary:
           result.audioGenerated ? 'success' : 'warning',
         );
       },
-      error: () => { this.regeneratingAudioId.set(null); void this._toast('Audio generation failed', 'danger'); },
+      error: () => {
+        this.regeneratingAudioId.set(null);
+        void this._toast('Audio generation failed', 'danger');
+      },
     });
   }
 
@@ -352,19 +455,46 @@ OUTPUT — valid JSON ONLY, no markdown fences, no commentary:
     this.adminApi.setPublishedStory(item.id, next).pipe(takeUntilDestroyed(this._destroyRef)).subscribe({
       next: () => {
         this.togglingStoryId.set(null);
-        this.stories.update(list => list.map(s => s.id === item.id ? { ...s, isPublished: next } : s));
+        this.stories.update(list => list.map(s => s.id === item.id ? {...s, isPublished: next} : s));
         void this._toast(`"${item.title}" ${next ? 'published' : 'unpublished'}`, 'success');
       },
-      error: () => { this.togglingStoryId.set(null); void this._toast('Toggle failed', 'danger'); },
+      error: () => {
+        this.togglingStoryId.set(null);
+        void this._toast('Toggle failed', 'danger');
+      },
     });
   }
 
-  switchTab(tab: 'collection' | 'json' | 'story' | 'manage'): void {
+  switchTab(tab: 'upload' | 'story' | 'collections' | 'stories'): void {
     this.activeTab.set(tab);
-    if (tab === 'manage') {
-      if (!this.collections().length) this.loadCollections();
-      if (!this.stories().length) this.loadStories();
+    if (tab === 'collections' && !this.collections().length) this.loadCollections();
+    if (tab === 'stories' && !this.stories().length) this.loadStories();
+  }
+
+  selectImportMode(mode: 'words' | 'json'): void {
+    this.importMode.set(mode);
+  }
+
+  selectCollectionImage(event: Event): void {
+    const input = event.target;
+    if (!(input instanceof HTMLInputElement)) return;
+    const file = input.files?.[0] ?? null;
+    this.collectionImage.set(file);
+    if (!file) {
+      this.collectionImagePreview.set(null);
+      return;
     }
+    const reader = new FileReader();
+    reader.addEventListener('load', () => {
+      this.collectionImagePreview.set(typeof reader.result === 'string' ? reader.result : null);
+    }, {once: true});
+    reader.readAsDataURL(file);
+  }
+
+  async selectJsonFile(event: Event): Promise<void> {
+    const input = event.target;
+    if (!(input instanceof HTMLInputElement) || !input.files?.[0]) return;
+    this.jsonForm.controls.wordsJson.setValue(await input.files[0].text());
   }
 
   importCollection(): void {
@@ -384,10 +514,11 @@ OUTPUT — valid JSON ONLY, no markdown fences, no commentary:
     this.adminApi.importCollection({
       title: v.title!.trim(),
       level: v.level!,
-      topic: v.topic!.trim(),
-      emoji: v.emoji?.trim() || undefined,
       words,
-    }).pipe(takeUntilDestroyed(this._destroyRef)).subscribe({
+    }).pipe(
+      concatMap(result => this.uploadCoverAfterImport(result.collectionId).pipe(map(() => result))),
+      takeUntilDestroyed(this._destroyRef),
+    ).subscribe({
       next: result => {
         this.importing.set(false);
         this.lastCollectionResult.set(result);
@@ -416,7 +547,12 @@ OUTPUT — valid JSON ONLY, no markdown fences, no commentary:
     this.importingStory.set(true);
     this.lastStoryResult.set(null);
 
-    this.adminApi.importStory({ platformCollectionId: v.platformCollectionId!.trim(), story, isFiction: v.isFiction ?? true, generateAudio: v.generateAudio ?? false }).pipe(takeUntilDestroyed(this._destroyRef)).subscribe({
+    this.adminApi.importStory({
+      platformCollectionId: v.platformCollectionId!.trim(),
+      story,
+      isFiction: v.isFiction ?? true,
+      generateAudio: v.generateAudio ?? false
+    }).pipe(takeUntilDestroyed(this._destroyRef)).subscribe({
       next: result => {
         this.importingStory.set(false);
         this.lastStoryResult.set(result);
@@ -450,10 +586,11 @@ OUTPUT — valid JSON ONLY, no markdown fences, no commentary:
     this.adminApi.importCollectionJson({
       title: v.title!.trim(),
       level: v.level!,
-      topic: v.topic!.trim() as AdminImportCollectionJsonDto['topic'],
-      emoji: v.emoji?.trim() || undefined,
       words,
-    }).pipe(takeUntilDestroyed(this._destroyRef)).subscribe({
+    }).pipe(
+      concatMap(result => this.uploadCoverAfterImport(result.collectionId).pipe(map(() => result))),
+      takeUntilDestroyed(this._destroyRef),
+    ).subscribe({
       next: result => {
         this.importingJson.set(false);
         this.lastJsonResult.set(result);
@@ -478,9 +615,9 @@ OUTPUT — valid JSON ONLY, no markdown fences, no commentary:
     setTimeout(() => this.storyPromptCopied.set(false), 2500);
   }
 
-  goBack(): void { this.router.navigate(['/home']); }
-
-  openV2Import(): void { void this.router.navigate(['/admin/import/v2']); }
+  goBack(): void {
+    this.router.navigate(['/home']);
+  }
 
   private _parseWordList(raw: string): RawWordInput[] {
     return raw
@@ -491,15 +628,26 @@ OUTPUT — valid JSON ONLY, no markdown fences, no commentary:
         const lower = line.toLowerCase();
         for (const art of ['der ', 'die ', 'das '] as const) {
           if (lower.startsWith(art)) {
-            return { back: line.substring(4).trim(), article: art.trim() as 'der' | 'die' | 'das' };
+            return {back: line.substring(4).trim(), article: art.trim() as 'der' | 'die' | 'das'};
           }
         }
-        return { back: line, article: null };
+        return {back: line, article: null};
       });
   }
 
   private async _toast(message: string, color: 'success' | 'danger' | 'warning'): Promise<void> {
-    const t = await this.toastCtrl.create({ message, duration: 4000, color, position: 'bottom' });
+    const t = await this.toastCtrl.create({message, duration: 4000, color, position: 'bottom'});
     await t.present();
+  }
+
+  private uploadCoverAfterImport(collectionId: string): Observable<unknown> {
+    const image = this.collectionImage();
+    if (!image) return of(null);
+    return this.adminApi.uploadCollectionCover(collectionId, image).pipe(
+      catchError(() => {
+        void this._toast('Collection created, but the thumbnail upload failed.', 'warning');
+        return of(null);
+      }),
+    );
   }
 }

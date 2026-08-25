@@ -1220,7 +1220,7 @@ export interface DictionaryBatchResolveResult {
 
 export interface AdminImportCollectionDto {
   level: CefrLevel;
-  topic: CollectionTopic;
+  topic?: CollectionTopic;
   title: string;
   emoji?: string;
   words: RawWordInput[];
@@ -1319,7 +1319,7 @@ export interface EnrichedWordInput {
 export interface AdminImportCollectionJsonDto {
   title: string;
   level: CefrLevel;
-  topic: CollectionTopic;
+  topic?: CollectionTopic;
   emoji?: string;
   words: EnrichedWordInput[];
 }
@@ -1433,6 +1433,7 @@ export interface AdminPlatformCollectionListItem {
   id: string;
   title: string;
   emoji: string | null;
+  coverImageUrl: string | null;
   level: string;
   topic: string;
   sourceLanguage: LanguageCode;

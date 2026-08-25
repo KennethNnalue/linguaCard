@@ -195,9 +195,8 @@ export const routes: Routes = [
       },
       {
         path: 'admin/import/v2',
-        canActivate: [AdminGuard],
-        loadComponent: () =>
-          import('./features/admin/pages/admin-import-v2/admin-import-v2.page').then(m => m.AdminImportV2Page),
+        redirectTo: 'admin/import',
+        pathMatch: 'full',
       },
       {
         path: 'admin/discount-codes',

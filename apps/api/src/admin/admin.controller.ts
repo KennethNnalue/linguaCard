@@ -1,4 +1,5 @@
-import { Body, Controller, Delete, Get, HttpCode, Param, Patch, Post, UseGuards } from '@nestjs/common';
+import { BadRequestException, Body, Controller, Delete, Get, HttpCode, Param, Patch, Post, UploadedFile, UseGuards, UseInterceptors } from '@nestjs/common';
+import { FileInterceptor } from '@nestjs/platform-express';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { AdminGuard } from '../auth/guards/admin.guard';
 import { AdminService } from './admin.service';
@@ -99,6 +100,18 @@ export class AdminController {
   @HttpCode(200)
   importCollectionJson(@Body() dto: AdminImportCollectionJsonDto): Promise<AdminImportCollectionJsonResult> {
     return this.adminService.importCollectionJson(dto);
+  }
+
+  @Post('platform-collections/:id/cover')
+  @UseInterceptors(FileInterceptor('image', { limits: { fileSize: 5 * 1024 * 1024 } }))
+  uploadCollectionCover(
+    @Param('id') id: string,
+    @UploadedFile() file?: { buffer: Buffer; mimetype: string },
+  ): Promise<{ coverImageUrl: string }> {
+    if (!file || !['image/jpeg', 'image/png', 'image/webp'].includes(file.mimetype)) {
+      throw new BadRequestException('Upload a JPEG, PNG, or WebP image up to 5 MB');
+    }
+    return this.adminService.uploadCollectionCover(id, file.buffer, file.mimetype);
   }
 
   @Post('platform-stories/import')
