@@ -1,5 +1,5 @@
 import {ChangeDetectionStrategy, Component, ElementRef, input, model, output, viewChild} from '@angular/core';
-import {IonIcon, IonInput} from '@ionic/angular/standalone';
+import {IonIcon} from '@ionic/angular/standalone';
 import {addIcons} from 'ionicons';
 import {checkmarkOutline} from 'ionicons/icons';
 import {TranslatePipe} from '@ngx-translate/core';
@@ -11,7 +11,7 @@ import {ButtonComponent} from '../../../../../../shared/ui/button/button.compone
   templateUrl: './front-type.component.html',
   styleUrls: ['./front-type.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [IonIcon, TranslatePipe, ButtonComponent, IonInput],
+  imports: [IonIcon, TranslatePipe, ButtonComponent],
 })
 export class FrontTypeComponent {
   private readonly answerInput = viewChild<ElementRef<HTMLInputElement>>('answerInput');
