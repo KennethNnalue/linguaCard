@@ -2,6 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { InjectDataSource } from '@nestjs/typeorm';
 import { DataSource } from 'typeorm';
 import { LearningContextEntity } from '../entities/learning-context.entity';
+import { stableResourceId } from '../../vocabulary/domain/stable-resource-id';
 import type {
   CollectionSummaryRow,
   LearningItemCursor,
@@ -22,6 +23,7 @@ export const LEARNING_ITEM_READ_REPOSITORY = Symbol('LEARNING_ITEM_READ_REPOSITO
 export interface LearningItemReadPort {
   findLearningContext(userId: string, learningContextId: string): Promise<LearningContextEntity | null>;
   findActiveLearningContext(userId: string): Promise<LearningContextEntity | null>;
+  ensureActiveLearningContext(userId: string): Promise<LearningContextEntity>;
   findLearningItems(options: FindLearningItemsOptions): Promise<LearningItemReadRow[]>;
   loadLearningItemStats(userId: string, learningContextId: string): Promise<LearningItemStats>;
   findCollectionSummaries(userId: string, learningContextId: string): Promise<CollectionSummaryRow[]>;
@@ -47,6 +49,36 @@ export class LearningItemReadRepository implements LearningItemReadPort {
 
   findActiveLearningContext(userId: string): Promise<LearningContextEntity | null> {
     return this.dataSource.getRepository(LearningContextEntity).findOneBy({ userId, isActive: true });
+  }
+
+  async ensureActiveLearningContext(userId: string): Promise<LearningContextEntity> {
+    const active = await this.findActiveLearningContext(userId);
+    if (active) return active;
+
+    return this.dataSource.transaction(async manager => {
+      await manager.query('SELECT pg_advisory_xact_lock(hashtext($1))', [`learning-context:${userId}`]);
+      const repository = manager.getRepository(LearningContextEntity);
+      const concurrentActive = await repository.findOneBy({ userId, isActive: true });
+      if (concurrentActive) return concurrentActive;
+
+      let context = await repository.findOneBy({
+        userId,
+        sourceLanguage: 'en',
+        targetLanguage: 'de',
+      });
+      if (!context) {
+        context = repository.create({
+          id: stableResourceId('learning-context', userId, 'en', 'de'),
+          userId,
+          sourceLanguage: 'en',
+          targetLanguage: 'de',
+          isActive: true,
+        });
+      } else {
+        context.isActive = true;
+      }
+      return repository.save(context);
+    });
   }
 
   findLearningItems(options: FindLearningItemsOptions): Promise<LearningItemReadRow[]> {

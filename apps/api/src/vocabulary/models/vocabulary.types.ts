@@ -1,6 +1,6 @@
 export type TextDirection = 'ltr' | 'rtl';
 export type SpeechPolicy = 'synthesized' | 'device';
-export type VocabularySource = 'ai-enrich' | 'admin' | 'story-extract' | 'migration';
+export type VocabularySource = 'ai-enrich' | 'admin' | 'story-extract' | 'migration' | 'user';
 export type LocalizationStatus = 'pending' | 'ready' | 'failed' | 'needs_review';
 export type SpeechAssetStatus = 'pending' | 'generating' | 'ready' | 'failed';
 export type SpeechContentKind = 'word' | 'example' | 'sentence';

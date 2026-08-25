@@ -68,6 +68,7 @@ function repository(overrides: Partial<LearningItemReadPort> = {}): LearningItem
   return {
     findLearningContext: async () => learningContext(),
     findActiveLearningContext: async () => learningContext(),
+    ensureActiveLearningContext: async () => learningContext(),
     findLearningItems: async () => [],
     loadLearningItemStats: async () => ({ itemCount: 0, dueCount: 0, masteredCount: 0 }),
     findCollectionSummaries: async () => [],
@@ -145,5 +146,21 @@ describe('LearningItemReadService', () => {
     }));
 
     await expect(service.loadVault('user-2', 'context-1')).rejects.toBeInstanceOf(NotFoundException);
+  });
+
+  it('creates the default context when an empty account opens the Vault', async () => {
+    const ensureActiveLearningContext = jest.fn(async (_userId: string) => learningContext());
+    const service = new LearningItemReadService(repository({
+      findActiveLearningContext: async () => null,
+      ensureActiveLearningContext,
+    }));
+
+    await expect(service.loadActiveLearningContext('user-1')).resolves.toEqual({
+      id: 'context-1',
+      sourceLanguage: 'en',
+      targetLanguage: 'de',
+      isActive: true,
+    });
+    expect(ensureActiveLearningContext).toHaveBeenCalledWith('user-1');
   });
 });

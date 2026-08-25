@@ -16,6 +16,7 @@
     "dev:api": "npx ts-node -r tsconfig-paths/register apps/api/src/main.ts",
     "build:api": "tsc -p apps/api/tsconfig.json && tsc-alias -p apps/api/tsconfig.json",
     "migrate:database": "node dist/api/apps/api/src/scripts/run-database-migrations.js",
+    "start:api:production": "npm run migrate:database && node dist/api/apps/api/src/main.js",
     "migrate:review-scheduling": "nx build api && node dist/api/apps/api/src/scripts/migrate-review-scheduling.js",
     "migrate:engagement": "npm run build:api && node dist/api/apps/api/src/scripts/migrate-engagement.js",
     "backfill:multilingual-vocabulary": "npx ts-node -r tsconfig-paths/register --project apps/api/tsconfig.json apps/api/src/scripts/backfill-multilingual-vocabulary.ts",

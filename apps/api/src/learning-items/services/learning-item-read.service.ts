@@ -81,8 +81,7 @@ export class LearningItemReadService {
   }
 
   async loadActiveLearningContext(userId: string) {
-    const context = await this.repository.findActiveLearningContext(userId);
-    if (!context) throw new NotFoundException('Active learning context not found');
+    const context = await this.repository.ensureActiveLearningContext(userId);
     return {
       id: context.id,
       sourceLanguage: this.toLanguageCode(context.sourceLanguage),
