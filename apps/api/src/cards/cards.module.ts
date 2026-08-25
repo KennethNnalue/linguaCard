@@ -8,6 +8,7 @@ import { WordAudioModule } from '../word-audio/word-audio.module';
 import { SubscriptionsModule } from '../subscriptions/subscriptions.module';
 import { SharesModule } from '../shares/shares.module';
 import { ReviewSchedulingEntity } from '../review/review-scheduling.entity';
+import { LearningItemsModule } from '../learning-items/learning-items.module';
 
 @Module({
   imports: [
@@ -15,6 +16,7 @@ import { ReviewSchedulingEntity } from '../review/review-scheduling.entity';
     WordAudioModule,
     SubscriptionsModule,
     forwardRef(() => SharesModule),
+    LearningItemsModule,
   ],
   controllers: [CardsController],
   providers: [CardsService, WordDedupService],

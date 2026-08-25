@@ -29,5 +29,6 @@ export const LEARNING_ITEM_ENTITIES = [
     },
     LearningItemReadService,
   ],
+  exports: [LearningItemReadService],
 })
 export class LearningItemsModule {}

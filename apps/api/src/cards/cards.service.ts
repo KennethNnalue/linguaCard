@@ -9,6 +9,8 @@ import { WordAudioService } from '../word-audio/word-audio.service';
 import { SubscriptionService } from '../subscriptions/subscription.service';
 import { ShareSyncService } from '../shares/share-sync.service';
 import { createNewReviewScheduling } from '../review/review-scheduling.entity';
+import { LearningItemReadService } from '../learning-items/services/learning-item-read.service';
+import { canonicalCardToScheduledCard } from './canonical-card.mapper';
 
 @Injectable()
 export class CardsService {
@@ -17,19 +19,31 @@ export class CardsService {
   constructor(
     @InjectRepository(CardEntity)
     private readonly repo: Repository<CardEntity>,
+    private readonly learningItems: LearningItemReadService,
     @Optional() private readonly wordAudioService?: WordAudioService,
     @Optional() private readonly subscriptions?: SubscriptionService,
     @Optional() private readonly syncService?: ShareSyncService,
   ) {}
 
   async findAll(userId: string, query: CardQueryParams): Promise<ScheduledCard[]> {
-    const qb = this.repo.createQueryBuilder('card')
-      .innerJoinAndSelect('card.scheduling', 'scheduling')
-      .where('card.userId = :userId', { userId });
-    if (query.collectionId) qb.andWhere('card.collectionId = :collectionId', { collectionId: query.collectionId });
-    if (query.categoryId)   qb.andWhere(':categoryId = ANY(card.categoryIds)', { categoryId: query.categoryId });
-    if (query.state)        qb.andWhere("scheduling.state->>'stage' = :state", { state: query.state });
-    return (await qb.getMany()).map(this.toModel);
+    const context = await this.learningItems.loadActiveLearningContext(userId);
+    const canonicalCards: ScheduledCard[] = [];
+    let cursor: string | undefined;
+    do {
+      const page = await this.learningItems.listLearningItems({
+        userId,
+        learningContextId: context.id,
+        collectionId: query.collectionId,
+        cursor,
+        limit: 100,
+      });
+      canonicalCards.push(...page.items.map(card => canonicalCardToScheduledCard(userId, card)));
+      cursor = page.nextCursor ?? undefined;
+    } while (cursor);
+
+    return canonicalCards
+      .filter(card => !query.state || card.reviewState.stage === query.state)
+      .filter(card => !query.categoryId || card.categoryIds.includes(query.categoryId));
   }
 
   async findOne(userId: string, id: string): Promise<ScheduledCard> {
