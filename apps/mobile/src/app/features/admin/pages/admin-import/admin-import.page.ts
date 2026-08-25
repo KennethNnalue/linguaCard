@@ -2,6 +2,7 @@ import {AppNotificationService} from '@lingua-card/mobile/notifications';
 import {ChangeDetectionStrategy, Component, DestroyRef, inject, signal} from '@angular/core';
 import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
 import {FormControl, FormGroup, ReactiveFormsModule, Validators} from '@angular/forms';
+import {HttpErrorResponse} from '@angular/common/http';
 import {Router} from '@angular/router';
 import {AlertController, IonContent, IonHeader, IonIcon, IonToolbar} from '@ionic/angular/standalone';
 import {addIcons} from 'ionicons';
@@ -195,6 +196,9 @@ OUTPUT — valid JSON ONLY, no markdown fences, no commentary:
   readonly importing = signal(false);
   readonly importingStory = signal(false);
   readonly importingJson = signal(false);
+  readonly jsonImportStage = signal<'idle' | 'validating' | 'vocabulary' | 'thumbnail' | 'complete' | 'failed'>('idle');
+  readonly jsonImportError = signal<string | null>(null);
+  readonly jsonImportWarning = signal<string | null>(null);
   readonly lastCollectionResult = signal<AdminImportCollectionResult | null>(null);
   readonly lastStoryResult = signal<AdminImportStoryResult | null>(null);
   readonly lastJsonResult = signal<AdminImportCollectionJsonResult | null>(null);
@@ -278,9 +282,9 @@ OUTPUT — valid JSON ONLY, no markdown fences, no commentary:
         this.collections.update(list => list.map(c => c.id === item.id ? {...c, isPublished: next} : c));
         void this._toast(`"${item.title}" ${next ? 'published' : 'unpublished'}`, 'success');
       },
-      error: () => {
+      error: error => {
         this.togglingId.set(null);
-        void this._toast('Toggle failed', 'danger');
+        void this._toast(this.apiErrorMessage(error, 'Publishing failed'), 'danger');
       },
     });
   }
@@ -571,16 +575,22 @@ OUTPUT — valid JSON ONLY, no markdown fences, no commentary:
     if (this.jsonForm.invalid || this.importingJson()) return;
 
     const v = this.jsonForm.getRawValue();
+    this.jsonImportStage.set('validating');
+    this.jsonImportError.set(null);
+    this.jsonImportWarning.set(null);
     let words: AdminImportCollectionJsonDto['words'];
     try {
-      words = JSON.parse(v.wordsJson!) as AdminImportCollectionJsonDto['words'];
-      if (!Array.isArray(words) || !words.length) throw new Error();
-    } catch {
-      void this._toast('Invalid JSON. Paste an array of word objects with at least "back" and "front" fields.', 'danger');
+      words = this.parseEnrichedWords(v.wordsJson ?? '');
+    } catch (error) {
+      const message = error instanceof Error ? error.message : 'Invalid JSON';
+      this.jsonImportStage.set('failed');
+      this.jsonImportError.set(message);
+      void this._toast(message, 'danger');
       return;
     }
 
     this.importingJson.set(true);
+    this.jsonImportStage.set('vocabulary');
     this.lastJsonResult.set(null);
 
     this.adminApi.importCollectionJson({
@@ -588,17 +598,24 @@ OUTPUT — valid JSON ONLY, no markdown fences, no commentary:
       level: v.level!,
       words,
     }).pipe(
-      concatMap(result => this.uploadCoverAfterImport(result.collectionId).pipe(map(() => result))),
+      concatMap(result => {
+        this.jsonImportStage.set(this.collectionImage() ? 'thumbnail' : 'complete');
+        return this.uploadCoverAfterImport(result.collectionId).pipe(map(() => result));
+      }),
       takeUntilDestroyed(this._destroyRef),
     ).subscribe({
       next: result => {
         this.importingJson.set(false);
+        this.jsonImportStage.set('complete');
         this.lastJsonResult.set(result);
         void this._toast(`✓ "${result.title}" — ${result.inserted} inserted, ${result.reused} reused, ${result.audioLinked} audio linked`, 'success');
       },
-      error: () => {
+      error: error => {
         this.importingJson.set(false);
-        void this._toast('JSON import failed. Check admin permissions and word object shape.', 'danger');
+        this.jsonImportStage.set('failed');
+        const message = this.apiErrorMessage(error, 'JSON import failed');
+        this.jsonImportError.set(message);
+        void this._toast(message, 'danger');
       },
     });
   }
@@ -645,9 +662,120 @@ OUTPUT — valid JSON ONLY, no markdown fences, no commentary:
     if (!image) return of(null);
     return this.adminApi.uploadCollectionCover(collectionId, image).pipe(
       catchError(() => {
-        void this._toast('Collection created, but the thumbnail upload failed.', 'warning');
+        const message = 'Collection created, but the thumbnail upload failed. You can still review and publish it.';
+        this.jsonImportWarning.set(message);
+        void this._toast(message, 'warning');
         return of(null);
       }),
     );
+  }
+
+  private parseEnrichedWords(raw: string): AdminImportCollectionJsonDto['words'] {
+    let value: unknown;
+    try {
+      value = JSON.parse(raw);
+    } catch {
+      throw new Error('The selected file is not valid JSON.');
+    }
+    if (!Array.isArray(value) || value.length === 0) {
+      throw new Error('JSON must be a non-empty array of word objects.');
+    }
+    for (let index = 0; index < value.length; index += 1) {
+      const word = value[index];
+      if (!this.isRecord(word)) throw new Error(`Word ${index + 1} must be an object.`);
+      if (typeof word['back'] !== 'string' || !word['back'].trim()) {
+        throw new Error(`Word ${index + 1} is missing a valid "back" value.`);
+      }
+      if (typeof word['front'] !== 'string' || !word['front'].trim()) {
+        throw new Error(`Word ${index + 1} is missing a valid "front" value.`);
+      }
+      const article = word['article'];
+      if (article !== null && article !== 'der' && article !== 'die' && article !== 'das') {
+        throw new Error(`Word ${index + 1} has an invalid "article" value.`);
+      }
+      if (word['plural'] !== null && typeof word['plural'] !== 'string') {
+        throw new Error(`Word ${index + 1} has an invalid "plural" value.`);
+      }
+      if (!this.isCefrLevel(word['cefrLevel'])) {
+        throw new Error(`Word ${index + 1} has an invalid "cefrLevel" value.`);
+      }
+      if (!this.isWordType(word['wordType'])) {
+        throw new Error(`Word ${index + 1} has an invalid "wordType" value.`);
+      }
+    }
+    return value.map((word, index) => ({
+      back: String(word['back']).trim(),
+      front: String(word['front']).trim(),
+      article: word['article'] === 'der' || word['article'] === 'die' || word['article'] === 'das' ? word['article'] : null,
+      plural: typeof word['plural'] === 'string' ? word['plural'] : null,
+      phonetic: typeof word['phonetic'] === 'string' ? word['phonetic'] : null,
+      cefrLevel: this.isCefrLevel(word['cefrLevel']) ? word['cefrLevel'] : null,
+      categoryName: typeof word['categoryName'] === 'string' ? word['categoryName'] : undefined,
+      examples: this.parseExamples(word['examples'], index),
+      synonyms: this.parseSynonyms(word['synonyms'], index),
+      wordType: this.isWordType(word['wordType']) ? word['wordType'] : 'other',
+    }));
+  }
+
+  private parseExamples(value: unknown, wordIndex: number): Array<{ target: string; native: string }> {
+    if (!Array.isArray(value) || value.length !== 1) {
+      throw new Error(`Word ${wordIndex + 1} must contain exactly one example.`);
+    }
+    return value.map(example => {
+      if (!this.isRecord(example) || typeof example['target'] !== 'string' || typeof example['native'] !== 'string') {
+        throw new Error(`Word ${wordIndex + 1} contains an invalid example.`);
+      }
+      return {target: example['target'], native: example['native']};
+    });
+  }
+
+  private parseSynonyms(value: unknown, wordIndex: number): AdminImportCollectionJsonDto['words'][number]['synonyms'] {
+    if (!Array.isArray(value) || value.length === 0) {
+      throw new Error(`Word ${wordIndex + 1} must contain at least one synonym.`);
+    }
+    return value.map(synonym => {
+      if (!this.isRecord(synonym) || typeof synonym['word'] !== 'string' || typeof synonym['translation'] !== 'string') {
+        throw new Error(`Word ${wordIndex + 1} contains an invalid synonym.`);
+      }
+      const article = synonym['article'];
+      if (article !== null && article !== undefined && article !== 'der' && article !== 'die' && article !== 'das') {
+        throw new Error(`Word ${wordIndex + 1} contains a synonym with an invalid article.`);
+      }
+      if (typeof synonym['example'] !== 'string' || !synonym['example'].trim()
+        || typeof synonym['exampleNative'] !== 'string' || !synonym['exampleNative'].trim()) {
+        throw new Error(`Word ${wordIndex + 1} contains a synonym without valid example translations.`);
+      }
+      return {
+        word: synonym['word'],
+        article: synonym['article'] === 'der' || synonym['article'] === 'die' || synonym['article'] === 'das'
+          ? synonym['article'] : null,
+        translation: synonym['translation'],
+        example: typeof synonym['example'] === 'string' ? synonym['example'] : undefined,
+        exampleNative: typeof synonym['exampleNative'] === 'string' ? synonym['exampleNative'] : undefined,
+      };
+    });
+  }
+
+  private isCefrLevel(value: unknown): value is CefrLevel {
+    return value === 'A1' || value === 'A2' || value === 'B1' || value === 'B2' || value === 'C1';
+  }
+
+  private isWordType(value: unknown): value is 'noun' | 'verb' | 'adjective' | 'adverb' | 'other' {
+    return value === 'noun' || value === 'verb' || value === 'adjective' || value === 'adverb' || value === 'other';
+  }
+
+  private isRecord(value: unknown): value is Readonly<Record<string, unknown>> {
+    return typeof value === 'object' && value !== null && !Array.isArray(value);
+  }
+
+  private apiErrorMessage(error: unknown, fallback: string): string {
+    if (!(error instanceof HttpErrorResponse)) return fallback;
+    const response = error.error;
+    if (this.isRecord(response)) {
+      const message = response['message'];
+      if (typeof message === 'string' && message.trim()) return message;
+      if (Array.isArray(message) && message.every(item => typeof item === 'string')) return message.join(' ');
+    }
+    return error.status ? `${fallback} (HTTP ${error.status})` : fallback;
   }
 }

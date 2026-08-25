@@ -21,6 +21,7 @@ import { SpeechAssetEntity } from '../vocabulary/entities/speech-asset.entity';
 import { VocabularyModule } from '../vocabulary/vocabulary.module';
 import { PlatformCollectionImportRepository } from './platform-collection-import.repository';
 import { StorageService } from '../storage/storage.service';
+import { LegacyDictionaryLexemeEntity } from '../vocabulary/entities/legacy-dictionary-lexeme.entity';
 
 @Module({
   imports: [
@@ -35,6 +36,7 @@ import { StorageService } from '../storage/storage.service';
       LexemeEntity,
       LexemeLocalizationEntity,
       SpeechAssetEntity,
+      LegacyDictionaryLexemeEntity,
     ]),
     WordDictionaryModule,
     WordAudioModule,

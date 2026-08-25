@@ -153,6 +153,21 @@
             placeholder='[{"back": "Apfel", "front": "apple", "article": "der", "plural": "die Äpfel"}]'></textarea>
         </div>
 
+        @if (jsonImportStage() !== 'idle') {
+          <div class="adm-import-progress" [class.adm-import-progress--error]="jsonImportStage() === 'failed'" aria-live="polite">
+            @switch (jsonImportStage()) {
+              @case ('validating') { <strong>1/3 Validating JSON…</strong> }
+              @case ('vocabulary') { <strong>2/3 Resolving vocabulary and preparing collection…</strong> }
+              @case ('thumbnail') { <strong>3/3 Uploading thumbnail…</strong> }
+              @case ('complete') {
+                <strong>✓ Collection import complete and ready for review.</strong>
+                @if (jsonImportWarning()) { <span>{{ jsonImportWarning() }}</span> }
+              }
+              @case ('failed') { <strong>{{ jsonImportError() }}</strong> }
+            }
+          </div>
+        }
+
         @if (lastJsonResult(); as r) {
           <div class="adm-result-bar">
             <span class="adm-result-bar__icon">⚡</span>

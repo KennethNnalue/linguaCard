@@ -1,4 +1,4 @@
-import { ConflictException, Injectable, Logger, NotFoundException } from '@nestjs/common';
+import { BadRequestException, ConflictException, Injectable, Logger, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { In, IsNull, Repository } from 'typeorm';
 import { randomUUID } from 'crypto';
@@ -12,6 +12,7 @@ import { WordAudioService } from '../word-audio/word-audio.service';
 import { PlatformCollectionImportEntity } from './platform-collection-import.entity';
 import { StoryAudioService } from '../stories/story-audio.service';
 import { StorageService } from '../storage/storage.service';
+import { LegacyDictionaryLexemeEntity } from '../vocabulary/entities/legacy-dictionary-lexeme.entity';
 import type {
   AdminImportCollectionDto,
   AdminImportCollectionResult,
@@ -40,6 +41,8 @@ export class AdminService {
     private readonly dictRepo: Repository<WordDictionaryEntity>,
     @InjectRepository(PlatformCollectionImportEntity)
     private readonly importRepo: Repository<PlatformCollectionImportEntity>,
+    @InjectRepository(LegacyDictionaryLexemeEntity)
+    private readonly dictionaryLexemeRepo: Repository<LegacyDictionaryLexemeEntity>,
     private readonly dictionary: WordDictionaryService,
     private readonly wordAudio: WordAudioService,
     private readonly storyAudio: StoryAudioService,
@@ -121,6 +124,7 @@ export class AdminService {
   }
 
   async importCollectionJson(dto: AdminImportCollectionJsonDto): Promise<AdminImportCollectionJsonResult> {
+    this.validateJsonCollection(dto);
     const collectionId = crypto.randomUUID();
     let inserted = 0;
     let reused = 0;
@@ -137,11 +141,16 @@ export class AdminService {
         inserted++;
         if (entity.wordAudioId) audioLinked++;
       }
+      const mapping = await this.dictionaryLexemeRepo.findOneBy({ dictionaryWordId: entity.id });
+      if (!mapping) {
+        throw new ConflictException(`Vocabulary projection failed for words[${wordRows.length}].back (${word.back})`);
+      }
       wordRows.push(
         this.wordRepo.create({
           id: randomUUID(),
           platformCollectionId: collectionId,
           dictionaryWordId: entity.id,
+          lexemeId: mapping.lexemeId,
           position: wordRows.length,
         }),
       );
@@ -156,14 +165,28 @@ export class AdminService {
       isPublished: false,
       wordCount: wordRows.length,
     });
-    await this.collectionRepo.save(collection);
-    await this.wordRepo.save(wordRows);
+    await this.collectionRepo.manager.transaction(async manager => {
+      await manager.save(PlatformCollectionEntity, collection);
+      await manager.save(PlatformCollectionWordEntity, wordRows);
+    });
 
     return { collectionId, title: dto.title, inserted, reused, audioLinked };
   }
 
   async importCollection(dto: AdminImportCollectionDto): Promise<AdminImportCollectionResult> {
+    if (!dto.title?.trim() || !dto.level || !Array.isArray(dto.words) || dto.words.length === 0) {
+      throw new BadRequestException('Title, level, and at least one word are required');
+    }
     const batchResult = await this.dictionary.batchResolve(dto.words, 'de-DE', 'en');
+
+    const mappings = await this.dictionaryLexemeRepo.findBy({
+      dictionaryWordId: In(batchResult.entries.map(entry => entry.id)),
+    });
+    const lexemeIdByDictionaryId = new Map(mappings.map(mapping => [mapping.dictionaryWordId, mapping.lexemeId]));
+    const unresolvedEntry = batchResult.entries.find(entry => !lexemeIdByDictionaryId.has(entry.id));
+    if (unresolvedEntry) {
+      throw new ConflictException(`Vocabulary projection failed for ${unresolvedEntry.displayText}`);
+    }
 
     const collectionId = crypto.randomUUID();
     const collection = this.collectionRepo.create({
@@ -175,17 +198,19 @@ export class AdminService {
       isPublished: false,
       wordCount: batchResult.entries.length,
     });
-    await this.collectionRepo.save(collection);
-
     const wordRows = batchResult.entries.map((entry, i) =>
       this.wordRepo.create({
         id: crypto.randomUUID(),
         platformCollectionId: collectionId,
         dictionaryWordId: entry.id,
+        lexemeId: lexemeIdByDictionaryId.get(entry.id),
         position: i,
       }),
     );
-    await this.wordRepo.save(wordRows);
+    await this.collectionRepo.manager.transaction(async manager => {
+      await manager.save(PlatformCollectionEntity, collection);
+      await manager.save(PlatformCollectionWordEntity, wordRows);
+    });
 
     return {
       collectionId,
@@ -405,6 +430,7 @@ export class AdminService {
       if (importRecord && importRecord.status !== 'ready_to_publish') {
         throw new ConflictException('Collection cannot be published until localization and target audio are ready');
       }
+      await this.repairLegacyVocabularyLinks(id);
       const unresolved = await this.wordRepo.countBy({ platformCollectionId: id, lexemeId: IsNull() });
       if (unresolved > 0) {
         throw new ConflictException('Collection cannot be published while vocabulary items are unresolved');
@@ -414,6 +440,82 @@ export class AdminService {
     entity.status = isPublished ? 'published' : 'draft';
     entity.publishedAt = isPublished ? new Date() : null;
     await this.collectionRepo.save(entity);
+  }
+
+  private async repairLegacyVocabularyLinks(collectionId: string): Promise<void> {
+    const unresolved = await this.wordRepo.findBy({ platformCollectionId: collectionId, lexemeId: IsNull() });
+    if (!unresolved.length) return;
+    const mappings = await this.dictionaryLexemeRepo.findBy({
+      dictionaryWordId: In(unresolved.map(item => item.dictionaryWordId)),
+    });
+    const lexemeIdByDictionaryId = new Map(mappings.map(mapping => [mapping.dictionaryWordId, mapping.lexemeId]));
+    const repaired = unresolved
+      .filter(item => lexemeIdByDictionaryId.has(item.dictionaryWordId))
+      .map(item => ({ ...item, lexemeId: lexemeIdByDictionaryId.get(item.dictionaryWordId) ?? null }));
+    if (repaired.length) await this.wordRepo.save(repaired);
+  }
+
+  private validateJsonCollection(dto: AdminImportCollectionJsonDto): void {
+    if (!dto.title?.trim()) throw new BadRequestException('title must be a non-empty string');
+    if (!['A1', 'A2', 'B1', 'B2', 'C1'].includes(dto.level)) {
+      throw new BadRequestException('level must be one of A1, A2, B1, B2, or C1');
+    }
+    if (!Array.isArray(dto.words) || dto.words.length === 0) {
+      throw new BadRequestException('words must be a non-empty JSON array');
+    }
+    for (let index = 0; index < dto.words.length; index += 1) {
+      const word = dto.words[index];
+      if (!word || typeof word.back !== 'string' || !word.back.trim()) {
+        throw new BadRequestException(`words[${index}].back must be a non-empty string`);
+      }
+      if (typeof word.front !== 'string' || !word.front.trim()) {
+        throw new BadRequestException(`words[${index}].front must be a non-empty string`);
+      }
+      if (word.article !== null && !['der', 'die', 'das'].includes(word.article)) {
+        throw new BadRequestException(`words[${index}].article must be der, die, das, or null`);
+      }
+      if (word.plural !== null && typeof word.plural !== 'string') {
+        throw new BadRequestException(`words[${index}].plural must be a string or null`);
+      }
+      if (!word.cefrLevel || !['A1', 'A2', 'B1', 'B2', 'C1'].includes(word.cefrLevel)) {
+        throw new BadRequestException(`words[${index}].cefrLevel must be one of A1, A2, B1, B2, or C1`);
+      }
+      if (!word.wordType || !['noun', 'verb', 'adjective', 'adverb', 'other'].includes(word.wordType)) {
+        throw new BadRequestException(`words[${index}].wordType is invalid`);
+      }
+      if (!Array.isArray(word.examples) || word.examples.length !== 1) {
+        throw new BadRequestException(`words[${index}].examples must contain exactly one example`);
+      }
+      const example = word.examples[0];
+      if (typeof example.target !== 'string' || !example.target.trim()
+        || typeof example.native !== 'string' || !example.native.trim()) {
+        throw new BadRequestException(`words[${index}].examples[0] must contain target and native text`);
+      }
+      if (!Array.isArray(word.synonyms) || word.synonyms.length === 0) {
+        throw new BadRequestException(`words[${index}].synonyms must contain at least one synonym`);
+      }
+      for (let synonymIndex = 0; synonymIndex < word.synonyms.length; synonymIndex += 1) {
+        const synonym = word.synonyms[synonymIndex];
+        if (typeof synonym.word !== 'string' || !synonym.word.trim()
+          || typeof synonym.translation !== 'string' || !synonym.translation.trim()) {
+          throw new BadRequestException(
+            `words[${index}].synonyms[${synonymIndex}] must contain word and translation`,
+          );
+        }
+        if (synonym.article !== null && synonym.article !== undefined
+          && !['der', 'die', 'das'].includes(synonym.article)) {
+          throw new BadRequestException(
+            `words[${index}].synonyms[${synonymIndex}].article must be der, die, das, or null`,
+          );
+        }
+        if (typeof synonym.example !== 'string' || !synonym.example.trim()
+          || typeof synonym.exampleNative !== 'string' || !synonym.exampleNative.trim()) {
+          throw new BadRequestException(
+            `words[${index}].synonyms[${synonymIndex}] must contain example and exampleNative text`,
+          );
+        }
+      }
+    }
   }
 
   async listCollectionWords(id: string): Promise<AdminPlatformCollectionWordItem[]> {
