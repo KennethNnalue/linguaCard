@@ -2,7 +2,7 @@ import {ChangeDetectionStrategy, Component, computed, inject, OnDestroy, OnInit,
 import {ActivatedRoute, Router} from '@angular/router';
 import {IonContent, IonRefresher, IonRefresherContent, ModalController} from '@ionic/angular/standalone';
 import {TranslatePipe, TranslateService} from '@ngx-translate/core';
-import type {Card, CardView, CefrLevel, CollectionSummaryView, PlatformCollectionSummary} from '@lingua-card/shared/domain';
+import type {CardView, CefrLevel, CollectionSummaryView, PlatformCollectionSummary} from '@lingua-card/shared/domain';
 import {CardStore} from '../../store/card.store';
 import {CollectionStore} from '../../store/collection.store';
 import {PlatformCollectionStore} from '../../store/platform-collection.store';
@@ -90,6 +90,12 @@ export class VaultPage implements OnInit, OnDestroy {
     }
   }
 
+  ionViewWillEnter(): void {
+    this.vaultStore.loadActiveVault();
+    void this.cardStore.loadCards();
+    this.collectionStore.loadCollections();
+  }
+
   ngOnDestroy(): void {
     // Don't leak this page's search into other consumers of the shared stores.
     this.platformStore.setSearch('');
@@ -143,7 +149,7 @@ export class VaultPage implements OnInit, OnDestroy {
     for (const c of this.vaultStore.learningItems()) {
       if (this.isViewDue(c, now)) due++;
       if (c.reviewState.stage === 'new') fresh++;
-      if (c.reviewState.stage === 'mastered') mastered++;
+      if (c.reviewState.stage === 'mastered' && c.reviewState.relearning === undefined) mastered++;
     }
     return {due, fresh, mastered};
   });
@@ -165,12 +171,11 @@ export class VaultPage implements OnInit, OnDestroy {
     }));
   });
 
-  /** Weighted mastery progress across all six levels (0–100). */
+  /** Percentage of canonical learning items currently mastered. */
   readonly masteryPct = computed(() => {
     const cards = this.vaultStore.learningItems();
     if (cards.length === 0) return 0;
-    const weighted = cards.reduce((sum, c) => sum + stageIndicator(c.reviewState.stage), 0);
-    return Math.round((weighted / (cards.length * 5)) * 100);
+    return Math.round((this.masteredCount() / cards.length) * 100);
   });
 
   // ─── Word index ──────────────────────────────────────────────────────────────

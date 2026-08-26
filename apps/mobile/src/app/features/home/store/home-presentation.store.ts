@@ -2,10 +2,9 @@ import {computed, inject} from '@angular/core';
 import {signalStore, withComputed} from '@ngrx/signals';
 import {EngagementStore} from '../../engagement/state/engagement.store';
 import {estimateReviewMinutes} from '../../review/application/estimate-review-time';
-import {ReviewFilterService} from '../../review/services/review-filter.service';
 import {ReviewPrefsService} from '../../review/services/review-prefs.service';
 import {ReviewStore} from '../../review/store/review.store';
-import {CardStore} from '../../vault/store/card.store';
+import {VaultV2Store} from '../../vault/store/vault-v2.store';
 
 export type HomePrimaryAction = 'add-vocabulary' | 'start-review' | 'learn-new' | 'keep-practicing';
 
@@ -20,22 +19,25 @@ export type HomeHeroViewModel =
 export const HomePresentationStore = signalStore(
   {providedIn: 'root'},
   withComputed(() => {
-    const cards = inject(CardStore);
+    const vault = inject(VaultV2Store);
     const engagement = inject(EngagementStore);
-    const reviewFilter = inject(ReviewFilterService);
     const reviewPrefs = inject(ReviewPrefsService);
     const review = inject(ReviewStore);
 
     return {
       hero: computed<HomeHeroViewModel>(() => {
-        const totalCards = cards.cards().length;
+        const items = vault.learningItems();
+        const totalCards = items.length;
         if (totalCards === 0) return {kind: 'empty', action: 'add-vocabulary'};
 
         const completed = engagement.completedToday();
         const goal = Math.max(1, engagement.dailyGoal());
         const streak = engagement.streak().current;
-        const due = reviewFilter.getDueTodayCount();
-        const newAvailable = reviewFilter.getNewCount();
+        const now = Date.now();
+        const due = items.filter(item => item.reviewState.masterySource !== 'manual'
+          && item.reviewState.dueAt !== undefined
+          && new Date(item.reviewState.dueAt).getTime() <= now).length;
+        const newAvailable = items.filter(item => item.reviewState.stage === 'new').length;
         const available = due + newAvailable;
 
         if (completed >= goal) {

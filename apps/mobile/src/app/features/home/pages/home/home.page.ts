@@ -32,11 +32,11 @@ import {StreakMilestoneComponent} from '../../components/streak-milestone/streak
 import {GettingStartedChecklistComponent} from '../../components/getting-started-checklist/getting-started-checklist.component';
 import {StudyGoalsPromptComponent} from '../../../settings/components/study-goals-prompt/study-goals-prompt.component';
 import {BottomSheetService} from '../../../../shared/components/bottom-sheet/bottom-sheet.service';
-import {isDue, isNew} from '../../../review/domain/review-status';
 import {Card} from '@lingua-card/shared/domain';
 import {GoalPromptPolicyService} from '../../../settings/services/goal-prompt-policy.service';
 import {HomePresentationStore} from '../../store/home-presentation.store';
 import {ButtonComponent} from '../../../../shared/ui/button/button.component';
+import {VaultV2Store} from '../../../vault/store/vault-v2.store';
 
 @Component({
   selector: 'lc-home',
@@ -76,6 +76,7 @@ export class HomePage {
   private readonly filterService = inject(ReviewFilterService);
   private readonly goalPromptPolicy = inject(GoalPromptPolicyService);
   readonly homePresentation = inject(HomePresentationStore);
+  private readonly vaultStore = inject(VaultV2Store);
 
   private goalPromptCheckInProgress = false;
 
@@ -95,6 +96,9 @@ export class HomePage {
   }
 
   ionViewWillEnter(): void {
+    void this.cardStore.loadCards();
+    this.vaultStore.loadActiveVault();
+    this.collectionStore.loadCollections();
     if (this.settingsStore.needsGoalSetup()) void this.showGoalsPromptIfEligible();
   }
 
@@ -145,19 +149,21 @@ export class HomePage {
   // ─── Hero ring stats ─────────────────────────────────────────────────────────
   readonly newCardsCount = computed(() => {
     const collectionId = this.selectedCollectionId();
-    const cards = collectionId
-      ? this.cardStore.cards().filter(c => c.collectionId === collectionId)
-      : this.cardStore.cards();
-    return cards.filter(isNew).length;
+    const items = collectionId
+      ? this.vaultStore.learningItems().filter(item => item.collectionIds.includes(collectionId))
+      : this.vaultStore.learningItems();
+    return items.filter(item => item.reviewState.stage === 'new').length;
   });
 
   readonly reviewsCount = computed(() => {
     const collectionId = this.selectedCollectionId();
     const now = new Date();
-    const cards = collectionId
-      ? this.cardStore.cards().filter(c => c.collectionId === collectionId)
-      : this.cardStore.cards();
-    return cards.filter(c => isDue(c, now)).length;
+    const items = collectionId
+      ? this.vaultStore.learningItems().filter(item => item.collectionIds.includes(collectionId))
+      : this.vaultStore.learningItems();
+    return items.filter(item => item.reviewState.masterySource !== 'manual'
+      && item.reviewState.dueAt !== undefined
+      && new Date(item.reviewState.dueAt).getTime() <= now.getTime()).length;
   });
 
   readonly totalDue = computed(() => this.newCardsCount() + this.reviewsCount());
@@ -178,8 +184,9 @@ export class HomePage {
   readonly streakFreezeProgress = this.engagementStore.streakFreezeProgress;
   readonly streakReady = computed(() => this.engagementStore.loadState().status === 'ready');
   readonly last7DaysActivity = this.engagementStore.last7DaysActivity;
-  readonly totalCards = this.cardStore.totalCount;
-  readonly masteredCount = this.cardStore.masteredCount;
+  readonly totalCards = computed(() => this.vaultStore.learningItems().length);
+  readonly masteredCount = computed(() => this.vaultStore.learningItems()
+    .filter(item => item.reviewState.stage === 'mastered' && item.reviewState.relearning === undefined).length);
   readonly dailyGoal = this.engagementStore.dailyGoal;
   readonly weeklyGoal = computed(() => this.settingsStore.weeklyGoal());
 

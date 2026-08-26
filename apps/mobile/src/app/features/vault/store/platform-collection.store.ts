@@ -17,6 +17,8 @@ import type {
 } from '@lingua-card/shared/domain';
 import { PlatformCollectionApiService } from '../services/platform-collection-api.service';
 import { CollectionStore } from './collection.store';
+import { CardStore } from './card.store';
+import { VaultV2Store } from './vault-v2.store';
 
 export interface TopicShelf {
   topic: string;
@@ -115,6 +117,14 @@ export const PlatformCollectionStore = signalStore(
   withMethods((store) => {
     const api = inject(PlatformCollectionApiService);
     const collectionStore = inject(CollectionStore);
+    const cardStore = inject(CardStore);
+    const vaultStore = inject(VaultV2Store);
+
+    function refreshPersonalLibrary(): void {
+      collectionStore.loadCollections();
+      void cardStore.loadCards();
+      vaultStore.loadActiveVault();
+    }
 
     return {
       loadCollections: rxMethod<void>(
@@ -190,6 +200,7 @@ export const PlatformCollectionStore = signalStore(
                 // Drop the detail cache entry so next visit re-fetches with
                 // accurate per-word knownToUser flags post-adoption.
                 const { [id]: _dropped, ...remainingCache } = cache;
+                void _dropped;
                 patchState(store, {
                   adoptingId: null,
                   lastAdoptEvent: { type: 'success', result },
@@ -200,7 +211,7 @@ export const PlatformCollectionStore = signalStore(
                   ),
                   detailCache: remainingCache,
                 });
-                collectionStore.loadCollections();
+                refreshPersonalLibrary();
               }),
               catchError(() => {
                 patchState(store, { adoptingId: null, lastAdoptEvent: { type: 'error' } });
@@ -222,6 +233,7 @@ export const PlatformCollectionStore = signalStore(
           const result = await firstValueFrom(api.adopt(id));
           const cache = store.detailCache();
           const { [id]: _dropped, ...remainingCache } = cache;
+          void _dropped;
           const event: AdoptEvent = { type: 'success', result };
           patchState(store, {
             adoptingId: null,
@@ -233,7 +245,7 @@ export const PlatformCollectionStore = signalStore(
             ),
             detailCache: remainingCache,
           });
-          collectionStore.loadCollections();
+          refreshPersonalLibrary();
           return event;
         } catch {
           const event: AdoptEvent = { type: 'error' };

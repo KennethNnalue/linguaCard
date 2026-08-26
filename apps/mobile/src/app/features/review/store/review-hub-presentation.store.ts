@@ -2,8 +2,7 @@ import {computed, inject} from '@angular/core';
 import {signalStore, withComputed, withMethods} from '@ngrx/signals';
 import {EngagementStore} from '../../engagement/state/engagement.store';
 import {SettingsStore} from '../../settings/store/settings.store';
-import {CardStore} from '../../vault/store/card.store';
-import {ReviewFilterService} from '../services/review-filter.service';
+import {VaultV2Store} from '../../vault/store/vault-v2.store';
 import {ReviewPrefsService, StudyMode} from '../services/review-prefs.service';
 import {estimateReviewMinutes} from '../application/estimate-review-time';
 
@@ -17,28 +16,37 @@ export type ReviewHeroViewModel =
 export const ReviewHubPresentationStore = signalStore(
   {providedIn: 'root'},
   withComputed(() => {
-    const cards = inject(CardStore);
+    const vault = inject(VaultV2Store);
     const engagement = inject(EngagementStore);
     const settings = inject(SettingsStore);
-    const filters = inject(ReviewFilterService);
     const prefs = inject(ReviewPrefsService);
 
-    const queue = computed(() => ({
-      dueNow: filters.getDueTodayCount(),
-      newAvailable: filters.getNewCount(),
-      struggling: filters.getStrugglingCount(),
-    }));
+    const queue = computed(() => {
+      const now = Date.now();
+      const items = vault.learningItems();
+      return {
+        dueNow: items.filter(item => item.reviewState.masterySource !== 'manual'
+          && item.reviewState.dueAt !== undefined
+          && new Date(item.reviewState.dueAt).getTime() <= now).length,
+        newAvailable: items.filter(item => item.reviewState.stage === 'new').length,
+        struggling: items.filter(item => item.reviewState.problemStatus === 'leech'
+          || (item.reviewState.totalReviewCount > 0 && item.reviewState.stage === 'learning')).length,
+      };
+    });
 
     return {
       queue,
       mode: prefs.mode,
       mastery: computed(() => ({
-        mastered: cards.masteredCount(),
-        total: cards.totalCount(),
-        progress: cards.totalCount() === 0 ? 0 : cards.masteredCount() / cards.totalCount(),
+        mastered: vault.learningItems().filter(item => item.reviewState.stage === 'mastered'
+          && item.reviewState.relearning === undefined).length,
+        total: vault.learningItems().length,
+        progress: vault.learningItems().length === 0 ? 0
+          : vault.learningItems().filter(item => item.reviewState.stage === 'mastered'
+            && item.reviewState.relearning === undefined).length / vault.learningItems().length,
       })),
       hero: computed<ReviewHeroViewModel>(() => {
-        if (cards.cards().length === 0) return {kind: 'empty'};
+        if (vault.learningItems().length === 0) return {kind: 'empty'};
 
         const completed = engagement.completedToday();
         const goal = Math.max(1, settings.dailyGoal());

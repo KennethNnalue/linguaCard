@@ -182,7 +182,10 @@ export class LearningItemReadRepository implements LearningItemReadPort {
            WHERE (scheduling.state->>'dueAt')::timestamptz <= now()
              AND COALESCE(scheduling.state->>'masterySource', '') <> 'manual'
          )::int AS "dueCount",
-         COUNT(*) FILTER (WHERE scheduling.state->>'stage' = 'mastered')::int AS "masteredCount"
+         COUNT(*) FILTER (
+           WHERE scheduling.state->>'stage' = 'mastered'
+             AND scheduling.state->>'relearning' IS NULL
+         )::int AS "masteredCount"
        FROM learning_items item
        LEFT JOIN review_scheduling scheduling ON scheduling."cardId" = COALESCE(item."legacyCardId", item.id)
        WHERE item."userId" = $1 AND item."learningContextId" = $2`,
@@ -203,7 +206,10 @@ export class LearningItemReadRepository implements LearningItemReadPort {
          collection.level,
          collection.topic,
          COUNT(membership."learningItemId")::int AS "itemCount",
-         COUNT(*) FILTER (WHERE scheduling.state->>'stage' = 'mastered')::int AS "masteredCount",
+         COUNT(*) FILTER (
+           WHERE scheduling.state->>'stage' = 'mastered'
+             AND scheduling.state->>'relearning' IS NULL
+         )::int AS "masteredCount",
          COUNT(*) FILTER (
            WHERE (scheduling.state->>'dueAt')::timestamptz <= now()
              AND COALESCE(scheduling.state->>'masterySource', '') <> 'manual'

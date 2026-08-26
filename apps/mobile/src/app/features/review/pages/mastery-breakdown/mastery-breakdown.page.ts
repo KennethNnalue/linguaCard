@@ -5,12 +5,10 @@ import { addIcons } from 'ionicons';
 import { chevronBackOutline, warningOutline } from 'ionicons/icons';
 import { TranslatePipe } from '@ngx-translate/core';
 import type { LearningStage } from '@lingua-card/shared/domain';
-import { isMastered, lifecycleState } from '../../domain/review-status';
 import { CardStore } from '../../../vault/store/card.store';
-import { CollectionStore } from '../../../vault/store/collection.store';
 import { ReviewPlayerService } from '../../services/review-player.service';
-import { ReviewFilterService } from '../../services/review-filter.service';
 import { ReviewRoute } from '../../models/review.model';
+import { VaultV2Store } from '../../../vault/store/vault-v2.store';
 
 interface LifecycleBucket {
   state: LearningStage;
@@ -48,18 +46,25 @@ const LIFECYCLE: { state: LearningStage; labelKey: string; subKey: string; colou
 })
 export class MasteryBreakdownPage {
   private readonly cardStore = inject(CardStore);
-  private readonly collectionStore = inject(CollectionStore);
+  private readonly vaultStore = inject(VaultV2Store);
   private readonly reviewPlayer = inject(ReviewPlayerService);
-  private readonly filterService = inject(ReviewFilterService);
   private readonly router = inject(Router);
 
   constructor() {
     addIcons({ chevronBackOutline, warningOutline });
   }
 
-  readonly masteredCount = this.cardStore.masteredCount;
-  readonly totalCount = this.cardStore.totalCount;
-  readonly strugglingCount = this.cardStore.strugglingCount;
+  readonly masteredCount = computed(() => this.vaultStore.learningItems()
+    .filter(item => item.reviewState.stage === 'mastered' && item.reviewState.relearning === undefined).length);
+  readonly totalCount = computed(() => this.vaultStore.learningItems().length);
+  readonly strugglingCount = computed(() => this.vaultStore.learningItems()
+    .filter(item => item.reviewState.problemStatus === 'leech'
+      || (item.reviewState.totalReviewCount > 0 && item.reviewState.stage === 'learning')).length);
+
+  ionViewWillEnter(): void {
+    void this.cardStore.loadCards();
+    this.vaultStore.loadActiveVault();
+  }
 
   readonly overallPct = computed(() => {
     const total = this.totalCount();
@@ -72,10 +77,10 @@ export class MasteryBreakdownPage {
   readonly heroRingOffset = computed(() => this.heroCirc * (1 - this.overallPct() / 100));
 
   readonly buckets = computed<LifecycleBucket[]>(() => {
-    const cards = this.cardStore.cards();
+    const cards = this.vaultStore.learningItems();
     const total = cards.length || 1;
     const counts: Record<LearningStage, number> = { new: 0, learning: 0, familiar: 0, strong: 0, mastered: 0 };
-    for (const c of cards) counts[lifecycleState(c)]++;
+    for (const card of cards) counts[card.reviewState.stage]++;
     return LIFECYCLE.map(l => ({
       ...l,
       count: counts[l.state],
@@ -84,28 +89,20 @@ export class MasteryBreakdownPage {
   });
 
   readonly masteryByCollection = computed<CollectionMastery[]>(() => {
-    const cards = this.cardStore.cards();
-    return this.collectionStore
-      .collections()
-      .map(col => {
-        const inCol = cards.filter(c => c.collectionId === col.id);
-        const mastered = inCol.filter(isMastered).length;
-        const total = inCol.length;
-        return {
-          id: col.id,
-          name: `${col.emoji ?? ''} ${col.name}`.trim(),
-          mastered,
-          total,
-          pct: total ? Math.round((mastered / total) * 100) : 0,
-        };
-      })
+    return this.vaultStore.vault()?.collections
+      .map(collection => ({
+        id: collection.id,
+        name: collection.name,
+        mastered: collection.masteredCount,
+        total: collection.itemCount,
+        pct: collection.itemCount ? Math.round((collection.masteredCount / collection.itemCount) * 100) : 0,
+      }))
       .filter(c => c.total > 0)
-      .sort((a, b) => b.pct - a.pct);
+      .sort((a, b) => b.pct - a.pct) ?? [];
   });
 
   drillStruggling(): void {
-    const cards = this.filterService.getStrugglingCards();
-    void this.reviewPlayer.open(cards, { kind: 'struggling' });
+    void this.reviewPlayer.openSource({ kind: 'struggling' }, Math.max(1, this.strugglingCount()));
   }
 
   goBack(): void {

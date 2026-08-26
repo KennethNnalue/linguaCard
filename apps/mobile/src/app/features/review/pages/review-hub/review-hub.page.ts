@@ -13,7 +13,6 @@ import {
 } from 'ionicons/icons';
 import { ReviewStore } from '../../store/review.store';
 import { CardStore } from '../../../vault/store/card.store';
-import { ReviewFilterService } from '../../services/review-filter.service';
 import { LeechService } from '../../services/leech.service';
 import { ReviewPrefsService, StudyMode } from '../../services/review-prefs.service';
 import { SessionStatsService } from '../../shared/services/session-stats.service';
@@ -27,7 +26,7 @@ import {ButtonComponent} from '../../../../shared/ui/button/button.component';
 import {BottomSheetService} from '../../../../shared/components/bottom-sheet/bottom-sheet.service';
 import type {ReviewAutoplayMode} from '../../application/review-audio-policy';
 import { ReviewPlayerService } from '../../services/review-player.service';
-import { isNew } from '../../domain/review-status';
+import { VaultV2Store } from '../../../vault/store/vault-v2.store';
 
 interface StudyModeOption {
   value: StudyMode;
@@ -46,7 +45,6 @@ export class ReviewHubPage {
   private readonly reviewStore = inject(ReviewStore);
   private readonly reviewPlayer = inject(ReviewPlayerService);
   private readonly cardStore = inject(CardStore);
-  private readonly filterService = inject(ReviewFilterService);
   private readonly leech = inject(LeechService);
   private readonly prefs = inject(ReviewPrefsService);
   private readonly engagementStore = inject(EngagementStore);
@@ -56,6 +54,7 @@ export class ReviewHubPage {
   private readonly translate = inject(TranslateService);
   private readonly bottomSheet = inject(BottomSheetService);
   readonly presentation = inject(ReviewHubPresentationStore);
+  private readonly vaultStore = inject(VaultV2Store);
 
   constructor() {
     addIcons({
@@ -69,18 +68,24 @@ export class ReviewHubPage {
     });
   }
 
-  readonly hasCards = computed(() => this.cardStore.cards().length > 0);
+  ionViewWillEnter(): void {
+    void this.cardStore.loadCards();
+    this.vaultStore.loadActiveVault();
+  }
+
+  readonly hasCards = computed(() => this.vaultStore.learningItems().length > 0);
 
   // ─── Hero counts (all from shared selectors / facade — never re-derived) ────
-  readonly overdueCount = computed(() => this.filterService.getDueTodayCount());
-  readonly newCount = computed(() => this.filterService.getNewCount());
+  readonly overdueCount = computed(() => this.presentation.queue().dueNow);
+  readonly newCount = computed(() => this.presentation.queue().newAvailable);
   readonly dueTodayCount = computed(() => this.overdueCount() + this.newCount());
-  readonly attentionCount = computed(() => this.filterService.getStrugglingCount());
+  readonly attentionCount = computed(() => this.presentation.queue().struggling);
   readonly strugglingCount = this.attentionCount;
   readonly completedToday = this.engagementStore.completedToday;
   // ─── Mastery snapshot ───────────────────────────────────────────────────────
-  readonly masteredCount = this.cardStore.masteredCount;
-  readonly totalCount = this.cardStore.totalCount;
+  readonly masteredCount = computed(() => this.vaultStore.learningItems()
+    .filter(item => item.reviewState.stage === 'mastered' && item.reviewState.relearning === undefined).length);
+  readonly totalCount = computed(() => this.vaultStore.learningItems().length);
   readonly masteryPct = computed(() => {
     const total = this.totalCount();
     return total ? Math.round((this.masteredCount() / total) * 100) : 0;
@@ -177,8 +182,7 @@ export class ReviewHubPage {
   }
 
   startNewOnly(): void {
-    const cards = this.cardStore.cards().filter(isNew);
-    void this.reviewPlayer.open(cards, { kind: 'new-only' });
+    void this.reviewPlayer.openSource({ kind: 'new-only' }, this.settingsStore.dailyGoal());
   }
 
   goToStruggling(): void { void this.router.navigate([ReviewRoute.STRUGGLING]); }
