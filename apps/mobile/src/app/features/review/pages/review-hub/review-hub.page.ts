@@ -70,7 +70,7 @@ export class ReviewHubPage {
 
   ionViewWillEnter(): void {
     void this.cardStore.loadCards();
-    this.vaultStore.loadActiveVault();
+    this.vaultStore.ensureActiveVault();
   }
 
   readonly hasCards = computed(() => this.vaultStore.learningItems().length > 0);
@@ -83,9 +83,8 @@ export class ReviewHubPage {
   readonly strugglingCount = this.attentionCount;
   readonly completedToday = this.engagementStore.completedToday;
   // ─── Mastery snapshot ───────────────────────────────────────────────────────
-  readonly masteredCount = computed(() => this.vaultStore.learningItems()
-    .filter(item => item.reviewState.stage === 'mastered' && item.reviewState.relearning === undefined).length);
-  readonly totalCount = computed(() => this.vaultStore.learningItems().length);
+  readonly masteredCount = computed(() => this.presentation.mastery().mastered);
+  readonly totalCount = computed(() => this.presentation.mastery().total);
   readonly masteryPct = computed(() => {
     const total = this.totalCount();
     return total ? Math.round((this.masteredCount() / total) * 100) : 0;

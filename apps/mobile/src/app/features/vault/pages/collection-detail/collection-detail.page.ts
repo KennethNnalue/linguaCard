@@ -78,7 +78,7 @@ export class CollectionDetailPage implements OnInit {
 
   readonly dueCount = computed(() => {
     const now = new Date();
-    return this.allCards().filter(item => this.isViewDue(item, now)).length;
+    return this.allCards().filter(item => this.isViewDue(item.reviewState, now)).length;
   });
 
   readonly pendingGhosts = computed(() => {
@@ -149,7 +149,7 @@ export class CollectionDetailPage implements OnInit {
   ngOnInit(): void {
     const id = this.route.snapshot.paramMap.get('id')!;
     this.collectionId.set(id);
-    this.vaultStore.loadActiveVault();
+    this.vaultStore.ensureActiveVault();
 
     // Prefer the store (already cached) to avoid an extra API call on every open.
     // Fall back to the API only when the collection is absent (deep-link / fresh device).
@@ -228,7 +228,17 @@ export class CollectionDetailPage implements OnInit {
     this.router.navigate(['/vault']);
   }
 
-  startReview(): void {
+  startDueReview(): void {
+    const col = this.collection();
+    if (!col) return;
+    const now = new Date();
+    void this.reviewPlayer.open(
+      this.reviewCards().filter(card => this.isViewDue(card.reviewState, now)),
+      { kind: 'collection', collectionId: col.id },
+    );
+  }
+
+  startReviewAll(): void {
     const col = this.collection();
     if (!col) return;
     void this.reviewPlayer.open(this.reviewCards(), { kind: 'collection', collectionId: col.id });
@@ -462,11 +472,9 @@ export class CollectionDetailPage implements OnInit {
     return locales[language] ?? language;
   }
 
-  private isViewDue(item: CardView, now: Date): boolean {
-    if (!item.reviewState.dueAt) return false;
-    return item.reviewState.stage !== 'new'
-      && item.reviewState.stage !== 'mastered'
-      && item.reviewState.masterySource !== 'manual'
-      && new Date(item.reviewState.dueAt).getTime() <= now.getTime();
+  private isViewDue(reviewState: CardView['reviewState'], now: Date): boolean {
+    if (!reviewState.dueAt) return false;
+    return reviewState.masterySource !== 'manual'
+      && new Date(reviewState.dueAt).getTime() <= now.getTime();
   }
 }

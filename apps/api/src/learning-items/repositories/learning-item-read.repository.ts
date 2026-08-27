@@ -158,9 +158,10 @@ export class LearningItemReadRepository implements LearningItemReadPort {
          )
          AND (
            $5::timestamptz IS NULL
-           OR (item."createdAt", item.id) < ($5::timestamptz, $6::varchar)
+           OR (date_trunc('milliseconds', item."createdAt"), item.id)
+             < ($5::timestamptz, $6::varchar)
          )
-       ORDER BY item."createdAt" DESC, item.id DESC
+       ORDER BY date_trunc('milliseconds', item."createdAt") DESC, item.id DESC
        LIMIT $7`,
       [
         options.userId,

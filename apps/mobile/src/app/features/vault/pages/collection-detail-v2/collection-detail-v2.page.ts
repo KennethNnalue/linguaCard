@@ -45,7 +45,7 @@ export class CollectionDetailV2Page implements OnInit {
   });
 
   ngOnInit(): void {
-    this.store.loadActiveVault();
+    this.store.ensureActiveVault();
   }
 
   goBack(): void {

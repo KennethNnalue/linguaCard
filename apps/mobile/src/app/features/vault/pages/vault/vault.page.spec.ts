@@ -8,7 +8,7 @@ import { VaultV2Store } from '../../store/vault-v2.store';
 
 const vaultStoreStub = {
   vault: signal(null), learningItems: signal([]), isVaultLoading: signal(false),
-  isLearningItemsLoading: signal(false), loadActiveVault: jest.fn(),
+  isLearningItemsLoading: signal(false), loadActiveVault: jest.fn(), ensureActiveVault: jest.fn(),
 };
 
 describe('VaultPage', () => {

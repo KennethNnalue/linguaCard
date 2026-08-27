@@ -39,13 +39,12 @@
       </div>
     </div>
     <div class="stats-actions">
-      <button class="btn-review" (click)="startReview()" [disabled]="wordCount() === 0">
+      <button class="btn-review" (click)="startDueReview()" [disabled]="dueCount() === 0">
         <svg viewBox="0 0 24 24" width="14" height="14" fill="currentColor"><polygon points="6,4 20,12 6,20"/></svg>
-        @if (dueCount() > 0) {
-          {{ 'vault.lexicon.reviewCount' | translate:{ count: dueCount() } }}
-        } @else {
-          {{ 'collectionDetail.actions.reviewAllLabel' | translate }}
-        }
+        {{ 'vault.lexicon.reviewCount' | translate:{ count: dueCount() } }}
+      </button>
+      <button class="btn-sand" (click)="startReviewAll()" [disabled]="wordCount() === 0">
+        {{ 'collectionDetail.actions.reviewAllLabel' | translate }}
       </button>
       <button class="btn-sand" (click)="startListen()" [disabled]="wordCount() === 0">
         <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><polygon points="11,5 6,9 2,9 2,15 6,15 11,19 11,5"/><path d="M15.5,8.5a5,5,0,0,1,0,7"/></svg>

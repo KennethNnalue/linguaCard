@@ -93,7 +93,7 @@ export class VaultV2Page implements OnInit {
   });
 
   ngOnInit(): void {
-    this.store.loadActiveVault();
+    this.store.ensureActiveVault();
     void this.engagementStore.loadEngagement();
     if (!this.platformStore.hasEverLoaded()) this.platformStore.loadCollections();
   }

@@ -2,7 +2,7 @@ import { computed, inject } from '@angular/core';
 import { patchState, signalStore, withComputed, withMethods, withState } from '@ngrx/signals';
 import { rxMethod } from '@ngrx/signals/rxjs-interop';
 import type { CardView, VaultView } from '@lingua-card/shared/domain';
-import { catchError, EMPTY, expand, forkJoin, map, pipe, reduce, switchMap, tap } from 'rxjs';
+import { catchError, EMPTY, expand, forkJoin, pipe, reduce, switchMap, tap } from 'rxjs';
 import {
   type ListLearningItemsRequest,
   VaultV2ApiService,
@@ -42,52 +42,69 @@ export const VaultV2Store = signalStore(
     }),
     isVaultLoading: computed(() => vaultRequest().status === 'loading'),
     isLearningItemsLoading: computed(() => learningItemsRequest().status === 'loading'),
+    hasCompleteVault: computed(() => {
+      const vault = vaultRequest();
+      const items = learningItemsRequest();
+      return vault.status === 'success'
+        && items.status === 'success'
+        && items.data.length === vault.data.allWords.itemCount;
+    }),
   })),
   withMethods((store) => {
     const api = inject(VaultV2ApiService);
 
-    return {
-      loadActiveVault: rxMethod<void>(
-        pipe(
-          tap(() => patchState(store, {
-            vaultRequest: { status: 'loading' },
-            learningItemsRequest: { status: 'loading' },
+    const loadActiveVault = rxMethod<void>(
+      pipe(
+        tap(() => {
+          if (store.vaultRequest().status !== 'success') {
+            patchState(store, { vaultRequest: { status: 'loading' } });
+          }
+          if (store.learningItemsRequest().status !== 'success') {
+            patchState(store, { learningItemsRequest: { status: 'loading' } });
+          }
+        }),
+        switchMap(() => api.loadActiveContext()),
+        switchMap(context => forkJoin({
+          vault: api.loadVault(context.id),
+          items: api.listLearningItems({ learningContextId: context.id, limit: 100 }).pipe(
+            expand(page => page.nextCursor
+              ? api.listLearningItems({ learningContextId: context.id, cursor: page.nextCursor, limit: 100 })
+              : EMPTY),
+            reduce((items, page) => [...items, ...page.items], [] as CardView[]),
+          ),
+        }).pipe(
+          tap(({ vault, items }) => patchState(store, {
+            learningContextId: context.id,
+            vaultRequest: { status: 'success', data: vault },
+            learningItemsRequest: { status: 'success', data: items },
             nextLearningItemsCursor: null,
           })),
-          switchMap(() => api.loadActiveContext()),
-          switchMap(context => forkJoin({
-            vault: api.loadVault(context.id),
-            items: api.listLearningItems({ learningContextId: context.id, limit: 100 }).pipe(
-              expand(page => page.nextCursor
-                ? api.listLearningItems({ learningContextId: context.id, cursor: page.nextCursor, limit: 100 })
-                : EMPTY),
-              reduce((items, page) => [...items, ...page.items], [] as CardView[]),
-              map(items => ({ items, nextCursor: null })),
-            ),
-          }).pipe(
-            tap(({ vault, items }) => patchState(store, {
-              learningContextId: context.id,
-              vaultRequest: { status: 'success', data: vault },
-              learningItemsRequest: { status: 'success', data: items.items },
-              nextLearningItemsCursor: items.nextCursor,
-            })),
-            catchError(() => {
-              patchState(store, {
-                vaultRequest: { status: 'error', message: 'Unable to load your Vault' },
-                learningItemsRequest: { status: 'error', message: 'Unable to load words' },
-              });
-              return EMPTY;
-            }),
-          )),
           catchError(() => {
-            patchState(store, {
-              vaultRequest: { status: 'error', message: 'Unable to load your Vault' },
-              learningItemsRequest: { status: 'error', message: 'Unable to load words' },
-            });
+            if (store.vaultRequest().status !== 'success') {
+              patchState(store, { vaultRequest: { status: 'error', message: 'Unable to load your Vault' } });
+            }
+            if (store.learningItemsRequest().status !== 'success') {
+              patchState(store, { learningItemsRequest: { status: 'error', message: 'Unable to load words' } });
+            }
             return EMPTY;
           }),
-        ),
+        )),
       ),
+    );
+
+    return {
+      loadActiveVault,
+
+      ensureActiveVault(): void {
+        const vault = store.vaultRequest();
+        const items = store.learningItemsRequest();
+        if (vault.status === 'success'
+          && items.status === 'success'
+          && items.data.length === vault.data.allWords.itemCount) return;
+        if (store.vaultRequest().status === 'loading'
+          || store.learningItemsRequest().status === 'loading') return;
+        loadActiveVault();
+      },
 
       loadVault: rxMethod<string>(
         pipe(

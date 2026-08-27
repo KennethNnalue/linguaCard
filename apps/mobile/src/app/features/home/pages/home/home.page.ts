@@ -97,7 +97,7 @@ export class HomePage {
 
   ionViewWillEnter(): void {
     void this.cardStore.loadCards();
-    this.vaultStore.loadActiveVault();
+    this.vaultStore.ensureActiveVault();
     this.collectionStore.loadCollections();
     if (this.settingsStore.needsGoalSetup()) void this.showGoalsPromptIfEligible();
   }

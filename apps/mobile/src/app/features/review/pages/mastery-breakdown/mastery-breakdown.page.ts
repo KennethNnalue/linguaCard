@@ -63,7 +63,7 @@ export class MasteryBreakdownPage {
 
   ionViewWillEnter(): void {
     void this.cardStore.loadCards();
-    this.vaultStore.loadActiveVault();
+    this.vaultStore.ensureActiveVault();
   }
 
   readonly overallPct = computed(() => {

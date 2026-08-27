@@ -79,7 +79,7 @@ export class VaultPage implements OnInit, OnDestroy {
     // The Vault may be the first page shown (deep link / tab restore); the streak
     // store has no auto-load, so refresh it here rather than depending on Home.
     void this.engagementStore.loadEngagement();
-    this.vaultStore.loadActiveVault();
+    this.vaultStore.ensureActiveVault();
     // Start each visit with a clean search so a stale query can't filter the
     // shared CardStore / PlatformCollectionStore from a previous session.
     this.applyCollectionSearch('');
@@ -91,7 +91,7 @@ export class VaultPage implements OnInit, OnDestroy {
   }
 
   ionViewWillEnter(): void {
-    this.vaultStore.loadActiveVault();
+    this.vaultStore.ensureActiveVault();
     void this.cardStore.loadCards();
     this.collectionStore.loadCollections();
   }

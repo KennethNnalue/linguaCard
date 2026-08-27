@@ -40,10 +40,8 @@ export const ReviewHubPresentationStore = signalStore(
       mastery: computed(() => ({
         mastered: vault.learningItems().filter(item => item.reviewState.stage === 'mastered'
           && item.reviewState.relearning === undefined).length,
-        total: vault.learningItems().length,
-        progress: vault.learningItems().length === 0 ? 0
-          : vault.learningItems().filter(item => item.reviewState.stage === 'mastered'
-            && item.reviewState.relearning === undefined).length / vault.learningItems().length,
+        total: vault.vault()?.allWords.itemCount ?? 0,
+        progress: (vault.vault()?.allWords.masteredPercentage ?? 0) / 100,
       })),
       hero: computed<ReviewHeroViewModel>(() => {
         if (vault.learningItems().length === 0) return {kind: 'empty'};
