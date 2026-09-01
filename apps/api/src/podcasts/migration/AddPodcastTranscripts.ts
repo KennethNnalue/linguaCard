@@ -7,7 +7,7 @@ export class AddPodcastTranscripts1787443000000 implements MigrationInterface {
     await queryRunner.query('ALTER TABLE podcast_episodes ADD COLUMN IF NOT EXISTS "transcriptFingerprint" varchar(64) NULL');
     await queryRunner.query('ALTER TABLE podcast_episodes ADD COLUMN IF NOT EXISTS "estimatedDurationMs" integer NOT NULL DEFAULT 0');
     await queryRunner.query(`
-      CREATE TABLE podcast_speakers (
+      CREATE TABLE IF NOT EXISTS podcast_speakers (
         id varchar PRIMARY KEY, "episodeId" varchar NOT NULL, "speakerKey" varchar(60) NOT NULL,
         "displayName" varchar(100) NOT NULL, "voiceId" varchar(200) NOT NULL, position integer NOT NULL,
         CONSTRAINT uq_podcast_speakers_episode_key UNIQUE ("episodeId", "speakerKey"),
@@ -15,7 +15,7 @@ export class AddPodcastTranscripts1787443000000 implements MigrationInterface {
       )
     `);
     await queryRunner.query(`
-      CREATE TABLE podcast_turns (
+      CREATE TABLE IF NOT EXISTS podcast_turns (
         id varchar PRIMARY KEY, "episodeId" varchar NOT NULL, "speakerId" varchar NOT NULL,
         position integer NOT NULL, "targetText" text NOT NULL, translation text NOT NULL,
         "vocabularyKeys" jsonb NOT NULL DEFAULT '[]', "wordTimings" jsonb NOT NULL DEFAULT '[]',
@@ -25,7 +25,7 @@ export class AddPodcastTranscripts1787443000000 implements MigrationInterface {
       )
     `);
     await queryRunner.query(`
-      CREATE TABLE podcast_episode_vocabulary (
+      CREATE TABLE IF NOT EXISTS podcast_episode_vocabulary (
         id varchar PRIMARY KEY, "episodeId" varchar NOT NULL, "lexemeId" varchar NOT NULL,
         "vocabularyKey" varchar(60) NOT NULL, position integer NOT NULL, importance varchar(20) NOT NULL,
         CONSTRAINT uq_podcast_episode_vocabulary_key UNIQUE ("episodeId", "vocabularyKey"),
@@ -35,8 +35,8 @@ export class AddPodcastTranscripts1787443000000 implements MigrationInterface {
         CONSTRAINT ck_podcast_episode_vocabulary_importance CHECK (importance IN ('essential','supporting'))
       )
     `);
-    await queryRunner.query('CREATE INDEX idx_podcast_turns_episode ON podcast_turns ("episodeId")');
-    await queryRunner.query('CREATE INDEX idx_podcast_episode_vocabulary_episode ON podcast_episode_vocabulary ("episodeId")');
+    await queryRunner.query('CREATE INDEX IF NOT EXISTS idx_podcast_turns_episode ON podcast_turns ("episodeId")');
+    await queryRunner.query('CREATE INDEX IF NOT EXISTS idx_podcast_episode_vocabulary_episode ON podcast_episode_vocabulary ("episodeId")');
   }
 
   async down(queryRunner: QueryRunner): Promise<void> {

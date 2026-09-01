@@ -84,6 +84,12 @@ async function runDatabaseMigrations(): Promise<void> {
       // This project predates TypeORM migrations for its original tables. Schema
       // synchronization is safe only for a completely empty database bootstrap.
       await dataSource.synchronize(false);
+      const baselinedMigrations = await dataSource.runMigrations({
+        transaction: 'each',
+        fake: true,
+      });
+      console.log(`Fresh database baseline complete: ${baselinedMigrations.length} migrations recorded.`);
+      return;
     }
     console.log('Schema baseline is ready; applying pending TypeORM migrations.');
     const migrations = await dataSource.runMigrations({ transaction: 'each' });

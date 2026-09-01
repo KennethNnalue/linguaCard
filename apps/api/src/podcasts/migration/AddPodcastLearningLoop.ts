@@ -4,9 +4,20 @@ export class AddPodcastLearningLoop1787445000000 implements MigrationInterface {
   name = 'AddPodcastLearningLoop1787445000000';
   async up(queryRunner: QueryRunner): Promise<void> {
     await queryRunner.query('ALTER TABLE collections ADD COLUMN IF NOT EXISTS "sourcePodcastEpisodeId" varchar NULL');
-    await queryRunner.query('ALTER TABLE collections ADD CONSTRAINT fk_collections_podcast_episode FOREIGN KEY ("sourcePodcastEpisodeId") REFERENCES podcast_episodes(id) ON DELETE SET NULL');
+    await queryRunner.query(`
+      DO $$
+      BEGIN
+        IF NOT EXISTS (
+          SELECT 1 FROM pg_constraint WHERE conname = 'fk_collections_podcast_episode'
+        ) THEN
+          ALTER TABLE collections ADD CONSTRAINT fk_collections_podcast_episode
+            FOREIGN KEY ("sourcePodcastEpisodeId") REFERENCES podcast_episodes(id) ON DELETE SET NULL;
+        END IF;
+      END
+      $$
+    `);
     await queryRunner.query('CREATE UNIQUE INDEX IF NOT EXISTS uq_collections_user_podcast_episode ON collections ("userId", "sourcePodcastEpisodeId") WHERE "sourcePodcastEpisodeId" IS NOT NULL');
-    await queryRunner.query(`CREATE TABLE podcast_listening_progress (
+    await queryRunner.query(`CREATE TABLE IF NOT EXISTS podcast_listening_progress (
       id varchar PRIMARY KEY, "userId" varchar NOT NULL, "episodeId" varchar NOT NULL,
       "audioVersion" integer NOT NULL, "positionMs" integer NOT NULL DEFAULT 0,
       "completedAt" timestamptz NULL, "createdAt" timestamptz NOT NULL DEFAULT now(),

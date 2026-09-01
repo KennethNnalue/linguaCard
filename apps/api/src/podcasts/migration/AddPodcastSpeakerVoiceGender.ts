@@ -13,9 +13,18 @@ export class AddPodcastSpeakerVoiceGender1787446000000 implements MigrationInter
     await queryRunner.query(
       `ALTER TABLE podcast_speakers ALTER COLUMN "voiceGender" SET NOT NULL`,
     );
-    await queryRunner.query(
-      `ALTER TABLE podcast_speakers ADD CONSTRAINT ck_podcast_speaker_voice_gender CHECK ("voiceGender" IN ('female', 'male'))`,
-    );
+    await queryRunner.query(`
+      DO $$
+      BEGIN
+        IF NOT EXISTS (
+          SELECT 1 FROM pg_constraint WHERE conname = 'ck_podcast_speaker_voice_gender'
+        ) THEN
+          ALTER TABLE podcast_speakers ADD CONSTRAINT ck_podcast_speaker_voice_gender
+            CHECK ("voiceGender" IN ('female', 'male'));
+        END IF;
+      END
+      $$
+    `);
   }
 
   async down(queryRunner: QueryRunner): Promise<void> {
