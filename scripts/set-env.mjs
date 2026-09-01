@@ -12,6 +12,15 @@ if (!apiUrl) {
 }
 
 const file = 'apps/mobile/src/environments/environment.prod.ts';
-const updated = readFileSync(file, 'utf8').replace('%%API_URL%%', apiUrl);
+const source = readFileSync(file, 'utf8');
+const apiUrlProperty = /apiUrl:\s*['`][^'`]+['`]/;
+
+if (!apiUrlProperty.test(source)) {
+  console.error(`ERROR: Could not find apiUrl in ${file}.`);
+  process.exit(1);
+}
+
+const normalizedApiUrl = apiUrl.replace(/\/$/, '');
+const updated = source.replace(apiUrlProperty, `apiUrl: '${normalizedApiUrl}/api/v1'`);
 writeFileSync(file, updated);
-console.log(`environment.prod.ts → apiUrl set to ${apiUrl}`);
+console.log(`environment.prod.ts → apiUrl set to ${normalizedApiUrl}/api/v1`);

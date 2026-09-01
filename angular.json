@@ -80,6 +80,18 @@
               "sourceMap": true,
               "namedChunks": true
             },
+            "remote-development": {
+              "optimization": false,
+              "extractLicenses": false,
+              "sourceMap": true,
+              "namedChunks": true,
+              "fileReplacements": [
+                {
+                  "replace": "apps/mobile/src/environments/environment.ts",
+                  "with": "apps/mobile/src/environments/environment.remote-development.ts"
+                }
+              ]
+            },
             "ci": {
               "progress": false
             }
@@ -97,6 +109,9 @@
             },
             "development": {
               "buildTarget": "mobile:build:development"
+            },
+            "remote-development": {
+              "buildTarget": "mobile:build:remote-development"
             },
             "ci": {
               "progress": false

@@ -1,7 +1,7 @@
 services:
   - type: web
     name: linguacard-api
-    env: node
+    runtime: node
     region: oregon
     plan: free
     buildCommand: npm install --include=dev && npm run build:api
@@ -75,3 +75,90 @@ services:
         sync: false          # paste Gmail App Password in Render dashboard
       - key: SMTP_FROM
         value: noreply@linguacard.app
+
+  - type: web
+    name: linguacard-api-dev
+    runtime: node
+    region: oregon
+    plan: free
+    buildCommand: npm install --include=dev && npm run build:api
+    startCommand: npm run start:api:production
+    healthCheckPath: /api/v1/health
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: APP_ENV
+        value: development
+      - key: DATABASE_URL
+        fromDatabase:
+          name: linguacard-db-dev
+          property: connectionString
+      - key: CORS_ORIGIN
+        value: http://localhost:4200,http://localhost:8100
+      - key: JWT_SECRET
+        sync: false
+      - key: GEMINI_API_KEY
+        sync: false
+      - key: ANTHROPIC_API_KEY
+        sync: false
+      - key: OPENAI_API_KEY
+        sync: false
+      - key: AI_DEFAULT_PROVIDER
+        value: gemini
+      - key: OPENROUTER_API_KEY
+        sync: false
+      - key: OPENROUTER_VISION_MODEL
+        value: google/gemma-4-26b-a4b-it:free
+      - key: OPENROUTER_TEXT_MODEL
+        value: google/gemma-4-26b-a4b-it:free
+      - key: ENRICHMENT_MODEL
+        value: anthropic/claude-haiku-4-5
+      - key: STORY_MODEL_PRO
+        value: anthropic/claude-sonnet-4-6
+      - key: STORY_MODEL_FREE
+        value: google/gemini-2.5-flash
+      - key: GROQ_API_KEY
+        sync: false
+      - key: GOOGLE_CLOUD_TTS_KEY_BASE64
+        sync: false
+      - key: GOOGLE_CLOUD_TTS_VOICE
+        value: de-DE-Wavenet-B
+      - key: GOOGLE_CLOUD_TTS_LANGUAGE
+        value: de-DE
+      - key: ELEVENLABS_API_KEY
+        sync: false
+      - key: ELEVENLABS_DIALOGUE_MODEL
+        value: eleven_v3
+      - key: ELEVENLABS_FEMALE_VOICE_IDS
+        sync: false
+      - key: ELEVENLABS_MALE_VOICE_IDS
+        sync: false
+      - key: API_PUBLIC_URL
+        value: https://linguacard-api-dev.onrender.com
+      - key: R2_ACCOUNT_ID
+        sync: false
+      - key: R2_ACCESS_KEY_ID
+        sync: false
+      - key: R2_SECRET_ACCESS_KEY
+        sync: false
+      - key: R2_BUCKET
+        sync: false
+      - key: R2_PUBLIC_URL
+        sync: false
+      - key: SMTP_HOST
+        value: smtp.gmail.com
+      - key: SMTP_PORT
+        value: "587"
+      - key: SMTP_USER
+        sync: false
+      - key: SMTP_PASS
+        sync: false
+      - key: SMTP_FROM
+        value: noreply@linguacard.app
+
+databases:
+  - name: linguacard-db-dev
+    databaseName: linguacard_dev
+    user: linguacard_dev
+    region: oregon
+    plan: free
