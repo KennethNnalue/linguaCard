@@ -245,6 +245,10 @@ OUTPUT — valid JSON ONLY, no markdown fences, no commentary:
     });
   }
 
+  openPodcasts(): void {
+    void this.router.navigate(['/admin/podcasts']);
+  }
+
   loadCollections(): void {
     if (this.collectionsLoading()) return;
     this.collectionsLoading.set(true);

@@ -1,0 +1,34 @@
+<ion-content>
+  <main class="completion-page">
+    @if (store.isLoading()) { <p class="state">Preparing your recap…</p> }
+    @else if (store.error(); as error) { <p class="state">{{ error }}</p> }
+    @else if (store.completion(); as completion) {
+      <section class="scene">
+        <img [src]="completion.episode.thumbnail.heroUrl" [alt]="completion.episode.thumbnail.accessibilityDescription" [style.object-position]="(completion.episode.thumbnail.focalPoint.x * 100) + '% ' + (completion.episode.thumbnail.focalPoint.y * 100) + '%'" />
+        <div class="shade"></div><div class="scene-copy"><span>Episode complete</span><div class="check"><ion-icon name="checkmark" /></div><p>{{ completion.episode.topicTitle }}</p><h1>{{ completion.episode.title }}</h1><p class="translation">{{ completion.episode.titleTranslation }}</p></div>
+      </section>
+      <section class="actions">
+        <ion-button fill="outline" class="secondary" (click)="replay(completion.episode.id)">
+          <ion-icon slot="start" name="refresh" />
+          <span>Replay episode</span>
+        </ion-button>
+        @if (completion.nextEpisode; as next) {
+          <ion-button class="primary" (click)="openNext(next.id)">
+            <span class="action-copy"><small>Next episode</small><strong>{{ next.title }}</strong></span>
+            <ion-icon slot="end" name="arrow-forward" />
+          </ion-button>
+        } @else {
+          <ion-button class="primary" (click)="openTopic(completion.episode.topicId)">
+            <span class="action-copy"><small>Topic complete</small><strong>Back to {{ completion.episode.topicTitle }}</strong></span>
+            <ion-icon slot="end" name="arrow-forward" />
+          </ion-button>
+        }
+      </section>
+      <section class="recap"><span>Words in this conversation</span><h2>You heard vocabulary in context</h2><div class="words">
+        @for (word of completion.vocabulary; track word.lexemeId) {
+          <article><div><strong>{{ word.text }}</strong><p>{{ word.translation }}</p></div><small>{{ word.mastery === 'new' ? 'New to you' : word.mastery }}</small></article>
+        }
+      </div></section>
+    }
+  </main>
+</ion-content>

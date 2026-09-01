@@ -3,29 +3,19 @@ import * as dotenv from 'dotenv';
 import {NestFactory} from '@nestjs/core';
 import {NestExpressApplication} from '@nestjs/platform-express';
 import {ValidationPipe} from '@nestjs/common';
+import {json} from 'express';
 import {join} from 'path';
 import {AppModule} from './app.module';
+import {isAllowedOrigin} from './config/cors-origin';
 
 dotenv.config();
-
-const developmentWebOriginPattern =
-  /^http:\/\/(?:localhost|127\.0\.0\.1|10(?:\.\d{1,3}){3}|192\.168(?:\.\d{1,3}){2}|172\.(?:1[6-9]|2\d|3[01])(?:\.\d{1,3}){2}):(4200|8100)$/;
-
-function isAllowedOrigin(
-  origin: string,
-  configuredOrigins: readonly string[],
-  allowDevelopmentOrigins: boolean,
-): boolean {
-  return configuredOrigins.includes(origin)
-    || (allowDevelopmentOrigins && developmentWebOriginPattern.test(origin));
-}
 
 async function bootstrap() {
   const app = await NestFactory.create<NestExpressApplication>(AppModule);
 
   // Image import sends base64-encoded images in JSON.
   // 5 MB raw file → ~6.7 MB base64 + JSON overhead; set limit with headroom.
-  app.use(require('express').json({limit: '10mb'}));
+  app.use(json({limit: '10mb'}));
 
   app.setGlobalPrefix('api/v1');
   app.useGlobalPipes(new ValidationPipe({whitelist: true, transform: true}));

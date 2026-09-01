@@ -1,3 +1,7 @@
 ion-tab-bar.hide {
   display: none !important;
 }
+
+ion-tab-bar {
+  min-height: 56px;
+}

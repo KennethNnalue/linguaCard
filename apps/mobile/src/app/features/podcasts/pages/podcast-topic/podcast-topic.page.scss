@@ -1,0 +1,26 @@
+@use 'theme/tokens' as t;
+
+:host { --bg:#09130f; --surface:#102119; --text:#f4efe4; --muted:#91a095; --line:rgba(167,188,174,.2); }
+ion-content { --background:var(--bg); --color:var(--text); }
+.topic-page { position:relative; width:min(100%,780px); margin:auto; padding:18px 18px 90px; }
+.back { position:absolute; z-index:2; width:48px; height:48px; margin:14px; --background:rgba(9,19,15,.75); --border-color:rgba(255,255,255,.35); --border-style:solid; --border-width:1px; --color:white; }
+.topic-hero { position:relative; overflow:hidden; border-radius:t.$lc-radius-xl; background:var(--surface); }
+.topic-hero img { width:100%; aspect-ratio:16/9; object-fit:cover; }
+.topic-hero div { padding:20px; }
+.topic-hero span,.episodes ion-label span { color:var(--lc-ss-premium-star); font-size:t.$lc-text-xxs; text-transform:uppercase; }
+.topic-hero h1 { margin:6px 0; font-family:t.$lc-font-display; font-size:clamp(2rem,7vw,3.2rem); }
+.topic-hero p,.episodes small,.state { color:var(--muted); }
+.play-topic { margin:14px 0 0; --background:var(--lc-ss-sage); --color:#102119; --border-radius:#{t.$lc-radius-full}; font-weight:700; }
+.topic-actions { display:flex; flex-wrap:wrap; gap:8px; padding:0!important; }
+.topic-actions ion-button { margin:14px 0 0; --border-color:var(--line); --border-radius:#{t.$lc-radius-full}; --color:var(--text); font-weight:700; }
+.topic-actions .play-topic { --background:var(--lc-ss-sage); --color:#102119; }
+.episodes { margin-top:24px; }
+.episodes h2 { font-family:t.$lc-font-display; }
+.episodes ion-list { padding:0; background:transparent; }
+.episodes ion-item { --padding-start:0; --inner-padding-end:0; --background:transparent; --border-color:var(--line); --color:var(--text); }
+.episodes img { width:120px; aspect-ratio:16/9; border-radius:t.$lc-radius-md; object-fit:cover; }
+.episodes ion-label { display:grid; gap:5px; margin:14px 8px; }
+.episodes strong { font-size:t.$lc-text-md; }
+.episodes ion-icon { color:var(--muted); }
+
+@media(max-width:480px) { .episodes img { width:92px; } }

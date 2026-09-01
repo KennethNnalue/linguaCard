@@ -1,0 +1,52 @@
+<ion-content>
+  <main class="topic-page">
+    <ion-button class="back" fill="clear" shape="round" (click)="goBack()" aria-label="Back to podcasts">
+      <ion-icon slot="icon-only" name="arrow-back-outline" />
+    </ion-button>
+    @if (store.topic(); as topic) {
+      <header class="topic-hero">
+        <img [src]="topic.thumbnail.heroUrl" [alt]="topic.thumbnail.accessibilityDescription"
+          [style.object-position]="(topic.thumbnail.focalPoint.x*100)+'% '+(topic.thumbnail.focalPoint.y*100)+'%'" />
+        <div>
+          <span>{{ topic.minimumLevel }}–{{ topic.maximumLevel }} · {{ topic.episodeCount }} episodes</span>
+          <h1>{{ topic.title }}</h1>
+          <p>{{ topic.description }}</p>
+          @if (topic.episodes.length) {
+            <div class="topic-actions">
+            <ion-button class="play-topic" (click)="playTopic()">
+              <ion-icon slot="start" name="play" /> Play topic
+            </ion-button>
+            <ion-button fill="outline" (click)="shuffleTopic()">
+              <ion-icon slot="start" name="shuffle-outline" /> Shuffle
+            </ion-button>
+            <ion-button fill="outline" (click)="playTopic(true)">
+              <ion-icon slot="start" name="repeat-outline" /> Repeat
+            </ion-button>
+            </div>
+          }
+        </div>
+      </header>
+
+      <section class="episodes">
+        <h2>Episodes</h2>
+        <ion-list lines="full">
+          @for (episode of topic.episodes; track episode.id) {
+            <ion-item button detail="false" (click)="openEpisode(episode.id)">
+              <img slot="start" [src]="episode.thumbnail.cardUrl" [alt]="episode.thumbnail.accessibilityDescription" />
+              <ion-label>
+                <span>Episode {{ episode.position + 1 }} · {{ episode.level }} · {{ duration(episode.durationMs) }}</span>
+                <strong>{{ episode.title }}</strong>
+                <small>{{ episode.focusVocabularyCount }} focus words</small>
+              </ion-label>
+              <ion-icon slot="end" name="chevron-forward-outline" />
+            </ion-item>
+          }
+        </ion-list>
+      </section>
+    } @else if (store.isLoading()) {
+      <p class="state">Loading episodes…</p>
+    } @else {
+      <p class="state">{{ store.error() }}</p>
+    }
+  </main>
+</ion-content>

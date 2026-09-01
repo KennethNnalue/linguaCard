@@ -1,0 +1,78 @@
+<ion-content>
+  <main class="prep-page">
+    @if (store.preparation(); as prep) {
+      <header class="scene">
+        <img [src]="prep.episode.thumbnail.heroUrl" [alt]="prep.episode.thumbnail.accessibilityDescription" />
+        <ion-button class="back" fill="clear" shape="round" (click)="goBack(prep.episode.topicId)" aria-label="Back to topic">
+          <ion-icon slot="icon-only" name="arrow-back-outline" />
+        </ion-button>
+        <div>
+          <span>{{ prep.episode.topicTitle }} · {{ prep.episode.level }}</span>
+          <h1>{{ prep.episode.title }}</h1>
+          <p>{{ prep.episode.description }}</p>
+        </div>
+      </header>
+
+      <section class="readiness">
+        <div class="ring" [style.--progress]="prep.readiness.percent">
+          <strong>{{ prep.readiness.percent }}%</strong><span>ready</span>
+        </div>
+        <div>
+          <span>Before you listen</span>
+          <h2>
+            @switch (prep.readiness.recommendation) {
+              @case ('ready') { You’re ready for this conversation }
+              @case ('review_first') { A quick word review will help }
+              @default { Learn the essential words first }
+            }
+          </h2>
+          <p>Your current LinguaCard vocabulary progress is already included.</p>
+        </div>
+      </section>
+
+      <div class="actions">
+        <ion-button class="secondary" fill="outline" (click)="reviewWords()">
+          <ion-icon slot="start" name="school-outline" />
+          {{ prep.readiness.learnFirstCount ? 'Review ' + prep.readiness.learnFirstCount + ' essential words' : 'View vocabulary' }}
+        </ion-button>
+        <ion-button class="primary" (click)="listenNow()">
+          <ion-icon slot="start" name="play" /> Listen now
+        </ion-button>
+      </div>
+
+      @if (prep.readiness.learnFirstCount && !store.preparationCollectionId()) {
+        <ion-button class="learn-action" fill="outline" expand="block"
+          [disabled]="store.preparationMutationStatus()==='loading'" (click)="prepareWords(prep.episode.id)">
+          @if (store.preparationMutationStatus()==='loading') {
+            <ion-spinner slot="start" name="crescent" /> Preparing words…
+          } @else {
+            <ion-icon slot="start" name="library-outline" /> Add suggested words to my vault
+          }
+        </ion-button>
+      } @else if (store.preparationCollectionId()) {
+        <ion-button class="learn-action" fill="outline" expand="block" (click)="openPreparedCollection()">
+          <ion-icon slot="start" name="library-outline" /> Open podcast vocabulary collection
+        </ion-button>
+      }
+
+      @if (store.error()) { <p class="mutation-error" role="alert">{{ store.error() }}</p> }
+
+      <section #wordList class="words">
+        <h2>Essential vocabulary</h2>
+        @for(item of store.essentialVocabulary(); track item.lexemeId) {
+          <article><div><strong>{{ item.text }}</strong><span>{{ item.translation }}</span></div><small [attr.data-mastery]="item.mastery">{{ item.mastery }}</small></article>
+        }
+        @if(store.supportingVocabulary().length) {
+          <h2>Supporting vocabulary</h2>
+          @for(item of store.supportingVocabulary(); track item.lexemeId) {
+            <article><div><strong>{{ item.text }}</strong><span>{{ item.translation }}</span></div><small [attr.data-mastery]="item.mastery">{{ item.mastery }}</small></article>
+          }
+        }
+      </section>
+    } @else if(store.isLoading()) {
+      <p class="state"><ion-spinner name="crescent" /> Checking your vocabulary…</p>
+    } @else {
+      <p class="state">{{store.error()}}</p>
+    }
+  </main>
+</ion-content>

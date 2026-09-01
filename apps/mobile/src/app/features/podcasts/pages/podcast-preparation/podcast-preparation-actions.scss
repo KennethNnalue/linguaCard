@@ -1,0 +1,49 @@
+@use 'theme/tokens' as t;
+
+.learn-action {
+  width: calc(100% - 36px);
+  margin: 0 18px 18px;
+  --min-height: 52px;
+  --border-color: var(--lc-ss-premium-star);
+  --border-radius: #{t.$lc-radius-full};
+  --color: var(--lc-ss-premium-star);
+  font-weight: 700;
+}
+
+.learn-action:disabled { opacity: .5; }
+
+.actions ion-button {
+  --min-height: 56px;
+  --border-radius: #{t.$lc-radius-full};
+  margin: 0;
+  font-weight: 700;
+}
+
+.actions .primary {
+  --background: var(--lc-ss-sage);
+  --color: #102119;
+}
+
+.actions .secondary {
+  --border-color: var(--line);
+  --color: var(--text);
+}
+
+.scene .back {
+  position: absolute;
+  z-index: 3;
+  width: 48px;
+  height: 48px;
+  margin: 18px;
+  --background: rgba(9,19,15,.7);
+  --border-color: rgba(255,255,255,.4);
+  --border-style: solid;
+  --border-width: 1px;
+  --color: white;
+}
+
+.mutation-error {
+  margin: 0 18px 18px;
+  color: var(--ion-color-danger, #ef6b68);
+  text-align: center;
+}

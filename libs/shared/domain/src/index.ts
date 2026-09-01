@@ -1598,3 +1598,344 @@ export interface ShareNotificationList {
   pending: ShareNotification[];
   total: number;
 }
+
+// ─── PODCASTS ───────────────────────────────────────────────────────────────
+
+export type PodcastContentStatus = 'draft' | 'published' | 'archived';
+export type PodcastEpisodeStatus =
+  | 'draft'
+  | 'validating'
+  | 'queued'
+  | 'generating'
+  | 'ready_for_review'
+  | 'published'
+  | 'failed'
+  | 'archived';
+
+export interface PodcastThumbnail {
+  assetId: string;
+  cardUrl: string;
+  cardWidth: number;
+  cardHeight: number;
+  heroUrl: string;
+  heroWidth: number;
+  heroHeight: number;
+  accessibilityDescription: string;
+  focalPoint: { x: number; y: number };
+  version: number;
+}
+
+export interface AdminPodcastEpisodeListItem {
+  id: string;
+  topicId: string;
+  externalId: string;
+  title: string;
+  titleTranslation: string;
+  description: string;
+  level: CefrLevel;
+  position: number;
+  audioDurationMs: number;
+  audioUrl: string | null;
+  audioVersion: number;
+  generationError: string | null;
+  hasTranscript: boolean;
+  estimatedDurationMs: number;
+  status: PodcastEpisodeStatus;
+  thumbnail: PodcastThumbnail | null;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface PodcastWordTiming {
+  text: string;
+  startMs: number;
+  endMs: number;
+}
+
+export interface AdminGeneratePodcastAudioResult {
+  episodeId: string;
+  status: 'ready_for_review';
+  audioUrl: string;
+  audioDurationMs: number;
+  audioVersion: number;
+  turnCount: number;
+}
+
+export type PodcastVocabularyMastery = LearningStage;
+export type PodcastReadinessRecommendation = 'ready' | 'review_first' | 'learn_first';
+
+export interface PodcastLibraryEpisode {
+  id: string;
+  title: string;
+  titleTranslation: string;
+  level: CefrLevel;
+  position: number;
+  durationMs: number;
+  focusVocabularyCount: number;
+  thumbnail: PodcastThumbnail;
+}
+
+export interface PodcastLibraryTopic {
+  id: string;
+  title: string;
+  description: string;
+  targetLanguage: LanguageCode;
+  translationLanguage: LanguageCode;
+  minimumLevel: CefrLevel;
+  maximumLevel: CefrLevel;
+  episodeCount: number;
+  totalDurationMs: number;
+  thumbnail: PodcastThumbnail;
+}
+
+export type PodcastListeningStatus = 'in_progress' | 'completed';
+
+export interface PodcastEpisodeActivity {
+  episode: PodcastLibraryEpisode & {
+    topicId: string;
+    topicTitle: string;
+  };
+  positionMs: number;
+  progressPercent: number;
+  status: PodcastListeningStatus;
+  completedAt: string | null;
+  updatedAt: string;
+}
+
+export interface PodcastLibraryResponse {
+  topics: PodcastLibraryTopic[];
+  continueListening: PodcastEpisodeActivity | null;
+  recentEpisodes: PodcastEpisodeActivity[];
+}
+
+export interface PodcastTopicDetail extends PodcastLibraryTopic {
+  episodes: PodcastLibraryEpisode[];
+}
+
+export interface PodcastPreparationVocabulary {
+  lexemeId: string;
+  text: string;
+  translation: string;
+  importance: PodcastVocabularyImportance;
+  mastery: PodcastVocabularyMastery;
+  masteryWeight: number;
+  isInVault: boolean;
+}
+
+export interface PodcastEpisodePreparation {
+  episode: PodcastLibraryEpisode & {
+    topicId: string;
+    topicTitle: string;
+    description: string;
+    audioUrl: string;
+  };
+  readiness: {
+    percent: number;
+    recommendation: PodcastReadinessRecommendation;
+    learnFirstCount: number;
+  };
+  vocabulary: PodcastPreparationVocabulary[];
+}
+
+export interface PodcastEpisodeCompletion {
+  episode: PodcastLibraryEpisode & {
+    topicId: string;
+    topicTitle: string;
+  };
+  completedAt: string;
+  vocabulary: PodcastPreparationVocabulary[];
+  nextEpisode: PodcastLibraryEpisode | null;
+}
+
+export interface PodcastPlayerSpeaker {
+  id: string;
+  key: string;
+  name: string;
+}
+
+export interface PodcastPlayerTurn {
+  id: string;
+  speakerId: string;
+  position: number;
+  targetText: string;
+  translation: string;
+  startMs: number;
+  endMs: number;
+  wordTimings: PodcastWordTiming[];
+}
+
+export interface PodcastEpisodePlayer {
+  id: string;
+  topicId: string;
+  topicTitle: string;
+  title: string;
+  audioUrl: string;
+  audioDurationMs: number;
+  audioVersion: number;
+  thumbnail: PodcastThumbnail;
+  speakers: PodcastPlayerSpeaker[];
+  turns: PodcastPlayerTurn[];
+  progress: PodcastListeningProgress | null;
+  playbackContext: PodcastPlaybackContext;
+}
+
+export interface PodcastPlaybackContext {
+  firstEpisodeId: string;
+  previousEpisodeId: string | null;
+  nextEpisodeId: string | null;
+  nextTopic: {
+    id: string;
+    title: string;
+    firstEpisodeId: string;
+  } | null;
+}
+
+export interface PodcastListeningProgress {
+  episodeId: string;
+  audioVersion: number;
+  positionMs: number;
+  completedAt: string | null;
+  updatedAt: string;
+}
+
+export interface SavePodcastProgressDto {
+  audioVersion: number;
+  positionMs: number;
+  completed: boolean;
+}
+
+export interface PreparePodcastVocabularyResult {
+  collectionId: string;
+  addedCount: number;
+  reusedCount: number;
+}
+
+export interface AdminPodcastTopicListItem {
+  id: string;
+  externalId: string;
+  title: string;
+  description: string;
+  targetLanguage: LanguageCode;
+  translationLanguage: LanguageCode;
+  minimumLevel: CefrLevel;
+  maximumLevel: CefrLevel;
+  status: PodcastContentStatus;
+  thumbnail: PodcastThumbnail | null;
+  episodes: AdminPodcastEpisodeListItem[];
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface AdminCreatePodcastTopicDto {
+  externalId: string;
+  title: string;
+  description: string;
+  targetLanguage: LanguageCode;
+  translationLanguage: LanguageCode;
+  minimumLevel: CefrLevel;
+  maximumLevel: CefrLevel;
+}
+
+export interface AdminUpdatePodcastTopicDto {
+  title?: string;
+  description?: string;
+  minimumLevel?: CefrLevel;
+  maximumLevel?: CefrLevel;
+}
+
+export interface AdminCreatePodcastEpisodeDto {
+  externalId: string;
+  title: string;
+  titleTranslation: string;
+  description: string;
+  level: CefrLevel;
+  position?: number;
+}
+
+export type PodcastVocabularyImportance = 'essential' | 'supporting';
+export type PodcastVoiceGender = 'female' | 'male';
+
+export interface AdminPodcastTranscriptSpeakerInput {
+  key: string;
+  name: string;
+  voiceGender: PodcastVoiceGender;
+  voiceId?: string;
+}
+
+export interface AdminPodcastTranscriptTurnInput {
+  speakerKey: string;
+  targetText: string;
+  translation: string;
+  vocabularyRefs: string[];
+}
+
+export interface AdminPodcastTranscriptVocabularyInput {
+  key: string;
+  text: string;
+  translation: string;
+  importance: PodcastVocabularyImportance;
+}
+
+export interface AdminPodcastTranscriptEpisodeInput {
+  title: string;
+  titleTranslation: string;
+  description: string;
+}
+
+export interface AdminPodcastTranscriptPayload {
+  schemaVersion: 1;
+  episode?: AdminPodcastTranscriptEpisodeInput;
+  speakers: AdminPodcastTranscriptSpeakerInput[];
+  turns: AdminPodcastTranscriptTurnInput[];
+  vocabulary: AdminPodcastTranscriptVocabularyInput[];
+}
+
+export interface AdminPodcastTranscriptConflict {
+  code: 'duplicate-key' | 'unknown-reference' | 'unresolved-vocabulary'
+    | 'ambiguous-vocabulary' | 'translation-mismatch' | 'duration-limit' | 'provider-limit';
+  pointer: string;
+  severity: 'error';
+  message: string;
+  remediation: string;
+}
+
+export interface AdminPodcastVocabularyResolution {
+  key: string;
+  text: string;
+  lexemeId: string | null;
+  status: 'resolved' | 'new' | 'ambiguous';
+}
+
+export interface AdminPodcastTranscriptPreview {
+  episodeId: string;
+  episode: AdminPodcastTranscriptEpisodeInput | null;
+  fingerprint: string;
+  status: 'valid' | 'conflicts';
+  counts: {
+    speakers: number;
+    turns: number;
+    vocabulary: number;
+    resolvedVocabulary: number;
+    newVocabulary: number;
+  };
+  estimatedDurationMs: number;
+  conflicts: AdminPodcastTranscriptConflict[];
+  vocabulary: AdminPodcastVocabularyResolution[];
+}
+
+export interface AdminCommitPodcastTranscriptDto {
+  fingerprint: string;
+  payload: AdminPodcastTranscriptPayload;
+}
+
+export interface AdminCommitPodcastTranscriptResult {
+  episodeId: string;
+  title: string;
+  titleTranslation: string;
+  description: string;
+  fingerprint: string;
+  speakerCount: number;
+  turnCount: number;
+  vocabularyCount: number;
+  estimatedDurationMs: number;
+}

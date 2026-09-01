@@ -10,6 +10,7 @@ import {
 } from '@angular/core';
 import { Router } from '@angular/router';
 import { NavController } from '@ionic/angular';
+import type { ViewWillLeave } from '@ionic/angular';
 import { IonContent, IonHeader, IonToolbar, IonSpinner } from '@ionic/angular/standalone';
 import { TranslatePipe } from '@ngx-translate/core';
 import { PlayMode } from '@lingua-card/shared/domain';
@@ -33,7 +34,7 @@ import { ListenTransportComponent } from '../../components/listen-transport/list
     ListenTransportComponent,
   ],
 })
-export class NowPlayingPage {
+export class NowPlayingPage implements ViewWillLeave {
   protected readonly listenStore = inject(ListenStore);
   private readonly router = inject(Router);
   private readonly navCtrl = inject(NavController);
@@ -66,6 +67,12 @@ export class NowPlayingPage {
   readonly isPreparing = computed(() => this.listenStore.status() === 'loading');
 
   readonly progressPercent = this.listenStore.progressPercent;
+
+  ionViewWillLeave(): void {
+    if (this.listenStore.status() === 'complete') return;
+    this.listenStore.stopAudio();
+    this.listenStore.pause();
+  }
 
   readonly segmentViewModels = computed<SegmentViewModel[]>(() => {
     const script = this.listenStore.currentScript();

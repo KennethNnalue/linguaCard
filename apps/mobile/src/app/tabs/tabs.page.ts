@@ -14,11 +14,9 @@ import {
   volumeHighOutline
 } from 'ionicons/icons';
 
-// Routes where the tab bar should be hidden (player / complete screens)
-const HIDE_TAB_BAR_ROUTES = [
-  '/listen',
-  '/listen/now-playing',
-  '/listen/complete',
+const IMMERSIVE_PLAYER_ROUTES = [
+  /^\/listen\/now-playing(?:[/?#]|$)/,
+  /^\/podcasts\/episodes\/[^/]+\/player(?:[/?#]|$)/,
 ];
 
 @Component({
@@ -34,7 +32,10 @@ export class TabsPage {
 
   private readonly currentUrl = signal(this.router.url);
   readonly hideTabBar = computed(() =>
-    HIDE_TAB_BAR_ROUTES.some(r => this.currentUrl().startsWith(r))
+    IMMERSIVE_PLAYER_ROUTES.some(route => route.test(this.currentUrl()))
+  );
+  readonly isListenArea = computed(() =>
+    this.currentUrl().startsWith('/listen') || this.currentUrl().startsWith('/podcasts')
   );
 
   constructor() {

@@ -31,6 +31,7 @@ import { aiConfig } from './config/ai.config';
 import { EngagementModule } from './engagement/engagement.module';
 import { VocabularyModule } from './vocabulary/vocabulary.module';
 import { LearningItemsModule } from './learning-items/learning-items.module';
+import { PodcastsModule } from './podcasts/podcasts.module';
 
 @Module({
   imports: [
@@ -72,6 +73,7 @@ import { LearningItemsModule } from './learning-items/learning-items.module';
     PlatformCollectionsModule,
     DiscountCodesModule,
     SharesModule,
+    PodcastsModule,
     SeedModule,
   ],
   providers: [

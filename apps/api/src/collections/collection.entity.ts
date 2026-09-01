@@ -64,6 +64,10 @@ export class CollectionEntity {
   @Column({ type: 'varchar', nullable: true, default: null })
   sourcePlatformCollectionId!: string | null;
 
+  @Index('idx_collections_sourcePodcastEpisodeId')
+  @Column({ type: 'varchar', nullable: true, default: null })
+  sourcePodcastEpisodeId!: string | null;
+
   /** CEFR level carried from the source platform collection; null for hand-authored sets (LC-405). */
   @Column({ type: 'varchar', length: 4, nullable: true, default: null })
   level!: string | null;

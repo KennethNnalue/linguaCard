@@ -1,0 +1,209 @@
+<ion-header class="ion-no-border">
+  <ion-toolbar>
+    <div class="pod-admin-nav">
+      <button type="button" class="pod-icon-button" (click)="goBack()" aria-label="Back to admin">
+        <ion-icon name="arrow-back-outline" />
+      </button>
+      <div>
+        <span>Admin · Content studio</span>
+        <h1>Podcast topics</h1>
+      </div>
+      <button type="button" class="pod-icon-button" (click)="store.loadTopics()" aria-label="Refresh podcast topics">
+        <ion-icon name="refresh-outline" />
+      </button>
+    </div>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+  <main class="pod-admin-page">
+    @if (store.error(); as error) {
+      <div class="pod-error" role="alert">
+        <span>{{ error }}</span>
+        <button type="button" (click)="store.clearError()">Dismiss</button>
+      </div>
+    }
+    @if (store.success(); as success) {
+      <div class="pod-notification pod-notification--success" role="status">
+        <span>{{ success }}</span>
+        <button type="button" (click)="store.clearSuccess()">Dismiss</button>
+      </div>
+    }
+
+    <section class="pod-form-section">
+      <div class="pod-section-heading">
+        <div><span>Step 1</span><h2>Create a topic</h2></div>
+        <small>Create the topic once. If its external ID already exists, choose a different ID or continue with the existing topic below.</small>
+      </div>
+      <form [formGroup]="topicForm" (ngSubmit)="createTopic()" class="pod-form-grid">
+        <label>External ID<input formControlName="externalId" placeholder="at-the-cafe" /><small>Permanent unique key: lowercase letters, numbers, and hyphens. Example: at-the-cafe.</small></label>
+        <label>Title<input formControlName="title" placeholder="At the café" /></label>
+        <label class="pod-wide">Description<textarea formControlName="description" rows="3" placeholder="What learners will practise"></textarea></label>
+        <label>Target language<select formControlName="targetLanguage">@for (language of languages; track language) { <option [value]="language">{{ language.toUpperCase() }}</option> }</select></label>
+        <label>Translation language<select formControlName="translationLanguage">@for (language of languages; track language) { <option [value]="language">{{ language.toUpperCase() }}</option> }</select></label>
+        <label>Minimum level<select formControlName="minimumLevel">@for (level of levels; track level) { <option [value]="level">{{ level }}</option> }</select></label>
+        <label>Maximum level<select formControlName="maximumLevel">@for (level of levels; track level) { <option [value]="level">{{ level }}</option> }</select></label>
+        <button class="pod-primary pod-wide" type="submit" [disabled]="topicForm.invalid || store.isMutating()">Create topic draft</button>
+      </form>
+    </section>
+
+    <section class="pod-form-section">
+      <div class="pod-section-heading">
+        <div><span>Step 2</span><h2>Add an episode</h2></div>
+        <small>Select the draft topic, then create its first episode. Publication happens later after images, transcript, and audio are ready.</small>
+      </div>
+      <form [formGroup]="episodeForm" (ngSubmit)="createEpisode()" class="pod-form-grid">
+        <label class="pod-wide">Topic<select formControlName="topicId"><option value="">Choose a topic</option>@for (topic of store.topics(); track topic.id) { <option [value]="topic.id">{{ topic.title }} · {{ topic.episodes.length }} episodes</option> }</select></label>
+        <label>External ID<input formControlName="externalId" placeholder="cafe-ordering-01" /><small>Permanent unique key across all episodes. Example: cafe-ordering-01.</small></label>
+        <label>Level<select formControlName="level">@for (level of levels; track level) { <option [value]="level">{{ level }}</option> }</select></label>
+        <label>Title<input formControlName="title" placeholder="Ordering a drink" /></label>
+        <label>Title translation<input formControlName="titleTranslation" placeholder="Translation" /></label>
+        <label class="pod-wide">Description<textarea formControlName="description" rows="2"></textarea></label>
+        <button class="pod-primary pod-wide" type="submit" [disabled]="episodeForm.invalid || store.isMutating()">Add episode draft</button>
+      </form>
+    </section>
+
+    <section class="pod-transcript-guide">
+      <ion-icon name="information-circle-outline" aria-hidden="true" />
+      <div>
+        <strong>Transcript format: JSON</strong>
+        <p>JSON is required because speakers, dialogue turns, translations, and vocabulary references remain unambiguous and can be validated before audio generation. Plain text loses those relationships; PDF adds extraction errors and is not accepted.</p>
+        <small>Enter only an optional title and word list, copy the prompt, and ask an AI to return the JSON. Save it as a <b>.json</b> file and upload it; LinguaCard handles vocabulary reuse, new vocabulary, and provider voices.</small>
+      </div>
+    </section>
+
+    <section class="pod-library-section">
+      <div class="pod-section-heading">
+        <div><span>Library</span><h2>{{ store.topics().length }} topics · {{ store.episodeCount() }} episodes</h2></div>
+        <small>{{ store.draftTopicCount() }} draft topics</small>
+      </div>
+
+      @if (store.isLoading()) {
+        <p class="pod-muted">Loading podcast topics…</p>
+      } @else if (!store.topics().length) {
+        <p class="pod-empty">No podcast topics yet. Create the first draft above.</p>
+      } @else {
+        <div class="pod-topic-list">
+          @for (topic of store.topics(); track topic.id) {
+            <article class="pod-topic-card">
+              <div class="pod-topic-header">
+                <div class="pod-thumbnail pod-thumbnail--topic">
+                  @if (topic.thumbnail; as thumbnail) {
+                    <img [src]="thumbnail.cardUrl" [alt]="thumbnail.accessibilityDescription" [style.object-position]="(thumbnail.focalPoint.x * 100) + '% ' + (thumbnail.focalPoint.y * 100) + '%'" />
+                  } @else {
+                    <ion-icon name="image-outline" aria-hidden="true" />
+                  }
+                </div>
+                <div class="pod-topic-copy"><span>{{ topic.status }} · {{ topic.minimumLevel }}–{{ topic.maximumLevel }}</span><h3>{{ topic.title }}</h3><p>{{ topic.description }}</p></div>
+              </div>
+              <div class="pod-upload-row">
+                <label class="pod-scene-description">Topic image description<input #topicImageDescription type="text" autocomplete="off" [value]="topic.thumbnail?.accessibilityDescription ?? ''" placeholder="Example: Two people ordering at a café counter" /></label>
+                <label class="pod-upload-button"><ion-icon name="image-outline" /> {{ topic.thumbnail ? 'Replace topic image' : 'Upload topic image' }}<input type="file" accept="image/jpeg,image/png,image/webp" (change)="uploadTopicThumbnail(topic.id, $event, topicImageDescription.value)" /></label>
+              </div>
+
+              <div class="pod-episode-list">
+                @for (episode of topic.episodes; track episode.id) {
+                  <div class="pod-episode-row">
+                    <div class="pod-thumbnail pod-thumbnail--episode">
+                      @if (episode.thumbnail; as thumbnail) {
+                        <img [src]="thumbnail.cardUrl" [alt]="thumbnail.accessibilityDescription" [style.object-position]="(thumbnail.focalPoint.x * 100) + '% ' + (thumbnail.focalPoint.y * 100) + '%'" />
+                      } @else {
+                        <ion-icon name="mic-outline" aria-hidden="true" />
+                      }
+                    </div>
+                    <div><small>Episode {{ episode.position + 1 }} · {{ episode.level }} · {{ episode.status }}</small><strong>{{ episode.title }}</strong></div>
+                    <div class="pod-episode-upload">
+                      <input #episodeImageDescription type="text" autocomplete="off" aria-label="Episode image description" [value]="episode.thumbnail?.accessibilityDescription ?? ''" placeholder="Describe the episode scene" />
+                      <label><ion-icon name="image-outline" /><span>{{ episode.thumbnail ? 'Replace' : 'Upload' }}</span><input type="file" accept="image/jpeg,image/png,image/webp" (change)="uploadEpisodeThumbnail(episode.id, $event, episodeImageDescription.value)" /></label>
+                    </div>
+                    <div class="pod-transcript-import">
+                      <label class="pod-prompt-words">
+                        Episode brief and words (optional)
+                        <textarea #promptWords rows="4" placeholder="Title: Und was hast du gemacht&#10;Arbeit&#10;heiraten&#10;Hochzeit"></textarea>
+                        <small>An optional “Title:” line inspires a new episode title. Every other line becomes essential vocabulary.</small>
+                      </label>
+                      <button type="button" class="pod-copy-prompt" (click)="copyTranscriptPrompt(topic, episode, promptWords.value)">
+                        <ion-icon name="copy-outline" />
+                        <span>Copy AI prompt</span>
+                      </button>
+                      <label class="pod-transcript-file">
+                        <ion-icon name="document-text-outline" />
+                        <span>{{ episode.hasTranscript ? 'Replace transcript' : 'Upload transcript' }}</span>
+                        <input type="file" accept="application/json,.json" (change)="previewTranscript(episode.id, $event)" />
+                      </label>
+                      @if (episode.hasTranscript) {
+                        <small>Imported · {{ formatDuration(episode.estimatedDurationMs) }} estimated</small>
+                      }
+                    </div>
+                  </div>
+                  @if (store.transcriptEpisodeId() === episode.id) {
+                    @if (store.transcriptPreview(); as preview) {
+                      <div class="pod-transcript-preview" [class.pod-transcript-preview--error]="preview.status === 'conflicts'">
+                      <div>
+                        <strong>{{ preview.status === 'valid' ? 'Transcript imported automatically' : 'Transcript needs attention' }}</strong>
+                        @if (preview.episode; as proposedEpisode) {
+                          <span>Episode title: <b>{{ proposedEpisode.title }}</b> · {{ proposedEpisode.titleTranslation }}</span>
+                        }
+                        <span>{{ preview.counts.turns }} turns · {{ preview.counts.speakers }} speakers · {{ preview.counts.vocabulary }} words ready ({{ preview.counts.resolvedVocabulary }} reused, {{ preview.counts.newVocabulary }} new) · {{ formatDuration(preview.estimatedDurationMs) }}</span>
+                      </div>
+                      @if (preview.conflicts.length) {
+                        <ul>@for (conflict of preview.conflicts; track conflict.pointer + conflict.code) { <li><b>{{ conflict.pointer }}</b> — {{ conflict.message }} {{ conflict.remediation }}</li> }</ul>
+                      }
+                      </div>
+                    }
+                  }
+                  @if (episode.hasTranscript) {
+                    <div class="pod-audio-review">
+                      <div>
+                        <strong>Episode audio</strong>
+                        <span>ElevenLabs dialogue · maximum 5 minutes</span>
+                      </div>
+                      @if (episode.audioUrl) {
+                        <audio controls preload="metadata" [src]="episode.audioUrl"></audio>
+                      }
+                      <button
+                        type="button"
+                        class="pod-primary"
+                        [disabled]="!episode.thumbnail || episode.status === 'published' || store.audioGenerationStatus() === 'loading'"
+                        (click)="store.generateAudio(episode.id)"
+                      >
+                        @if (store.audioGenerationEpisodeId() === episode.id && store.audioGenerationStatus() === 'loading') {
+                          Generating…
+                        } @else {
+                          {{ episode.audioUrl ? 'Generate another take' : 'Generate audio' }}
+                        }
+                      </button>
+                      @if (!episode.thumbnail) { <small>Upload the episode scene image first.</small> }
+                      @if (episode.status === 'published') { <small>Published audio is locked to keep the live episode available.</small> }
+                      @if (episode.generationError) { <small class="pod-audio-error">{{ episode.generationError }}</small> }
+                      @if (episode.status === 'ready_for_review') {
+                        <button type="button" class="pod-publish" [disabled]="store.isMutating()" (click)="store.publishEpisode(episode.id)">Publish episode</button>
+                      }
+                    </div>
+                  }
+                }
+              </div>
+              @if (topic.status === 'draft') {
+                <div class="pod-topic-publish">
+                  <div>
+                    <strong>Final step · Publish topic</strong>
+                    @if (!topic.thumbnail) {
+                      <small>First upload the topic image.</small>
+                    } @else if (!topic.episodes.length) {
+                      <small>Next add an episode to this topic.</small>
+                    } @else if (!hasPublishedEpisode(topic)) {
+                      <small>Finish and publish at least one episode first.</small>
+                    } @else {
+                      <small>The topic image and a published episode are ready.</small>
+                    }
+                  </div>
+                  <button type="button" class="pod-publish" [disabled]="store.isMutating() || !topic.thumbnail || !hasPublishedEpisode(topic)" (click)="store.publishTopic(topic.id)">Publish topic</button>
+                </div>
+              }
+            </article>
+          }
+        </div>
+      }
+    </section>
+  </main>
+</ion-content>

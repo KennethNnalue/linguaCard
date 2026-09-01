@@ -1,4 +1,4 @@
-package io.ionic.starter;
+package com.anugw.linguacard.dev;
 
 import com.getcapacitor.BridgeActivity;
 

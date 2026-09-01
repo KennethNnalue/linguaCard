@@ -6,7 +6,7 @@ ion-content {
   display: flex;
   flex-direction: column;
   gap: 14px;
-  padding: 0 24px 32px;
+  padding: 0 24px calc(32px + env(safe-area-inset-bottom, 0px));
   min-height: 100%;
 }
 
@@ -14,7 +14,7 @@ ion-content {
 .auth-lang {
   display: flex;
   justify-content: flex-end;
-  padding-top: 16px;
+  padding-top: calc(16px + env(safe-area-inset-top, 0px));
 }
 
 /* ── Logo ─────────────────────────────────────────────────── */
@@ -241,5 +241,11 @@ ion-content {
     font-weight: 600;
     text-decoration: none;
     cursor: pointer;
+  }
+}
+
+@media (max-height: 760px) {
+  .auth-logo-area {
+    padding-block: 20px 12px;
   }
 }

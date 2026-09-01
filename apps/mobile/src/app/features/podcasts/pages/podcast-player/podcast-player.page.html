@@ -1,0 +1,78 @@
+<ion-content [scrollY]="false">
+  <main class="player">
+    @if (store.episode(); as episode) {
+      <img class="scene" [src]="episode.thumbnail.heroUrl" [alt]="episode.thumbnail.accessibilityDescription"
+        [style.object-position]="(episode.thumbnail.focalPoint.x * 100) + '% ' + (episode.thumbnail.focalPoint.y * 100) + '%'"
+        />
+      <div class="shade"></div>
+
+      <header>
+        <ion-button fill="clear" shape="round" (click)="goBack(episode.topicId)" aria-label="Back to topic">
+          <ion-icon slot="icon-only" name="arrow-back-outline" />
+        </ion-button>
+        <div><small>{{episode.topicTitle}}</small><strong>{{episode.title}}</strong></div>
+        <span class="header-spacer" aria-hidden="true"></span>
+      </header>
+
+      @if (store.currentTurn(); as turn) {
+        <section class="dialogue">
+          <span>{{speakerName(turn.speakerId)}}</span>
+          <p class="target">
+            @if(turn.wordTimings.length) {
+              @for(word of turn.wordTimings; track $index) {
+                <mark [class.active]="$index===store.activeWordIndex()">{{word.text}}</mark>
+              }
+            } @else { <span>{{turn.targetText}}</span> }
+          </p>
+          @if(store.showTranslation()) {
+            <p class="translation">{{turn.translation}}</p>
+          } @else if(store.translationMode()==='reveal') {
+            <ion-button fill="clear" size="small" (click)="store.revealTranslation()">Reveal translation</ion-button>
+          }
+        </section>
+      }
+
+      <section class="controls">
+        <ion-range min="0" [max]="episode.audioDurationMs" [value]="store.currentTimeMs()"
+          (ionKnobMoveEnd)="seek($event.detail.value)" aria-label="Episode position" />
+        <div class="times"><span>{{time(store.currentTimeMs())}}</span><span>-{{time(episode.audioDurationMs-store.currentTimeMs())}}</span></div>
+
+        <div class="transport">
+          <ion-button fill="outline" shape="round" (click)="rewind()" aria-label="Rewind ten seconds">
+            <ion-icon name="arrow-undo-outline" />
+            <span aria-hidden="true">10s</span>
+          </ion-button>
+          <ion-button class="play" shape="round" (click)="togglePlayback()" [attr.aria-label]="store.isPlaying() ? 'Pause' : 'Play'">
+            <ion-icon slot="icon-only" [name]="store.isPlaying() ? 'pause' : 'play'" />
+          </ion-button>
+          <ion-button fill="outline" shape="round" (click)="forward()" aria-label="Forward ten seconds">
+            <ion-icon name="arrow-redo-outline" />
+            <span aria-hidden="true">10s</span>
+          </ion-button>
+        </div>
+
+        <div class="secondary-controls">
+          <ion-button fill="clear" (click)="toggleRepeat()"
+            [class.active]="store.repeatMode() !== 'off'"
+            [attr.aria-pressed]="store.repeatMode() !== 'off'">
+            <ion-icon slot="start" name="repeat-outline" />
+            {{ store.repeatMode() === 'off' ? 'Repeat' : store.repeatMode() === 'topic' ? 'Repeat topic' : 'Repeat episode' }}
+          </ion-button>
+          <ion-button fill="clear" (click)="toggleSubtitles()"
+            [class.active]="store.translationMode() !== 'target'"
+            [attr.aria-pressed]="store.translationMode() !== 'target'">
+            <ion-icon slot="start" [name]="store.translationMode() === 'target' ? 'eye-outline' : 'eye-off-outline'" />
+            {{ store.translationMode() === 'target' ? 'Show subtitles' : 'Hide subtitles' }}
+          </ion-button>
+        </div>
+      </section>
+      @if(store.progressError()) { <p class="progress-error" role="alert">{{store.progressError()}}</p> }
+      <audio #audioPlayer preload="auto" [src]="episode.audioUrl" (loadedmetadata)="prepareAudio($event)" (canplay)="readyToPlay()"
+        (timeupdate)="timeChanged($event)" (play)="started()" (pause)="paused($event)" (ended)="completed()"></audio>
+    } @else if(store.status()==='loading') {
+      <p class="state">Loading conversation…</p>
+    } @else {
+      <p class="state">{{store.error()}}</p>
+    }
+  </main>
+</ion-content>

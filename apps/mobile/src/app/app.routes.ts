@@ -148,6 +148,31 @@ export const routes: Routes = [
           import('./features/listen/pages/listen-complete/listen-complete.page').then(m => m.ListenCompletePage),
       },
       {
+        path: 'podcasts',
+        loadComponent: () => import('./features/podcasts/pages/podcast-library/podcast-library.page')
+          .then(m => m.PodcastLibraryPage),
+      },
+      {
+        path: 'podcasts/topics/:topicId',
+        loadComponent: () => import('./features/podcasts/pages/podcast-topic/podcast-topic.page')
+          .then(m => m.PodcastTopicPage),
+      },
+      {
+        path: 'podcasts/episodes/:episodeId',
+        loadComponent: () => import('./features/podcasts/pages/podcast-preparation/podcast-preparation.page')
+          .then(m => m.PodcastPreparationPage),
+      },
+      {
+        path: 'podcasts/episodes/:episodeId/player',
+        loadComponent: () => import('./features/podcasts/pages/podcast-player/podcast-player.page')
+          .then(m => m.PodcastPlayerPage),
+      },
+      {
+        path: 'podcasts/episodes/:episodeId/complete',
+        loadComponent: () => import('./features/podcasts/pages/podcast-completion/podcast-completion.page')
+          .then(m => m.PodcastCompletionPage),
+      },
+      {
         path: 'stories',
         loadComponent: () =>
           import('./features/stories/pages/story-library/story-library.page').then(m => m.StoryLibraryPage),
@@ -203,6 +228,13 @@ export const routes: Routes = [
         canActivate: [AdminGuard],
         loadComponent: () =>
           import('./features/admin/pages/admin-discount-codes/admin-discount-codes.page').then(m => m.AdminDiscountCodesPage),
+      },
+      {
+        path: 'admin/podcasts',
+        canActivate: [AdminGuard],
+        loadComponent: () =>
+          import('./features/admin/podcasts/pages/admin-podcast-topics/admin-podcast-topics.page')
+            .then(m => m.AdminPodcastTopicsPage),
       },
       {
         path: 'notifications',

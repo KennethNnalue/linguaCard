@@ -1,6 +1,5 @@
 import {ChangeDetectionStrategy, Component, computed, effect, inject} from '@angular/core';
 import {ActivatedRoute, Router} from '@angular/router';
-import {NavController} from '@ionic/angular';
 import {IonContent, IonHeader, IonToolbar, ModalController, ViewWillEnter} from '@ionic/angular/standalone';
 import {PlayMode} from '@lingua-card/shared/domain';
 import {TranslatePipe, TranslateService} from '@ngx-translate/core';
@@ -40,7 +39,6 @@ export class ListenComponent implements ViewWillEnter {
   private readonly route = inject(ActivatedRoute);
   private readonly wordAudio = inject(WordAudioService);
   private readonly translate = inject(TranslateService);
-  private readonly = inject(NavController);
 
   readonly MODES = PLAY_MODE_OPTIONS;
   readonly SPEEDS = LISTEN_SPEEDS_EXTENDED;
@@ -120,6 +118,14 @@ export class ListenComponent implements ViewWillEnter {
 
   downloadOffline(): void {
     void this.listenStore.downloadQueueForOffline();
+  }
+
+  openPodcasts(): void {
+    this.wordAudio.stop();
+    if (this.listenStore.status() === 'playing' || this.listenStore.status() === 'loading') {
+      this.listenStore.pause();
+    }
+    void this.router.navigate(['/podcasts']);
   }
 
   cycleSpeed(): void {

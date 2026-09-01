@@ -594,6 +594,38 @@ Use it when parent and child conceptually share an editable value.
 
 # 21. Template Logic
 
+## Ionic-First UI Components and Icons
+
+For Ionic application screens, use Ionic components whenever they provide the
+required semantics and interaction.
+
+Prefer components such as:
+
+- `ion-button` for actions
+- `ion-icon` with registered Ionicons for icons
+- `ion-range` for media progress and sliders
+- `ion-list`, `ion-item`, and `ion-label` for lists
+- `ion-card` for card-like surfaces
+- `ion-toggle`, `ion-checkbox`, and `ion-radio` for selection controls
+- `ion-spinner`, `ion-progress-bar`, `ion-toast`, and `ion-alert` for feedback
+- `ion-header`, `ion-toolbar`, `ion-title`, and `ion-content` for page structure
+
+Do not recreate an Ionic component with a raw HTML element and custom styling
+when the Ionic component supports the necessary behavior and accessibility.
+
+Use a native HTML element when it provides semantics or capabilities that the
+available Ionic components do not, such as the HTML media elements used for
+audio and video playback.
+
+Use Ionicons instead of Unicode symbols, emoji, text glyphs, or improvised CSS
+icons whenever a suitable Ionicon exists. Register only the icons used by the
+component or feature. Every icon-only action must have an accessible label.
+
+Do not select an Ionic component solely for visual appearance. Preserve the
+correct semantic element and interaction behavior.
+
+---
+
 Templates should remain declarative.
 
 Acceptable:
