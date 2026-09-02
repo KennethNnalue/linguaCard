@@ -51,6 +51,25 @@ export type AdoptEvent =
   | { type: 'success'; result: AdoptPlatformCollectionResult }
   | { type: 'error' };
 
+export function applyAdoptionToDetailCache(
+  cache: Readonly<Record<string, PlatformCollectionDetail>>,
+  collectionId: string,
+  result: AdoptPlatformCollectionResult,
+): Record<string, PlatformCollectionDetail> {
+  const detail = cache[collectionId];
+  if (!detail) return {...cache};
+
+  return {
+    ...cache,
+    [collectionId]: {
+      ...detail,
+      adoptionStatus: 'adopted',
+      adoptedCollectionId: result.collection.id,
+      words: detail.words.map(word => ({...word, knownToUser: true})),
+    },
+  };
+}
+
 interface PlatformCollectionState {
   collections: PlatformCollectionSummary[];
   levelCounts: Record<CefrLevel, number>;
@@ -196,11 +215,6 @@ export const PlatformCollectionStore = signalStore(
           switchMap(id =>
             api.adopt(id).pipe(
               tap(result => {
-                const cache = store.detailCache();
-                // Drop the detail cache entry so next visit re-fetches with
-                // accurate per-word knownToUser flags post-adoption.
-                const { [id]: _dropped, ...remainingCache } = cache;
-                void _dropped;
                 patchState(store, {
                   adoptingId: null,
                   lastAdoptEvent: { type: 'success', result },
@@ -209,7 +223,7 @@ export const PlatformCollectionStore = signalStore(
                       ? { ...c, adoptionStatus: 'adopted', adoptedCollectionId: result.collection.id }
                       : c,
                   ),
-                  detailCache: remainingCache,
+                  detailCache: applyAdoptionToDetailCache(store.detailCache(), id, result),
                 });
                 refreshPersonalLibrary();
               }),
@@ -231,9 +245,6 @@ export const PlatformCollectionStore = signalStore(
         patchState(store, { adoptingId: id, lastAdoptEvent: null });
         try {
           const result = await firstValueFrom(api.adopt(id));
-          const cache = store.detailCache();
-          const { [id]: _dropped, ...remainingCache } = cache;
-          void _dropped;
           const event: AdoptEvent = { type: 'success', result };
           patchState(store, {
             adoptingId: null,
@@ -243,7 +254,7 @@ export const PlatformCollectionStore = signalStore(
                 ? { ...c, adoptionStatus: 'adopted', adoptedCollectionId: result.collection.id }
                 : c,
             ),
-            detailCache: remainingCache,
+            detailCache: applyAdoptionToDetailCache(store.detailCache(), id, result),
           });
           refreshPersonalLibrary();
           return event;

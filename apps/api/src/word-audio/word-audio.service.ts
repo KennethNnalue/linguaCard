@@ -79,8 +79,11 @@ export class WordAudioService {
     const existing = await this.repo.findByNormalizedText(normalizedText, language);
 
     if (existing?.status === 'ready') {
-      await this.projectToSpeechAsset(existing);
-      return { wordAudio: this.toModel(existing), cached: true };
+      const available = await this.verifyReadyAsset(existing);
+      if (available) {
+        await this.projectToSpeechAsset(available);
+        return { wordAudio: this.toModel(available), cached: true };
+      }
     }
 
     // Cache-read-only mode (non-Pro callers): never trigger generation. Return the
@@ -192,6 +195,11 @@ export class WordAudioService {
     const existingMap = new Map(
       existingArrays.flat().map(e => [`${e.language}:${e.normalizedText}`, e]),
     );
+    const missingReadyAssets = new Set<string>();
+    await Promise.all([...existingMap.entries()].map(async ([key, entity]) => {
+      if (entity.status !== 'ready') return;
+      if (!await this.verifyReadyAsset(entity)) missingReadyAssets.add(key);
+    }));
 
     const resultMap = new Map<string, WordAudioResolveResponse>();
     let generated = 0;
@@ -204,7 +212,7 @@ export class WordAudioService {
     if (!generate) {
       for (const n of normalized) {
         const e = existingMap.get(`${n.language}:${n.normalizedText}`);
-        if (e?.status === 'ready') {
+        if (e?.status === 'ready' && !missingReadyAssets.has(`${n.language}:${n.normalizedText}`)) {
           resultMap.set(`${n.language}:${n.normalizedText}`, { wordAudio: this.toModel(e), cached: true });
           reused++;
         } else {
@@ -225,11 +233,13 @@ export class WordAudioService {
     // absent    → must generate
     const needsGeneration = normalized.filter(n => {
       const e = existingMap.get(`${n.language}:${n.normalizedText}`);
-      return !e || e.status === 'failed';
+      return !e || e.status === 'failed' || missingReadyAssets.has(`${n.language}:${n.normalizedText}`);
     });
     const alreadyHandled = normalized.filter(n => {
       const e = existingMap.get(`${n.language}:${n.normalizedText}`);
-      return e && (e.status === 'ready' || e.status === 'pending');
+      return e
+        && !missingReadyAssets.has(`${n.language}:${n.normalizedText}`)
+        && (e.status === 'ready' || e.status === 'pending');
     });
 
     for (const n of alreadyHandled) {
@@ -323,6 +333,28 @@ export class WordAudioService {
 
     const speech = await this.gemini.generateSpeech({ text: displayText, language });
     return { audioBuffer: speech.audioBuffer, durationMs: speech.durationMs, mimeType: speech.mimeType };
+  }
+
+  private async verifyReadyAsset(entity: WordAudioEntity): Promise<WordAudioEntity | null> {
+    if (!entity.storagePath) return entity.audioUrl ? entity : null;
+
+    const availableUrl = await this.storage.getUrlIfExists(entity.storagePath);
+    if (!availableUrl) {
+      this.logger.warn(
+        `Cached audio object is missing from storage; regenerating ${entity.language}:${entity.normalizedText}`,
+      );
+      entity.status = 'pending';
+      entity.audioUrl = null;
+      entity.failedAt = null;
+      await this.repo.save(entity);
+      return null;
+    }
+
+    if (entity.audioUrl !== availableUrl) {
+      entity.audioUrl = availableUrl;
+      await this.repo.save(entity);
+    }
+    return entity;
   }
 
   private async generateAndPersist(

@@ -5,7 +5,6 @@ import type { OnboardingMotivation, OnboardingLevel, PlatformCollectionSummary }
 import { SUGGESTED_DAILY_GOAL } from '@lingua-card/shared/domain';
 import { SettingsStore } from '../../settings/store/settings.store';
 import { PlatformCollectionStore } from '../../vault/store/platform-collection.store';
-import { CardStore } from '../../vault/store/card.store';
 
 interface OnboardingState {
   step: number;
@@ -44,7 +43,6 @@ export const OnboardingStore = signalStore(
   withMethods((store) => {
     const settings = inject(SettingsStore);
     const platformStore = inject(PlatformCollectionStore);
-    const cardStore = inject(CardStore);
     const router = inject(Router);
 
     const persistStep = async (step: number): Promise<void> => {
@@ -99,7 +97,6 @@ export const OnboardingStore = signalStore(
             isSeeding: false,
             seededCount: event.result.addedCount,
           });
-          cardStore.loadCards();
         } else {
           patchState(store, { isSeeding: false, seedError: 'adopt_failed' });
         }
