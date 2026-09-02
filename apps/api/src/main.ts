@@ -6,7 +6,7 @@ import {ValidationPipe} from '@nestjs/common';
 import {json} from 'express';
 import {join} from 'path';
 import {AppModule} from './app.module';
-import {isAllowedOrigin} from './config/cors-origin';
+import {isAllowedOrigin, shouldAllowDevelopmentOrigins} from './config/cors-origin';
 
 dotenv.config();
 
@@ -24,7 +24,10 @@ async function bootstrap() {
     ?.split(',')
     .map(origin => origin.trim())
     .filter(Boolean) ?? [];
-  const allowDevelopmentOrigins = process.env['NODE_ENV'] !== 'production';
+  const allowDevelopmentOrigins = shouldAllowDevelopmentOrigins(
+    process.env['NODE_ENV'],
+    process.env['APP_ENV'],
+  );
 
   // CORS must be enabled before useStaticAssets so that fetch() calls from the
   // web client (http://localhost:4200) can download audio files for IndexedDB
