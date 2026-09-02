@@ -6,6 +6,7 @@ import { generateUuid } from '@lingua-card/shared/utils';
 import type { SyncHandler } from '../models/sync-handler.model';
 import type { DataRefresher } from '../models/data-refresher.model';
 import { AuthService } from './auth.service';
+import { environment } from '../../../environments/environment';
 
 export type SyncOperationType =
   | 'CREATE_CARD'
@@ -38,7 +39,9 @@ export interface SyncResult {
   ts: string;
 }
 
-const QUEUE_KEY = 'lc_sync_queue';
+const QUEUE_KEY = environment.production
+  ? 'lc_sync_queue'
+  : `lc_sync_queue:${environment.storageNamespace}`;
 const MAX_RETRIES = 5;
 const DEBOUNCE_MS = 10_000;
 

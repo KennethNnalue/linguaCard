@@ -28,8 +28,9 @@ export interface RegisterPayload {
   password: string;
 }
 
-const TOKEN_KEY = 'lc-token';
-const USER_KEY = 'lc-user';
+const STORAGE_SUFFIX = environment.production ? '' : `:${environment.storageNamespace}`;
+const TOKEN_KEY = `lc-token${STORAGE_SUFFIX}`;
+const USER_KEY = `lc-user${STORAGE_SUFFIX}`;
 
 @Injectable({ providedIn: 'root' })
 export class AuthService {

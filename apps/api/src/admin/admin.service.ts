@@ -499,7 +499,7 @@ export class AdminService {
       if (word.article !== null && !['der', 'die', 'das'].includes(word.article)) {
         throw new BadRequestException(`words[${index}].article must be der, die, das, or null`);
       }
-      if (word.plural !== null && typeof word.plural !== 'string') {
+      if (word.plural !== undefined && word.plural !== null && typeof word.plural !== 'string') {
         throw new BadRequestException(`words[${index}].plural must be a string or null`);
       }
       if (!word.cefrLevel || !['A1', 'A2', 'B1', 'B2', 'C1'].includes(word.cefrLevel)) {
@@ -516,11 +516,12 @@ export class AdminService {
         || typeof example.native !== 'string' || !example.native.trim()) {
         throw new BadRequestException(`words[${index}].examples[0] must contain target and native text`);
       }
-      if (!Array.isArray(word.synonyms) || word.synonyms.length === 0) {
-        throw new BadRequestException(`words[${index}].synonyms must contain at least one synonym`);
+      if (word.synonyms !== undefined && !Array.isArray(word.synonyms)) {
+        throw new BadRequestException(`words[${index}].synonyms must be an array`);
       }
-      for (let synonymIndex = 0; synonymIndex < word.synonyms.length; synonymIndex += 1) {
-        const synonym = word.synonyms[synonymIndex];
+      const synonyms = word.synonyms ?? [];
+      for (let synonymIndex = 0; synonymIndex < synonyms.length; synonymIndex += 1) {
+        const synonym = synonyms[synonymIndex];
         if (typeof synonym.word !== 'string' || !synonym.word.trim()
           || typeof synonym.translation !== 'string' || !synonym.translation.trim()) {
           throw new BadRequestException(
@@ -533,8 +534,9 @@ export class AdminService {
             `words[${index}].synonyms[${synonymIndex}].article must be der, die, das, or null`,
           );
         }
-        if (typeof synonym.example !== 'string' || !synonym.example.trim()
-          || typeof synonym.exampleNative !== 'string' || !synonym.exampleNative.trim()) {
+        const hasExample = synonym.example !== undefined || synonym.exampleNative !== undefined;
+        if (hasExample && (typeof synonym.example !== 'string' || !synonym.example.trim()
+          || typeof synonym.exampleNative !== 'string' || !synonym.exampleNative.trim())) {
           throw new BadRequestException(
             `words[${index}].synonyms[${synonymIndex}] must contain example and exampleNative text`,
           );

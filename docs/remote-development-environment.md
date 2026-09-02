@@ -27,6 +27,13 @@ point `linguacard-api-dev` at the production `DATABASE_URL`.
    bucket.
 6. Wait for `/api/v1/health` to return `{ "status": "ok" }`.
 
+The startup log reports disabled integrations explicitly. Configure
+`GEMINI_API_KEY` and `OPENROUTER_API_KEY` for AI/import flows,
+`GOOGLE_CLOUD_TTS_KEY_BASE64` for generated audio, and the three `VAPID_*`
+values for push notifications. Generate the VAPID pair with
+`npx web-push generate-vapid-keys`. These values cannot be supplied from the
+repository because they are secrets.
+
 The first API startup creates the schema in the empty dev database and applies
 all TypeORM migrations. Platform starter content is idempotently seeded. User
 accounts and user-owned production records are not copied.
@@ -50,6 +57,18 @@ To make a distributable development build:
 ```bash
 npm run build:remote-dev
 ```
+
+For the native iOS project, build and sync the hosted-API configuration before
+running the app from Xcode:
+
+```bash
+npm run build:ios:remote-dev
+```
+
+`npm run build:ios:dev` deliberately remains the local-backend configuration
+and points the embedded client at port 3001. Existing installs can also retain
+an access token issued by another backend. Sign out and register or sign in on
+the dev environment after installing the remote-development build.
 
 ## CORS and hosted development clients
 

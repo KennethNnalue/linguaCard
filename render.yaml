@@ -155,6 +155,12 @@ services:
         sync: false
       - key: SMTP_FROM
         value: noreply@linguacard.app
+      - key: VAPID_PUBLIC_KEY
+        sync: false
+      - key: VAPID_PRIVATE_KEY
+        sync: false
+      - key: VAPID_SUBJECT
+        sync: false
 
 databases:
   - name: linguacard-db-dev
