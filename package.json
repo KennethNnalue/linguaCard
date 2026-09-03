@@ -12,6 +12,8 @@
     "start": "ng serve --project=mobile",
     "start:remote-dev": "ng serve --project=mobile --configuration remote-development",
     "build": "ng build --project=mobile",
+    "build:stats": "ng build --project=mobile --configuration=production --stats-json && npm run bundle:report",
+    "bundle:report": "node scripts/report-mobile-bundle.mjs",
     "build:remote-dev": "ng build --project=mobile --configuration remote-development",
     "watch": "ng build --project=mobile --watch --configuration development",
     "build:cap": "ng build --project=mobile --configuration production && npx cap sync",

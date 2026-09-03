@@ -4,7 +4,6 @@ import { bootstrapApplication } from '@angular/platform-browser';
 import { provideAnimations } from '@angular/platform-browser/animations';
 import { provideHttpClient, withFetch, withInterceptors } from '@angular/common/http';
 import {
-  PreloadAllModules,
   provideRouter,
   RouteReuseStrategy,
   withPreloading,
@@ -24,11 +23,11 @@ import { routes } from './app/app.routes';
 import { AppComponent } from './app/app.component';
 import { authInterceptor } from './app/core/interceptors/auth.interceptor';
 import { LanguageService } from './app/core/services/language.service';
-import { provideAi } from './app/features/ai/ai.providers';
 import { provideVault } from './app/features/vault/vault.providers';
 import { provideStories } from './app/features/stories/stories.providers';
 import { provideReview } from './app/features/review/review.providers';
 import { provideSettings } from './app/features/settings/settings.providers';
+import { SelectivePreloadingStrategy } from './app/core/routing/selective-preloading.strategy';
 
 registerLocaleData(localeEs, 'es');
 registerLocaleData(localeTr, 'tr');
@@ -58,7 +57,7 @@ bootstrapApplication(AppComponent, {
     { provide: RouteReuseStrategy, useClass: IonicRouteStrategy },
     provideIonicAngular(),
     provideHttpClient(withFetch(), withInterceptors([authInterceptor])),
-    provideRouter(routes, withPreloading(PreloadAllModules)),
+    provideRouter(routes, withPreloading(SelectivePreloadingStrategy)),
     provideServiceWorker('ngsw-worker.js', {
       enabled: !isDevMode(),
       registrationStrategy: 'registerWhenStable:30000',
@@ -79,7 +78,6 @@ bootstrapApplication(AppComponent, {
     // pipe ever renders against an empty store (which would stick on raw keys
     // in production where the JSON arrives after the first render).
     provideAppInitializer(() => inject(LanguageService).initialize()),
-    provideAi(),
     provideVault(),
     provideStories(),
     provideReview(),

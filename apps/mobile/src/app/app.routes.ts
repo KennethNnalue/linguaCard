@@ -33,6 +33,7 @@ export const routes: Routes = [
       },
       {
         path: 'vault',
+        data: { preload: true },
         loadComponent: () =>
           import('./features/vault/pages/vault/vault.page').then(m => m.VaultPage),
       },
@@ -87,6 +88,7 @@ export const routes: Routes = [
       },
       {
         path: 'review',
+        data: { preload: true },
         loadComponent: () =>
           import('./features/review/pages/review-hub/review-hub.page').then(m => m.ReviewHubPage),
       },
@@ -134,6 +136,7 @@ export const routes: Routes = [
       },
       {
         path: 'listen',
+        data: { preload: true },
         loadComponent: () =>
           import('./features/listen/pages/listen/listen.component').then(m => m.ListenComponent),
       },
@@ -174,6 +177,7 @@ export const routes: Routes = [
       },
       {
         path: 'stories',
+        data: { preload: true },
         loadComponent: () =>
           import('./features/stories/pages/story-library/story-library.page').then(m => m.StoryLibraryPage),
       },
