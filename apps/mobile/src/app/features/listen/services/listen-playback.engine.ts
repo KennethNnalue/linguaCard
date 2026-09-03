@@ -8,6 +8,7 @@ import {
   PlayerStatus,
 } from '@lingua-card/shared/domain';
 import { WordAudioService } from '../../../shared/audio/word-audio.service';
+import {NativeTranslationSpeechService} from './native-translation-speech.service';
 import {
   LISTEN_PREFETCH_WINDOW,
   OfflineDownloadStatus,
@@ -18,6 +19,10 @@ import {
 interface TaggedSegment {
   segment: AudioSegment;
   generation: number;
+}
+
+export function usesNativeTranslationSpeech(segment: AudioSegment): boolean {
+  return segment.type === 'word_native' || segment.type === 'example_native';
 }
 
 /**
@@ -68,6 +73,7 @@ export interface PlaybackStatePatch {
 @Injectable({ providedIn: 'root' })
 export class ListenPlaybackEngine {
   private readonly wordAudio = inject(WordAudioService);
+  private readonly nativeTranslationSpeech = inject(NativeTranslationSpeechService);
   private readonly destroyRef = inject(DestroyRef);
 
   private host!: PlaybackHost;
@@ -171,8 +177,8 @@ export class ListenPlaybackEngine {
   }
 
   // ── Prefetch ──────────────────────────────────────────────────────────────
-  // Pre-warm every spoken segment in a sliding window so target and native audio
-  // are equally reliable when the sequence reaches them.
+  // Pre-warm persisted target-language clips. Translation segments use the
+  // platform speech engine and therefore have no server asset to prepare.
 
   resetPrefetch(): void {
     this.prefetchedIndices.clear();
@@ -180,7 +186,7 @@ export class ListenPlaybackEngine {
 
   audioItemsForScript(script: PlaybackScript): { text: string; language: string }[] {
     return script.segments
-      .filter(segment => segment.type !== 'silence')
+      .filter(segment => segment.type !== 'silence' && !usesNativeTranslationSpeech(segment))
       .map(segment => ({ text: segment.text, language: segment.language }));
   }
 
@@ -245,6 +251,7 @@ export class ListenPlaybackEngine {
   /** Stop web-speech + hard-abort any in-flight utterance, then bump generation. */
   private abort(): number {
     this.wordAudio.stop();
+    this.nativeTranslationSpeech.stop();
     return ++this.generation;
   }
 
@@ -275,6 +282,11 @@ export class ListenPlaybackEngine {
           }
           // Read speed live so a mid-session change takes effect from the next segment.
           const rate = this.host.settings().speed;
+          if (usesNativeTranslationSpeech(segment)) {
+            return from(this.nativeTranslationSpeech.speak(segment.text, segment.language, rate)).pipe(
+              map(() => generation),
+            );
+          }
           return from(this.wordAudio.playRequired(segment.text, segment.language, rate)).pipe(
             map(() => generation),
           );

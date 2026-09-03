@@ -52,6 +52,7 @@
     "@angular/service-worker": "^21.2.22",
     "@anthropic-ai/sdk": "^0.100.1",
     "@aws-sdk/client-s3": "^3.1057.0",
+    "@capacitor-community/text-to-speech": "^8.0.2",
     "@capacitor/android": "8.3.1",
     "@capacitor/app": "8.1.0",
     "@capacitor/camera": "^8.2.0",

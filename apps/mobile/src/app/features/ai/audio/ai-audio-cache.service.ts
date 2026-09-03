@@ -7,9 +7,29 @@ const WEB_DB_NAME    = 'lc-audio-cache';
 const WEB_DB_VERSION = 1;
 const WEB_STORE_NAME = 'audio-blobs';
 
+interface CachedWebAudio {
+  buffer: ArrayBuffer;
+  mimeType: string;
+}
+
+export function audioExtensionFromUrl(url: string): 'wav' | 'mp3' {
+  try {
+    return new URL(url).pathname.toLowerCase().endsWith('.mp3') ? 'mp3' : 'wav';
+  } catch {
+    return url.toLowerCase().split(/[?#]/, 1)[0].endsWith('.mp3') ? 'mp3' : 'wav';
+  }
+}
+
+export function detectAudioMimeType(buffer: ArrayBuffer): string {
+  const bytes = new Uint8Array(buffer, 0, Math.min(buffer.byteLength, 12));
+  const startsWithId3 = bytes[0] === 0x49 && bytes[1] === 0x44 && bytes[2] === 0x33;
+  const startsWithMp3Frame = bytes[0] === 0xff && (bytes[1] & 0xe0) === 0xe0;
+  return startsWithId3 || startsWithMp3Frame ? 'audio/mpeg' : 'audio/wav';
+}
+
 @Injectable({ providedIn: 'root' })
 export class AiAudioCacheService {
-  private readonly CACHE_DIR = 'ai-audio';
+  private readonly CACHE_DIR = 'ai-audio-v2';
 
   private get isNative(): boolean {
     return Capacitor.getPlatform() !== 'web';
@@ -48,10 +68,11 @@ export class AiAudioCacheService {
   async saveFromUrl(
     cacheKey: string,
     remoteUrl: string,
-    ext: 'wav' | 'mp3' = 'wav',
+    ext?: 'wav' | 'mp3',
   ): Promise<string | null> {
+    const resolvedExt = ext ?? audioExtensionFromUrl(remoteUrl);
     if (this.isNative) {
-      return this._nativeSaveFromUrl(cacheKey, remoteUrl, ext);
+      return this._nativeSaveFromUrl(cacheKey, remoteUrl, resolvedExt);
     }
 
     // Web: check session map and IndexedDB first to avoid re-downloading.
@@ -59,9 +80,9 @@ export class AiAudioCacheService {
     if (cached) return cached;
 
     try {
-      const buffer  = await this._fetchBuffer(remoteUrl);
-      const blobUrl = this._makeBlobUrl(buffer, remoteUrl);
-      await this._webPut(cacheKey, buffer);
+      const audio = await this._fetchAudio(remoteUrl, resolvedExt);
+      const blobUrl = this._makeBlobUrl(audio.buffer, audio.mimeType);
+      await this._webPut(cacheKey, audio);
       this._blobUrlMap.set(cacheKey, blobUrl);
       return blobUrl;
     } catch {
@@ -81,7 +102,7 @@ export class AiAudioCacheService {
     try {
       const mime    = ext === 'mp3' ? 'audio/mpeg' : 'audio/wav';
       const blobUrl = this._makeBlobUrl(audioBuffer, mime);
-      await this._webPut(cacheKey, audioBuffer);
+      await this._webPut(cacheKey, {buffer: audioBuffer, mimeType: mime});
       this._blobUrlMap.set(cacheKey, blobUrl);
       return blobUrl;
     } catch {
@@ -239,16 +260,19 @@ export class AiAudioCacheService {
 
     try {
       const db = await this._openDb();
-      const buf = await new Promise<ArrayBuffer | undefined>((resolve, reject) => {
+      const cached = await new Promise<ArrayBuffer | CachedWebAudio | undefined>((resolve, reject) => {
         const tx  = db.transaction(WEB_STORE_NAME, 'readonly');
         const req = tx.objectStore(WEB_STORE_NAME).get(key);
-        req.onsuccess = () => resolve(req.result as ArrayBuffer | undefined);
+        req.onsuccess = () => resolve(req.result as ArrayBuffer | CachedWebAudio | undefined);
         req.onerror   = () => reject(req.error);
       });
 
-      if (!buf) return null;
+      if (!cached) return null;
 
-      const url = URL.createObjectURL(new Blob([buf], { type: 'audio/wav' }));
+      const audio = cached instanceof ArrayBuffer
+        ? {buffer: cached, mimeType: detectAudioMimeType(cached)}
+        : cached;
+      const url = this._makeBlobUrl(audio.buffer, audio.mimeType);
       this._blobUrlMap.set(key, url);
       return url;
     } catch {
@@ -256,13 +280,13 @@ export class AiAudioCacheService {
     }
   }
 
-  private async _webPut(key: string, buffer: ArrayBuffer): Promise<void> {
+  private async _webPut(key: string, audio: CachedWebAudio): Promise<void> {
     try {
       const db = await this._openDb();
       return new Promise((resolve, reject) => {
         const tx    = db.transaction(WEB_STORE_NAME, 'readwrite');
         const store = tx.objectStore(WEB_STORE_NAME);
-        const req   = store.put(buffer, key);
+        const req   = store.put(audio, key);
         req.onsuccess = () => resolve();
         req.onerror   = () => reject(req.error);
       });
@@ -284,11 +308,17 @@ export class AiAudioCacheService {
 
   // ── Shared helpers ─────────────────────────────────────────────────────────
 
-  /** Fetch a remote URL and return its bytes as an ArrayBuffer. */
-  private async _fetchBuffer(url: string): Promise<ArrayBuffer> {
+  private async _fetchAudio(url: string, fallbackExtension: 'wav' | 'mp3'): Promise<CachedWebAudio> {
     const response = await fetch(url);
     if (!response.ok) throw new Error(`Audio fetch failed: ${response.status}`);
-    return response.arrayBuffer();
+    const buffer = await response.arrayBuffer();
+    const responseType = response.headers.get('content-type')?.split(';')[0]?.trim();
+    return {
+      buffer,
+      mimeType: responseType?.startsWith('audio/')
+        ? responseType
+        : fallbackExtension === 'mp3' ? 'audio/mpeg' : 'audio/wav',
+    };
   }
 
   /**
@@ -301,6 +331,7 @@ export class AiAudioCacheService {
       : mimeHint === 'mp3' ? 'audio/mpeg' : 'audio/wav';
     return URL.createObjectURL(new Blob([buffer], { type: mime }));
   }
+
 
   private _arrayBufferToBase64(buffer: ArrayBuffer): string {
     let binary = '';

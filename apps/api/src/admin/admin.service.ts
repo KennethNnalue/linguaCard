@@ -27,6 +27,7 @@ import type {
   AdminUpdatePlatformCollectionDto,
   StoryKeyword,
 } from '@lingua-card/shared/domain';
+import {platformCollectionAudioRequests} from './platform-collection-audio';
 
 @Injectable()
 export class AdminService {
@@ -100,18 +101,7 @@ export class AdminService {
 
     const dictEntries = await this.dictRepo.findBy({ id: In(dictIds) });
 
-    // Build deduped target-language audio items (headword + first example).
-    const seen = new Set<string>();
-    const items: { text: string; language: string }[] = [];
-    for (const e of dictEntries) {
-      if (!e.displayText?.trim()) continue;
-      const word = (e.article ? `${e.article} ` : '') + e.displayText;
-      for (const text of [word, e.examples?.[0]?.target]) {
-        if (!text?.trim() || seen.has(text)) continue;
-        seen.add(text);
-        items.push({ text, language: 'de-DE' });
-      }
-    }
+    const items = platformCollectionAudioRequests(dictEntries);
 
     this.logger.log(
       `Backfilling audio for ${collections.length} published collection(s), ${items.length} unique clips…`,
