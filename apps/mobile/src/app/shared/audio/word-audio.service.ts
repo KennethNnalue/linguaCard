@@ -5,6 +5,12 @@ import { WordAudioApiService } from './word-audio-api.service';
 import { AudioReadinessStore, AudioReadinessStatus } from './audio-readiness.store';
 import { normalizeForAudio } from './normalize';
 
+export interface AudioPreWarmResult {
+  requestedCount: number;
+  availableCount: number;
+  savedOfflineCount: number;
+}
+
 @Injectable({ providedIn: 'root' })
 export class WordAudioService {
   private readonly api = inject(WordAudioApiService);
@@ -263,22 +269,32 @@ export class WordAudioService {
    * survives app restarts without a network round-trip.
    * Call after card creation or import to trigger background generation.
    */
-  async preWarm(words: { text: string; language?: string }[]): Promise<void> {
-    if (!words.length) return;
-    const requests: WordAudioResolveRequest[] = words.map(w => ({
-      text: w.text,
-      language: w.language ?? 'de-DE',
-    }));
+  async preWarm(words: { text: string; language?: string }[]): Promise<AudioPreWarmResult> {
+    const uniqueRequests = new Map<string, WordAudioResolveRequest>();
+    for (const word of words) {
+      const language = word.language ?? 'de-DE';
+      const normalized = normalizeForAudio(word.text, language);
+      uniqueRequests.set(this._cacheKey(normalized, language), {text: word.text, language});
+    }
+    const requests = [...uniqueRequests.values()];
+    const summary: AudioPreWarmResult = {
+      requestedCount: requests.length,
+      availableCount: 0,
+      savedOfflineCount: 0,
+    };
+    if (!requests.length) return summary;
     try {
       const response = await this.api.batchResolve(requests);
       for (const r of response.results) {
         if (!r.wordAudio.audioUrl) continue;
+        summary.availableCount++;
         const key      = this._cacheKey(r.wordAudio.normalizedText, r.wordAudio.language);
         const remoteUrl = r.wordAudio.audioUrl;
 
         // Download to device filesystem (no-op on web, idempotent if already cached).
         const localUrl = await this.cache.saveFromUrl(key, remoteUrl);
         const resolvedUrl = localUrl ?? remoteUrl;
+        if (localUrl) summary.savedOfflineCount++;
 
         this._urlMap.set(key, resolvedUrl);
         this.audioReadiness.markReady(key);
@@ -286,6 +302,7 @@ export class WordAudioService {
     } catch {
       // Pre-warm failure is non-fatal
     }
+    return summary;
   }
 
   /**

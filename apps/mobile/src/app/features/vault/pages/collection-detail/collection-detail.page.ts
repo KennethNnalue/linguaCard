@@ -1,5 +1,5 @@
 import { AppNotificationService } from '@lingua-card/mobile/notifications';
-import {Component, computed, inject, OnInit, signal} from '@angular/core';
+import {Component, computed, effect, inject, OnInit, signal, untracked} from '@angular/core';
 import {ActivatedRoute, Router} from '@angular/router';
 import {
   ActionSheetButton,
@@ -18,7 +18,6 @@ import {AddWordSheetComponent} from '../../components/add-word-sheet/add-word-sh
 import {FabButtonComponent} from '../../../../shared/components/fab-button/fab-button.component';
 import {ReviewFilterService} from '../../../review/services/review-filter.service';
 import {ReviewPlayerService} from '../../../review/services/review-player.service';
-import {WordAudioService} from '../../../../shared/audio/word-audio.service';
 import {AudioReadinessStore} from '../../../../shared/audio/audio-readiness.store';
 import {normalizeForAudio} from '../../../../shared/audio/normalize';
 import {ImageImportApiService} from '../../import/services/image-import-api.service';
@@ -30,6 +29,7 @@ import {VocabularyPlayerService} from '../../../listen/services/vocabulary-playe
 import {toVocabularyPlaylistItem} from '../../../listen/models/listen.models';
 import {VaultV2Store} from '../../store/vault-v2.store';
 import {CollectionCoverComponent} from '../../components/collection-cover/collection-cover.component';
+import {CollectionAudioPrefetchService} from '../../../../shared/audio/collection-audio-prefetch.service';
 
 @Component({
   selector: 'lc-collection-detail',
@@ -49,8 +49,8 @@ export class CollectionDetailPage implements OnInit {
   private readonly toastCtrl = inject(AppNotificationService);
   private readonly filterService = inject(ReviewFilterService);
   private readonly reviewPlayer = inject(ReviewPlayerService);
-  private readonly wordAudio = inject(WordAudioService);
   private readonly audioReadiness = inject(AudioReadinessStore);
+  private readonly audioPrefetch = inject(CollectionAudioPrefetchService);
   private readonly importApi = inject(ImageImportApiService);
   private readonly translate = inject(TranslateService);
   private readonly cardStore = inject(CardStore);
@@ -98,18 +98,24 @@ export class CollectionDetailPage implements OnInit {
    * so that markReady() writes map to the same keys allSettled() reads.
    */
   private readonly _audioCacheKeys = computed(() => {
-    const keys: string[] = [];
+    const keys = new Set<string>();
     for (const c of this.allCards()) {
       const locale = this.targetLocale();
-      keys.push(`wa-${locale}-${normalizeForAudio(c.lexeme.text, locale)}`);
+      const article = c.lexeme.grammar['article'];
+      const headword = typeof article === 'string' && article.trim()
+        ? `${article.trim()} ${c.lexeme.text}`
+        : c.lexeme.text;
+      keys.add(`wa-${locale}-${normalizeForAudio(headword, locale)}`);
       for (const ex of c.examples) {
         if (ex.targetText.trim()) {
-          keys.push(`wa-${locale}-${normalizeForAudio(ex.targetText.trim(), locale)}`);
+          keys.add(`wa-${locale}-${normalizeForAudio(ex.targetText.trim(), locale)}`);
         }
       }
     }
-    return keys;
+    return [...keys];
   });
+
+  readonly audioClipCount = computed(() => this._audioCacheKeys().length);
 
   readonly audioReadyCount = computed(() =>
     this.audioReadiness.readyCountFor(this._audioCacheKeys()),
@@ -144,6 +150,12 @@ export class CollectionDetailPage implements OnInit {
 
   constructor() {
     addIcons({shareOutline, trashOutline, closeCircleOutline, syncOutline});
+    effect(() => {
+      const items = this.allCards();
+      const language = this.targetLocale();
+      if (!items.length) return;
+      untracked(() => this.audioPrefetch.prefetchLearningItems(items, language));
+    });
   }
 
   ngOnInit(): void {

@@ -183,7 +183,7 @@ export interface ListenState {
   downloadStatus: OfflineDownloadStatus;
 }
 
-export type OfflineDownloadStatus = 'idle' | 'downloading' | 'done';
+export type OfflineDownloadStatus = 'idle' | 'downloading' | 'done' | 'failed';
 
 // ─── Teleprompter ─────────────────────────────────────────────────────────────
 

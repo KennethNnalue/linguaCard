@@ -227,7 +227,11 @@ export class ListenPlaybackEngine {
       return script ? this.audioItemsForScript(script) : [];
     });
     try {
-      await this.wordAudio.preWarm(items);
+      const result = await this.wordAudio.preWarm(items);
+      if (result.savedOfflineCount !== result.requestedCount) {
+        this.host.patch({ downloadStatus: 'failed' });
+        return;
+      }
       // The whole queue is now warm — keep the sliding prefetch from redoing it.
       for (let i = 0; i < queue.length; i++) this.prefetchedIndices.add(i);
       this.host.patch({ downloadStatus: 'done' });

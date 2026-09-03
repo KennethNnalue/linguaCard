@@ -74,9 +74,9 @@
     <div class="audio-progress">
       <span class="audio-icon">♫</span>
       <div class="audio-body">
-        <span class="audio-label">{{ 'collectionDetail.audio.preparingLabel' | translate }} {{ audioReadyCount() }} / {{ wordCount() }} {{ 'collectionDetail.audio.readyUnit' | translate }}</span>
+        <span class="audio-label">{{ 'collectionDetail.audio.preparingLabel' | translate }} {{ audioReadyCount() }} / {{ audioClipCount() }} {{ 'collectionDetail.audio.readyUnit' | translate }}</span>
         <span class="audio-track">
-          <span class="audio-fill" [style.width.%]="wordCount() > 0 ? (audioReadyCount() / wordCount()) * 100 : 0"></span>
+          <span class="audio-fill" [style.width.%]="audioClipCount() > 0 ? (audioReadyCount() / audioClipCount()) * 100 : 0"></span>
         </span>
       </div>
     </div>

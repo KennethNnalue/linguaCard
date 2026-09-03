@@ -130,6 +130,8 @@
         <span>{{ 'listen.queue.offline' | translate }}</span>
         @if (listenStore.downloadStatus() === 'done') {
           <strong>{{ 'listen.queue.downloaded' | translate }}</strong>
+        } @else if (listenStore.downloadStatus() === 'failed') {
+          <strong>{{ 'common.retry' | translate }}</strong>
         }
         <span class="setting-chevron">›</span>
       </button>

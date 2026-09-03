@@ -1,5 +1,5 @@
 import { inject, Injectable } from '@angular/core';
-import type { Card } from '@lingua-card/shared/domain';
+import type { Card, CardView, WordAudioResolveRequest } from '@lingua-card/shared/domain';
 import { AiAudioCacheService } from '../../features/ai/audio/ai-audio-cache.service';
 import { WordAudioApiService } from './word-audio-api.service';
 import { WordAudioService } from './word-audio.service';
@@ -7,6 +7,25 @@ import { AudioReadinessStore } from './audio-readiness.store';
 import { normalizeForAudio } from './normalize';
 
 const CHUNK_SIZE = 50;
+type ResolvedAudioRequest = WordAudioResolveRequest & {language: string};
+
+export function learningItemAudioRequests(
+  items: readonly CardView[],
+  language: string,
+): WordAudioResolveRequest[] {
+  return items.flatMap(item => {
+    const article = item.lexeme.grammar['article'];
+    const headword = typeof article === 'string' && article.trim()
+      ? `${article.trim()} ${item.lexeme.text}`
+      : item.lexeme.text;
+    return [
+      {text: headword, language},
+      ...item.examples
+        .filter(example => example.targetText.trim())
+        .map(example => ({text: example.targetText.trim(), language})),
+    ];
+  });
+}
 
 @Injectable({ providedIn: 'root' })
 export class CollectionAudioPrefetchService {
@@ -20,11 +39,16 @@ export class CollectionAudioPrefetchService {
    * Caller continues immediately; audio arrives in the background.
    */
   prefetchCollection(cards: Card[]): void {
-    this._run(cards).catch(err => console.warn('[AudioPrefetch] failed:', err));
+    this._run(this._buildWordList(cards)).catch(err => console.warn('[AudioPrefetch] failed:', err));
   }
 
-  private async _run(cards: Card[]): Promise<void> {
-    const words = this._buildWordList(cards);
+  prefetchLearningItems(items: readonly CardView[], language: string): void {
+    this._run(learningItemAudioRequests(items, language))
+      .catch(err => console.warn('[AudioPrefetch] failed:', err));
+  }
+
+  private async _run(requests: readonly WordAudioResolveRequest[]): Promise<void> {
+    const words = this._uniqueRequests(requests);
 
     // Mark all as pending immediately so the progress bar appears right away.
     // Skip words already 'ready' so a re-visit doesn't reset completed state.
@@ -40,7 +64,10 @@ export class CollectionAudioPrefetchService {
     // This prevents the mismatch where displayText differs from the sent text.
     const keyByNormalized = new Map<string, string>();
     for (const w of words) {
-      keyByNormalized.set(normalizeForAudio(w.text, w.language), this._cacheKey(w.text, w.language));
+      keyByNormalized.set(
+        `${w.language}:${normalizeForAudio(w.text, w.language)}`,
+        this._cacheKey(w.text, w.language),
+      );
     }
 
     for (let i = 0; i < words.length; i += CHUNK_SIZE) {
@@ -53,7 +80,7 @@ export class CollectionAudioPrefetchService {
         for (const item of resp.results) {
           // Resolve the key using normalizedText from the API response, which
           // matches the normalizedText stored in our keyByNormalized map.
-          const key = keyByNormalized.get(item.wordAudio.normalizedText)
+          const key = keyByNormalized.get(`${item.wordAudio.language}:${item.wordAudio.normalizedText}`)
             ?? this._cacheKey(item.wordAudio.displayText, item.wordAudio.language);
 
           const audioUrl = item.wordAudio.audioUrl;
@@ -126,6 +153,16 @@ export class CollectionAudioPrefetchService {
       }
     }
     return items;
+  }
+
+  private _uniqueRequests(requests: readonly WordAudioResolveRequest[]): ResolvedAudioRequest[] {
+    const unique = new Map<string, ResolvedAudioRequest>();
+    for (const request of requests) {
+      const language = request.language ?? 'de-DE';
+      const key = `${language}:${normalizeForAudio(request.text, language)}`;
+      if (!unique.has(key)) unique.set(key, {...request, language});
+    }
+    return [...unique.values()];
   }
 
   private _cacheKey(text: string, language: string): string {
