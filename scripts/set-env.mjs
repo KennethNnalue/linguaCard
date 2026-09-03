@@ -20,7 +20,11 @@ if (!apiUrlProperty.test(source)) {
   process.exit(1);
 }
 
-const normalizedApiUrl = apiUrl.replace(/\/$/, '');
-const updated = source.replace(apiUrlProperty, `apiUrl: '${normalizedApiUrl}/api/v1'`);
+const apiOrigin = apiUrl
+  .trim()
+  .replace(/\/+$/, '')
+  .replace(/(?:\/api\/v1)+$/, '');
+const normalizedApiUrl = `${apiOrigin}/api/v1`;
+const updated = source.replace(apiUrlProperty, `apiUrl: '${normalizedApiUrl}'`);
 writeFileSync(file, updated);
-console.log(`environment.prod.ts → apiUrl set to ${normalizedApiUrl}/api/v1`);
+console.log(`environment.prod.ts → apiUrl set to ${normalizedApiUrl}`);
