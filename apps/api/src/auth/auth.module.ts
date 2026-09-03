@@ -8,6 +8,7 @@ import { AuthController } from './auth.controller';
 import { JwtAuthGuard } from './guards/jwt-auth.guard';
 import { SubscriptionsModule } from '../subscriptions/subscriptions.module';
 import { SettingsModule } from '../settings/settings.module';
+import {BootstrapAdminService} from './bootstrap-admin.service';
 
 @Module({
   imports: [
@@ -24,7 +25,7 @@ import { SettingsModule } from '../settings/settings.module';
     SettingsModule,
   ],
   controllers: [AuthController],
-  providers: [AuthService, JwtAuthGuard],
+  providers: [AuthService, JwtAuthGuard, BootstrapAdminService],
   exports: [AuthService, JwtModule, JwtAuthGuard],
 })
 export class AuthModule {}

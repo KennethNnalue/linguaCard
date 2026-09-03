@@ -8,6 +8,7 @@ import { UserEntity } from './user.entity';
 import { SubscriptionService } from '../subscriptions/subscription.service';
 import { UserSettingsService } from '../settings/user-settings.service';
 import type { LoginDto, RegisterDto } from '@lingua-card/shared/dto';
+import {isBootstrapAdminEmail} from './bootstrap-admin.policy';
 
 export interface AuthUser {
   id: string;
@@ -49,6 +50,7 @@ export class AuthService {
       name: dto.name,
       passwordHash: await bcrypt.hash(dto.password, 12),
       avatarInitials,
+      isAdmin: isBootstrapAdminEmail(email),
     });
     const saved = await this.userRepo.save(entity);
     await this.subscriptions.createFree(saved.id);
