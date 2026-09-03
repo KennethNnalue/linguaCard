@@ -1,14 +1,15 @@
 import { ChangeDetectionStrategy, Component, inject, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
-import { IonButton, IonContent, IonIcon, IonItem, IonLabel, IonList } from '@ionic/angular/standalone';
+import { IonButton, IonContent, IonIcon, IonItem, IonLabel, IonList, IonSpinner } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
 import { arrowBackOutline, chevronForwardOutline, play, repeatOutline, shuffleOutline } from 'ionicons/icons';
 import { PodcastCatalogueStore } from '../../store/podcast-catalogue.store';
 import { shufflePodcastEpisodeIds } from '../../domain/podcast-playback-queue';
+import { OfflineImageDirective } from '../../../../shared/image/offline-image.directive';
 
 @Component({
   selector: 'lc-podcast-topic', standalone: true,
-  imports: [IonButton, IonContent, IonIcon, IonItem, IonLabel, IonList],
+  imports: [IonButton, IonContent, IonIcon, IonItem, IonLabel, IonList, IonSpinner, OfflineImageDirective],
   providers: [PodcastCatalogueStore], templateUrl: './podcast-topic.page.html',
   styleUrl: './podcast-topic.page.scss', changeDetection: ChangeDetectionStrategy.OnPush,
 })

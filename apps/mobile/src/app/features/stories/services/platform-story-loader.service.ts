@@ -4,6 +4,7 @@ import type { PlatformStory, UserStoryProgress } from '@lingua-card/shared/domai
 import { PlatformStoryApiService } from './platform-story-api.service';
 import { LocalDataService } from '../../../core/services/local-data.service';
 import { AiAudioCacheService } from '../../ai/audio/ai-audio-cache.service';
+import { PlatformStoryProgressService } from './platform-story-progress.service';
 
 export interface PlatformStoryLoadResult {
   story: PlatformStory;
@@ -25,15 +26,21 @@ export class PlatformStoryLoaderService {
   private readonly api = inject(PlatformStoryApiService);
   private readonly localData = inject(LocalDataService);
   private readonly audioCache = inject(AiAudioCacheService);
+  private readonly progressService = inject(PlatformStoryProgressService);
 
   async load(id: string): Promise<PlatformStoryLoadResult | null> {
-    const cached = await this.localData.getPlatformStory(id);
+    let cached: PlatformStory | null = null;
+    try {
+      cached = await this.localData.getPlatformStory(id);
+    } catch {
+      cached = null;
+    }
 
     // Background refresh keeps the cache fresh for the next open. Fire-and-forget;
     // resolves to null on network failure (offline).
-    const networkPromise = firstValueFrom(this.api.getById(id))
+    const networkPromise = navigator.onLine ? firstValueFrom(this.api.getById(id))
       .then(fresh => { void this.localData.setPlatformStory(fresh); return fresh; })
-      .catch(() => null);
+      .catch(() => null) : Promise.resolve(null);
 
     // Prefer cache for instant render + offline; fall back to network when uncached.
     let story = cached ?? (await networkPromise);
@@ -41,21 +48,13 @@ export class PlatformStoryLoaderService {
 
     // Resolve narration audio to a cached/local URL (downloads on native for offline).
     if (story.audioUrl) {
-      const localUrl = await this.audioCache.getOrDownload(story.id, story.audioUrl);
-      if (localUrl && localUrl !== story.audioUrl) {
-        story = { ...story, audioUrl: localUrl };
-      }
+      const localUrl = navigator.onLine
+        ? await this.audioCache.getOrDownload(story.id, story.audioUrl)
+        : await this.audioCache.getFromCache(story.id);
+      story = { ...story, audioUrl: localUrl };
     }
 
-    // Fire-and-forget read marker; progress is awaited so the page can render it.
-    this.api.markAsRead(id).subscribe({ error: () => undefined });
-
-    let progress: UserStoryProgress | null = null;
-    try {
-      progress = await firstValueFrom(this.api.getProgress(id));
-    } catch {
-      progress = null;
-    }
+    const progress: UserStoryProgress | null = await this.progressService.loadAndMarkRead(id);
 
     return { story, progress };
   }

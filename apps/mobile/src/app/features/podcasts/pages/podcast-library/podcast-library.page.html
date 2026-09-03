@@ -1,31 +1,31 @@
 <ion-header class="ion-no-border"><ion-toolbar><div class="pod-nav"><ion-button fill="clear" shape="round" (click)="goBack()" aria-label="Back"><ion-icon slot="icon-only" name="arrow-back" /></ion-button><div><span>Real-world listening</span><h1>Podcasts</h1></div></div></ion-toolbar></ion-header>
 <ion-content><main class="pod-page">
   <section class="pod-hero"><span>Short conversations</span><h2>Hear your vocabulary in real life</h2><p>Practice natural conversations in episodes under five minutes.</p></section>
-  @if (store.isLoading()) { <p class="pod-state">Loading conversations…</p> }
+  @if (store.isLoading()) { <p class="pod-state"><ion-spinner name="crescent" /> Loading conversations…</p> }
   @else if (store.error(); as error) { <p class="pod-state">{{ error }}</p> }
   @else {
     @if (store.continueListening(); as activity) {
       <section class="pod-section"><div class="pod-section-title"><span>Pick up where you left off</span><h2>Continue listening</h2></div>
-        <ion-button fill="clear" class="pod-continue" (click)="continueEpisode(activity.episode.id)">
-          <img [src]="activity.episode.thumbnail.cardUrl" [alt]="activity.episode.thumbnail.accessibilityDescription" [style.object-position]="(activity.episode.thumbnail.focalPoint.x * 100) + '% ' + (activity.episode.thumbnail.focalPoint.y * 100) + '%'" />
+        <button type="button" class="pod-continue" (click)="continueEpisode(activity.episode.id)">
+          <img [lcOfflineSrc]="activity.episode.thumbnail.cardUrl" [alt]="activity.episode.thumbnail.accessibilityDescription" [style.object-position]="(activity.episode.thumbnail.focalPoint.x * 100) + '% ' + (activity.episode.thumbnail.focalPoint.y * 100) + '%'" />
           <div><span>{{ activity.episode.topicTitle }} · {{ activity.progressPercent }}% complete</span><h3>{{ activity.episode.title }}</h3><div class="pod-progress"><i [style.width.%]="activity.progressPercent"></i></div><strong><ion-icon name="play" /> Continue episode</strong></div>
-        </ion-button>
+        </button>
       </section>
     }
     @if (store.recentEpisodes().length) {
       <section class="pod-section"><div class="pod-section-title"><span>Your listening</span><h2>Recent episodes</h2></div><div class="pod-recent">
         @for (activity of store.recentEpisodes(); track activity.episode.id) {
-          <ion-button fill="clear" (click)="openActivity(activity.episode.id, activity.status === 'completed')"><img [src]="activity.episode.thumbnail.cardUrl" [alt]="activity.episode.thumbnail.accessibilityDescription" /><div><span>{{ activity.status === 'completed' ? 'Completed' : activity.progressPercent + '% complete' }}</span><h3>{{ activity.episode.title }}</h3><p>{{ activity.episode.topicTitle }}</p></div></ion-button>
+          <button type="button" (click)="openActivity(activity.episode.id, activity.status === 'completed')"><img [lcOfflineSrc]="activity.episode.thumbnail.cardUrl" [alt]="activity.episode.thumbnail.accessibilityDescription" /><div><span>{{ activity.status === 'completed' ? 'Completed' : activity.progressPercent + '% complete' }}</span><h3>{{ activity.episode.title }}</h3><p>{{ activity.episode.topicTitle }}</p></div></button>
         }
       </div></section>
     }
     @if (!store.topics().length) { <p class="pod-state">No podcast topics are published yet.</p> }
     @else { <section class="pod-section"><div class="pod-section-title"><span>Browse by scene</span><h2>Podcast topics</h2></div><div class="pod-grid" aria-label="Podcast topics">
     @for (topic of store.topics(); track topic.id) {
-      <ion-button fill="clear" class="pod-card" (click)="openTopic(topic.id)">
-        <img [src]="topic.thumbnail.cardUrl" [alt]="topic.thumbnail.accessibilityDescription" [style.object-position]="(topic.thumbnail.focalPoint.x * 100) + '% ' + (topic.thumbnail.focalPoint.y * 100) + '%'" />
-        <div><span>{{ topic.minimumLevel }}–{{ topic.maximumLevel }} · {{ topic.episodeCount }} episodes · {{ duration(topic.totalDurationMs) }}</span><h3>{{ topic.title }}</h3><p>{{ topic.description }}</p><ion-icon name="arrow-forward" aria-hidden="true" /></div>
-      </ion-button>
+      <button type="button" class="pod-card" (click)="openTopic(topic.id)">
+        <img [lcOfflineSrc]="topic.thumbnail.cardUrl" [alt]="topic.thumbnail.accessibilityDescription" [style.object-position]="(topic.thumbnail.focalPoint.x * 100) + '% ' + (topic.thumbnail.focalPoint.y * 100) + '%'" />
+        <div><span>{{ topic.minimumLevel }}–{{ topic.maximumLevel }} · {{ topic.episodeCount }} episodes · {{ duration(topic.totalDurationMs) }}</span><h3>{{ topic.title }}</h3><p>{{ topic.description }}</p></div>
+      </button>
     }
   </div></section> }
   }

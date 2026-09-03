@@ -1,5 +1,39 @@
-/* Inter Font from Google Fonts */
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400&display=swap');
+/* Fonts are bundled so native cold starts never depend on Google Fonts or an
+ * incidental WebView HTTP cache. Keep these weights aligned with theme tokens. */
+@import '@fontsource/inter/latin-400.css';
+@import '@fontsource/lora/latin-400.css';
+@import '@fontsource/lora/latin-400-italic.css';
+@import '@fontsource/lora/latin-500.css';
+@import '@fontsource/lora/latin-500-italic.css';
+@import '@fontsource/lora/latin-600.css';
+@import '@fontsource/lora/latin-600-italic.css';
+@import '@fontsource/newsreader/latin-400.css';
+@import '@fontsource/newsreader/latin-400-italic.css';
+@import '@fontsource/newsreader/latin-500.css';
+@import '@fontsource/newsreader/latin-500-italic.css';
+@import '@fontsource/newsreader/latin-600.css';
+@import '@fontsource/dm-sans/latin-300.css';
+@import '@fontsource/dm-sans/latin-400.css';
+@import '@fontsource/dm-sans/latin-500.css';
+@import '@fontsource/dm-sans/latin-600.css';
+@import '@fontsource/dm-sans/latin-700.css';
+@import '@fontsource/fira-code/latin-500.css';
+@import '@fontsource/fira-code/latin-600.css';
+@import '@fontsource/spectral/latin-300.css';
+@import '@fontsource/spectral/latin-300-italic.css';
+@import '@fontsource/spectral/latin-400.css';
+@import '@fontsource/spectral/latin-400-italic.css';
+@import '@fontsource/spectral/latin-500.css';
+@import '@fontsource/spectral/latin-500-italic.css';
+@import '@fontsource/spectral/latin-600.css';
+@import '@fontsource/spectral/latin-600-italic.css';
+@import '@fontsource/hanken-grotesk/latin-400.css';
+@import '@fontsource/hanken-grotesk/latin-500.css';
+@import '@fontsource/hanken-grotesk/latin-600.css';
+@import '@fontsource/hanken-grotesk/latin-700.css';
+@import '@fontsource/hanken-grotesk/latin-800.css';
+@import '@fontsource/spline-sans-mono/latin-500.css';
+@import '@fontsource/spline-sans-mono/latin-600.css';
 
 /*
  * App Global CSS

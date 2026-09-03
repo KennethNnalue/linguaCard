@@ -131,10 +131,10 @@ export class StoryWordSheetService {
    * Add the tapped word to the vault. Prompts for a collection first; no-ops if
    * the word is already saved (with a toast) or the user cancels the picker.
    */
-  async addToVault(detail: WordDetail): Promise<void> {
+  async addToVault(detail: WordDetail): Promise<boolean> {
     if (this.isInVault(detail)) {
       await this.toast('srs.alreadyInVault', 'success', 2000);
-      return;
+      return true;
     }
 
     const modal = await this.modalCtrl.create({
@@ -145,7 +145,7 @@ export class StoryWordSheetService {
     });
     await modal.present();
     const { data } = await modal.onWillDismiss<{ collectionId: string | null }>();
-    if (!data?.collectionId) return; // user cancelled
+    if (!data?.collectionId) return false;
 
     // Reuse the global word library so the saved card inherits canonical
     // examples/synonyms/phonetic/plural/audio. batchLookup returns the existing
@@ -166,8 +166,8 @@ export class StoryWordSheetService {
     const article = entry?.article ?? detail.article;
     const gender = article ? (GENDER_MAP[article] ?? null) : null;
 
-    this.cardStore
-      .createCard({
+    try {
+      await firstValueFrom(this.cardStore.createCard({
         deckId: DEFAULT_DECK_ID,
         collectionId: data.collectionId,
         userId,
@@ -190,11 +190,13 @@ export class StoryWordSheetService {
         createdAt: now,
         updatedAt: now,
         version: 1,
-      })
-      .subscribe({
-        next: () => void this.toast('stories.reader.addedToVaultToast', 'success', 2000),
-        error: () => void this.toast('stories.reader.saveFailedToast', 'danger', 3000),
-      });
+      }));
+      await this.toast('stories.reader.addedToVaultToast', 'success', 2000);
+      return true;
+    } catch {
+      await this.toast('stories.reader.saveFailedToast', 'danger', 3000);
+      return false;
+    }
   }
 
   private pluralFor(cardId: string | null): string | null {

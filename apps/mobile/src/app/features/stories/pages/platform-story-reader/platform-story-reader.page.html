@@ -9,7 +9,7 @@
     @if (!tappedWord()) {
       <div class="sr2-cover">
         @if (s.coverImageUrl) {
-          <img [src]="s.coverImageUrl" class="sr2-cover-img" alt="" />
+          <img [lcOfflineSrc]="s.coverImageUrl" class="sr2-cover-img" alt="" />
         }
         <div class="sr2-cover-overlay"></div>
         <div class="sr2-top-bar">
@@ -147,7 +147,7 @@
     @if (tappedWordDetail(); as wd) {
       <div class="sr-word-cover sr-word-cover--fixed" (click)="dismissTappedWord()">
         @if (s.coverImageUrl) {
-          <img [src]="s.coverImageUrl" class="sr2-cover-img" alt="" />
+          <img [lcOfflineSrc]="s.coverImageUrl" class="sr2-cover-img" alt="" />
         }
         <div class="sr2-cover-overlay"></div>
 

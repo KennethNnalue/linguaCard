@@ -3,7 +3,7 @@
 
 :host {
   position: fixed;
-  bottom: 80px;
+  bottom: t.$lc-space-4;
   right: t.$lc-space-4;
   z-index: t.$lc-z-fab;
   display: block;

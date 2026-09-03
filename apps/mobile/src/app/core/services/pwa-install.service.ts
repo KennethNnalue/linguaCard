@@ -1,4 +1,5 @@
 import {Injectable, signal} from '@angular/core';
+import {Capacitor} from '@capacitor/core';
 
 interface BeforeInstallPromptEvent extends Event {
   prompt(): Promise<void>;
@@ -17,7 +18,7 @@ export class PwaInstallService {
   readonly isInstalled = signal(false);
 
   constructor() {
-    if (typeof window === 'undefined') return;
+    if (typeof window === 'undefined' || Capacitor.isNativePlatform()) return;
 
     // Android / Chrome / Edge — browser-native install prompt
     window.addEventListener('beforeinstallprompt', (event: Event) => {

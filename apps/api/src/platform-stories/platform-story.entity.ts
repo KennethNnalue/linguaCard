@@ -2,7 +2,7 @@ import {
   Entity, PrimaryColumn, Column, Index, CreateDateColumn,
 } from 'typeorm';
 import type {
-  StorySentence, WordTimestamp, StoryKeyword,
+  StorySentence, WordTimestamp, PlatformStoryKeyword,
   StoryQuizQuestion, StoryGrammarNote,
   StoryDifficulty, StoryCategory, StoryLength,
 } from '@lingua-card/shared/domain';
@@ -34,7 +34,7 @@ export class PlatformStoryEntity {
   wordTimestamps!: WordTimestamp[];
 
   @Column('jsonb', { default: [] })
-  keywords!: StoryKeyword[];
+  keywords!: PlatformStoryKeyword[];
 
   @Column('jsonb', { default: [] })
   quizQuestions!: StoryQuizQuestion[];

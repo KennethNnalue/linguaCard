@@ -41,7 +41,10 @@ export class PlatformStoriesSeedService implements OnApplicationBootstrap {
         nativeLang: 'en',
         sentences: seed.sentences,
         wordTimestamps: [],
-        keywords: seed.keywords,
+        keywords: seed.keywords.map((keyword, index) => ({
+          ...keyword,
+          wordId: `${seed.id}:keyword:${index}`,
+        })),
         quizQuestions: seed.quizQuestions,
         grammarNotes: seed.grammarNotes,
         audioUrl: null,

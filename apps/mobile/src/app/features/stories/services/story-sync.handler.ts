@@ -35,3 +35,42 @@ export class StoryDeleteSyncHandler implements SyncHandler {
     }
   }
 }
+
+function storyLearnedPayload(payload: unknown): { storyId: string; isLearned: boolean } {
+  if (typeof payload !== 'object' || payload === null
+    || !('storyId' in payload) || typeof payload.storyId !== 'string'
+    || !('isLearned' in payload) || typeof payload.isLearned !== 'boolean') {
+    throw new Error('Invalid story learned synchronization payload');
+  }
+  return { storyId: payload.storyId, isLearned: payload.isLearned };
+}
+
+function storyIdPayload(payload: unknown): { storyId: string } {
+  if (typeof payload !== 'object' || payload === null
+    || !('storyId' in payload) || typeof payload.storyId !== 'string') {
+    throw new Error('Invalid story synchronization payload');
+  }
+  return { storyId: payload.storyId };
+}
+
+@Injectable({ providedIn: 'root' })
+export class StoryLearnedSyncHandler implements SyncHandler {
+  readonly type = 'MARK_STORY_LEARNED' as const;
+  private readonly api = inject(StoryApiService);
+
+  async execute(payload: unknown): Promise<void> {
+    const { storyId, isLearned } = storyLearnedPayload(payload);
+    await firstValueFrom(this.api.markLearned(storyId, isLearned));
+  }
+}
+
+@Injectable({ providedIn: 'root' })
+export class StoryListenSyncHandler implements SyncHandler {
+  readonly type = 'RECORD_STORY_LISTEN' as const;
+  private readonly api = inject(StoryApiService);
+
+  async execute(payload: unknown): Promise<void> {
+    const { storyId } = storyIdPayload(payload);
+    await firstValueFrom(this.api.recordListen(storyId));
+  }
+}

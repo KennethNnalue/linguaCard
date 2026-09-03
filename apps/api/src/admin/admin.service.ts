@@ -216,6 +216,7 @@ export class AdminService {
   async importStory(dto: AdminImportStoryDto): Promise<AdminImportStoryResult> {
     const { story } = dto;
     const nativeLang = story.nativeLang ?? 'en';
+    const storyId = crypto.randomUUID();
 
     // Map story keywords through dictionary (lookup only — no enrichment for admin import).
     // Index-aligned with story.keywords; null = dictionary miss (keep the JSON-supplied values).
@@ -240,6 +241,7 @@ export class AdminService {
     const keywords: PlatformStoryEntity['keywords'] = story.keywords.map((kw, i) => {
       const entry = keywordEntries[i];
       return {
+        wordId: entry?.id ?? `${storyId}:keyword:${i}`,
         cardId: null,
         german: kw.article ? `${kw.article} ${kw.germanBase}` : kw.germanBase,
         germanBase: kw.germanBase,
@@ -269,7 +271,6 @@ export class AdminService {
       additionalExamples: g.additionalExamples ?? [],
     }));
 
-    const storyId = crypto.randomUUID();
     const totalWords = story.sentences.reduce((acc, s) => acc + s.german.split(/\s+/).length, 0);
     const bodyDe = story.sentences.map(s => s.german).join(' ');
 

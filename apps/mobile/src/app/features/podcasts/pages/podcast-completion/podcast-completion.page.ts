@@ -2,11 +2,12 @@ import { ChangeDetectionStrategy, Component, inject, OnInit } from '@angular/cor
 import { ActivatedRoute, Router } from '@angular/router';
 import { IonButton, IonContent, IonIcon } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
-import { arrowForward, checkmark, refresh } from 'ionicons/icons';
+import { arrowBackOutline, arrowForward, checkmark, refresh } from 'ionicons/icons';
 import { PodcastCatalogueStore } from '../../store/podcast-catalogue.store';
+import { OfflineImageDirective } from '../../../../shared/image/offline-image.directive';
 
 @Component({
-  selector: 'lc-podcast-completion', standalone: true, imports: [IonButton, IonContent, IonIcon],
+  selector: 'lc-podcast-completion', standalone: true, imports: [IonButton, IonContent, IonIcon, OfflineImageDirective],
   providers: [PodcastCatalogueStore], templateUrl: './podcast-completion.page.html',
   styleUrl: './podcast-completion.page.scss', changeDetection: ChangeDetectionStrategy.OnPush,
 })
@@ -15,7 +16,7 @@ export class PodcastCompletionPage implements OnInit {
   private readonly route = inject(ActivatedRoute);
   private readonly router = inject(Router);
 
-  constructor() { addIcons({ arrowForward, checkmark, refresh }); }
+  constructor() { addIcons({ arrowBackOutline, arrowForward, checkmark, refresh }); }
 
   ngOnInit(): void {
     this.store.loadCompletion(this.route.snapshot.paramMap.get('episodeId') ?? '');
@@ -32,6 +33,10 @@ export class PodcastCompletionPage implements OnInit {
   }
 
   openTopic(topicId: string): void {
+    void this.router.navigate(['/podcasts/topics', topicId]);
+  }
+
+  goBack(topicId: string): void {
     void this.router.navigate(['/podcasts/topics', topicId]);
   }
 }

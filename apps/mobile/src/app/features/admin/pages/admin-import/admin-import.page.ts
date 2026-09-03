@@ -1,6 +1,6 @@
 import {AppNotificationService} from '@lingua-card/mobile/notifications';
-import {ChangeDetectionStrategy, Component, DestroyRef, inject, signal} from '@angular/core';
-import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
+import {ChangeDetectionStrategy, Component, computed, DestroyRef, inject, signal} from '@angular/core';
+import {takeUntilDestroyed, toSignal} from '@angular/core/rxjs-interop';
 import {FormControl, FormGroup, ReactiveFormsModule, Validators} from '@angular/forms';
 import {HttpErrorResponse} from '@angular/common/http';
 import {Router} from '@angular/router';
@@ -8,9 +8,14 @@ import {AlertController, IonContent, IonHeader, IonIcon, IonToolbar} from '@ioni
 import {addIcons} from 'ionicons';
 import {
   arrowBackOutline,
+  bookOutline,
   cloudUploadOutline,
+  createOutline,
+  documentsOutline,
   eyeOffOutline,
   eyeOutline,
+  folderOpenOutline,
+  musicalNotesOutline,
   sparklesOutline,
   trashOutline,
   volumeHighOutline
@@ -30,7 +35,7 @@ import type {
 } from '@lingua-card/shared/domain';
 import {STORY_CATEGORIES} from '@lingua-card/shared/domain';
 import {TranslatePipe} from '@ngx-translate/core';
-import {catchError, concatMap, map, Observable, of} from 'rxjs';
+import {catchError, concatMap, map, Observable, of, startWith} from 'rxjs';
 import {AdminApiService} from '../../services/admin-api.service';
 
 @Component({
@@ -236,14 +241,27 @@ OUTPUT — valid JSON ONLY, no markdown fences, no commentary:
   constructor() {
     addIcons({
       arrowBackOutline,
+      bookOutline,
       cloudUploadOutline,
+      createOutline,
+      documentsOutline,
       sparklesOutline,
+      folderOpenOutline,
+      musicalNotesOutline,
       eyeOutline,
       eyeOffOutline,
       trashOutline,
       volumeHighOutline
     });
   }
+
+  private readonly wordListRaw = toSignal(
+    this.collectionForm.controls.wordListRaw.valueChanges.pipe(
+      startWith(this.collectionForm.controls.wordListRaw.value),
+    ),
+    {initialValue: ''},
+  );
+  readonly wordCount = computed(() => this._parseWordList(this.wordListRaw() ?? '').length);
 
   openPodcasts(): void {
     void this.router.navigate(['/admin/podcasts']);

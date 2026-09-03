@@ -1,11 +1,12 @@
 import { ChangeDetectionStrategy, Component, computed, input } from '@angular/core';
+import { OfflineImageDirective } from '../../../../shared/image/offline-image.directive';
 
 @Component({
   selector: 'lc-collection-cover',
   template: `
     <span class="cover" [class]="paletteClass()">
       @if (imageUrl()) {
-        <img class="image" [src]="imageUrl()" alt="" />
+        <img class="image" [lcOfflineSrc]="imageUrl()" alt="" />
       } @else {
         <span class="mark" aria-hidden="true"></span>
         <span class="initial" aria-hidden="true">{{ initial() }}</span>
@@ -13,6 +14,7 @@ import { ChangeDetectionStrategy, Component, computed, input } from '@angular/co
     </span>
   `,
   styleUrls: ['./collection-cover.component.scss'],
+  imports: [OfflineImageDirective],
   changeDetection: ChangeDetectionStrategy.OnPush,
   host: {
     '[attr.aria-label]': 'name()',

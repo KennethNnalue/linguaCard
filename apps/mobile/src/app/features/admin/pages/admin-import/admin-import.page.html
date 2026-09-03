@@ -4,7 +4,10 @@
       <button class="adm-back-btn" (click)="goBack()" [attr.aria-label]="'common.back' | translate">
         <ion-icon name="arrow-back-outline"></ion-icon>
       </button>
-      <span class="adm-title lc-display">{{ 'admin.import.pageTitle' | translate }}</span>
+      <div class="adm-title-group">
+        <span class="adm-eyebrow">Administration</span>
+        <span class="adm-title lc-display">Content studio</span>
+      </div>
       <span class="adm-nav-spacer"></span>
     </div>
   </ion-toolbar>
@@ -13,60 +16,65 @@
 <ion-content>
   <div class="adm-content">
 
-    <!-- Tabs -->
-    <div class="adm-tabs">
+    <nav class="adm-tabs" aria-label="Content studio sections">
       <button
         class="adm-tab"
-        [class.adm-tab--active]="activeTab() === 'upload'"
+        [class.adm-tab--active]="activeTab() === 'upload' || activeTab() === 'story'"
         (click)="switchTab('upload')">
-        Upload collection
+        <ion-icon name="create-outline"></ion-icon>
+        Create
       </button>
       <button
         class="adm-tab"
-        [class.adm-tab--active]="activeTab() === 'story'"
-        (click)="switchTab('story')">
-        {{ 'admin.import.tabs.story' | translate }}
-      </button>
-      <button
-        class="adm-tab"
-        [class.adm-tab--active]="activeTab() === 'collections'"
+        [class.adm-tab--active]="activeTab() === 'collections' || activeTab() === 'stories'"
         (click)="switchTab('collections')">
-        Collections
-      </button>
-      <button
-        class="adm-tab"
-        [class.adm-tab--active]="activeTab() === 'stories'"
-        (click)="switchTab('stories')">
-        Stories
+        <ion-icon name="folder-open-outline"></ion-icon>
+        Manage
       </button>
       <button class="adm-tab" (click)="openPodcasts()">
+        <ion-icon name="musical-notes-outline"></ion-icon>
         Podcasts
       </button>
-    </div>
+    </nav>
+
+    <header class="adm-section-heading">
+      <span class="adm-eyebrow">{{ activeTab() === 'upload' || activeTab() === 'story' ? 'Create new content' : 'Manage content' }}</span>
+      <h1>{{ activeTab() === 'upload' ? 'Import a collection' : activeTab() === 'story' ? 'Import a story' : activeTab() === 'collections' ? 'Collections' : 'Stories' }}</h1>
+      <p>{{ activeTab() === 'upload' ? 'Add a ready-to-review vocabulary collection in a few clear steps.' : activeTab() === 'story' ? 'Create a story for an existing vocabulary collection.' : 'Review drafts, check readiness, and control what learners can see.' }}</p>
+    </header>
+
+    @if (activeTab() === 'upload' || activeTab() === 'story') {
+      <div class="adm-type-switch" aria-label="Content type">
+        <button type="button" [class.adm-type-switch--active]="activeTab() === 'upload'" (click)="switchTab('upload')"><ion-icon name="documents-outline"></ion-icon><span><strong>Collection</strong><small>Vocabulary and cover</small></span></button>
+        <button type="button" [class.adm-type-switch--active]="activeTab() === 'story'" (click)="switchTab('story')"><ion-icon name="book-outline"></ion-icon><span><strong>Story</strong><small>Text, quiz and audio</small></span></button>
+      </div>
+    }
 
     @if (activeTab() === 'upload') {
       <div class="adm-import-mode" aria-label="Collection input type">
-        <button type="button" [class.adm-import-mode--active]="importMode() === 'words'" (click)="selectImportMode('words')">Word list</button>
-        <button type="button" [class.adm-import-mode--active]="importMode() === 'json'" (click)="selectImportMode('json')">JSON</button>
+        <button type="button" [class.adm-import-mode--active]="importMode() === 'words'" (click)="selectImportMode('words')"><strong>Quick word list</strong><small>One German word per line</small></button>
+        <button type="button" [class.adm-import-mode--active]="importMode() === 'json'" (click)="selectImportMode('json')"><strong>Enriched JSON</strong><small>Translations and examples included</small></button>
       </div>
       <label class="adm-image-upload">
         @if (collectionImagePreview(); as preview) {
           <img [src]="preview" alt="Collection thumbnail preview" />
         } @else {
-          <span>＋</span>
+          <span><ion-icon name="cloud-upload-outline"></ion-icon></span>
         }
-        <span>{{ collectionImage() ? 'Change thumbnail' : 'Add collection thumbnail' }}</span>
+        <span><strong>{{ collectionImage() ? 'Change cover image' : 'Add a cover image' }}</strong><small>Optional · JPG, PNG or WebP</small></span>
         <input type="file" accept="image/jpeg,image/png,image/webp" (change)="selectCollectionImage($event)" />
       </label>
     }
 
     <!-- ─── COLLECTION IMPORT ──────────────────────────────────────────── -->
     @if (activeTab() === 'upload' && importMode() === 'words') {
-      <form [formGroup]="collectionForm" (ngSubmit)="importCollection()">
+      <form class="adm-form-card" [formGroup]="collectionForm" (ngSubmit)="importCollection()">
+        <div class="adm-form-card__heading"><span>Collection details</span><small>Creates a draft</small></div>
 
         <div class="adm-field">
-          <label class="adm-label">{{ 'admin.import.fields.title' | translate }}</label>
-          <input class="adm-input" formControlName="title" placeholder="e.g. Food & Drink A1" />
+          <label class="adm-label">Collection title</label>
+          <input class="adm-input" formControlName="title" placeholder="e.g. Food & Drink" />
+          <small class="adm-field-hint">Use the learner-facing name. The level appears separately.</small>
         </div>
 
         <div class="adm-field">
@@ -79,12 +87,13 @@
         </div>
 
         <div class="adm-field">
-          <label class="adm-label">{{ 'admin.import.fields.words' | translate }}</label>
+          <div class="adm-label-row"><label class="adm-label">German words</label><span>{{ wordCount() }} {{ wordCount() === 1 ? 'word' : 'words' }}</span></div>
           <textarea
             class="adm-textarea"
             formControlName="wordListRaw"
             rows="10"
             placeholder="der Apfel&#10;die Banane&#10;bestellen&#10;trinken"></textarea>
+          <small class="adm-field-hint">One word per line. Articles are optional. Blank lines and # comments are ignored.</small>
         </div>
 
         <!-- Result banner -->
@@ -107,7 +116,7 @@
             {{ 'admin.import.status.loading' | translate }}
           } @else {
             <ion-icon name="cloud-upload-outline"></ion-icon>
-            {{ 'admin.import.buttons.importCollection' | translate }}
+              Create collection draft
           }
         </button>
 
@@ -116,7 +125,8 @@
 
     <!-- ─── JSON COLLECTION IMPORT ──────────────────────────────────────── -->
     @if (activeTab() === 'upload' && importMode() === 'json') {
-      <form [formGroup]="jsonForm" (ngSubmit)="importJson()">
+      <form class="adm-form-card" [formGroup]="jsonForm" (ngSubmit)="importJson()">
+        <div class="adm-form-card__heading"><span>Collection details and vocabulary</span><small>Creates a draft</small></div>
 
         <div class="adm-prompt-box">
           <div class="adm-prompt-box__header">
@@ -129,13 +139,13 @@
         </div>
 
         <div class="adm-field">
-          <label class="adm-label">JSON file</label>
+          <label class="adm-label">Upload JSON file</label>
           <input class="adm-input" type="file" accept="application/json,.json" (change)="selectJsonFile($event)" />
         </div>
 
         <div class="adm-field">
-          <label class="adm-label">{{ 'admin.import.fields.title' | translate }}</label>
-          <input class="adm-input" formControlName="title" placeholder="e.g. Food & Drink A1" />
+          <label class="adm-label">Collection title</label>
+          <input class="adm-input" formControlName="title" placeholder="e.g. Food & Drink" />
         </div>
 
         <div class="adm-field">
@@ -190,7 +200,7 @@
             {{ 'admin.import.status.loading' | translate }}
           } @else {
             <ion-icon name="cloud-upload-outline"></ion-icon>
-            {{ 'admin.import.buttons.importJson' | translate }}
+            Validate and create draft
           }
         </button>
 
@@ -199,7 +209,8 @@
 
     <!-- ─── STORY IMPORT ───────────────────────────────────────────────── -->
     @if (activeTab() === 'story') {
-      <form [formGroup]="storyForm" (ngSubmit)="importStory()">
+      <form class="adm-form-card" [formGroup]="storyForm" (ngSubmit)="importStory()">
+        <div class="adm-form-card__heading"><span>Story source</span><small>Creates a draft</small></div>
 
         <div class="adm-prompt-box">
           <div class="adm-prompt-box__header">
@@ -212,8 +223,9 @@
         </div>
 
         <div class="adm-field">
-          <label class="adm-label">Platform Collection ID *</label>
-          <input class="adm-input" formControlName="platformCollectionId" placeholder="uuid" />
+          <label class="adm-label">Collection ID</label>
+          <input class="adm-input" formControlName="platformCollectionId" placeholder="Paste the collection UUID" />
+          <small class="adm-field-hint">The story will be linked to this collection and use its vocabulary.</small>
         </div>
 
         <div class="adm-field adm-field--inline">
@@ -257,7 +269,7 @@
             {{ 'admin.import.status.loading' | translate }}
           } @else {
             <ion-icon name="sparkles-outline"></ion-icon>
-            {{ 'admin.import.buttons.importStory' | translate }}
+            Create story draft
           }
         </button>
 
@@ -266,6 +278,10 @@
 
     <!-- ─── MANAGE COLLECTIONS ──────────────────────────────────────────── -->
     @if (activeTab() === 'collections' || activeTab() === 'stories') {
+      <div class="adm-import-mode" aria-label="Content to manage">
+        <button type="button" [class.adm-import-mode--active]="activeTab() === 'collections'" (click)="switchTab('collections')"><strong>Collections</strong><small>Vocabulary sets</small></button>
+        <button type="button" [class.adm-import-mode--active]="activeTab() === 'stories'" (click)="switchTab('stories')"><strong>Stories</strong><small>Reading content</small></button>
+      </div>
       <div class="adm-manage">
 
         @if (activeTab() === 'collections') {

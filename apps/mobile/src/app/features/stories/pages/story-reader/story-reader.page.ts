@@ -20,7 +20,6 @@ import {
 import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { addIcons } from 'ionicons';
 import { arrowBackOutline, chevronBackOutline } from 'ionicons/icons';
-import { firstValueFrom } from 'rxjs';
 import type { Story, StoryKeyword } from '@lingua-card/shared/domain';
 import { StoryStore } from '../../store/story.store';
 import { StoryApiService } from '../../services/story-api.service';
@@ -34,6 +33,7 @@ import { KeywordsTabComponent } from '../../components/keywords-tab/keywords-tab
 import { GrammarTabComponent } from '../../components/grammar-tab/grammar-tab.component';
 import { StoryTextComponent, StoryWordTap } from '../../components/story-text/story-text.component';
 import { computeQuizScore, type ReaderTab, type WordDetail } from '../../models/reader.model';
+import { OfflineImageDirective } from '../../../../shared/image/offline-image.directive';
 
 @Component({
   selector: 'lc-story-reader',
@@ -50,6 +50,7 @@ import { computeQuizScore, type ReaderTab, type WordDetail } from '../../models/
     KeywordsTabComponent,
     GrammarTabComponent,
     StoryTextComponent,
+    OfflineImageDirective,
   ],
 })
 export class StoryReaderPage implements OnInit, ViewWillEnter, ViewWillLeave {
@@ -378,12 +379,8 @@ export class StoryReaderPage implements OnInit, ViewWillEnter, ViewWillLeave {
     if (!s) return;
     const newState = !this.isLearned();
     this.isLearned.set(newState);
-    try {
-      const updated = await firstValueFrom(this.api.markLearned(s.id, newState));
-      this.story.set({ ...s, isLearned: updated.isLearned });
-    } catch {
-      this.isLearned.set(!newState); // revert on failure
-    }
+    const updated = await this.storyStore.setLearned(s.id, newState);
+    if (updated) this.story.set({ ...s, isLearned: updated.isLearned });
   }
 
   // ── Word sheet (delegated to StoryWordSheetService) ──────────────

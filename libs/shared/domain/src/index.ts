@@ -703,6 +703,10 @@ export interface StoryKeyword {
   conjugations?: VerbConjugations;
 }
 
+export interface PlatformStoryKeyword extends StoryKeyword {
+  wordId: string;
+}
+
 export interface StorySentence {
   index: number;
   german: string;
@@ -1013,7 +1017,7 @@ export interface PlatformStory {
   nativeLang: LanguageCode;
   sentences: StorySentence[];
   wordTimestamps: WordTimestamp[];
-  keywords: StoryKeyword[];
+  keywords: PlatformStoryKeyword[];
   quizQuestions: StoryQuizQuestion[];
   grammarNotes: StoryGrammarNote[];
   audioUrl: string | null;
@@ -1735,6 +1739,7 @@ export interface PodcastEpisodePreparation {
     learnFirstCount: number;
   };
   vocabulary: PodcastPreparationVocabulary[];
+  preparationCollectionId: string | null;
 }
 
 export interface PodcastEpisodeCompletion {

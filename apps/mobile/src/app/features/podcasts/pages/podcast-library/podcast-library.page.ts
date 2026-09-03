@@ -1,13 +1,14 @@
 import { ChangeDetectionStrategy, Component, inject, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
-import { IonButton, IonContent, IonHeader, IonIcon, IonToolbar } from '@ionic/angular/standalone';
+import { IonButton, IonContent, IonHeader, IonIcon, IonSpinner, IonToolbar } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
-import { arrowBack, arrowForward, play } from 'ionicons/icons';
+import { arrowBack, play } from 'ionicons/icons';
 import { PodcastCatalogueStore } from '../../store/podcast-catalogue.store';
+import { OfflineImageDirective } from '../../../../shared/image/offline-image.directive';
 
 @Component({
   selector: 'lc-podcast-library', standalone: true,
-  imports: [IonButton, IonContent, IonHeader, IonIcon, IonToolbar], providers: [PodcastCatalogueStore],
+  imports: [IonButton, IonContent, IonHeader, IonIcon, IonSpinner, IonToolbar, OfflineImageDirective], providers: [PodcastCatalogueStore],
   templateUrl: './podcast-library.page.html', styleUrl: './podcast-library.page.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
@@ -15,7 +16,7 @@ export class PodcastLibraryPage implements OnInit {
   readonly store = inject(PodcastCatalogueStore);
   private readonly router = inject(Router);
 
-  constructor() { addIcons({ arrowBack, arrowForward, play }); }
+  constructor() { addIcons({ arrowBack, play }); }
 
   ngOnInit(): void { this.store.loadTopics(); }
   openTopic(topicId: string): void { void this.router.navigate(['/podcasts/topics', topicId]); }

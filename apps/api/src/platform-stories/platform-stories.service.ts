@@ -11,6 +11,7 @@ import { storyLengthFromWordCount } from '@lingua-card/shared/domain';
 import { PlatformStoryEntity } from './platform-story.entity';
 import { UserStoryProgressEntity } from './user-story-progress.entity';
 import { StoryEntity } from '../stories/story.entity';
+import { normalizePlatformStoryKeywords } from './platform-story-keyword';
 
 export interface PlatformStoryFilters {
   level?: StoryDifficulty;
@@ -242,7 +243,7 @@ export class PlatformStoriesService {
       nativeLang: e.nativeLang as LanguageCode,
       sentences: e.sentences,
       wordTimestamps: e.wordTimestamps,
-      keywords: e.keywords,
+      keywords: normalizePlatformStoryKeywords(e.id, e.keywords),
       quizQuestions: e.quizQuestions,
       grammarNotes: e.grammarNotes,
       audioUrl: e.audioUrl,

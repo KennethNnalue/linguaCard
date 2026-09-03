@@ -4,7 +4,10 @@
     @else if (store.error(); as error) { <p class="state">{{ error }}</p> }
     @else if (store.completion(); as completion) {
       <section class="scene">
-        <img [src]="completion.episode.thumbnail.heroUrl" [alt]="completion.episode.thumbnail.accessibilityDescription" [style.object-position]="(completion.episode.thumbnail.focalPoint.x * 100) + '% ' + (completion.episode.thumbnail.focalPoint.y * 100) + '%'" />
+        <img [lcOfflineSrc]="completion.episode.thumbnail.heroUrl" [alt]="completion.episode.thumbnail.accessibilityDescription" [style.object-position]="(completion.episode.thumbnail.focalPoint.x * 100) + '% ' + (completion.episode.thumbnail.focalPoint.y * 100) + '%'" />
+        <ion-button class="back" fill="clear" shape="round" (click)="goBack(completion.episode.topicId)" aria-label="Back to topic">
+          <ion-icon slot="icon-only" name="arrow-back-outline" />
+        </ion-button>
         <div class="shade"></div><div class="scene-copy"><span>Episode complete</span><div class="check"><ion-icon name="checkmark" /></div><p>{{ completion.episode.topicTitle }}</p><h1>{{ completion.episode.title }}</h1><p class="translation">{{ completion.episode.titleTranslation }}</p></div>
       </section>
       <section class="actions">

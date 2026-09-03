@@ -55,19 +55,18 @@
 // ─── HOME ─────────────────────────────────────────────────────────────────────
 
 .home {
-  padding: t.$lc-space-2 t.$lc-space-5 t.$lc-space-8;
-  padding-top: calc(env(safe-area-inset-top, 0px) + t.$lc-space-2);
+  padding: t.$lc-space-2 t.$lc-space-5 calc(88px + env(safe-area-inset-bottom, 0px));
+  padding-top: 0;
 }
 
-// Header + inline search. While searching it pins to the top of the scroll
-// area so results stay in view; the negative inset cancels .home's padding so
-// the sticky band spans full width and its background masks content underneath.
-.home-top--stuck {
+// The negative inset cancels .home's padding so the sticky band spans the full
+// width and its surface masks content scrolling underneath.
+.home-top {
   position: sticky;
   top: 0;
   z-index: t.$lc-z-raised;
   margin: 0 (-(t.$lc-space-5));
-  padding: t.$lc-space-2 t.$lc-space-5 t.$lc-space-1;
+  padding: calc(env(safe-area-inset-top, 0px) + t.$lc-space-2) t.$lc-space-5 t.$lc-space-1;
   background: var(--lc-surface);
 
   .search--home { margin: 0; }

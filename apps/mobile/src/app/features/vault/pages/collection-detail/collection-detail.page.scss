@@ -362,7 +362,9 @@
   &--short { height: 8px; opacity: 0.7; }
 }
 
-.tail-space { height: 100px; }
+.tail-space {
+  height: calc(88px + env(safe-area-inset-bottom, 0px));
+}
 
 .detail-word-row {
   width: 100%;

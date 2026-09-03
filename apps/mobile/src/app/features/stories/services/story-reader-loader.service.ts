@@ -36,6 +36,7 @@ export class StoryReaderLoaderService {
   private readonly aiAudioCache = inject(AiAudioCacheService);
 
   async load(id: string, handlers: StoryLoadHandlers): Promise<StoryLoadResult | null> {
+    await this.storyStore.ensureLoaded();
     let story = this.storyStore.getById(id);
     if (!story) {
       try {
@@ -46,6 +47,9 @@ export class StoryReaderLoaderService {
     }
 
     if (!story.audioUrl) {
+      if (!navigator.onLine) {
+        return { story, hasAudio: false, needsEnrichment: false };
+      }
       handlers.onAudioGenerating(true);
       const generated = await this.storyStore.generateAudio(story.id);
       handlers.onAudioGenerating(false);
@@ -54,7 +58,9 @@ export class StoryReaderLoaderService {
     }
 
     handlers.onAudioLoading(true);
-    const resolvedUrl = await this.aiAudioCache.getOrDownload(story.id, story.audioUrl);
+    const resolvedUrl = navigator.onLine
+      ? await this.aiAudioCache.getOrDownload(story.id, story.audioUrl)
+      : await this.aiAudioCache.getFromCache(story.id);
     handlers.onAudioLoading(false);
 
     const resolved: Story = { ...story, audioUrl: resolvedUrl };

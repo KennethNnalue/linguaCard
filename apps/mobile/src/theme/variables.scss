@@ -493,8 +493,16 @@ body.ion-palette-dark {
 
 // FAB
 .lc-fab {
-  width: 44px; height: 44px;
-  border-radius: 50%;
+  width: 56px; height: 56px;
+  border-radius: var(--lc-radius-md);
+  --background: var(--lc-accent);
+  --background-activated: var(--lc-accent-dark);
+  --background-hover: var(--lc-accent);
+  --color: white;
+  --border-radius: var(--lc-radius-md);
+  --box-shadow: var(--lc-shadow-fab);
+  --padding-start: 0;
+  --padding-end: 0;
   background: var(--lc-accent);
   box-shadow: var(--lc-shadow-fab);
   display: flex; align-items: center; justify-content: center;

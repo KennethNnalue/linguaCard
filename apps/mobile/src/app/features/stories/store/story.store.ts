@@ -1,8 +1,9 @@
-import { computed, inject } from '@angular/core';
+import { computed, effect, inject } from '@angular/core';
 import {
   patchState,
   signalStore,
   withComputed,
+  withHooks,
   withMethods,
   withState,
 } from '@ngrx/signals';
@@ -87,22 +88,32 @@ export const StoryStore = signalStore(
         void (async () => {
           const userId = uid();
 
-          // 1. Show cache immediately — zero delay to user
           if (userId) {
-            const cached = await localData.getStories(userId);
-            if (cached.length > 0) {
-              patchState(store, { stories: cached, hasEverLoaded: true });
+            try {
+              const cached = await localData.getStories(userId);
+              if (cached.length > 0) {
+                patchState(store, { stories: cached, hasEverLoaded: true });
+              }
+            } catch {
+              patchState(store, { error: 'Stories saved on this device could not be read.' });
             }
           }
 
-          // 2. Determine whether to block (no cache) or silently refresh
+          if (!navigator.onLine) {
+            patchState(store, {
+              isLoading: false,
+              isRefreshing: false,
+              error: store.hasEverLoaded() ? null : 'No stories are saved on this device yet.',
+            });
+            return;
+          }
+
           if (!store.hasEverLoaded()) {
             patchState(store, { isLoading: true, error: null });
           } else {
             patchState(store, { isRefreshing: true });
           }
 
-          // 3. Background network refresh
           try {
             const stories = await firstValueFrom(api.getAll());
             patchState(store, {
@@ -136,12 +147,17 @@ export const StoryStore = signalStore(
         if (store.hasEverLoaded() || store.stories().length > 0) return;
         const userId = uid();
         if (userId) {
-          const cached = await localData.getStories(userId);
-          if (cached.length > 0) {
-            patchState(store, { stories: cached, hasEverLoaded: true });
-            return;
+          try {
+            const cached = await localData.getStories(userId);
+            if (cached.length > 0) {
+              patchState(store, { stories: cached, hasEverLoaded: true });
+              return;
+            }
+          } catch {
+            if (!navigator.onLine) return;
           }
         }
+        if (!navigator.onLine) return;
         try {
           const stories = await firstValueFrom(api.getAll());
           patchState(store, { stories, hasEverLoaded: true });
@@ -219,14 +235,45 @@ export const StoryStore = signalStore(
       },
 
       incrementListenCount(id: string): void {
-        patchState(store, {
-          stories: store.stories().map(s =>
+        const stories = store.stories().map(s =>
             s.id === id
               ? { ...s, listenCount: s.listenCount + 1, lastListenedAt: new Date().toISOString() }
               : s
-          ),
-        });
-        void firstValueFrom(api.recordListen(id)).catch(() => null);
+          );
+        patchState(store, { stories });
+        const userId = uid();
+        if (userId) void localData.setStories(userId, stories).catch(() => undefined);
+        if (!navigator.onLine) {
+          void syncService.enqueue({ type: 'RECORD_STORY_LISTEN', payload: { storyId: id } });
+          return;
+        }
+        void firstValueFrom(api.recordListen(id)).catch(() =>
+          syncService.enqueue({ type: 'RECORD_STORY_LISTEN', payload: { storyId: id } })
+        );
+      },
+
+      async setLearned(id: string, isLearned: boolean): Promise<Story | null> {
+        const current = store.stories().find(story => story.id === id);
+        if (!current) return null;
+        const optimistic = { ...current, isLearned };
+        const stories = store.stories().map(story => story.id === id ? optimistic : story);
+        patchState(store, { stories });
+        const userId = uid();
+        if (userId) await localData.setStories(userId, stories);
+        if (!navigator.onLine) {
+          await syncService.enqueue({ type: 'MARK_STORY_LEARNED', payload: { storyId: id, isLearned } });
+          return optimistic;
+        }
+        try {
+          const saved = await firstValueFrom(api.markLearned(id, isLearned));
+          const reconciled = store.stories().map(story => story.id === id ? saved : story);
+          patchState(store, { stories: reconciled });
+          if (userId) await localData.setStories(userId, reconciled);
+          return saved;
+        } catch {
+          await syncService.enqueue({ type: 'MARK_STORY_LEARNED', payload: { storyId: id, isLearned } });
+          return optimistic;
+        }
       },
 
       /**
@@ -235,9 +282,10 @@ export const StoryStore = signalStore(
        * cached copy. Local-only — no server write (the file is already gone).
        */
       markAudioMissing(id: string): void {
-        patchState(store, {
-          stories: store.stories().map(s => (s.id === id ? { ...s, audioUrl: null } : s)),
-        });
+        const stories = store.stories().map(s => (s.id === id ? { ...s, audioUrl: null } : s));
+        patchState(store, { stories });
+        const userId = uid();
+        if (userId) void localData.setStories(userId, stories).catch(() => undefined);
         void audioCache.evict(id);
       },
 
@@ -310,5 +358,20 @@ export const StoryStore = signalStore(
         patchState(store, initialState);
       },
     };
-  })
+  }),
+  withHooks(store => {
+    const auth = inject(AuthService);
+    let activeUserId = auth.currentUser()?.id;
+    return {
+      onInit(): void {
+        effect(() => {
+          const nextUserId = auth.currentUser()?.id;
+          if (nextUserId === activeUserId) return;
+          activeUserId = nextUserId;
+          store.reset();
+          if (nextUserId) store.loadStories();
+        });
+      },
+    };
+  }),
 );

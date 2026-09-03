@@ -1,7 +1,7 @@
 <ion-content [scrollY]="false">
   <main class="player">
     @if (store.episode(); as episode) {
-      <img class="scene" [src]="episode.thumbnail.heroUrl" [alt]="episode.thumbnail.accessibilityDescription"
+      <img class="scene" [lcOfflineSrc]="episode.thumbnail.heroUrl" [alt]="episode.thumbnail.accessibilityDescription"
         [style.object-position]="(episode.thumbnail.focalPoint.x * 100) + '% ' + (episode.thumbnail.focalPoint.y * 100) + '%'"
         />
       <div class="shade"></div>
@@ -38,31 +38,36 @@
         <div class="times"><span>{{time(store.currentTimeMs())}}</span><span>-{{time(episode.audioDurationMs-store.currentTimeMs())}}</span></div>
 
         <div class="transport">
-          <ion-button fill="outline" shape="round" (click)="rewind()" aria-label="Rewind ten seconds">
+          <ion-button class="seek" fill="clear" shape="round" (click)="rewind()" aria-label="Rewind ten seconds">
             <ion-icon name="arrow-undo-outline" />
             <span aria-hidden="true">10s</span>
           </ion-button>
           <ion-button class="play" shape="round" (click)="togglePlayback()" [attr.aria-label]="store.isPlaying() ? 'Pause' : 'Play'">
             <ion-icon slot="icon-only" [name]="store.isPlaying() ? 'pause' : 'play'" />
           </ion-button>
-          <ion-button fill="outline" shape="round" (click)="forward()" aria-label="Forward ten seconds">
+          <ion-button class="seek" fill="clear" shape="round" (click)="forward()" aria-label="Forward ten seconds">
             <ion-icon name="arrow-redo-outline" />
             <span aria-hidden="true">10s</span>
           </ion-button>
         </div>
 
         <div class="secondary-controls">
-          <ion-button fill="clear" (click)="toggleRepeat()"
-            [class.active]="store.repeatMode() !== 'off'"
-            [attr.aria-pressed]="store.repeatMode() !== 'off'">
-            <ion-icon slot="start" name="repeat-outline" />
-            {{ store.repeatMode() === 'off' ? 'Repeat' : store.repeatMode() === 'topic' ? 'Repeat topic' : 'Repeat episode' }}
+          <ion-button class="speed" fill="clear" shape="round" (click)="changeSpeed()"
+            [attr.aria-label]="'Playback speed ' + store.speed() + ' times. Tap to change.'">
+            <ion-icon name="speedometer-outline" />
+            <span aria-hidden="true">{{ store.speed() }}×</span>
           </ion-button>
-          <ion-button fill="clear" (click)="toggleSubtitles()"
+          <ion-button fill="clear" shape="round" (click)="toggleRepeat()"
+            [class.active]="store.repeatMode() !== 'off'"
+            [attr.aria-pressed]="store.repeatMode() !== 'off'"
+            [attr.aria-label]="store.repeatMode() === 'off' ? 'Repeat episode' : 'Turn off repeat'">
+            <ion-icon slot="icon-only" name="repeat-outline" />
+          </ion-button>
+          <ion-button fill="clear" shape="round" (click)="toggleSubtitles()"
             [class.active]="store.translationMode() !== 'target'"
-            [attr.aria-pressed]="store.translationMode() !== 'target'">
-            <ion-icon slot="start" [name]="store.translationMode() === 'target' ? 'eye-outline' : 'eye-off-outline'" />
-            {{ store.translationMode() === 'target' ? 'Show subtitles' : 'Hide subtitles' }}
+            [attr.aria-pressed]="store.translationMode() !== 'target'"
+            [attr.aria-label]="store.translationMode() === 'target' ? 'Show subtitles' : 'Hide subtitles'">
+            <ion-icon slot="icon-only" [name]="store.translationMode() === 'target' ? 'eye-outline' : 'eye-off-outline'" />
           </ion-button>
         </div>
       </section>
@@ -70,7 +75,7 @@
       <audio #audioPlayer preload="auto" [src]="episode.audioUrl" (loadedmetadata)="prepareAudio($event)" (canplay)="readyToPlay()"
         (timeupdate)="timeChanged($event)" (play)="started()" (pause)="paused($event)" (ended)="completed()"></audio>
     } @else if(store.status()==='loading') {
-      <p class="state">Loading conversation…</p>
+      <p class="state"><ion-spinner name="crescent" /> Loading conversation…</p>
     } @else {
       <p class="state">{{store.error()}}</p>
     }

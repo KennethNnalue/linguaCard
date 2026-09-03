@@ -9,7 +9,7 @@
 }
 
 .ss-page {
-  padding: calc(#{t.$lc-space-2} + env(safe-area-inset-top, 0px)) 18px 28px;
+  padding: 0 18px 28px;
 }
 
 .ss-refresh-bar {
@@ -24,10 +24,9 @@
   to   { background-position: 200px 0; }
 }
 
-// Header + inline search. While searching it pins to the top of the scroll area
-// so results stay in view; the negative inset cancels .ss-page's padding so the
-// band spans full width and its paper background masks content underneath.
-.ss-top--stuck {
+// The negative inset cancels .ss-page's padding so the sticky band spans the
+// full width and its paper background masks content scrolling underneath.
+.ss-top {
   position: sticky;
   top: 0;
   z-index: t.$lc-z-raised;

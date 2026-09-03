@@ -1,14 +1,15 @@
-import {ChangeDetectionStrategy, Component, computed, effect, inject} from '@angular/core';
+import {ChangeDetectionStrategy, Component, computed, effect, inject, signal} from '@angular/core';
 import {ActivatedRoute, Router} from '@angular/router';
 import {IonContent, IonHeader, IonToolbar, ModalController, ViewWillEnter} from '@ionic/angular/standalone';
 import {PlayMode} from '@lingua-card/shared/domain';
 import {TranslatePipe, TranslateService} from '@ngx-translate/core';
 import {CollectionStore} from '../../../vault/store/collection.store';
 import {ListenStore} from '../../store/listen.store';
+import {PodcastCatalogueStore} from '../../../podcasts/store/podcast-catalogue.store';
+import {OfflineImageDirective} from '../../../../shared/image/offline-image.directive';
 import {WordAudioService} from '../../../../shared/audio/word-audio.service';
 import {EmptyStateComponent} from '../../../../shared/ui/empty-state/empty-state.component';
 import {PlaylistSourceSheetComponent} from '../../components/playlist-source-sheet/playlist-source-sheet.component';
-import {ListenEqualizerComponent} from '../../components/listen-equalizer/listen-equalizer.component';
 import {ListenModeSelectorComponent} from '../../components/listen-mode-selector/listen-mode-selector.component';
 import {ListenQueueItemComponent} from '../../components/listen-queue-item/listen-queue-item.component';
 import {
@@ -23,16 +24,18 @@ import {
   templateUrl: './listen.component.html',
   styleUrl: './listen.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
+  providers: [PodcastCatalogueStore],
   imports: [
     IonContent, IonHeader, IonToolbar, TranslatePipe,
     EmptyStateComponent,
-    ListenEqualizerComponent,
+    OfflineImageDirective,
     ListenModeSelectorComponent,
     ListenQueueItemComponent,
   ],
 })
 export class ListenComponent implements ViewWillEnter {
   protected readonly listenStore = inject(ListenStore);
+  protected readonly podcastStore = inject(PodcastCatalogueStore);
   private readonly collectionStore = inject(CollectionStore);
   private readonly modalCtrl = inject(ModalController);
   private readonly router = inject(Router);
@@ -45,6 +48,11 @@ export class ListenComponent implements ViewWillEnter {
 
   readonly queueCount = computed(() => this.listenStore.queue().length);
   readonly queuePreview = computed(() => this.listenStore.queue().slice(0, 3));
+  readonly experience = signal<'words' | 'podcasts'>('words');
+  readonly featuredPodcast = computed(
+    () => this.podcastStore.continueListening() ?? this.podcastStore.recentEpisodes()[0] ?? null,
+  );
+  readonly podcastTopics = computed(() => this.podcastStore.topics().slice(0, 2));
 
   /** i18n key of the active mode's label — used in the hero sub-line. */
   readonly modeLabelKey = computed(
@@ -63,7 +71,8 @@ export class ListenComponent implements ViewWillEnter {
     });
   }
 
-  ionViewWillEnter(): void {
+  async ionViewWillEnter(): Promise<void> {
+    this.podcastStore.loadTopics();
     const params = this.route.snapshot.queryParamMap;
     const collectionId = params.get('collectionId');
     if (collectionId) {
@@ -73,7 +82,9 @@ export class ListenComponent implements ViewWillEnter {
       const prefix = this.translate.instant('listen.card.collectionPrefix');
       this.listenStore.loadCollectionCards(collectionId, `${prefix} ${colName}`);
       this.router.navigate([], {replaceUrl: true, queryParams: {}});
+      return;
     }
+    await this.listenStore.ensureDefaultQueue();
   }
 
   async openSourceSheet(): Promise<void> {
@@ -126,6 +137,27 @@ export class ListenComponent implements ViewWillEnter {
       this.listenStore.pause();
     }
     void this.router.navigate(['/podcasts']);
+  }
+
+  selectExperience(experience: 'words' | 'podcasts'): void {
+    this.wordAudio.stop();
+    this.experience.set(experience);
+  }
+
+  playPodcast(episodeId: string): void {
+    this.wordAudio.stop();
+    if (this.listenStore.status() === 'playing' || this.listenStore.status() === 'loading') {
+      this.listenStore.pause();
+    }
+    void this.router.navigate(['/podcasts/episodes', episodeId, 'player']);
+  }
+
+  openPodcastTopic(topicId: string): void {
+    void this.router.navigate(['/podcasts/topics', topicId]);
+  }
+
+  podcastDuration(durationMs: number): string {
+    return `${Math.max(1, Math.round(durationMs / 60000))} min`;
   }
 
   cycleSpeed(): void {

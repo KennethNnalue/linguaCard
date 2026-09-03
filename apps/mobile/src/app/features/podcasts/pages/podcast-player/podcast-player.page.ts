@@ -3,20 +3,28 @@ import {
 } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import {
-  IonButton, IonContent, IonIcon, IonRange,
+  IonButton, IonContent, IonIcon, IonRange, IonSpinner,
 } from '@ionic/angular/standalone';
 import type { ViewWillLeave } from '@ionic/angular';
 import { addIcons } from 'ionicons';
 import {
   arrowBackOutline, arrowRedoOutline, arrowUndoOutline, eyeOffOutline, eyeOutline,
-  pause, play, repeatOutline,
+  pause, play, repeatOutline, speedometerOutline,
 } from 'ionicons/icons';
 import { PodcastPlayerStore } from '../../store/podcast-player.store';
+import { OfflineImageDirective } from '../../../../shared/image/offline-image.directive';
+
+const PODCAST_PLAYBACK_SPEEDS = [0.75, 1, 1.25, 1.5] as const;
+
+export function nextPodcastPlaybackSpeed(currentSpeed: number): number {
+  const currentIndex = PODCAST_PLAYBACK_SPEEDS.findIndex(speed => speed === currentSpeed);
+  return PODCAST_PLAYBACK_SPEEDS[(currentIndex + 1) % PODCAST_PLAYBACK_SPEEDS.length];
+}
 
 @Component({
   selector: 'lc-podcast-player', standalone: true,
   imports: [
-    IonButton, IonContent, IonIcon, IonRange,
+    IonButton, IonContent, IonIcon, IonRange, IonSpinner, OfflineImageDirective,
   ],
   providers: [PodcastPlayerStore], templateUrl: './podcast-player.page.html',
   styleUrl: './podcast-player.page.scss', changeDetection: ChangeDetectionStrategy.OnPush,
@@ -32,7 +40,7 @@ export class PodcastPlayerPage implements OnInit, ViewWillLeave {
   constructor() {
     addIcons({
       arrowBackOutline, arrowRedoOutline, arrowUndoOutline, eyeOffOutline, eyeOutline,
-      pause, play, repeatOutline,
+      pause, play, repeatOutline, speedometerOutline,
     });
     this.destroyRef.onDestroy(() => this.stopAudioPlayback());
   }
@@ -119,6 +127,14 @@ export class PodcastPlayerPage implements OnInit, ViewWillLeave {
     this.store.translationModeChanged(
       this.store.translationMode() === 'target' ? 'both' : 'target',
     );
+  }
+  changeSpeed(): void {
+    const speed = nextPodcastPlaybackSpeed(this.store.speed());
+    this.store.speedChanged(speed);
+    const audio = this.audio()?.nativeElement;
+    if (!audio) return;
+    audio.defaultPlaybackRate = speed;
+    audio.playbackRate = speed;
   }
   speakerName(speakerId: string): string { return this.store.episode()?.speakers.find(speaker => speaker.id === speakerId)?.name ?? 'Speaker'; }
   time(ms: number): string { const seconds = Math.floor(ms / 1000); return `${Math.floor(seconds / 60)}:${String(seconds % 60).padStart(2, '0')}`; }

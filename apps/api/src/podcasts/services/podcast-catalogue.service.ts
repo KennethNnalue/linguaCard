@@ -7,6 +7,7 @@ import type {
   PodcastTopicDetail,
 } from '@lingua-card/shared/domain';
 import { DataSource, In, Repository } from 'typeorm';
+import { CollectionEntity } from '../../collections/collection.entity';
 import { LexemeEntity } from '../../vocabulary/entities/lexeme.entity';
 import { LexemeLocalizationEntity } from '../../vocabulary/entities/lexeme-localization.entity';
 import { calculatePodcastReadiness, podcastMasteryWeight } from '../domain/podcast-readiness';
@@ -122,13 +123,17 @@ export class PodcastCatalogueService {
     if (!topic) throw new NotFoundException(`Podcast topic ${episode.topicId} not found`);
     const vocabularyLinks = await this.vocabularyRepo.find({ where: { episodeId }, order: { position: 'ASC' } });
     const lexemeIds = vocabularyLinks.map(link => link.lexemeId);
-    const [lexemes, localizations, masteryRows, thumbnailEntity] = await Promise.all([
+    const [lexemes, localizations, masteryRows, thumbnailEntity, preparationCollection] = await Promise.all([
       lexemeIds.length ? this.dataSource.getRepository(LexemeEntity).findBy({ id: In(lexemeIds) }) : [],
       lexemeIds.length ? this.dataSource.getRepository(LexemeLocalizationEntity).find({
         where: { lexemeId: In(lexemeIds), language: topic.translationLanguage, isActive: true },
       }) : [],
       this.loadMastery(userId, topic, lexemeIds),
       this.thumbnailRepo.findOneBy({ id: episode.thumbnailAssetId ?? '' }),
+      this.dataSource.getRepository(CollectionEntity).findOneBy({
+        userId,
+        sourcePodcastEpisodeId: episodeId,
+      }),
     ]);
     if (!thumbnailEntity) throw new NotFoundException(`Podcast episode ${episodeId} thumbnail not found`);
     const lexemeById = new Map(lexemes.map(lexeme => [lexeme.id, lexeme]));
@@ -154,6 +159,7 @@ export class PodcastCatalogueService {
       },
       readiness: calculatePodcastReadiness(vocabulary),
       vocabulary,
+      preparationCollectionId: preparationCollection?.id ?? null,
     };
   }
 

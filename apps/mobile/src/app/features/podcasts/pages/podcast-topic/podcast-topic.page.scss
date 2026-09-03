@@ -2,14 +2,14 @@
 
 :host { --bg:#09130f; --surface:#102119; --text:#f4efe4; --muted:#91a095; --line:rgba(167,188,174,.2); }
 ion-content { --background:var(--bg); --color:var(--text); }
-.topic-page { position:relative; width:min(100%,780px); margin:auto; padding:18px 18px 90px; }
+.topic-page { position:relative; width:min(100%,780px); margin:auto; padding:calc(12px + env(safe-area-inset-top, 0px)) 18px calc(112px + env(safe-area-inset-bottom, 0px)); }
 .back { position:absolute; z-index:2; width:48px; height:48px; margin:14px; --background:rgba(9,19,15,.75); --border-color:rgba(255,255,255,.35); --border-style:solid; --border-width:1px; --color:white; }
 .topic-hero { position:relative; overflow:hidden; border-radius:t.$lc-radius-xl; background:var(--surface); }
 .topic-hero img { width:100%; aspect-ratio:16/9; object-fit:cover; }
 .topic-hero div { padding:20px; }
 .topic-hero span,.episodes ion-label span { color:var(--lc-ss-premium-star); font-size:t.$lc-text-xxs; text-transform:uppercase; }
 .topic-hero h1 { margin:6px 0; font-family:t.$lc-font-display; font-size:clamp(2rem,7vw,3.2rem); }
-.topic-hero p,.episodes small,.state { color:var(--muted); }
+.topic-hero p,.episodes small,.state { color:#b8c3bb; }
 .play-topic { margin:14px 0 0; --background:var(--lc-ss-sage); --color:#102119; --border-radius:#{t.$lc-radius-full}; font-weight:700; }
 .topic-actions { display:flex; flex-wrap:wrap; gap:8px; padding:0!important; }
 .topic-actions ion-button { margin:14px 0 0; --border-color:var(--line); --border-radius:#{t.$lc-radius-full}; --color:var(--text); font-weight:700; }
@@ -22,5 +22,6 @@ ion-content { --background:var(--bg); --color:var(--text); }
 .episodes ion-label { display:grid; gap:5px; margin:14px 8px; }
 .episodes strong { font-size:t.$lc-text-md; }
 .episodes ion-icon { color:var(--muted); }
+.state { display:flex; min-height:60vh; align-items:center; justify-content:center; gap:10px; text-align:center; }
 
 @media(max-width:480px) { .episodes img { width:92px; } }

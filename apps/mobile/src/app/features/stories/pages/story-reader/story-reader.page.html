@@ -4,7 +4,7 @@
     <!-- ── Cover header ─────────────────────────────────────────────── -->
     <div class="ss-rcover" [style.background]="coverGradient(s)">
       @if (s.coverImageUrl) {
-        <img [src]="s.coverImageUrl" class="ss-rcover-img" alt="" />
+        <img [lcOfflineSrc]="s.coverImageUrl" class="ss-rcover-img" alt="" />
       }
       <div class="ss-rcover-overlay"></div>
 
@@ -214,7 +214,7 @@
 
       <div class="ss-xp-body">
         <div class="ss-xp-cover" [style.background]="coverGradient(s)">
-          @if (s.coverImageUrl) { <img [src]="s.coverImageUrl" class="ss-xp-cover-img" alt="" /> }
+          @if (s.coverImageUrl) { <img [lcOfflineSrc]="s.coverImageUrl" class="ss-xp-cover-img" alt="" /> }
           <span class="ss-xp-level">{{ s.difficultyLevel }}</span>
         </div>
 

@@ -7,6 +7,7 @@ import type {
   AdminPodcastTopicListItem,
   AdminPodcastTranscriptPayload,
   AdminPodcastTranscriptPreview,
+  AdminUpdatePodcastTopicDto,
 } from '@lingua-card/shared/domain';
 import { EMPTY, catchError, exhaustMap, pipe, switchMap, tap } from 'rxjs';
 import {
@@ -28,6 +29,10 @@ interface AdminPodcastState {
   transcriptStatus: RequestStatus;
   audioGenerationEpisodeId: string | null;
   audioGenerationStatus: RequestStatus;
+  lastCreatedTopicId: string | null;
+  lastCreatedEpisodeId: string | null;
+  lastUploadedTopicThumbnailId: string | null;
+  lastUploadedEpisodeThumbnailId: string | null;
 }
 
 const initialState: AdminPodcastState = {
@@ -42,7 +47,16 @@ const initialState: AdminPodcastState = {
   transcriptStatus: 'idle',
   audioGenerationEpisodeId: null,
   audioGenerationStatus: 'idle',
+  lastCreatedTopicId: null,
+  lastCreatedEpisodeId: null,
+  lastUploadedTopicThumbnailId: null,
+  lastUploadedEpisodeThumbnailId: null,
 };
+
+export interface UpdateTopicCommand {
+  topicId: string;
+  dto: AdminUpdatePodcastTopicDto;
+}
 
 export interface CreateEpisodeCommand {
   topicId: string;
@@ -99,12 +113,34 @@ export const AdminPodcastStore = signalStore(
             tap(topic => patchState(store, {
               topics: [topic, ...store.topics()],
               mutationStatus: 'success',
+              lastCreatedTopicId: topic.id,
               success: `Topic “${topic.title}” was created as a draft. Add its first episode next.`,
             })),
             catchError(error => {
               patchState(store, {
                 mutationStatus: 'error',
                 error: adminPodcastErrorMessage(error, 'Could not create the topic.'),
+              });
+              return EMPTY;
+            }),
+          );
+        }),
+      ),
+    ),
+    updateTopic: rxMethod<UpdateTopicCommand>(
+      pipe(
+        exhaustMap(command => {
+          patchState(store, { mutationStatus: 'loading', error: null, success: null });
+          return api.updateTopic(command.topicId, command.dto).pipe(
+            tap(updated => patchState(store, {
+              topics: store.topics().map(topic => topic.id === command.topicId ? updated : topic),
+              mutationStatus: 'success',
+              success: `Topic “${updated.title}” was updated.`,
+            })),
+            catchError(error => {
+              patchState(store, {
+                mutationStatus: 'error',
+                error: adminPodcastErrorMessage(error, 'Could not update the topic.'),
               });
               return EMPTY;
             }),
@@ -122,6 +158,7 @@ export const AdminPodcastStore = signalStore(
                 ? { ...topic, episodes: [...topic.episodes, episode].sort((a, b) => a.position - b.position) }
                 : topic),
               mutationStatus: 'success',
+              lastCreatedEpisodeId: episode.id,
               success: `Episode “${episode.title}” was created as a draft. Add its image and transcript next.`,
             })),
             catchError(error => {
@@ -145,6 +182,7 @@ export const AdminPodcastStore = signalStore(
                 ? { ...topic, thumbnail }
                 : topic),
               mutationStatus: 'success',
+              lastUploadedTopicThumbnailId: command.topicId,
               success: 'The topic image was saved.',
             })),
             catchError(error => {
@@ -171,6 +209,7 @@ export const AdminPodcastStore = signalStore(
                   : episode),
               })),
               mutationStatus: 'success',
+              lastUploadedEpisodeThumbnailId: command.episodeId,
               success: 'The episode image was saved.',
             })),
             catchError(error => {

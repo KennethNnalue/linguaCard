@@ -1,4 +1,5 @@
 import { computed, inject } from '@angular/core';
+import { toObservable } from '@angular/core/rxjs-interop';
 import { patchState, signalStore, withComputed, withHooks, withMethods, withState } from '@ngrx/signals';
 import { AudioSegment, PlaybackScript, PlayerSettings, PlayMode } from '@lingua-card/shared/domain';
 import { isStruggling } from '../../review/domain/review-status';
@@ -20,6 +21,7 @@ import {
 } from '../models/listen.models';
 import { ListenPlaybackEngine, PlaybackHost } from '../services/listen-playback.engine';
 import { ScriptCompilerService } from '../services/script-compiler.service';
+import { filter, firstValueFrom, take } from 'rxjs';
 
 function isRecord(value: unknown): value is Record<string, unknown> {
   return typeof value === 'object' && value !== null;
@@ -174,6 +176,7 @@ export const ListenStore = signalStore(
     const compiler = inject(ScriptCompilerService);
     const cardStore = inject(CardStore);
     const engine = inject(ListenPlaybackEngine);
+    const cardLoadState = toObservable(cardStore.loadState);
 
     function compileQueue(items: readonly VocabularyPlaylistItem[], mode: PlayMode): PlaybackScript[] {
       return items.map(item => compiler.compile(item, mode, store.languages()));
@@ -256,6 +259,21 @@ export const ListenStore = signalStore(
           languages: DEFAULT_PLAYLIST_LANGUAGES,
           items: cards.map(toVocabularyPlaylistItem),
         });
+      },
+      async ensureDefaultQueue(): Promise<void> {
+        if (store.queue().length > 0 || store.selectedSource() !== ListenSource.Due) return;
+        const state = cardStore.loadState();
+        if (state.status === 'idle' || state.status === 'error') {
+          await cardStore.loadCards();
+        } else if (state.status === 'loading') {
+          await firstValueFrom(cardLoadState.pipe(
+            filter(candidate => candidate.status !== 'loading'),
+            take(1),
+          ));
+        }
+        if (store.queue().length === 0 && store.selectedSource() === ListenSource.Due) {
+          this.loadDueCards();
+        }
       },
       loadAllCards(): void {
         patchState(store, { selectedSource: ListenSource.All });

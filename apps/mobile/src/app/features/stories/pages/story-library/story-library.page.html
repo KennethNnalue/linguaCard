@@ -13,8 +13,8 @@
 
   <div class="ss-page">
 
-    <!-- Header + inline search — pinned to the top while searching so results lead. -->
-    <div class="ss-top" [class.ss-top--stuck]="searchOpen()">
+    <!-- Header + inline search -->
+    <div class="ss-top">
     <!-- ═══════════════ HEADER ═══════════════ -->
     <div class="ss-header">
       <div class="ss-header-titles">
@@ -143,7 +143,7 @@
                [attr.aria-label]="'Open: ' + story.title">
             <div class="ss-cover-art" [style.background]="gradientFor(story.id)">
               @if (story.coverImageUrl) {
-                <img [src]="story.coverImageUrl" class="ss-cover-img" [alt]="story.title" />
+                <img [lcOfflineSrc]="story.coverImageUrl" class="ss-cover-img" [alt]="story.title" />
               }
               <span class="ss-level-pill ss-level-pill--art">{{ story.level }}</span>
               @if (story.isPremium) {

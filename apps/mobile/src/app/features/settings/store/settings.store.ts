@@ -5,6 +5,8 @@ import type { UserSettings, UpdateUserSettingsDto } from '@lingua-card/shared/do
 import { DEFAULT_STUDY_GOALS } from '@lingua-card/shared/domain';
 import { SettingsApiService } from '../services/settings-api.service';
 import { SyncService } from '../../../core/services/sync.service';
+import { AuthService } from '../../../core/services/auth.service';
+import { LocalDataService } from '../../../core/services/local-data.service';
 
 const GOAL_PROMPT_INTERVAL_MS = 7 * 24 * 60 * 60 * 1000;
 
@@ -31,12 +33,28 @@ export const SettingsStore = signalStore(
   withMethods(store => {
     const api = inject(SettingsApiService);
     const sync = inject(SyncService);
+    const auth = inject(AuthService);
+    const localData = inject(LocalDataService);
 
     return {
       async load(): Promise<void> {
+        const userId = auth.currentUser()?.id;
+        if (userId) {
+          try {
+            const cached = await localData.getSettings(userId);
+            if (cached) patchState(store, { settings: cached, loaded: true });
+          } catch {
+            // Continue to the API when device storage is temporarily unavailable.
+          }
+        }
+        if (!navigator.onLine) {
+          patchState(store, { loaded: true });
+          return;
+        }
         try {
           const settings = await firstValueFrom(api.get());
           patchState(store, { settings, loaded: true, updateStatus: 'idle' });
+          if (userId) await localData.setSettings(userId, settings);
           // Sync device timezone after state is patched, using proper error handling
           // with offline queueing rather than a fire-and-forget Observable subscribe.
           if (settings.timezone === 'UTC') {
@@ -47,6 +65,7 @@ export const SettingsStore = signalStore(
               try {
                 const saved = await firstValueFrom(api.update(dto));
                 patchState(store, { settings: saved });
+                if (userId) await localData.setSettings(userId, saved);
               } catch {
                 await sync.enqueue({ type: 'PATCH_SETTINGS', payload: dto });
               }
@@ -77,11 +96,22 @@ export const SettingsStore = signalStore(
         try {
           const saved = await firstValueFrom(api.update(stamped));
           patchState(store, { settings: saved, updateStatus: 'idle' });
+          const userId = auth.currentUser()?.id;
+          if (userId) {
+            try {
+              await localData.setSettings(userId, saved);
+            } catch {
+              return;
+            }
+          }
         } catch {
           // Offline or transient failure — queue for retry when connectivity returns.
           // The optimistic value stays in memory; the server will be updated on reconnect.
           await sync.enqueue({ type: 'PATCH_SETTINGS', payload: stamped });
           patchState(store, { updateStatus: 'pending-sync' });
+          const userId = auth.currentUser()?.id;
+          const optimistic = store.settings();
+          if (userId && optimistic) await localData.setSettings(userId, optimistic);
         }
       },
 
@@ -89,6 +119,8 @@ export const SettingsStore = signalStore(
       // response without triggering another API write.
       setFromServer(settings: UserSettings): void {
         patchState(store, { settings, loaded: true, updateStatus: 'idle' });
+        const userId = auth.currentUser()?.id;
+        if (userId) void localData.setSettings(userId, settings).catch(() => undefined);
       },
 
       dailyGoal(): number {

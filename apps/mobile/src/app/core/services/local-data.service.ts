@@ -1,11 +1,23 @@
 import { inject, Injectable } from '@angular/core';
 import { Storage } from '@ionic/storage-angular';
-import { Category, Collection, PlatformStory, PlatformStoryCard, ScheduledCard, Story } from '@lingua-card/shared/domain';
+import {
+  CardView, Category, Collection, PlatformStory, PlatformStoryCard, PodcastEpisodePlayer,
+  PodcastEpisodePreparation, PodcastLibraryResponse, PodcastTopicDetail, ScheduledCard, Story,
+  UserSettings, VaultView,
+  UserStoryProgress,
+} from '@lingua-card/shared/domain';
 import type { UpsertSessionDto } from '../../features/review/services/review-session-api.service';
 import type { PersistedActiveReviewSession, PersistedReviewLocalState } from '../../features/review/domain/review-persistence';
 import { EMPTY_ENGAGEMENT_STATE, PersistedEngagementState } from '../../features/engagement/data-access/engagement-local.models';
 
-type SyncFeature = 'stories' | 'cards' | 'collections' | 'categories';
+type SyncFeature = 'stories' | 'cards' | 'collections' | 'categories' | 'vault';
+
+export interface CachedVaultSnapshot {
+  learningContextId: string;
+  vault: VaultView;
+  learningItems: CardView[];
+  cachedAt: string;
+}
 
 @Injectable({ providedIn: 'root' })
 export class LocalDataService {
@@ -53,6 +65,26 @@ export class LocalDataService {
     await this.storage.set(`collections:${userId}`, collections);
   }
 
+  async getVaultSnapshot(userId: string): Promise<CachedVaultSnapshot | null> {
+    await this.init();
+    return (await this.storage.get(`vault_v2:${userId}`)) ?? null;
+  }
+
+  async setVaultSnapshot(userId: string, snapshot: CachedVaultSnapshot): Promise<void> {
+    await this.init();
+    await this.storage.set(`vault_v2:${userId}`, snapshot);
+  }
+
+  async getSettings(userId: string): Promise<UserSettings | null> {
+    await this.init();
+    return (await this.storage.get(`settings:${userId}`)) ?? null;
+  }
+
+  async setSettings(userId: string, settings: UserSettings): Promise<void> {
+    await this.init();
+    await this.storage.set(`settings:${userId}`, settings);
+  }
+
   // ── Stories ──────────────────────────────────────────────────
   async getStories(userId: string): Promise<Story[]> {
     await this.init();
@@ -80,6 +112,20 @@ export class LocalDataService {
     await this.storage.set(`platform_story:${story.id}`, story);
   }
 
+  async getPlatformStoryProgress(userId: string, storyId: string): Promise<UserStoryProgress | null> {
+    await this.init();
+    const progress = (await this.storage.get(`platform_story_progress:${userId}`))
+      ?? {};
+    return progress[storyId] ?? null;
+  }
+
+  async setPlatformStoryProgress(userId: string, progress: UserStoryProgress): Promise<void> {
+    await this.init();
+    const key = `platform_story_progress:${userId}`;
+    const existing = (await this.storage.get(key)) ?? {};
+    await this.storage.set(key, { ...existing, [progress.storyId]: progress });
+  }
+
   // ── Platform stories list (Explore catalogue — keyed by native language) ──────
   async getPlatformStoriesList(nativeLang: string): Promise<PlatformStoryCard[]> {
     await this.init();
@@ -89,6 +135,46 @@ export class LocalDataService {
   async setPlatformStoriesList(nativeLang: string, stories: PlatformStoryCard[]): Promise<void> {
     await this.init();
     await this.storage.set(`platform_stories_list:${nativeLang}`, stories);
+  }
+
+  async getPodcastLibrary(userId: string): Promise<PodcastLibraryResponse | null> {
+    await this.init();
+    return (await this.storage.get(`podcast_library:${userId}`)) ?? null;
+  }
+
+  async setPodcastLibrary(userId: string, library: PodcastLibraryResponse): Promise<void> {
+    await this.init();
+    await this.storage.set(`podcast_library:${userId}`, library);
+  }
+
+  async getPodcastTopic(topicId: string): Promise<PodcastTopicDetail | null> {
+    await this.init();
+    return (await this.storage.get(`podcast_topic:${topicId}`)) ?? null;
+  }
+
+  async setPodcastTopic(topic: PodcastTopicDetail): Promise<void> {
+    await this.init();
+    await this.storage.set(`podcast_topic:${topic.id}`, topic);
+  }
+
+  async getPodcastPreparation(userId: string, episodeId: string): Promise<PodcastEpisodePreparation | null> {
+    await this.init();
+    return (await this.storage.get(`podcast_preparation:${userId}:${episodeId}`)) ?? null;
+  }
+
+  async setPodcastPreparation(userId: string, preparation: PodcastEpisodePreparation): Promise<void> {
+    await this.init();
+    await this.storage.set(`podcast_preparation:${userId}:${preparation.episode.id}`, preparation);
+  }
+
+  async getPodcastPlayer(userId: string, episodeId: string): Promise<PodcastEpisodePlayer | null> {
+    await this.init();
+    return (await this.storage.get(`podcast_player:${userId}:${episodeId}`)) ?? null;
+  }
+
+  async setPodcastPlayer(userId: string, episode: PodcastEpisodePlayer): Promise<void> {
+    await this.init();
+    await this.storage.set(`podcast_player:${userId}:${episode.id}`, episode);
   }
 
   // ── Review session history ────────────────────────────────────
@@ -182,6 +268,9 @@ export class LocalDataService {
     await Promise.all([
       this.storage.remove(`cards:${userId}`),
       this.storage.remove(`collections:${userId}`),
+      this.storage.remove(`vault_v2:${userId}`),
+      this.storage.remove(`settings:${userId}`),
+      this.storage.remove(`platform_story_progress:${userId}`),
       this.storage.remove(`categories:${userId}`),
       this.storage.remove(`stories:${userId}`),
       this.storage.remove(`review_domain_v1:${userId}`),
@@ -189,8 +278,10 @@ export class LocalDataService {
       this.storage.remove(`session_history:${userId}`),
       this.storage.remove(`pending_sessions:${userId}`),
       this.storage.remove(`active_review_session:${userId}`),
+      this.storage.remove(`podcast_library:${userId}`),
       this.storage.remove('last_synced_at:cards'),
       this.storage.remove('last_synced_at:collections'),
+      this.storage.remove('last_synced_at:vault'),
       this.storage.remove('last_synced_at:categories'),
       this.storage.remove('last_synced_at:stories'),
     ]);

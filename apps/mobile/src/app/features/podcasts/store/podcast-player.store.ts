@@ -2,8 +2,11 @@ import { computed, inject } from '@angular/core';
 import { patchState, signalStore, withComputed, withMethods, withState } from '@ngrx/signals';
 import { rxMethod } from '@ngrx/signals/rxjs-interop';
 import type { PodcastEpisodePlayer } from '@lingua-card/shared/domain';
-import { EMPTY, catchError, concatMap, firstValueFrom, pipe, switchMap, tap } from 'rxjs';
+import { EMPTY, catchError, concatMap, firstValueFrom, pipe, tap } from 'rxjs';
 import { PodcastApiService } from '../data-access/podcast-api.service';
+import { AuthService } from '../../../core/services/auth.service';
+import { LocalDataService } from '../../../core/services/local-data.service';
+import { AiAudioCacheService } from '../../ai/audio/ai-audio-cache.service';
 import { findPodcastTurnAtTime } from '../domain/podcast-playback';
 import {
   type PodcastRepeatMode, resolvePodcastPlaybackTarget,
@@ -51,24 +54,42 @@ export const PodcastPlayerStore = signalStore(
     showTranslation: computed(() => translationMode() === 'both'
       || (translationMode() === 'reveal' && revealedTurnId() === currentTurn()?.id)),
   })),
-  withMethods((store, api = inject(PodcastApiService)) => ({
-    loadEpisode: rxMethod<string>(pipe(
-      tap(() => patchState(store, {
-        episode: null, currentTimeMs: 0, isPlaying: false, revealedTurnId: null,
-        progressError: null, status: 'loading', error: null,
-      })),
-      switchMap(episodeId => api.getPlayer(episodeId).pipe(
-        tap(episode => patchState(store, {
-          episode,
-          currentTimeMs: episode.progress?.completedAt ? 0 : episode.progress?.positionMs ?? 0,
-          status: 'success',
-        })),
-        catchError(() => {
-          patchState(store, { status: 'error', error: 'Could not load this podcast episode.' });
-          return EMPTY;
-        }),
-      )),
-    )),
+  withMethods((
+    store,
+    api = inject(PodcastApiService),
+    localData = inject(LocalDataService),
+    auth = inject(AuthService),
+    audioCache = inject(AiAudioCacheService),
+  ) => ({
+    loadEpisode(episodeId: string): void {
+      void (async () => {
+        patchState(store, {
+          episode: null, currentTimeMs: 0, isPlaying: false, revealedTurnId: null,
+          progressError: null, status: 'loading', error: null,
+        });
+        const userId = auth.currentUser()?.id;
+        const cached = userId ? await localData.getPodcastPlayer(userId, episodeId) : null;
+        const present = async (episode: PodcastEpisodePlayer): Promise<void> => {
+          const audioUrl = await audioCache.getOrDownload(
+            `podcast-${episode.id}-v${episode.audioVersion}`,
+            episode.audioUrl,
+          );
+          patchState(store, {
+            episode: { ...episode, audioUrl: audioUrl ?? episode.audioUrl },
+            currentTimeMs: episode.progress?.completedAt ? 0 : episode.progress?.positionMs ?? 0,
+            status: 'success', error: null,
+          });
+        };
+        if (cached) await present(cached);
+        try {
+          const episode = await firstValueFrom(api.getPlayer(episodeId));
+          if (userId) await localData.setPodcastPlayer(userId, episode);
+          await present(episode);
+        } catch {
+          if (!cached) patchState(store, { status: 'error', error: 'Could not load this podcast episode.' });
+        }
+      })();
+    },
     playbackTimeChanged(currentTimeMs: number): void {
       patchState(store, { currentTimeMs });
     },

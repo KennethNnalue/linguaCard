@@ -49,6 +49,7 @@ import { LocalDataService } from '../../../../core/services/local-data.service';
 import { firstValueFrom } from 'rxjs';
 import { ShareSheetComponent } from '../../../sharing/components/share-sheet/share-sheet.component';
 import { ShareApiService } from '../../../sharing/services/share-api.service';
+import { OfflineImageDirective } from '../../../../shared/image/offline-image.directive';
 
 const LEVEL_FILTERS: Array<{ value: StoryDifficulty | null; label: string }> = [
   { value: null, label: 'All' },
@@ -67,6 +68,7 @@ const LEVEL_FILTERS: Array<{ value: StoryDifficulty | null; label: string }> = [
     IonContent, IonIcon,
     IonRefresher, IonRefresherContent,
     TranslatePipe,
+    OfflineImageDirective,
   ],
 })
 export class StoryLibraryPage implements OnInit {

@@ -39,6 +39,9 @@ import { ButtonComponent } from '../../../../shared/ui/button/button.component';
 import { StoryWordSheetService } from '../../services/story-word-sheet.service';
 import { StoryTokenizerService } from '../../services/story-tokenizer.service';
 import type { ReaderTab, WordDetail, WordToken } from '../../models/reader.model';
+import { computeQuizScore } from '../../models/reader.model';
+import { PlatformStoryProgressService } from '../../services/platform-story-progress.service';
+import { OfflineImageDirective } from '../../../../shared/image/offline-image.directive';
 
 const PLATFORM_SPEEDS = [0.75, 0.95, 1.0, 1.25, 1.5];
 
@@ -57,6 +60,7 @@ const PLATFORM_SPEEDS = [0.75, 0.95, 1.0, 1.25, 1.5];
     KeywordsTabComponent,
     GrammarTabComponent,
     ButtonComponent,
+    OfflineImageDirective,
   ],
 })
 export class PlatformStoryReaderPage implements OnInit, ViewWillLeave {
@@ -72,6 +76,8 @@ export class PlatformStoryReaderPage implements OnInit, ViewWillLeave {
   private readonly storyStore = inject(StoryStore);
   private readonly toastCtrl = inject(AppNotificationService);
   private readonly translate = inject(TranslateService);
+  private readonly progressService = inject(PlatformStoryProgressService);
+  private lastSavedQuiz: string | null = null;
 
   readonly story = signal<PlatformStory | null>(null);
   readonly progress = signal<UserStoryProgress | null>(null);
@@ -147,6 +153,21 @@ export class PlatformStoryReaderPage implements OnInit, ViewWillLeave {
       if (idx < 0) return;
       const el = this.sentenceEls()[idx]?.nativeElement;
       el?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    });
+    effect(() => {
+      const story = this.story();
+      const currentIndex = this.quizCurrentIdx();
+      const answered = this.quizAnswered();
+      if (!story || currentIndex < story.quizQuestions.length) return;
+      const score = computeQuizScore(story.quizQuestions, answered);
+      if (!score.attempted) return;
+      const receipt = `${story.id}:${score.correct}:${score.total}`;
+      if (receipt === this.lastSavedQuiz) return;
+      this.lastSavedQuiz = receipt;
+      void this.progressService.saveQuizScore(story.id, score.correct)
+        .then(progress => {
+          if (progress) this.progress.set(progress);
+        });
     });
   }
 
@@ -240,7 +261,16 @@ export class PlatformStoryReaderPage implements OnInit, ViewWillLeave {
 
   async addToVault(): Promise<void> {
     const wd = this.tappedWordDetail();
-    if (wd) await this.wordSheet.addToVault(wd);
+    const story = this.story();
+    if (!wd || !story) return;
+    const saved = await this.wordSheet.addToVault(wd);
+    if (!saved) return;
+    const keyword = story.keywords.find(candidate =>
+      candidate.germanBase.toLowerCase() === wd.base.toLowerCase()
+    );
+    if (!keyword) return;
+    const progress = await this.progressService.addSavedWord(story.id, keyword.wordId);
+    if (progress) this.progress.set(progress);
   }
 
   /** Open the word sheet from a Keywords-tab row. */
