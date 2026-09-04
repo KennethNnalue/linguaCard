@@ -26,7 +26,7 @@ describe('isAllowedOrigin', () => {
   });
 
   it('allows explicitly configured web origins', () => {
-    expect(isAllowedOrigin('https://linguacard.example', ['https://linguacard.example'], false))
+    expect(isAllowedOrigin('https://lingua-card.app', ['https://lingua-card.app'], false))
       .toBe(true);
   });
 

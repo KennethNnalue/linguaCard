@@ -13,7 +13,7 @@ services:
       - key: DATABASE_URL
         sync: false          # paste Neon connection string in Render dashboard
       - key: CORS_ORIGIN
-        sync: false          # set after Vercel deploy: https://your-app.vercel.app
+        value: https://lingua-card.app
       - key: JWT_SECRET
         sync: false          # generate a strong random string in the Render dashboard
       - key: GEMINI_API_KEY
