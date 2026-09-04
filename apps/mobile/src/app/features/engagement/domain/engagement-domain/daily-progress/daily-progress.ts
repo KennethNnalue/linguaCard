@@ -3,6 +3,7 @@ import { EngagementDayKey } from '../shared/engagement-date';
 export interface DailyProgress {
   userId: string;
   dayKey: EngagementDayKey;
+  streakPolicyVersion?: number;
   targetUniqueCards: number;
   reviewedCardIds: readonly string[];
   uniqueCardsReviewed: number;

@@ -9,7 +9,7 @@ import type {
   AdminPodcastTranscriptPreview,
   AdminUpdatePodcastTopicDto,
 } from '@lingua-card/shared/domain';
-import { EMPTY, catchError, exhaustMap, pipe, switchMap, tap } from 'rxjs';
+import { EMPTY, Observable, catchError, exhaustMap, pipe, switchMap, takeWhile, tap, timer } from 'rxjs';
 import {
   AdminPodcastApiService, PodcastThumbnailUpload,
 } from '../data-access/admin-podcast-api.service';
@@ -33,6 +33,7 @@ interface AdminPodcastState {
   lastCreatedEpisodeId: string | null;
   lastUploadedTopicThumbnailId: string | null;
   lastUploadedEpisodeThumbnailId: string | null;
+  elevenLabsProjects: Record<string, string>;
 }
 
 const initialState: AdminPodcastState = {
@@ -51,6 +52,7 @@ const initialState: AdminPodcastState = {
   lastCreatedEpisodeId: null,
   lastUploadedTopicThumbnailId: null,
   lastUploadedEpisodeThumbnailId: null,
+  elevenLabsProjects: {},
 };
 
 export interface UpdateTopicCommand {
@@ -76,6 +78,24 @@ export interface UploadEpisodeThumbnailCommand {
 export interface PreviewTranscriptCommand {
   episodeId: string;
   payload: AdminPodcastTranscriptPayload;
+}
+
+export interface GenerateTranscriptCommand {
+  episodeId: string;
+  vocabulary: string[];
+}
+
+function pollEpisodeGeneration(
+  api: AdminPodcastApiService,
+  episodeId: string,
+): Observable<AdminPodcastTopicListItem[]> {
+  return timer(0, 1500).pipe(
+    switchMap(() => api.listTopics()),
+    takeWhile(topics => {
+      const current = topics.flatMap(topic => topic.episodes).find(item => item.id === episodeId);
+      return current?.status === 'queued' || current?.status === 'generating';
+    }, true),
+  );
 }
 
 export const AdminPodcastStore = signalStore(
@@ -155,16 +175,86 @@ export const AdminPodcastStore = signalStore(
           return api.createEpisode(command.topicId, command.dto).pipe(
             tap(episode => patchState(store, {
               topics: store.topics().map(topic => topic.id === command.topicId
-                ? { ...topic, episodes: [...topic.episodes, episode].sort((a, b) => a.position - b.position) }
+                ? { ...topic, episodes: [...topic.episodes.filter(item => item.id !== episode.id), episode]
+                  .sort((a, b) => a.position - b.position) }
                 : topic),
-              mutationStatus: 'success',
               lastCreatedEpisodeId: episode.id,
-              success: `Episode “${episode.title}” was created as a draft. Add its image and transcript next.`,
+              success: 'Episode generation started. You can leave this screen safely.',
             })),
+            switchMap(episode => pollEpisodeGeneration(api, episode.id).pipe(
+              tap(topics => {
+                const current = topics.flatMap(topic => topic.episodes).find(item => item.id === episode.id);
+                const isPending = current?.status === 'queued' || current?.status === 'generating';
+                const failed = !current || current.status === 'failed';
+                patchState(store, {
+                  topics,
+                  mutationStatus: isPending ? 'loading' : failed ? 'error' : 'success',
+                  error: !current ? 'The generated episode could not be found.'
+                    : current.status === 'failed' ? current.generationError || 'Episode generation failed.' : null,
+                  success: isPending ? 'Episode generation is in progress.'
+                    : failed ? null
+                      : 'Episode conversation is ready. Add artwork and create the audio next.',
+                });
+              }),
+            )),
             catchError(error => {
               patchState(store, {
                 mutationStatus: 'error',
                 error: adminPodcastErrorMessage(error, 'Could not create the episode.'),
+              });
+              return EMPTY;
+            }),
+          );
+        }),
+      ),
+    ),
+    retryEpisodeGeneration: rxMethod<string>(
+      pipe(
+        exhaustMap(episodeId => {
+          patchState(store, { mutationStatus: 'loading', error: null, success: 'Retrying episode generation…' });
+          return api.retryEpisodeGeneration(episodeId).pipe(
+            switchMap(() => pollEpisodeGeneration(api, episodeId)),
+            tap(topics => {
+              const current = topics.flatMap(topic => topic.episodes).find(item => item.id === episodeId);
+              const isPending = current?.status === 'queued' || current?.status === 'generating';
+              const failed = !current || current.status === 'failed';
+              patchState(store, {
+                topics,
+                mutationStatus: isPending ? 'loading' : failed ? 'error' : 'success',
+                error: !current ? 'The generated episode could not be found.'
+                  : current.status === 'failed' ? current.generationError || 'Episode generation failed.' : null,
+                success: isPending ? 'Episode generation is in progress.'
+                  : failed ? null : 'Episode conversation is ready.',
+              });
+            }),
+            catchError(error => {
+              patchState(store, {
+                mutationStatus: 'error',
+                error: adminPodcastErrorMessage(error, 'Could not retry episode generation.'),
+              });
+              return EMPTY;
+            }),
+          );
+        }),
+      ),
+    ),
+    createEpisodeDraft: rxMethod<string>(
+      pipe(
+        exhaustMap(topicId => {
+          patchState(store, { mutationStatus: 'loading', error: null, success: null });
+          return api.createEpisodeDraft(topicId, { requestId: crypto.randomUUID() }).pipe(
+            tap(episode => patchState(store, {
+              topics: store.topics().map(topic => topic.id === topicId
+                ? { ...topic, episodes: [...topic.episodes, episode] }
+                : topic),
+              mutationStatus: 'success',
+              lastCreatedEpisodeId: episode.id,
+              success: 'Empty episode created. Upload the externally generated transcript next.',
+            })),
+            catchError(error => {
+              patchState(store, {
+                mutationStatus: 'error',
+                error: adminPodcastErrorMessage(error, 'Could not create an empty episode.'),
               });
               return EMPTY;
             }),
@@ -268,6 +358,84 @@ export const AdminPodcastStore = signalStore(
               patchState(store, {
                 transcriptStatus: 'error',
                 error: adminPodcastErrorMessage(error, 'Could not validate the transcript file.'),
+              });
+              return EMPTY;
+            }),
+          );
+        }),
+      ),
+    ),
+    generateTranscript: rxMethod<GenerateTranscriptCommand>(
+      pipe(
+        exhaustMap(command => {
+          patchState(store, {
+            transcriptEpisodeId: command.episodeId, transcriptPayload: null,
+            transcriptPreview: null, transcriptStatus: 'loading', error: null, success: null,
+          });
+          return api.generateTranscript(command.episodeId, command.vocabulary).pipe(
+            exhaustMap(generated => {
+              patchState(store, {
+                transcriptPayload: generated.payload,
+                transcriptPreview: generated.preview,
+                transcriptStatus: generated.preview.status === 'valid' ? 'loading' : 'success',
+              });
+              if (generated.preview.status !== 'valid') return EMPTY;
+              return api.commitTranscript(
+                command.episodeId, generated.preview.fingerprint, generated.payload,
+              ).pipe(
+                tap(result => patchState(store, {
+                  topics: store.topics().map(topic => ({
+                    ...topic,
+                    episodes: topic.episodes.map(episode => episode.id === command.episodeId
+                      ? {
+                        ...episode, title: result.title,
+                        titleTranslation: result.titleTranslation,
+                        description: result.description, hasTranscript: true,
+                        estimatedDurationMs: result.estimatedDurationMs,
+                      }
+                      : episode),
+                  })),
+                  transcriptStatus: 'success', transcriptPayload: null,
+                  success: 'Transcript generated and saved. It is ready for ElevenLabs audio.',
+                })),
+              );
+            }),
+            catchError(error => {
+              patchState(store, {
+                transcriptStatus: 'error',
+                error: adminPodcastErrorMessage(error, 'Could not generate the transcript.'),
+              });
+              return EMPTY;
+            }),
+          );
+        }),
+      ),
+    ),
+    createElevenLabsPodcast: rxMethod<GenerateTranscriptCommand>(
+      pipe(
+        exhaustMap(command => {
+          patchState(store, {
+            audioGenerationEpisodeId: command.episodeId,
+            audioGenerationStatus: 'loading', error: null, success: null,
+          });
+          return api.createElevenLabsPodcast(command.episodeId, command.vocabulary).pipe(
+            tap(result => patchState(store, {
+              topics: store.topics().map(topic => ({
+                ...topic,
+                episodes: topic.episodes.map(episode => episode.id === command.episodeId
+                  ? { ...episode, elevenLabsProjectId: result.projectId }
+                  : episode),
+              })),
+              elevenLabsProjects: {
+                ...store.elevenLabsProjects(), [command.episodeId]: result.projectId,
+              },
+              audioGenerationStatus: 'success',
+              success: `ElevenLabs Studio project ${result.projectId} is generating the podcast.`,
+            })),
+            catchError(error => {
+              patchState(store, {
+                audioGenerationStatus: 'error',
+                error: adminPodcastErrorMessage(error, 'Could not start the ElevenLabs podcast.'),
               });
               return EMPTY;
             }),

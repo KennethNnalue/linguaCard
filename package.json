@@ -20,6 +20,8 @@
     "build:cap:dev": "ng build --project=mobile --configuration development && npx cap sync",
     "build:cap:remote-dev": "ng build --project=mobile --configuration remote-development && npx cap sync",
     "build:ios:dev": "ng build --project=mobile --configuration development && npx cap sync ios",
+    "build:ios:release": "ng build --project=mobile --configuration production && npx cap sync ios",
+    "validate:ios:release": "node scripts/validate-ios-release.mjs",
     "build:ios:remote-dev": "ng build --project=mobile --configuration remote-development && npx cap sync ios",
     "sync:ios:device": "node scripts/sync-ios-device.mjs",
     "watch:cap": "concurrently \"ng build --project=mobile --watch --configuration development\" \"npx cap copy\"",

@@ -1,10 +1,11 @@
 import {
-  Controller, Post, Body, UnauthorizedException,
+  Body, Controller, Delete, HttpCode, HttpStatus, Post, UnauthorizedException,
 } from '@nestjs/common';
 import { IsString } from 'class-validator';
 import { AuthService } from './auth.service';
 import { RegisterDto, LoginDto } from '@lingua-card/shared/dto';
 import { Public } from '../common/decorators/public.decorator';
+import { CurrentUser } from '../common/decorators/current-user.decorator';
 
 class VerifyPasswordDto {
   @IsString() email!: string;
@@ -13,6 +14,10 @@ class VerifyPasswordDto {
 
 class ForgotPasswordDto {
   @IsString() email!: string;
+}
+
+class DeleteAccountDto {
+  @IsString() password!: string;
 }
 
 @Controller('auth')
@@ -41,7 +46,17 @@ export class AuthController {
 
   @Public()
   @Post('forgot-password')
-  forgotPassword(@Body() _dto: ForgotPasswordDto) {
+  forgotPassword(@Body() dto: ForgotPasswordDto) {
+    void dto;
     return { message: 'If that email exists, a reset link has been sent.' };
+  }
+
+  @Delete('account')
+  @HttpCode(HttpStatus.NO_CONTENT)
+  deleteAccount(
+    @CurrentUser() userId: string,
+    @Body() dto: DeleteAccountDto,
+  ): Promise<void> {
+    return this.authService.deleteAccount(userId, dto.password);
   }
 }

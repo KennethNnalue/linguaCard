@@ -181,6 +181,8 @@ export interface ListenState {
   sessionStartedAt: number;
   /** Offline-download state for the whole current queue's target audio. */
   downloadStatus: OfflineDownloadStatus;
+  completedCardIds: readonly string[];
+  completionPointsAwarded: number;
 }
 
 export type OfflineDownloadStatus = 'idle' | 'downloading' | 'done' | 'failed';

@@ -9,6 +9,7 @@ import { StreakFreezeTransaction } from '../domain/engagement-domain';
 
 interface EngagementDashboardDto {
   today: { reviewed: number; goal: number; goalComplete: boolean };
+  personalGoal: { reviewed: number; goal: number; goalComplete: boolean };
   streak: {
     current: number;
     longest: number;
@@ -41,6 +42,10 @@ export interface ServerEngagementSnapshot {
   streakFreezeTransactions: readonly StreakFreezeTransaction[];
 }
 
+export interface EngagementCompletionResult {
+  pointsAwarded: number;
+}
+
 @Injectable({ providedIn: 'root' })
 export class EngagementApiService {
   private readonly http = inject(HttpClient);
@@ -51,6 +56,7 @@ export class EngagementApiService {
       map(response => ({
         dashboard: {
           today: response.today,
+          personalGoal: response.personalGoal,
           streak: {
             ...response.streak,
             lastQualifiedDayKey: response.streak.lastQualifiedDayKey
@@ -74,6 +80,23 @@ export class EngagementApiService {
           sourceId: transaction.sourceId,
         })),
       })),
+    );
+  }
+
+  completeCollectionListening(
+    collectionId: string,
+    cardIds: readonly string[],
+  ): Observable<EngagementCompletionResult> {
+    return this.http.post<EngagementCompletionResult>(
+      `${this.baseUrl}/collections/${collectionId}/listening-completions`,
+      { cardIds },
+    );
+  }
+
+  completeStory(storyId: string, sentenceIndexes: readonly number[]): Observable<EngagementCompletionResult> {
+    return this.http.post<EngagementCompletionResult>(
+      `${this.baseUrl}/stories/${storyId}/completions`,
+      { sentenceIndexes },
     );
   }
 }

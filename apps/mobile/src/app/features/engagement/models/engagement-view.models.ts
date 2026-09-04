@@ -2,6 +2,7 @@ import { EngagementDayKey, Streak } from '../domain/engagement-domain';
 
 export interface EngagementDashboard {
   today: { reviewed: number; goal: number; goalComplete: boolean };
+  personalGoal: { reviewed: number; goal: number; goalComplete: boolean };
   streak: Streak;
   learningPoints: number;
   streakFreezes: number;

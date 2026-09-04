@@ -8,8 +8,6 @@ import { VaultV2Store } from '../../store/vault-v2.store';
 import { EngagementStore } from '../../../engagement/state/engagement.store';
 import { ReviewPlayerService } from '../../../review/services/review-player.service';
 import { SettingsStore } from '../../../settings/store/settings.store';
-import { CardStore } from '../../store/card.store';
-import { isDue } from '../../../review/domain/review-status';
 
 type LevelFilter = CefrLevel | 'all';
 
@@ -26,7 +24,6 @@ export class VaultV2Page implements OnInit {
   private readonly engagementStore = inject(EngagementStore);
   private readonly reviewPlayer = inject(ReviewPlayerService);
   private readonly settingsStore = inject(SettingsStore);
-  private readonly cardStore = inject(CardStore);
   private readonly router = inject(Router);
 
   readonly query = signal('');
@@ -127,11 +124,10 @@ export class VaultV2Page implements OnInit {
   }
 
   reviewCollection(collectionId: string): void {
-    const now = new Date();
-    const dueCards = this.cardStore.cards().filter(card => card.collectionId === collectionId && isDue(card, now));
-    if (dueCards.length > 0) {
-      void this.reviewPlayer.open(dueCards, { kind: 'collection', collectionId });
-    }
+    void this.reviewPlayer.openSource(
+      { kind: 'collection', collectionId },
+      this.settingsStore.dailyGoal(),
+    );
   }
 
   openPlatformCollection(collection: PlatformCollectionSummary): void {

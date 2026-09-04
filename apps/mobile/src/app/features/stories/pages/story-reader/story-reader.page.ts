@@ -34,6 +34,9 @@ import { GrammarTabComponent } from '../../components/grammar-tab/grammar-tab.co
 import { StoryTextComponent, StoryWordTap } from '../../components/story-text/story-text.component';
 import { computeQuizScore, type ReaderTab, type WordDetail } from '../../models/reader.model';
 import { OfflineImageDirective } from '../../../../shared/image/offline-image.directive';
+import { EngagementApiService } from '../../../engagement/data-access/engagement-api.service';
+import { EngagementStore } from '../../../engagement/state/engagement.store';
+import { firstValueFrom } from 'rxjs';
 
 @Component({
   selector: 'lc-story-reader',
@@ -66,6 +69,8 @@ export class StoryReaderPage implements OnInit, ViewWillEnter, ViewWillLeave {
   private readonly interaction = inject(StoryReaderInteractionService);
   private readonly translate = inject(TranslateService);
   private readonly toastCtrl = inject(AppNotificationService);
+  private readonly engagementApi = inject(EngagementApiService);
+  private readonly engagement = inject(EngagementStore);
 
   // ── Story state ─────────────────────────────────────────────────
   readonly story = signal<Story | null>(null);
@@ -328,7 +333,7 @@ export class StoryReaderPage implements OnInit, ViewWillEnter, ViewWillLeave {
   }
 
   /** Manual completion — the only path to the Story Complete screen. */
-  completeStory(): void {
+  async completeStory(): Promise<void> {
     const s = this.story();
     if (!s) return;
     this.player.pause();
@@ -340,8 +345,25 @@ export class StoryReaderPage implements OnInit, ViewWillEnter, ViewWillLeave {
     this.player.lastQuizScore.set(score.attempted ? score.correct : null);
     this.player.lastQuizTotal.set(score.total);
 
-    this.storyStore.incrementListenCount(s.id);
-    void this.router.navigate(['/stories', s.id, 'complete']);
+    try {
+      const completion = await firstValueFrom(this.engagementApi.completeStory(
+        s.id,
+        s.sentences.map(sentence => sentence.index),
+      ));
+      await this.engagement.refreshFromServer();
+      this.storyStore.incrementListenCount(s.id);
+      await this.router.navigate(['/stories', s.id, 'complete'], {
+        queryParams: completion.pointsAwarded > 0 ? { earned: completion.pointsAwarded } : undefined,
+      });
+    } catch {
+      const toast = await this.toastCtrl.create({
+        message: 'Story completion could not be saved. Please try again.',
+        duration: 3000,
+        color: 'warning',
+        position: 'bottom',
+      });
+      await toast.present();
+    }
   }
 
   readonly repeatModeLabel = computed(() => {

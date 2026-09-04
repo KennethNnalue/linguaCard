@@ -41,6 +41,11 @@
                 "glob": "manifest.webmanifest",
                 "input": "apps/mobile/src",
                 "output": "/"
+              },
+              {
+                "glob": "**/*",
+                "input": "apps/mobile/src/legal",
+                "output": "/"
               }
             ],
             "styles": [

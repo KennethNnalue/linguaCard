@@ -115,6 +115,14 @@
     <ion-icon name="chevron-forward-outline" class="ctx-chevron"></ion-icon>
   </button>
 
+  <button class="ctx-item ctx-item--danger" role="menuitem" (click)="onDeleteAccountClick()">
+    <div class="ctx-item-left">
+      <ion-icon name="trash-outline"></ion-icon>
+      {{ 'settings.dangerZone.deleteAccountTitle' | translate }}
+    </div>
+    <ion-icon name="chevron-forward-outline" class="ctx-chevron"></ion-icon>
+  </button>
+
   <!-- Sign out -->
   <button class="ctx-item" role="menuitem" (click)="signOut()">
     <div class="ctx-item-left">

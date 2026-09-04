@@ -3,6 +3,11 @@ import { randomUUID } from 'node:crypto';
 import type {
   ArticleType, GenderType, PodcastListeningProgress, PreparePodcastVocabularyResult,
 } from '@lingua-card/shared/domain';
+import {
+  mergePodcastPlaybackRanges,
+  podcastPlaybackRangeDuration,
+  PODCAST_COMPLETION_LISTENING_RATIO,
+} from '@lingua-card/shared/domain';
 import { DataSource } from 'typeorm';
 import type { EntityManager } from 'typeorm';
 import { CardEntity } from '../../cards/card.entity';
@@ -17,10 +22,21 @@ import { PodcastEpisodeVocabularyEntity } from '../entities/podcast-episode-voca
 import { PodcastEpisodeEntity } from '../entities/podcast-episode.entity';
 import { PodcastListeningProgressEntity } from '../entities/podcast-listening-progress.entity';
 import { PodcastTopicEntity } from '../entities/podcast-topic.entity';
+import { EngagementActivityRewardService } from '../../engagement/engagement-activity-reward.service';
+import { UserSettingsService } from '../../settings/user-settings.service';
 
 interface PodcastProgressUpdate {
   positionMs: number;
   completedAt: Date | null;
+}
+
+export function qualifiesPodcastCompletion(
+  qualifyingListenedMs: number,
+  episodeDurationMs: number,
+): boolean {
+  if (episodeDurationMs <= 0) return false;
+  return qualifyingListenedMs
+    >= Math.ceil(episodeDurationMs * PODCAST_COMPLETION_LISTENING_RATIO);
 }
 
 export function resolvePodcastProgressUpdate(
@@ -44,7 +60,11 @@ export function resolvePodcastProgressUpdate(
 
 @Injectable()
 export class PodcastLearningLoopService {
-  constructor(private readonly dataSource: DataSource) {}
+  constructor(
+    private readonly dataSource: DataSource,
+    private readonly engagementRewards: EngagementActivityRewardService,
+    private readonly settings: UserSettingsService,
+  ) {}
 
   async getProgress(userId: string, episodeId: string): Promise<PodcastListeningProgress | null> {
     const progress = await this.dataSource.getRepository(PodcastListeningProgressEntity)
@@ -55,6 +75,7 @@ export class PodcastLearningLoopService {
   async saveProgress(
     userId: string, episodeId: string, dto: SavePodcastProgressDto,
   ): Promise<PodcastListeningProgress> {
+    const settings = await this.settings.getForUser(userId);
     return this.dataSource.transaction(async manager => {
       await manager.query('SELECT pg_advisory_xact_lock(hashtext($1))', [`podcast-progress:${userId}:${episodeId}`]);
       const episode = await manager.findOneBy(PodcastEpisodeEntity, { id: episodeId, status: 'published' });
@@ -63,19 +84,38 @@ export class PodcastLearningLoopService {
       let progress = await manager.findOneBy(PodcastListeningProgressEntity, { userId, episodeId });
       if (!progress) progress = manager.create(PodcastListeningProgressEntity, {
         id: randomUUID(), userId, episodeId, audioVersion: dto.audioVersion,
-        positionMs: 0, completedAt: null,
+        positionMs: 0, qualifyingListenedMs: 0, listenedRanges: [], completedAt: null,
       });
+      const wasCompleted = progress.completedAt !== null;
+      progress.listenedRanges = mergePodcastPlaybackRanges(
+        progress.listenedRanges,
+        dto.playedRanges ?? [],
+        episode.audioDurationMs,
+      );
+      progress.qualifyingListenedMs = podcastPlaybackRangeDuration(progress.listenedRanges);
+      const hasMeaningfulListening = qualifiesPodcastCompletion(
+        progress.qualifyingListenedMs,
+        episode.audioDurationMs,
+      );
+      const completed = dto.completed && hasMeaningfulListening;
+      const completedAt = new Date();
       const update = resolvePodcastProgressUpdate(
         progress.completedAt,
         episode.audioDurationMs,
         dto.positionMs,
-        dto.completed,
-        new Date(),
+        completed,
+        completedAt,
       );
       progress.audioVersion = dto.audioVersion;
       progress.positionMs = update.positionMs;
       progress.completedAt = update.completedAt;
-      return this.toProgress(await manager.save(progress));
+      const saved = await manager.save(progress);
+      const pointsAwarded = !wasCompleted && saved.completedAt
+        ? await this.engagementRewards.awardPodcastCompletion(
+          manager, userId, episodeId, completedAt, settings.timezone,
+        )
+        : 0;
+      return this.toProgress(saved, pointsAwarded);
     });
   }
 
@@ -185,10 +225,11 @@ export class PodcastLearningLoopService {
     return value === 'masculine' || value === 'feminine' || value === 'neuter' ? value : null;
   }
 
-  private toProgress(entity: PodcastListeningProgressEntity): PodcastListeningProgress {
+  private toProgress(entity: PodcastListeningProgressEntity, pointsAwarded = 0): PodcastListeningProgress {
     return {
       episodeId: entity.episodeId, audioVersion: entity.audioVersion, positionMs: entity.positionMs,
       completedAt: entity.completedAt?.toISOString() ?? null, updatedAt: entity.updatedAt.toISOString(),
+      pointsAwarded,
     };
   }
 }

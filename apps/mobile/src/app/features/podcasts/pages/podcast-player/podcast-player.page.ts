@@ -98,6 +98,8 @@ export class PodcastPlayerPage implements OnInit, ViewWillLeave {
   async completed(): Promise<void> {
     const currentEpisodeId = this.store.episode()?.id;
     const nextEpisodeId = this.store.nextPlaybackTarget();
+    const pointsAwarded = await this.store.completeCurrentEpisode();
+    if (pointsAwarded === null || !currentEpisodeId) return;
     if (currentEpisodeId && nextEpisodeId === currentEpisodeId) {
       const audio = this.audio()?.nativeElement;
       if (audio) {
@@ -107,10 +109,12 @@ export class PodcastPlayerPage implements OnInit, ViewWillLeave {
       }
       return;
     }
-    if (!await this.store.completeCurrentEpisode() || !currentEpisodeId) return;
     if (!nextEpisodeId) {
       await this.router.navigate(
-        ['/podcasts/episodes', currentEpisodeId, 'complete'], { replaceUrl: true },
+        ['/podcasts/episodes', currentEpisodeId, 'complete'], {
+          replaceUrl: true,
+          queryParams: pointsAwarded > 0 ? { earned: pointsAwarded } : undefined,
+        },
       );
       return;
     }

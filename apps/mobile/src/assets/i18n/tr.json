@@ -141,6 +141,12 @@
       "newCardsLabel": "yeni kart",
       "reviewsLabel": "tekrar"
     },
+    "personalGoal": {
+      "title": "Hedefin",
+      "progress": "{{current}} / {{target}} tekrar",
+      "complete": "Tamamlandı ✓",
+      "independent": "Serini etkilemez"
+    },
     "actions": {
       "startSession": "Oturumu başlat",
       "filter": "Filtre"
@@ -1370,12 +1376,12 @@
         "decreaseAria": "Aylık hedefi azalt",
         "increaseAria": "Aylık hedefi artır"
       },
-      "streakNote": "🔥 Günlük hedefinize ulaşmak serinizi uzatır. Bir gün kaçırırsanız seri sıfırlanır."
+      "streakNote": "🔥 Serini uzatmak için 10 kartı tekrar et. Kişisel hedeflerin bu koşulu değiştirmez."
     },
     "goalsPrompt": {
       "titleFirstTime": "Çalışma hedeflerini belirle",
       "titleUpdate": "Hedeflerini güncelleme zamanı",
-      "bodyFirstTime": "LinguaCard'a her gün ne kadar çalışmak istediğini söyle. Hedeflerin serini şekillendirir ve yolunda kalmana yardımcı olur.",
+      "bodyFirstTime": "LinguaCard'a ne kadar çalışmak istediğini söyle. Hedeflerin plan yapmana yardımcı olur; günlük 10 kart tekrarı serini korur.",
       "bodyUpdate": "Hedeflerini en son güncellediğinden beri biraz zaman geçti. Hâlâ hızına uygun olduklarından emin olmak için bir dakikanı ayır.",
       "cards": "kart",
       "setMyGoals": "Hedeflerimi belirle",
@@ -1411,7 +1417,11 @@
       "irreversible": "Bu işlem geri alınamaz.",
       "deleteDetails": "Tüm {{wordCount}} kelime ve {{collectionCount}} koleksiyon kalıcı olarak silinecektir.",
       "confirmPassword": "Onaylamak için şifrenizi girin",
-      "confirm": "Evet, her şeyi sil"
+      "confirm": "Evet, her şeyi sil",
+      "deleteAccountTitle": "Hesabı sil",
+      "deleteAccountWarning": "Bu işlem LinguaCard hesabınızı ve ilişkili kişisel verileri kalıcı olarak silecektir.",
+      "deleteAccountDetails": "Hesabınız, {{wordCount}} kelime, {{collectionCount}} koleksiyon, tekrar geçmişi, ilerleme ve ayarlar kalıcı olarak silinecektir.",
+      "confirmAccountDeletion": "Hesabımı kalıcı olarak sil"
     },
     "language": {
       "title": "Dil",

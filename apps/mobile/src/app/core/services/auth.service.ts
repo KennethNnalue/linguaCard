@@ -80,12 +80,28 @@ export class AuthService {
       );
   }
 
+  deleteAccount(password: string): Observable<void> {
+    return this.http.delete<void>(`${this.authUrl}/account`, { body: { password } }).pipe(
+      catchError((err) => throwError(() => this.toError(err)))
+    );
+  }
+
+  completeAccountDeletion(): void {
+    this.clearSession();
+    localStorage.clear();
+    void this.router.navigateByUrl('/auth/login');
+  }
+
   logout(): void {
+    this.clearSession();
+    void this.router.navigateByUrl('/auth/login');
+  }
+
+  private clearSession(): void {
     this._token.set(null);
     this._user.set(null);
     localStorage.removeItem(TOKEN_KEY);
     localStorage.removeItem(USER_KEY);
-    this.router.navigateByUrl('/auth/login');
   }
 
   private persist(res: AuthResponse): void {

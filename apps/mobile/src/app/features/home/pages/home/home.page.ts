@@ -188,6 +188,7 @@ export class HomePage {
   readonly masteredCount = computed(() => this.vaultStore.learningItems()
     .filter(item => item.reviewState.stage === 'mastered' && item.reviewState.relearning === undefined).length);
   readonly dailyGoal = this.engagementStore.dailyGoal;
+  readonly personalGoal = this.engagementStore.personalGoal;
   readonly weeklyGoal = computed(() => this.settingsStore.weeklyGoal());
 
   readonly dailyGoalPct = computed(() => {
@@ -253,6 +254,17 @@ export class HomePage {
       component: ResetDataSheetComponent,
       breakpoints: [0, 0.65, 0.85],
       initialBreakpoint: 0.65,
+      handleBehavior: 'cycle',
+    });
+    await modal.present();
+  }
+
+  async openDeleteAccountSheet(): Promise<void> {
+    const modal = await this.modalCtrl.create({
+      component: ResetDataSheetComponent,
+      componentProps: { mode: 'account' },
+      breakpoints: [0, 0.7, 0.9],
+      initialBreakpoint: 0.7,
       handleBehavior: 'cycle',
     });
     await modal.present();

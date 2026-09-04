@@ -5,6 +5,7 @@ import { reconcileClosedStreakDays, resolveEngagementDayKey } from '../domain/en
 import { EngagementActivity, EngagementDashboard } from '../models/engagement-view.models';
 import { buildEngagementDashboard } from './build-engagement-dashboard';
 import { buildEngagementActivity } from './build-engagement-activity';
+import { DAILY_STREAK_POLICY } from '@lingua-card/shared/domain';
 
 function streakDaysEqual(
   left: PersistedEngagementState['streakDays'],
@@ -24,7 +25,7 @@ function streakDaysEqual(
 export interface ReconcileStreakFreezesRequest {
   userId: string;
   timeZone: string;
-  configuredDailyGoal: number;
+  personalDailyGoal: number;
   occurredAt: Date;
 }
 
@@ -45,7 +46,7 @@ export class ReconcileStreakFreezesService {
       const reconciliation = reconcileClosedStreakDays({
         userId: request.userId, todayKey, occurredAt: request.occurredAt,
         days: current.streakDays, transactions: current.streakFreezeTransactions,
-        goalTarget: () => request.configuredDailyGoal,
+        goalTarget: () => DAILY_STREAK_POLICY.requiredUniqueReviews,
         transactionId: dayKey => `freeze-consumed:${request.userId}:${dayKey}`,
         transactionDayKey: occurredAt => resolveEngagementDayKey(occurredAt, request.timeZone),
       });
@@ -58,8 +59,13 @@ export class ReconcileStreakFreezesService {
       };
     });
     return {
-      dashboard: buildEngagementDashboard(state, todayKey, request.configuredDailyGoal),
-      activity: buildEngagementActivity(state, todayKey, request.configuredDailyGoal),
+      dashboard: buildEngagementDashboard(
+        state,
+        todayKey,
+        DAILY_STREAK_POLICY.requiredUniqueReviews,
+        request.personalDailyGoal,
+      ),
+      activity: buildEngagementActivity(state, todayKey, DAILY_STREAK_POLICY.requiredUniqueReviews),
       consumedFreezeCount,
     };
   }

@@ -110,6 +110,7 @@ lc-import-review ion-content::part(scroll) {
 /* Goal review prompt — content-sized and anchored to the viewport bottom. */
 .goals-prompt-modal-wrapper {
   align-items: flex-end;
+  --background: var(--lc-card-elevated);
   --height: auto;
   --max-height: calc(100vh - env(safe-area-inset-top));
   --border-radius: 28px 28px 0 0;

@@ -1,5 +1,9 @@
 import { Injectable } from '@nestjs/common';
-import { MAX_STREAK_FREEZE_INVENTORY, STREAK_FREEZE_GOAL_INTERVAL } from '@lingua-card/shared/domain';
+import {
+  DAILY_STREAK_POLICY,
+  MAX_STREAK_FREEZE_INVENTORY,
+  STREAK_FREEZE_GOAL_INTERVAL,
+} from '@lingua-card/shared/domain';
 import { Between, DataSource } from 'typeorm';
 import { UserSettingsService } from '../settings/user-settings.service';
 import { DailyProgressEntity } from './entities/daily-progress.entity';
@@ -9,6 +13,7 @@ import { StreakFreezeReconciliationService } from './streak-freeze-reconciliatio
 
 export interface ServerEngagementDashboard {
   today: { reviewed: number; goal: number; goalComplete: boolean };
+  personalGoal: { reviewed: number; goal: number; goalComplete: boolean };
   streak: {
     current: number;
     longest: number;
@@ -106,15 +111,20 @@ export class EngagementDashboardService {
       this.loadStreak(userId, todayKey, yesterdayKey),
       this.sumColumn(RewardTransactionEntity, userId, 'amount'),
       this.dataSource.getRepository(StreakFreezeTransactionEntity).findBy({ userId }),
-      this.loadRecentDays(userId, todayKey, settings.dailyGoal),
+      this.loadRecentDays(userId, todayKey, DAILY_STREAK_POLICY.requiredUniqueReviews),
     ]);
     const freezes = freezeTransactions.reduce((total, transaction) => total + transaction.amount, 0);
     const state = streak.todayQualified ? 'safe' : streak.yesterdayQualified ? 'at_risk' : 'broken';
     return {
       today: {
         reviewed: progress?.uniqueCardsReviewed ?? 0,
-        goal: progress?.targetUniqueCards ?? settings.dailyGoal,
+        goal: progress?.targetUniqueCards ?? DAILY_STREAK_POLICY.requiredUniqueReviews,
         goalComplete: progress !== null && progress.uniqueCardsReviewed >= progress.targetUniqueCards,
+      },
+      personalGoal: {
+        reviewed: progress?.uniqueCardsReviewed ?? 0,
+        goal: settings.dailyGoal,
+        goalComplete: (progress?.uniqueCardsReviewed ?? 0) >= settings.dailyGoal,
       },
       streak: {
         current: state === 'safe' ? streak.currentFromToday : state === 'at_risk' ? streak.currentFromYesterday : 0,

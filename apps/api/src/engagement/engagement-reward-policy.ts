@@ -13,6 +13,8 @@ export function buildServerRewardAwards(input: {
   event: ServerReviewCommittedEvent;
   addedUniqueCard: boolean;
   reachedGoalNow: boolean;
+  sourcePodcastEpisodeId: string | null;
+  recoveredAfterIncorrect: boolean;
 }): readonly ServerRewardAward[] {
   const awards: ServerRewardAward[] = [];
   if (input.addedUniqueCard) {
@@ -28,10 +30,24 @@ export function buildServerRewardAwards(input: {
       deduplicationKey: `daily-goal:${input.userId}:${input.dayKey}`,
     });
   }
+  if (input.recoveredAfterIncorrect) {
+    awards.push({
+      reason: 'recovered_card_review',
+      deduplicationKey: `recovered-review:${input.userId}:${input.dayKey}:${input.event.cardId}`,
+      cardId: input.event.cardId,
+    });
+  }
   if (input.event.becameMastered) {
     awards.push({
       reason: 'earned_card_mastery',
       deduplicationKey: `earned-mastery:${input.event.eventId}`,
+      cardId: input.event.cardId,
+    });
+  }
+  if (input.sourcePodcastEpisodeId) {
+    awards.push({
+      reason: 'podcast_word_retrieved',
+      deduplicationKey: `podcast-word-retrieved:${input.userId}:${input.sourcePodcastEpisodeId}:${input.event.cardId}`,
       cardId: input.event.cardId,
     });
   }

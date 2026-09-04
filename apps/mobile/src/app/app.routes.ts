@@ -235,7 +235,32 @@ export const routes: Routes = [
       },
       {
         path: 'admin/podcasts',
+        pathMatch: 'full',
         canActivate: [AdminGuard],
+        loadComponent: () =>
+          import('./features/admin/podcasts/pages/admin-podcast-topics/admin-podcast-topics.page')
+            .then(m => m.AdminPodcastTopicsPage),
+      },
+      {
+        path: 'admin/podcasts/new',
+        canActivate: [AdminGuard],
+        data: { podcastView: 'create' },
+        loadComponent: () =>
+          import('./features/admin/podcasts/pages/admin-podcast-topics/admin-podcast-topics.page')
+            .then(m => m.AdminPodcastTopicsPage),
+      },
+      {
+        path: 'admin/podcasts/:topicId/new-episode',
+        canActivate: [AdminGuard],
+        data: { podcastView: 'new-episode' },
+        loadComponent: () =>
+          import('./features/admin/podcasts/pages/admin-podcast-topics/admin-podcast-topics.page')
+            .then(m => m.AdminPodcastTopicsPage),
+      },
+      {
+        path: 'admin/podcasts/:topicId',
+        canActivate: [AdminGuard],
+        data: { podcastView: 'topic' },
         loadComponent: () =>
           import('./features/admin/podcasts/pages/admin-podcast-topics/admin-podcast-topics.page')
             .then(m => m.AdminPodcastTopicsPage),

@@ -10,6 +10,9 @@
       <div class="ss-complete-eyebrow">{{ 'stories.complete.eyebrow' | translate }}</div>
       <div class="ss-complete-title">{{ s.title }}</div>
       <div class="ss-complete-meta">{{ metaLine() }}</div>
+      @if (pointsAwarded > 0) {
+        <strong class="ss-complete-reward">+{{ pointsAwarded }} Learning Points</strong>
+      }
 
       @if (quizDone()) {
         <div class="ss-complete-quiz">

@@ -8,7 +8,7 @@
         <ion-button class="back" fill="clear" shape="round" (click)="goBack(completion.episode.topicId)" aria-label="Back to topic">
           <ion-icon slot="icon-only" name="arrow-back-outline" />
         </ion-button>
-        <div class="shade"></div><div class="scene-copy"><span>Episode complete</span><div class="check"><ion-icon name="checkmark" /></div><p>{{ completion.episode.topicTitle }}</p><h1>{{ completion.episode.title }}</h1><p class="translation">{{ completion.episode.titleTranslation }}</p></div>
+        <div class="shade"></div><div class="scene-copy"><span>Episode complete</span><div class="check"><ion-icon name="checkmark" /></div><p>{{ completion.episode.topicTitle }}</p><h1>{{ completion.episode.title }}</h1><p class="translation">{{ completion.episode.titleTranslation }}</p>@if (pointsAwarded > 0) { <strong class="reward">+{{ pointsAwarded }} Learning Points</strong> }</div>
       </section>
       <section class="actions">
         <ion-button fill="outline" class="secondary" (click)="replay(completion.episode.id)">

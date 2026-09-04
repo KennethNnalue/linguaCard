@@ -9,6 +9,7 @@ import { SubscriptionService } from '../subscriptions/subscription.service';
 import { UserSettingsService } from '../settings/user-settings.service';
 import type { LoginDto, RegisterDto } from '@lingua-card/shared/dto';
 import {isBootstrapAdminEmail} from './bootstrap-admin.policy';
+import { UserAccountDeletionService } from './user-account-deletion.service';
 
 export interface AuthUser {
   id: string;
@@ -31,6 +32,7 @@ export class AuthService {
     private readonly jwtService: JwtService,
     private readonly subscriptions: SubscriptionService,
     private readonly settings: UserSettingsService,
+    private readonly accountDeletion: UserAccountDeletionService,
   ) {}
 
   async register(dto: RegisterDto): Promise<AuthResponse> {
@@ -69,6 +71,16 @@ export class AuthService {
     const user = await this.findByEmailCaseInsensitive(email);
     if (!user) return false;
     return bcrypt.compare(password, user.passwordHash);
+  }
+
+  async deleteAccount(userId: string, password: string): Promise<void> {
+    const user = await this.userRepo.findOneBy({ id: userId });
+    const passwordIsValid = user && await bcrypt.compare(password, user.passwordHash);
+    if (!user || !passwordIsValid) {
+      throw new UnauthorizedException('Incorrect password');
+    }
+
+    await this.accountDeletion.deleteAccount(user.id, user.email);
   }
 
   /**

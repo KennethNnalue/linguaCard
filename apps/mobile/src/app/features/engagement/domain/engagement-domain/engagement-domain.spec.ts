@@ -61,7 +61,7 @@ describe('engagement domain', () => {
     expect(rewards.map(reward => reward.deduplicationKey)).toEqual([
       'review-card:user-1:2026-08-16:card-2', 'daily-goal:user-1:2026-08-16', 'earned-mastery:goal-event',
     ]);
-    expect(rewards.reduce((total, reward) => total + reward.amount, 0)).toBe(16);
+    expect(rewards.reduce((total, reward) => total + reward.amount, 0)).toBe(17);
   });
 
   test('does not penalize Again or reward a repeat card', () => {
@@ -185,7 +185,7 @@ describe('engagement domain', () => {
     });
     const result = { eventId: event.eventId, dayKey, dailyProgress: transition.next,
       streak: { current: 4, longest: 4, state: 'safe' as const, lastQualifiedDayKey: dayKey },
-      rewardTransactions, pointsAwarded: 16, freezeEarned: true,
+      rewardTransactions, pointsAwarded: 17, freezeEarned: true,
       feedback: { kind: 'daily_goal_reached' as const, feedbackId: 'feedback', dayKey, current: 2, target: 2, messageKey: 'review.engagement.dailyGoalComplete' as const },
     };
     expect(buildSessionCelebration({
@@ -193,6 +193,6 @@ describe('engagement domain', () => {
       engagementResults: [result], dailyProgressAtCompletion: transition.next,
       streakAtCompletion: result.streak, learningPointsBalance: 50,
     })).toMatchObject({ intensity: 'goal_completed', earnedMasteryCount: 1, freezeEarned: true,
-      rewards: { pointsEarnedInSession: 16, dailyGoalBonus: 10, totalLearningPoints: 50 } });
+      rewards: { pointsEarnedInSession: 17, dailyGoalBonus: 10, totalLearningPoints: 50 } });
   });
 });

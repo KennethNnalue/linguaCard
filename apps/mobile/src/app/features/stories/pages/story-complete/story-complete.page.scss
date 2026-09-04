@@ -43,6 +43,15 @@
   margin-bottom: 6px;
 }
 
+.ss-complete-reward {
+  margin: 14px 0;
+  padding: 7px 12px;
+  border-radius: t.$lc-radius-full;
+  background: var(--lc-brand-soft);
+  color: var(--lc-brand);
+  font-size: t.$lc-text-sm;
+}
+
 .ss-complete-meta {
   font-size: 12px;
   color: var(--lc-ss-muted);

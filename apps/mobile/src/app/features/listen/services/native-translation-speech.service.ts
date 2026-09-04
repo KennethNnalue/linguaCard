@@ -4,9 +4,15 @@ import {QueueStrategy, TextToSpeech} from '@capacitor-community/text-to-speech';
 @Injectable({providedIn: 'root'})
 export class NativeTranslationSpeechService {
   private finishActive: (() => void) | null = null;
+  private generation = 0;
 
   async speak(text: string, language: string, rate = 1): Promise<void> {
-    this.stop();
+    const generation = ++this.generation;
+    this.finishActive?.();
+    this.finishActive = null;
+    await TextToSpeech.stop().catch(() => undefined);
+    if (generation !== this.generation) return;
+
     let finishCancellation!: () => void;
     const cancellation = new Promise<void>(resolve => {
       finishCancellation = resolve;
@@ -20,7 +26,7 @@ export class NativeTranslationSpeechService {
           rate: Math.min(2, Math.max(0.5, rate)),
           pitch: 1,
           volume: 1,
-          category: 'ambient',
+          category: 'playback',
           queueStrategy: QueueStrategy.Flush,
         }),
         cancellation,
@@ -31,6 +37,7 @@ export class NativeTranslationSpeechService {
   }
 
   stop(): void {
+    this.generation += 1;
     const finish = this.finishActive;
     this.finishActive = null;
     finish?.();

@@ -15,12 +15,22 @@ import { PodcastAudioGenerationService } from './services/podcast-audio-generati
 import { PodcastsController } from './controllers/podcasts.controller';
 import { PodcastCatalogueService } from './services/podcast-catalogue.service';
 import { PodcastLearningLoopService } from './services/podcast-learning-loop.service';
+import { AiModule } from '../ai/ai.module';
+import { PodcastTranscriptGenerationService } from './services/podcast-transcript-generation.service';
+import { ElevenLabsPodcastAdapter } from './infrastructure/elevenlabs-podcast.adapter';
+import { ElevenLabsPodcastGenerationService } from './services/elevenlabs-podcast-generation.service';
+import { PodcastEpisodeCreationService } from './services/podcast-episode-creation.service';
+import { EngagementModule } from '../engagement/engagement.module';
+import { SettingsModule } from '../settings/settings.module';
 
 @Module({
   imports: [
     TypeOrmModule.forFeature(PODCAST_ENTITIES),
     forwardRef(() => AuthModule),
     VocabularyModule,
+    AiModule,
+    EngagementModule,
+    SettingsModule,
   ],
   controllers: [AdminPodcastsController, AdminPodcastEpisodesController, PodcastsController],
   providers: [
@@ -28,6 +38,9 @@ import { PodcastLearningLoopService } from './services/podcast-learning-loop.ser
     PodcastAudioGenerationService, ElevenLabsDialogueAdapter, StorageService,
     PodcastCatalogueService,
     PodcastLearningLoopService,
+    PodcastTranscriptGenerationService, ElevenLabsPodcastAdapter,
+    ElevenLabsPodcastGenerationService,
+    PodcastEpisodeCreationService,
   ],
   exports: [AdminPodcastsService],
 })

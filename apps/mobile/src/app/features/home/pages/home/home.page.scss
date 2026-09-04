@@ -79,6 +79,36 @@
   background: t.$lc-vx-hero-grad;
 }
 
+.personal-goal {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: t.$lc-space-3;
+  margin: 0 t.$lc-space-4 t.$lc-space-3;
+  padding: t.$lc-space-3 t.$lc-space-4;
+  border: 1px solid var(--lc-border);
+  border-radius: t.$lc-radius-md;
+  background: var(--lc-card);
+  color: var(--lc-text-secondary);
+  @include u.lc-font('xs');
+
+  div {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+  }
+
+  strong {
+    color: var(--lc-text-primary);
+    @include u.lc-font('sm', t.$lc-font-weight-semibold);
+  }
+}
+
+.personal-goal__complete {
+  color: var(--lc-brand);
+  font-weight: t.$lc-font-weight-semibold;
+}
+
 .daily-eyebrow {
   display: block;
   margin-bottom: t.$lc-space-2;

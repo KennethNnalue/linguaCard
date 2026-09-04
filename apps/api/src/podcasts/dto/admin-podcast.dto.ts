@@ -1,7 +1,7 @@
 import { Type } from 'class-transformer';
 import {
   ArrayMaxSize, ArrayMinSize, IsArray, IsIn, IsInt, IsNumber, IsOptional,
-  IsString, Matches, Max, MaxLength, Min, MinLength, ValidateNested,
+  IsString, IsUUID, Matches, Max, MaxLength, Min, MinLength, ValidateNested,
 } from 'class-validator';
 import type { CefrLevel, LanguageCode } from '@lingua-card/shared/domain';
 
@@ -10,11 +10,6 @@ const LANGUAGE_CODES = ['en', 'de', 'fr', 'es', 'it', 'pt', 'ja', 'zh', 'ko', 'a
 const CONTAINS_NON_WHITESPACE = /\S/u;
 
 export class CreatePodcastTopicDto {
-  @IsString()
-  @Matches(/^[a-z0-9]+(?:-[a-z0-9]+)*$/)
-  @MaxLength(120)
-  externalId!: string;
-
   @IsString()
   @MinLength(1)
   @Matches(CONTAINS_NON_WHITESPACE)
@@ -34,10 +29,7 @@ export class CreatePodcastTopicDto {
   translationLanguage!: LanguageCode;
 
   @IsIn(CEFR_LEVELS)
-  minimumLevel!: CefrLevel;
-
-  @IsIn(CEFR_LEVELS)
-  maximumLevel!: CefrLevel;
+  level!: CefrLevel;
 }
 
 export class UpdatePodcastTopicDto {
@@ -55,42 +47,40 @@ export class UpdatePodcastTopicDto {
 
   @IsOptional()
   @IsIn(CEFR_LEVELS)
-  minimumLevel?: CefrLevel;
-
-  @IsOptional()
-  @IsIn(CEFR_LEVELS)
-  maximumLevel?: CefrLevel;
+  level?: CefrLevel;
 }
 
 export class CreatePodcastEpisodeDto {
-  @IsString()
-  @Matches(/^[a-z0-9]+(?:-[a-z0-9]+)*$/)
-  @MaxLength(120)
-  externalId!: string;
+  @IsUUID()
+  requestId!: string;
 
-  @IsString()
-  @MinLength(1)
-  @Matches(CONTAINS_NON_WHITESPACE)
-  @MaxLength(160)
-  title!: string;
+  @IsArray() @ArrayMinSize(1) @ArrayMaxSize(40)
+  @IsString({ each: true }) @MinLength(1, { each: true })
+  @Matches(CONTAINS_NON_WHITESPACE, { each: true }) @MaxLength(200, { each: true })
+  vocabulary!: string[];
 
-  @IsString()
-  @MaxLength(160)
-  titleTranslation!: string;
-
-  @IsString()
-  @MaxLength(2000)
-  description!: string;
-
-  @IsIn(CEFR_LEVELS)
-  level!: CefrLevel;
-
-  @IsOptional()
-  @Type(() => Number)
-  @IsInt()
-  @Min(0)
-  position?: number;
+  @IsOptional() @IsString() @Matches(CONTAINS_NON_WHITESPACE) @MaxLength(500)
+  direction?: string;
 }
+
+export class CreatePodcastEpisodeDraftDto {
+  @IsUUID()
+  requestId!: string;
+}
+
+export class GeneratePodcastTranscriptDto {
+  @IsArray()
+  @ArrayMinSize(1)
+  @ArrayMaxSize(40)
+  @IsString({ each: true }) @MinLength(1, { each: true })
+  @Matches(CONTAINS_NON_WHITESPACE, { each: true }) @MaxLength(200, { each: true })
+  vocabulary!: string[];
+
+  @IsOptional() @IsString() @Matches(CONTAINS_NON_WHITESPACE) @MaxLength(500)
+  direction?: string;
+}
+
+export class CreateElevenLabsPodcastDto extends GeneratePodcastTranscriptDto {}
 
 export class PodcastThumbnailMetadataDto {
   @IsString()
@@ -159,8 +149,15 @@ export class CommitPodcastTranscriptDto {
   @ValidateNested() @Type(() => PodcastTranscriptPayloadDto) payload!: PodcastTranscriptPayloadDto;
 }
 
+export class PodcastPlaybackRangeDto {
+  @IsInt() @Min(0) @Max(300000) startMs!: number;
+  @IsInt() @Min(1) @Max(300000) endMs!: number;
+}
+
 export class SavePodcastProgressDto {
   @IsInt() @Min(1) audioVersion!: number;
   @IsInt() @Min(0) @Max(300000) positionMs!: number;
   @IsIn([true, false]) completed!: boolean;
+  @IsOptional() @IsArray() @ArrayMaxSize(200) @ValidateNested({ each: true }) @Type(() => PodcastPlaybackRangeDto)
+  playedRanges?: PodcastPlaybackRangeDto[];
 }

@@ -7,10 +7,14 @@ import { PodcastApiService } from '../data-access/podcast-api.service';
 import { AuthService } from '../../../core/services/auth.service';
 import { LocalDataService } from '../../../core/services/local-data.service';
 import { AiAudioCacheService } from '../../ai/audio/ai-audio-cache.service';
+import { EngagementStore } from '../../engagement/state/engagement.store';
 import { findPodcastTurnAtTime } from '../domain/podcast-playback';
 import {
   type PodcastRepeatMode, resolvePodcastPlaybackTarget,
 } from '../domain/podcast-playback-queue';
+import {
+  appendQualifyingPlaybackRange, type PodcastPlaybackRange,
+} from '../domain/podcast-listening-progress';
 
 export type PodcastTranslationMode = 'target' | 'both' | 'reveal';
 
@@ -19,6 +23,8 @@ interface PodcastPlayerState {
   status: 'idle' | 'loading' | 'success' | 'error';
   error: string | null;
   currentTimeMs: number;
+  lastPlaybackTimeMs: number;
+  unsyncedPlayedRanges: readonly PodcastPlaybackRange[];
   isPlaying: boolean;
   speed: number;
   repeatMode: PodcastRepeatMode;
@@ -32,6 +38,7 @@ interface PodcastPlayerState {
 
 const initialState: PodcastPlayerState = {
   episode: null, status: 'idle', error: null, currentTimeMs: 0,
+  lastPlaybackTimeMs: 0, unsyncedPlayedRanges: [],
   isPlaying: false, speed: 1, repeatMode: 'off', topicQueueEnabled: false,
   continueToNextTopic: false, translationMode: 'both', revealedTurnId: null,
   progressError: null,
@@ -60,11 +67,13 @@ export const PodcastPlayerStore = signalStore(
     localData = inject(LocalDataService),
     auth = inject(AuthService),
     audioCache = inject(AiAudioCacheService),
+    engagement = inject(EngagementStore),
   ) => ({
     loadEpisode(episodeId: string): void {
       void (async () => {
         patchState(store, {
-          episode: null, currentTimeMs: 0, isPlaying: false, revealedTurnId: null,
+          episode: null, currentTimeMs: 0, lastPlaybackTimeMs: 0, unsyncedPlayedRanges: [],
+          isPlaying: false, revealedTurnId: null,
           progressError: null, status: 'loading', error: null,
         });
         const userId = auth.currentUser()?.id;
@@ -77,6 +86,7 @@ export const PodcastPlayerStore = signalStore(
           patchState(store, {
             episode: { ...episode, audioUrl: audioUrl ?? episode.audioUrl },
             currentTimeMs: episode.progress?.completedAt ? 0 : episode.progress?.positionMs ?? 0,
+            lastPlaybackTimeMs: episode.progress?.completedAt ? 0 : episode.progress?.positionMs ?? 0,
             status: 'success', error: null,
           });
         };
@@ -91,7 +101,14 @@ export const PodcastPlayerStore = signalStore(
       })();
     },
     playbackTimeChanged(currentTimeMs: number): void {
-      patchState(store, { currentTimeMs });
+      const playedRanges = appendQualifyingPlaybackRange(
+        store.unsyncedPlayedRanges(), store.lastPlaybackTimeMs(), currentTimeMs, store.isPlaying(),
+      );
+      patchState(store, {
+        currentTimeMs,
+        lastPlaybackTimeMs: currentTimeMs,
+        unsyncedPlayedRanges: playedRanges,
+      });
     },
     playbackStateChanged(isPlaying: boolean): void { patchState(store, { isPlaying }); },
     speedChanged(speed: number): void { patchState(store, { speed }); },
@@ -117,33 +134,50 @@ export const PodcastPlayerStore = signalStore(
       concatMap(completed => {
         const episode = store.episode();
         if (!episode) return EMPTY;
+        const playedRanges = store.unsyncedPlayedRanges();
+        patchState(store, { unsyncedPlayedRanges: [] });
         return api.saveProgress(episode.id, {
           audioVersion: episode.audioVersion,
           positionMs: store.currentTimeMs(),
           completed,
+          playedRanges,
         }).pipe(
           tap(() => patchState(store, { progressError: null })),
           catchError(() => {
-            patchState(store, { progressError: 'Listening progress could not be saved.' });
+            patchState(store, {
+              progressError: 'Listening progress could not be saved.',
+              unsyncedPlayedRanges: [...playedRanges, ...store.unsyncedPlayedRanges()],
+            });
             return EMPTY;
           }),
         );
       }),
     )),
-    async completeCurrentEpisode(): Promise<boolean> {
+    async completeCurrentEpisode(): Promise<number | null> {
       const episode = store.episode();
-      if (!episode) return false;
+      if (!episode) return null;
       try {
-        await firstValueFrom(api.saveProgress(episode.id, {
+        const playedRanges = store.unsyncedPlayedRanges();
+        const progress = await firstValueFrom(api.saveProgress(episode.id, {
           audioVersion: episode.audioVersion,
           positionMs: episode.audioDurationMs,
           completed: true,
+          playedRanges,
         }));
-        patchState(store, { progressError: null, isPlaying: false });
-        return true;
+        if (!progress.completedAt) {
+          patchState(store, {
+            progressError: 'Listen to at least 70% of the episode before completing it.',
+            isPlaying: false,
+            unsyncedPlayedRanges: [],
+          });
+          return null;
+        }
+        patchState(store, { progressError: null, isPlaying: false, unsyncedPlayedRanges: [] });
+        await engagement.refreshFromServer();
+        return progress.pointsAwarded;
       } catch {
         patchState(store, { progressError: 'Listening progress could not be saved.' });
-        return false;
+        return null;
       }
     },
     nextPlaybackTarget(): string | null {

@@ -4,6 +4,7 @@ import { Column, Entity, PrimaryColumn } from 'typeorm';
 export class DailyProgressEntity {
   @PrimaryColumn({ type: 'varchar' }) userId!: string;
   @PrimaryColumn({ type: 'date' }) dayKey!: string;
+  @Column({ type: 'int', default: 0 }) streakPolicyVersion!: number;
   @Column({ type: 'int' }) targetUniqueCards!: number;
   @Column({ type: 'int', default: 0 }) uniqueCardsReviewed!: number;
   @Column({ type: 'int', default: 0 }) committedReviewCount!: number;

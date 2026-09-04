@@ -7,13 +7,14 @@ import { EngagementLocalRepository } from '../data-access/engagement-local.repos
 import { EngagementActivity, EngagementDashboard } from '../models/engagement-view.models';
 import { buildEngagementDashboard } from './build-engagement-dashboard';
 import { buildEngagementActivity } from './build-engagement-activity';
-import { streakFreezeGrantMilestone } from '@lingua-card/shared/domain';
+import { DAILY_STREAK_POLICY, dailyStreakReviewTarget, streakFreezeGrantMilestone } from '@lingua-card/shared/domain';
 import { streakFreezeInventory } from '../domain/engagement-domain/streak/streak-freeze';
 
 export interface ProjectReviewEngagementRequest {
   userId: string;
   timeZone: string;
-  configuredDailyGoal: number;
+  personalDailyGoal: number;
+  eligibleCardCount: number;
   event: ReviewCommittedEvent;
   suppressTransientFeedback: boolean;
 }
@@ -34,7 +35,12 @@ export class ProjectReviewEngagementService {
     const previousResult = existing.projectionResults[request.event.eventId];
     if (previousResult) return {
       result: previousResult,
-      dashboard: buildEngagementDashboard(existing, previousResult.dayKey, previousResult.dailyProgress.targetUniqueCards),
+      dashboard: buildEngagementDashboard(
+        existing,
+        previousResult.dayKey,
+        previousResult.dailyProgress.targetUniqueCards,
+        request.personalDailyGoal,
+      ),
       activity: buildEngagementActivity(existing, previousResult.dayKey, previousResult.dailyProgress.targetUniqueCards),
       duplicate: true,
     };
@@ -44,7 +50,10 @@ export class ProjectReviewEngagementService {
       const duplicate = state.projectionResults[request.event.eventId];
       if (duplicate) return state;
       const current: DailyProgress = state.dailyProgress[dayKey] ?? {
-        userId: request.userId, dayKey, targetUniqueCards: request.configuredDailyGoal,
+        userId: request.userId,
+        dayKey,
+        streakPolicyVersion: DAILY_STREAK_POLICY.version,
+        targetUniqueCards: dailyStreakReviewTarget(request.eligibleCardCount),
         reviewedCardIds: [], uniqueCardsReviewed: 0, committedReviewCount: 0,
       };
       const transition = applyReviewToDailyProgress(current, request.event, dayKey);
@@ -100,15 +109,25 @@ export class ProjectReviewEngagementService {
     if (!projectionResult) throw new Error('Engagement projection did not produce a result');
     return {
       result: projectionResult,
-      dashboard: buildEngagementDashboard(nextState, dayKey, projectionResult.dailyProgress.targetUniqueCards),
+      dashboard: buildEngagementDashboard(
+        nextState,
+        dayKey,
+        projectionResult.dailyProgress.targetUniqueCards,
+        request.personalDailyGoal,
+      ),
       activity: buildEngagementActivity(nextState, dayKey, projectionResult.dailyProgress.targetUniqueCards),
       duplicate: false,
     };
   }
 
-  async dashboard(userId: string, today: Date, timeZone: string, configuredDailyGoal: number): Promise<EngagementDashboard> {
+  async dashboard(userId: string, today: Date, timeZone: string, personalDailyGoal: number): Promise<EngagementDashboard> {
     const state = await this.repository.state(userId);
     const dayKey = resolveEngagementDayKey(today, timeZone);
-    return buildEngagementDashboard(state, dayKey, configuredDailyGoal);
+    return buildEngagementDashboard(
+      state,
+      dayKey,
+      DAILY_STREAK_POLICY.requiredUniqueReviews,
+      personalDailyGoal,
+    );
   }
 }

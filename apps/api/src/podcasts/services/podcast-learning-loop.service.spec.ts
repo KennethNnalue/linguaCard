@@ -1,5 +1,9 @@
 import { describe, expect, it } from '@jest/globals';
-import { resolvePodcastProgressUpdate } from './podcast-learning-loop.service';
+import { mergePodcastPlaybackRanges, podcastPlaybackRangeDuration } from '@lingua-card/shared/domain';
+import {
+  qualifiesPodcastCompletion,
+  resolvePodcastProgressUpdate,
+} from './podcast-learning-loop.service';
 
 describe('resolvePodcastProgressUpdate', () => {
   const completionTime = new Date('2026-08-29T12:00:00.000Z');
@@ -32,5 +36,30 @@ describe('resolvePodcastProgressUpdate', () => {
       false,
       completionTime,
     )).toEqual({ positionMs: 120_000, completedAt: null });
+  });
+});
+
+describe('qualifiesPodcastCompletion', () => {
+  it('requires at least seventy percent of meaningful listening', () => {
+    expect(qualifiesPodcastCompletion(83_999, 120_000)).toBe(false);
+    expect(qualifiesPodcastCompletion(84_000, 120_000)).toBe(true);
+  });
+
+  it('never completes an episode without a valid duration', () => {
+    expect(qualifiesPodcastCompletion(10_000, 0)).toBe(false);
+  });
+});
+
+describe('podcast playback range accounting', () => {
+  it('does not count overlapping or replayed audio twice', () => {
+    const ranges = mergePodcastPlaybackRanges(
+      [{ startMs: 0, endMs: 50_000 }],
+      [{ startMs: 20_000, endMs: 60_000 }, { startMs: 0, endMs: 50_000 }],
+      120_000,
+    );
+
+    expect(ranges).toEqual([{ startMs: 0, endMs: 60_000 }]);
+    expect(podcastPlaybackRangeDuration(ranges)).toBe(60_000);
+    expect(qualifiesPodcastCompletion(podcastPlaybackRangeDuration(ranges), 120_000)).toBe(false);
   });
 });

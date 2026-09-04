@@ -103,6 +103,7 @@ export class PodcastTranscriptImportService {
       episode.audioDurationMs = 0;
       episode.audioVersion = 0;
       episode.generationError = null;
+      episode.generationInput = null;
       await manager.save(episode);
     });
     if (obsoleteAudioPath) await this.storage.delete(obsoleteAudioPath);

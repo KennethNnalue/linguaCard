@@ -11,6 +11,7 @@ import { ProjectReviewEngagementService } from './project-review-engagement.serv
 function dashboard(reviewed: number, learningPoints: number): EngagementDashboard {
   return {
     today: { reviewed, goal: 20, goalComplete: reviewed >= 20 },
+    personalGoal: { reviewed, goal: 30, goalComplete: reviewed >= 30 },
     streak: { current: 1, longest: 1, state: 'safe', lastQualifiedDayKey: null },
     learningPoints,
     streakFreezes: 1,
@@ -85,7 +86,8 @@ describe('ReconcileEngagementWithServerService', () => {
     const outcome = await TestBed.inject(ProjectReviewEngagementService).project({
       userId: 'user-1',
       timeZone: 'Europe/Berlin',
-      configuredDailyGoal: 20,
+      personalDailyGoal: 20,
+      eligibleCardCount: 10,
       suppressTransientFeedback: false,
       event: {
         type: 'ReviewCommitted', schemaVersion: 1, eventId: 'event-2', reviewId: 'review-2', attemptId: 'attempt-2',

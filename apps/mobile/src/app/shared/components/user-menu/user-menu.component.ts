@@ -42,6 +42,7 @@ export class UserMenuComponent {
 
   readonly closed = output<void>();
   readonly resetRequested = output<void>();
+  readonly accountDeletionRequested = output<void>();
 
   constructor() {
     addIcons({ moonOutline, syncOutline, trashOutline, logOutOutline, chevronForwardOutline, trophyOutline, notificationsOutline, cloudUploadOutline, languageOutline, rocketOutline, giftOutline, pricetagsOutline });
@@ -84,6 +85,11 @@ export class UserMenuComponent {
   onResetClick(): void {
     this.closed.emit();
     this.resetRequested.emit();
+  }
+
+  onDeleteAccountClick(): void {
+    this.closed.emit();
+    this.accountDeletionRequested.emit();
   }
 
   async replayOnboarding(): Promise<void> {

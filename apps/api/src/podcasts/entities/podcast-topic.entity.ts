@@ -25,10 +25,7 @@ export class PodcastTopicEntity {
   translationLanguage!: LanguageCode;
 
   @Column({ type: 'varchar', length: 4 })
-  minimumLevel!: CefrLevel;
-
-  @Column({ type: 'varchar', length: 4 })
-  maximumLevel!: CefrLevel;
+  level!: CefrLevel;
 
   @Index('idx_podcast_topics_status')
   @Column({ type: 'varchar', length: 20, default: 'draft' })

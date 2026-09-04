@@ -4,7 +4,7 @@ export interface RewardPolicy {
   earnedMasteryPoints: number;
 }
 export const DEFAULT_REWARD_POLICY: RewardPolicy = {
-  firstDailyCardReviewPoints: 1,
+  firstDailyCardReviewPoints: 2,
   dailyGoalCompletionPoints: 10,
   earnedMasteryPoints: 5,
 };

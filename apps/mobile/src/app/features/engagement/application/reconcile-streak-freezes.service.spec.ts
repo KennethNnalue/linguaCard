@@ -33,7 +33,7 @@ describe('ReconcileStreakFreezesService', () => {
 
   test('persists the protected day and immutable consumption in one repository mutation', async () => {
     const outcome = await service.reconcile({
-      userId: 'user-1', timeZone: 'Europe/Berlin', configuredDailyGoal: 2,
+      userId: 'user-1', timeZone: 'Europe/Berlin', personalDailyGoal: 2,
       occurredAt: new Date('2026-08-16T08:00:00.000Z'),
     });
     expect(mutate).toHaveBeenCalledTimes(1);
@@ -44,7 +44,7 @@ describe('ReconcileStreakFreezesService', () => {
 
   test('a second reconciliation creates no duplicate consumption', async () => {
     const request = {
-      userId: 'user-1', timeZone: 'Europe/Berlin', configuredDailyGoal: 2,
+      userId: 'user-1', timeZone: 'Europe/Berlin', personalDailyGoal: 2,
       occurredAt: new Date('2026-08-16T08:00:00.000Z'),
     };
     await service.reconcile(request);

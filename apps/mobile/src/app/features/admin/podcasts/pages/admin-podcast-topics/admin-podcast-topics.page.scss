@@ -23,6 +23,8 @@ button { cursor: pointer; }
 .pod-step-number { display: grid; width: 34px; height: 34px; place-items: center; border: 1px solid var(--lc-ss-hairline-strong); border-radius: 50%; color: var(--lc-ss-on-dark-70); font-weight: t.$lc-font-weight-bold; }
 .pod-step--active .pod-step-number { border-color: var(--lc-ss-premium-star); color: var(--lc-ss-premium-star); }
 .pod-step--complete .pod-step-number { border-color: var(--lc-ss-sage); color: var(--lc-ss-sage); font-size: 22px; }
+.pod-step--simple .pod-step-header { grid-template-columns: 1fr; cursor: default; }
+.pod-step--simple .pod-step-content { border-top: 0; }
 .pod-step-title { display: grid; gap: 2px; }
 .pod-step-title small { color: var(--lc-ss-premium-star); font-size: t.$lc-text-xxs; font-weight: t.$lc-font-weight-bold; letter-spacing: .08em; text-transform: uppercase; }
 .pod-step-title strong { font-family: t.$lc-font-serif; font-size: t.$lc-text-lg; font-weight: t.$lc-font-weight-medium; }
@@ -32,6 +34,8 @@ button { cursor: pointer; }
 .pod-step-content { padding: 0 18px 18px; border-top: 1px solid var(--lc-ss-hairline-strong); }
 
 .pod-form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 13px; padding-top: 18px; }
+.pod-level-range { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin: 0; padding: 0; border: 0; }
+.pod-level-range legend { margin-bottom: 7px; color: var(--lc-ss-on-dark-70); font-size: t.$lc-text-xs; font-weight: t.$lc-font-weight-semibold; }
 .pod-form-grid label, .pod-scene-description, .pod-prompt-words { display: grid; gap: 6px; color: var(--lc-ss-on-dark-70); font-size: t.$lc-text-xs; font-weight: t.$lc-font-weight-semibold; }
 .pod-required { display: inline; margin-left: 2px; color: var(--lc-ss-premium-star); }
 .pod-optional { display: inline; margin-left: 5px; color: var(--lc-ss-on-dark-55); font-size: t.$lc-text-xxs; font-weight: t.$lc-font-weight-medium; }
@@ -82,6 +86,10 @@ textarea { resize: vertical; }
 .pod-task-label > span { display: grid; gap: 2px; }
 .pod-task-label small { color: var(--lc-ss-on-dark-55); }
 .pod-prompt-words textarea { min-height: 75px; }
+.pod-alternative-methods { border: 1px solid var(--lc-ss-hairline-strong); border-radius: var(--lc-radius-md); color: var(--lc-ss-on-dark-70); }
+.pod-alternative-methods summary { padding: 12px; cursor: pointer; color: var(--lc-ss-on-dark); font-size: t.$lc-text-xs; font-weight: t.$lc-font-weight-bold; }
+.pod-alternative-methods > div { display: flex; flex-wrap: wrap; gap: 8px; padding: 0 12px 12px; }
+.pod-alternative-methods p { width: 100%; margin: 0; color: var(--lc-ss-on-dark-55); font-size: t.$lc-text-xxs; }
 .pod-inline-actions { display: flex; flex-wrap: wrap; gap: 8px; }
 .pod-inline-actions .pod-primary { flex: 1; }
 audio { width: 100%; }
@@ -105,6 +113,7 @@ audio { width: 100%; }
 .pod-library-section { margin-top: 34px; }
 .pod-library-list { display: grid; gap: 8px; }
 .pod-library-list article { display: grid; grid-template-columns: 76px 1fr auto; align-items: center; gap: 12px; padding: 10px; border: 1px solid var(--lc-ss-hairline-strong); border-radius: var(--lc-radius-lg); }
+.pod-open-topic { min-width: 84px; }
 .pod-library-list article > div:nth-child(2) { display: grid; gap: 3px; }
 .pod-library-list article span { color: var(--lc-ss-on-dark-55); font-size: t.$lc-text-xs; }
 .pod-thumbnail--library { width: 76px; aspect-ratio: 16 / 9; }
@@ -126,9 +135,10 @@ ion-fab-button { --background: var(--lc-ss-sage); --color: var(--lc-ss-pine-deep
   .pod-form-grid, .pod-upload-row { grid-template-columns: 1fr; }
   .pod-wide { grid-column: auto; }
   .pod-checklist { grid-template-columns: 1fr 1fr; }
+  .pod-level-range { grid-template-columns: 1fr 1fr; }
   .pod-asset-heading { align-items: start; }
   .pod-thumbnail--topic { width: 94px; }
   .pod-topic-publish { align-items: stretch; flex-direction: column; }
   .pod-library-list article { grid-template-columns: 70px 1fr; }
-  .pod-library-list article .pod-secondary { grid-column: 1 / -1; }
+  .pod-library-list article .pod-open-topic { grid-column: auto; min-width: 70px; }
 }

@@ -24,6 +24,7 @@ export class StoryCompletePage implements OnInit {
   private readonly translate = inject(TranslateService);
 
   readonly story = signal<Story | null>(null);
+  readonly pointsAwarded = Number(this.route.snapshot.queryParamMap.get('earned') ?? 0);
 
   // Quiz result captured at completion (null when the quiz wasn't attempted).
   readonly quizScore = this.player.lastQuizScore;

@@ -4,8 +4,8 @@ import { KeyboardResize } from '@capacitor/keyboard';
 const developmentServerUrl = process.env['CAPACITOR_DEV_SERVER_URL'];
 
 const config: CapacitorConfig = {
-  appId: 'com.anugw.linguacard.dev',
-  appName: 'linguaCard',
+  appId: 'app.linguacard',
+  appName: 'LinguaCard',
   webDir: 'www',
   ...(developmentServerUrl
     ? {

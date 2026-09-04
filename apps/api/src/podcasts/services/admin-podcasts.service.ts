@@ -7,16 +7,15 @@ import { DataSource, In, QueryFailedError, Repository } from 'typeorm';
 import type {
   AdminPodcastEpisodeListItem,
   AdminPodcastTopicListItem,
-  CefrLevel,
   PodcastThumbnail,
 } from '@lingua-card/shared/domain';
-import { CreatePodcastEpisodeDto, CreatePodcastTopicDto, UpdatePodcastTopicDto } from '../dto/admin-podcast.dto';
-import { PodcastEpisodeEntity } from '../entities/podcast-episode.entity';
+import { CreatePodcastTopicDto, UpdatePodcastTopicDto } from '../dto/admin-podcast.dto';
+import { PodcastEpisodeEntity, PodcastEpisodeGenerationInput } from '../entities/podcast-episode.entity';
 import { PodcastThumbnailAssetEntity } from '../entities/podcast-thumbnail-asset.entity';
 import { PodcastTopicEntity } from '../entities/podcast-topic.entity';
 import { toPodcastThumbnail } from '../podcast-thumbnail.mapper';
 import { PodcastThumbnailService } from './podcast-thumbnail.service';
-import { isPodcastEpisodeLevelValid, isPodcastLevelRangeValid } from '../domain/podcast-level';
+import { podcastEpisodeExternalId, podcastExternalId } from '../domain/podcast-external-id';
 
 const PG_UNIQUE_VIOLATION = '23505';
 
@@ -62,19 +61,18 @@ export class AdminPodcastsService {
   }
 
   async createTopic(dto: CreatePodcastTopicDto): Promise<AdminPodcastTopicListItem> {
-    this.validateLevelRange(dto.minimumLevel, dto.maximumLevel);
     if (dto.targetLanguage === dto.translationLanguage) {
       throw new BadRequestException('Target and translation languages must be different');
     }
+    const externalId = podcastExternalId(dto.title);
     const entity = this.topicRepo.create({
       id: randomUUID(),
-      externalId: dto.externalId,
+      externalId,
       title: dto.title.trim(),
       description: dto.description.trim(),
       targetLanguage: dto.targetLanguage,
       translationLanguage: dto.translationLanguage,
-      minimumLevel: dto.minimumLevel,
-      maximumLevel: dto.maximumLevel,
+      level: dto.level,
       status: 'draft',
       thumbnailAssetId: null,
       publishedAt: null,
@@ -84,7 +82,7 @@ export class AdminPodcastsService {
       return this.toTopicModel(saved, [], new Map());
     } catch (error) {
       if (this.isUniqueViolation(error)) {
-        throw new ConflictException(`Podcast topic externalId ${dto.externalId} already exists`);
+        throw new ConflictException(`A podcast topic derived as “${externalId}” already exists`);
       }
       throw error;
     }
@@ -99,31 +97,34 @@ export class AdminPodcastsService {
         where: { id: topicId }, lock: { mode: 'pessimistic_write' },
       });
       if (!topic) throw new NotFoundException(`Podcast topic ${topicId} not found`);
-      const minimumLevel = dto.minimumLevel ?? topic.minimumLevel;
-      const maximumLevel = dto.maximumLevel ?? topic.maximumLevel;
-      this.validateLevelRange(minimumLevel, maximumLevel);
+      const level = dto.level ?? topic.level;
       const episodes = await manager.findBy(PodcastEpisodeEntity, { topicId });
       const incompatibleEpisode = episodes.find(
-        episode => !isPodcastEpisodeLevelValid(episode.level, minimumLevel, maximumLevel),
+        episode => episode.level !== level,
       );
       if (incompatibleEpisode) {
         throw new ConflictException(
-          `Episode “${incompatibleEpisode.title}” is outside the requested ${minimumLevel}–${maximumLevel} range`,
+          `Episode “${incompatibleEpisode.title}” uses a different learner level`,
         );
       }
       if (dto.title !== undefined) topic.title = dto.title.trim();
       if (dto.description !== undefined) topic.description = dto.description.trim();
-      topic.minimumLevel = minimumLevel;
-      topic.maximumLevel = maximumLevel;
+      topic.level = level;
       await manager.save(topic);
     });
     return this.findTopicModel(topicId);
   }
 
-  async createEpisode(
+  async reserveEpisode(
     topicId: string,
-    dto: CreatePodcastEpisodeDto,
+    requestId: string,
+    generationInput: PodcastEpisodeGenerationInput | null,
   ): Promise<AdminPodcastEpisodeListItem> {
+    const existing = await this.episodeRepo.findOneBy({ generationRequestId: requestId });
+    if (existing) {
+      if (existing.topicId !== topicId) throw new ConflictException('This request identifier is already in use');
+      return this.findEpisodeModel(existing.id);
+    }
     let episodeId: string;
     try {
       episodeId = await this.dataSource.transaction(async manager => {
@@ -132,34 +133,23 @@ export class AdminPodcastsService {
           lock: { mode: 'pessimistic_write' },
         });
         if (!topic) throw new NotFoundException(`Podcast topic ${topicId} not found`);
-        this.validateEpisodeLevel(dto.level, topic.minimumLevel, topic.maximumLevel);
-        const episodeCount = await manager.count(PodcastEpisodeEntity, { where: { topicId } });
-        const position = dto.position ?? episodeCount;
-        if (position > episodeCount) {
-          throw new BadRequestException(`position must be between 0 and ${episodeCount}`);
+        const existingRequest = await manager.findOneBy(PodcastEpisodeEntity, { generationRequestId: requestId });
+        if (existingRequest) {
+          if (existingRequest.topicId !== topicId) throw new ConflictException('This request identifier is already in use');
+          return existingRequest.id;
         }
-        if (position < episodeCount) {
-          await manager.query(
-            `UPDATE podcast_episodes SET position = position + 100000
-             WHERE "topicId" = $1 AND position >= $2`,
-            [topicId, position],
-          );
-          await manager.query(
-            `UPDATE podcast_episodes SET position = position - 99999
-             WHERE "topicId" = $1 AND position >= 100000`,
-            [topicId],
-          );
-        }
+        const maximumPosition = await manager.maximum(PodcastEpisodeEntity, 'position', { topicId });
+        const position = (maximumPosition ?? -1) + 1;
         const entity = manager.create(PodcastEpisodeEntity, {
           id: randomUUID(),
           topicId,
-          externalId: dto.externalId,
-          title: dto.title.trim(),
-          titleTranslation: dto.titleTranslation.trim(),
-          description: dto.description.trim(),
-          level: dto.level,
+          externalId: podcastEpisodeExternalId(topic.externalId, `episode-${position + 1}`, position),
+          title: `Episode ${position + 1}`,
+          titleTranslation: '',
+          description: '',
+          level: topic.level,
           position,
-          status: 'draft',
+          status: generationInput ? 'queued' : 'draft',
           thumbnailAssetId: null,
           audioUrl: null,
           audioStoragePath: null,
@@ -169,16 +159,54 @@ export class AdminPodcastsService {
           transcriptFingerprint: null,
           estimatedDurationMs: 0,
           generationError: null,
+          generationRequestId: requestId,
+          generationInput,
+          elevenLabsProjectId: null,
           publishedAt: null,
         });
         return (await manager.save(entity)).id;
       });
     } catch (error) {
       if (this.isUniqueViolation(error)) {
-        throw new ConflictException(`Podcast episode externalId ${dto.externalId} already exists`);
+        throw new ConflictException('An episode with this derived identifier already exists');
       }
       throw error;
     }
+    return this.findEpisodeModel(episodeId);
+  }
+
+  async findPendingGeneratedEpisodes(): Promise<PodcastEpisodeEntity[]> {
+    await this.episodeRepo.update({ status: 'generating' }, { status: 'queued' });
+    return this.episodeRepo.find({ where: { status: 'queued' } });
+  }
+
+  async findEpisodeEntity(episodeId: string): Promise<PodcastEpisodeEntity> {
+    const episode = await this.episodeRepo.findOneBy({ id: episodeId });
+    if (!episode) throw new NotFoundException(`Podcast episode ${episodeId} not found`);
+    return episode;
+  }
+
+  async markEpisodeGenerationStarted(episodeId: string): Promise<boolean> {
+    const result = await this.episodeRepo.update(
+      { id: episodeId, status: 'queued' },
+      { status: 'generating', generationError: null },
+    );
+    return (result.affected ?? 0) > 0;
+  }
+
+  async markEpisodeGenerationFailed(episodeId: string, message: string): Promise<void> {
+    await this.episodeRepo.update(
+      { id: episodeId },
+      { status: 'failed', generationError: message.slice(0, 1000) },
+    );
+  }
+
+  async queueFailedEpisode(episodeId: string): Promise<AdminPodcastEpisodeListItem> {
+    const result = await this.episodeRepo.update(
+      { id: episodeId, status: 'failed' },
+      { status: 'queued', generationError: null },
+    );
+    if (!(result.affected ?? 0)) throw new ConflictException('Only a failed episode can be retried');
     return this.findEpisodeModel(episodeId);
   }
 
@@ -292,7 +320,7 @@ export class AdminPodcastsService {
     return topic;
   }
 
-  private async findEpisodeModel(episodeId: string): Promise<AdminPodcastEpisodeListItem> {
+  async findEpisodeModel(episodeId: string): Promise<AdminPodcastEpisodeListItem> {
     const episode = await this.episodeRepo.findOneBy({ id: episodeId });
     if (!episode) throw new NotFoundException(`Podcast episode ${episodeId} not found`);
     const thumbnail = episode.thumbnailAssetId
@@ -313,8 +341,7 @@ export class AdminPodcastsService {
       description: topic.description,
       targetLanguage: topic.targetLanguage,
       translationLanguage: topic.translationLanguage,
-      minimumLevel: topic.minimumLevel,
-      maximumLevel: topic.maximumLevel,
+      level: topic.level,
       status: topic.status,
       thumbnail: topic.thumbnailAssetId ? thumbnailById.get(topic.thumbnailAssetId) ?? null : null,
       episodes: episodes.map(episode => this.toEpisodeModel(
@@ -343,6 +370,8 @@ export class AdminPodcastsService {
       audioUrl: episode.audioUrl,
       audioVersion: episode.audioVersion,
       generationError: episode.generationError,
+      generationRequestId: episode.generationRequestId,
+      elevenLabsProjectId: episode.elevenLabsProjectId,
       hasTranscript: episode.transcriptFingerprint !== null,
       estimatedDurationMs: episode.estimatedDurationMs,
       status: episode.status,
@@ -352,24 +381,8 @@ export class AdminPodcastsService {
     };
   }
 
-  private validateLevelRange(minimum: CefrLevel, maximum: CefrLevel): void {
-    if (!isPodcastLevelRangeValid(minimum, maximum)) {
-      throw new BadRequestException('minimumLevel must not be higher than maximumLevel');
-    }
-  }
-
   private thumbnailStoragePaths(thumbnail: PodcastThumbnailAssetEntity): readonly string[] {
     return [thumbnail.originalStoragePath, thumbnail.cardStoragePath, thumbnail.heroStoragePath];
-  }
-
-  private validateEpisodeLevel(
-    level: CefrLevel,
-    minimum: CefrLevel,
-    maximum: CefrLevel,
-  ): void {
-    if (!isPodcastEpisodeLevelValid(level, minimum, maximum)) {
-      throw new BadRequestException(`Episode level must be between ${minimum} and ${maximum}`);
-    }
   }
 
   private isUniqueViolation(error: unknown): boolean {

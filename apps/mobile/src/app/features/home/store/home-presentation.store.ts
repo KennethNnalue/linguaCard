@@ -33,12 +33,8 @@ export const HomePresentationStore = signalStore(
         const completed = engagement.completedToday();
         const goal = Math.max(1, engagement.dailyGoal());
         const streak = engagement.streak().current;
-        const now = Date.now();
-        const due = items.filter(item => item.reviewState.masterySource !== 'manual'
-          && item.reviewState.dueAt !== undefined
-          && new Date(item.reviewState.dueAt).getTime() <= now).length;
         const newAvailable = items.filter(item => item.reviewState.stage === 'new').length;
-        const available = due + newAvailable;
+        const available = items.filter(item => item.reviewState.masterySource !== 'manual').length;
 
         if (completed >= goal) {
           return {kind: 'complete', reviewed: completed, streak, action: 'keep-practicing'};
@@ -54,8 +50,8 @@ export const HomePresentationStore = signalStore(
 
         const remaining = goal - completed;
         const cardsInSession = Math.min(remaining, available);
-        const reviewCards = Math.min(cardsInSession, due);
-        const newCards = Math.max(0, cardsInSession - reviewCards);
+        const newCards = Math.min(cardsInSession, newAvailable);
+        const reviewCards = cardsInSession - newCards;
         const minutes = estimateReviewMinutes({newCards, reviewCards, mode: reviewPrefs.mode()});
 
         if (review.sessionHistory().length === 0 && completed === 0) {

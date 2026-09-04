@@ -53,6 +53,15 @@ ion-content {
   color: var(--lc-text-hint);
 }
 
+.reward {
+  margin: -(t.$lc-space-4) 0 t.$lc-space-5;
+  padding: 7px 12px;
+  border-radius: t.$lc-radius-full;
+  background: var(--lc-brand-soft);
+  color: var(--lc-brand);
+  font-size: t.$lc-text-sm;
+}
+
 .mode-badge {
   display: inline-flex;
   align-items: center;

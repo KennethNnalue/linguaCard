@@ -42,6 +42,8 @@ export interface PlaybackHost {
   downloadStatus: () => OfflineDownloadStatus;
   patch: (state: PlaybackStatePatch) => void;
   saveSession: () => void;
+  cardCompleted: (cardId: string) => void;
+  sessionCompleted: () => void;
 }
 
 export interface PlaybackStatePatch {
@@ -204,7 +206,11 @@ export class ListenPlaybackEngine {
    */
   async prepareWindow(startIdx: number): Promise<void> {
     const items = this._collectWindowItems(startIdx);
-    if (items.length) await this.wordAudio.preWarm(items);
+    if (!items.length) return;
+    const result = await this.wordAudio.preWarm(items);
+    if (result.availableCount < result.requestedCount) {
+      throw new Error('HD audio is not ready yet. Check your connection and try again.');
+    }
   }
 
   /** Collect (and mark) the un-warmed target items for the window at startIdx. */
@@ -310,12 +316,16 @@ export class ListenPlaybackEngine {
           } else {
             const cardIdx = this.host.cardIndex();
             const queueLen = this.host.queue().length;
+            const completedCard = this.host.queue()[cardIdx];
+            if (completedCard) this.host.cardCompleted(completedCard.id);
             if (cardIdx >= queueLen - 1) {
               if (this.host.settings().repeat) {
+                this.host.sessionCompleted();
                 this.host.patch({ cardIndex: 0, segmentIndex: 0, status: 'playing' });
                 this.emitCurrent(gen);
               } else {
                 this.host.patch({ status: 'complete' });
+                this.host.sessionCompleted();
               }
             } else {
               this.host.patch({ cardIndex: cardIdx + 1, segmentIndex: 0 });

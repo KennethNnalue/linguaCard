@@ -9,9 +9,11 @@
     </div>
 
     <!-- Title + body -->
-    <h2 class="reset-title lc-display">{{ 'settings.dangerZone.resetTitle' | translate }}?</h2>
+    <h2 class="reset-title lc-display">
+      {{ (mode() === 'account' ? 'settings.dangerZone.deleteAccountTitle' : 'settings.dangerZone.resetTitle') | translate }}?
+    </h2>
     <p class="reset-body">
-      {{ 'settings.dangerZone.resetWarning' | translate }}
+      {{ (mode() === 'account' ? 'settings.dangerZone.deleteAccountWarning' : 'settings.dangerZone.resetWarning') | translate }}
     </p>
 
     <!-- Warning box -->
@@ -19,7 +21,7 @@
       <ion-icon name="alert-circle-outline" class="warning-icon"></ion-icon>
       <p class="warning-text">
         <strong>{{ 'settings.dangerZone.irreversible' | translate }}</strong>
-        {{ 'settings.dangerZone.deleteDetails' | translate:{ wordCount: wordCount(), collectionCount: collectionCount() } }}
+        {{ (mode() === 'account' ? 'settings.dangerZone.deleteAccountDetails' : 'settings.dangerZone.deleteDetails') | translate:{ wordCount: wordCount(), collectionCount: collectionCount() } }}
       </p>
     </div>
 
@@ -51,7 +53,7 @@
       @if (loading()) {
         <span class="btn-spinner"></span>
       } @else {
-        {{ 'settings.dangerZone.confirm' | translate }}
+        {{ (mode() === 'account' ? 'settings.dangerZone.confirmAccountDeletion' : 'settings.dangerZone.confirm') | translate }}
       }
     </button>
 

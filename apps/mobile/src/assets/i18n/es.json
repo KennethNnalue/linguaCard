@@ -141,6 +141,12 @@
       "newCardsLabel": "tarjetas nuevas",
       "reviewsLabel": "repasos"
     },
+    "personalGoal": {
+      "title": "Tu objetivo",
+      "progress": "{{current}} de {{target}} repasos",
+      "complete": "Completado ✓",
+      "independent": "No afecta a tu racha"
+    },
     "actions": {
       "startSession": "Iniciar sesión",
       "filter": "Filtrar"
@@ -1370,12 +1376,12 @@
         "decreaseAria": "Reducir meta mensual",
         "increaseAria": "Aumentar meta mensual"
       },
-      "streakNote": "🔥 Cumplir tu meta diaria extiende tu racha. Si fallas un día, la racha se reinicia."
+      "streakNote": "🔥 Repasa 10 tarjetas para extender tu racha. Tus objetivos personales no cambian este requisito."
     },
     "goalsPrompt": {
       "titleFirstTime": "Establece tus metas de estudio",
       "titleUpdate": "Es hora de actualizar tus metas",
-      "bodyFirstTime": "Dile a LinguaCard cuánto quieres estudiar cada día. Tus metas definen tu racha y te ayudan a mantener el ritmo.",
+      "bodyFirstTime": "Dile a LinguaCard cuánto quieres estudiar. Tus objetivos te ayudan a planificar; el repaso diario de 10 tarjetas mantiene tu racha.",
       "bodyUpdate": "Ha pasado un tiempo desde que actualizaste tus objetivos. Tómate un momento para asegurarte de que aún se ajustan a tu ritmo.",
       "cards": "tarjetas",
       "setMyGoals": "Establecer mis metas",
@@ -1411,7 +1417,11 @@
       "irreversible": "Esta acción no se puede deshacer.",
       "deleteDetails": "Las {{wordCount}} palabras y {{collectionCount}} colecciones se eliminarán permanentemente.",
       "confirmPassword": "Introduce tu contraseña para confirmar",
-      "confirm": "Sí, eliminar todo"
+      "confirm": "Sí, eliminar todo",
+      "deleteAccountTitle": "Eliminar cuenta",
+      "deleteAccountWarning": "Esto eliminará permanentemente tu cuenta de LinguaCard y los datos personales asociados.",
+      "deleteAccountDetails": "Tu cuenta, {{wordCount}} palabras, {{collectionCount}} colecciones, historial de repasos, progreso y ajustes se eliminarán permanentemente.",
+      "confirmAccountDeletion": "Eliminar mi cuenta permanentemente"
     },
     "language": {
       "title": "Idioma",

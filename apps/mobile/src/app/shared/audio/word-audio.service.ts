@@ -285,19 +285,20 @@ export class WordAudioService {
     if (!requests.length) return summary;
     try {
       const response = await this.api.batchResolve(requests);
-      for (const r of response.results) {
-        if (!r.wordAudio.audioUrl) continue;
-        summary.availableCount++;
-        const key      = this._cacheKey(r.wordAudio.normalizedText, r.wordAudio.language);
-        const remoteUrl = r.wordAudio.audioUrl;
-
-        // Download to device filesystem (no-op on web, idempotent if already cached).
+      const available = response.results.filter(result => Boolean(result.wordAudio.audioUrl));
+      summary.availableCount = available.length;
+      const persisted = await Promise.all(available.map(async result => {
+        const key = this._cacheKey(result.wordAudio.normalizedText, result.wordAudio.language);
+        const remoteUrl = result.wordAudio.audioUrl;
+        if (!remoteUrl) return null;
         const localUrl = await this.cache.saveFromUrl(key, remoteUrl);
-        const resolvedUrl = localUrl ?? remoteUrl;
-        if (localUrl) summary.savedOfflineCount++;
-
-        this._urlMap.set(key, resolvedUrl);
-        this.audioReadiness.markReady(key);
+        return { key, localUrl, remoteUrl };
+      }));
+      for (const result of persisted) {
+        if (!result) continue;
+        if (result.localUrl) summary.savedOfflineCount += 1;
+        this._urlMap.set(result.key, result.localUrl ?? result.remoteUrl);
+        this.audioReadiness.markReady(result.key);
       }
     } catch {
       // Pre-warm failure is non-fatal

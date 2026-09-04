@@ -15,6 +15,7 @@ export class PodcastCompletionPage implements OnInit {
   readonly store = inject(PodcastCatalogueStore);
   private readonly route = inject(ActivatedRoute);
   private readonly router = inject(Router);
+  readonly pointsAwarded = Number(this.route.snapshot.queryParamMap.get('earned') ?? 0);
 
   constructor() { addIcons({ arrowBackOutline, arrowForward, checkmark, refresh }); }
 

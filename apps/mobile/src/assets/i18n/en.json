@@ -134,7 +134,7 @@
       "progressAria": "Daily practice progress",
       "remaining": "{{count}} cards left · about {{minutes}} min",
       "streak": "{{count}} day streak",
-      "completeTitle": "Daily goal complete",
+      "completeTitle": "Daily review complete",
       "reviewedToday": "{{count}} cards reviewed today",
       "caughtUpTitle": "You're all caught up ✓",
       "caughtUpSupport": "Everything you've learned is on track.",
@@ -149,6 +149,12 @@
       "newCardsLabel": "new cards",
       "reviewsLabel": "reviews"
     },
+    "personalGoal": {
+      "title": "Your target",
+      "progress": "{{current}} of {{target}} reviews",
+      "complete": "Complete ✓",
+      "independent": "Does not affect your streak"
+    },
     "actions": {
       "startSession": "Start session",
       "filter": "Filter"
@@ -157,7 +163,7 @@
       "keepStreakPrefix": "Review now to keep your",
       "keepStreakSuffix": "day streak alive",
       "startStreakSuffix": "cards today to start a streak",
-      "dailyGoalSuffix": "more cards to hit your daily goal",
+      "dailyGoalSuffix": "more cards to complete today's review",
       "reviewText": "Review",
       "startButton": "Start"
     },
@@ -168,7 +174,7 @@
       "broken": "Start a new streak"
     },
     "goalRing": {
-      "label": "Daily goal",
+      "label": "Daily review",
       "todayLabel": "today",
       "doneLabel": "done",
       "notStarted": "Not started",
@@ -904,16 +910,16 @@
       "editCardHint": "Fix the word, meaning or examples"
     },
     "engagement": {
-      "dailyGoalComplete": "Daily goal complete",
+      "dailyGoalComplete": "Daily review complete",
       "wordsStudied": "{{count}} words studied",
       "dayStreak": "{{count}}-day streak",
       "sessionPoints": "+{{count}} Learning Points this session",
       "reviewPoints": "+{{count}} Learning Points",
-      "goalCompleteKeepGoing": "Daily goal complete · keep going!",
+      "goalCompleteKeepGoing": "Daily review complete · keep going!",
       "beyondGoal": "Goal crushed · +{{count}} extra today",
       "dailyGoalBonus": "+{{count}} Learning Points goal bonus",
       "totalLearningPoints": "{{count}} total Learning Points",
-      "dailyProgress": "Daily goal: {{current}}/{{target}}",
+      "dailyProgress": "Daily review: {{current}}/{{target}}",
       "masteryEarned": "{{count}} cards mastered",
       "freezeEarned": "Streak freeze earned",
       "freezeEarnProgress": "{{current}}/{{target}} goal days toward the next freeze",
@@ -940,9 +946,9 @@
         "loadError": "We couldn't load your progress.",
         "retry": "Try again",
         "emptyTitle": "Your rhythm starts today",
-        "emptyHint": "Complete your first daily goal to begin your progress history.",
+        "emptyHint": "Complete your first daily review to begin your progress history.",
         "learningPoints": "Learning Points",
-        "pointsHint": "Earned from daily reviews, goals and mastery",
+        "pointsHint": "Earned from daily reviews and mastery",
         "howFreezesWork": "How freezes work",
         "freezeExplanation": "If you miss a full day, one available freeze protects your streak automatically. It never adds reviews or Learning Points."
       }
@@ -1425,7 +1431,7 @@
       "targetsSection": "Targets",
       "daily": {
         "name": "Daily",
-        "desc": "Cards per day to keep your streak",
+        "desc": "Your personal review target",
         "decreaseAria": "Decrease daily goal",
         "increaseAria": "Increase daily goal",
         "light": "Light",
@@ -1448,12 +1454,12 @@
         "decreaseAria": "Decrease monthly goal",
         "increaseAria": "Increase monthly goal"
       },
-      "streakNote": "🔥 Hitting your daily goal extends your streak. Miss a day and the streak resets."
+      "streakNote": "🔥 Review 10 cards to extend your streak. Your personal targets do not change the streak requirement."
     },
     "goalsPrompt": {
       "titleFirstTime": "Set your study goals",
       "titleUpdate": "Time to update your goals",
-      "bodyFirstTime": "Tell LinguaCard how much you want to study each day. Your goals shape your streak and help you stay on track.",
+      "bodyFirstTime": "Tell LinguaCard how much you want to study. Your targets help you plan, while the daily 10-card review maintains your streak.",
       "bodyUpdate": "It's been a while since you last updated your targets. Take a moment to make sure they still match your pace.",
       "cards": "cards",
       "setMyGoals": "Set my goals",
@@ -1495,7 +1501,11 @@
       "irreversible": "This action cannot be undone.",
       "deleteDetails": "All {{wordCount}} words and {{collectionCount}} collections will be deleted permanently.",
       "confirmPassword": "Enter your password to confirm",
-      "confirm": "Yes, delete everything"
+      "confirm": "Yes, delete everything",
+      "deleteAccountTitle": "Delete account",
+      "deleteAccountWarning": "This will permanently delete your LinguaCard account and the personal data associated with it.",
+      "deleteAccountDetails": "Your account, {{wordCount}} words, {{collectionCount}} collections, review history, progress, and settings will be deleted permanently.",
+      "confirmAccountDeletion": "Permanently delete my account"
     }
   },
   "sync": {

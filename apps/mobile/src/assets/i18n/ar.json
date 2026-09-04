@@ -141,6 +141,12 @@
       "newCardsLabel": "بطاقات جديدة",
       "reviewsLabel": "مراجعات"
     },
+    "personalGoal": {
+      "title": "هدفك",
+      "progress": "{{current}} من {{target}} مراجعات",
+      "complete": "مكتمل ✓",
+      "independent": "لا يؤثر في سلسلتك"
+    },
     "actions": {
       "startSession": "بدء الجلسة",
       "filter": "تصفية"
@@ -1370,12 +1376,12 @@
         "decreaseAria": "تقليل الهدف الشهري",
         "increaseAria": "زيادة الهدف الشهري"
       },
-      "streakNote": "🔥 تحقيق هدفك اليومي يمدد سلسلتك. فوّت يومًا وستنقطع السلسلة."
+      "streakNote": "🔥 راجع 10 بطاقات لتمديد سلسلتك. أهدافك الشخصية لا تغيّر هذا الشرط."
     },
     "goalsPrompt": {
       "titleFirstTime": "حدد أهداف دراستك",
       "titleUpdate": "حان وقت تحديث أهدافك",
-      "bodyFirstTime": "أخبر LinguaCard بمقدار ما تريد دراسته يوميًا. أهدافك تشكّل سلسلتك وتساعدك على البقاء على المسار.",
+      "bodyFirstTime": "أخبر LinguaCard بمقدار ما تريد دراسته. تساعدك أهدافك على التخطيط، وتحافظ مراجعة 10 بطاقات يوميًا على سلسلتك.",
       "bodyUpdate": "مر وقت منذ آخر تحديث لأهدافك. خذ لحظة للتأكد من أنها لا تزال تناسب وتيرتك.",
       "cards": "بطاقات",
       "setMyGoals": "تحديد أهدافي",
@@ -1411,7 +1417,11 @@
       "irreversible": "لا يمكن التراجع عن هذا الإجراء.",
       "deleteDetails": "سيتم حذف جميع الكلمات الـ {{wordCount}} والمجموعات الـ {{collectionCount}} نهائيًا.",
       "confirmPassword": "أدخل كلمة المرور للتأكيد",
-      "confirm": "نعم، احذف كل شيء"
+      "confirm": "نعم، احذف كل شيء",
+      "deleteAccountTitle": "حذف الحساب",
+      "deleteAccountWarning": "سيؤدي هذا إلى حذف حساب LinguaCard وبياناتك الشخصية المرتبطة به نهائيًا.",
+      "deleteAccountDetails": "سيتم حذف حسابك و{{wordCount}} كلمة و{{collectionCount}} مجموعة وسجل المراجعة والتقدم والإعدادات نهائيًا.",
+      "confirmAccountDeletion": "حذف حسابي نهائيًا"
     },
     "language": {
       "title": "اللغة",

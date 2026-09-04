@@ -32,6 +32,7 @@ import { ReviewCommitService } from '../services/review-commit.service';
 import { ReviewLocalRepository } from '../services/review-local.repository';
 import { EngagementStore } from '../../engagement/state/engagement.store';
 import { CardAdministrationService } from '../services/card-administration.service';
+import { SettingsStore } from '../../settings/store/settings.store';
 
 export interface ReviewCommitContext {
   reviewMode?: 'typing' | 'recall';
@@ -129,6 +130,7 @@ export const ReviewStore = signalStore(
     const reviewLocal = inject(ReviewLocalRepository);
     const engagementStore = inject(EngagementStore);
     const cardAdministration = inject(CardAdministrationService);
+    const settingsStore = inject(SettingsStore);
     let persistenceChain: Promise<void> = Promise.resolve();
 
     function serializePersistence(work: () => Promise<void>): Promise<void> {
@@ -289,7 +291,9 @@ export const ReviewStore = signalStore(
         const request = {
           source, limit, mode: toReviewMode(reviewPrefs.mode()), direction: toPromptDirection(reviewPrefs.dir()),
         };
-        const result = await sessionBuilder.start(request, new Date(), generateUuid());
+        const timeZone = settingsStore.settings()?.timezone
+          ?? Intl.DateTimeFormat().resolvedOptions().timeZone;
+        const result = await sessionBuilder.start(request, new Date(), generateUuid(), { timeZone });
         if (result.kind !== 'started') {
           patchState(store, {
             operation: result.kind === 'load_failed'
@@ -411,6 +415,7 @@ export const ReviewStore = signalStore(
         try {
           await engagementStore.projectCommittedReview(
             deserializeReviewCommittedEvent(pendingCommit.event),
+            cardStore.cards().filter(card => card.reviewState.masterySource !== 'manual').length,
             nextSelection.kind === 'complete',
           );
         } catch {

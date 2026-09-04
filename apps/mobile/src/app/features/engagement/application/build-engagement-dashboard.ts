@@ -6,11 +6,12 @@ import { MAX_STREAK_FREEZE_INVENTORY, STREAK_FREEZE_GOAL_INTERVAL } from '@lingu
 export function buildEngagementDashboard(
   state: PersistedEngagementState,
   todayKey: EngagementDayKey,
-  configuredDailyGoal: number,
+  platformDailyTarget: number,
+  personalDailyGoal: number = platformDailyTarget,
 ): EngagementDashboard {
   const progress = state.dailyProgress[todayKey];
   const reviewed = progress?.uniqueCardsReviewed ?? 0;
-  const goal = progress?.targetUniqueCards ?? configuredDailyGoal;
+  const goal = progress?.targetUniqueCards ?? platformDailyTarget;
   const streakDays = state.streakDays.some(day => day.dayKey === todayKey)
     ? state.streakDays
     : [...state.streakDays, { dayKey: todayKey, goalTarget: goal, uniqueCardsReviewed: reviewed, status: 'open' as const }];
@@ -18,6 +19,11 @@ export function buildEngagementDashboard(
   const qualifyingGoalDayCount = streakDays.filter(day => day.status === 'goal_met').length;
   return {
     today: { reviewed, goal, goalComplete: reviewed >= goal },
+    personalGoal: {
+      reviewed,
+      goal: personalDailyGoal,
+      goalComplete: reviewed >= personalDailyGoal,
+    },
     streak: calculateStreak(streakDays, todayKey),
     learningPoints: state.rewardTransactions.reduce((total, transaction) => total + transaction.amount, 0),
     streakFreezes,

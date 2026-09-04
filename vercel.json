@@ -2,6 +2,9 @@
   "buildCommand": "npm run build:web",
   "outputDirectory": "www",
   "rewrites": [
+    { "source": "/privacy", "destination": "/privacy/index.html" },
+    { "source": "/delete-account", "destination": "/delete-account/index.html" },
+    { "source": "/support", "destination": "/support/index.html" },
     { "source": "/(.*)", "destination": "/index.html" }
   ],
   "headers": [

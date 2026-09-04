@@ -1,5 +1,5 @@
 import { AppNotificationService } from '@lingua-card/mobile/notifications';
-import { Component, computed, inject, signal } from '@angular/core';
+import { Component, computed, inject, input, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import {
   IonContent,
@@ -38,6 +38,7 @@ export class ResetDataSheetComponent {
   readonly password = signal('');
   readonly loading = signal(false);
   readonly passwordError = signal('');
+  readonly mode = input<'data' | 'account'>('data');
 
   readonly wordCount = this.cardStore.totalCount;
   readonly collectionCount = computed(() => this.collectionStore.collections().length);
@@ -56,25 +57,40 @@ export class ResetDataSheetComponent {
     this.loading.set(true);
     this.passwordError.set('');
 
-    const valid = await firstValueFrom(this.auth.verifyPassword(this.password()));
-
-    if (!valid) {
-      this.loading.set(false);
-      this.passwordError.set(this.translate.instant('auth.reset.passwordIncorrect'));
-      return;
-    }
-
     try {
+      const userId = this.auth.currentUser()?.id;
+      if (!userId) {
+        this.auth.logout();
+        return;
+      }
+
+      if (this.mode() === 'account') {
+        await firstValueFrom(this.auth.deleteAccount(this.password()));
+        try {
+          await this.localData.clearAllUserData(userId);
+          this.cardStore.reset();
+          this.collectionStore.reset();
+          await this.modalCtrl.dismiss({ reset: true, accountDeleted: true });
+        } finally {
+          this.auth.completeAccountDeletion();
+        }
+        return;
+      }
+
+      const valid = await firstValueFrom(this.auth.verifyPassword(this.password()));
+      if (!valid) {
+        this.loading.set(false);
+        this.passwordError.set(this.translate.instant('auth.reset.passwordIncorrect'));
+        return;
+      }
       await firstValueFrom(this.cardApi.removeAll());
       await firstValueFrom(this.collectionApi.removeAll());
-
-      const userId = this.auth.currentUser()?.id;
-      if (userId) await this.localData.clearAllUserData(userId);
+      await this.localData.clearAllUserData(userId);
 
       this.cardStore.reset();
       this.collectionStore.reset();
 
-      await this.modalCtrl.dismiss({ reset: true });
+      await this.modalCtrl.dismiss({ reset: true, accountDeleted: false });
 
       const toast = await this.toastCtrl.create({
         message: this.translate.instant('auth.reset.success'),
@@ -83,9 +99,13 @@ export class ResetDataSheetComponent {
         position: 'top',
       });
       await toast.present();
-    } catch {
+    } catch (error) {
       this.loading.set(false);
-      this.passwordError.set(this.translate.instant('common.error.generic'));
+      this.passwordError.set(
+        error instanceof Error
+          ? error.message
+          : this.translate.instant('common.error.generic'),
+      );
     }
   }
 

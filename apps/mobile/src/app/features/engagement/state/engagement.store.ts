@@ -33,6 +33,7 @@ export const EngagementStore = signalStore(
   withComputed(store => ({
     completedToday: computed(() => store.dashboard()?.today.reviewed ?? 0),
     dailyGoal: computed(() => store.dashboard()?.today.goal ?? 0),
+    personalGoal: computed(() => store.dashboard()?.personalGoal ?? { reviewed: 0, goal: 0, goalComplete: false }),
     dayStreak: computed(() => store.dashboard()?.streak.current ?? 0),
     learningPoints: computed(() => store.dashboard()?.learningPoints ?? 0),
     streakFreezes: computed(() => store.dashboard()?.streakFreezes ?? 0),
@@ -55,11 +56,11 @@ export const EngagementStore = signalStore(
     const serverReconciler = inject(ReconcileEngagementWithServerService);
     let acknowledgementTimer: ReturnType<typeof setTimeout> | null = null;
 
-    function context(): { userId: string; timeZone: string; configuredDailyGoal: number } | null {
+    function context(): { userId: string; timeZone: string; personalDailyGoal: number } | null {
       const userId = auth.currentUser()?.id;
       const userSettings = settings.settings();
       if (!userId || !userSettings?.timezone) return null;
-      return { userId, timeZone: userSettings.timezone, configuredDailyGoal: settings.dailyGoal() };
+      return { userId, timeZone: userSettings.timezone, personalDailyGoal: settings.dailyGoal() };
     }
 
     return {
@@ -81,11 +82,17 @@ export const EngagementStore = signalStore(
           } } });
         }
       },
-      async projectCommittedReview(event: ReviewCommittedEvent, suppressTransientFeedback = false): Promise<void> {
+      async projectCommittedReview(
+        event: ReviewCommittedEvent,
+        eligibleCardCount: number,
+        suppressTransientFeedback = false,
+      ): Promise<void> {
         const request = context();
         if (!request) throw new Error('Engagement requires a signed-in user and valid timezone');
         try {
-          const outcome = await projector.project({ ...request, event, suppressTransientFeedback });
+          const outcome = await projector.project({
+            ...request, event, eligibleCardCount, suppressTransientFeedback,
+          });
           const feedback = outcome.result.feedback;
           const reviewPoints = outcome.result.rewardTransactions
             .filter(transaction => transaction.reason === 'first_daily_card_review')
@@ -151,6 +158,10 @@ export const EngagementStore = signalStore(
             code: 'engagement_reconciliation_failed', message: 'Server engagement progress could not be reconciled.', recoverable: true,
           } });
         }
+      },
+      async refreshFromServer(): Promise<void> {
+        if (!store.dashboard()) await this.loadEngagement();
+        await this.reconcileWithServer();
       },
       dismissFeedback(feedbackId: string): void {
         if (store.pendingFeedback()?.feedbackId === feedbackId) patchState(store, { pendingFeedback: null });

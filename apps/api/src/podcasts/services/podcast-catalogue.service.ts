@@ -308,7 +308,7 @@ export class PodcastCatalogueService {
     return {
       id: topic.id, title: topic.title, description: topic.description,
       targetLanguage: topic.targetLanguage, translationLanguage: topic.translationLanguage,
-      minimumLevel: topic.minimumLevel, maximumLevel: topic.maximumLevel,
+      minimumLevel: topic.level, maximumLevel: topic.level,
       episodeCount: episodes.length,
       totalDurationMs: episodes.reduce((total, episode) => total + episode.audioDurationMs, 0),
       thumbnail: this.requireThumbnail(thumbnails, topic.thumbnailAssetId),

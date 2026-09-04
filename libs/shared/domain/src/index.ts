@@ -16,6 +16,38 @@ export type PlayerStatus = 'idle' | 'loading' | 'playing' | 'paused' | 'error' |
 
 export const STREAK_FREEZE_GOAL_INTERVAL = 7;
 export const MAX_STREAK_FREEZE_INVENTORY = 2;
+export const DAILY_STREAK_POLICY_VERSION = 1;
+export const DAILY_STREAK_REVIEW_TARGET = 10;
+
+export interface DailyStreakPolicy {
+  version: number;
+  requiredUniqueReviews: number;
+}
+
+export const DAILY_STREAK_POLICY: Readonly<DailyStreakPolicy> = {
+  version: DAILY_STREAK_POLICY_VERSION,
+  requiredUniqueReviews: DAILY_STREAK_REVIEW_TARGET,
+};
+
+export const REVIEW_LEARNING_POINTS = {
+  firstUniqueDailyReview: 2,
+  recoveredRecall: 1,
+  dailyStreakCompleted: 10,
+  cardMastered: 5,
+} as const;
+
+export const PODCAST_COMPLETION_POINTS = 10;
+export const PODCAST_COMPLETION_LISTENING_RATIO = 0.7;
+export const PODCAST_WORD_RETRIEVAL_POINTS = 3;
+export const COLLECTION_LISTENING_POINTS = 5;
+export const STORY_COMPLETION_POINTS = 8;
+
+export function dailyStreakReviewTarget(eligibleCardCount: number): number {
+  if (!Number.isInteger(eligibleCardCount) || eligibleCardCount < 1) {
+    throw new Error('Eligible card count must be a positive integer');
+  }
+  return Math.min(DAILY_STREAK_POLICY.requiredUniqueReviews, eligibleCardCount);
+}
 
 export function streakFreezeGrantMilestone(
   qualifyingGoalDayCount: number,
@@ -1642,6 +1674,8 @@ export interface AdminPodcastEpisodeListItem {
   audioUrl: string | null;
   audioVersion: number;
   generationError: string | null;
+  generationRequestId: string | null;
+  elevenLabsProjectId: string | null;
   hasTranscript: boolean;
   estimatedDurationMs: number;
   status: PodcastEpisodeStatus;
@@ -1801,12 +1835,47 @@ export interface PodcastListeningProgress {
   positionMs: number;
   completedAt: string | null;
   updatedAt: string;
+  pointsAwarded: number;
+}
+
+export interface PodcastPlaybackRange {
+  startMs: number;
+  endMs: number;
+}
+
+export function mergePodcastPlaybackRanges(
+  existing: readonly PodcastPlaybackRange[],
+  incoming: readonly PodcastPlaybackRange[],
+  durationMs: number,
+): PodcastPlaybackRange[] {
+  const ranges = [...existing, ...incoming].map(range => ({
+    startMs: Math.max(0, Math.min(durationMs, range.startMs)),
+    endMs: Math.max(0, Math.min(durationMs, range.endMs)),
+  })).filter(range => Number.isInteger(range.startMs)
+    && Number.isInteger(range.endMs)
+    && range.endMs > range.startMs)
+    .sort((left, right) => left.startMs - right.startMs || left.endMs - right.endMs);
+  const merged: PodcastPlaybackRange[] = [];
+  for (const range of ranges) {
+    const previous = merged[merged.length - 1];
+    if (!previous || range.startMs > previous.endMs) {
+      merged.push(range);
+    } else {
+      previous.endMs = Math.max(previous.endMs, range.endMs);
+    }
+  }
+  return merged;
+}
+
+export function podcastPlaybackRangeDuration(ranges: readonly PodcastPlaybackRange[]): number {
+  return ranges.reduce((total, range) => total + range.endMs - range.startMs, 0);
 }
 
 export interface SavePodcastProgressDto {
   audioVersion: number;
   positionMs: number;
   completed: boolean;
+  playedRanges?: readonly PodcastPlaybackRange[];
 }
 
 export interface PreparePodcastVocabularyResult {
@@ -1822,8 +1891,7 @@ export interface AdminPodcastTopicListItem {
   description: string;
   targetLanguage: LanguageCode;
   translationLanguage: LanguageCode;
-  minimumLevel: CefrLevel;
-  maximumLevel: CefrLevel;
+  level: CefrLevel;
   status: PodcastContentStatus;
   thumbnail: PodcastThumbnail | null;
   episodes: AdminPodcastEpisodeListItem[];
@@ -1832,29 +1900,50 @@ export interface AdminPodcastTopicListItem {
 }
 
 export interface AdminCreatePodcastTopicDto {
-  externalId: string;
   title: string;
   description: string;
   targetLanguage: LanguageCode;
   translationLanguage: LanguageCode;
-  minimumLevel: CefrLevel;
-  maximumLevel: CefrLevel;
+  level: CefrLevel;
 }
 
 export interface AdminUpdatePodcastTopicDto {
   title?: string;
   description?: string;
-  minimumLevel?: CefrLevel;
-  maximumLevel?: CefrLevel;
+  level?: CefrLevel;
 }
 
 export interface AdminCreatePodcastEpisodeDto {
-  externalId: string;
-  title: string;
-  titleTranslation: string;
-  description: string;
-  level: CefrLevel;
-  position?: number;
+  requestId: string;
+  vocabulary: string[];
+  direction?: string;
+}
+
+export interface AdminCreatePodcastEpisodeDraftDto {
+  requestId: string;
+}
+
+export interface AdminGeneratePodcastTranscriptDto {
+  vocabulary: string[];
+}
+
+export interface AdminGeneratePodcastTranscriptResult {
+  payload: AdminPodcastTranscriptPayload;
+  preview: AdminPodcastTranscriptPreview;
+}
+
+export interface AdminCreateElevenLabsPodcastDto {
+  vocabulary: string[];
+}
+
+export interface AdminCreateElevenLabsPodcastResult {
+  episodeId: string;
+  projectId: string;
+  status: 'processing';
+}
+
+export interface AdminPodcastTranscriptPromptResult {
+  prompt: string;
 }
 
 export type PodcastVocabularyImportance = 'essential' | 'supporting';

@@ -1,5 +1,12 @@
 import { describe, expect, test } from '@jest/globals';
-import { streakFreezeGrantMilestone } from '@lingua-card/shared/domain';
+import { dailyStreakReviewTarget, streakFreezeGrantMilestone } from '@lingua-card/shared/domain';
+
+describe('dailyStreakReviewTarget', () => {
+  test.each([[1, 1], [4, 4], [10, 10], [30, 10]])(
+    'uses a reachable target for %i eligible cards',
+    (eligibleCards, target) => expect(dailyStreakReviewTarget(eligibleCards)).toBe(target),
+  );
+});
 
 describe('streakFreezeGrantMilestone', () => {
   test.each([

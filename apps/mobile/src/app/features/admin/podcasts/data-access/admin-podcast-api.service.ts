@@ -2,6 +2,7 @@ import { HttpClient } from '@angular/common/http';
 import { inject, Injectable } from '@angular/core';
 import type {
   AdminCreatePodcastEpisodeDto,
+  AdminCreatePodcastEpisodeDraftDto,
   AdminCreatePodcastTopicDto,
   AdminPodcastEpisodeListItem,
   AdminPodcastTopicListItem,
@@ -9,6 +10,9 @@ import type {
   AdminPodcastTranscriptPreview,
   AdminCommitPodcastTranscriptResult,
   AdminGeneratePodcastAudioResult,
+  AdminGeneratePodcastTranscriptResult,
+  AdminCreateElevenLabsPodcastResult,
+  AdminPodcastTranscriptPromptResult,
   AdminUpdatePodcastTopicDto,
   PodcastThumbnail,
 } from '@lingua-card/shared/domain';
@@ -50,6 +54,21 @@ export class AdminPodcastApiService {
     return this.http.post<AdminPodcastEpisodeListItem>(
       `${this.topicUrl}/${topicId}/episodes`,
       dto,
+    );
+  }
+
+  createEpisodeDraft(
+    topicId: string,
+    dto: AdminCreatePodcastEpisodeDraftDto,
+  ): Observable<AdminPodcastEpisodeListItem> {
+    return this.http.post<AdminPodcastEpisodeListItem>(
+      `${this.topicUrl}/${topicId}/episode-drafts`, dto,
+    );
+  }
+
+  retryEpisodeGeneration(episodeId: string): Observable<AdminPodcastEpisodeListItem> {
+    return this.http.post<AdminPodcastEpisodeListItem>(
+      `${this.episodeUrl}/${episodeId}/retry-generation`, {},
     );
   }
 
@@ -95,6 +114,33 @@ export class AdminPodcastApiService {
   generateAudio(episodeId: string): Observable<AdminGeneratePodcastAudioResult> {
     return this.http.post<AdminGeneratePodcastAudioResult>(
       `${this.episodeUrl}/${episodeId}/generate-audio`, {},
+    );
+  }
+
+  generateTranscript(
+    episodeId: string,
+    vocabulary: string[],
+  ): Observable<AdminGeneratePodcastTranscriptResult> {
+    return this.http.post<AdminGeneratePodcastTranscriptResult>(
+      `${this.episodeUrl}/${episodeId}/transcript/generate`, { vocabulary },
+    );
+  }
+
+  createTranscriptPrompt(
+    episodeId: string,
+    vocabulary: string[],
+  ): Observable<AdminPodcastTranscriptPromptResult> {
+    return this.http.post<AdminPodcastTranscriptPromptResult>(
+      `${this.episodeUrl}/${episodeId}/transcript/prompt`, { vocabulary },
+    );
+  }
+
+  createElevenLabsPodcast(
+    episodeId: string,
+    vocabulary: string[],
+  ): Observable<AdminCreateElevenLabsPodcastResult> {
+    return this.http.post<AdminCreateElevenLabsPodcastResult>(
+      `${this.episodeUrl}/${episodeId}/elevenlabs-podcast`, { vocabulary },
     );
   }
 

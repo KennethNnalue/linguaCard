@@ -30,6 +30,7 @@
   <lc-user-menu
     (closed)="closeMenu()"
     (resetRequested)="openResetSheet()"
+    (accountDeletionRequested)="openDeleteAccountSheet()"
   ></lc-user-menu>
 }
 
@@ -87,6 +88,18 @@
             @default { {{ (hero.kind === 'in-progress' ? 'home.daily.continueReview' : 'home.daily.startReview') | translate }} }
           }
         </lc-button>
+      </section>
+    }
+
+    @if (streakReady() && personalGoal().goal !== dailyGoal()) {
+      <section class="personal-goal" aria-labelledby="personal-goal-title">
+        <div>
+          <strong id="personal-goal-title">{{ 'home.personalGoal.title' | translate }}</strong>
+          <span>{{ 'home.personalGoal.progress' | translate:{ current: personalGoal().reviewed, target: personalGoal().goal } }}</span>
+        </div>
+        <span [class.personal-goal__complete]="personalGoal().goalComplete">
+          {{ (personalGoal().goalComplete ? 'home.personalGoal.complete' : 'home.personalGoal.independent') | translate }}
+        </span>
       </section>
     }
 

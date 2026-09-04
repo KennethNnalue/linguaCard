@@ -2,7 +2,7 @@
 @use '../../../../../theme/utils' as u;
 
 .sgp-modal {
-  background: t.$lc-card;
+  background: var(--lc-card-elevated);
   padding: t.$lc-space-6 t.$lc-space-6 calc(#{t.$lc-space-4} + env(safe-area-inset-bottom));
   text-align: center;
 }
@@ -20,13 +20,13 @@
 .sgp-title {
   font-family: t.$lc-font-display;
   @include u.lc-font('2xl', t.$lc-font-weight-semibold);
-  color: t.$lc-text-primary;
+  color: var(--lc-text-primary);
   margin: 0 0 t.$lc-space-3;
 }
 
 .sgp-body {
   @include u.lc-font('sm');
-  color: t.$lc-text-secondary;
+  color: var(--lc-text-secondary);
   line-height: 1.55;
   margin: 0 0 t.$lc-space-5;
 }
@@ -36,8 +36,8 @@
   align-items: center;
   justify-content: center;
   gap: 0;
-  background: t.$lc-surface;
-  border: 1px solid t.$lc-border;
+  background: var(--lc-surface);
+  border: 1px solid var(--lc-border);
   border-radius: t.$lc-radius-md;
   padding: t.$lc-space-4 t.$lc-space-3;
   margin-bottom: t.$lc-space-6;
@@ -55,26 +55,26 @@
   @include u.lc-font('xxs', t.$lc-font-weight-semibold);
   text-transform: uppercase;
   letter-spacing: 0.08em;
-  color: t.$lc-text-hint;
+  color: var(--lc-text-hint);
 }
 
 .sgp-goal-value {
   font-family: t.$lc-font-display;
   @include u.lc-font('lg', t.$lc-font-weight-semibold);
-  color: t.$lc-brand;
+  color: var(--lc-brand);
 }
 
 .sgp-divider {
   width: 1px;
   height: 36px;
-  background: t.$lc-border;
+  background: var(--lc-border);
   flex-shrink: 0;
 }
 
 .sgp-btn-primary {
   width: 100%;
-  background: t.$lc-brand;
-  color: t.$lc-text-inverse;
+  background: var(--lc-brand);
+  color: var(--lc-surface);
   border: none;
   border-radius: t.$lc-radius-md;
   padding: t.$lc-space-4;
@@ -91,7 +91,7 @@
   border: none;
   padding: t.$lc-space-3;
   @include u.lc-font('sm', t.$lc-font-weight-medium);
-  color: t.$lc-text-secondary;
+  color: var(--lc-text-secondary);
   font-family: t.$lc-font-body;
   cursor: pointer;
   @include u.touch-state;

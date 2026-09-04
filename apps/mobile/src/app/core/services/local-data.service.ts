@@ -265,6 +265,8 @@ export class LocalDataService {
   // ── Full user wipe ───────────────────────────────────────────
   async clearAllUserData(userId: string): Promise<void> {
     await this.init();
+    const userScopedKeys = (await this.storage.keys())
+      .filter(key => key.split(':').includes(userId));
     await Promise.all([
       this.storage.remove(`cards:${userId}`),
       this.storage.remove(`collections:${userId}`),
@@ -284,6 +286,7 @@ export class LocalDataService {
       this.storage.remove('last_synced_at:vault'),
       this.storage.remove('last_synced_at:categories'),
       this.storage.remove('last_synced_at:stories'),
+      ...userScopedKeys.map(key => this.storage.remove(key)),
     ]);
   }
 }

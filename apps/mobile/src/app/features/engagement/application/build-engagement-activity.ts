@@ -19,7 +19,7 @@ function countForDay(state: PersistedEngagementState, dayKey: EngagementDayKey):
 export function buildEngagementActivity(
   state: PersistedEngagementState,
   todayKey: EngagementDayKey,
-  configuredDailyGoal: number,
+  platformDailyTarget: number,
   calendar: EngagementCalendar = engagementCalendar,
 ): EngagementActivity {
   const last7DayKeys: EngagementDayKey[] = [todayKey];
@@ -42,7 +42,7 @@ export function buildEngagementActivity(
     return {
       dayKey,
       reviewed: progress?.uniqueCardsReviewed ?? streakDay?.uniqueCardsReviewed ?? 0,
-      goal: progress?.targetUniqueCards ?? streakDay?.goalTarget ?? configuredDailyGoal,
+      goal: progress?.targetUniqueCards ?? streakDay?.goalTarget ?? platformDailyTarget,
       status: streakDay?.status ?? (dayKey === todayKey
         ? 'open'
         : !firstTrackedDayKey || dayKey < firstTrackedDayKey ? 'untracked' : 'missed'),

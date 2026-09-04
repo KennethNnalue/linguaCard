@@ -9,6 +9,7 @@ import { JwtAuthGuard } from './guards/jwt-auth.guard';
 import { SubscriptionsModule } from '../subscriptions/subscriptions.module';
 import { SettingsModule } from '../settings/settings.module';
 import {BootstrapAdminService} from './bootstrap-admin.service';
+import { UserAccountDeletionService } from './user-account-deletion.service';
 
 @Module({
   imports: [
@@ -25,7 +26,7 @@ import {BootstrapAdminService} from './bootstrap-admin.service';
     SettingsModule,
   ],
   controllers: [AuthController],
-  providers: [AuthService, JwtAuthGuard, BootstrapAdminService],
+  providers: [AuthService, JwtAuthGuard, BootstrapAdminService, UserAccountDeletionService],
   exports: [AuthService, JwtModule, JwtAuthGuard],
 })
 export class AuthModule {}

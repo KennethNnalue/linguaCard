@@ -22,6 +22,8 @@ import {
 import { ListenPlaybackEngine, PlaybackHost } from '../services/listen-playback.engine';
 import { ScriptCompilerService } from '../services/script-compiler.service';
 import { filter, firstValueFrom, take } from 'rxjs';
+import { EngagementApiService } from '../../engagement/data-access/engagement-api.service';
+import { EngagementStore } from '../../engagement/state/engagement.store';
 
 function isRecord(value: unknown): value is Record<string, unknown> {
   return typeof value === 'object' && value !== null;
@@ -120,6 +122,8 @@ const initialState: ListenState = {
   settings: DEFAULT_LISTEN_SETTINGS,
   sessionStartedAt: 0,
   downloadStatus: 'idle',
+  completedCardIds: [],
+  completionPointsAwarded: 0,
 };
 
 export const ListenStore = signalStore(
@@ -176,6 +180,8 @@ export const ListenStore = signalStore(
     const compiler = inject(ScriptCompilerService);
     const cardStore = inject(CardStore);
     const engine = inject(ListenPlaybackEngine);
+    const engagementApi = inject(EngagementApiService);
+    const engagement = inject(EngagementStore);
     const cardLoadState = toObservable(cardStore.loadState);
 
     function compileQueue(items: readonly VocabularyPlaylistItem[], mode: PlayMode): PlaybackScript[] {
@@ -197,6 +203,24 @@ export const ListenStore = signalStore(
       }
     }
 
+    function recordCompletedCard(cardId: string): void {
+      if (store.completedCardIds().includes(cardId)) return;
+      patchState(store, { completedCardIds: [...store.completedCardIds(), cardId] });
+    }
+
+    function completeListeningSession(): void {
+      const source = store.selectedSource();
+      if (!source.startsWith('collection:') || store.completedCardIds().length < 5) return;
+      const collectionId = source.slice('collection:'.length);
+      void firstValueFrom(engagementApi.completeCollectionListening(
+        collectionId,
+        store.completedCardIds(),
+      )).then(async result => {
+        patchState(store, { completionPointsAwarded: result.pointsAwarded });
+        await engagement.refreshFromServer();
+      }).catch(() => undefined);
+    }
+
     const host: PlaybackHost = {
       currentScript: store.currentScript,
       scriptAt: index => store.scripts()[index] ?? null,
@@ -209,6 +233,8 @@ export const ListenStore = signalStore(
       downloadStatus: store.downloadStatus,
       patch: state => patchState(store, state),
       saveSession,
+      cardCompleted: recordCompletedCard,
+      sessionCompleted: completeListeningSession,
     };
 
     function setPlaylist(request: VocabularyPlaylistRequest): void {
@@ -231,6 +257,8 @@ export const ListenStore = signalStore(
         status: 'idle',
         errorMessage: null,
         downloadStatus: 'idle',
+        completedCardIds: [],
+        completionPointsAwarded: 0,
       });
       localStorage.removeItem(LISTEN_SESSION_KEY);
       engine.resetPrefetch();
@@ -328,12 +356,20 @@ export const ListenStore = signalStore(
           status: 'loading',
           errorMessage: null,
           sessionStartedAt: Date.now(),
+          completedCardIds: [],
+          completionPointsAwarded: 0,
         });
         engine.resetPrefetch();
-        void engine.prepareWindow(0).finally(() => {
+        void engine.prepareWindow(0).then(() => {
           if (store.status() !== 'loading') return;
           patchState(store, { status: 'playing' });
           engine.restart();
+        }).catch((error: unknown) => {
+          if (store.status() !== 'loading') return;
+          patchState(store, {
+            status: 'error',
+            errorMessage: error instanceof Error ? error.message : 'HD audio preparation failed',
+          });
         });
       },
       pause(): void { engine.pause(); },
@@ -390,6 +426,8 @@ export const ListenStore = signalStore(
           status: 'loading',
           errorMessage: null,
           sessionStartedAt: Date.now(),
+          completedCardIds: [],
+          completionPointsAwarded: 0,
         });
         engine.resetPrefetch();
         void engine.prepareWindow(0).finally(() => {

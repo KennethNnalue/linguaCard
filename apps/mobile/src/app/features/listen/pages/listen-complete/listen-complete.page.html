@@ -16,6 +16,9 @@
 
     <h1 class="headline">{{ 'listen.complete.title' | translate }}</h1>
     <p class="subline">{{ 'listen.complete.subtitle' | translate:{ count: queueCount() } }}</p>
+    @if (listenStore.completionPointsAwarded() > 0) {
+      <strong class="reward">+{{ listenStore.completionPointsAwarded() }} Learning Points</strong>
+    }
 
     <div class="mode-badge">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round">
