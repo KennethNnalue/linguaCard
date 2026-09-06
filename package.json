@@ -38,6 +38,7 @@
     "validate:canonical-learning-items": "node dist/api/apps/api/src/scripts/backfill-multilingual-vocabulary.js --validate-only",
     "build:web": "node scripts/set-env.mjs && ng build --project=mobile --configuration=production",
     "test": "jest",
+    "test:api": "jest --config jest.api.config.ts",
     "test:watch": "jest --watch",
     "test:coverage": "jest --coverage",
     "lint": "ng lint --project=mobile",

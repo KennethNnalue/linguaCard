@@ -6,7 +6,9 @@ import type {
   AdminCreatePodcastTopicDto,
   AdminPodcastEpisodeListItem,
   AdminPodcastTopicListItem,
+  AdminUpdatePodcastEpisodeDto,
   AdminPodcastTranscriptPayload,
+  AdminPodcastTranscriptDetails,
   AdminPodcastTranscriptPreview,
   AdminCommitPodcastTranscriptResult,
   AdminGeneratePodcastAudioResult,
@@ -66,6 +68,18 @@ export class AdminPodcastApiService {
     );
   }
 
+  updateEpisode(episodeId: string, dto: AdminUpdatePodcastEpisodeDto): Observable<AdminPodcastEpisodeListItem> {
+    return this.http.patch<AdminPodcastEpisodeListItem>(`${this.episodeUrl}/${episodeId}`, dto);
+  }
+
+  deleteEpisode(episodeId: string): Observable<void> {
+    return this.http.delete<void>(`${this.episodeUrl}/${episodeId}`);
+  }
+
+  deleteTopic(topicId: string): Observable<void> {
+    return this.http.delete<void>(`${this.topicUrl}/${topicId}`);
+  }
+
   retryEpisodeGeneration(episodeId: string): Observable<AdminPodcastEpisodeListItem> {
     return this.http.post<AdminPodcastEpisodeListItem>(
       `${this.episodeUrl}/${episodeId}/retry-generation`, {},
@@ -98,6 +112,12 @@ export class AdminPodcastApiService {
   ): Observable<AdminPodcastTranscriptPreview> {
     return this.http.post<AdminPodcastTranscriptPreview>(
       `${this.episodeUrl}/${episodeId}/transcript/preview`, payload,
+    );
+  }
+
+  getTranscript(episodeId: string): Observable<AdminPodcastTranscriptDetails> {
+    return this.http.get<AdminPodcastTranscriptDetails>(
+      `${this.episodeUrl}/${episodeId}/transcript`,
     );
   }
 

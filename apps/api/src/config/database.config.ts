@@ -47,6 +47,10 @@ import { BackfillPlatformStoryKeywordIds1787447000000 } from '../platform-storie
 import { AddDailyStreakPolicyVersion1787448000000 } from '../engagement/migration/AddDailyStreakPolicyVersion';
 import { AddPodcastQualifyingListening1787449000000 } from '../podcasts/migration/AddPodcastQualifyingListening';
 import { SimplifyPodcastProduction1787450000000 } from '../podcasts/migration/SimplifyPodcastProduction';
+import { ObjectDeletionJobEntity } from '../data-deletion/object-deletion-job.entity';
+import { CreateObjectDeletionJobs1787451000000 } from '../data-deletion/migration/CreateObjectDeletionJobs';
+import { AccountDeletionRequestEntity } from '../data-deletion/account-deletion-request.entity';
+import { CreateAccountDeletionRequests1787452000000 } from '../data-deletion/migration/CreateAccountDeletionRequests';
 
 export default registerAs('database', (): TypeOrmModuleOptions => ({
   type: 'postgres',
@@ -54,8 +58,8 @@ export default registerAs('database', (): TypeOrmModuleOptions => ({
   ssl: process.env['NODE_ENV'] === 'production'
     ? { rejectUnauthorized: false }
     : false,
-  entities: [UserEntity, CardEntity, ReviewSchedulingEntity, CollectionEntity, CategoryEntity, StoryEntity, WordAudioEntity, SubscriptionEntity, ReviewSessionEntity, ReviewCommitEntity, CardAdministrationEventEntity, PlatformStoryEntity, UserStoryProgressEntity, UserSettingsEntity, PushSubscriptionEntity, WordDictionaryEntity, PlatformCollectionEntity, PlatformCollectionWordEntity, PlatformCollectionImportEntity, DiscountCodeEntity, DiscountRedemptionEntity, ShareEntity, ShareSyncLinkEntity, EngagementProcessedEventEntity, DailyReviewCardEntity, DailyProgressEntity, RewardTransactionEntity, StreakFreezeTransactionEntity, ...VOCABULARY_ENTITIES, ...LEARNING_ITEM_ENTITIES, ...PODCAST_ENTITIES],
-  migrations: [CreateEngagementTables1760000000000, CreateMultilingualVocabulary1787436000000, CreateLearningItems1787437000000, CreatePlatformCollectionImports1787438000000, AddPlatformCollectionVocabulary1787439000000, CompleteCanonicalCardProjection1787440000000, ProjectExistingCardsIntoCanonicalModel1787441000000, CreatePodcasts1787442000000, AddPodcastTranscripts1787443000000, AddPodcastAudioGeneration1787444000000, AddPodcastLearningLoop1787445000000, AddPodcastSpeakerVoiceGender1787446000000, BackfillPlatformStoryKeywordIds1787447000000, AddDailyStreakPolicyVersion1787448000000, AddPodcastQualifyingListening1787449000000, SimplifyPodcastProduction1787450000000],
+  entities: [UserEntity, CardEntity, ReviewSchedulingEntity, CollectionEntity, CategoryEntity, StoryEntity, WordAudioEntity, SubscriptionEntity, ReviewSessionEntity, ReviewCommitEntity, CardAdministrationEventEntity, PlatformStoryEntity, UserStoryProgressEntity, UserSettingsEntity, PushSubscriptionEntity, WordDictionaryEntity, PlatformCollectionEntity, PlatformCollectionWordEntity, PlatformCollectionImportEntity, DiscountCodeEntity, DiscountRedemptionEntity, ShareEntity, ShareSyncLinkEntity, EngagementProcessedEventEntity, DailyReviewCardEntity, DailyProgressEntity, RewardTransactionEntity, StreakFreezeTransactionEntity, ObjectDeletionJobEntity, AccountDeletionRequestEntity, ...VOCABULARY_ENTITIES, ...LEARNING_ITEM_ENTITIES, ...PODCAST_ENTITIES],
+  migrations: [CreateEngagementTables1760000000000, CreateMultilingualVocabulary1787436000000, CreateLearningItems1787437000000, CreatePlatformCollectionImports1787438000000, AddPlatformCollectionVocabulary1787439000000, CompleteCanonicalCardProjection1787440000000, ProjectExistingCardsIntoCanonicalModel1787441000000, CreatePodcasts1787442000000, AddPodcastTranscripts1787443000000, AddPodcastAudioGeneration1787444000000, AddPodcastLearningLoop1787445000000, AddPodcastSpeakerVoiceGender1787446000000, BackfillPlatformStoryKeywordIds1787447000000, AddDailyStreakPolicyVersion1787448000000, AddPodcastQualifyingListening1787449000000, SimplifyPodcastProduction1787450000000, CreateObjectDeletionJobs1787451000000, CreateAccountDeletionRequests1787452000000],
   migrationsRun: process.env['NODE_ENV'] !== 'production',
   synchronize: process.env['TYPEORM_SYNCHRONIZE'] === 'true' && process.env['NODE_ENV'] !== 'production',
   logging: process.env['NODE_ENV'] !== 'production',

@@ -49,7 +49,8 @@ The identifier uses the reverse-DNS form of the owned `lingua-card.app` domain. 
 - [x] Build and sync production web assets into the iOS project.
 - [x] Add `npm run validate:ios:release` to detect identifier, development-server, permission, and privacy-manifest mistakes before upload.
 - [x] Implement account deletion across the authenticated API and mobile account menu.
-- [ ] Verify production object-storage cleanup for any user-generated image/audio assets before declaring deletion fully compliant.
+- [x] Add a durable, retrying object-deletion queue for user-owned story audio, including recursively shared story copies and completed-job data minimization.
+- [ ] Apply the data-deletion migrations and verify object cleanup against the production R2 bucket before declaring deletion fully compliant.
 - [ ] Review whether development-only local-network plist entries should be split into a Debug-only plist before the final App Store submission.
 - [x] Run focused account-deletion unit tests, lint, translation validation, plist validation, and the iOS release validator after compliance work.
 - [x] Run the full API build, production mobile build, and test suite (90 suites / 308 tests).
@@ -57,6 +58,9 @@ The identifier uses the reverse-DNS form of the owned `lingua-card.app` domain. 
 - [x] Run a Release simulator build.
 - [ ] Run a signed physical-device smoke test after Apple Developer Program enrollment.
 - [x] Add deployable privacy, support, and external account-deletion pages at the store metadata paths.
+- [x] Exclude the public compliance routes from Angular PWA navigation fallback and support trailing-slash URLs.
+- [x] Add a public, enumeration-safe account-deletion request form backed by a durable database request and support notification.
+- [ ] Deploy the API and apply `CreateObjectDeletionJobs1787451000000` and `CreateAccountDeletionRequests1787452000000` before publishing the deletion form.
 - [ ] Deploy `lingua-card.app` and verify the three public compliance URLs over HTTPS.
 
 ### 2. Apple account and identifier setup

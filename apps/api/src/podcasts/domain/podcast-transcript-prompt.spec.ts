@@ -13,4 +13,13 @@ describe('buildPodcastTranscriptPrompt', () => {
     expect(prompt).toContain('Include 8–15 vocabulary items total');
     expect(prompt).toContain('preserve any supplied translation exactly');
   });
+
+  it('instructs the external generator to choose vocabulary when none is supplied', () => {
+    const prompt = buildPodcastTranscriptPrompt({
+      topicTitle: 'At the café', topicDescription: '', targetLanguage: 'de',
+      translationLanguage: 'en', level: 'A1', vocabulary: [],
+    });
+
+    expect(prompt).toContain('None supplied. Select 8–15 useful vocabulary items');
+  });
 });

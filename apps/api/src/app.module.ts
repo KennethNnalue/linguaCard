@@ -32,6 +32,7 @@ import { EngagementModule } from './engagement/engagement.module';
 import { VocabularyModule } from './vocabulary/vocabulary.module';
 import { LearningItemsModule } from './learning-items/learning-items.module';
 import { PodcastsModule } from './podcasts/podcasts.module';
+import { DataDeletionModule } from './data-deletion/data-deletion.module';
 
 @Module({
   imports: [
@@ -74,6 +75,7 @@ import { PodcastsModule } from './podcasts/podcasts.module';
     DiscountCodesModule,
     SharesModule,
     PodcastsModule,
+    DataDeletionModule,
     SeedModule,
   ],
   providers: [

@@ -10,6 +10,7 @@ import { SubscriptionsModule } from '../subscriptions/subscriptions.module';
 import { SettingsModule } from '../settings/settings.module';
 import {BootstrapAdminService} from './bootstrap-admin.service';
 import { UserAccountDeletionService } from './user-account-deletion.service';
+import { DataDeletionModule } from '../data-deletion/data-deletion.module';
 
 @Module({
   imports: [
@@ -24,6 +25,7 @@ import { UserAccountDeletionService } from './user-account-deletion.service';
     }),
     forwardRef(() => SubscriptionsModule),
     SettingsModule,
+    DataDeletionModule,
   ],
   controllers: [AuthController],
   providers: [AuthService, JwtAuthGuard, BootstrapAdminService, UserAccountDeletionService],

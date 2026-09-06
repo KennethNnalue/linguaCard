@@ -250,9 +250,25 @@ export const routes: Routes = [
             .then(m => m.AdminPodcastTopicsPage),
       },
       {
-        path: 'admin/podcasts/:topicId/new-episode',
+        path: 'admin/podcasts/:topicId/episodes/new',
         canActivate: [AdminGuard],
         data: { podcastView: 'new-episode' },
+        loadComponent: () =>
+          import('./features/admin/podcasts/pages/admin-podcast-topics/admin-podcast-topics.page')
+            .then(m => m.AdminPodcastTopicsPage),
+      },
+      {
+        path: 'admin/podcasts/:topicId/episodes/:episodeId/transcript',
+        canActivate: [AdminGuard],
+        data: { podcastView: 'new-episode' },
+        loadComponent: () =>
+          import('./features/admin/podcasts/pages/admin-podcast-topics/admin-podcast-topics.page')
+            .then(m => m.AdminPodcastTopicsPage),
+      },
+      {
+        path: 'admin/podcasts/:topicId/episodes/:episodeId/review',
+        canActivate: [AdminGuard],
+        data: { podcastView: 'review' },
         loadComponent: () =>
           import('./features/admin/podcasts/pages/admin-podcast-topics/admin-podcast-topics.page')
             .then(m => m.AdminPodcastTopicsPage),

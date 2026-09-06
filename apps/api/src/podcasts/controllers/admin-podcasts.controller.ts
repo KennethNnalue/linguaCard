@@ -1,5 +1,5 @@
 import {
-  BadRequestException, Body, Controller, Get, HttpCode, HttpStatus, Param, Patch, Post, UploadedFile,
+  BadRequestException, Body, Controller, Delete, Get, HttpCode, HttpStatus, Param, Patch, Post, UploadedFile,
   UseGuards, UseInterceptors,
 } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
@@ -9,6 +9,7 @@ import type {
   AdminPodcastTranscriptPreview, PodcastThumbnail, AdminGeneratePodcastTranscriptResult,
   AdminCreateElevenLabsPodcastResult,
   AdminPodcastTranscriptPromptResult,
+  AdminPodcastTranscriptDetails,
 } from '@lingua-card/shared/domain';
 import { AdminGuard } from '../../auth/guards/admin.guard';
 import { JwtAuthGuard } from '../../auth/guards/jwt-auth.guard';
@@ -21,7 +22,9 @@ import {
   CommitPodcastTranscriptDto,
   PodcastTranscriptPayloadDto,
   GeneratePodcastTranscriptDto,
+  CreatePodcastTranscriptPromptDto,
   CreateElevenLabsPodcastDto,
+  UpdatePodcastEpisodeDto,
 } from '../dto/admin-podcast.dto';
 import { AdminPodcastsService } from '../services/admin-podcasts.service';
 import { PodcastTranscriptImportService } from '../services/podcast-transcript-import.service';
@@ -91,6 +94,12 @@ export class AdminPodcastsController {
     return this.podcasts.publishTopic(topicId);
   }
 
+  @Delete(':topicId')
+  @HttpCode(HttpStatus.NO_CONTENT)
+  async deleteTopic(@Param('topicId') topicId: string): Promise<void> {
+    await this.podcasts.deleteTopic(topicId);
+  }
+
   private requireFile(
     file: { buffer: Buffer; mimetype: string } | undefined,
   ): { buffer: Buffer; mimetype: string } {
@@ -111,6 +120,27 @@ export class AdminPodcastEpisodesController {
     private readonly episodeCreation: PodcastEpisodeCreationService,
   ) {}
 
+  @Patch(':episodeId')
+  updateEpisode(
+    @Param('episodeId') episodeId: string,
+    @Body() dto: UpdatePodcastEpisodeDto,
+  ): Promise<AdminPodcastEpisodeListItem> {
+    return this.podcasts.updateEpisode(episodeId, dto);
+  }
+
+  @Delete(':episodeId')
+  @HttpCode(HttpStatus.NO_CONTENT)
+  async deleteEpisode(@Param('episodeId') episodeId: string): Promise<void> {
+    await this.podcasts.deleteEpisode(episodeId);
+  }
+
+  @Get(':episodeId/transcript')
+  getTranscript(
+    @Param('episodeId') episodeId: string,
+  ): Promise<AdminPodcastTranscriptDetails> {
+    return this.podcasts.findEpisodeTranscript(episodeId);
+  }
+
   @Post(':episodeId/transcript/generate')
   generateTranscript(
     @Param('episodeId') episodeId: string,
@@ -130,7 +160,7 @@ export class AdminPodcastEpisodesController {
   @Post(':episodeId/transcript/prompt')
   async createTranscriptPrompt(
     @Param('episodeId') episodeId: string,
-    @Body() dto: GeneratePodcastTranscriptDto,
+    @Body() dto: CreatePodcastTranscriptPromptDto,
   ): Promise<AdminPodcastTranscriptPromptResult> {
     return { prompt: await this.transcriptGeneration.prompt(episodeId, dto.vocabulary, dto.direction) };
   }

@@ -6,16 +6,20 @@ import { randomUUID } from 'node:crypto';
 import { DataSource, In, QueryFailedError, Repository } from 'typeorm';
 import type {
   AdminPodcastEpisodeListItem,
+  AdminPodcastTranscriptDetails,
   AdminPodcastTopicListItem,
   PodcastThumbnail,
 } from '@lingua-card/shared/domain';
-import { CreatePodcastTopicDto, UpdatePodcastTopicDto } from '../dto/admin-podcast.dto';
+import { CreatePodcastTopicDto, UpdatePodcastEpisodeDto, UpdatePodcastTopicDto } from '../dto/admin-podcast.dto';
 import { PodcastEpisodeEntity, PodcastEpisodeGenerationInput } from '../entities/podcast-episode.entity';
 import { PodcastThumbnailAssetEntity } from '../entities/podcast-thumbnail-asset.entity';
 import { PodcastTopicEntity } from '../entities/podcast-topic.entity';
+import { PodcastSpeakerEntity } from '../entities/podcast-speaker.entity';
+import { PodcastTurnEntity } from '../entities/podcast-turn.entity';
 import { toPodcastThumbnail } from '../podcast-thumbnail.mapper';
 import { PodcastThumbnailService } from './podcast-thumbnail.service';
 import { podcastEpisodeExternalId, podcastExternalId } from '../domain/podcast-external-id';
+import { StorageService } from '../../storage/storage.service';
 
 const PG_UNIQUE_VIOLATION = '23505';
 
@@ -30,6 +34,7 @@ export class AdminPodcastsService {
     private readonly thumbnailRepo: Repository<PodcastThumbnailAssetEntity>,
     private readonly dataSource: DataSource,
     private readonly thumbnails: PodcastThumbnailService,
+    private readonly storage: StorageService,
   ) {}
 
   async listTopics(): Promise<AdminPodcastTopicListItem[]> {
@@ -184,6 +189,78 @@ export class AdminPodcastsService {
     const episode = await this.episodeRepo.findOneBy({ id: episodeId });
     if (!episode) throw new NotFoundException(`Podcast episode ${episodeId} not found`);
     return episode;
+  }
+
+  async updateEpisode(
+    episodeId: string,
+    dto: UpdatePodcastEpisodeDto,
+  ): Promise<AdminPodcastEpisodeListItem> {
+    const episode = await this.findEpisodeEntity(episodeId);
+    if (dto.title !== undefined) episode.title = dto.title.trim();
+    if (dto.titleTranslation !== undefined) episode.titleTranslation = dto.titleTranslation.trim();
+    if (dto.description !== undefined) episode.description = dto.description.trim();
+    await this.episodeRepo.save(episode);
+    return this.findEpisodeModel(episodeId);
+  }
+
+  async deleteEpisode(episodeId: string): Promise<void> {
+    const episode = await this.findEpisodeEntity(episodeId);
+    const thumbnail = episode.thumbnailAssetId
+      ? await this.thumbnailRepo.findOneBy({ id: episode.thumbnailAssetId }) : null;
+    await this.dataSource.transaction(async manager => {
+      await manager.delete(PodcastEpisodeEntity, { id: episodeId });
+      if (thumbnail) await manager.delete(PodcastThumbnailAssetEntity, { id: thumbnail.id });
+    });
+    if (thumbnail) await this.thumbnails.remove(this.thumbnailStoragePaths(thumbnail));
+    if (episode.audioStoragePath) await this.storage.delete(episode.audioStoragePath);
+  }
+
+  async deleteTopic(topicId: string): Promise<void> {
+    const topic = await this.topicRepo.findOneBy({ id: topicId });
+    if (!topic) throw new NotFoundException(`Podcast topic ${topicId} not found`);
+    const episodes = await this.episodeRepo.findBy({ topicId });
+    const thumbnailIds = [topic.thumbnailAssetId, ...episodes.map(episode => episode.thumbnailAssetId)]
+      .filter((id): id is string => id !== null);
+    const thumbnails = thumbnailIds.length
+      ? await this.thumbnailRepo.findBy({ id: In([...new Set(thumbnailIds)]) }) : [];
+    await this.dataSource.transaction(async manager => {
+      await manager.delete(PodcastTopicEntity, { id: topicId });
+      if (thumbnailIds.length) await manager.delete(PodcastThumbnailAssetEntity, thumbnailIds);
+    });
+    await Promise.all(thumbnails.map(thumbnail => this.thumbnails.remove(this.thumbnailStoragePaths(thumbnail))));
+    await Promise.all(episodes.map(episode => episode.audioStoragePath
+      ? this.storage.delete(episode.audioStoragePath) : Promise.resolve()));
+  }
+
+  async findEpisodeTranscript(episodeId: string): Promise<AdminPodcastTranscriptDetails> {
+    const episode = await this.findEpisodeEntity(episodeId);
+    if (!episode.transcriptFingerprint) {
+      throw new NotFoundException(`Podcast episode ${episodeId} does not have a transcript`);
+    }
+    const [speakers, turns] = await Promise.all([
+      this.dataSource.getRepository(PodcastSpeakerEntity).find({
+        where: { episodeId }, order: { position: 'ASC' },
+      }),
+      this.dataSource.getRepository(PodcastTurnEntity).find({
+        where: { episodeId }, order: { position: 'ASC' },
+      }),
+    ]);
+    const speakerKeyById = new Map(speakers.map(speaker => [speaker.id, speaker.speakerKey]));
+    return {
+      episodeId,
+      speakers: speakers.map(speaker => ({
+        key: speaker.speakerKey,
+        name: speaker.displayName,
+        voiceGender: speaker.voiceGender,
+        voiceId: speaker.voiceId,
+      })),
+      turns: turns.map(turn => ({
+        speakerKey: speakerKeyById.get(turn.speakerId) ?? 'unknown',
+        targetText: turn.targetText,
+        translation: turn.translation,
+        vocabularyRefs: turn.vocabularyKeys,
+      })),
+    };
   }
 
   async markEpisodeGenerationStarted(episodeId: string): Promise<boolean> {

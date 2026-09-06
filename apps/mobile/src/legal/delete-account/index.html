@@ -19,8 +19,15 @@
   <p>This deletes your account and associated personal learning data from active systems. Limited records may be retained where required for security, legal obligations, dispute resolution, or routine backup expiry.</p>
 
   <h2>Request deletion without the app</h2>
-  <p>Email us from the address registered to your LinguaCard account. Include “Account deletion request” in the subject. We may ask you to verify account ownership before processing the request.</p>
-  <p class="actions"><a class="button" href="mailto:kennethnnalue.dev@gmail.com?subject=LinguaCard%20account%20deletion%20request">Email an account deletion request</a></p>
+  <p>Submit the email address registered to your LinguaCard account. For your security, submitting this form does not immediately delete an account. We will verify account ownership before processing the request.</p>
+  <form id="deletion-request-form">
+    <label for="email">Account email</label>
+    <input id="email" name="email" type="email" autocomplete="email" maxlength="320" required>
+    <p class="actions"><button class="button" type="submit">Request account deletion</button></p>
+    <p id="form-message" class="message" role="status" aria-live="polite"></p>
+  </form>
+  <noscript><p>JavaScript is required for this form. You can instead email <a href="mailto:kennethnnalue.dev@gmail.com?subject=LinguaCard%20account%20deletion%20request">kennethnnalue.dev@gmail.com</a>.</p></noscript>
   <p>For other questions, visit <a href="/support">LinguaCard support</a> or read our <a href="/privacy">privacy policy</a>.</p>
+  <script src="/delete-account/request.js" defer></script>
 </main></body>
 </html>

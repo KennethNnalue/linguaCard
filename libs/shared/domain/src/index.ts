@@ -1923,6 +1923,12 @@ export interface AdminCreatePodcastEpisodeDraftDto {
   requestId: string;
 }
 
+export interface AdminUpdatePodcastEpisodeDto {
+  title?: string;
+  titleTranslation?: string;
+  description?: string;
+}
+
 export interface AdminGeneratePodcastTranscriptDto {
   vocabulary: string[];
 }
@@ -1982,6 +1988,12 @@ export interface AdminPodcastTranscriptPayload {
   speakers: AdminPodcastTranscriptSpeakerInput[];
   turns: AdminPodcastTranscriptTurnInput[];
   vocabulary: AdminPodcastTranscriptVocabularyInput[];
+}
+
+export interface AdminPodcastTranscriptDetails {
+  episodeId: string;
+  speakers: AdminPodcastTranscriptSpeakerInput[];
+  turns: AdminPodcastTranscriptTurnInput[];
 }
 
 export interface AdminPodcastTranscriptConflict {

@@ -36,7 +36,9 @@ Use this inventory to produce the public privacy policy, Apple App Privacy answe
 - [ ] Confirm whether any data is used for analytics, advertising, profiling, or cross-app tracking.
 - [ ] Confirm whether data is linked to identity and whether any category is shared under Apple/Google definitions.
 - [ ] Confirm child-directed status and minimum user age.
-- [ ] Verify deletion of database records, object-storage assets, email-provider data, push subscriptions, logs where applicable, and downstream processor data.
+- [x] Queue user-owned story audio for retrying deletion, including recursively shared copies.
+- [ ] Apply and production-test the object-deletion migrations and worker against R2.
+- [ ] Verify deletion from email providers, logs, backups, and downstream content-generation providers where applicable.
 - [ ] Publish a privacy policy consistent with the verified inventory.
 - [ ] Re-audit after dependency or provider changes.
 
@@ -47,6 +49,7 @@ Use this inventory to produce the public privacy policy, Apple App Privacy answe
 - Transactional deletion of known user-owned database records: implemented.
 - Device authentication and offline-cache cleanup: implemented.
 - Readily discoverable in-app action: implemented in the account menu.
-- External deletion webpage required by Google Play: not yet published.
-- Object-storage and downstream-provider deletion: requires production infrastructure verification.
+- External deletion webpage required by Google Play: implemented, awaiting production deployment and HTTPS verification.
+- Object-storage deletion: durable queue implemented, awaiting production migration and R2 verification.
+- Downstream-provider deletion: requires production infrastructure verification.
 - Backup/log retention disclosure: requires an operational policy.

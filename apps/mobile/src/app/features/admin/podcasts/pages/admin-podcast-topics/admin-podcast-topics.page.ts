@@ -1,448 +1,131 @@
-import { ChangeDetectionStrategy, Component, computed, effect, inject, OnDestroy, OnInit, signal, untracked } from '@angular/core';
-import { AppNotificationService } from '@lingua-card/mobile/notifications';
+import { ChangeDetectionStrategy, Component, computed, effect, inject, OnInit, signal, untracked } from '@angular/core';
 import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
-import { IonContent, IonFab, IonFabButton, IonHeader, IonIcon, IonToolbar } from '@ionic/angular/standalone';
-import type {
-  AdminPodcastTopicListItem,
-  AdminPodcastTranscriptPayload,
-  CefrLevel,
-  LanguageCode,
-} from '@lingua-card/shared/domain';
-import { addIcons } from 'ionicons';
 import {
-  addOutline, arrowBackOutline, checkmarkCircleOutline, chevronDownOutline, copyOutline,
-  documentTextOutline, imageOutline, informationCircleOutline, micOutline,
-  pencilOutline, refreshOutline,
-} from 'ionicons/icons';
+  AlertController, IonButton, IonContent, IonIcon, IonInput, IonItem,
+  IonSelect, IonSelectOption, IonSpinner, IonTextarea,
+} from '@ionic/angular/standalone';
+import type { AdminPodcastTranscriptPayload, CefrLevel, LanguageCode } from '@lingua-card/shared/domain';
+import { addIcons } from 'ionicons';
+import { addOutline, arrowBackOutline, cafeOutline, checkmarkCircleOutline, chevronForwardOutline, cloudUploadOutline, documentTextOutline, micOutline, pencilOutline, refreshOutline, sparklesOutline, trashOutline } from 'ionicons/icons';
+import { AppNotificationService } from '@lingua-card/mobile/notifications';
 import { PodcastTranscriptClipboardService } from '../../application/podcast-transcript-clipboard.service';
 import { AdminPodcastStore } from '../../store/admin-podcast.store';
 
-type UploadFeedback = {
-  fileName: string;
-  previewUrl?: string;
-  status: 'uploading' | 'success' | 'error';
-  message: string;
-};
+type StudioView = 'library' | 'topic' | 'new-topic' | 'new-episode' | 'review';
 
-@Component({
-  selector: 'lc-admin-podcast-topics',
-  standalone: true,
-  imports: [IonContent, IonFab, IonFabButton, IonHeader, IonIcon, IonToolbar, ReactiveFormsModule],
-  providers: [AdminPodcastStore],
-  templateUrl: './admin-podcast-topics.page.html',
-  styleUrl: './admin-podcast-topics.page.scss',
-  changeDetection: ChangeDetectionStrategy.OnPush,
-})
-
-export class AdminPodcastTopicsPage implements OnInit, OnDestroy {
+@Component({ selector: 'lc-admin-podcast-topics', standalone: true, imports: [IonButton, IonContent, IonIcon, IonInput, IonItem, IonSelect, IonSelectOption, IonSpinner, IonTextarea, ReactiveFormsModule], providers: [AdminPodcastStore], templateUrl: './admin-podcast-topics.page.html', styleUrl: './admin-podcast-topics.page.scss', changeDetection: ChangeDetectionStrategy.OnPush })
+export class AdminPodcastTopicsPage implements OnInit {
   readonly store = inject(AdminPodcastStore);
   private readonly router = inject(Router);
   private readonly route = inject(ActivatedRoute);
   private readonly notifications = inject(AppNotificationService);
-  private readonly transcriptClipboard = inject(PodcastTranscriptClipboardService);
-  readonly isNewEpisodeScreen = this.route.snapshot.data['podcastView'] === 'new-episode';
-
+  private readonly clipboard = inject(PodcastTranscriptClipboardService);
+  private readonly alerts = inject(AlertController);
   readonly levels: readonly CefrLevel[] = ['A1', 'A2', 'B1', 'B2', 'C1'];
   readonly languages: readonly LanguageCode[] = ['de', 'en', 'es', 'tr', 'uk', 'ru', 'ar'];
-  readonly activeStep = signal<1 | 2 | 3 | null>(1);
-  readonly viewMode = signal<'list' | 'create' | 'topic'>('list');
-  readonly selectedTopicId = signal<string | null>(null);
-  private readonly requestedTopicId = signal<string | null>(null);
-  readonly selectedTopic = computed(() => {
-    const topicId = this.selectedTopicId();
-    return this.store.topics().find(topic => topic.id === topicId) ?? null;
+  readonly view = signal<StudioView>('library');
+  readonly topicId = signal<string | null>(null);
+  readonly pendingTranscript = signal<AdminPodcastTranscriptPayload | null>(null);
+  readonly pendingPromptWords = signal<readonly string[] | null>(null);
+  readonly transcriptOpen = signal(false);
+  readonly transcriptReviewed = signal(false);
+  readonly topic = computed(() => this.store.topics().find(item => item.id === this.topicId()) ?? null);
+  readonly episode = computed(() => {
+    const topic = this.topic();
+    const routeEpisodeId = this.route.snapshot.paramMap.get('episodeId');
+    if (routeEpisodeId) return topic?.episodes.find(item => item.id === routeEpisodeId) ?? null;
+    const createdEpisodeId = this.store.lastCreatedEpisodeId();
+    return createdEpisodeId
+      ? topic?.episodes.find(item => item.id === createdEpisodeId) ?? null
+      : null;
   });
-  readonly lastCreatedEpisode = computed(() => {
-    const episodeId = this.store.lastCreatedEpisodeId();
-    return this.selectedTopic()?.episodes.find(episode => episode.id === episodeId) ?? null;
-  });
-  readonly topicImageFeedback = signal<Record<string, UploadFeedback>>({});
-  readonly episodeImageFeedback = signal<Record<string, UploadFeedback>>({});
-  readonly transcriptFeedback = signal<Record<string, UploadFeedback>>({});
-
-  readonly topicForm = new FormGroup({
-    title: new FormControl('', { nonNullable: true, validators: [Validators.required] }),
-    description: new FormControl('', { nonNullable: true }),
-    targetLanguage: new FormControl<LanguageCode>('de', { nonNullable: true }),
-    translationLanguage: new FormControl<LanguageCode>('en', { nonNullable: true }),
-    level: new FormControl<CefrLevel>('A1', { nonNullable: true }),
-  });
-
-  readonly episodeForm = new FormGroup({
-    vocabulary: new FormControl('', { nonNullable: true, validators: [Validators.required] }),
-    direction: new FormControl('', { nonNullable: true }),
-  });
+  readonly topicForm = new FormGroup({ title: new FormControl('', { nonNullable: true, validators: Validators.required }), targetLanguage: new FormControl<LanguageCode>('de', { nonNullable: true }), translationLanguage: new FormControl<LanguageCode>('en', { nonNullable: true }), level: new FormControl<CefrLevel>('A1', { nonNullable: true }), description: new FormControl('', { nonNullable: true }) });
+  readonly editTopicForm = new FormGroup({ title: new FormControl('', { nonNullable: true, validators: Validators.required }), level: new FormControl<CefrLevel>('A1', { nonNullable: true }), description: new FormControl('', { nonNullable: true }) });
+  readonly episodeForm = new FormGroup({ vocabulary: new FormControl('', { nonNullable: true, validators: Validators.required }), direction: new FormControl('', { nonNullable: true }) });
+  readonly detailsForm = new FormGroup({ title: new FormControl('', { nonNullable: true, validators: Validators.required }), translation: new FormControl('', { nonNullable: true }), description: new FormControl('', { nonNullable: true }) });
 
   constructor() {
-    addIcons({
-      arrowBackOutline, copyOutline, documentTextOutline, imageOutline,
-      informationCircleOutline, micOutline, refreshOutline, checkmarkCircleOutline,
-      chevronDownOutline, pencilOutline, addOutline,
-    });
-
+    addIcons({ addOutline, arrowBackOutline, cafeOutline, checkmarkCircleOutline, chevronForwardOutline, cloudUploadOutline, documentTextOutline, micOutline, pencilOutline, refreshOutline, sparklesOutline, trashOutline });
+    effect(() => { const id = this.store.lastCreatedTopicId(); if (id && this.view() === 'new-topic') untracked(() => void this.router.navigate(['/admin/podcasts', id])); });
+    effect(() => { const item = this.episode(); if (item) untracked(() => { this.detailsForm.patchValue({ title: item.title, translation: item.titleTranslation, description: item.description }); this.transcriptReviewed.set(Boolean(item.audioUrl) || item.status === 'published'); if (this.view() === 'review' && !item.hasTranscript) void this.router.navigate(['/admin/podcasts', item.topicId, 'episodes', item.id, 'transcript']); }); });
     effect(() => {
-      const topicId = this.store.lastCreatedTopicId();
-      if (!topicId) return;
-      untracked(() => void this.router.navigate(['/admin/podcasts', topicId, 'new-episode']));
-    });
-
-    effect(() => {
-      const topicId = this.requestedTopicId();
-      if (!topicId || !this.store.topics().some(topic => topic.id === topicId)) return;
-      const step = this.route.snapshot.data['podcastView'] === 'new-episode' ? 2 : 3;
-      untracked(() => this.openTopic(topicId, step));
-    });
-
-    effect(() => {
-      const topicId = this.store.lastUploadedTopicThumbnailId();
-      if (!topicId) return;
-      untracked(() => this.markUploadSuccessful(this.topicImageFeedback, topicId, 'Image uploaded successfully.'));
-    });
-
-    effect(() => {
-      const episodeId = this.store.lastUploadedEpisodeThumbnailId();
-      if (!episodeId) return;
-      untracked(() => this.markUploadSuccessful(this.episodeImageFeedback, episodeId, 'Image uploaded successfully.'));
-    });
-
-    effect(() => {
-      const episodeId = this.store.transcriptEpisodeId();
+      const item = this.episode();
+      const transcript = this.store.transcriptDetails();
       const status = this.store.transcriptStatus();
-      if (!episodeId || status === 'idle') return;
-      untracked(() => {
-        if (status === 'loading') {
-          this.updateUploadMessage(this.transcriptFeedback, episodeId, 'uploading', 'Validating and importing transcript…');
-        } else if (status === 'error') {
-          this.updateUploadMessage(this.transcriptFeedback, episodeId, 'error', 'Transcript could not be imported. Check the file and try again.');
-        } else if (status === 'success') {
-          this.markUploadSuccessful(this.transcriptFeedback, episodeId, 'Transcript imported successfully.');
-        }
-      });
+      const transcriptView = this.view() === 'new-episode' || this.view() === 'review';
+      if (!transcriptView || !item?.hasTranscript || transcript?.episodeId === item.id
+        || status === 'loading'
+        || (status === 'error' && this.store.transcriptEpisodeId() === item.id)) return;
+      untracked(() => this.store.loadTranscript(item.id));
     });
-
-    effect(() => {
-      const episodeId = this.store.lastCreatedEpisodeId();
-      if (!episodeId) return;
-      const topic = this.selectedTopic();
-      const episode = topic?.episodes.find(item => item.id === episodeId);
-      if (!topic || !episode || episode.status === 'queued' || episode.status === 'generating') return;
-      untracked(() => {
-        if (episode.status !== 'failed') {
-          this.prepareEpisodeForm();
-          void this.router.navigate(['/admin/podcasts', topic.id]);
-        }
-      });
-    });
+    effect(() => { const item = this.topic(); if (item) untracked(() => this.editTopicForm.patchValue({ title: item.title, level: item.level, description: item.description })); });
+    effect(() => { const id = this.store.lastCreatedEpisodeId(), payload = this.pendingTranscript(); if (id && payload) untracked(() => { this.store.previewTranscript({ episodeId: id, payload }); this.pendingTranscript.set(null); }); });
+    effect(() => { const id = this.store.lastCreatedEpisodeId(), words = this.pendingPromptWords(); if (id && words) untracked(() => { this.pendingPromptWords.set(null); void this.copyPromptForEpisode(id, words); }); });
+    effect(() => { const id = this.store.lastDeletedTopicId(); if (id && id === this.topicId()) untracked(() => void this.router.navigate(['/admin/podcasts'])); });
+    effect(() => { const id = this.store.lastDeletedEpisodeId(); if (id && id === this.route.snapshot.paramMap.get('episodeId')) untracked(() => void this.router.navigate(['/admin/podcasts', this.topicId()])); });
   }
-
-  ngOnInit(): void {
-    this.store.loadTopics();
-    const view = this.route.snapshot.data['podcastView'];
-    if (view === 'create') this.prepareNewTopic();
-    else this.requestedTopicId.set(this.route.snapshot.paramMap.get('topicId'));
-  }
-
-  ngOnDestroy(): void {
-    this.revokePreviewUrls(this.topicImageFeedback());
-    this.revokePreviewUrls(this.episodeImageFeedback());
-  }
-
+  refresh(): void { this.store.loadTopics(); }
+  ngOnInit(): void { this.store.loadTopics(); this.topicId.set(this.route.snapshot.paramMap.get('topicId')); const value = this.route.snapshot.data['podcastView']; this.view.set(value === 'create' ? 'new-topic' : value === 'new-episode' ? 'new-episode' : value === 'review' ? 'review' : this.topicId() ? 'topic' : 'library'); }
   goBack(): void {
-    if (this.viewMode() !== 'list') {
-      this.showTopicList();
+    if ((this.view() === 'new-episode' || this.view() === 'review') && this.topicId()) {
+      void this.router.navigate(['/admin/podcasts', this.topicId()]);
+      return;
+    }
+    if (this.view() !== 'library') {
+      void this.router.navigate(['/admin/podcasts']);
       return;
     }
     void this.router.navigate(['/admin/import']);
   }
-
-  createTopic(): void {
-    if (this.topicForm.invalid) return;
-    this.store.createTopic(this.topicForm.getRawValue());
+  show(view: StudioView): void {
+    if (view === 'library') void this.router.navigate(['/admin/podcasts']);
+    else if (view === 'new-topic') void this.router.navigate(['/admin/podcasts/new']);
+    else if (view === 'new-episode' && this.topicId()) void this.router.navigate(['/admin/podcasts', this.topicId(), 'episodes', 'new']);
+    else if (view === 'topic' && this.topicId()) void this.router.navigate(['/admin/podcasts', this.topicId()]);
   }
-
-  saveTopic(): void {
-    const topic = this.selectedTopic();
-    if (!topic || this.topicForm.invalid) return;
-    const value = this.topicForm.getRawValue();
-    this.store.updateTopic({
-      topicId: topic.id,
-      dto: {
-        title: value.title,
-        description: value.description,
-        level: value.level,
-      },
-    });
+  createTopic(): void { if (this.topicForm.valid) this.store.createTopic(this.topicForm.getRawValue()); }
+  updateTopic(): void { const topic = this.topic(); if (topic && this.editTopicForm.valid) this.store.updateTopic({ topicId: topic.id, dto: this.editTopicForm.getRawValue() }); }
+  updateEpisode(): void { const episode = this.episode(); if (episode && this.detailsForm.valid) { const value = this.detailsForm.getRawValue(); this.store.updateEpisode({ episodeId: episode.id, dto: { title: value.title, titleTranslation: value.translation, description: value.description } }); } }
+  createEpisode(): void { const topic = this.topic(); if (!topic || this.episodeForm.invalid) return; const value = this.episodeForm.getRawValue(); const vocabulary = this.words(value.vocabulary); if (!vocabulary.length) { this.store.setLocalError('Add at least one vocabulary item.'); return; } this.store.createEpisode({ topicId: topic.id, dto: { requestId: crypto.randomUUID(), vocabulary, direction: value.direction.trim() || undefined } }); }
+  submitTranscriptStep(): void { if (this.route.snapshot.paramMap.get('episodeId')) this.generateTranscriptForEpisode(); else this.createEpisode(); }
+  openTopic(id: string): void { void this.router.navigate(['/admin/podcasts', id]); }
+  openEpisode(topicId: string | null, episodeId: string | null): void { if (!topicId || !episodeId) return; const episode = this.store.topics().find(topic => topic.id === topicId)?.episodes.find(item => item.id === episodeId); void this.router.navigate(['/admin/podcasts', topicId, 'episodes', episodeId, episode?.hasTranscript ? 'review' : 'transcript']); }
+  reviewTranscript(): void { const episode = this.episode(); if (!episode?.hasTranscript) return; this.transcriptOpen.set(true); if (this.store.transcriptDetails()?.episodeId !== episode.id) this.store.loadTranscript(episode.id); }
+  closeTranscript(): void { this.transcriptOpen.set(false); }
+  completeTranscriptReview(): void {
+    if (this.store.transcriptStatus() !== 'success' || !this.store.transcriptDetails()) return;
+    this.transcriptReviewed.set(true);
+    this.transcriptOpen.set(false);
   }
-
-  selectTopic(topicId: string, step: 1 | 2 | 3): void {
-    void this.router.navigate(step === 2
-      ? ['/admin/podcasts', topicId, 'new-episode']
-      : ['/admin/podcasts', topicId]);
-  }
-
-  private openTopic(topicId: string, step: 1 | 2 | 3): void {
-    const topic = this.store.topics().find(item => item.id === topicId);
-    if (!topic) return;
-    this.selectedTopicId.set(topic.id);
-    this.topicForm.setValue({
-      title: topic.title,
-      description: topic.description,
-      targetLanguage: topic.targetLanguage,
-      translationLanguage: topic.translationLanguage,
-      level: topic.level,
-    });
-    this.topicForm.controls.targetLanguage.disable();
-    this.topicForm.controls.translationLanguage.disable();
-    this.prepareEpisodeForm();
-    this.viewMode.set('topic');
-    this.activeStep.set(step);
-  }
-
-  startNewTopic(): void {
-    void this.router.navigate(['/admin/podcasts/new']);
-  }
-
-  private prepareNewTopic(): void {
-    this.selectedTopicId.set(null);
-    this.topicForm.controls.targetLanguage.enable();
-    this.topicForm.controls.translationLanguage.enable();
-    this.topicForm.reset({
-      title: '', description: '', targetLanguage: 'de',
-      translationLanguage: 'en', level: 'A1',
-    });
-    this.episodeForm.reset({
-      vocabulary: '', direction: '',
-    });
-    this.viewMode.set('create');
-    this.activeStep.set(1);
-  }
-
-  showTopicList(): void {
-    this.selectedTopicId.set(null);
-    this.viewMode.set('list');
-    this.activeStep.set(null);
-    this.store.clearError();
-    this.store.clearSuccess();
-    void this.router.navigate(['/admin/podcasts']);
-  }
-
-  addEpisode(): void {
-    const topic = this.selectedTopic();
-    if (!topic) return;
-    void this.router.navigate(['/admin/podcasts', topic.id, 'new-episode']);
-  }
-
-  openStep(step: 1 | 2 | 3): void {
-    if (step > 1 && !this.selectedTopic()) return;
-    this.activeStep.update(activeStep => activeStep === step ? null : step);
-  }
-
-  private prepareEpisodeForm(): void {
-    this.episodeForm.reset({
-      vocabulary: '',
-      direction: '',
-    });
-  }
-
-  createEpisode(): void {
-    if (this.episodeForm.invalid) return;
-    const topic = this.selectedTopic();
-    if (!topic) return;
-    const value = this.episodeForm.getRawValue();
-    const vocabulary = this.parseVocabulary(value.vocabulary);
-    if (!vocabulary.length) {
-      this.store.setLocalError('Add at least one vocabulary item before generating an episode.');
+  openTranscriptWorkspace(): void { const episode = this.episode(); if (episode && episode.status !== 'published') void this.router.navigate(['/admin/podcasts', episode.topicId, 'episodes', episode.id, 'transcript']); }
+  generateTranscriptForEpisode(): void {
+    const episode = this.episode();
+    const vocabulary = this.words(this.episodeForm.controls.vocabulary.value);
+    if (!episode || !vocabulary.length) {
+      this.store.setLocalError('Add at least one vocabulary item before generating the transcript.');
       return;
     }
-    this.store.createEpisode({
-      topicId: topic.id,
-      dto: {
-        requestId: crypto.randomUUID(),
-        vocabulary,
-        direction: value.direction.trim() || undefined,
-      },
-    });
+    this.store.generateTranscript({ episodeId: episode.id, vocabulary });
   }
-
-  createEpisodeDraft(): void {
-    const topic = this.selectedTopic();
-    if (topic) this.store.createEpisodeDraft(topic.id);
-  }
-
-  generateTranscript(episodeId: string, vocabularyText: string): void {
-    const vocabulary = this.parseVocabulary(vocabularyText);
-    if (!vocabulary.length) {
-      this.store.setLocalError('Add at least one vocabulary item before generating a transcript.');
-      return;
-    }
-    this.store.generateTranscript({ episodeId, vocabulary });
-  }
-
-  createElevenLabsPodcast(episodeId: string, vocabularyText: string): void {
-    const vocabulary = this.parseVocabulary(vocabularyText);
-    if (!vocabulary.length) {
-      this.store.setLocalError('Add at least one vocabulary item before creating the podcast.');
-      return;
-    }
-    this.store.createElevenLabsPodcast({ episodeId, vocabulary });
-  }
-
-  private parseVocabulary(value: string): string[] {
-    return value.split(/[,\n]/u).map(item => item.trim()).filter(Boolean);
-  }
-
-  uploadTopicThumbnail(
-    topicId: string,
-    event: Event,
-    description: string,
-  ): void {
-    const file = this.selectedFile(event);
-    if (!file) return;
-    this.setImageFeedback(this.topicImageFeedback, topicId, file);
-    const topic = this.store.topics().find(item => item.id === topicId);
-    const accessibilityDescription = description.trim() || `${topic?.title ?? 'Podcast topic'} cover artwork`;
-    this.store.uploadTopicThumbnail({
-      topicId,
-      upload: {
-        file,
-        accessibilityDescription,
-        focalPointX: 0.5,
-        focalPointY: 0.5,
-      },
-    });
-  }
-
-  uploadEpisodeThumbnail(
-    episodeId: string,
-    event: Event,
-    description: string,
-  ): void {
-    const file = this.selectedFile(event);
-    if (!file) return;
-    this.setImageFeedback(this.episodeImageFeedback, episodeId, file);
-    const episode = this.store.topics().flatMap(topic => topic.episodes)
-      .find(item => item.id === episodeId);
-    const accessibilityDescription = description.trim() || `${episode?.title ?? 'Podcast episode'} artwork`;
-    this.store.uploadEpisodeThumbnail({
-      episodeId,
-      upload: {
-        file,
-        accessibilityDescription,
-        focalPointX: 0.5,
-        focalPointY: 0.5,
-      },
-    });
-  }
-
-  async previewTranscript(episodeId: string, event: Event): Promise<void> {
-    const file = this.selectedFile(event);
-    if (!file) return;
-    this.transcriptFeedback.update(feedback => ({
-      ...feedback,
-      [episodeId]: { fileName: file.name, status: 'uploading', message: 'Reading transcript file…' },
-    }));
-    try {
-      const parsed: unknown = JSON.parse(await file.text());
-      if (!this.isTranscriptPayload(parsed)) throw new Error('Invalid transcript shape');
-      this.store.previewTranscript({ episodeId, payload: parsed });
-    } catch {
-      this.store.setLocalError('Choose a valid podcast transcript JSON file.');
-      this.updateUploadMessage(this.transcriptFeedback, episodeId, 'error', 'This file is not valid podcast transcript JSON.');
-    }
-  }
-
-  formatDuration(milliseconds: number): string {
-    const totalSeconds = Math.round(milliseconds / 1000);
-    return `${Math.floor(totalSeconds / 60)}:${String(totalSeconds % 60).padStart(2, '0')}`;
-  }
-
-  hasPublishedEpisode(topic: AdminPodcastTopicListItem): boolean {
-    return topic.episodes.some(episode => episode.status === 'published');
-  }
-
-  async copyTranscriptPrompt(
-    episode: AdminPodcastTopicListItem['episodes'][number],
-    preferredVocabulary: string,
-  ): Promise<void> {
-    try {
-      const vocabulary = this.parseVocabulary(preferredVocabulary);
-      if (!vocabulary.length) {
-        this.store.setLocalError('Add at least one vocabulary item before copying the prompt.');
-        return;
-      }
-      await this.transcriptClipboard.copy(episode.id, vocabulary);
-      await this.notifications.present({
-        message: 'AI transcript prompt copied.',
-        duration: 2200,
-        color: 'success',
-      });
-    } catch {
-      await this.notifications.present({
-        message: 'Could not copy the prompt. Check this browser’s clipboard permission.',
-        duration: 3500,
-        color: 'danger',
-      });
-    }
-  }
-
-  private isTranscriptPayload(value: unknown): value is AdminPodcastTranscriptPayload {
-    if (!isRecord(value)) return false;
-    return value['schemaVersion'] === 1 && Array.isArray(value['speakers'])
-      && Array.isArray(value['turns']) && Array.isArray(value['vocabulary']);
-  }
-
-  private selectedFile(event: Event): File | null {
-    if (!(event.target instanceof HTMLInputElement)) return null;
-    const file = event.target.files?.item(0) ?? null;
-    event.target.value = '';
-    return file;
-  }
-
-  private setImageFeedback(
-    feedbackSignal: typeof this.topicImageFeedback,
-    id: string,
-    file: File,
-  ): void {
-    const previous = feedbackSignal()[id];
-    if (previous?.previewUrl) URL.revokeObjectURL(previous.previewUrl);
-    feedbackSignal.update(feedback => ({
-      ...feedback,
-      [id]: {
-        fileName: file.name,
-        previewUrl: URL.createObjectURL(file),
-        status: 'uploading',
-        message: 'Uploading image…',
-      },
-    }));
-  }
-
-  private markUploadSuccessful(
-    feedbackSignal: typeof this.topicImageFeedback,
-    id: string,
-    message: string,
-  ): void {
-    this.updateUploadMessage(feedbackSignal, id, 'success', message);
-  }
-
-  private updateUploadMessage(
-    feedbackSignal: typeof this.topicImageFeedback,
-    id: string,
-    status: UploadFeedback['status'],
-    message: string,
-  ): void {
-    const current = feedbackSignal()[id];
-    if (!current) return;
-    feedbackSignal.update(feedback => ({ ...feedback, [id]: { ...current, status, message } }));
-  }
-
-  private revokePreviewUrls(feedback: Record<string, UploadFeedback>): void {
-    for (const item of Object.values(feedback)) {
-      if (item.previewUrl) URL.revokeObjectURL(item.previewUrl);
-    }
-  }
+  publishEpisode(): void { const episode = this.episode(); if (episode) this.store.publishEpisode(episode.id); }
+  publishTopic(): void { const topic = this.topic(); if (topic) this.store.publishTopic(topic.id); }
+  hasPublishedEpisode(): boolean { return this.topic()?.episodes.some(episode => episode.status === 'published') ?? false; }
+  async deleteTopic(): Promise<void> { const topic = this.topic(); if (!topic || !await this.confirm(`Delete “${topic.title}” and all of its episodes?`)) return; this.store.deleteTopic(topic.id); }
+  async deleteEpisode(): Promise<void> { const episode = this.episode(); if (!episode || !await this.confirm(`Delete “${episode.title}”?`)) return; this.store.deleteEpisode(episode.id); }
+  uploadTopicThumbnail(event: Event): void { const topic = this.topic(), file = this.selectedFile(event); if (topic && file) this.store.uploadTopicThumbnail({ topicId: topic.id, upload: { file, accessibilityDescription: `${topic.title} cover artwork`, focalPointX: .5, focalPointY: .5 } }); }
+  uploadEpisodeThumbnail(event: Event): void { const episode = this.episode(), file = this.selectedFile(event); if (episode && file) this.store.uploadEpisodeThumbnail({ episodeId: episode.id, upload: { file, accessibilityDescription: `${episode.title} artwork`, focalPointX: .5, focalPointY: .5 } }); }
+  async copyPrompt(): Promise<void> { const episode = this.episode(), topicId = this.topicId(), words = this.words(this.episodeForm.controls.vocabulary.value); if (episode) { await this.copyPromptForEpisode(episode.id, words); return; } if (!topicId) return; this.pendingPromptWords.set(words); this.store.createEpisodeDraft(topicId); }
+  async uploadTranscript(event: Event): Promise<void> { const file = this.selectedFile(event); if (!file) return; try { const parsed: unknown = JSON.parse(await file.text()); if (!this.isTranscriptPayload(parsed)) throw new Error('Invalid transcript'); const episode = this.episode(), topicId = this.topicId(); if (episode) this.store.previewTranscript({ episodeId: episode.id, payload: parsed }); else if (topicId) { this.pendingTranscript.set(parsed); this.store.createEpisodeDraft(topicId); } } catch { this.store.setLocalError('Choose a valid podcast transcript JSON file.'); } }
+  createAudio(): void { const episode = this.episode(); if (episode) this.store.generateAudio(episode.id); }
+  formatDuration(ms: number): string { const seconds = Math.round(ms / 1000); return `${Math.floor(seconds / 60)}:${String(seconds % 60).padStart(2, '0')}`; }
+  speakerName(key: string): string { return this.store.transcriptDetails()?.speakers.find(speaker => speaker.key === key)?.name ?? key; }
+  languageName(code: LanguageCode): string { return new Intl.DisplayNames(['en'], { type: 'language' }).of(code) ?? code.toUpperCase(); }
+  private words(value: string): string[] { return value.split(/[\n,]/u).map(word => word.trim()).filter(Boolean); }
+  private selectedFile(event: Event): File | null { if (!(event.target instanceof HTMLInputElement)) return null; const file = event.target.files?.item(0) ?? null; event.target.value = ''; return file; }
+  private isTranscriptPayload(value: unknown): value is AdminPodcastTranscriptPayload { return isRecord(value) && value['schemaVersion'] === 1 && Array.isArray(value['speakers']) && Array.isArray(value['turns']) && Array.isArray(value['vocabulary']); }
+  private async copyPromptForEpisode(episodeId: string, words: readonly string[]): Promise<void> { try { await this.clipboard.copy(episodeId, [...words]); await this.notifications.present({ message: 'Generation prompt copied.', duration: 1800, color: 'success' }); } catch { this.store.setLocalError('Could not copy the generation prompt.'); } }
+  private async confirm(message: string): Promise<boolean> { const alert = await this.alerts.create({ header: 'Confirm deletion', message, buttons: [{ text: 'Cancel', role: 'cancel' }, { text: 'Delete', role: 'destructive' }] }); await alert.present(); const result = await alert.onDidDismiss(); return result.role === 'destructive'; }
 }
 
-function isRecord(value: unknown): value is Record<string, unknown> {
-  return typeof value === 'object' && value !== null;
-}
+function isRecord(value: unknown): value is Record<string, unknown> { return typeof value === 'object' && value !== null; }

@@ -50,4 +50,19 @@ WHERE user_id = '${userId ?? 'FIND BY EMAIL'}';
       this.logger.error('Failed to send upgrade email', err);
     }
   }
+
+  async sendAccountDeletionRequest(email: string, userId: string): Promise<void> {
+    try {
+      await this.transporter.sendMail({
+        from: this.config.get<string>('SMTP_FROM', 'noreply@linguacard.app'),
+        to: this.toEmail,
+        subject: 'LinguaCard account deletion request',
+        text: `A deletion request was submitted for an existing LinguaCard account.\n\nEmail: ${email}\nUser ID: ${userId}\n\nVerify ownership with the requester before manually deleting the account.`,
+      });
+      this.logger.log(`Account deletion request notification sent for user ${userId}`);
+    } catch (error: unknown) {
+      const message = error instanceof Error ? error.message : 'Unknown email error';
+      this.logger.error(`Failed to send account deletion request notification: ${message}`);
+    }
+  }
 }

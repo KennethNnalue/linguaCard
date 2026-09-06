@@ -22,6 +22,9 @@ export function normalizePodcastVocabulary(vocabulary: readonly string[]): strin
 
 export function buildPodcastTranscriptPrompt(context: PodcastTranscriptPromptContext): string {
   const vocabulary = normalizePodcastVocabulary(context.vocabulary);
+  const vocabularyList = vocabulary.length
+    ? vocabulary.map(item => `- ${item}`).join('\n')
+    : '- None supplied. Select 8–15 useful vocabulary items that fit the topic and CEFR level.';
   return `Create a complete LinguaCard language-learning podcast episode. Return valid JSON only, without Markdown fences or commentary.
 Topic: ${context.topicTitle}
 Topic description: ${context.topicDescription || 'No description supplied.'}
@@ -30,7 +33,7 @@ Translation language: ${context.translationLanguage}
 CEFR level: ${context.level}
 Creative direction: ${context.direction?.trim() || 'Infer a natural everyday scenario from the topic and vocabulary.'}
 Required vocabulary (preserve supplied translations):
-${vocabulary.map(item => `- ${item}`).join('\n')}
+${vocabularyList}
 
 Schema:
 {"schemaVersion":1,"episode":{"title":"","titleTranslation":"","description":""},"speakers":[{"key":"host","name":"","voiceGender":"female"},{"key":"guest","name":"","voiceGender":"male"}],"turns":[{"speakerKey":"host","targetText":"","translation":"","vocabularyRefs":["word-key"]}],"vocabulary":[{"key":"word-key","text":"","translation":"","importance":"essential"}]}

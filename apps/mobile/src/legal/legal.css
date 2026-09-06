@@ -26,6 +26,11 @@ a { color: #3157c8; }
 .muted { color: #5e687c; }
 .actions { display: flex; flex-wrap: wrap; gap: 12px; margin: 24px 0; }
 .button { display: inline-block; padding: 11px 17px; border-radius: 10px; background: #3157c8; color: #fff; text-decoration: none; }
+label { display: block; margin-bottom: 6px; font-weight: 650; }
+input { width: 100%; box-sizing: border-box; padding: 12px; border: 1px solid #98a2b5; border-radius: 9px; font: inherit; }
+button { border: 0; font: inherit; cursor: pointer; }
+.message { min-height: 1.6em; }
+.message--error { color: #b42318; }
 
 @media (max-width: 600px) {
   main { width: 100%; margin: 0; min-height: 100vh; padding: 28px 20px; border-radius: 0; }
@@ -36,4 +41,5 @@ a { color: #3157c8; }
   main { background: #171e2e; }
   a { color: #9bb3ff; }
   .muted { color: #b5bfd2; }
+  input { background: #101522; color: #edf1fa; }
 }

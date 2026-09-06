@@ -6,8 +6,10 @@ import type {
   AdminCreatePodcastTopicDto,
   AdminPodcastTopicListItem,
   AdminPodcastTranscriptPayload,
+  AdminPodcastTranscriptDetails,
   AdminPodcastTranscriptPreview,
   AdminUpdatePodcastTopicDto,
+  AdminUpdatePodcastEpisodeDto,
 } from '@lingua-card/shared/domain';
 import { EMPTY, Observable, catchError, exhaustMap, pipe, switchMap, takeWhile, tap, timer } from 'rxjs';
 import {
@@ -27,10 +29,13 @@ interface AdminPodcastState {
   transcriptPayload: AdminPodcastTranscriptPayload | null;
   transcriptPreview: AdminPodcastTranscriptPreview | null;
   transcriptStatus: RequestStatus;
+  transcriptDetails: AdminPodcastTranscriptDetails | null;
   audioGenerationEpisodeId: string | null;
   audioGenerationStatus: RequestStatus;
   lastCreatedTopicId: string | null;
   lastCreatedEpisodeId: string | null;
+  lastDeletedTopicId: string | null;
+  lastDeletedEpisodeId: string | null;
   lastUploadedTopicThumbnailId: string | null;
   lastUploadedEpisodeThumbnailId: string | null;
   elevenLabsProjects: Record<string, string>;
@@ -46,10 +51,13 @@ const initialState: AdminPodcastState = {
   transcriptPayload: null,
   transcriptPreview: null,
   transcriptStatus: 'idle',
+  transcriptDetails: null,
   audioGenerationEpisodeId: null,
   audioGenerationStatus: 'idle',
   lastCreatedTopicId: null,
   lastCreatedEpisodeId: null,
+  lastDeletedTopicId: null,
+  lastDeletedEpisodeId: null,
   lastUploadedTopicThumbnailId: null,
   lastUploadedEpisodeThumbnailId: null,
   elevenLabsProjects: {},
@@ -63,6 +71,11 @@ export interface UpdateTopicCommand {
 export interface CreateEpisodeCommand {
   topicId: string;
   dto: AdminCreatePodcastEpisodeDto;
+}
+
+export interface UpdateEpisodeCommand {
+  episodeId: string;
+  dto: AdminUpdatePodcastEpisodeDto;
 }
 
 export interface UploadTopicThumbnailCommand {
@@ -208,6 +221,60 @@ export const AdminPodcastStore = signalStore(
         }),
       ),
     ),
+    updateEpisode: rxMethod<UpdateEpisodeCommand>(
+      pipe(
+        exhaustMap(command => {
+          patchState(store, { mutationStatus: 'loading', error: null, success: null });
+          return api.updateEpisode(command.episodeId, command.dto).pipe(
+            tap(updated => patchState(store, {
+              topics: store.topics().map(topic => ({
+                ...topic,
+                episodes: topic.episodes.map(episode => episode.id === updated.id ? updated : episode),
+              })),
+              mutationStatus: 'success', success: `Episode “${updated.title}” was updated.`,
+            })),
+            catchError(error => {
+              patchState(store, { mutationStatus: 'error', error: adminPodcastErrorMessage(error, 'Could not update the episode.') });
+              return EMPTY;
+            }),
+          );
+        }),
+      ),
+    ),
+    deleteEpisode: rxMethod<string>(
+      pipe(
+        exhaustMap(episodeId => {
+          patchState(store, { mutationStatus: 'loading', error: null, success: null });
+          return api.deleteEpisode(episodeId).pipe(
+            tap(() => patchState(store, {
+              topics: store.topics().map(topic => ({ ...topic, episodes: topic.episodes.filter(episode => episode.id !== episodeId) })),
+              mutationStatus: 'success', success: 'Episode deleted.', lastDeletedEpisodeId: episodeId,
+            })),
+            catchError(error => {
+              patchState(store, { mutationStatus: 'error', error: adminPodcastErrorMessage(error, 'Could not delete the episode.') });
+              return EMPTY;
+            }),
+          );
+        }),
+      ),
+    ),
+    deleteTopic: rxMethod<string>(
+      pipe(
+        exhaustMap(topicId => {
+          patchState(store, { mutationStatus: 'loading', error: null, success: null });
+          return api.deleteTopic(topicId).pipe(
+            tap(() => patchState(store, {
+              topics: store.topics().filter(topic => topic.id !== topicId),
+              mutationStatus: 'success', success: 'Podcast topic deleted.', lastDeletedTopicId: topicId,
+            })),
+            catchError(error => {
+              patchState(store, { mutationStatus: 'error', error: adminPodcastErrorMessage(error, 'Could not delete the topic.') });
+              return EMPTY;
+            }),
+          );
+        }),
+      ),
+    ),
     retryEpisodeGeneration: rxMethod<string>(
       pipe(
         exhaustMap(episodeId => {
@@ -318,7 +385,7 @@ export const AdminPodcastStore = signalStore(
         exhaustMap(command => {
           patchState(store, {
             transcriptEpisodeId: command.episodeId, transcriptPayload: command.payload,
-            transcriptPreview: null, transcriptStatus: 'loading', error: null,
+            transcriptPreview: null, transcriptDetails: null, transcriptStatus: 'loading', error: null,
             success: null,
           });
           return api.previewTranscript(command.episodeId, command.payload).pipe(
@@ -365,12 +432,32 @@ export const AdminPodcastStore = signalStore(
         }),
       ),
     ),
+    loadTranscript: rxMethod<string>(
+      pipe(
+        tap(episodeId => patchState(store, {
+          transcriptEpisodeId: episodeId,
+          transcriptStatus: 'loading', transcriptDetails: null, error: null,
+        })),
+        switchMap(episodeId => api.getTranscript(episodeId).pipe(
+          tap(transcriptDetails => patchState(store, {
+            transcriptDetails, transcriptStatus: 'success',
+          })),
+          catchError(error => {
+            patchState(store, {
+              transcriptStatus: 'error',
+              error: adminPodcastErrorMessage(error, 'Could not load the transcript.'),
+            });
+            return EMPTY;
+          }),
+        )),
+      ),
+    ),
     generateTranscript: rxMethod<GenerateTranscriptCommand>(
       pipe(
         exhaustMap(command => {
           patchState(store, {
             transcriptEpisodeId: command.episodeId, transcriptPayload: null,
-            transcriptPreview: null, transcriptStatus: 'loading', error: null, success: null,
+            transcriptPreview: null, transcriptDetails: null, transcriptStatus: 'loading', error: null, success: null,
           });
           return api.generateTranscript(command.episodeId, command.vocabulary).pipe(
             exhaustMap(generated => {

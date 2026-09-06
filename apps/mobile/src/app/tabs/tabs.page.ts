@@ -17,6 +17,7 @@ import {
 const IMMERSIVE_PLAYER_ROUTES = [
   /^\/listen\/now-playing(?:[/?#]|$)/,
   /^\/podcasts\/episodes\/[^/]+\/player(?:[/?#]|$)/,
+  /^\/admin\/podcasts(?:[/?#]|$)/,
 ];
 
 @Component({

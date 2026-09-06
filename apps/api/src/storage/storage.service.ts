@@ -82,18 +82,25 @@ export class StorageService {
   }
 
   async delete(path: string): Promise<void> {
+    try {
+      await this.deleteOrThrow(path);
+    } catch (error: unknown) {
+      const message = error instanceof Error ? error.message : 'Unknown storage error';
+      this.logger.warn(`Storage delete failed for "${path}": ${message}`);
+    }
+  }
+
+  async deleteOrThrow(path: string): Promise<void> {
     if (this.s3) {
-      try {
-        await this.s3.send(new DeleteObjectCommand({ Bucket: this.bucket, Key: path }));
-      } catch (err) {
-        this.logger.warn(`R2 delete failed for "${path}":`, err);
-      }
-    } else {
-      try {
-        await unlink(join(this.uploadsDir, path));
-      } catch {
-        // File may not exist — ignore
-      }
+      await this.s3.send(new DeleteObjectCommand({ Bucket: this.bucket, Key: path }));
+      return;
+    }
+
+    try {
+      await unlink(join(this.uploadsDir, path));
+    } catch (error: unknown) {
+      if (isFileNotFoundError(error)) return;
+      throw error;
     }
   }
 
@@ -105,4 +112,8 @@ export class StorageService {
     const baseUrl = process.env['API_PUBLIC_URL']?.replace(/\/$/, '') ?? 'http://localhost:3001';
     return `${baseUrl}/uploads/${path}`;
   }
+}
+
+function isFileNotFoundError(error: unknown): boolean {
+  return error instanceof Error && 'code' in error && error.code === 'ENOENT';
 }

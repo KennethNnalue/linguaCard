@@ -68,9 +68,31 @@ export class CreatePodcastEpisodeDraftDto {
   requestId!: string;
 }
 
+export class UpdatePodcastEpisodeDto {
+  @IsOptional() @IsString() @MinLength(1) @Matches(CONTAINS_NON_WHITESPACE) @MaxLength(160)
+  title?: string;
+
+  @IsOptional() @IsString() @MaxLength(160)
+  titleTranslation?: string;
+
+  @IsOptional() @IsString() @MaxLength(2000)
+  description?: string;
+}
+
 export class GeneratePodcastTranscriptDto {
   @IsArray()
   @ArrayMinSize(1)
+  @ArrayMaxSize(40)
+  @IsString({ each: true }) @MinLength(1, { each: true })
+  @Matches(CONTAINS_NON_WHITESPACE, { each: true }) @MaxLength(200, { each: true })
+  vocabulary!: string[];
+
+  @IsOptional() @IsString() @Matches(CONTAINS_NON_WHITESPACE) @MaxLength(500)
+  direction?: string;
+}
+
+export class CreatePodcastTranscriptPromptDto {
+  @IsArray()
   @ArrayMaxSize(40)
   @IsString({ each: true }) @MinLength(1, { each: true })
   @Matches(CONTAINS_NON_WHITESPACE, { each: true }) @MaxLength(200, { each: true })
