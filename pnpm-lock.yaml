@@ -113,6 +113,9 @@ importers:
       '@ionic/angular':
         specifier: ^8.0.0
         version: 8.8.19(5af96dfb5d4c015e750730fce298e0da)
+      '@ionic/storage':
+        specifier: ^4.0.0
+        version: 4.0.0
       '@ionic/storage-angular':
         specifier: ^4.0.0
         version: 4.0.0(@angular/core@21.2.22(@angular/compiler@21.2.22)(rxjs@7.8.2)(zone.js@0.15.1))(rxjs@7.8.2)
