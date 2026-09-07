@@ -30,6 +30,7 @@ interface AdminPodcastState {
   transcriptPreview: AdminPodcastTranscriptPreview | null;
   transcriptStatus: RequestStatus;
   transcriptDetails: AdminPodcastTranscriptDetails | null;
+  transcriptRevision: number;
   audioGenerationEpisodeId: string | null;
   audioGenerationStatus: RequestStatus;
   completedTranscriptEpisodeId: string | null;
@@ -53,6 +54,7 @@ const initialState: AdminPodcastState = {
   transcriptPreview: null,
   transcriptStatus: 'idle',
   transcriptDetails: null,
+  transcriptRevision: 0,
   audioGenerationEpisodeId: null,
   audioGenerationStatus: 'idle',
   completedTranscriptEpisodeId: null,
@@ -152,6 +154,14 @@ export const AdminPodcastStore = signalStore(
               : episode),
           })),
           transcriptStatus: 'success', transcriptPayload: null, transcriptPreview: null,
+          transcriptDetails: {
+            episodeId,
+            speakers: payload.speakers.map(speaker => ({ ...speaker })),
+            turns: payload.turns.map(turn => ({
+              ...turn,
+              vocabularyRefs: [...turn.vocabularyRefs],
+            })),
+          },
           completedTranscriptEpisodeId: episodeId, success,
         })),
       );
@@ -421,7 +431,7 @@ export const AdminPodcastStore = signalStore(
           patchState(store, {
             transcriptEpisodeId: command.episodeId, transcriptPayload: command.payload,
             transcriptPreview: null, transcriptDetails: null, transcriptStatus: 'loading', completedTranscriptEpisodeId: null, error: null,
-            success: null,
+            success: null, transcriptRevision: store.transcriptRevision() + 1,
           });
           return api.previewTranscript(command.episodeId, command.payload).pipe(
             exhaustMap(preview => saveTranscript(
@@ -444,18 +454,23 @@ export const AdminPodcastStore = signalStore(
           transcriptEpisodeId: episodeId,
           transcriptStatus: 'loading', transcriptDetails: null, error: null,
         })),
-        switchMap(episodeId => api.getTranscript(episodeId).pipe(
-          tap(transcriptDetails => patchState(store, {
-            transcriptDetails, transcriptStatus: 'success',
-          })),
+        switchMap(episodeId => {
+          const revision = store.transcriptRevision();
+          return api.getTranscript(episodeId).pipe(
+          tap(transcriptDetails => {
+            if (store.transcriptRevision() !== revision) return;
+            patchState(store, { transcriptDetails, transcriptStatus: 'success' });
+          }),
           catchError(error => {
+            if (store.transcriptRevision() !== revision) return EMPTY;
             patchState(store, {
               transcriptStatus: 'error',
               error: adminPodcastErrorMessage(error, 'Could not load the transcript.'),
             });
             return EMPTY;
           }),
-        )),
+        );
+        }),
       ),
     ),
     generateTranscript: rxMethod<GenerateTranscriptCommand>(
@@ -464,6 +479,7 @@ export const AdminPodcastStore = signalStore(
           patchState(store, {
             transcriptEpisodeId: command.episodeId, transcriptPayload: null,
             transcriptPreview: null, transcriptDetails: null, transcriptStatus: 'loading', completedTranscriptEpisodeId: null, error: null, success: null,
+            transcriptRevision: store.transcriptRevision() + 1,
           });
           return api.generateTranscript(command.episodeId, command.vocabulary).pipe(
             exhaustMap(generated => saveTranscript(

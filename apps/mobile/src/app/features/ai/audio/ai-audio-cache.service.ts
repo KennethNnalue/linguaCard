@@ -62,8 +62,9 @@ export class AiAudioCacheService {
 
   /**
    * Download a remote audio file and persist it under the given cacheKey.
-   * Idempotent: skips the download if the file is already cached.
-   * Returns a playable local URL (Capacitor URI on native, blob: URL on web).
+   * Native downloads are idempotent and return a playable Capacitor URI.
+   * Web only reads previously cached buffers; remote URLs are played directly by
+   * callers because fetching an object-storage URL requires bucket CORS access.
    */
   async saveFromUrl(
     cacheKey: string,
@@ -74,20 +75,7 @@ export class AiAudioCacheService {
     if (this.isNative) {
       return this._nativeSaveFromUrl(cacheKey, remoteUrl, resolvedExt);
     }
-
-    // Web: check session map and IndexedDB first to avoid re-downloading.
-    const cached = await this._webGet(cacheKey);
-    if (cached) return cached;
-
-    try {
-      const audio = await this._fetchAudio(remoteUrl, resolvedExt);
-      const blobUrl = this._makeBlobUrl(audio.buffer, audio.mimeType);
-      await this._webPut(cacheKey, audio);
-      this._blobUrlMap.set(cacheKey, blobUrl);
-      return blobUrl;
-    } catch {
-      return null;
-    }
+    return this._webGet(cacheKey);
   }
 
   async saveBuffer(cacheKey: string, audioBuffer: ArrayBuffer, ext: 'wav' | 'mp3' = 'wav'): Promise<string | null> {
@@ -307,19 +295,6 @@ export class AiAudioCacheService {
   }
 
   // ── Shared helpers ─────────────────────────────────────────────────────────
-
-  private async _fetchAudio(url: string, fallbackExtension: 'wav' | 'mp3'): Promise<CachedWebAudio> {
-    const response = await fetch(url);
-    if (!response.ok) throw new Error(`Audio fetch failed: ${response.status}`);
-    const buffer = await response.arrayBuffer();
-    const responseType = response.headers.get('content-type')?.split(';')[0]?.trim();
-    return {
-      buffer,
-      mimeType: responseType?.startsWith('audio/')
-        ? responseType
-        : fallbackExtension === 'mp3' ? 'audio/mpeg' : 'audio/wav',
-    };
-  }
 
   /**
    * Create a blob URL from an ArrayBuffer.

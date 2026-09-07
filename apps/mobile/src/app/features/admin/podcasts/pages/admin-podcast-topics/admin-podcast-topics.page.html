@@ -12,7 +12,6 @@
   @if (view() === 'new-episode') {
     <section class="studio-content">
       <div class="progress creation-progress" aria-label="Step 2 of 4"><i></i><i></i><i></i><i></i></div>
-      <ion-button class="previous-step" fill="clear" (click)="show('topic')"><ion-icon slot="start" name="arrow-back-outline"></ion-icon>Back to topic</ion-button>
       @if (topic(); as item) {
         <span class="eyebrow">Step 2 · {{ item.title }}</span><h2>{{ episode() ? episode()?.title : 'Choose the words' }}</h2><p class="lead">{{ episode()?.hasTranscript ? 'The saved transcript is ready. Review it below or expand the controls to replace it.' : 'Complete this step to create the transcript before review becomes available.' }}</p>
         @if (episode()?.hasTranscript) {
@@ -22,6 +21,7 @@
         @if (episode(); as generatedEpisode) {
           @if (generatedEpisode.hasTranscript && generatedEpisode.status !== 'failed') { <ion-button class="outline review-created" fill="outline" expand="block" (click)="openEpisode(item.id, generatedEpisode.id)">Continue to review</ion-button> }
           @if (generatedEpisode.status === 'failed') { <p class="step-warning" role="alert">Generation failed. Resolve the error before continuing to review.</p> }
+          <div class="management-actions"><ion-button color="danger" fill="outline" [disabled]="store.isMutating()" (click)="deleteEpisode()"><ion-icon slot="start" name="trash-outline"></ion-icon>Delete episode</ion-button></div>
         }
         <details [open]="!episode()?.hasTranscript"><summary>Import a transcript instead</summary><p>Copy the external-generation prompt, provide any vocabulary list alongside it, then upload the resulting JSON.</p><ion-button class="outline" fill="outline" expand="block" type="button" [disabled]="store.isMutating() || store.transcriptStatus() === 'loading'" (click)="copyPrompt()">Copy generation prompt</ion-button><label class="upload-button">Upload transcript JSON<input type="file" accept="application/json,.json" [disabled]="store.isMutating() || store.transcriptStatus() === 'loading'" (change)="uploadTranscript($event)" /></label></details>
       } @else { <p>Open a topic before creating an episode.</p><ion-button fill="outline" (click)="show('library')">Choose a topic</ion-button> }
@@ -43,7 +43,7 @@
         <details class="generated" open><summary>Edit episode details</summary><form [formGroup]="detailsForm" (ngSubmit)="updateEpisode()"><ion-item><ion-input label="Title" labelPlacement="stacked" formControlName="title"></ion-input></ion-item><ion-item><ion-input label="Translation" labelPlacement="stacked" formControlName="translation"></ion-input></ion-item><ion-item><ion-textarea label="Description" labelPlacement="stacked" formControlName="description" autoGrow></ion-textarea></ion-item><ion-button class="outline" fill="outline" type="submit" [disabled]="detailsForm.invalid || store.isMutating()">Save episode details</ion-button></form></details>
         <section class="audio-step" [class.is-locked]="!transcriptReviewed() || !item.thumbnail"><span class="eyebrow">Step 4 · Audio</span>@if (item.audioUrl) { <audio controls preload="metadata" [src]="item.audioUrl"></audio> }<ion-button class="primary icon-action" expand="block" (click)="createAudio()" [disabled]="!transcriptReviewed() || !item.thumbnail || item.status === 'published' || store.audioGenerationStatus() === 'loading'"><ion-icon slot="start" name="mic-outline"></ion-icon>{{ store.audioGenerationStatus() === 'loading' ? 'Creating audio…' : item.audioUrl ? 'Create new audio version' : 'Create audio' }}</ion-button>@if (!transcriptReviewed()) { <small>Review and confirm the transcript to unlock audio.</small> } @else if (!item.thumbnail) { <small>Upload episode artwork to unlock audio.</small> }</section>
         <div class="management-actions">@if (item.status === 'ready_for_review') { <ion-button class="primary" [disabled]="store.isMutating()" (click)="publishEpisode()">Publish episode</ion-button> }<ion-button color="danger" fill="outline" [disabled]="store.isMutating()" (click)="deleteEpisode()"><ion-icon slot="start" name="trash-outline"></ion-icon>Delete episode</ion-button></div>
-      } @else { <p>This episode does not belong to the selected topic or no longer exists.</p><ion-button fill="outline" (click)="show('topic')">Back to topic</ion-button> }
+      } @else { <p>This episode does not belong to the selected topic or no longer exists.</p> }
     </section>
   }
 </main>

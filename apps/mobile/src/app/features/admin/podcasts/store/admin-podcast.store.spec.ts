@@ -119,4 +119,26 @@ describe('AdminPodcastStore transcript completion', () => {
     store.previewTranscript({ episodeId: 'episode', payload });
     expect(store.completedTranscriptEpisodeId()).toBe('episode');
   });
+
+  it('keeps the imported transcript when an older transcript request finishes later', () => {
+    const { api, store } = setup();
+    const staleTranscript = new Subject<{ episodeId: string; speakers: AdminPodcastTranscriptPayload['speakers']; turns: AdminPodcastTranscriptPayload['turns'] }>();
+    api.getTranscript.mockReturnValue(staleTranscript);
+
+    store.loadTranscript('episode');
+    store.previewTranscript({ episodeId: 'episode', payload });
+    staleTranscript.next({
+      episodeId: 'episode',
+      speakers: [{ key: 'old-speaker', name: 'Old speaker', voiceGender: 'male' }],
+      turns: [{
+        speakerKey: 'old-speaker', targetText: 'Old transcript',
+        translation: 'Old translation', vocabularyRefs: [],
+      }],
+    });
+    staleTranscript.complete();
+
+    expect(store.transcriptDetails()).toEqual({
+      episodeId: 'episode', speakers: payload.speakers, turns: payload.turns,
+    });
+  });
 });
