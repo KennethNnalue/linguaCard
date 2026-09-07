@@ -22,9 +22,10 @@ export function normalizePodcastVocabulary(vocabulary: readonly string[]): strin
 
 export function buildPodcastTranscriptPrompt(context: PodcastTranscriptPromptContext): string {
   const vocabulary = normalizePodcastVocabulary(context.vocabulary);
+  const vocabularyTarget = podcastVocabularyTarget(vocabulary.length);
   const vocabularyList = vocabulary.length
     ? vocabulary.map(item => `- ${item}`).join('\n')
-    : '- None supplied. Select 8–15 useful vocabulary items that fit the topic and CEFR level.';
+    : `- None supplied. Select ${vocabularyTarget} useful vocabulary items that fit the topic and CEFR level.`;
   return `Create a complete LinguaCard language-learning podcast episode. Return valid JSON only, without Markdown fences or commentary.
 Topic: ${context.topicTitle}
 Topic description: ${context.topicDescription || 'No description supplied.'}
@@ -41,10 +42,20 @@ Schema:
 Requirements:
 - Derive a concise natural episode title in the target language, its accurate translation, and a learner-facing description in the translation language.
 - Use exactly two speakers with consistent female or male voiceGender values.
-- Write a natural conversation appropriate for the CEFR level and keep all target-language dialogue below 2,000 characters.
+- Write a natural conversation appropriate for the CEFR level that is designed to produce at least 3 minutes of audio, aiming near the lower end of the 3–5 minute range.
+- Use 18–26 concise turns and natural greetings, transitions, follow-up questions, reactions, and a closing so the dialogue feels complete rather than padded.
+- Use most of the available dialogue budget: aim for 1,750–1,950 target-language characters in total, with an absolute maximum below 2,000 characters.
+- Keep the speaking pace natural for ${context.level} learners. Prefer short sentences, brief pauses implied by punctuation, and useful repetition in context.
 - Use every supplied vocabulary item naturally, preserve any supplied translation exactly, and mark supplied items essential.
 - If an item has no translation, provide an accurate dictionary translation.
-- Include 8–15 vocabulary items total, adding only relevant supporting items when fewer than 8 are supplied.
+- Include ${vocabularyTarget} vocabulary items total. Add relevant supporting words at the same ${context.level} level when the supplied list is smaller than this target.
 - Give every turn an accurate translation. Every speaker and vocabulary reference must resolve.
 - Use unique lowercase kebab-case keys. Do not include voice IDs or extra fields.`;
+}
+
+export function podcastVocabularyTarget(suppliedCount: number): number {
+  if (suppliedCount > 15) return suppliedCount;
+  if (suppliedCount >= 12) return 15;
+  if (suppliedCount >= 5) return 12;
+  return 8;
 }
