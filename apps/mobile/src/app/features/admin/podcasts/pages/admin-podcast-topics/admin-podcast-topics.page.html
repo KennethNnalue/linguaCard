@@ -23,7 +23,7 @@
           @if (generatedEpisode.hasTranscript && generatedEpisode.status !== 'failed') { <ion-button class="outline review-created" fill="outline" expand="block" (click)="openEpisode(item.id, generatedEpisode.id)">Continue to review</ion-button> }
           @if (generatedEpisode.status === 'failed') { <p class="step-warning" role="alert">Generation failed. Resolve the error before continuing to review.</p> }
         }
-        <details [open]="!episode()?.hasTranscript"><summary>Import a transcript instead</summary><ion-button class="outline" fill="outline" expand="block" type="button" (click)="copyPrompt()">Copy generation prompt</ion-button><label class="upload-button">Upload transcript JSON<input type="file" accept="application/json,.json" [disabled]="store.isMutating() || store.transcriptStatus() === 'loading'" (change)="uploadTranscript($event)" /></label></details>
+        <details [open]="!episode()?.hasTranscript"><summary>Import a transcript instead</summary><p>Copy the external-generation prompt, provide any vocabulary list alongside it, then upload the resulting JSON.</p><ion-button class="outline" fill="outline" expand="block" type="button" [disabled]="store.isMutating() || store.transcriptStatus() === 'loading'" (click)="copyPrompt()">Copy generation prompt</ion-button><label class="upload-button">Upload transcript JSON<input type="file" accept="application/json,.json" [disabled]="store.isMutating() || store.transcriptStatus() === 'loading'" (change)="uploadTranscript($event)" /></label></details>
       } @else { <p>Open a topic before creating an episode.</p><ion-button fill="outline" (click)="show('library')">Choose a topic</ion-button> }
     </section>
   }
