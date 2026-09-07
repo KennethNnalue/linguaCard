@@ -58,6 +58,20 @@ describe('buildEngagementActivity', () => {
     ]);
   });
 
+  test('uses reconciled history when this device has only part of the review activity', () => {
+    const activity = buildEngagementActivity({
+      ...EMPTY_ENGAGEMENT_STATE,
+      dailyProgress: { '2026-08-16': progress('2026-08-16', 1, 10) },
+      streakDays: [{ dayKey: engagementDayKey('2026-08-16'), goalTarget: 10,
+        uniqueCardsReviewed: 10, status: 'goal_met' }],
+    }, engagementDayKey('2026-08-16'), 10);
+    expect(activity.recentDays.at(-1)).toEqual({
+      dayKey: '2026-08-16', reviewed: 10, goal: 10, status: 'goal_met',
+    });
+    expect(activity.last7DaysGoalActivity.at(-1)).toBe(true);
+    expect(activity.weeklyTotal).toBe(10);
+  });
+
   test('marks dates before the first tracked review as untracked instead of missed', () => {
     const state = {
       ...EMPTY_ENGAGEMENT_STATE,

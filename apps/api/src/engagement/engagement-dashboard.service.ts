@@ -9,6 +9,7 @@ import { UserSettingsService } from '../settings/user-settings.service';
 import { DailyProgressEntity } from './entities/daily-progress.entity';
 import { RewardTransactionEntity } from './entities/reward-transaction.entity';
 import { StreakFreezeTransactionEntity } from './entities/streak-freeze-transaction.entity';
+import { buildServerStreakDays } from './build-server-streak-days';
 import { StreakFreezeReconciliationService } from './streak-freeze-reconciliation.service';
 
 export interface ServerEngagementDashboard {
@@ -25,6 +26,7 @@ export interface ServerEngagementDashboard {
   streakFreezeProgress: { daysTowardNext: number; interval: number; atCapacity: boolean };
   streakFreezeTransactions: readonly ServerStreakFreezeTransaction[];
   recentDays: readonly ServerEngagementDay[];
+  streakDays: readonly ServerEngagementDay[];
 }
 
 export interface ServerStreakFreezeTransaction {
@@ -107,11 +109,16 @@ export class EngagementDashboardService {
     const yesterdayKey = previousDay(todayKey);
     await this.freezeReconciliation.reconcileClosedDays(userId, todayKey, settings.timezone, now);
     const progress = await this.dataSource.getRepository(DailyProgressEntity).findOneBy({ userId, dayKey: todayKey });
-    const [streak, points, freezeTransactions, recentDays] = await Promise.all([
+    const [streak, points, freezeTransactions, recentDays, progressHistory] = await Promise.all([
       this.loadStreak(userId, todayKey, yesterdayKey),
       this.sumColumn(RewardTransactionEntity, userId, 'amount'),
       this.dataSource.getRepository(StreakFreezeTransactionEntity).findBy({ userId }),
       this.loadRecentDays(userId, todayKey, DAILY_STREAK_POLICY.requiredUniqueReviews),
+      this.dataSource.getRepository(DailyProgressEntity).find({
+        where: { userId, dayKey: Between('0001-01-01', todayKey) },
+        select: { dayKey: true, uniqueCardsReviewed: true, targetUniqueCards: true },
+        order: { dayKey: 'ASC' },
+      }),
     ]);
     const freezes = freezeTransactions.reduce((total, transaction) => total + transaction.amount, 0);
     const state = streak.todayQualified ? 'safe' : streak.yesterdayQualified ? 'at_risk' : 'broken';
@@ -151,6 +158,7 @@ export class EngagementDashboardService {
         sourceId: transaction.sourceId,
       })),
       recentDays,
+      streakDays: buildServerStreakDays(progressHistory, freezeTransactions, todayKey),
     };
   }
 

@@ -1,4 +1,4 @@
-import {Component, inject, OnInit} from '@angular/core';
+import {Component, inject, OnInit, signal} from '@angular/core';
 import {IonApp, IonRouterOutlet} from '@ionic/angular/standalone';
 import {App} from '@capacitor/app';
 import {Capacitor} from '@capacitor/core';
@@ -26,6 +26,7 @@ import {PwaUpdateService} from './core/services/pwa-update.service';
   imports: [IonApp, IonRouterOutlet, PwaInstallBannerComponent, OfflineBannerComponent, UpdateBannerComponent],
 })
 export class AppComponent implements OnInit {
+  readonly isStarting = signal(true);
   private readonly themeService = inject(ThemeService);
   private readonly languageService = inject(LanguageService);
   private readonly localData = inject(LocalDataService);

@@ -56,6 +56,23 @@ export const EngagementStore = signalStore(
     const serverReconciler = inject(ReconcileEngagementWithServerService);
     let acknowledgementTimer: ReturnType<typeof setTimeout> | null = null;
 
+    let operationChain = Promise.resolve();
+    let userGeneration = 0;
+
+    function enqueue(operation: (publish: (state: Partial<EngagementFeatureState>) => void) => Promise<void>): Promise<void> {
+      const generation = userGeneration;
+      const userId = auth.currentUser()?.id;
+      const isCurrent = () => generation === userGeneration && userId === auth.currentUser()?.id;
+      const result = operationChain.then(async () => {
+        if (!isCurrent()) return;
+        await operation(state => {
+          if (isCurrent()) patchState(store, state);
+        });
+      });
+      operationChain = result.catch(() => undefined);
+      return result;
+    }
+
     function context(): { userId: string; timeZone: string; personalDailyGoal: number } | null {
       const userId = auth.currentUser()?.id;
       const userSettings = settings.settings();
@@ -65,99 +82,107 @@ export const EngagementStore = signalStore(
 
     return {
       async loadEngagement(): Promise<void> {
-        const request = context();
-        if (!request) {
-          patchState(store, { loadState: { status: 'error', error: {
-            code: 'engagement_context_missing', message: 'Engagement requires a signed-in user and valid timezone.', recoverable: true,
-          } } });
-          return;
-        }
-        patchState(store, { loadState: { status: 'loading' } });
-        try {
-          const { dashboard, activity } = await freezeReconciler.reconcile({ ...request, occurredAt: new Date() });
-          patchState(store, { dashboard, activity, loadState: { status: 'ready' } });
-        } catch {
-          patchState(store, { loadState: { status: 'error', error: {
-            code: 'engagement_load_failed', message: 'Engagement progress could not be loaded.', recoverable: true,
-          } } });
-        }
+        return enqueue(async publish => {
+          const request = context();
+          if (!request) {
+            publish({ loadState: { status: 'error', error: {
+              code: 'engagement_context_missing', message: 'Engagement requires a signed-in user and valid timezone.', recoverable: true,
+            } } });
+            return;
+          }
+          publish({ loadState: { status: 'loading' } });
+          try {
+            const { dashboard, activity } = await freezeReconciler.reconcile({ ...request, occurredAt: new Date() });
+            publish({ dashboard, activity, loadState: { status: 'ready' } });
+          } catch {
+            publish({ loadState: { status: 'error', error: {
+              code: 'engagement_load_failed', message: 'Engagement progress could not be loaded.', recoverable: true,
+            } } });
+          }
+        });
       },
       async projectCommittedReview(
         event: ReviewCommittedEvent,
         eligibleCardCount: number,
         suppressTransientFeedback = false,
       ): Promise<void> {
-        const request = context();
-        if (!request) throw new Error('Engagement requires a signed-in user and valid timezone');
-        try {
-          const outcome = await projector.project({
-            ...request, event, eligibleCardCount, suppressTransientFeedback,
-          });
-          const feedback = outcome.result.feedback;
-          const reviewPoints = outcome.result.rewardTransactions
-            .filter(transaction => transaction.reason === 'first_daily_card_review')
-            .reduce((total, transaction) => total + transaction.amount, 0);
-          const showFeedback = feedback !== undefined
-            && await presentationReceipts.claim(request.userId, feedback.feedbackId);
-          patchState(store, {
-            dashboard: outcome.dashboard,
-            activity: outcome.activity,
-            pendingFeedback: showFeedback ? feedback : store.pendingFeedback(),
-            loadState: { status: 'ready' },
-            reviewAcknowledgement: reviewPoints > 0
-              ? { id: outcome.result.eventId, points: reviewPoints }
-              : null,
-          });
-          if (acknowledgementTimer) clearTimeout(acknowledgementTimer);
-          if (reviewPoints > 0) {
-            acknowledgementTimer = setTimeout(() => {
-              if (store.reviewAcknowledgement()?.id === outcome.result.eventId) {
-                patchState(store, { reviewAcknowledgement: null });
-              }
-            }, 2_000);
+        return enqueue(async publish => {
+          const request = context();
+          if (!request) throw new Error('Engagement requires a signed-in user and valid timezone');
+          try {
+            const outcome = await projector.project({
+              ...request, event, eligibleCardCount, suppressTransientFeedback,
+            });
+            const feedback = outcome.result.feedback;
+            const reviewPoints = outcome.result.rewardTransactions
+              .filter(transaction => transaction.reason === 'first_daily_card_review')
+              .reduce((total, transaction) => total + transaction.amount, 0);
+            const showFeedback = feedback !== undefined
+              && await presentationReceipts.claim(request.userId, feedback.feedbackId);
+            publish({
+              dashboard: outcome.dashboard,
+              activity: outcome.activity,
+              pendingFeedback: showFeedback ? feedback : store.pendingFeedback(),
+              loadState: { status: 'ready' },
+              reviewAcknowledgement: reviewPoints > 0
+                ? { id: outcome.result.eventId, points: reviewPoints }
+                : null,
+            });
+            if (acknowledgementTimer) clearTimeout(acknowledgementTimer);
+            if (reviewPoints > 0) {
+              acknowledgementTimer = setTimeout(() => {
+                if (store.reviewAcknowledgement()?.id === outcome.result.eventId) {
+                  publish({ reviewAcknowledgement: null });
+                }
+              }, 2_000);
+            }
+          } catch {
+            publish({ loadState: { status: 'error', error: {
+              code: 'engagement_projection_failed', message: 'Review saved. Engagement progress will be retried.', recoverable: true,
+            } } });
+            throw new Error('Engagement projection failed');
           }
-        } catch {
-          patchState(store, { loadState: { status: 'error', error: {
-            code: 'engagement_projection_failed', message: 'Review saved. Engagement progress will be retried.', recoverable: true,
-          } } });
-          throw new Error('Engagement projection failed');
-        }
+        });
       },
       async reconcileClosedStreakDays(): Promise<void> {
-        const request = context();
-        if (!request) throw new Error('Engagement requires a signed-in user and valid timezone');
-        try {
-          const { dashboard, activity } = await freezeReconciler.reconcile({ ...request, occurredAt: new Date() });
-          patchState(store, { dashboard, activity, loadState: { status: 'ready' } });
-        } catch {
-          patchState(store, { loadState: { status: 'error', error: {
-            code: 'streak_reconciliation_failed', message: 'Streak protection could not be reconciled.', recoverable: true,
-          } } });
-        }
+        return enqueue(async publish => {
+          const request = context();
+          if (!request) throw new Error('Engagement requires a signed-in user and valid timezone');
+          try {
+            const { dashboard, activity } = await freezeReconciler.reconcile({ ...request, occurredAt: new Date() });
+            publish({ dashboard, activity, loadState: { status: 'ready' } });
+          } catch {
+            publish({ loadState: { status: 'error', error: {
+              code: 'streak_reconciliation_failed', message: 'Streak protection could not be reconciled.', recoverable: true,
+            } } });
+          }
+        });
       },
       async reconcileWithServer(): Promise<void> {
-        const request = context();
-        const dashboard = store.dashboard();
-        if (!request || !dashboard) return;
-        try {
-          const reconciliation = await serverReconciler.reconcile(request.userId, dashboard);
-          if (reconciliation.appliedServerDashboard) {
-            patchState(store, {
-              dashboard: reconciliation.dashboard,
-              activity: reconciliation.recentDays && store.activity()
-                ? { ...store.activity()!, recentDays: reconciliation.recentDays }
-                : store.activity(),
-              loadState: { status: 'ready' },
-              syncError: null,
-            });
-          } else {
-            patchState(store, { syncError: null });
+        return enqueue(async publish => {
+          const request = context();
+          const dashboard = store.dashboard();
+          if (!request || !dashboard) return;
+          try {
+            const reconciliation = await serverReconciler.reconcile(request.userId, dashboard);
+            if (reconciliation.appliedServerDashboard) {
+              publish({
+                dashboard: reconciliation.dashboard,
+                activity: reconciliation.recentDays && store.activity()
+                  ? { ...store.activity()!, recentDays: reconciliation.recentDays }
+                  : store.activity(),
+                loadState: { status: 'ready' },
+                syncError: null,
+              });
+            } else {
+              publish({ syncError: null });
+            }
+          } catch {
+            publish({ syncError: {
+              code: 'engagement_reconciliation_failed', message: 'Server engagement progress could not be reconciled.', recoverable: true,
+            } });
           }
-        } catch {
-          patchState(store, { syncError: {
-            code: 'engagement_reconciliation_failed', message: 'Server engagement progress could not be reconciled.', recoverable: true,
-          } });
-        }
+        });
       },
       async refreshFromServer(): Promise<void> {
         if (!store.dashboard()) await this.loadEngagement();
@@ -192,6 +217,7 @@ export const EngagementStore = signalStore(
         }
       },
       resetForUserChange(): void {
+        userGeneration += 1;
         if (acknowledgementTimer) clearTimeout(acknowledgementTimer);
         patchState(store, initialState);
       },

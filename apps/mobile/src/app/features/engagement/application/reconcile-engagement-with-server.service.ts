@@ -24,13 +24,14 @@ export class ReconcileEngagementWithServerService {
       this.reviewRepository.pendingCommits(userId),
     ]);
     const reconciledAt = new Date().toISOString();
-    if (pendingCommits.length > 0) {
+    if (pendingCommits.length > 0 || (await this.reviewRepository.pendingCommits(userId)).length > 0) {
       await this.recordSuccessfulReconciliation(userId, reconciledAt);
       return { dashboard: optimisticDashboard, appliedServerDashboard: false, recentDays: null };
     }
     await this.engagementRepository.mutate(userId, state => ({
       ...state,
       streakFreezeTransactions: serverSnapshot.streakFreezeTransactions,
+      streakDays: serverSnapshot.streakDays ?? state.streakDays,
       lastSuccessfulServerReconciliationAt: reconciledAt,
     }));
     return { dashboard: serverSnapshot.dashboard, appliedServerDashboard: true, recentDays: serverSnapshot.recentDays };

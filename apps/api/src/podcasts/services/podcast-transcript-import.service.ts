@@ -14,6 +14,7 @@ import { PodcastEpisodeEntity } from '../entities/podcast-episode.entity';
 import { PodcastSpeakerEntity } from '../entities/podcast-speaker.entity';
 import { PodcastTopicEntity } from '../entities/podcast-topic.entity';
 import { PodcastTurnEntity } from '../entities/podcast-turn.entity';
+import { normalizeTranscriptVocabularyReferences } from '../domain/normalize-transcript-vocabulary-references';
 import { StorageService } from '../../storage/storage.service';
 import { LegacyVocabularyProjectionService } from '../../vocabulary/services/legacy-vocabulary-projection.service';
 
@@ -43,20 +44,21 @@ export class PodcastTranscriptImportService {
   ) {}
 
   async preview(episodeId: string, payload: PodcastTranscriptPayloadDto): Promise<AdminPodcastTranscriptPreview> {
-    return (await this.resolve(episodeId, payload)).preview;
+    return (await this.resolve(episodeId, normalizeTranscriptVocabularyReferences(payload))).preview;
   }
 
   async commit(episodeId: string, dto: CommitPodcastTranscriptDto): Promise<AdminCommitPodcastTranscriptResult> {
-    let resolved = await this.resolve(episodeId, dto.payload);
+    const payload = normalizeTranscriptVocabularyReferences(dto.payload);
+    let resolved = await this.resolve(episodeId, payload);
     if (resolved.preview.fingerprint !== dto.fingerprint) {
       throw new ConflictException('The transcript changed after preview');
     }
     if (resolved.preview.conflicts.length) {
       throw new ConflictException('Resolve transcript conflicts before importing');
     }
-    await this.createMissingVocabulary(episodeId, dto.payload, resolved.preview.vocabulary);
-    resolved = await this.resolve(episodeId, dto.payload);
-    if (resolved.preview.conflicts.length || resolved.lexemeByKey.size !== dto.payload.vocabulary.length) {
+    await this.createMissingVocabulary(episodeId, payload, resolved.preview.vocabulary);
+    resolved = await this.resolve(episodeId, payload);
+    if (resolved.preview.conflicts.length || resolved.lexemeByKey.size !== payload.vocabulary.length) {
       throw new ConflictException('Podcast vocabulary could not be prepared automatically');
     }
 
@@ -71,28 +73,28 @@ export class PodcastTranscriptImportService {
       await manager.delete(PodcastEpisodeVocabularyEntity, { episodeId });
       await manager.delete(PodcastSpeakerEntity, { episodeId });
 
-      const speakers = dto.payload.speakers.map((speaker, position) => manager.create(PodcastSpeakerEntity, {
+      const speakers = payload.speakers.map((speaker, position) => manager.create(PodcastSpeakerEntity, {
         id: randomUUID(), episodeId, speakerKey: speaker.key, displayName: speaker.name.trim(),
         voiceGender: speaker.voiceGender, voiceId: this.adminSuppliedVoiceId(speaker.voiceId), position,
       }));
       await manager.save(speakers);
       const speakerByKey = new Map(speakers.map(speaker => [speaker.speakerKey, speaker]));
-      await manager.save(dto.payload.turns.map((turn, position) => manager.create(PodcastTurnEntity, {
+      await manager.save(payload.turns.map((turn, position) => manager.create(PodcastTurnEntity, {
         id: randomUUID(), episodeId,
         speakerId: this.requireMapValue(speakerByKey, turn.speakerKey, 'speaker').id, position,
         targetText: turn.targetText.trim(), translation: turn.translation.trim(),
         vocabularyKeys: [...turn.vocabularyRefs], startMs: null, endMs: null, wordTimings: [],
       })));
-      await manager.save(dto.payload.vocabulary.map((item, position) => manager.create(PodcastEpisodeVocabularyEntity, {
+      await manager.save(payload.vocabulary.map((item, position) => manager.create(PodcastEpisodeVocabularyEntity, {
         id: randomUUID(), episodeId,
         lexemeId: this.requireMapValue(resolved.lexemeByKey, item.key, 'vocabulary'),
         vocabularyKey: item.key, position, importance: item.importance,
       })));
       episode.transcriptFingerprint = dto.fingerprint;
-      if (dto.payload.episode) {
-        episode.title = dto.payload.episode.title.trim();
-        episode.titleTranslation = dto.payload.episode.titleTranslation.trim();
-        episode.description = dto.payload.episode.description.trim();
+      if (payload.episode) {
+        episode.title = payload.episode.title.trim();
+        episode.titleTranslation = payload.episode.titleTranslation.trim();
+        episode.description = payload.episode.description.trim();
       }
       episode.estimatedDurationMs = resolved.preview.estimatedDurationMs;
       episode.contentVersion += 1;
@@ -110,13 +112,13 @@ export class PodcastTranscriptImportService {
 
     return {
       episodeId, fingerprint: dto.fingerprint,
-      title: dto.payload.episode?.title.trim() ?? this.requireEpisodeMetadata(resolved.preview).title,
-      titleTranslation: dto.payload.episode?.titleTranslation.trim()
+      title: payload.episode?.title.trim() ?? this.requireEpisodeMetadata(resolved.preview).title,
+      titleTranslation: payload.episode?.titleTranslation.trim()
         ?? this.requireEpisodeMetadata(resolved.preview).titleTranslation,
-      description: dto.payload.episode?.description.trim()
+      description: payload.episode?.description.trim()
         ?? this.requireEpisodeMetadata(resolved.preview).description,
-      speakerCount: dto.payload.speakers.length, turnCount: dto.payload.turns.length,
-      vocabularyCount: dto.payload.vocabulary.length,
+      speakerCount: payload.speakers.length, turnCount: payload.turns.length,
+      vocabularyCount: payload.vocabulary.length,
       estimatedDurationMs: resolved.preview.estimatedDurationMs,
     };
   }

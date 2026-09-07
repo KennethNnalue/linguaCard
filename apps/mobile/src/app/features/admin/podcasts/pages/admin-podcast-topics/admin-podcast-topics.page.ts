@@ -47,6 +47,17 @@ export class AdminPodcastTopicsPage implements OnInit {
 
   constructor() {
     addIcons({ addOutline, arrowBackOutline, cafeOutline, checkmarkCircleOutline, chevronForwardOutline, cloudUploadOutline, documentTextOutline, micOutline, pencilOutline, refreshOutline, sparklesOutline, trashOutline });
+    effect(() => {
+      const id = this.store.completedTranscriptEpisodeId();
+      if (!id || this.view() !== 'new-episode') return;
+      untracked(() => {
+        void this.notifications.present({
+          message: this.store.success() ?? 'Transcript saved successfully.',
+          duration: 3000, color: 'success',
+        });
+        void this.router.navigate(['/admin/podcasts', this.topicId(), 'episodes', id, 'review']);
+      });
+    });
     effect(() => { const id = this.store.lastCreatedTopicId(); if (id && this.view() === 'new-topic') untracked(() => void this.router.navigate(['/admin/podcasts', id])); });
     effect(() => { const item = this.episode(); if (item) untracked(() => { this.detailsForm.patchValue({ title: item.title, translation: item.titleTranslation, description: item.description }); this.transcriptReviewed.set(Boolean(item.audioUrl) || item.status === 'published'); if (this.view() === 'review' && !item.hasTranscript) void this.router.navigate(['/admin/podcasts', item.topicId, 'episodes', item.id, 'transcript']); }); });
     effect(() => {
@@ -116,7 +127,7 @@ export class AdminPodcastTopicsPage implements OnInit {
   uploadTopicThumbnail(event: Event): void { const topic = this.topic(), file = this.selectedFile(event); if (topic && file) this.store.uploadTopicThumbnail({ topicId: topic.id, upload: { file, accessibilityDescription: `${topic.title} cover artwork`, focalPointX: .5, focalPointY: .5 } }); }
   uploadEpisodeThumbnail(event: Event): void { const episode = this.episode(), file = this.selectedFile(event); if (episode && file) this.store.uploadEpisodeThumbnail({ episodeId: episode.id, upload: { file, accessibilityDescription: `${episode.title} artwork`, focalPointX: .5, focalPointY: .5 } }); }
   async copyPrompt(): Promise<void> { const episode = this.episode(), topicId = this.topicId(), words = this.words(this.episodeForm.controls.vocabulary.value); if (episode) { await this.copyPromptForEpisode(episode.id, words); return; } if (!topicId) return; this.pendingPromptWords.set(words); this.store.createEpisodeDraft(topicId); }
-  async uploadTranscript(event: Event): Promise<void> { const file = this.selectedFile(event); if (!file) return; try { const parsed: unknown = JSON.parse(await file.text()); if (!this.isTranscriptPayload(parsed)) throw new Error('Invalid transcript'); const episode = this.episode(), topicId = this.topicId(); if (episode) this.store.previewTranscript({ episodeId: episode.id, payload: parsed }); else if (topicId) { this.pendingTranscript.set(parsed); this.store.createEpisodeDraft(topicId); } } catch { this.store.setLocalError('Choose a valid podcast transcript JSON file.'); } }
+  async uploadTranscript(event: Event): Promise<void> { const file = this.selectedFile(event); if (!file) return; try { const parsed: unknown = JSON.parse(await file.text()); if (!this.isTranscriptPayload(parsed)) throw new Error('Expected schemaVersion 1 and speakers, turns, and vocabulary arrays.'); const episode = this.episode(), topicId = this.topicId(); if (episode) this.store.previewTranscript({ episodeId: episode.id, payload: parsed }); else if (topicId) { this.pendingTranscript.set(parsed); this.store.createEpisodeDraft(topicId); } } catch (error) { this.store.setLocalError(error instanceof SyntaxError ? 'The file contains invalid JSON. Correct its syntax and try again.' : error instanceof Error ? error.message : 'Could not read the transcript file. Select it again to retry.'); } }
   createAudio(): void { const episode = this.episode(); if (episode) this.store.generateAudio(episode.id); }
   formatDuration(ms: number): string { const seconds = Math.round(ms / 1000); return `${Math.floor(seconds / 60)}:${String(seconds % 60).padStart(2, '0')}`; }
   speakerName(key: string): string { return this.store.transcriptDetails()?.speakers.find(speaker => speaker.key === key)?.name ?? key; }

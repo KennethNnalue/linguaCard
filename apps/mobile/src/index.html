@@ -30,10 +30,46 @@
   <meta name="apple-mobile-web-app-title" content="LinguaCard"/>
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"/>
   <link rel="manifest" href="manifest.webmanifest"/>
+  <link rel="preload" as="image" href="assets/icon/icon-512.png"/>
+  <!-- Inline so the splash can paint before the application bundles load. -->
+  <style>
+    .lc-startup {
+      position: fixed;
+      inset: 0;
+      z-index: 100000;
+      display: grid;
+      place-items: center;
+      overflow: hidden;
+      background: #111614;
+      isolation: isolate;
+    }
+    .lc-startup::before, .lc-startup::after {
+      content: "";
+      position: absolute;
+      z-index: -1;
+      width: 180vmax;
+      height: 140vmax;
+      border-radius: 50%;
+      background: #18231e;
+      transform: rotate(-28deg);
+    }
+    .lc-startup::before { right: -35vmax; bottom: 28%; }
+    .lc-startup::after { right: -55vmax; bottom: 62%; background: #1d2c25; }
+    .lc-startup img {
+      width: 128px;
+      height: 128px;
+      border-radius: 28px;
+      box-shadow: 0 16px 56px #00000040;
+    }
+  </style>
 </head>
 
 <body>
-  <lc-root></lc-root>
+  <lc-root>
+    <div class="lc-startup" role="status" aria-label="Loading LinguaCard">
+      <img src="assets/icon/icon-512.png" width="128" height="128" alt="LinguaCard"/>
+    </div>
+  </lc-root>
   <noscript>Please enable JavaScript to continue using this application.</noscript>
 </body>
 

@@ -32,6 +32,7 @@ interface AdminPodcastState {
   transcriptDetails: AdminPodcastTranscriptDetails | null;
   audioGenerationEpisodeId: string | null;
   audioGenerationStatus: RequestStatus;
+  completedTranscriptEpisodeId: string | null;
   lastCreatedTopicId: string | null;
   lastCreatedEpisodeId: string | null;
   lastDeletedTopicId: string | null;
@@ -54,6 +55,7 @@ const initialState: AdminPodcastState = {
   transcriptDetails: null,
   audioGenerationEpisodeId: null,
   audioGenerationStatus: 'idle',
+  completedTranscriptEpisodeId: null,
   lastCreatedTopicId: null,
   lastCreatedEpisodeId: null,
   lastDeletedTopicId: null,
@@ -122,7 +124,39 @@ export const AdminPodcastStore = signalStore(
       0,
     )),
   })),
-  withMethods((store, api = inject(AdminPodcastApiService)) => ({
+  withMethods((store, api = inject(AdminPodcastApiService)) => {
+    const saveTranscript = (
+      episodeId: string,
+      payload: AdminPodcastTranscriptPayload,
+      preview: AdminPodcastTranscriptPreview,
+      success: string,
+    ) => {
+      patchState(store, { transcriptPayload: payload, transcriptPreview: preview });
+      if (preview.status !== 'valid') {
+        patchState(store, {
+          transcriptStatus: 'error',
+          error: preview.conflicts.map(conflict =>
+            `${conflict.pointer}: ${conflict.message} ${conflict.remediation}`,
+          ).join(' ') || 'Resolve transcript conflicts before continuing.',
+        });
+        return EMPTY;
+      }
+      return api.commitTranscript(episodeId, preview.fingerprint, payload).pipe(
+        tap(result => patchState(store, {
+          topics: store.topics().map(topic => ({
+            ...topic,
+            episodes: topic.episodes.map(episode => episode.id === episodeId
+              ? { ...episode, title: result.title, titleTranslation: result.titleTranslation,
+                description: result.description, hasTranscript: true,
+                estimatedDurationMs: result.estimatedDurationMs }
+              : episode),
+          })),
+          transcriptStatus: 'success', transcriptPayload: null, transcriptPreview: null,
+          completedTranscriptEpisodeId: episodeId, success,
+        })),
+      );
+    };
+    return {
     loadTopics: rxMethod<void>(
       pipe(
         tap(() => patchState(store, { loadStatus: 'loading', error: null })),
@@ -201,6 +235,7 @@ export const AdminPodcastStore = signalStore(
                 const failed = !current || current.status === 'failed';
                 patchState(store, {
                   topics,
+                  completedTranscriptEpisodeId: !isPending && !failed && current.hasTranscript ? current.id : null,
                   mutationStatus: isPending ? 'loading' : failed ? 'error' : 'success',
                   error: !current ? 'The generated episode could not be found.'
                     : current.status === 'failed' ? current.generationError || 'Episode generation failed.' : null,
@@ -385,46 +420,17 @@ export const AdminPodcastStore = signalStore(
         exhaustMap(command => {
           patchState(store, {
             transcriptEpisodeId: command.episodeId, transcriptPayload: command.payload,
-            transcriptPreview: null, transcriptDetails: null, transcriptStatus: 'loading', error: null,
+            transcriptPreview: null, transcriptDetails: null, transcriptStatus: 'loading', completedTranscriptEpisodeId: null, error: null,
             success: null,
           });
           return api.previewTranscript(command.episodeId, command.payload).pipe(
-            exhaustMap(preview => {
-              patchState(store, { transcriptPreview: preview, transcriptStatus: 'success' });
-              if (preview.status === 'conflicts') return EMPTY;
-              patchState(store, { transcriptStatus: 'loading' });
-              return api.commitTranscript(command.episodeId, preview.fingerprint, command.payload).pipe(
-                tap(result => patchState(store, {
-                  topics: store.topics().map(topic => ({
-                    ...topic,
-                    episodes: topic.episodes.map(episode => episode.id === command.episodeId
-                      ? {
-                        ...episode,
-                        title: result.title,
-                        titleTranslation: result.titleTranslation,
-                        description: result.description,
-                        hasTranscript: true,
-                        estimatedDurationMs: result.estimatedDurationMs,
-                      }
-                      : episode),
-                  })),
-                  transcriptStatus: 'success',
-                  transcriptPayload: null,
-                  success: `Transcript imported. ${result.vocabularyCount} vocabulary items were prepared automatically.`,
-                })),
-                catchError(error => {
-                  patchState(store, {
-                    transcriptStatus: 'error',
-                    error: adminPodcastErrorMessage(error, 'Could not import the transcript.'),
-                  });
-                  return EMPTY;
-                }),
-              );
-            }),
+            exhaustMap(preview => saveTranscript(
+              command.episodeId, command.payload, preview, 'Transcript imported successfully.',
+            )),
             catchError(error => {
               patchState(store, {
                 transcriptStatus: 'error',
-                error: adminPodcastErrorMessage(error, 'Could not validate the transcript file.'),
+                error: adminPodcastErrorMessage(error, 'Could not validate or save the transcript file.'),
               });
               return EMPTY;
             }),
@@ -457,36 +463,13 @@ export const AdminPodcastStore = signalStore(
         exhaustMap(command => {
           patchState(store, {
             transcriptEpisodeId: command.episodeId, transcriptPayload: null,
-            transcriptPreview: null, transcriptDetails: null, transcriptStatus: 'loading', error: null, success: null,
+            transcriptPreview: null, transcriptDetails: null, transcriptStatus: 'loading', completedTranscriptEpisodeId: null, error: null, success: null,
           });
           return api.generateTranscript(command.episodeId, command.vocabulary).pipe(
-            exhaustMap(generated => {
-              patchState(store, {
-                transcriptPayload: generated.payload,
-                transcriptPreview: generated.preview,
-                transcriptStatus: generated.preview.status === 'valid' ? 'loading' : 'success',
-              });
-              if (generated.preview.status !== 'valid') return EMPTY;
-              return api.commitTranscript(
-                command.episodeId, generated.preview.fingerprint, generated.payload,
-              ).pipe(
-                tap(result => patchState(store, {
-                  topics: store.topics().map(topic => ({
-                    ...topic,
-                    episodes: topic.episodes.map(episode => episode.id === command.episodeId
-                      ? {
-                        ...episode, title: result.title,
-                        titleTranslation: result.titleTranslation,
-                        description: result.description, hasTranscript: true,
-                        estimatedDurationMs: result.estimatedDurationMs,
-                      }
-                      : episode),
-                  })),
-                  transcriptStatus: 'success', transcriptPayload: null,
-                  success: 'Transcript generated and saved. It is ready for ElevenLabs audio.',
-                })),
-              );
-            }),
+            exhaustMap(generated => saveTranscript(
+              command.episodeId, generated.payload, generated.preview,
+              'Transcript generated successfully.',
+            )),
             catchError(error => {
               patchState(store, {
                 transcriptStatus: 'error',
@@ -537,25 +520,8 @@ export const AdminPodcastStore = signalStore(
           const payload = store.transcriptPayload();
           const preview = store.transcriptPreview();
           if (!episodeId || !payload || !preview || preview.status !== 'valid') return EMPTY;
-          patchState(store, { transcriptStatus: 'loading', error: null, success: null });
-          return api.commitTranscript(episodeId, preview.fingerprint, payload).pipe(
-            tap(result => patchState(store, {
-              topics: store.topics().map(topic => ({
-                ...topic,
-                episodes: topic.episodes.map(episode => episode.id === episodeId
-                  ? {
-                    ...episode,
-                    title: result.title,
-                    titleTranslation: result.titleTranslation,
-                    description: result.description,
-                    hasTranscript: true,
-                    estimatedDurationMs: result.estimatedDurationMs,
-                  }
-                  : episode),
-              })),
-              transcriptStatus: 'success', transcriptPayload: null, transcriptPreview: null,
-              success: 'The transcript was imported successfully. Generate the episode audio next.',
-            })),
+          patchState(store, { transcriptStatus: 'loading', completedTranscriptEpisodeId: null, error: null, success: null });
+          return saveTranscript(episodeId, payload, preview, 'Transcript imported successfully.').pipe(
             catchError(error => {
               patchState(store, {
                 transcriptStatus: 'error',
@@ -681,5 +647,6 @@ export const AdminPodcastStore = signalStore(
     setLocalSuccess(success: string): void {
       patchState(store, { success, error: null });
     },
-  })),
+    };
+  }),
 );

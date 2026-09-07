@@ -13,7 +13,8 @@ function mondayFor(dayKey: EngagementDayKey, calendar: EngagementCalendar): Enga
 }
 
 function countForDay(state: PersistedEngagementState, dayKey: EngagementDayKey): number {
-  return state.dailyProgress[dayKey]?.uniqueCardsReviewed ?? 0;
+  return Math.max(state.dailyProgress[dayKey]?.uniqueCardsReviewed ?? 0,
+    state.streakDays.find(day => day.dayKey === dayKey)?.uniqueCardsReviewed ?? 0);
 }
 
 export function buildEngagementActivity(
@@ -26,7 +27,8 @@ export function buildEngagementActivity(
   while (last7DayKeys.length < 7) last7DayKeys.unshift(calendar.previousDay(last7DayKeys[0]));
   const last7DaysGoalActivity = last7DayKeys.map(dayKey => {
     const progress = state.dailyProgress[dayKey];
-    return progress !== undefined && progress.uniqueCardsReviewed >= progress.targetUniqueCards;
+    return state.streakDays.some(day => day.dayKey === dayKey && day.status === 'goal_met')
+      || (progress !== undefined && progress.uniqueCardsReviewed >= progress.targetUniqueCards);
   });
 
   const recentDayKeys: EngagementDayKey[] = [todayKey];
@@ -41,8 +43,8 @@ export function buildEngagementActivity(
     const streakDay = state.streakDays.find(day => day.dayKey === dayKey);
     return {
       dayKey,
-      reviewed: progress?.uniqueCardsReviewed ?? streakDay?.uniqueCardsReviewed ?? 0,
-      goal: progress?.targetUniqueCards ?? streakDay?.goalTarget ?? platformDailyTarget,
+      reviewed: countForDay(state, dayKey),
+      goal: streakDay?.goalTarget ?? progress?.targetUniqueCards ?? platformDailyTarget,
       status: streakDay?.status ?? (dayKey === todayKey
         ? 'open'
         : !firstTrackedDayKey || dayKey < firstTrackedDayKey ? 'untracked' : 'missed'),

@@ -10,8 +10,9 @@ export function buildEngagementDashboard(
   personalDailyGoal: number = platformDailyTarget,
 ): EngagementDashboard {
   const progress = state.dailyProgress[todayKey];
-  const reviewed = progress?.uniqueCardsReviewed ?? 0;
-  const goal = progress?.targetUniqueCards ?? platformDailyTarget;
+  const reconciledDay = state.streakDays.find(day => day.dayKey === todayKey);
+  const reviewed = Math.max(progress?.uniqueCardsReviewed ?? 0, reconciledDay?.uniqueCardsReviewed ?? 0);
+  const goal = reconciledDay?.goalTarget ?? progress?.targetUniqueCards ?? platformDailyTarget;
   const streakDays = state.streakDays.some(day => day.dayKey === todayKey)
     ? state.streakDays
     : [...state.streakDays, { dayKey: todayKey, goalTarget: goal, uniqueCardsReviewed: reviewed, status: 'open' as const }];

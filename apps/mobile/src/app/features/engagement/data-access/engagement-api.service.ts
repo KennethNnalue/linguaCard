@@ -1,13 +1,14 @@
 import { inject, Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { map, Observable } from 'rxjs';
+import { map, Observable, timeout } from 'rxjs';
 import { environment } from '../../../../environments/environment';
 import { engagementDayKey } from '../domain/engagement-domain';
 import { EngagementDashboard } from '../models/engagement-view.models';
 import { EngagementDayView } from '../models/engagement-view.models';
-import { StreakFreezeTransaction } from '../domain/engagement-domain';
+import { StreakDay, StreakFreezeTransaction } from '../domain/engagement-domain';
 
 interface EngagementDashboardDto {
+  streakDays?: EngagementDashboardDto['recentDays'];
   today: { reviewed: number; goal: number; goalComplete: boolean };
   personalGoal: { reviewed: number; goal: number; goalComplete: boolean };
   streak: {
@@ -37,6 +38,7 @@ interface EngagementDashboardDto {
 }
 
 export interface ServerEngagementSnapshot {
+  streakDays?: readonly StreakDay[];
   dashboard: EngagementDashboard;
   recentDays: readonly EngagementDayView[];
   streakFreezeTransactions: readonly StreakFreezeTransaction[];
@@ -53,6 +55,7 @@ export class EngagementApiService {
 
   dashboard(): Observable<ServerEngagementSnapshot> {
     return this.http.get<EngagementDashboardDto>(`${this.baseUrl}/dashboard`).pipe(
+      timeout(10_000),
       map(response => ({
         dashboard: {
           today: response.today,
@@ -67,6 +70,11 @@ export class EngagementApiService {
           streakFreezes: response.streakFreezes,
           streakFreezeProgress: response.streakFreezeProgress,
         },
+        streakDays: response.streakDays?.flatMap((day): StreakDay[] => day.status === 'untracked' ? [] : [{
+          dayKey: engagementDayKey(day.dayKey), goalTarget: day.goal,
+          uniqueCardsReviewed: day.reviewed,
+          status: day.status,
+        }]),
         recentDays: response.recentDays.map(day => ({ ...day, dayKey: engagementDayKey(day.dayKey) })),
         streakFreezeTransactions: response.streakFreezeTransactions.map(transaction => ({
           transactionId: transaction.transactionId,

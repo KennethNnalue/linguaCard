@@ -1,6 +1,6 @@
 import { inject, Injectable } from '@angular/core';
 import {
-  applyReviewToDailyProgress, applyRewardPolicy, calculateStreak, DailyProgress, DEFAULT_REWARD_POLICY,
+  applyReviewToDailyProgress, applyRewardPolicy, calculateStreak, DailyProgress, DailyProgressTransition, DEFAULT_REWARD_POLICY,
   EngagementProjectionResult, resolveEngagementDayKey, ReviewCommittedEvent, StreakDay,
 } from '../domain/engagement-domain';
 import { EngagementLocalRepository } from '../data-access/engagement-local.repository';
@@ -49,23 +49,29 @@ export class ProjectReviewEngagementService {
     const nextState = await this.repository.mutate(request.userId, state => {
       const duplicate = state.projectionResults[request.event.eventId];
       if (duplicate) return state;
+      const reconciledDay = state.streakDays.find(day => day.dayKey === dayKey);
       const current: DailyProgress = state.dailyProgress[dayKey] ?? {
         userId: request.userId,
         dayKey,
         streakPolicyVersion: DAILY_STREAK_POLICY.version,
-        targetUniqueCards: dailyStreakReviewTarget(request.eligibleCardCount),
+        targetUniqueCards: reconciledDay?.goalTarget
+          ?? dailyStreakReviewTarget(request.eligibleCardCount),
         reviewedCardIds: [], uniqueCardsReviewed: 0, committedReviewCount: 0,
       };
-      const transition = applyReviewToDailyProgress(current, request.event, dayKey);
+      const localTransition = applyReviewToDailyProgress(current, request.event, dayKey);
+      const transition: DailyProgressTransition = reconciledDay?.status === 'goal_met'
+        ? { ...localTransition, goalTransition: 'already_reached' }
+        : localTransition;
       const rewardTransactions = applyRewardPolicy({
         userId: request.userId, event: request.event, dailyProgressTransition: transition, dayKey,
         policy: DEFAULT_REWARD_POLICY, transactionId: reason => `${request.event.eventId}:${reason}`,
       });
       const existingDays = state.streakDays.filter(day => day.dayKey !== dayKey);
       const today: StreakDay = {
-        dayKey, goalTarget: transition.next.targetUniqueCards,
-        uniqueCardsReviewed: transition.next.uniqueCardsReviewed,
-        status: transition.next.uniqueCardsReviewed >= transition.next.targetUniqueCards ? 'goal_met' : 'open',
+        dayKey, goalTarget: reconciledDay?.goalTarget ?? transition.next.targetUniqueCards,
+        uniqueCardsReviewed: Math.max(reconciledDay?.uniqueCardsReviewed ?? 0, transition.next.uniqueCardsReviewed),
+        status: transition.next.uniqueCardsReviewed >= transition.next.targetUniqueCards ? 'goal_met'
+          : reconciledDay?.status ?? 'open',
       };
       const streakDays = [...existingDays, today].sort((left, right) => left.dayKey.localeCompare(right.dayKey));
       const streak = calculateStreak(streakDays, dayKey);

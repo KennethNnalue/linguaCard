@@ -1,6 +1,11 @@
 <ion-app>
   <lc-offline-banner></lc-offline-banner>
   <lc-update-banner></lc-update-banner>
-  <ion-router-outlet></ion-router-outlet>
+  <ion-router-outlet (activate)="isStarting.set(false)"></ion-router-outlet>
   <lc-pwa-install-banner></lc-pwa-install-banner>
 </ion-app>
+@if (isStarting()) {
+  <div class="lc-startup" role="status" aria-label="Loading LinguaCard">
+    <img src="assets/icon/icon-512.png" width="128" height="128" alt="LinguaCard"/>
+  </div>
+}

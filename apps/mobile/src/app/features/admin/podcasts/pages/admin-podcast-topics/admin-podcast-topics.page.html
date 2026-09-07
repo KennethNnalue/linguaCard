@@ -23,14 +23,14 @@
           @if (generatedEpisode.hasTranscript && generatedEpisode.status !== 'failed') { <ion-button class="outline review-created" fill="outline" expand="block" (click)="openEpisode(item.id, generatedEpisode.id)">Continue to review</ion-button> }
           @if (generatedEpisode.status === 'failed') { <p class="step-warning" role="alert">Generation failed. Resolve the error before continuing to review.</p> }
         }
-        <details [open]="!episode()?.hasTranscript"><summary>Import a transcript instead</summary><ion-button class="outline" fill="outline" expand="block" type="button" (click)="copyPrompt()">Copy generation prompt</ion-button><label class="upload-button">Upload transcript JSON<input type="file" accept="application/json" (change)="uploadTranscript($event)" /></label></details>
+        <details [open]="!episode()?.hasTranscript"><summary>Import a transcript instead</summary><ion-button class="outline" fill="outline" expand="block" type="button" (click)="copyPrompt()">Copy generation prompt</ion-button><label class="upload-button">Upload transcript JSON<input type="file" accept="application/json,.json" [disabled]="store.isMutating() || store.transcriptStatus() === 'loading'" (change)="uploadTranscript($event)" /></label></details>
       } @else { <p>Open a topic before creating an episode.</p><ion-button fill="outline" (click)="show('library')">Choose a topic</ion-button> }
     </section>
   }
 
   @if (view() === 'review') {
     <section class="studio-content">
-      <div class="progress review-progress" [class.audio-ready]="episode()?.audioUrl" aria-label="Episode review workflow"><i></i><i></i><i></i><i></i></div>
+      <div class="progress review-progress" [class.audio-ready]="episode()?.audioUrl" aria-label="Step 3 of 4: Review transcript"><i></i><i></i><i></i><i></i></div>
       <ion-button class="previous-step" fill="clear" (click)="show('topic')"><ion-icon slot="start" name="arrow-back-outline"></ion-icon>Back to episodes</ion-button>
       @if (episode(); as item) {
         <span class="eyebrow">Step 3 · {{ topic()?.title }}</span><h2>{{ item.title }}</h2><p class="lead">Review the conversation and details before creating audio.</p>
