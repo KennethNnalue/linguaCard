@@ -177,7 +177,11 @@ export class AdminPodcastTopicsPage implements OnInit {
     });
     effect(() => {
       const id = this.store.lastDeletedEpisodeId();
-      if (id && id === this.route.snapshot.paramMap.get('episodeId')) untracked(() => void this.router.navigate(['/admin/podcasts', this.topicId()]));
+      const topicId = this.topicId();
+      const isEpisodeView = this.view() === 'new-episode' || this.view() === 'review';
+      if (id && topicId && isEpisodeView) {
+        untracked(() => void this.router.navigate(['/admin/podcasts', topicId]));
+      }
     });
   }
 

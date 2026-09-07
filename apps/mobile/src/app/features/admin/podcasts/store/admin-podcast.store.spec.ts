@@ -44,6 +44,7 @@ describe('AdminPodcastStore transcript completion', () => {
       previewTranscript: jest.fn(() => of(preview)),
       generateTranscript: jest.fn(() => of({ payload, preview })),
       commitTranscript: jest.fn(() => of(result)),
+      deleteEpisode: jest.fn(() => of(undefined)),
     };
     TestBed.configureTestingModule({ providers: [AdminPodcastStore, { provide: AdminPodcastApiService, useValue: api }] });
     const store = TestBed.inject(AdminPodcastStore);
@@ -140,5 +141,26 @@ describe('AdminPodcastStore transcript completion', () => {
     expect(store.transcriptDetails()).toEqual({
       episodeId: 'episode', speakers: payload.speakers, turns: payload.turns,
     });
+  });
+
+  it.each(['new-episode', 'review'] as const)('returns to the updated topic after deleting from %s', view => {
+    const navigate = jest.fn().mockResolvedValue(true);
+    TestBed.configureTestingModule({ providers: [
+      { provide: Router, useValue: { navigate } },
+      { provide: ActivatedRoute, useValue: { snapshot: { paramMap: { get: () => null } } } },
+      { provide: AppNotificationService, useValue: {} },
+      { provide: PodcastTranscriptClipboardService, useValue: {} },
+      { provide: AlertController, useValue: {} },
+    ] });
+    const { store } = setup();
+    const page = TestBed.runInInjectionContext(() => new AdminPodcastTopicsPage());
+    page.topicId.set('topic');
+    page.view.set(view);
+
+    store.deleteEpisode('episode');
+    TestBed.tick();
+
+    expect(store.topics()[0].episodes).toEqual([]);
+    expect(navigate).toHaveBeenCalledWith(['/admin/podcasts', 'topic']);
   });
 });
