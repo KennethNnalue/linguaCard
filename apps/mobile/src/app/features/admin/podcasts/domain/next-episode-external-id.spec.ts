@@ -28,6 +28,7 @@ function createEpisode(externalId: string): AdminPodcastEpisodeListItem {
     description: '', level: 'A1', position: 0, audioDurationMs: 0, audioUrl: null,
     audioVersion: 0, generationError: null, generationRequestId: null,
     elevenLabsProjectId: null, hasTranscript: false, estimatedDurationMs: 0,
-    status: 'draft', thumbnail: null, createdAt: '', updatedAt: '',
+    status: 'draft', thumbnail: null, essentialVocabularyCount: 0, platformCollection: null,
+    createdAt: '', updatedAt: '',
   };
 }

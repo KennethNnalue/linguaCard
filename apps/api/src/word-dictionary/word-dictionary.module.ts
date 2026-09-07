@@ -7,16 +7,18 @@ import { WordDictionaryController } from './word-dictionary.controller';
 import { ImportModule } from '../import/import.module';
 import { WordAudioModule } from '../word-audio/word-audio.module';
 import { VocabularyModule } from '../vocabulary/vocabulary.module';
+import { LegacyDictionaryLexemeEntity } from '../vocabulary/entities/legacy-dictionary-lexeme.entity';
+import { CanonicalDictionaryProjectionService } from './canonical-dictionary-projection.service';
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([WordDictionaryEntity]),
+    TypeOrmModule.forFeature([WordDictionaryEntity, LegacyDictionaryLexemeEntity]),
     forwardRef(() => ImportModule),
     WordAudioModule,
     VocabularyModule,
   ],
   controllers: [WordDictionaryController],
-  providers: [WordDictionaryRepository, WordDictionaryService],
-  exports: [WordDictionaryService, WordDictionaryRepository],
+  providers: [WordDictionaryRepository, WordDictionaryService, CanonicalDictionaryProjectionService],
+  exports: [WordDictionaryService, WordDictionaryRepository, CanonicalDictionaryProjectionService],
 })
 export class WordDictionaryModule {}

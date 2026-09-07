@@ -3,6 +3,7 @@ import {
 } from 'typeorm';
 
 @Entity('platform_collection_words')
+@Index('uq_pcw_collection_dictionary', ['platformCollectionId', 'dictionaryWordId'], { unique: true })
 export class PlatformCollectionWordEntity {
   @PrimaryColumn()
   id!: string;

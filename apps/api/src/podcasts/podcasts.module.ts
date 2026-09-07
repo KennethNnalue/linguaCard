@@ -22,6 +22,8 @@ import { ElevenLabsPodcastGenerationService } from './services/elevenlabs-podcas
 import { PodcastEpisodeCreationService } from './services/podcast-episode-creation.service';
 import { EngagementModule } from '../engagement/engagement.module';
 import { SettingsModule } from '../settings/settings.module';
+import { WordDictionaryModule } from '../word-dictionary/word-dictionary.module';
+import { PodcastPlatformCollectionService } from './services/podcast-platform-collection.service';
 
 @Module({
   imports: [
@@ -31,6 +33,7 @@ import { SettingsModule } from '../settings/settings.module';
     AiModule,
     EngagementModule,
     SettingsModule,
+    WordDictionaryModule,
   ],
   controllers: [AdminPodcastsController, AdminPodcastEpisodesController, PodcastsController],
   providers: [
@@ -41,6 +44,7 @@ import { SettingsModule } from '../settings/settings.module';
     PodcastTranscriptGenerationService, ElevenLabsPodcastAdapter,
     ElevenLabsPodcastGenerationService,
     PodcastEpisodeCreationService,
+    PodcastPlatformCollectionService,
   ],
   exports: [AdminPodcastsService],
 })

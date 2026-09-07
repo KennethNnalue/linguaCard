@@ -12,7 +12,7 @@ const config: Config = {
     '/apps/api/src/word-audio/ssml-builder.spec.ts$',
   ],
   transformIgnorePatterns: [
-    'node_modules/(?!(.*\\.mjs$|@angular/common/locales/.*\\.js$|@ionic|@capacitor|ionicons|@stencil))',
+    'node_modules/(?!(.*\\.mjs$|@angular/common/locales/.*\\.js$|(?:\\.pnpm/[^/]+/node_modules/)?(?:@ionic|@capacitor|ionicons|@stencil)))',
   ],
   moduleNameMapper: {
     'ionicons/components/(.*)': '<rootDir>/node_modules/ionicons/components/$1',

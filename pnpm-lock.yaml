@@ -74,6 +74,9 @@ importers:
       '@capacitor/preferences':
         specifier: ^8.0.1
         version: 8.0.1(@capacitor/core@8.3.1)
+      '@capacitor/screen-orientation':
+        specifier: 8.0.1
+        version: 8.0.1(@capacitor/core@8.3.1)
       '@capacitor/status-bar':
         specifier: 8.0.2
         version: 8.0.2(@capacitor/core@8.3.1)
@@ -1377,6 +1380,11 @@ packages:
 
   '@capacitor/preferences@8.0.1':
     resolution: {integrity: sha512-T6no3ebi79XJCk91U3Jp/liJUwgBdvHR+s6vhvPkPxSuch7z3zx5Rv1bdWM6sWruNx+pViuEGqZvbfCdyBvcHQ==}
+    peerDependencies:
+      '@capacitor/core': '>=8.0.0'
+
+  '@capacitor/screen-orientation@8.0.1':
+    resolution: {integrity: sha512-DPz/1YGmlAUDMg2ON+AGJp1eFn9IfVNP9VKI5zIU+jD5xAZ4JGxUDlY9MDCvEPQs7UCD53NduJpqvqhcnb32Kw==}
     peerDependencies:
       '@capacitor/core': '>=8.0.0'
 
@@ -9062,6 +9070,10 @@ snapshots:
       '@capacitor/core': 8.3.1
 
   '@capacitor/preferences@8.0.1(@capacitor/core@8.3.1)':
+    dependencies:
+      '@capacitor/core': 8.3.1
+
+  '@capacitor/screen-orientation@8.0.1(@capacitor/core@8.3.1)':
     dependencies:
       '@capacitor/core': 8.3.1
 

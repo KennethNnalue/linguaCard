@@ -10,6 +10,7 @@ import type {
   AdminCreateElevenLabsPodcastResult,
   AdminPodcastTranscriptPromptResult,
   AdminPodcastTranscriptDetails,
+  AdminPublishPodcastVocabularyResult,
 } from '@lingua-card/shared/domain';
 import { AdminGuard } from '../../auth/guards/admin.guard';
 import { JwtAuthGuard } from '../../auth/guards/jwt-auth.guard';
@@ -32,6 +33,7 @@ import { PodcastAudioGenerationService } from '../services/podcast-audio-generat
 import { PodcastTranscriptGenerationService } from '../services/podcast-transcript-generation.service';
 import { ElevenLabsPodcastGenerationService } from '../services/elevenlabs-podcast-generation.service';
 import { PodcastEpisodeCreationService } from '../services/podcast-episode-creation.service';
+import { PodcastPlatformCollectionService } from '../services/podcast-platform-collection.service';
 
 const THUMBNAIL_UPLOAD_OPTIONS = { limits: { fileSize: 5 * 1024 * 1024, files: 1 } };
 
@@ -118,6 +120,7 @@ export class AdminPodcastEpisodesController {
     private readonly transcriptGeneration: PodcastTranscriptGenerationService,
     private readonly elevenLabsPodcastGeneration: ElevenLabsPodcastGenerationService,
     private readonly episodeCreation: PodcastEpisodeCreationService,
+    private readonly platformCollections: PodcastPlatformCollectionService,
   ) {}
 
   @Patch(':episodeId')
@@ -193,6 +196,13 @@ export class AdminPodcastEpisodesController {
     @Param('episodeId') episodeId: string,
   ): Promise<AdminPodcastEpisodeListItem> {
     return this.podcasts.publishEpisode(episodeId);
+  }
+
+  @Post(':episodeId/platform-collection')
+  publishVocabularyCollection(
+    @Param('episodeId') episodeId: string,
+  ): Promise<AdminPublishPodcastVocabularyResult> {
+    return this.platformCollections.publish(episodeId);
   }
 
   @Post(':episodeId/transcript')

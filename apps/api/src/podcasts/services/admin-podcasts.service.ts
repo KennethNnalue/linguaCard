@@ -20,8 +20,18 @@ import { toPodcastThumbnail } from '../podcast-thumbnail.mapper';
 import { PodcastThumbnailService } from './podcast-thumbnail.service';
 import { podcastEpisodeExternalId, podcastExternalId } from '../domain/podcast-external-id';
 import { StorageService } from '../../storage/storage.service';
+import { PlatformCollectionEntity } from '../../admin/platform-collection.entity';
+import { PodcastEpisodeVocabularyEntity } from '../entities/podcast-episode-vocabulary.entity';
 
 const PG_UNIQUE_VIOLATION = '23505';
+
+interface EpisodePublicationMetadata {
+  essentialVocabularyCount: number;
+  platformCollection: {
+    id: string;
+    isPublished: boolean;
+  } | null;
+}
 
 @Injectable()
 export class AdminPodcastsService {
@@ -52,6 +62,9 @@ export class AdminPodcastsService {
     const thumbnailById = new Map(
       thumbnailEntities.map(entity => [entity.id, toPodcastThumbnail(entity)]),
     );
+    const publicationMetadata = await this.episodePublicationMetadata(
+      episodes.map(episode => episode.id),
+    );
     const episodesByTopic = new Map<string, PodcastEpisodeEntity[]>();
     for (const episode of episodes) {
       const topicEpisodes = episodesByTopic.get(episode.topicId) ?? [];
@@ -62,6 +75,7 @@ export class AdminPodcastsService {
       topic,
       episodesByTopic.get(topic.id) ?? [],
       thumbnailById,
+      publicationMetadata,
     ));
   }
 
@@ -84,7 +98,7 @@ export class AdminPodcastsService {
     });
     try {
       const saved = await this.topicRepo.save(entity);
-      return this.toTopicModel(saved, [], new Map());
+      return this.toTopicModel(saved, [], new Map(), new Map());
     } catch (error) {
       if (this.isUniqueViolation(error)) {
         throw new ConflictException(`A podcast topic derived as “${externalId}” already exists`);
@@ -403,13 +417,19 @@ export class AdminPodcastsService {
     const thumbnail = episode.thumbnailAssetId
       ? await this.thumbnailRepo.findOneBy({ id: episode.thumbnailAssetId })
       : null;
-    return this.toEpisodeModel(episode, thumbnail ? toPodcastThumbnail(thumbnail) : null);
+    const publicationMetadata = await this.episodePublicationMetadata([episode.id]);
+    return this.toEpisodeModel(
+      episode,
+      thumbnail ? toPodcastThumbnail(thumbnail) : null,
+      publicationMetadata.get(episode.id),
+    );
   }
 
   private toTopicModel(
     topic: PodcastTopicEntity,
     episodes: PodcastEpisodeEntity[],
     thumbnailById: ReadonlyMap<string, PodcastThumbnail>,
+    publicationMetadata: ReadonlyMap<string, EpisodePublicationMetadata>,
   ): AdminPodcastTopicListItem {
     return {
       id: topic.id,
@@ -424,6 +444,7 @@ export class AdminPodcastsService {
       episodes: episodes.map(episode => this.toEpisodeModel(
         episode,
         episode.thumbnailAssetId ? thumbnailById.get(episode.thumbnailAssetId) ?? null : null,
+        publicationMetadata.get(episode.id),
       )),
       createdAt: topic.createdAt.toISOString(),
       updatedAt: topic.updatedAt.toISOString(),
@@ -433,6 +454,7 @@ export class AdminPodcastsService {
   private toEpisodeModel(
     episode: PodcastEpisodeEntity,
     thumbnail: PodcastThumbnail | null,
+    publicationMetadata: EpisodePublicationMetadata | undefined,
   ): AdminPodcastEpisodeListItem {
     return {
       id: episode.id,
@@ -453,9 +475,49 @@ export class AdminPodcastsService {
       estimatedDurationMs: episode.estimatedDurationMs,
       status: episode.status,
       thumbnail,
+      essentialVocabularyCount: publicationMetadata?.essentialVocabularyCount ?? 0,
+      platformCollection: publicationMetadata?.platformCollection ?? null,
       createdAt: episode.createdAt.toISOString(),
       updatedAt: episode.updatedAt.toISOString(),
     };
+  }
+
+  private async episodePublicationMetadata(
+    episodeIds: readonly string[],
+  ): Promise<Map<string, EpisodePublicationMetadata>> {
+    if (!episodeIds.length) return new Map();
+    const [vocabulary, collections] = await Promise.all([
+      this.dataSource.getRepository(PodcastEpisodeVocabularyEntity).findBy({
+        episodeId: In([...episodeIds]),
+        importance: 'essential',
+      }),
+      this.dataSource.getRepository(PlatformCollectionEntity).findBy({
+        sourcePodcastEpisodeId: In([...episodeIds]),
+      }),
+    ]);
+    const result = new Map<string, EpisodePublicationMetadata>();
+    for (const episodeId of episodeIds) {
+      result.set(episodeId, {
+        essentialVocabularyCount: 0,
+        platformCollection: null,
+      });
+    }
+    for (const item of vocabulary) {
+      const metadata = result.get(item.episodeId);
+      if (metadata) metadata.essentialVocabularyCount += 1;
+    }
+    for (const collection of collections) {
+      const episodeId = collection.sourcePodcastEpisodeId;
+      if (!episodeId) continue;
+      const metadata = result.get(episodeId);
+      if (metadata) {
+        metadata.platformCollection = {
+          id: collection.id,
+          isPublished: collection.isPublished,
+        };
+      }
+    }
+    return result;
   }
 
   private thumbnailStoragePaths(thumbnail: PodcastThumbnailAssetEntity): readonly string[] {

@@ -17,11 +17,12 @@ import {
 } from '../domain/podcast-listening-progress';
 
 export type PodcastTranslationMode = 'target' | 'both' | 'reveal';
+export type PodcastPlayerError = 'load-episode' | 'save-progress' | 'completion-threshold';
 
 interface PodcastPlayerState {
   episode: PodcastEpisodePlayer | null;
   status: 'idle' | 'loading' | 'success' | 'error';
-  error: string | null;
+  error: PodcastPlayerError | null;
   currentTimeMs: number;
   lastPlaybackTimeMs: number;
   unsyncedPlayedRanges: readonly PodcastPlaybackRange[];
@@ -32,7 +33,7 @@ interface PodcastPlayerState {
   continueToNextTopic: boolean;
   translationMode: PodcastTranslationMode;
   revealedTurnId: string | null;
-  progressError: string | null;
+  progressError: PodcastPlayerError | null;
   playbackQueue: string[];
 }
 
@@ -96,7 +97,7 @@ export const PodcastPlayerStore = signalStore(
           if (userId) await localData.setPodcastPlayer(userId, episode);
           await present(episode);
         } catch {
-          if (!cached) patchState(store, { status: 'error', error: 'Could not load this podcast episode.' });
+          if (!cached) patchState(store, { status: 'error', error: 'load-episode' });
         }
       })();
     },
@@ -145,7 +146,7 @@ export const PodcastPlayerStore = signalStore(
           tap(() => patchState(store, { progressError: null })),
           catchError(() => {
             patchState(store, {
-              progressError: 'Listening progress could not be saved.',
+              progressError: 'save-progress',
               unsyncedPlayedRanges: [...playedRanges, ...store.unsyncedPlayedRanges()],
             });
             return EMPTY;
@@ -166,7 +167,7 @@ export const PodcastPlayerStore = signalStore(
         }));
         if (!progress.completedAt) {
           patchState(store, {
-            progressError: 'Listen to at least 70% of the episode before completing it.',
+            progressError: 'completion-threshold',
             isPlaying: false,
             unsyncedPlayedRanges: [],
           });
@@ -176,7 +177,7 @@ export const PodcastPlayerStore = signalStore(
         await engagement.refreshFromServer();
         return progress.pointsAwarded;
       } catch {
-        patchState(store, { progressError: 'Listening progress could not be saved.' });
+        patchState(store, { progressError: 'save-progress' });
         return null;
       }
     },

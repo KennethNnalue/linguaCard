@@ -43,6 +43,23 @@
         <details class="generated" open><summary>Edit episode details</summary><form [formGroup]="detailsForm" (ngSubmit)="updateEpisode()"><ion-item><ion-input label="Title" labelPlacement="stacked" formControlName="title"></ion-input></ion-item><ion-item><ion-input label="Translation" labelPlacement="stacked" formControlName="translation"></ion-input></ion-item><ion-item><ion-textarea label="Description" labelPlacement="stacked" formControlName="description" autoGrow></ion-textarea></ion-item><ion-button class="outline" fill="outline" type="submit" [disabled]="detailsForm.invalid || store.isMutating()">Save episode details</ion-button></form></details>
         <section class="audio-step" [class.is-locked]="!transcriptReviewed() || !item.thumbnail"><span class="eyebrow">Step 4 · Audio</span>@if (item.audioUrl) { <audio controls preload="metadata" [src]="item.audioUrl"></audio> }<ion-button class="primary icon-action" expand="block" (click)="createAudio()" [disabled]="!transcriptReviewed() || !item.thumbnail || item.status === 'published' || store.audioGenerationStatus() === 'loading'"><ion-icon slot="start" name="mic-outline"></ion-icon>{{ store.audioGenerationStatus() === 'loading' ? 'Creating audio…' : item.audioUrl ? 'Create new audio version' : 'Create audio' }}</ion-button>@if (!transcriptReviewed()) { <small>Review and confirm the transcript to unlock audio.</small> } @else if (!item.thumbnail) { <small>Upload episode artwork to unlock audio.</small> }</section>
         <div class="management-actions">@if (item.status === 'ready_for_review') { <ion-button class="primary" [disabled]="store.isMutating()" (click)="publishEpisode()">Publish episode</ion-button> }<ion-button color="danger" fill="outline" [disabled]="store.isMutating()" (click)="deleteEpisode()"><ion-icon slot="start" name="trash-outline"></ion-icon>Delete episode</ion-button></div>
+        @if (item.status === 'published') {
+          <section class="vocabulary-publication" aria-labelledby="vocabulary-publication-title">
+            <div>
+              <span class="eyebrow">Platform collection</span>
+              <h3 id="vocabulary-publication-title">Essential vocabulary</h3>
+              <p>{{ item.essentialVocabularyCount }} {{ item.essentialVocabularyCount === 1 ? 'word' : 'words' }} marked essential.</p>
+            </div>
+            @if (item.platformCollection; as collection) {
+              <p class="publication-status"><ion-icon name="checkmark-circle-outline"></ion-icon>{{ collection.isPublished ? 'Published to platform collections' : 'Collection is currently unpublished' }}</p>
+              <ion-button fill="outline" expand="block" (click)="openPlatformCollections()"><ion-icon slot="start" name="library-outline"></ion-icon>Open collections</ion-button>
+            } @else {
+              <ion-button class="primary" expand="block" [disabled]="topic()?.status !== 'published' || item.essentialVocabularyCount === 0 || store.isMutating()" (click)="publishEpisodeVocabulary()"><ion-icon slot="start" name="library-outline"></ion-icon>Publish essential vocabulary</ion-button>
+              @if (topic()?.status !== 'published') { <small>Publish the podcast topic first.</small> }
+              @else if (item.essentialVocabularyCount === 0) { <small>This episode has no vocabulary marked essential.</small> }
+            }
+          </section>
+        }
       } @else { <p>This episode does not belong to the selected topic or no longer exists.</p> }
     </section>
   }

@@ -1142,6 +1142,31 @@
       "backHome": "العودة إلى الرئيسية"
     }
   },
+  "podcasts": {
+    "player": {
+      "backToTopic": "العودة إلى الموضوع",
+      "openLandscape": "فتح المشغل بالوضع الأفقي",
+      "returnPortrait": "العودة إلى الوضع العمودي",
+      "revealTranslation": "إظهار الترجمة",
+      "episodePosition": "موضع الحلقة",
+      "rewindTenSeconds": "إرجاع عشر ثوانٍ",
+      "forwardTenSeconds": "تقديم عشر ثوانٍ",
+      "play": "تشغيل",
+      "pause": "إيقاف مؤقت",
+      "playbackSpeed": "سرعة التشغيل {{speed}}. اضغط للتغيير.",
+      "repeatEpisode": "تكرار الحلقة",
+      "turnOffRepeat": "إيقاف التكرار",
+      "showSubtitles": "إظهار الترجمة النصية",
+      "hideSubtitles": "إخفاء الترجمة النصية",
+      "rotateDevice": "أدر جهازك للعرض الأفقي.",
+      "loadingConversation": "جارٍ تحميل المحادثة…",
+      "errors": {
+        "loadEpisode": "تعذر تحميل حلقة البودكاست هذه.",
+        "saveProgress": "تعذر حفظ تقدم الاستماع.",
+        "completionThreshold": "استمع إلى 70٪ على الأقل من الحلقة قبل إكمالها."
+      }
+    }
+  },
   "stories": {
     "library": {
       "pageTitle": "استوديو القصص",

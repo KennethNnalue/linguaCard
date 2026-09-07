@@ -1680,8 +1680,23 @@ export interface AdminPodcastEpisodeListItem {
   estimatedDurationMs: number;
   status: PodcastEpisodeStatus;
   thumbnail: PodcastThumbnail | null;
+  essentialVocabularyCount: number;
+  platformCollection: {
+    id: string;
+    isPublished: boolean;
+  } | null;
   createdAt: string;
   updatedAt: string;
+}
+
+export interface AdminPublishPodcastVocabularyResult {
+  collection: AdminPlatformCollectionListItem;
+  created: boolean;
+  essentialCount: number;
+  dictionaryReused: number;
+  dictionaryCreated: number;
+  audioReused: number;
+  audioGenerated: number;
 }
 
 export interface PodcastWordTiming {

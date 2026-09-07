@@ -17,6 +17,7 @@ import type {
   AdminPodcastTranscriptPromptResult,
   AdminUpdatePodcastTopicDto,
   PodcastThumbnail,
+  AdminPublishPodcastVocabularyResult,
 } from '@lingua-card/shared/domain';
 import { Observable } from 'rxjs';
 import { environment } from '../../../../../environments/environment';
@@ -169,6 +170,13 @@ export class AdminPodcastApiService {
   publishEpisode(episodeId: string): Observable<AdminPodcastEpisodeListItem> {
     return this.http.patch<AdminPodcastEpisodeListItem>(
       `${this.episodeUrl}/${episodeId}/publish`, {},
+    );
+  }
+
+  publishVocabularyCollection(episodeId: string): Observable<AdminPublishPodcastVocabularyResult> {
+    return this.http.post<AdminPublishPodcastVocabularyResult>(
+      `${this.episodeUrl}/${episodeId}/platform-collection`,
+      {},
     );
   }
 

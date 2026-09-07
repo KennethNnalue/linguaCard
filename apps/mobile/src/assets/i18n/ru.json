@@ -1142,6 +1142,31 @@
       "backHome": "На главную"
     }
   },
+  "podcasts": {
+    "player": {
+      "backToTopic": "Вернуться к теме",
+      "openLandscape": "Открыть альбомный плеер",
+      "returnPortrait": "Вернуться в портретный режим",
+      "revealTranslation": "Показать перевод",
+      "episodePosition": "Позиция в эпизоде",
+      "rewindTenSeconds": "Назад на десять секунд",
+      "forwardTenSeconds": "Вперёд на десять секунд",
+      "play": "Воспроизвести",
+      "pause": "Пауза",
+      "playbackSpeed": "Скорость воспроизведения {{speed}}. Нажмите, чтобы изменить.",
+      "repeatEpisode": "Повторять эпизод",
+      "turnOffRepeat": "Отключить повтор",
+      "showSubtitles": "Показать субтитры",
+      "hideSubtitles": "Скрыть субтитры",
+      "rotateDevice": "Поверните устройство для альбомного просмотра.",
+      "loadingConversation": "Загрузка диалога…",
+      "errors": {
+        "loadEpisode": "Не удалось загрузить этот эпизод подкаста.",
+        "saveProgress": "Не удалось сохранить прогресс прослушивания.",
+        "completionThreshold": "Прослушайте не менее 70 % эпизода, прежде чем завершить его."
+      }
+    }
+  },
   "stories": {
     "library": {
       "pageTitle": "Студия рассказов",

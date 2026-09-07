@@ -1142,6 +1142,31 @@
       "backHome": "На головну"
     }
   },
+  "podcasts": {
+    "player": {
+      "backToTopic": "Повернутися до теми",
+      "openLandscape": "Відкрити альбомний програвач",
+      "returnPortrait": "Повернутися до портретного режиму",
+      "revealTranslation": "Показати переклад",
+      "episodePosition": "Позиція в епізоді",
+      "rewindTenSeconds": "Назад на десять секунд",
+      "forwardTenSeconds": "Уперед на десять секунд",
+      "play": "Відтворити",
+      "pause": "Пауза",
+      "playbackSpeed": "Швидкість відтворення {{speed}}. Торкніться, щоб змінити.",
+      "repeatEpisode": "Повторювати епізод",
+      "turnOffRepeat": "Вимкнути повтор",
+      "showSubtitles": "Показати субтитри",
+      "hideSubtitles": "Сховати субтитри",
+      "rotateDevice": "Поверніть пристрій для альбомного перегляду.",
+      "loadingConversation": "Завантаження діалогу…",
+      "errors": {
+        "loadEpisode": "Не вдалося завантажити цей епізод подкасту.",
+        "saveProgress": "Не вдалося зберегти прогрес прослуховування.",
+        "completionThreshold": "Прослухайте щонайменше 70 % епізоду, перш ніж завершити його."
+      }
+    }
+  },
   "stories": {
     "library": {
       "pageTitle": "Студія історій",

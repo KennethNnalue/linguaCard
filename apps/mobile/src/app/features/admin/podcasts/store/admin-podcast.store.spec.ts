@@ -35,7 +35,8 @@ describe('AdminPodcastStore transcript completion', () => {
         id: 'episode', topicId: 'topic', externalId: 'episode', title: 'Draft', titleTranslation: '',
         description: '', level: 'A1', position: 0, audioDurationMs: 0, audioUrl: null, audioVersion: 0,
         generationError: null, generationRequestId: null, elevenLabsProjectId: null, hasTranscript: false,
-        estimatedDurationMs: 0, status: 'draft', thumbnail: null, createdAt: '', updatedAt: '',
+        estimatedDurationMs: 0, status: 'draft', thumbnail: null,
+        essentialVocabularyCount: 0, platformCollection: null, createdAt: '', updatedAt: '',
       }],
     };
     const api = {
@@ -45,6 +46,16 @@ describe('AdminPodcastStore transcript completion', () => {
       generateTranscript: jest.fn(() => of({ payload, preview })),
       commitTranscript: jest.fn(() => of(result)),
       deleteEpisode: jest.fn(() => of(undefined)),
+      publishVocabularyCollection: jest.fn(() => of({
+        collection: {
+          id: 'platform-collection', title: 'Podcast · Draft', emoji: '🎙️', coverImageUrl: null,
+          level: 'A1', topic: 'Topic', sourceLanguage: 'en', targetLanguage: 'de',
+          status: 'published', wordCount: 3, dictionaryLinked: 3, isPublished: true,
+          storyCategory: null, createdAt: '', updatedAt: '',
+        },
+        created: true, essentialCount: 3, dictionaryReused: 2, dictionaryCreated: 1,
+        audioReused: 3, audioGenerated: 0,
+      })),
     };
     TestBed.configureTestingModule({ providers: [AdminPodcastStore, { provide: AdminPodcastApiService, useValue: api }] });
     const store = TestBed.inject(AdminPodcastStore);
@@ -141,6 +152,20 @@ describe('AdminPodcastStore transcript completion', () => {
     expect(store.transcriptDetails()).toEqual({
       episodeId: 'episode', speakers: payload.speakers, turns: payload.turns,
     });
+  });
+
+  it('publishes essential vocabulary and updates the episode collection state', () => {
+    const { api, store } = setup();
+
+    store.publishEpisodeVocabulary('episode');
+
+    expect(api.publishVocabularyCollection).toHaveBeenCalledWith('episode');
+    expect(store.topics()[0].episodes[0]).toMatchObject({
+      essentialVocabularyCount: 3,
+      platformCollection: { id: 'platform-collection', isPublished: true },
+    });
+    expect(store.success()).toContain('2 dictionary entries reused and 1 created');
+    expect(store.mutationStatus()).toBe('success');
   });
 
   it.each(['new-episode', 'review'] as const)('returns to the updated topic after deleting from %s', view => {

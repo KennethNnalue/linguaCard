@@ -11,7 +11,8 @@ function createEpisode(status: AdminPodcastEpisodeListItem['status'] = 'queued')
     titleTranslation: '', description: '', level: 'A1', position: 0, audioDurationMs: 0,
     audioUrl: null, audioVersion: 0, generationError: null, generationRequestId: 'request-1',
     elevenLabsProjectId: null, hasTranscript: false, estimatedDurationMs: 0, status,
-    thumbnail: null, createdAt: '2026-09-04T00:00:00.000Z', updatedAt: '2026-09-04T00:00:00.000Z',
+    thumbnail: null, essentialVocabularyCount: 0, platformCollection: null,
+    createdAt: '2026-09-04T00:00:00.000Z', updatedAt: '2026-09-04T00:00:00.000Z',
   };
 }
 

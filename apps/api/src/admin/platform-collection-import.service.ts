@@ -252,6 +252,7 @@ export class PlatformCollectionImportService implements OnApplicationBootstrap {
           isPublished: false,
           status: 'draft',
           wordCount: resolvedItems.length,
+          sourcePodcastEpisodeId: null,
           storyCategory: null,
         },
         items: resolvedItems.map(item => ({

@@ -24,6 +24,7 @@ import {
   cloudUploadOutline,
   documentTextOutline,
   micOutline,
+  libraryOutline,
   pencilOutline,
   refreshOutline,
   sparklesOutline,
@@ -111,6 +112,7 @@ export class AdminPodcastTopicsPage implements OnInit {
       cloudUploadOutline,
       documentTextOutline,
       micOutline,
+      libraryOutline,
       pencilOutline,
       refreshOutline,
       sparklesOutline,
@@ -317,6 +319,15 @@ export class AdminPodcastTopicsPage implements OnInit {
   publishEpisode(): void {
     const episode = this.episode();
     if (episode) this.store.publishEpisode(episode.id);
+  }
+
+  publishEpisodeVocabulary(): void {
+    const episode = this.episode();
+    if (episode) this.store.publishEpisodeVocabulary(episode.id);
+  }
+
+  openPlatformCollections(): void {
+    void this.router.navigate(['/admin/import']);
   }
 
   publishTopic(): void {

@@ -1142,6 +1142,31 @@
       "backHome": "Volver al inicio"
     }
   },
+  "podcasts": {
+    "player": {
+      "backToTopic": "Volver al tema",
+      "openLandscape": "Abrir reproductor horizontal",
+      "returnPortrait": "Volver al reproductor vertical",
+      "revealTranslation": "Mostrar traducción",
+      "episodePosition": "Posición del episodio",
+      "rewindTenSeconds": "Retroceder diez segundos",
+      "forwardTenSeconds": "Avanzar diez segundos",
+      "play": "Reproducir",
+      "pause": "Pausar",
+      "playbackSpeed": "Velocidad de reproducción {{speed}}. Toca para cambiar.",
+      "repeatEpisode": "Repetir episodio",
+      "turnOffRepeat": "Desactivar repetición",
+      "showSubtitles": "Mostrar subtítulos",
+      "hideSubtitles": "Ocultar subtítulos",
+      "rotateDevice": "Gira el dispositivo para usar la vista horizontal.",
+      "loadingConversation": "Cargando conversación…",
+      "errors": {
+        "loadEpisode": "No se pudo cargar este episodio del podcast.",
+        "saveProgress": "No se pudo guardar el progreso de escucha.",
+        "completionThreshold": "Escucha al menos el 70 % del episodio antes de completarlo."
+      }
+    }
+  },
   "stories": {
     "library": {
       "pageTitle": "Story Studio",

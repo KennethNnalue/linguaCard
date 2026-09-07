@@ -1,5 +1,6 @@
 import {
-  ChangeDetectionStrategy, Component, DestroyRef, ElementRef, inject, OnInit, viewChild,
+  ChangeDetectionStrategy, Component, computed, DestroyRef, ElementRef, inject, OnInit, signal,
+  viewChild,
 } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import {
@@ -7,14 +8,33 @@ import {
 } from '@ionic/angular/standalone';
 import type { ViewWillLeave } from '@ionic/angular';
 import { addIcons } from 'ionicons';
+import { TranslatePipe } from '@ngx-translate/core';
 import {
   arrowBackOutline, arrowRedoOutline, arrowUndoOutline, eyeOffOutline, eyeOutline,
-  pause, play, repeatOutline, speedometerOutline,
+  contractOutline, expandOutline, pause, play, repeatOutline, speedometerOutline,
 } from 'ionicons/icons';
-import { PodcastPlayerStore } from '../../store/podcast-player.store';
+import {
+  type PodcastPlayerError, PodcastPlayerStore,
+} from '../../store/podcast-player.store';
 import { OfflineImageDirective } from '../../../../shared/image/offline-image.directive';
+import { PodcastImmersiveModeService } from '../../services/podcast-immersive-mode.service';
 
 const PODCAST_PLAYBACK_SPEEDS = [0.75, 1, 1.25, 1.5] as const;
+export const PODCAST_CHROME_AUTO_HIDE_MS = 3000;
+export type PodcastPlayerErrorMessageKey =
+  | 'podcasts.player.errors.loadEpisode'
+  | 'podcasts.player.errors.saveProgress'
+  | 'podcasts.player.errors.completionThreshold';
+
+export function podcastPlayerErrorMessageKey(
+  error: PodcastPlayerError,
+): PodcastPlayerErrorMessageKey {
+  switch (error) {
+    case 'load-episode': return 'podcasts.player.errors.loadEpisode';
+    case 'save-progress': return 'podcasts.player.errors.saveProgress';
+    case 'completion-threshold': return 'podcasts.player.errors.completionThreshold';
+  }
+}
 
 export function nextPodcastPlaybackSpeed(currentSpeed: number): number {
   const currentIndex = PODCAST_PLAYBACK_SPEEDS.findIndex(speed => speed === currentSpeed);
@@ -24,25 +44,36 @@ export function nextPodcastPlaybackSpeed(currentSpeed: number): number {
 @Component({
   selector: 'lc-podcast-player', standalone: true,
   imports: [
-    IonButton, IonContent, IonIcon, IonRange, IonSpinner, OfflineImageDirective,
+    IonButton, IonContent, IonIcon, IonRange, IonSpinner, OfflineImageDirective, TranslatePipe,
   ],
-  providers: [PodcastPlayerStore], templateUrl: './podcast-player.page.html',
+  providers: [PodcastPlayerStore, PodcastImmersiveModeService], templateUrl: './podcast-player.page.html',
   styleUrl: './podcast-player.page.scss', changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class PodcastPlayerPage implements OnInit, ViewWillLeave {
   readonly store = inject(PodcastPlayerStore);
+  readonly immersiveMode = inject(PodcastImmersiveModeService);
+  readonly chromeVisible = signal(true);
+  readonly isChromeVisible = computed(
+    () => !this.immersiveMode.isLandscape() || this.chromeVisible(),
+  );
+  readonly errorMessageKey = podcastPlayerErrorMessageKey;
   private readonly route = inject(ActivatedRoute);
   private readonly router = inject(Router);
   private readonly destroyRef = inject(DestroyRef);
+  private readonly playerHost = viewChild<ElementRef<HTMLElement>>('playerHost');
   private readonly audio = viewChild<ElementRef<HTMLAudioElement>>('audioPlayer');
   private autoplayNext = false;
+  private chromeAutoHideTimer: ReturnType<typeof setTimeout> | null = null;
 
   constructor() {
     addIcons({
       arrowBackOutline, arrowRedoOutline, arrowUndoOutline, eyeOffOutline, eyeOutline,
-      pause, play, repeatOutline, speedometerOutline,
+      contractOutline, expandOutline, pause, play, repeatOutline, speedometerOutline,
     });
-    this.destroyRef.onDestroy(() => this.stopAudioPlayback());
+    this.destroyRef.onDestroy(() => {
+      this.clearChromeAutoHide();
+      this.stopAudioPlayback();
+    });
   }
 
   ngOnInit(): void {
@@ -57,9 +88,63 @@ export class PodcastPlayerPage implements OnInit, ViewWillLeave {
   }
 
   ionViewWillLeave(): void {
+    this.clearChromeAutoHide();
     this.stopAudioPlayback();
+    void this.immersiveMode.restorePortrait();
   }
-  goBack(topicId: string): void { void this.router.navigate(['/podcasts/topics', topicId]); }
+  async goBack(topicId: string): Promise<void> {
+    this.clearChromeAutoHide();
+    await this.immersiveMode.restorePortrait();
+    this.clearChromeAutoHide();
+    this.chromeVisible.set(true);
+    await this.router.navigate(['/podcasts/topics', topicId]);
+  }
+  async enterImmersiveMode(): Promise<void> {
+    const playerHost = this.playerHost()?.nativeElement;
+    if (!playerHost) return;
+
+    this.clearChromeAutoHide();
+    await this.immersiveMode.enter(playerHost);
+    this.chromeVisible.set(!this.immersiveMode.isImmersive());
+  }
+  async exitImmersiveMode(): Promise<void> {
+    this.clearChromeAutoHide();
+    await this.immersiveMode.exit();
+    this.clearChromeAutoHide();
+    this.chromeVisible.set(true);
+  }
+  playerSurfaceTapped(event: MouseEvent): void {
+    if (!this.immersiveMode.isLandscape()) return;
+    if (this.isInteractiveTarget(event.target)) return;
+
+    if (!this.chromeVisible()) {
+      this.chromeVisible.set(true);
+      this.scheduleChromeAutoHide();
+      return;
+    }
+
+    if (this.store.isPlaying()) {
+      this.chromeVisible.set(false);
+      this.clearChromeAutoHide();
+    }
+  }
+  chromeInteracted(event: Event): void {
+    event.stopPropagation();
+    this.chromeVisible.set(true);
+    this.scheduleChromeAutoHide();
+  }
+  chromeFocused(): void {
+    this.chromeVisible.set(true);
+    this.clearChromeAutoHide();
+  }
+  chromeFocusLeft(event: FocusEvent): void {
+    if (
+      event.currentTarget instanceof HTMLElement
+      && event.relatedTarget instanceof Node
+      && event.currentTarget.contains(event.relatedTarget)
+    ) return;
+    this.scheduleChromeAutoHide();
+  }
   togglePlayback(): void {
     const audio = this.audio()?.nativeElement;
     if (!audio) return;
@@ -89,11 +174,21 @@ export class PodcastPlayerPage implements OnInit, ViewWillLeave {
   }
   started(): void {
     this.store.playbackStateChanged(true);
+    this.scheduleChromeAutoHide();
   }
   paused(event: Event): void {
     this.store.playbackStateChanged(false);
+    this.clearChromeAutoHide();
+    if (this.immersiveMode.isImmersive() || this.immersiveMode.isLandscape()) {
+      this.chromeVisible.set(true);
+    }
     if (event.target instanceof HTMLAudioElement && event.target.ended) return;
     this.store.persistProgress(false);
+  }
+  playbackFailed(): void {
+    this.store.playbackStateChanged(false);
+    this.clearChromeAutoHide();
+    this.chromeVisible.set(true);
   }
   async completed(): Promise<void> {
     const currentEpisodeId = this.store.episode()?.id;
@@ -152,6 +247,28 @@ export class PodcastPlayerPage implements OnInit, ViewWillLeave {
     const audio = this.audio()?.nativeElement;
     if (!audio || audio.paused) return;
     audio.pause();
+  }
+
+  private scheduleChromeAutoHide(): void {
+    this.clearChromeAutoHide();
+    if (!this.chromeVisible() || !this.store.isPlaying()) return;
+    if (!this.immersiveMode.isLandscape()) return;
+
+    this.chromeAutoHideTimer = setTimeout(() => {
+      this.chromeVisible.set(false);
+      this.chromeAutoHideTimer = null;
+    }, PODCAST_CHROME_AUTO_HIDE_MS);
+  }
+
+  private clearChromeAutoHide(): void {
+    if (this.chromeAutoHideTimer === null) return;
+    clearTimeout(this.chromeAutoHideTimer);
+    this.chromeAutoHideTimer = null;
+  }
+
+  private isInteractiveTarget(target: EventTarget | null): boolean {
+    if (!(target instanceof Element)) return false;
+    return target.closest('ion-button, ion-range, button, a, [role="button"]') !== null;
   }
 
   private playbackQueryParams(): Record<string, string> {

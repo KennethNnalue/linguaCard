@@ -12,3 +12,23 @@
 .artwork{display:block;width:100%;max-height:360px;object-fit:cover;margin:0 0 18px;border-radius:22px;aspect-ratio:16/9}.audio-step{display:grid;gap:14px;margin-top:38px;padding-top:30px;border-top:2px solid var(--line)}.audio-step.is-locked{opacity:.62}.audio-step small{color:var(--muted);font-size:17px}.management-actions{display:grid;gap:16px;margin-top:38px;padding-top:30px;border-top:2px solid var(--line)}.management-actions ion-button{min-height:64px;text-transform:none}audio{width:100%;margin:24px 0}.transcript-confirm{margin-top:28px}
 .transcript-state{display:grid;gap:22px;margin:30px 0;padding:26px;border:2px solid var(--line);border-radius:24px;background:var(--panel)}.transcript-state-heading{display:flex;align-items:center;gap:16px}.transcript-state-heading ion-icon{flex:0 0 auto;color:var(--mint);font-size:32px}.transcript-state-heading div{display:grid;gap:7px}.transcript-state-heading strong{font-size:22px}.transcript-state-heading small{color:var(--muted);font-size:16px}.inline-transcript{display:grid;gap:12px;max-height:420px;overflow:auto;padding-right:4px}.inline-transcript article{padding:18px;border-radius:16px;background:var(--bg)}.inline-transcript article>strong{color:var(--mint);font-size:16px}.inline-transcript p{margin:8px 0;font-size:19px;line-height:1.4}.inline-transcript article>small{color:var(--muted);font-size:15px}.transcript-controls{margin-top:24px}.review-transcript{margin-top:38px}
 @media(max-width:760px){.studio-shell{border-radius:0}.studio-header{grid-template-columns:58px 1fr 58px;min-height:105px;padding:18px 20px}.studio-header>div{min-width:0}.header-action{width:52px;height:52px;font-size:22px}.header-action ion-icon{font-size:24px}.studio-header span,.eyebrow{font-size:13px}.studio-header h1{font-size:32px}.studio-content{padding:34px 20px 54px}h2{font-size:38px}.lead{font-size:18px}.primary,.outline{min-height:64px;--border-radius:15px;font-size:17px}.studio-form{grid-template-columns:1fr;gap:24px}.studio-form .full{grid-column:auto}.topic-list{margin-top:40px}.topic-list article{grid-template-columns:72px 1fr 76px;gap:14px}.topic-icon{width:72px;height:72px}.topic-list h3{font-size:22px}.topic-list p{font-size:15px}.outline.small{min-height:54px}.summary-card div{font-size:16px}.section-heading h3{font-size:22px}.transcript-sheet{padding:28px 20px 44px}}
+.vocabulary-publication {
+  display: grid;
+  gap: 0.75rem;
+  margin-top: 1.5rem;
+  padding: 1rem;
+  border: 1px solid var(--ion-color-step-200, #d7d8da);
+  border-radius: 1rem;
+
+  h3,
+  p {
+    margin: 0.25rem 0 0;
+  }
+}
+
+.publication-status {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: var(--ion-color-success);
+}

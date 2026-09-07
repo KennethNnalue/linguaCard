@@ -20,6 +20,7 @@ let package = Package(
         .package(name: "CapacitorKeyboard", path: "../../../node_modules/.pnpm/@capacitor+keyboard@8.0.3_@capacitor+core@8.3.1/node_modules/@capacitor/keyboard"),
         .package(name: "CapacitorNetwork", path: "../../../node_modules/.pnpm/@capacitor+network@8.0.1_@capacitor+core@8.3.1/node_modules/@capacitor/network"),
         .package(name: "CapacitorPreferences", path: "../../../node_modules/.pnpm/@capacitor+preferences@8.0.1_@capacitor+core@8.3.1/node_modules/@capacitor/preferences"),
+        .package(name: "CapacitorScreenOrientation", path: "../../../node_modules/.pnpm/@capacitor+screen-orientation@8.0.1_@capacitor+core@8.3.1/node_modules/@capacitor/screen-orientation"),
         .package(name: "CapacitorStatusBar", path: "../../../node_modules/.pnpm/@capacitor+status-bar@8.0.2_@capacitor+core@8.3.1/node_modules/@capacitor/status-bar")
     ],
     targets: [
@@ -36,6 +37,7 @@ let package = Package(
                 .product(name: "CapacitorKeyboard", package: "CapacitorKeyboard"),
                 .product(name: "CapacitorNetwork", package: "CapacitorNetwork"),
                 .product(name: "CapacitorPreferences", package: "CapacitorPreferences"),
+                .product(name: "CapacitorScreenOrientation", package: "CapacitorScreenOrientation"),
                 .product(name: "CapacitorStatusBar", package: "CapacitorStatusBar")
             ]
         )

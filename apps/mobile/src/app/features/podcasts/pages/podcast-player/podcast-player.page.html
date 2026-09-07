@@ -1,17 +1,35 @@
-<ion-content [scrollY]="false">
-  <main class="player">
+<ion-content [fullscreen]="true" [scrollY]="false">
+  <main #playerHost class="player"
+    [class.player--landscape]="immersiveMode.isLandscape()"
+    [class.player--immersive]="immersiveMode.isImmersive()"
+    [class.player--chrome-visible]="isChromeVisible()"
+    (click)="playerSurfaceTapped($event)">
     @if (store.episode(); as episode) {
       <img class="scene" [lcOfflineSrc]="episode.thumbnail.heroUrl" [alt]="episode.thumbnail.accessibilityDescription"
         [style.object-position]="(episode.thumbnail.focalPoint.x * 100) + '% ' + (episode.thumbnail.focalPoint.y * 100) + '%'"
         />
-      <div class="shade"></div>
+      <div class="transcript-shade" aria-hidden="true"></div>
+      <div class="chrome-shade" aria-hidden="true"></div>
 
-      <header>
-        <ion-button fill="clear" shape="round" (click)="goBack(episode.topicId)" aria-label="Back to topic">
+      <header class="top-chrome"
+        [attr.aria-hidden]="!isChromeVisible() ? 'true' : null"
+        [attr.inert]="!isChromeVisible() ? '' : null"
+        (click)="chromeInteracted($event)" (focusin)="chromeFocused()" (focusout)="chromeFocusLeft($event)">
+        <ion-button fill="clear" shape="round" (click)="goBack(episode.topicId)" [attr.aria-label]="'podcasts.player.backToTopic' | translate">
           <ion-icon slot="icon-only" name="arrow-back-outline" />
         </ion-button>
         <div><small>{{episode.topicTitle}}</small><strong>{{episode.title}}</strong></div>
-        <span class="header-spacer" aria-hidden="true"></span>
+        @if (immersiveMode.isImmersive() || immersiveMode.isLandscape()) {
+          <ion-button fill="clear" shape="round" (click)="exitImmersiveMode()"
+            [disabled]="immersiveMode.isTransitioning()" [attr.aria-label]="'podcasts.player.returnPortrait' | translate">
+            <ion-icon slot="icon-only" name="contract-outline" />
+          </ion-button>
+        } @else {
+          <ion-button fill="clear" shape="round" (click)="enterImmersiveMode()"
+            [disabled]="immersiveMode.isTransitioning()" [attr.aria-label]="'podcasts.player.openLandscape' | translate">
+            <ion-icon slot="icon-only" name="expand-outline" />
+          </ion-button>
+        }
       </header>
 
       @if (store.currentTurn(); as turn) {
@@ -27,25 +45,28 @@
           @if(store.showTranslation()) {
             <p class="translation">{{turn.translation}}</p>
           } @else if(store.translationMode()==='reveal') {
-            <ion-button fill="clear" size="small" (click)="store.revealTranslation()">Reveal translation</ion-button>
+            <ion-button fill="clear" size="small" (click)="$event.stopPropagation(); store.revealTranslation()">{{'podcasts.player.revealTranslation' | translate}}</ion-button>
           }
         </section>
       }
 
-      <section class="controls">
+      <section class="controls"
+        [attr.aria-hidden]="!isChromeVisible() ? 'true' : null"
+        [attr.inert]="!isChromeVisible() ? '' : null"
+        (click)="chromeInteracted($event)" (focusin)="chromeFocused()" (focusout)="chromeFocusLeft($event)">
         <ion-range min="0" [max]="episode.audioDurationMs" [value]="store.currentTimeMs()"
-          (ionKnobMoveEnd)="seek($event.detail.value)" aria-label="Episode position" />
+          (ionKnobMoveEnd)="seek($event.detail.value)" [attr.aria-label]="'podcasts.player.episodePosition' | translate" />
         <div class="times"><span>{{time(store.currentTimeMs())}}</span><span>-{{time(episode.audioDurationMs-store.currentTimeMs())}}</span></div>
 
         <div class="transport">
-          <ion-button class="seek" fill="clear" shape="round" (click)="rewind()" aria-label="Rewind ten seconds">
+          <ion-button class="seek" fill="clear" shape="round" (click)="rewind()" [attr.aria-label]="'podcasts.player.rewindTenSeconds' | translate">
             <ion-icon name="arrow-undo-outline" />
             <span aria-hidden="true">10s</span>
           </ion-button>
-          <ion-button class="play" shape="round" (click)="togglePlayback()" [attr.aria-label]="store.isPlaying() ? 'Pause' : 'Play'">
+          <ion-button class="play" shape="round" (click)="togglePlayback()" [attr.aria-label]="(store.isPlaying() ? 'podcasts.player.pause' : 'podcasts.player.play') | translate">
             <ion-icon slot="icon-only" [name]="store.isPlaying() ? 'pause' : 'play'" />
           </ion-button>
-          <ion-button class="seek" fill="clear" shape="round" (click)="forward()" aria-label="Forward ten seconds">
+          <ion-button class="seek" fill="clear" shape="round" (click)="forward()" [attr.aria-label]="'podcasts.player.forwardTenSeconds' | translate">
             <ion-icon name="arrow-redo-outline" />
             <span aria-hidden="true">10s</span>
           </ion-button>
@@ -53,31 +74,35 @@
 
         <div class="secondary-controls">
           <ion-button class="speed" fill="clear" shape="round" (click)="changeSpeed()"
-            [attr.aria-label]="'Playback speed ' + store.speed() + ' times. Tap to change.'">
+            [attr.aria-label]="'podcasts.player.playbackSpeed' | translate:{ speed: store.speed() }">
             <ion-icon name="speedometer-outline" />
             <span aria-hidden="true">{{ store.speed() }}×</span>
           </ion-button>
           <ion-button fill="clear" shape="round" (click)="toggleRepeat()"
             [class.active]="store.repeatMode() !== 'off'"
             [attr.aria-pressed]="store.repeatMode() !== 'off'"
-            [attr.aria-label]="store.repeatMode() === 'off' ? 'Repeat episode' : 'Turn off repeat'">
+            [attr.aria-label]="(store.repeatMode() === 'off' ? 'podcasts.player.repeatEpisode' : 'podcasts.player.turnOffRepeat') | translate">
             <ion-icon slot="icon-only" name="repeat-outline" />
           </ion-button>
           <ion-button fill="clear" shape="round" (click)="toggleSubtitles()"
             [class.active]="store.translationMode() !== 'target'"
             [attr.aria-pressed]="store.translationMode() !== 'target'"
-            [attr.aria-label]="store.translationMode() === 'target' ? 'Show subtitles' : 'Hide subtitles'">
+            [attr.aria-label]="(store.translationMode() === 'target' ? 'podcasts.player.showSubtitles' : 'podcasts.player.hideSubtitles') | translate">
             <ion-icon slot="icon-only" [name]="store.translationMode() === 'target' ? 'eye-outline' : 'eye-off-outline'" />
           </ion-button>
         </div>
       </section>
-      @if(store.progressError()) { <p class="progress-error" role="alert">{{store.progressError()}}</p> }
+      @if (immersiveMode.failureReason() && !immersiveMode.isLandscape()) {
+        <p class="immersive-status" role="status">{{'podcasts.player.rotateDevice' | translate}}</p>
+      }
+      @if(store.progressError(); as progressError) { <p class="progress-error" role="alert">{{errorMessageKey(progressError) | translate}}</p> }
       <audio #audioPlayer preload="auto" [src]="episode.audioUrl" (loadedmetadata)="prepareAudio($event)" (canplay)="readyToPlay()"
-        (timeupdate)="timeChanged($event)" (play)="started()" (pause)="paused($event)" (ended)="completed()"></audio>
+        (timeupdate)="timeChanged($event)" (play)="started()" (pause)="paused($event)" (ended)="completed()"
+        (error)="playbackFailed()"></audio>
     } @else if(store.status()==='loading') {
-      <p class="state"><ion-spinner name="crescent" /> Loading conversation…</p>
+      <p class="state"><ion-spinner name="crescent" /> {{'podcasts.player.loadingConversation' | translate}}</p>
     } @else {
-      <p class="state">{{store.error()}}</p>
+      @if (store.error(); as error) { <p class="state">{{errorMessageKey(error) | translate}}</p> }
     }
   </main>
 </ion-content>

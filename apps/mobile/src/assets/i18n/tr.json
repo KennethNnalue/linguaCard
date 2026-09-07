@@ -1142,6 +1142,31 @@
       "backHome": "Ana sayfaya dön"
     }
   },
+  "podcasts": {
+    "player": {
+      "backToTopic": "Konuya dön",
+      "openLandscape": "Yatay oynatıcıyı aç",
+      "returnPortrait": "Dikey oynatıcıya dön",
+      "revealTranslation": "Çeviriyi göster",
+      "episodePosition": "Bölüm konumu",
+      "rewindTenSeconds": "On saniye geri sar",
+      "forwardTenSeconds": "On saniye ileri sar",
+      "play": "Oynat",
+      "pause": "Duraklat",
+      "playbackSpeed": "Oynatma hızı {{speed}}. Değiştirmek için dokunun.",
+      "repeatEpisode": "Bölümü tekrarla",
+      "turnOffRepeat": "Tekrarı kapat",
+      "showSubtitles": "Altyazıları göster",
+      "hideSubtitles": "Altyazıları gizle",
+      "rotateDevice": "Yatay görünüm için cihazınızı döndürün.",
+      "loadingConversation": "Konuşma yükleniyor…",
+      "errors": {
+        "loadEpisode": "Bu podcast bölümü yüklenemedi.",
+        "saveProgress": "Dinleme ilerlemesi kaydedilemedi.",
+        "completionThreshold": "Bölümü tamamlamadan önce en az %70'ini dinleyin."
+      }
+    }
+  },
   "stories": {
     "library": {
       "pageTitle": "Hikaye Stüdyosu",

@@ -1220,6 +1220,31 @@
       "strugglingDesc": "Mastery 0–2, needs practice"
     }
   },
+  "podcasts": {
+    "player": {
+      "backToTopic": "Back to topic",
+      "openLandscape": "Open landscape player",
+      "returnPortrait": "Return to portrait player",
+      "revealTranslation": "Reveal translation",
+      "episodePosition": "Episode position",
+      "rewindTenSeconds": "Rewind ten seconds",
+      "forwardTenSeconds": "Forward ten seconds",
+      "play": "Play",
+      "pause": "Pause",
+      "playbackSpeed": "Playback speed {{speed}} times. Tap to change.",
+      "repeatEpisode": "Repeat episode",
+      "turnOffRepeat": "Turn off repeat",
+      "showSubtitles": "Show subtitles",
+      "hideSubtitles": "Hide subtitles",
+      "rotateDevice": "Rotate your device for landscape view.",
+      "loadingConversation": "Loading conversation…",
+      "errors": {
+        "loadEpisode": "Could not load this podcast episode.",
+        "saveProgress": "Listening progress could not be saved.",
+        "completionThreshold": "Listen to at least 70% of the episode before completing it."
+      }
+    }
+  },
   "stories": {
     "library": {
       "pageTitle": "Story Studio",

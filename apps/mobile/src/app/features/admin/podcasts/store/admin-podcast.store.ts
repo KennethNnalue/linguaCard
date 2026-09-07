@@ -610,6 +610,42 @@ export const AdminPodcastStore = signalStore(
         }),
       ),
     ),
+    publishEpisodeVocabulary: rxMethod<string>(
+      pipe(
+        exhaustMap(episodeId => {
+          patchState(store, { mutationStatus: 'loading', error: null, success: null });
+          return api.publishVocabularyCollection(episodeId).pipe(
+            tap(result => patchState(store, {
+              topics: store.topics().map(topic => ({
+                ...topic,
+                episodes: topic.episodes.map(episode => episode.id === episodeId
+                  ? {
+                    ...episode,
+                    essentialVocabularyCount: result.essentialCount,
+                    platformCollection: {
+                      id: result.collection.id,
+                      isPublished: result.collection.isPublished,
+                    },
+                  }
+                  : episode),
+              })),
+              mutationStatus: 'success',
+              success: `Published ${result.essentialCount} essential words; ${result.dictionaryReused} dictionary entries reused and ${result.dictionaryCreated} created.`,
+            })),
+            catchError(error => {
+              patchState(store, {
+                mutationStatus: 'error',
+                error: adminPodcastErrorMessage(
+                  error,
+                  'Could not publish the essential vocabulary collection.',
+                ),
+              });
+              return EMPTY;
+            }),
+          );
+        }),
+      ),
+    ),
     publishTopic: rxMethod<string>(
       pipe(
         exhaustMap(topicId => {
