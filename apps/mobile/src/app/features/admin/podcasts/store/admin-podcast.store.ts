@@ -100,6 +100,7 @@ export interface PreviewTranscriptCommand {
 export interface GenerateTranscriptCommand {
   episodeId: string;
   vocabulary: string[];
+  direction?: string;
 }
 
 function pollEpisodeGeneration(
@@ -481,7 +482,7 @@ export const AdminPodcastStore = signalStore(
             transcriptPreview: null, transcriptDetails: null, transcriptStatus: 'loading', completedTranscriptEpisodeId: null, error: null, success: null,
             transcriptRevision: store.transcriptRevision() + 1,
           });
-          return api.generateTranscript(command.episodeId, command.vocabulary).pipe(
+          return api.generateTranscript(command.episodeId, command.vocabulary, command.direction).pipe(
             exhaustMap(generated => saveTranscript(
               command.episodeId, generated.payload, generated.preview,
               'Transcript generated successfully.',

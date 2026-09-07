@@ -52,7 +52,18 @@ export class PodcastTranscriptGenerationService {
     if (!episode) throw new NotFoundException(`Podcast episode ${episodeId} not found`);
     const topic = await this.dataSource.getRepository(PodcastTopicEntity).findOneBy({ id: episode.topicId });
     if (!topic) throw new NotFoundException(`Podcast topic ${episode.topicId} not found`);
-    return this.buildPrompt(topic, vocabulary, direction);
+    const requiredVocabulary = vocabulary.length
+      ? [...vocabulary]
+      : episode.generationInput?.vocabulary ?? [];
+    const creativeDirection = direction?.trim() || episode.generationInput?.direction;
+    if (vocabulary.length || direction?.trim()) {
+      episode.generationInput = {
+        vocabulary: requiredVocabulary,
+        ...(creativeDirection ? { direction: creativeDirection } : {}),
+      };
+      await this.dataSource.getRepository(PodcastEpisodeEntity).save(episode);
+    }
+    return this.buildPrompt(topic, requiredVocabulary, creativeDirection);
   }
 
   private async parsePayload(response: string): Promise<AdminPodcastTranscriptPayload> {

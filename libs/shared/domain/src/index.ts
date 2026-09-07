@@ -1998,7 +1998,8 @@ export interface AdminPodcastTranscriptDetails {
 
 export interface AdminPodcastTranscriptConflict {
   code: 'duplicate-key' | 'unknown-reference' | 'unresolved-vocabulary'
-    | 'ambiguous-vocabulary' | 'translation-mismatch' | 'duration-limit' | 'provider-limit';
+    | 'ambiguous-vocabulary' | 'missing-vocabulary' | 'unreferenced-vocabulary' | 'translation-mismatch'
+    | 'duration-limit' | 'provider-limit';
   pointer: string;
   severity: 'error';
   message: string;

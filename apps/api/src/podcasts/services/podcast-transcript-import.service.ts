@@ -2,7 +2,7 @@ import { ConflictException, Injectable, NotFoundException } from '@nestjs/common
 import { createHash, randomUUID } from 'node:crypto';
 import type {
   AdminCommitPodcastTranscriptResult, AdminPodcastTranscriptConflict,
-  AdminPodcastTranscriptPreview, AdminPodcastVocabularyResolution,
+  AdminPodcastTranscriptPreview, AdminPodcastVocabularyResolution, LanguageCode,
 } from '@lingua-card/shared/domain';
 import { DataSource, In } from 'typeorm';
 import { LexemeIdentityService } from '../../vocabulary/domain/lexeme-identity.service';
@@ -15,6 +15,7 @@ import { PodcastSpeakerEntity } from '../entities/podcast-speaker.entity';
 import { PodcastTopicEntity } from '../entities/podcast-topic.entity';
 import { PodcastTurnEntity } from '../entities/podcast-turn.entity';
 import { normalizeTranscriptVocabularyReferences } from '../domain/normalize-transcript-vocabulary-references';
+import { normalizePodcastVocabulary } from '../domain/podcast-transcript-prompt';
 import { StorageService } from '../../storage/storage.service';
 import { LegacyVocabularyProjectionService } from '../../vocabulary/services/legacy-vocabulary-projection.service';
 
@@ -131,6 +132,7 @@ export class PodcastTranscriptImportService {
 
     const conflicts: AdminPodcastTranscriptConflict[] = [];
     this.validateReferences(payload, conflicts);
+    this.validateRequiredVocabulary(episode, topic.targetLanguage, payload, conflicts);
     const identities = payload.vocabulary.map(item => this.lexemeIdentity.createIdentity({
       language: topic.targetLanguage, text: item.text,
     }));
@@ -218,6 +220,7 @@ export class PodcastTranscriptImportService {
       if (vocabularyKeys.has(item.key)) conflicts.push(this.duplicate(`/vocabulary/${index}/key`, item.key));
       vocabularyKeys.add(item.key);
     }
+    const referencedVocabularyKeys = new Set<string>();
     for (let index = 0; index < payload.turns.length; index += 1) {
       const turn = payload.turns[index];
       if (!speakerKeys.has(turn.speakerKey)) conflicts.push({
@@ -226,12 +229,50 @@ export class PodcastTranscriptImportService {
       });
       for (let refIndex = 0; refIndex < turn.vocabularyRefs.length; refIndex += 1) {
         const key = turn.vocabularyRefs[refIndex];
+        referencedVocabularyKeys.add(key);
         if (!vocabularyKeys.has(key)) conflicts.push({
           code: 'unknown-reference', pointer: `/turns/${index}/vocabularyRefs/${refIndex}`, severity: 'error',
           message: `Unknown vocabulary key “${key}”.`, remediation: 'Declare the word in vocabulary or remove the reference.',
         });
       }
     }
+    const unreferenced = [...vocabularyKeys].filter(key => !referencedVocabularyKeys.has(key));
+    if (unreferenced.length) conflicts.push({
+      code: 'unreferenced-vocabulary', pointer: '/turns', severity: 'error',
+      message: `The dialogue does not reference ${unreferenced.length} vocabulary ${unreferenced.length === 1 ? 'item' : 'items'}: ${unreferenced.join(', ')}.`,
+      remediation: 'Use every vocabulary item naturally and add its key to at least one turn vocabularyRefs array.',
+    });
+  }
+
+  private validateRequiredVocabulary(
+    episode: PodcastEpisodeEntity,
+    language: LanguageCode,
+    payload: PodcastTranscriptPayloadDto,
+    conflicts: AdminPodcastTranscriptConflict[],
+  ): void {
+    const requiredVocabulary = normalizePodcastVocabulary(
+      episode.generationInput?.vocabulary ?? [],
+    );
+    if (!requiredVocabulary.length) return;
+
+    const includedLemmas = new Set(payload.vocabulary.map(item =>
+      this.lexemeIdentity.createIdentity({ language, text: item.text }).normalizedLemma,
+    ));
+    const missing = requiredVocabulary.filter(item => {
+      const text = item.split('=', 1)[0].trim();
+      return !includedLemmas.has(
+        this.lexemeIdentity.createIdentity({ language, text }).normalizedLemma,
+      );
+    });
+    if (!missing.length) return;
+
+    conflicts.push({
+      code: 'missing-vocabulary',
+      pointer: '/vocabulary',
+      severity: 'error',
+      message: `The transcript omitted ${missing.length} required vocabulary ${missing.length === 1 ? 'item' : 'items'}: ${missing.join(', ')}.`,
+      remediation: 'Regenerate or edit the JSON so every required headword appears in vocabulary and is referenced by at least one turn.',
+    });
   }
 
   private duplicate(pointer: string, key: string): AdminPodcastTranscriptConflict {

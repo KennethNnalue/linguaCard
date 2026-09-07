@@ -6,8 +6,10 @@ import { AdminPodcastApiService } from '../data-access/admin-podcast-api.service
 export class PodcastTranscriptClipboardService {
   private readonly api = inject(AdminPodcastApiService);
 
-  async copy(episodeId: string, vocabulary: string[]): Promise<void> {
-    const result = await firstValueFrom(this.api.createTranscriptPrompt(episodeId, vocabulary));
+  async copy(episodeId: string, vocabulary: string[], direction?: string): Promise<void> {
+    const result = await firstValueFrom(
+      this.api.createTranscriptPrompt(episodeId, vocabulary, direction),
+    );
     await navigator.clipboard.writeText(result.prompt);
   }
 }

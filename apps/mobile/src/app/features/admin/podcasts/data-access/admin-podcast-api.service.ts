@@ -140,18 +140,20 @@ export class AdminPodcastApiService {
   generateTranscript(
     episodeId: string,
     vocabulary: string[],
+    direction?: string,
   ): Observable<AdminGeneratePodcastTranscriptResult> {
     return this.http.post<AdminGeneratePodcastTranscriptResult>(
-      `${this.episodeUrl}/${episodeId}/transcript/generate`, { vocabulary },
+      `${this.episodeUrl}/${episodeId}/transcript/generate`, { vocabulary, direction },
     );
   }
 
   createTranscriptPrompt(
     episodeId: string,
     vocabulary: string[],
+    direction?: string,
   ): Observable<AdminPodcastTranscriptPromptResult> {
     return this.http.post<AdminPodcastTranscriptPromptResult>(
-      `${this.episodeUrl}/${episodeId}/transcript/prompt`, { vocabulary },
+      `${this.episodeUrl}/${episodeId}/transcript/prompt`, { vocabulary, direction },
     );
   }
 

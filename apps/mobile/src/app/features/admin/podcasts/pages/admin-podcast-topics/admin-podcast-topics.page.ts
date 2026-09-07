@@ -31,6 +31,10 @@ import {
 } from 'ionicons/icons';
 import {AppNotificationService} from '@lingua-card/mobile/notifications';
 import {PodcastTranscriptClipboardService} from '../../application/podcast-transcript-clipboard.service';
+import {
+  parsePodcastVocabularyInput,
+  podcastGenerationDirection,
+} from '../../domain/podcast-vocabulary-input';
 import {AdminPodcastStore} from '../../store/admin-podcast.store';
 
 type StudioView = 'library' | 'topic' | 'new-topic' | 'new-episode' | 'review';
@@ -56,7 +60,7 @@ export class AdminPodcastTopicsPage implements OnInit {
   readonly view = signal<StudioView>('library');
   readonly topicId = signal<string | null>(null);
   readonly pendingTranscript = signal<AdminPodcastTranscriptPayload | null>(null);
-  readonly pendingPromptWords = signal<readonly string[] | null>(null);
+  readonly pendingPrompt = signal<{ words: readonly string[]; direction?: string } | null>(null);
   readonly transcriptOpen = signal(false);
   readonly transcriptReviewed = signal(false);
   readonly topic = computed(() => this.store.topics().find(item => item.id === this.topicId()) ?? null);
@@ -165,10 +169,10 @@ export class AdminPodcastTopicsPage implements OnInit {
       });
     });
     effect(() => {
-      const id = this.store.lastCreatedEpisodeId(), words = this.pendingPromptWords();
-      if (id && words) untracked(() => {
-        this.pendingPromptWords.set(null);
-        void this.copyPromptForEpisode(id, words);
+      const id = this.store.lastCreatedEpisodeId(), input = this.pendingPrompt();
+      if (id && input) untracked(() => {
+        this.pendingPrompt.set(null);
+        void this.copyPromptForEpisode(id, input.words, input.direction);
       });
     });
     effect(() => {
@@ -242,14 +246,19 @@ export class AdminPodcastTopicsPage implements OnInit {
     const topic = this.topic();
     if (!topic || this.episodeForm.invalid) return;
     const value = this.episodeForm.getRawValue();
-    const vocabulary = this.words(value.vocabulary);
+    const input = parsePodcastVocabularyInput(value.vocabulary);
+    const vocabulary = input.vocabulary;
     if (!vocabulary.length) {
       this.store.setLocalError('Add at least one vocabulary item.');
       return;
     }
     this.store.createEpisode({
       topicId: topic.id,
-      dto: {requestId: crypto.randomUUID(), vocabulary, direction: value.direction.trim() || undefined}
+      dto: {
+        requestId: crypto.randomUUID(),
+        vocabulary,
+        direction: podcastGenerationDirection(input.episodeTitle, value.direction),
+      }
     });
   }
 
@@ -291,12 +300,18 @@ export class AdminPodcastTopicsPage implements OnInit {
 
   generateTranscriptForEpisode(): void {
     const episode = this.episode();
-    const vocabulary = this.words(this.episodeForm.controls.vocabulary.value);
+    const value = this.episodeForm.getRawValue();
+    const input = parsePodcastVocabularyInput(value.vocabulary);
+    const vocabulary = input.vocabulary;
     if (!episode || !vocabulary.length) {
       this.store.setLocalError('Add at least one vocabulary item before generating the transcript.');
       return;
     }
-    this.store.generateTranscript({episodeId: episode.id, vocabulary});
+    this.store.generateTranscript({
+      episodeId: episode.id,
+      vocabulary,
+      direction: podcastGenerationDirection(input.episodeTitle, value.direction),
+    });
   }
 
   publishEpisode(): void {
@@ -343,12 +358,15 @@ export class AdminPodcastTopicsPage implements OnInit {
 
   async copyPrompt(): Promise<void> {
     const episode = this.episode(), topicId = this.topicId();
+    const value = this.episodeForm.getRawValue();
+    const input = parsePodcastVocabularyInput(value.vocabulary);
+    const direction = podcastGenerationDirection(input.episodeTitle, value.direction);
     if (episode) {
-      await this.copyPromptForEpisode(episode.id, []);
+      await this.copyPromptForEpisode(episode.id, input.vocabulary, direction);
       return;
     }
     if (!topicId) return;
-    this.pendingPromptWords.set([]);
+    this.pendingPrompt.set({words: input.vocabulary, direction});
     this.store.createEpisodeDraft(topicId);
   }
 
@@ -386,10 +404,6 @@ export class AdminPodcastTopicsPage implements OnInit {
     return new Intl.DisplayNames(['en'], {type: 'language'}).of(code) ?? code.toUpperCase();
   }
 
-  private words(value: string): string[] {
-    return value.split(/\r?\n/u).map(word => word.trim()).filter(Boolean);
-  }
-
   private selectedFile(event: Event): File | null {
     if (!(event.target instanceof HTMLInputElement)) return null;
     const file = event.target.files?.item(0) ?? null;
@@ -401,9 +415,13 @@ export class AdminPodcastTopicsPage implements OnInit {
     return isRecord(value) && value['schemaVersion'] === 1 && Array.isArray(value['speakers']) && Array.isArray(value['turns']) && Array.isArray(value['vocabulary']);
   }
 
-  private async copyPromptForEpisode(episodeId: string, words: readonly string[]): Promise<void> {
+  private async copyPromptForEpisode(
+    episodeId: string,
+    words: readonly string[],
+    direction?: string,
+  ): Promise<void> {
     try {
-      await this.clipboard.copy(episodeId, [...words]);
+      await this.clipboard.copy(episodeId, [...words], direction);
       await this.notifications.present({message: 'Generation prompt copied.', duration: 1800, color: 'success'});
     } catch {
       this.store.setLocalError('Could not copy the generation prompt.');

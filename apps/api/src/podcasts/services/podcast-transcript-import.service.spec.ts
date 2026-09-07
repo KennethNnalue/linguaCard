@@ -63,13 +63,25 @@ describe('podcast transcript import helpers', () => {
 
 
 describe('apartment transcript import regression', () => {
-  it('validates and previews the supplied JSON without vocabulary reference conflicts', async () => {
+  it('rejects the apartment JSON when required vocabulary is omitted or unused', async () => {
     const parsed: unknown = JSON.parse(readFileSync(join(__dirname, '../domain/fixtures/die-neue-wohnung.json'), 'utf8'));
     const input = plainToInstance(PodcastTranscriptPayloadDto, parsed);
     await expect(validate(input, { whitelist: true })).resolves.toHaveLength(0);
     const dataSource = new DataSource({ type: 'postgres' });
     jest.spyOn(dataSource.getRepository(PodcastEpisodeEntity), 'findOneBy').mockResolvedValue(
-      Object.assign(new PodcastEpisodeEntity(), { id: 'episode', topicId: 'topic' }),
+      Object.assign(new PodcastEpisodeEntity(), {
+        id: 'episode', topicId: 'topic',
+        generationInput: { vocabulary: [
+          'stellen (Carla will den Computer in die Küche stellen.)',
+          'aus|füllen (ein Formular ausfüllen)', 'besichtigen', 'die Kiste, -n',
+          'das Licht, -er', 'packen', 'schließen, er schließt, hat geschlossen',
+          'die Tür, -en', 'um|ziehen, er zieht um, ist umgezogen', 'der Umzug, "-e',
+          'unterschreiben, er unterschreibt, hat unterschrieben', 'der Vermieter, -',
+          'die Vermieterin, -nen', 'der Vertrag, "-e', 'zu|machen', 'freuen (sich)',
+          'scheinen, er scheint, hat geschienen', 'fehlend', 'bald', 'die Feier, -n',
+          'der Glückwunsch, "-e', 'der Samstagabend, -e',
+        ] },
+      }),
     );
     jest.spyOn(dataSource.getRepository(PodcastTopicEntity), 'findOneBy').mockResolvedValue(
       Object.assign(new PodcastTopicEntity(), { id: 'topic', targetLanguage: 'de', translationLanguage: 'en' }),
@@ -84,8 +96,14 @@ describe('apartment transcript import regression', () => {
     try {
       const service = module.get(PodcastTranscriptImportService);
       const preview = await service.preview('episode', input);
-      expect(preview.status).toBe('valid');
-      expect(preview.conflicts).toEqual([]);
+      expect(preview.status).toBe('conflicts');
+      expect(preview.conflicts).toEqual(expect.arrayContaining([
+        expect.objectContaining({
+          code: 'missing-vocabulary',
+          message: expect.stringContaining('Vermieterin'),
+        }),
+        expect.objectContaining({ code: 'unreferenced-vocabulary' }),
+      ]));
       expect(preview.counts).toMatchObject({ speakers: 2, turns: 11, vocabulary: 15 });
       const normalized = normalizeTranscriptVocabularyReferences(input);
       expect(normalized.turns[10].vocabularyRefs).toEqual(['zu-machen', 'die-tuer']);
