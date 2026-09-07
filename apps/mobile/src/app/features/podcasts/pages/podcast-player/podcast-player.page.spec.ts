@@ -245,9 +245,14 @@ describe('PodcastPlayerPage immersive presentation', () => {
   it('returns to portrait without replacing the audio element', async () => {
     await page.enterImmersiveMode();
     const audioBefore = playerRoot().querySelector('audio');
+    page.chromeVisible.set(true);
     fixture.detectChanges();
 
-    await page.exitImmersiveMode();
+    const contractButton = playerRoot().querySelector('ion-icon[name="contract-outline"]')
+      ?.closest('ion-button');
+    expect(contractButton).not.toBeNull();
+    contractButton?.dispatchEvent(new MouseEvent('click', { bubbles: true }));
+    await fixture.whenStable();
     fixture.detectChanges();
 
     expect(immersiveMode.exit).toHaveBeenCalledTimes(1);

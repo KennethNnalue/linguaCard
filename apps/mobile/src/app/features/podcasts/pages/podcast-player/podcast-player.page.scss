@@ -63,8 +63,8 @@ ion-content { --background:#050806; }
     position:absolute;
     z-index:4;
     top:var(--player-safe-top);
-    right:var(--player-safe-right);
-    left:var(--player-safe-left);
+    right:calc(12px + var(--player-safe-right));
+    left:calc(12px + var(--player-safe-left));
     grid-template-columns:48px minmax(0,1fr) 48px;
     min-height:56px;
     margin:0;
@@ -122,9 +122,9 @@ ion-content { --background:#050806; }
   }
   .times {
     position:absolute;
-    right:calc(14px + var(--player-safe-right));
+    right:calc(20px + var(--player-safe-right));
     bottom:calc(17px + var(--player-safe-bottom));
-    left:calc(14px + var(--player-safe-left));
+    left:calc(20px + var(--player-safe-left));
     align-items:center;
     font-size:.68rem;
   }
@@ -140,21 +140,22 @@ ion-content { --background:#050806; }
   .secondary-controls {
     position:absolute;
     top:50%;
-    right:calc(10px + var(--player-safe-right));
+    right:calc(20px + var(--player-safe-right));
     flex-direction:column;
     gap:6px;
     padding:0;
     transform:translateY(-50%);
     pointer-events:auto;
   }
-  .secondary-controls ion-button,.secondary-controls .speed { width:40px; height:40px; }
+  .secondary-controls ion-button,.secondary-controls .speed { width:44px; height:44px; }
   .progress-error { right:calc(12px + var(--player-safe-right)); bottom:calc(48px + var(--player-safe-bottom)); left:calc(12px + var(--player-safe-left)); }
   .immersive-status { top:calc(58px + var(--player-safe-top)); }
 
   &.player--chrome-visible {
     .chrome-shade { opacity:1; }
-    .top-chrome,.controls { opacity:1; visibility:visible; pointer-events:auto; transition-delay:0s; }
-    .top-chrome { transform:translateY(0); }
+    .top-chrome,.controls { opacity:1; visibility:visible; transition-delay:0s; }
+    .top-chrome { pointer-events:auto; transform:translateY(0); }
+    .controls { pointer-events:none; }
     .dialogue { bottom:calc(50px + var(--player-safe-bottom)); max-height:min(26dvh,112px); }
   }
 }
@@ -168,10 +169,10 @@ ion-content { --background:#050806; }
 @media(orientation:landscape) and (max-height:430px) {
   .player {
     .top-chrome { min-height:48px; }
-    .top-chrome ion-button { width:40px; height:40px; }
+    .top-chrome ion-button { width:44px; height:44px; }
     .transport { top:40%; }
     .transport .play { width:58px; height:58px; }
-    .transport .seek { width:42px; height:46px; }
+    .transport .seek { width:44px; height:46px; }
     .dialogue { padding:7px 12px; }
     .dialogue>span { font-size:.56rem; }
     .target { font-size:clamp(1.05rem,3.4vw,1.65rem); }
