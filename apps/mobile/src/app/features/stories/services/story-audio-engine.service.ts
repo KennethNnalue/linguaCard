@@ -1,6 +1,7 @@
-import { Injectable, signal } from '@angular/core';
+import { Injectable, inject, signal } from '@angular/core';
 import type { WordTimestamp } from '@lingua-card/shared/domain';
 import type { SentencePlan } from '../models/reader.model';
+import { ScreenAwakeService } from '../../../shared/audio/screen-awake.service';
 
 /** A single resolved track handed to the engine. */
 export interface AudioTrack {
@@ -24,11 +25,12 @@ export interface AudioTrack {
  * beyond the audio element — the cross-story queue (`StoryPlayerService`) layers
  * on top of this, and the platform reader uses it directly for one track.
  *
- * Not `providedIn: 'root'`: each consumer provides its own instance so two
- * readers never fight over one audio element.
+ * The user-story player uses the root instance. The platform reader provides a
+ * route-local instance so the two playback contexts never share an audio element.
  */
-@Injectable()
+@Injectable({ providedIn: 'root' })
 export class StoryAudioEngine {
+  private readonly screenAwake = inject(ScreenAwakeService);
   readonly playing = signal(false);
   /** Index of the currently-spoken word (-1 = not started / between words). */
   readonly activeWordIdx = signal(-1);
@@ -85,6 +87,7 @@ export class StoryAudioEngine {
     };
     this.endedHandler = () => {
       this.playing.set(false);
+      void this.screenAwake.playbackStopped();
       // Guard: a track that errored before producing any data can also fire
       // `ended` — treat that as a failure, not a natural finish, so the queue
       // doesn't auto-advance off a broken track twice.
@@ -98,6 +101,7 @@ export class StoryAudioEngine {
       // MEDIA_ERR_SRC_NOT_SUPPORTED (code 4) — most often a 404 / missing audio
       // file. Surface to the player so it can skip + flag the story for regen.
       this.playing.set(false);
+      void this.screenAwake.playbackStopped();
       this.errorCallback?.();
     };
     audio.addEventListener('timeupdate', this.timeupdateHandler);
@@ -150,6 +154,7 @@ export class StoryAudioEngine {
     const audio = this.audio;
     if (!audio || !audio.src) {
       this.playing.set(false);
+      await this.screenAwake.playbackStopped();
       return;
     }
     if (audio.ended || audio.currentTime >= (audio.duration || Infinity)) {
@@ -163,15 +168,18 @@ export class StoryAudioEngine {
       // Blocked autoplay or unplayable source — leave the element intact but
       // reset transport state so a later user-gesture play() can retry cleanly.
       this.playing.set(false);
+      await this.screenAwake.playbackStopped();
       throw err;
     }
     this.playing.set(true);
+    await this.screenAwake.playbackStarted();
   }
 
   pause(): void {
     if (this.audio && !this.audio.paused) {
       this.audio.pause();
       this.playing.set(false);
+      void this.screenAwake.playbackStopped();
     }
   }
 
@@ -220,6 +228,7 @@ export class StoryAudioEngine {
     this.playing.set(false);
     this.activeWordIdx.set(-1);
     this.activeSentenceIdx.set(-1);
+    void this.screenAwake.playbackStopped();
   }
 
   formatTime(ms: number): string {

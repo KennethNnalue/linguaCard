@@ -1,13 +1,13 @@
 import { TestBed } from '@angular/core/testing';
 import {
-  PODCAST_SCREEN_AWAKE_PLATFORM,
-  type PodcastScreenAwakePlatform,
-  PodcastScreenAwakeService,
-} from './podcast-screen-awake.service';
+  SCREEN_AWAKE_PLATFORM,
+  type ScreenAwakePlatform,
+  ScreenAwakeService,
+} from './screen-awake.service';
 
-describe('PodcastScreenAwakeService', () => {
-  let service: PodcastScreenAwakeService;
-  let platform: jest.Mocked<PodcastScreenAwakePlatform>;
+describe('ScreenAwakeService', () => {
+  let service: ScreenAwakeService;
+  let platform: jest.Mocked<ScreenAwakePlatform>;
 
   beforeEach(() => {
     platform = {
@@ -16,11 +16,11 @@ describe('PodcastScreenAwakeService', () => {
     };
     TestBed.configureTestingModule({
       providers: [
-        PodcastScreenAwakeService,
-        { provide: PODCAST_SCREEN_AWAKE_PLATFORM, useValue: platform },
+        ScreenAwakeService,
+        { provide: SCREEN_AWAKE_PLATFORM, useValue: platform },
       ],
     });
-    service = TestBed.inject(PodcastScreenAwakeService);
+    service = TestBed.inject(ScreenAwakeService);
   });
 
   it('keeps the screen awake by default while playback is active', async () => {

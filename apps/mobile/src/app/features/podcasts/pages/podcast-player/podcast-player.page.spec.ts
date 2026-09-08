@@ -11,7 +11,7 @@ import {
   type PodcastImmersiveFailureReason,
   type PodcastImmersiveModeState,
 } from '../../services/podcast-immersive-mode.service';
-import { PodcastScreenAwakeService } from '../../services/podcast-screen-awake.service';
+import { ScreenAwakeService } from '../../../../shared/audio/screen-awake.service';
 import {
   PODCAST_CHROME_AUTO_HIDE_MS,
   PodcastPlayerPage,
@@ -88,7 +88,7 @@ class PodcastImmersiveModeServiceMock {
   });
 }
 
-class PodcastScreenAwakeServiceMock {
+class ScreenAwakeServiceMock {
   readonly isSleepAllowed = signal(false);
   readonly isKeepingScreenAwake = computed(() => !this.isSleepAllowed());
   readonly playbackStarted = jest.fn(async () => undefined);
@@ -126,14 +126,14 @@ describe('PodcastPlayerPage immersive presentation', () => {
   let page: PodcastPlayerPage;
   let store: PodcastPlayerStoreMock;
   let immersiveMode: PodcastImmersiveModeServiceMock;
-  let screenAwake: PodcastScreenAwakeServiceMock;
+  let screenAwake: ScreenAwakeServiceMock;
   let episodeParams: BehaviorSubject<ParamMap>;
   let playbackQueryParams: BehaviorSubject<ParamMap>;
 
   beforeEach(async () => {
     store = new PodcastPlayerStoreMock();
     immersiveMode = new PodcastImmersiveModeServiceMock();
-    screenAwake = new PodcastScreenAwakeServiceMock();
+    screenAwake = new ScreenAwakeServiceMock();
     episodeParams = new BehaviorSubject(convertToParamMap({ episodeId: 'episode-1' }));
     playbackQueryParams = new BehaviorSubject(convertToParamMap({}));
     TestBed.overrideComponent(PodcastPlayerPage, {
@@ -141,7 +141,7 @@ describe('PodcastPlayerPage immersive presentation', () => {
         providers: [
           { provide: PodcastPlayerStore, useValue: store },
           { provide: PodcastImmersiveModeService, useValue: immersiveMode },
-          { provide: PodcastScreenAwakeService, useValue: screenAwake },
+          { provide: ScreenAwakeService, useValue: screenAwake },
           {
             provide: ActivatedRoute,
             useValue: {
@@ -317,6 +317,28 @@ describe('PodcastPlayerPage immersive presentation', () => {
     expect(store.playbackQueueChanged).toHaveBeenLastCalledWith(['episode-1', 'episode-2']);
     expect(store.repeatModeChanged).toHaveBeenLastCalledWith('topic');
     expect(store.loadEpisode).toHaveBeenLastCalledWith('episode-2');
+  });
+
+  it('keeps the audio element and autoplays after an episode source transition', async () => {
+    const audioBefore = playerRoot().querySelector('audio');
+    if (!(audioBefore instanceof HTMLAudioElement)) throw new Error('Expected audio element');
+    const playAudio = jest.spyOn(audioBefore, 'play').mockResolvedValue(undefined);
+    playbackQueryParams.next(convertToParamMap({
+      scope: 'topic', autoplay: '1', queue: 'episode-1,episode-2',
+    }));
+
+    store.episode.set({ ...episode, id: 'episode-2', audioUrl: '/episode-2.mp3' });
+    fixture.detectChanges();
+    page.readyToPlay();
+
+    expect(playerRoot().querySelector('audio')).toBe(audioBefore);
+    expect(playAudio).toHaveBeenCalledTimes(1);
+
+    audioBefore.dispatchEvent(new Event('play'));
+    page.readyToPlay();
+    await fixture.whenStable();
+
+    expect(playAudio).toHaveBeenCalledTimes(1);
   });
 
   it('returns to portrait without replacing the audio element', async () => {

@@ -21,7 +21,7 @@ import {
 } from '../../store/podcast-player.store';
 import { OfflineImageDirective } from '../../../../shared/image/offline-image.directive';
 import { PodcastImmersiveModeService } from '../../services/podcast-immersive-mode.service';
-import { PodcastScreenAwakeService } from '../../services/podcast-screen-awake.service';
+import { ScreenAwakeService } from '../../../../shared/audio/screen-awake.service';
 
 const PODCAST_PLAYBACK_SPEEDS = [0.75, 1, 1.25, 1.5] as const;
 export const PODCAST_CHROME_AUTO_HIDE_MS = 3000;
@@ -50,13 +50,13 @@ export function nextPodcastPlaybackSpeed(currentSpeed: number): number {
   imports: [
     IonButton, IonContent, IonIcon, IonRange, IonSpinner, OfflineImageDirective, TranslatePipe,
   ],
-  providers: [PodcastPlayerStore, PodcastImmersiveModeService, PodcastScreenAwakeService], templateUrl: './podcast-player.page.html',
+  providers: [PodcastPlayerStore, PodcastImmersiveModeService, ScreenAwakeService], templateUrl: './podcast-player.page.html',
   styleUrl: './podcast-player.page.scss', changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class PodcastPlayerPage implements OnInit, ViewWillLeave {
   readonly store = inject(PodcastPlayerStore);
   readonly immersiveMode = inject(PodcastImmersiveModeService);
-  readonly screenAwake = inject(PodcastScreenAwakeService);
+  readonly screenAwake = inject(ScreenAwakeService);
   readonly chromeVisible = signal(true);
   readonly isChromeVisible = computed(
     () => !this.immersiveMode.isLandscape() || this.chromeVisible(),
@@ -197,6 +197,7 @@ export class PodcastPlayerPage implements OnInit, ViewWillLeave {
     event.target.currentTime = this.store.currentTimeMs() / 1000;
   }
   started(): void {
+    this.autoplayNext = false;
     this.store.playbackStateChanged(true);
     void this.screenAwake.playbackStarted();
     this.scheduleChromeAutoHide();
@@ -270,8 +271,7 @@ export class PodcastPlayerPage implements OnInit, ViewWillLeave {
   time(ms: number): string { const seconds = Math.floor(ms / 1000); return `${Math.floor(seconds / 60)}:${String(seconds % 60).padStart(2, '0')}`; }
   readyToPlay(): void {
     if (!this.autoplayNext) return;
-    this.autoplayNext = false;
-    void this.audio()?.nativeElement.play();
+    void this.audio()?.nativeElement.play().catch(() => undefined);
   }
 
   private stopAudioPlayback(): void {

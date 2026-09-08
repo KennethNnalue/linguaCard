@@ -38,8 +38,7 @@ export class StoryPlayerService {
   private readonly audioCache = inject(AiAudioCacheService);
   private readonly tokenizer = inject(StoryTokenizerService);
 
-  /** This service owns a dedicated engine instance (not shared with other readers). */
-  private readonly engine = new StoryAudioEngine();
+  private readonly engine = inject(StoryAudioEngine);
 
   // ── Queue ──────────────────────────────────────────────────────────────
   /** Ordered list of story ids that make up the playback queue. */

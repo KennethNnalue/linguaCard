@@ -1,13 +1,13 @@
 import { DestroyRef, Injectable, InjectionToken, computed, inject, signal } from '@angular/core';
 import { KeepAwake } from '@capacitor-community/keep-awake';
 
-export interface PodcastScreenAwakePlatform {
+export interface ScreenAwakePlatform {
   keepAwake(): Promise<void>;
   allowSleep(): Promise<void>;
 }
 
-export const PODCAST_SCREEN_AWAKE_PLATFORM = new InjectionToken<PodcastScreenAwakePlatform>(
-  'PODCAST_SCREEN_AWAKE_PLATFORM',
+export const SCREEN_AWAKE_PLATFORM = new InjectionToken<ScreenAwakePlatform>(
+  'SCREEN_AWAKE_PLATFORM',
   {
     factory: () => ({
       keepAwake: () => KeepAwake.keepAwake(),
@@ -16,10 +16,10 @@ export const PODCAST_SCREEN_AWAKE_PLATFORM = new InjectionToken<PodcastScreenAwa
   },
 );
 
-@Injectable()
-export class PodcastScreenAwakeService {
+@Injectable({ providedIn: 'root' })
+export class ScreenAwakeService {
   private readonly destroyRef = inject(DestroyRef);
-  private readonly platform = inject(PODCAST_SCREEN_AWAKE_PLATFORM);
+  private readonly platform = inject(SCREEN_AWAKE_PLATFORM);
   private readonly sleepAllowed = signal(false);
   private transition = Promise.resolve();
   private isPlaying = false;

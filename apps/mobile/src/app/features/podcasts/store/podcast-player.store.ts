@@ -21,6 +21,7 @@ export type PodcastPlayerError = 'load-episode' | 'save-progress' | 'completion-
 
 interface PodcastPlayerState {
   episode: PodcastEpisodePlayer | null;
+  requestedEpisodeId: string | null;
   status: 'idle' | 'loading' | 'success' | 'error';
   error: PodcastPlayerError | null;
   currentTimeMs: number;
@@ -38,7 +39,7 @@ interface PodcastPlayerState {
 }
 
 const initialState: PodcastPlayerState = {
-  episode: null, status: 'idle', error: null, currentTimeMs: 0,
+  episode: null, requestedEpisodeId: null, status: 'idle', error: null, currentTimeMs: 0,
   lastPlaybackTimeMs: 0, unsyncedPlayedRanges: [],
   isPlaying: false, speed: 1, repeatMode: 'off', topicQueueEnabled: false,
   continueToNextTopic: false, translationMode: 'both', revealedTurnId: null,
@@ -73,17 +74,20 @@ export const PodcastPlayerStore = signalStore(
     loadEpisode(episodeId: string): void {
       void (async () => {
         patchState(store, {
-          episode: null, currentTimeMs: 0, lastPlaybackTimeMs: 0, unsyncedPlayedRanges: [],
+          requestedEpisodeId: episodeId,
+          currentTimeMs: 0, lastPlaybackTimeMs: 0, unsyncedPlayedRanges: [],
           isPlaying: false, revealedTurnId: null,
           progressError: null, status: 'loading', error: null,
         });
         const userId = auth.currentUser()?.id;
         const cached = userId ? await localData.getPodcastPlayer(userId, episodeId) : null;
         const present = async (episode: PodcastEpisodePlayer): Promise<void> => {
+          if (store.requestedEpisodeId() !== episodeId) return;
           const audioUrl = await audioCache.getOrDownload(
             `podcast-${episode.id}-v${episode.audioVersion}`,
             episode.audioUrl,
           );
+          if (store.requestedEpisodeId() !== episodeId) return;
           patchState(store, {
             episode: { ...episode, audioUrl: audioUrl ?? episode.audioUrl },
             currentTimeMs: episode.progress?.completedAt ? 0 : episode.progress?.positionMs ?? 0,
@@ -97,7 +101,9 @@ export const PodcastPlayerStore = signalStore(
           if (userId) await localData.setPodcastPlayer(userId, episode);
           await present(episode);
         } catch {
-          if (!cached) patchState(store, { status: 'error', error: 'load-episode' });
+          if (!cached && store.requestedEpisodeId() === episodeId) {
+            patchState(store, { episode: null, status: 'error', error: 'load-episode' });
+          }
         }
       })();
     },
