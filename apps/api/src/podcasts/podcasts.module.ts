@@ -24,6 +24,7 @@ import { EngagementModule } from '../engagement/engagement.module';
 import { SettingsModule } from '../settings/settings.module';
 import { WordDictionaryModule } from '../word-dictionary/word-dictionary.module';
 import { PodcastPlatformCollectionService } from './services/podcast-platform-collection.service';
+import { PodcastTranscriptManifestService } from './services/podcast-transcript-manifest.service';
 
 @Module({
   imports: [
@@ -45,6 +46,7 @@ import { PodcastPlatformCollectionService } from './services/podcast-platform-co
     ElevenLabsPodcastGenerationService,
     PodcastEpisodeCreationService,
     PodcastPlatformCollectionService,
+    PodcastTranscriptManifestService,
   ],
   exports: [AdminPodcastsService],
 })

@@ -7,6 +7,7 @@ import { Test } from '@nestjs/testing';
 import { DataSource } from 'typeorm';
 import { LexemeIdentityService } from '../../vocabulary/domain/lexeme-identity.service';
 import { LexemeEntity } from '../../vocabulary/entities/lexeme.entity';
+import { LexemeLocalizationEntity } from '../../vocabulary/entities/lexeme-localization.entity';
 import { LegacyVocabularyProjectionService } from '../../vocabulary/services/legacy-vocabulary-projection.service';
 import { StorageService } from '../../storage/storage.service';
 import { PodcastEpisodeEntity } from '../entities/podcast-episode.entity';
@@ -16,6 +17,9 @@ import { PodcastTranscriptPayloadDto } from '../dto/admin-podcast.dto';
 import {
   estimatePodcastDuration, podcastTranscriptFingerprint, PodcastTranscriptImportService,
 } from './podcast-transcript-import.service';
+import {
+  createPodcastTranscriptManifestDraft, finalizePodcastTranscriptManifest,
+} from '../domain/podcast-transcript-manifest';
 
 const episodeMetadata = {
   title: 'Und was hast du gemacht?',
@@ -109,6 +113,109 @@ describe('apartment transcript import regression', () => {
       expect(normalized.turns[10].vocabularyRefs).toEqual(['zu-machen', 'die-tuer']);
       expect(preview.fingerprint).toBe(podcastTranscriptFingerprint(normalized));
       expect((await service.preview('episode', normalized)).fingerprint).toBe(preview.fingerprint);
+    } finally {
+      await module.close();
+    }
+  });
+});
+
+describe('external transcript manifest import', () => {
+  it('uses the saved canonical identity and vocabulary fields for schema version 2', async () => {
+    const draft = createPodcastTranscriptManifestDraft(['die Wohnung, -en = Apartment'], 'de', 'en');
+    const manifest = finalizePodcastTranscriptManifest(draft, draft.items.map(item => ({
+      ...item,
+      canonicalLexemeId: 'wohnung-lexeme',
+    })));
+    const input = plainToInstance(PodcastTranscriptPayloadDto, {
+      schemaVersion: 2,
+      manifestId: manifest.id,
+      episode: episodeMetadata,
+      speakers: [{ key: 'host', name: 'Mia', voiceGender: 'female' }],
+      turns: [{
+        speakerKey: 'host', targetText: 'Das ist meine Wohnung.',
+        translation: 'This is my apartment.', vocabularyRefs: ['wohnung'],
+      }],
+      vocabulary: [{
+        key: 'wohnung', text: 'Changed by the external model',
+        translation: 'flat', importance: 'supporting',
+      }],
+    });
+    const dataSource = new DataSource({ type: 'postgres' });
+    jest.spyOn(dataSource.getRepository(PodcastEpisodeEntity), 'findOneBy').mockResolvedValue(
+      Object.assign(new PodcastEpisodeEntity(), {
+        id: 'episode', topicId: 'topic',
+        generationInput: { vocabulary: ['die Wohnung, -en = Apartment'], transcriptManifest: manifest },
+      }),
+    );
+    jest.spyOn(dataSource.getRepository(PodcastTopicEntity), 'findOneBy').mockResolvedValue(
+      Object.assign(new PodcastTopicEntity(), {
+        id: 'topic', targetLanguage: 'de', translationLanguage: 'en',
+      }),
+    );
+    jest.spyOn(dataSource.getRepository(LexemeEntity), 'find').mockResolvedValue([
+      Object.assign(new LexemeEntity(), {
+        id: 'wohnung-lexeme', language: 'de', normalizedLemma: 'wohnung', displayText: 'Wohnung',
+        partOfSpeech: 'noun', grammarDiscriminator: 'article=die;gender=feminine', grammar: { article: 'die' },
+      }),
+    ]);
+    jest.spyOn(dataSource.getRepository(LexemeLocalizationEntity), 'find').mockResolvedValue([]);
+    const module = await Test.createTestingModule({ providers: [
+      PodcastTranscriptImportService, LexemeIdentityService,
+      { provide: DataSource, useValue: dataSource },
+      { provide: LegacyVocabularyProjectionService, useValue: {} },
+      { provide: StorageService, useValue: {} },
+    ] }).compile();
+    try {
+      const preview = await module.get(PodcastTranscriptImportService).preview('episode', input);
+
+      expect(preview.status).toBe('valid');
+      expect(preview.vocabulary).toEqual([expect.objectContaining({
+        key: 'wohnung', lexemeId: 'wohnung-lexeme', status: 'resolved',
+      })]);
+      expect(preview.fingerprint).not.toBe(podcastTranscriptFingerprint(input));
+    } finally {
+      await module.close();
+    }
+  });
+
+  it('rejects a schema version 2 transcript from a different copied prompt', async () => {
+    const manifest = createPodcastTranscriptManifestDraft(['die Wohnung, -en'], 'de', 'en');
+    const input = plainToInstance(PodcastTranscriptPayloadDto, {
+      schemaVersion: 2,
+      manifestId: '0'.repeat(64),
+      episode: episodeMetadata,
+      speakers: [{ key: 'host', name: 'Mia', voiceGender: 'female' }],
+      turns: [{
+        speakerKey: 'host', targetText: 'Das ist meine Wohnung.',
+        translation: 'This is my apartment.', vocabularyRefs: ['wohnung'],
+      }],
+      vocabulary: [{ key: 'wohnung', text: 'Wohnung', translation: 'apartment', importance: 'essential' }],
+    });
+    const dataSource = new DataSource({ type: 'postgres' });
+    jest.spyOn(dataSource.getRepository(PodcastEpisodeEntity), 'findOneBy').mockResolvedValue(
+      Object.assign(new PodcastEpisodeEntity(), {
+        id: 'episode', topicId: 'topic',
+        generationInput: { vocabulary: ['die Wohnung, -en'], transcriptManifest: manifest },
+      }),
+    );
+    jest.spyOn(dataSource.getRepository(PodcastTopicEntity), 'findOneBy').mockResolvedValue(
+      Object.assign(new PodcastTopicEntity(), {
+        id: 'topic', targetLanguage: 'de', translationLanguage: 'en',
+      }),
+    );
+    jest.spyOn(dataSource.getRepository(LexemeEntity), 'find').mockResolvedValue([]);
+    const module = await Test.createTestingModule({ providers: [
+      PodcastTranscriptImportService, LexemeIdentityService,
+      { provide: DataSource, useValue: dataSource },
+      { provide: LegacyVocabularyProjectionService, useValue: {} },
+      { provide: StorageService, useValue: {} },
+    ] }).compile();
+    try {
+      const preview = await module.get(PodcastTranscriptImportService).preview('episode', input);
+
+      expect(preview.conflicts).toEqual(expect.arrayContaining([
+        expect.objectContaining({ code: 'manifest-mismatch', pointer: '/manifestId' }),
+      ]));
     } finally {
       await module.close();
     }

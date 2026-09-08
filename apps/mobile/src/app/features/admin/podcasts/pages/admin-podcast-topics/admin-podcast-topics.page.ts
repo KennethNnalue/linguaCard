@@ -386,7 +386,7 @@ export class AdminPodcastTopicsPage implements OnInit {
     if (!file) return;
     try {
       const parsed: unknown = JSON.parse(await file.text());
-      if (!this.isTranscriptPayload(parsed)) throw new Error('Expected schemaVersion 1 and speakers, turns, and vocabulary arrays.');
+      if (!this.isTranscriptPayload(parsed)) throw new Error('Expected schemaVersion 1 or 2 and speakers, turns, and vocabulary arrays.');
       const episode = this.episode(), topicId = this.topicId();
       if (episode) this.store.previewTranscript({episodeId: episode.id, payload: parsed}); else if (topicId) {
         this.pendingTranscript.set(parsed);
@@ -423,7 +423,11 @@ export class AdminPodcastTopicsPage implements OnInit {
   }
 
   private isTranscriptPayload(value: unknown): value is AdminPodcastTranscriptPayload {
-    return isRecord(value) && value['schemaVersion'] === 1 && Array.isArray(value['speakers']) && Array.isArray(value['turns']) && Array.isArray(value['vocabulary']);
+    return isRecord(value)
+      && (value['schemaVersion'] === 1 || value['schemaVersion'] === 2)
+      && Array.isArray(value['speakers'])
+      && Array.isArray(value['turns'])
+      && Array.isArray(value['vocabulary']);
   }
 
   private async copyPromptForEpisode(

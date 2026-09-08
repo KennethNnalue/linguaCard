@@ -3,6 +3,7 @@ import { plainToInstance } from 'class-transformer';
 import { validate } from 'class-validator';
 import type {
   AdminGeneratePodcastTranscriptResult,
+  AdminPodcastTranscriptPromptResult,
   AdminPodcastTranscriptPayload,
 } from '@lingua-card/shared/domain';
 import { DataSource } from 'typeorm';
@@ -12,6 +13,8 @@ import { PodcastEpisodeEntity } from '../entities/podcast-episode.entity';
 import { PodcastTopicEntity } from '../entities/podcast-topic.entity';
 import { PodcastTranscriptImportService } from './podcast-transcript-import.service';
 import { buildPodcastTranscriptPrompt } from '../domain/podcast-transcript-prompt';
+import { PodcastTranscriptManifestService } from './podcast-transcript-manifest.service';
+import type { PodcastTranscriptManifest } from '../domain/podcast-transcript-manifest';
 
 @Injectable()
 export class PodcastTranscriptGenerationService {
@@ -19,6 +22,7 @@ export class PodcastTranscriptGenerationService {
     private readonly dataSource: DataSource,
     private readonly ai: OpenRouterAdapter,
     private readonly transcriptImport: PodcastTranscriptImportService,
+    private readonly transcriptManifests: PodcastTranscriptManifestService,
   ) {}
 
   async generate(
@@ -47,7 +51,7 @@ export class PodcastTranscriptGenerationService {
     episodeId: string,
     vocabulary: readonly string[],
     direction?: string,
-  ): Promise<string> {
+  ): Promise<AdminPodcastTranscriptPromptResult> {
     const episode = await this.dataSource.getRepository(PodcastEpisodeEntity).findOneBy({ id: episodeId });
     if (!episode) throw new NotFoundException(`Podcast episode ${episodeId} not found`);
     const topic = await this.dataSource.getRepository(PodcastTopicEntity).findOneBy({ id: episode.topicId });
@@ -56,14 +60,28 @@ export class PodcastTranscriptGenerationService {
       ? [...vocabulary]
       : episode.generationInput?.vocabulary ?? [];
     const creativeDirection = direction?.trim() || episode.generationInput?.direction;
-    if (vocabulary.length || direction?.trim()) {
-      episode.generationInput = {
-        vocabulary: requiredVocabulary,
-        ...(creativeDirection ? { direction: creativeDirection } : {}),
-      };
-      await this.dataSource.getRepository(PodcastEpisodeEntity).save(episode);
-    }
-    return this.buildPrompt(topic, requiredVocabulary, creativeDirection);
+    const existingManifest = episode.generationInput?.transcriptManifest;
+    const canReuseManifest = !vocabulary.length
+      && existingManifest
+      && existingManifest.targetLanguage === topic.targetLanguage
+      && existingManifest.translationLanguage === topic.translationLanguage;
+    const manifest = canReuseManifest
+      ? existingManifest
+      : await this.transcriptManifests.create(
+        requiredVocabulary,
+        topic.targetLanguage,
+        topic.translationLanguage,
+      );
+    episode.generationInput = {
+      vocabulary: requiredVocabulary,
+      ...(creativeDirection ? { direction: creativeDirection } : {}),
+      transcriptManifest: manifest,
+    };
+    await this.dataSource.getRepository(PodcastEpisodeEntity).save(episode);
+    return {
+      prompt: this.buildPrompt(topic, requiredVocabulary, creativeDirection, manifest),
+      manifestId: manifest.id,
+    };
   }
 
   private async parsePayload(response: string): Promise<AdminPodcastTranscriptPayload> {
@@ -84,6 +102,7 @@ export class PodcastTranscriptGenerationService {
     topic: PodcastTopicEntity,
     vocabulary: readonly string[],
     direction?: string,
+    manifest?: PodcastTranscriptManifest,
   ): string {
     return buildPodcastTranscriptPrompt({
       topicTitle: topic.title,
@@ -93,6 +112,7 @@ export class PodcastTranscriptGenerationService {
       level: topic.level,
       vocabulary,
       direction,
+      manifest,
     });
   }
 

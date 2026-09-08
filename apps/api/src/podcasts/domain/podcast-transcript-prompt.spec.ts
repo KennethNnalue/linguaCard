@@ -1,6 +1,7 @@
 import {
   buildPodcastTranscriptPrompt, normalizePodcastVocabulary, podcastVocabularyTarget,
 } from './podcast-transcript-prompt';
+import { createPodcastTranscriptManifestDraft } from './podcast-transcript-manifest';
 
 describe('buildPodcastTranscriptPrompt', () => {
   test('uses one policy for generated and manually copied transcripts', () => {
@@ -85,5 +86,22 @@ describe('buildPodcastTranscriptPrompt', () => {
     expect(requiredVocabularySection).not.toContain('(+ D.)');
     expect(requiredVocabularySection).not.toContain('Die Lampe ist doch toll!');
     expect(requiredVocabularySection).not.toContain('hat ausgesehen');
+  });
+
+  it('exports a versioned external-import contract with LinguaCard-owned keys', () => {
+    const manifest = createPodcastTranscriptManifestDraft([
+      'das Kinderzimmer, -',
+      'ziehen, er zieht, ist gezogen (Beata ist in eine Wohnung gezogen.)',
+    ], 'de', 'en');
+    const prompt = buildPodcastTranscriptPrompt({
+      topicTitle: 'Meine Wohnung', topicDescription: '', targetLanguage: 'de',
+      translationLanguage: 'en', level: 'A1', vocabulary: [], manifest,
+    });
+
+    expect(prompt).toContain(`"schemaVersion":2,"manifestId":"${manifest.id}"`);
+    expect(prompt).toContain('"key":"kinderzimmer"');
+    expect(prompt).toContain('"sourceContext":"das Kinderzimmer, -"');
+    expect(prompt).toContain('Beata ist in eine Wohnung gezogen.');
+    expect(prompt).toContain('Copy every supplied LinguaCard key and text exactly');
   });
 });

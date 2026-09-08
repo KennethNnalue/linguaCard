@@ -1965,6 +1965,7 @@ export interface AdminCreateElevenLabsPodcastResult {
 
 export interface AdminPodcastTranscriptPromptResult {
   prompt: string;
+  manifestId: string;
 }
 
 export type PodcastVocabularyImportance = 'essential' | 'supporting';
@@ -1998,7 +1999,8 @@ export interface AdminPodcastTranscriptEpisodeInput {
 }
 
 export interface AdminPodcastTranscriptPayload {
-  schemaVersion: 1;
+  schemaVersion: 1 | 2;
+  manifestId?: string;
   episode?: AdminPodcastTranscriptEpisodeInput;
   speakers: AdminPodcastTranscriptSpeakerInput[];
   turns: AdminPodcastTranscriptTurnInput[];
@@ -2014,7 +2016,7 @@ export interface AdminPodcastTranscriptDetails {
 export interface AdminPodcastTranscriptConflict {
   code: 'duplicate-key' | 'unknown-reference' | 'unresolved-vocabulary'
     | 'ambiguous-vocabulary' | 'missing-vocabulary' | 'unreferenced-vocabulary' | 'translation-mismatch'
-    | 'duration-limit' | 'provider-limit';
+    | 'duration-limit' | 'provider-limit' | 'manifest-mismatch';
   pointer: string;
   severity: 'error';
   message: string;

@@ -1,4 +1,5 @@
 import type { CefrLevel, LanguageCode } from '@lingua-card/shared/domain';
+import type { PodcastTranscriptManifest } from './podcast-transcript-manifest';
 
 export interface PodcastTranscriptPromptContext {
   topicTitle: string;
@@ -8,6 +9,7 @@ export interface PodcastTranscriptPromptContext {
   level: CefrLevel;
   vocabulary: readonly string[];
   direction?: string;
+  manifest?: PodcastTranscriptManifest;
 }
 
 export function normalizePodcastVocabulary(vocabulary: readonly string[]): string[] {
@@ -41,10 +43,19 @@ export function normalizePodcastVocabularyItem(rawItem: string): string {
 }
 
 export function buildPodcastTranscriptPrompt(context: PodcastTranscriptPromptContext): string {
-  const vocabulary = normalizePodcastVocabulary(context.vocabulary);
+  const vocabulary = context.manifest
+    ? context.manifest.items.map(item => item.translation ? `${item.text} = ${item.translation}` : item.text)
+    : normalizePodcastVocabulary(context.vocabulary);
   const vocabularyTarget = podcastVocabularyTarget(vocabulary.length);
-  const vocabularyList = vocabulary.length
-    ? vocabulary.map(item => `- ${item}`).join('\n')
+  const vocabularyList = context.manifest
+    ? context.manifest.items.map(item => `- ${JSON.stringify({
+      key: item.key,
+      text: item.text,
+      translation: item.translation ?? '',
+      sourceContext: item.originalInput,
+    })}`).join('\n')
+    : vocabulary.length
+      ? vocabulary.map(item => `- ${item}`).join('\n')
     : '- None supplied by LinguaCard. Use a vocabulary list supplied alongside this prompt, if present.';
   const vocabularyHeading = vocabulary.length
     ? `Required vocabulary (${vocabulary.length} supplied; use every item and preserve supplied translations):`
@@ -63,7 +74,9 @@ ${vocabularyHeading}
 ${vocabularyList}
 
 Schema:
-{"schemaVersion":1,"episode":{"title":"","titleTranslation":"","description":""},"speakers":[{"key":"host","name":"","voiceGender":"female"},{"key":"guest","name":"","voiceGender":"male"}],"turns":[{"speakerKey":"host","targetText":"","translation":"","vocabularyRefs":["word-key"]}],"vocabulary":[{"key":"word-key","text":"","translation":"","importance":"essential"}]}
+${context.manifest
+    ? `{"schemaVersion":2,"manifestId":"${context.manifest.id}","episode":{"title":"","titleTranslation":"","description":""},"speakers":[{"key":"host","name":"","voiceGender":"female"},{"key":"guest","name":"","voiceGender":"male"}],"turns":[{"speakerKey":"host","targetText":"","translation":"","vocabularyRefs":["linguacard-key"]}],"vocabulary":[{"key":"linguacard-key","text":"","translation":"","importance":"essential"}]}`
+    : '{"schemaVersion":1,"episode":{"title":"","titleTranslation":"","description":""},"speakers":[{"key":"host","name":"","voiceGender":"female"},{"key":"guest","name":"","voiceGender":"male"}],"turns":[{"speakerKey":"host","targetText":"","translation":"","vocabularyRefs":["word-key"]}],"vocabulary":[{"key":"word-key","text":"","translation":"","importance":"essential"}]}' }
 
 Requirements:
 - Derive a concise natural episode title in the target language, its accurate translation, and a learner-facing description in the translation language.
@@ -75,11 +88,15 @@ Requirements:
 - Treat vocabulary supplied under Required vocabulary or elsewhere alongside this prompt as required input.
 - Reduce dictionary notation to the headword before creating vocabulary entries: remove articles, plural endings, conjugation notes, grammar notes, example sentences, and separable-verb bars. For example, "neben (+ D.)" becomes "neben", "doch (Die Lampe ist doch toll!)" becomes "doch", "die Einweihungsfeier, -n" becomes "Einweihungsfeier", and "aus|sehen, er sieht aus, hat ausgesehen" becomes "aussehen".
 - The vocabulary array must contain every supplied headword exactly once. Do not omit or replace any supplied headword.
+- ${context.manifest
+    ? 'Copy every supplied LinguaCard key and text exactly into vocabulary. Copy non-empty supplied translations exactly; fill in only blank translations.'
+    : 'Create a unique lowercase kebab-case key for every vocabulary item.'}
 - Use every supplied vocabulary item naturally in the dialogue, reference it from at least one turn, preserve any supplied translation exactly, and mark it essential.
 - If an item has no translation, provide an accurate dictionary translation.
 - ${vocabularyQuantityRequirement}
 - Give every turn an accurate translation. Every speaker and vocabulary reference must resolve.
 - Before returning JSON, verify that every supplied headword appears in the vocabulary array and has at least one matching vocabularyRefs entry.
+- ${context.manifest ? `Return schemaVersion 2 and manifestId “${context.manifest.id}” exactly.` : 'Return schemaVersion 1.'}
 - Use unique lowercase kebab-case keys. Do not include voice IDs or extra fields.`;
 }
 

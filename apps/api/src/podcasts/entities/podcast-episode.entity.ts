@@ -2,10 +2,12 @@ import {
   Column, CreateDateColumn, Entity, Index, PrimaryColumn, UpdateDateColumn,
 } from 'typeorm';
 import type { CefrLevel, PodcastEpisodeStatus } from '@lingua-card/shared/domain';
+import type { PodcastTranscriptManifest } from '../domain/podcast-transcript-manifest';
 
 export interface PodcastEpisodeGenerationInput {
   vocabulary: string[];
   direction?: string;
+  transcriptManifest?: PodcastTranscriptManifest;
 }
 
 @Entity('podcast_episodes')

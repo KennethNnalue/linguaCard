@@ -152,7 +152,8 @@ export class PodcastTranscriptEpisodeDto {
 }
 
 export class PodcastTranscriptPayloadDto {
-  @IsInt() @IsIn([1]) schemaVersion!: 1;
+  @IsInt() @IsIn([1, 2]) schemaVersion!: 1 | 2;
+  @IsOptional() @IsString() @Matches(/^[a-f0-9]{64}$/) manifestId?: string;
   @IsOptional() @ValidateNested() @Type(() => PodcastTranscriptEpisodeDto)
   episode?: PodcastTranscriptEpisodeDto;
   @IsArray() @ArrayMinSize(1) @ArrayMaxSize(6)

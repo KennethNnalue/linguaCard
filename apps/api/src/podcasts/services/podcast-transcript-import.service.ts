@@ -18,10 +18,12 @@ import { normalizeTranscriptVocabularyReferences } from '../domain/normalize-tra
 import { normalizePodcastVocabulary } from '../domain/podcast-transcript-prompt';
 import { StorageService } from '../../storage/storage.service';
 import { LegacyVocabularyProjectionService } from '../../vocabulary/services/legacy-vocabulary-projection.service';
+import type { PodcastTranscriptManifest } from '../domain/podcast-transcript-manifest';
 
 interface ResolvedTranscript {
   preview: AdminPodcastTranscriptPreview;
   lexemeByKey: Map<string, string>;
+  payload: PodcastTranscriptPayloadDto;
 }
 
 export function estimatePodcastDuration(payload: PodcastTranscriptPayloadDto): number {
@@ -49,8 +51,9 @@ export class PodcastTranscriptImportService {
   }
 
   async commit(episodeId: string, dto: CommitPodcastTranscriptDto): Promise<AdminCommitPodcastTranscriptResult> {
-    const payload = normalizeTranscriptVocabularyReferences(dto.payload);
+    let payload = normalizeTranscriptVocabularyReferences(dto.payload);
     let resolved = await this.resolve(episodeId, payload);
+    payload = resolved.payload;
     if (resolved.preview.fingerprint !== dto.fingerprint) {
       throw new ConflictException('The transcript changed after preview');
     }
@@ -59,6 +62,7 @@ export class PodcastTranscriptImportService {
     }
     await this.createMissingVocabulary(episodeId, payload, resolved.preview.vocabulary);
     resolved = await this.resolve(episodeId, payload);
+    payload = resolved.payload;
     if (resolved.preview.conflicts.length || resolved.lexemeByKey.size !== payload.vocabulary.length) {
       throw new ConflictException('Podcast vocabulary could not be prepared automatically');
     }
@@ -131,8 +135,10 @@ export class PodcastTranscriptImportService {
     if (!topic) throw new NotFoundException(`Podcast topic ${episode.topicId} not found`);
 
     const conflicts: AdminPodcastTranscriptConflict[] = [];
+    const manifest = this.requireMatchingManifest(episode, payload, conflicts);
+    payload = this.applyManifestVocabulary(payload, manifest);
     this.validateReferences(payload, conflicts);
-    this.validateRequiredVocabulary(episode, topic.targetLanguage, payload, conflicts);
+    this.validateRequiredVocabulary(episode, topic.targetLanguage, payload, conflicts, manifest);
     const identities = payload.vocabulary.map(item => this.lexemeIdentity.createIdentity({
       language: topic.targetLanguage, text: item.text,
     }));
@@ -148,15 +154,20 @@ export class PodcastTranscriptImportService {
     const usedLexemes = new Set<string>();
     const resolutions: AdminPodcastVocabularyResolution[] = payload.vocabulary.map((item, index) => {
       const matches = lexemes.filter(lexeme => lexeme.normalizedLemma === identities[index].normalizedLemma);
+      const manifestLexemeId = manifest?.items.find(manifestItem => manifestItem.key === item.key)?.canonicalLexemeId;
+      const manifestMatch = manifestLexemeId
+        ? matches.find(match => match.id === manifestLexemeId) ?? null
+        : null;
       const translationMatches = matches.filter(match =>
         this.normalize(localizationByLexeme.get(match.id)?.translation ?? '')
           === this.normalize(item.translation));
-      const matchedLexeme = translationMatches.length === 1
+      const matchedLexeme = manifestMatch ?? (translationMatches.length === 1
         ? translationMatches[0]
-        : matches.length === 1 ? matches[0] : null;
+        : matches.length === 1 ? matches[0] : null);
       let status: AdminPodcastVocabularyResolution['status'] = matchedLexeme ? 'resolved' : 'new';
       let lexemeId: string | null = matchedLexeme?.id ?? null;
       if (matches.length > 1 && !matchedLexeme) status = 'ambiguous';
+      if (manifestLexemeId && !manifestMatch) status = 'ambiguous';
       if (lexemeId && usedLexemes.has(lexemeId)) {
         status = 'ambiguous';
         lexemeId = null;
@@ -185,6 +196,7 @@ export class PodcastTranscriptImportService {
     });
     return {
       lexemeByKey,
+      payload,
       preview: {
         episodeId,
         episode: payload.episode ? {
@@ -249,7 +261,18 @@ export class PodcastTranscriptImportService {
     language: LanguageCode,
     payload: PodcastTranscriptPayloadDto,
     conflicts: AdminPodcastTranscriptConflict[],
+    manifest: PodcastTranscriptManifest | null,
   ): void {
+    if (manifest) {
+      const vocabularyKeys = new Set(payload.vocabulary.map(item => item.key));
+      const missingKeys = manifest.items.filter(item => !vocabularyKeys.has(item.key)).map(item => item.key);
+      if (missingKeys.length) conflicts.push({
+        code: 'missing-vocabulary', pointer: '/vocabulary', severity: 'error',
+        message: `The transcript omitted ${missingKeys.length} required vocabulary ${missingKeys.length === 1 ? 'item' : 'items'}: ${missingKeys.join(', ')}.`,
+        remediation: 'Return every LinguaCard vocabulary key from the copied prompt.',
+      });
+      return;
+    }
     const requiredVocabulary = normalizePodcastVocabulary(
       episode.generationInput?.vocabulary ?? [],
     );
@@ -273,6 +296,45 @@ export class PodcastTranscriptImportService {
       message: `The transcript omitted ${missing.length} required vocabulary ${missing.length === 1 ? 'item' : 'items'}: ${missing.join(', ')}.`,
       remediation: 'Regenerate or edit the JSON so every required headword appears in vocabulary and is referenced by at least one turn.',
     });
+  }
+
+  private requireMatchingManifest(
+    episode: PodcastEpisodeEntity,
+    payload: PodcastTranscriptPayloadDto,
+    conflicts: AdminPodcastTranscriptConflict[],
+  ): PodcastTranscriptManifest | null {
+    if (payload.schemaVersion !== 2) return null;
+    const manifest = episode.generationInput?.transcriptManifest;
+    if (!payload.manifestId || !manifest || payload.manifestId !== manifest.id) {
+      conflicts.push({
+        code: 'manifest-mismatch', pointer: '/manifestId', severity: 'error',
+        message: 'This transcript does not match the latest LinguaCard generation prompt.',
+        remediation: 'Use the JSON produced from the latest copied prompt for this episode.',
+      });
+      return null;
+    }
+    return manifest;
+  }
+
+  private applyManifestVocabulary(
+    payload: PodcastTranscriptPayloadDto,
+    manifest: PodcastTranscriptManifest | null,
+  ): PodcastTranscriptPayloadDto {
+    if (!manifest) return payload;
+    const manifestByKey = new Map(manifest.items.map(item => [item.key, item]));
+    return {
+      ...payload,
+      vocabulary: payload.vocabulary.map(item => {
+        const manifestItem = manifestByKey.get(item.key);
+        if (!manifestItem) return item;
+        return {
+          ...item,
+          text: manifestItem.text,
+          translation: manifestItem.translation ?? item.translation,
+          importance: 'essential',
+        };
+      }),
+    };
   }
 
   private duplicate(pointer: string, key: string): AdminPodcastTranscriptConflict {
@@ -303,26 +365,40 @@ export class PodcastTranscriptImportService {
     const topic = await this.dataSource.getRepository(PodcastTopicEntity).findOneBy({ id: episode.topicId });
     if (!topic) throw new NotFoundException(`Podcast topic ${episode.topicId} not found`);
     const statusByKey = new Map(resolutions.map(item => [item.key, item.status]));
+    const manifestByKey = new Map(
+      (episode.generationInput?.transcriptManifest?.items ?? []).map(item => [item.key, item]),
+    );
     const newVocabulary = payload.vocabulary.filter(item => statusByKey.get(item.key) === 'new');
-    await this.vocabularyProjection.projectMany(newVocabulary.map(item => ({
-      input: {
-        targetLanguage: topic.targetLanguage,
-        sourceLanguage: topic.translationLanguage,
-        displayText: item.text,
-        article: null,
-        gender: null,
-        translation: item.translation,
-        definition: null,
-        partOfSpeech: 'other',
-        phonetic: null,
-        cefrLevel: episode.level,
-        plurals: [],
-        examples: [],
-        synonyms: [],
-        source: 'admin',
-        model: 'podcast-transcript-import',
-      },
-    })));
+    await this.vocabularyProjection.projectMany(newVocabulary.map(item => {
+      const manifestItem = manifestByKey.get(item.key);
+      const article = manifestItem?.article ?? null;
+      return {
+        input: {
+          targetLanguage: topic.targetLanguage,
+          sourceLanguage: topic.translationLanguage,
+          displayText: item.text,
+          article,
+          gender: this.genderForGermanArticle(article),
+          translation: item.translation,
+          definition: null,
+          partOfSpeech: article ? 'noun' : 'other',
+          phonetic: null,
+          cefrLevel: episode.level,
+          plurals: [],
+          examples: [],
+          synonyms: [],
+          source: 'admin',
+          model: 'podcast-transcript-import',
+        },
+      };
+    }));
+  }
+
+  private genderForGermanArticle(article: string | null): string | null {
+    if (article === 'der') return 'masculine';
+    if (article === 'die') return 'feminine';
+    if (article === 'das') return 'neuter';
+    return null;
   }
 
   private normalize(value: string): string {
