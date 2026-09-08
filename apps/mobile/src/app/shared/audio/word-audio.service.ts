@@ -1,6 +1,9 @@
 import { Injectable, computed, inject, signal } from '@angular/core';
-import { type Card, type WordAudioResolveRequest } from '@lingua-card/shared/domain';
-import { AiAudioCacheService } from '../../features/ai/audio/ai-audio-cache.service';
+import { type Card, type WordAudio, type WordAudioResolveRequest } from '@lingua-card/shared/domain';
+import {
+  AiAudioCacheService,
+  audioExtensionFromUrl,
+} from '../../features/ai/audio/ai-audio-cache.service';
 import { WordAudioApiService } from './word-audio-api.service';
 import { AudioReadinessStore, AudioReadinessStatus } from './audio-readiness.store';
 import { normalizeForAudio } from './normalize';
@@ -11,6 +14,8 @@ export interface AudioPreWarmResult {
   availableCount: number;
   savedOfflineCount: number;
 }
+
+const AUDIO_DOWNLOAD_CONCURRENCY = 6;
 
 export function cardPronunciationText(card: Card): string {
   return `${card.content.article ? `${card.content.article} ` : ''}${card.content.back}`;
@@ -340,13 +345,18 @@ export class WordAudioService {
       const response = await this.api.batchResolve(missingRequests);
       const available = response.results.filter(result => Boolean(result.wordAudio.audioUrl));
       summary.availableCount += available.length;
-      const persisted = await Promise.all(available.map(async result => {
-        const key = audioCacheKey(result.wordAudio.normalizedText, result.wordAudio.language);
-        const remoteUrl = result.wordAudio.audioUrl;
-        if (!remoteUrl) return null;
-        const localUrl = await this.cache.saveFromUrl(key, remoteUrl);
-        return { key, localUrl, remoteUrl };
-      }));
+      const persisted: Array<{ key: string; localUrl: string | null; remoteUrl: string }> = [];
+      for (let index = 0; index < available.length; index += AUDIO_DOWNLOAD_CONCURRENCY) {
+        const chunk = available.slice(index, index + AUDIO_DOWNLOAD_CONCURRENCY);
+        const downloaded = await Promise.all(chunk.map(async result => {
+          const key = audioCacheKey(result.wordAudio.normalizedText, result.wordAudio.language);
+          const remoteUrl = result.wordAudio.audioUrl;
+          if (!remoteUrl) return null;
+          const localUrl = await this._saveResolvedAudio(key, result.wordAudio);
+          return { key, localUrl, remoteUrl };
+        }));
+        persisted.push(...downloaded.filter(result => result !== null));
+      }
       for (const result of persisted) {
         if (!result) continue;
         if (result.localUrl) {
@@ -456,7 +466,7 @@ export class WordAudioService {
       this._urlMap.set(cacheKey, audioUrl);
 
       // Persist before returning so subsequent sessions can play without network access.
-      const localUrl = await this.cache.saveFromUrl(cacheKey, audioUrl);
+      const localUrl = await this._saveResolvedAudio(cacheKey, result.wordAudio);
       if (localUrl && localUrl !== audioUrl) {
         this._urlMap.set(cacheKey, localUrl);
         this._offlineUrlMap.set(cacheKey, localUrl);
@@ -511,5 +521,19 @@ export class WordAudioService {
     const current = await this.cache.getFromCache(audioCacheKey(text, language));
     if (current) return current;
     return this.cache.getFromCache(legacyAudioCacheKey(text, language));
+  }
+
+  private async _saveResolvedAudio(cacheKey: string, wordAudio: WordAudio): Promise<string | null> {
+    if (!wordAudio.id || !wordAudio.audioUrl) return null;
+    try {
+      const audioBuffer = await this.api.download(wordAudio.id);
+      return this.cache.saveBuffer(
+        cacheKey,
+        audioBuffer,
+        audioExtensionFromUrl(wordAudio.audioUrl),
+      );
+    } catch {
+      return null;
+    }
   }
 }

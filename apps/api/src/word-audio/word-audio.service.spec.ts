@@ -83,4 +83,38 @@ describe('WordAudioService storage verification', () => {
       status: 'ready',
     }));
   });
+
+  it('reads ready audio bytes through the storage service', async () => {
+    const entity = readyEntity();
+    const repo = {findById: jest.fn().mockResolvedValue(entity)};
+    const stored = {buffer: Buffer.from([1, 2, 3]), contentType: 'audio/mpeg'};
+    const storage = {read: jest.fn().mockResolvedValue(stored)};
+    const service = new WordAudioService(
+      repo as never,
+      {} as never,
+      {} as never,
+      storage as never,
+      {} as never,
+    );
+
+    await expect(service.readAudio(entity.id)).resolves.toEqual(stored);
+    expect(storage.read).toHaveBeenCalledWith(entity.storagePath);
+  });
+
+  it('does not read storage for an audio row that is not ready', async () => {
+    const entity = readyEntity();
+    entity.status = 'pending';
+    const repo = {findById: jest.fn().mockResolvedValue(entity)};
+    const storage = {read: jest.fn()};
+    const service = new WordAudioService(
+      repo as never,
+      {} as never,
+      {} as never,
+      storage as never,
+      {} as never,
+    );
+
+    await expect(service.readAudio(entity.id)).resolves.toBeNull();
+    expect(storage.read).not.toHaveBeenCalled();
+  });
 });

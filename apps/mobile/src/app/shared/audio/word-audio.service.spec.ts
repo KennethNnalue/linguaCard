@@ -8,18 +8,20 @@ import { audioCacheKey, legacyAudioCacheKey } from './audio-cache-key';
 describe('WordAudioService prepared audio', () => {
   const api = {
     batchResolve: jest.fn(),
+    download: jest.fn(),
     resolve: jest.fn(),
   };
   const cache = {
     getFromCache: jest.fn(),
-    saveFromUrl: jest.fn(),
+    saveBuffer: jest.fn(),
   };
 
   beforeEach(() => {
     api.batchResolve.mockReset();
+    api.download.mockReset();
     api.resolve.mockReset();
     cache.getFromCache.mockReset();
-    cache.saveFromUrl.mockReset();
+    cache.saveBuffer.mockReset();
     TestBed.configureTestingModule({
       providers: [
         WordAudioService,
@@ -36,13 +38,17 @@ describe('WordAudioService prepared audio', () => {
 
   it('persists every pre-warmed phrase and serves it without resolving on demand', async () => {
     cache.getFromCache.mockResolvedValue(null);
-    cache.saveFromUrl
+    api.download
+      .mockResolvedValueOnce(new ArrayBuffer(3))
+      .mockResolvedValueOnce(new ArrayBuffer(4));
+    cache.saveBuffer
       .mockResolvedValueOnce('blob:word')
       .mockResolvedValueOnce('blob:example');
     api.batchResolve.mockResolvedValue({
       results: [
         {
           wordAudio: {
+            id: 'word-audio-1',
             normalizedText: 'die rechnung',
             language: 'de-DE',
             audioUrl: 'https://audio.example/word.mp3',
@@ -50,6 +56,7 @@ describe('WordAudioService prepared audio', () => {
         },
         {
           wordAudio: {
+            id: 'word-audio-2',
             normalizedText: 'die rechnung bitte',
             language: 'de-DE',
             audioUrl: 'https://audio.example/example.mp3',
@@ -65,6 +72,7 @@ describe('WordAudioService prepared audio', () => {
     ]);
 
     expect(result).toEqual({ requestedCount: 2, availableCount: 2, savedOfflineCount: 2 });
+    expect(api.download).toHaveBeenCalledTimes(2);
     await expect(service.resolvePreparedUrl('die Rechnung', 'de-DE')).resolves.toBe('blob:word');
     await expect(service.resolvePreparedUrl('Die Rechnung, bitte.', 'de-DE')).resolves.toBe('blob:example');
     expect(api.resolve).not.toHaveBeenCalled();

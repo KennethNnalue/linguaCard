@@ -40,7 +40,7 @@ export class AiAudioCacheService {
 
   // Session-level blob URL cache: cacheKey → blob URL.
   // Prevents creating duplicate blob URLs for the same audio across repeated
-  // getFromCache() / saveFromUrl() calls within a single app session.
+  // getFromCache() / saveBuffer() calls within a single app session.
   private readonly _blobUrlMap = new Map<string, string>();
 
   // ── Public API ─────────────────────────────────────────────────────────────
@@ -58,33 +58,6 @@ export class AiAudioCacheService {
     if (!remoteUrl) return null;
     if (!this.isNative) return remoteUrl;
     return this._nativeGetOrDownload(storyId, remoteUrl);
-  }
-
-  /**
-   * Download a remote audio file and persist it under the given cacheKey.
-   * Native downloads are idempotent and return a playable Capacitor URI.
-   * Web downloads the bytes once and persists them in IndexedDB so later
-   * playback is backed by a local blob URL and remains available offline.
-   */
-  async saveFromUrl(
-    cacheKey: string,
-    remoteUrl: string,
-    ext?: 'wav' | 'mp3',
-  ): Promise<string | null> {
-    const resolvedExt = ext ?? audioExtensionFromUrl(remoteUrl);
-    if (this.isNative) {
-      return this._nativeSaveFromUrl(cacheKey, remoteUrl, resolvedExt);
-    }
-    const existing = await this._webGet(cacheKey);
-    if (existing) return existing;
-
-    try {
-      const response = await fetch(remoteUrl);
-      if (!response.ok) return null;
-      return this.saveBuffer(cacheKey, await response.arrayBuffer(), resolvedExt);
-    } catch {
-      return null;
-    }
   }
 
   async saveBuffer(cacheKey: string, audioBuffer: ArrayBuffer, ext: 'wav' | 'mp3' = 'wav'): Promise<string | null> {
@@ -173,26 +146,6 @@ export class AiAudioCacheService {
     } catch (err) {
       console.error(`Audio cache download failed for story ${storyId}:`, err);
       return remoteUrl;
-    }
-  }
-
-  private async _nativeSaveFromUrl(
-    cacheKey: string,
-    remoteUrl: string,
-    ext: 'wav' | 'mp3',
-  ): Promise<string | null> {
-    const existing = await this._findExistingPath(cacheKey);
-    if (existing) return existing;
-
-    const path = `${this.CACHE_DIR}/${cacheKey}.${ext}`;
-    try {
-      await Filesystem.mkdir({ path: this.CACHE_DIR, directory: Directory.Data, recursive: true });
-      await Filesystem.downloadFile({ path, url: remoteUrl, directory: Directory.Data });
-      const result = await Filesystem.getUri({ path, directory: Directory.Data });
-      return Capacitor.convertFileSrc(result.uri);
-    } catch (err) {
-      console.error(`Audio saveFromUrl failed for key ${cacheKey}:`, err);
-      return null;
     }
   }
 

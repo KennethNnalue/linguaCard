@@ -1,7 +1,18 @@
 import { Injectable, Logger } from '@nestjs/common';
-import { S3Client, PutObjectCommand, DeleteObjectCommand, HeadObjectCommand } from '@aws-sdk/client-s3';
-import { writeFile, mkdir, unlink } from 'fs/promises';
-import { join } from 'path';
+import {
+  S3Client,
+  PutObjectCommand,
+  DeleteObjectCommand,
+  GetObjectCommand,
+  HeadObjectCommand,
+} from '@aws-sdk/client-s3';
+import { writeFile, mkdir, readFile, unlink } from 'fs/promises';
+import { extname, join } from 'path';
+
+export interface StoredFile {
+  buffer: Buffer;
+  contentType: string;
+}
 
 @Injectable()
 export class StorageService {
@@ -68,6 +79,35 @@ export class StorageService {
     }
   }
 
+  async read(path: string): Promise<StoredFile | null> {
+    if (this.s3) {
+      try {
+        const result = await this.s3.send(new GetObjectCommand({
+          Bucket: this.bucket,
+          Key: path,
+        }));
+        if (!result.Body) return null;
+        return {
+          buffer: Buffer.from(await result.Body.transformToByteArray()),
+          contentType: result.ContentType ?? this.contentTypeForPath(path),
+        };
+      } catch (error: unknown) {
+        if (this.isMissingObjectError(error)) return null;
+        throw error;
+      }
+    }
+
+    try {
+      return {
+        buffer: await readFile(join(this.uploadsDir, path)),
+        contentType: this.contentTypeForPath(path),
+      };
+    } catch (error: unknown) {
+      if (isFileNotFoundError(error)) return null;
+      throw error;
+    }
+  }
+
   private async uploadToR2(buffer: Buffer, path: string, contentType: string): Promise<string> {
     await this.s3!.send(new PutObjectCommand({
       Bucket: this.bucket,
@@ -112,6 +152,24 @@ export class StorageService {
     const baseUrl = process.env['API_PUBLIC_URL']?.replace(/\/$/, '') ?? 'http://localhost:3001';
     return `${baseUrl}/uploads/${path}`;
   }
+
+  private contentTypeForPath(path: string): string {
+    const extension = extname(path).toLowerCase();
+    if (extension === '.mp3') return 'audio/mpeg';
+    if (extension === '.wav') return 'audio/wav';
+    return 'application/octet-stream';
+  }
+
+  private isMissingObjectError(error: unknown): boolean {
+    if (!isRecord(error)) return false;
+    const metadata = error['$metadata'];
+    const statusCode = isRecord(metadata) ? metadata['httpStatusCode'] : undefined;
+    return error['name'] === 'NoSuchKey' || error['Code'] === 'NoSuchKey' || statusCode === 404;
+  }
+}
+
+function isRecord(value: unknown): value is Record<string, unknown> {
+  return typeof value === 'object' && value !== null;
 }
 
 function isFileNotFoundError(error: unknown): boolean {

@@ -26,6 +26,14 @@ export class WordAudioApiService {
     );
   }
 
+  download(id: string): Promise<ArrayBuffer> {
+    return firstValueFrom(
+      this.http.get(`${this.apiUrl}/content/${encodeURIComponent(id)}`, {
+        responseType: 'arraybuffer',
+      }),
+    );
+  }
+
   lookup(text: string, lang = 'de-DE'): Promise<WordAudio> {
     return firstValueFrom(
       this.http.get<WordAudio>(`${this.apiUrl}/lookup`, { params: { text, lang } }),

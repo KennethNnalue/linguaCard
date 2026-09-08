@@ -1,6 +1,7 @@
 import {
-  Body, Controller, Get, NotFoundException, Param, Post, Query,
+  Body, Controller, Get, NotFoundException, Param, Post, Query, Res,
 } from '@nestjs/common';
+import type { Response } from 'express';
 import type {
   WordAudioResolveResponse,
   WordAudioBatchResolveResponse,
@@ -47,6 +48,18 @@ export class WordAudioController {
     const wordAudio = await this.wordAudioService.findByText(text, lang ?? 'de-DE');
     if (!wordAudio) throw new NotFoundException('Word audio not found');
     return wordAudio;
+  }
+
+  @Get('content/:id')
+  async readAudio(@Param('id') id: string, @Res() response: Response): Promise<void> {
+    const audio = await this.wordAudioService.readAudio(id);
+    if (!audio) throw new NotFoundException('Word audio content not found');
+    response.set({
+      'Cache-Control': 'private, max-age=31536000, immutable',
+      'Content-Length': audio.buffer.byteLength,
+      'Content-Type': audio.contentType,
+    });
+    response.send(audio.buffer);
   }
 
   @Get(':id')

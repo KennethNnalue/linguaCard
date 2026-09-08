@@ -283,6 +283,12 @@ export class WordAudioService {
     return entity ? this.toModel(entity) : null;
   }
 
+  async readAudio(id: string): Promise<{ buffer: Buffer; contentType: string } | null> {
+    const entity = await this.repo.findById(id);
+    if (entity?.status !== 'ready' || !entity.storagePath) return null;
+    return this.storage.read(entity.storagePath);
+  }
+
   async findByText(text: string, language = 'de-DE'): Promise<WordAudio | null> {
     const normalizedText = normalizeForAudio(text, language);
     const entity = await this.repo.findByNormalizedText(normalizedText, language);
