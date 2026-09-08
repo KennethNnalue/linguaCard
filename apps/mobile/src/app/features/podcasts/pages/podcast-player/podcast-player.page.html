@@ -78,11 +78,20 @@
             <ion-icon name="speedometer-outline" />
             <span aria-hidden="true">{{ store.speed() }}×</span>
           </ion-button>
-          <ion-button fill="clear" shape="round" (click)="toggleRepeat()"
+          <ion-button class="repeat-control" fill="clear" shape="round" (click)="toggleRepeat()"
             [class.active]="store.repeatMode() !== 'off'"
             [attr.aria-pressed]="store.repeatMode() !== 'off'"
             [attr.aria-label]="(store.repeatMode() === 'off' ? 'podcasts.player.repeatEpisode' : 'podcasts.player.turnOffRepeat') | translate">
             <ion-icon slot="icon-only" name="repeat-outline" />
+            @if (store.repeatMode() !== 'off') {
+              <span class="repeat-mode-badge" aria-hidden="true">{{ store.repeatMode() === 'episode' ? '1' : '∞' }}</span>
+            }
+          </ion-button>
+          <ion-button fill="clear" shape="round" (click)="toggleSleepAllowed()"
+            [class.active]="screenAwake.isKeepingScreenAwake()"
+            [attr.aria-pressed]="screenAwake.isKeepingScreenAwake()"
+            [attr.aria-label]="(screenAwake.isSleepAllowed() ? 'podcasts.player.keepScreenAwake' : 'podcasts.player.allowScreenSleep') | translate">
+            <ion-icon slot="icon-only" [name]="screenAwake.isSleepAllowed() ? 'moon-outline' : 'sunny-outline'" />
           </ion-button>
           <ion-button fill="clear" shape="round" (click)="toggleSubtitles()"
             [class.active]="store.translationMode() !== 'target'"

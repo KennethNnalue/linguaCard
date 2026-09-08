@@ -1,6 +1,8 @@
 import { computed, signal } from '@angular/core';
 import { type ComponentFixture, TestBed } from '@angular/core/testing';
+import { ActivatedRoute, convertToParamMap, type ParamMap } from '@angular/router';
 import type { PodcastEpisodePlayer, PodcastPlayerTurn } from '@lingua-card/shared/domain';
+import { BehaviorSubject } from 'rxjs';
 import {
   type PodcastPlayerError, PodcastPlayerStore,
 } from '../../store/podcast-player.store';
@@ -9,6 +11,7 @@ import {
   type PodcastImmersiveFailureReason,
   type PodcastImmersiveModeState,
 } from '../../services/podcast-immersive-mode.service';
+import { PodcastScreenAwakeService } from '../../services/podcast-screen-awake.service';
 import {
   PODCAST_CHROME_AUTO_HIDE_MS,
   PodcastPlayerPage,
@@ -85,6 +88,16 @@ class PodcastImmersiveModeServiceMock {
   });
 }
 
+class PodcastScreenAwakeServiceMock {
+  readonly isSleepAllowed = signal(false);
+  readonly isKeepingScreenAwake = computed(() => !this.isSleepAllowed());
+  readonly playbackStarted = jest.fn(async () => undefined);
+  readonly playbackStopped = jest.fn(async () => undefined);
+  readonly toggleSleepAllowed = jest.fn(async () => {
+    this.isSleepAllowed.update(isAllowed => !isAllowed);
+  });
+}
+
 describe('podcast playback speed', () => {
   it('cycles through the supported speeds', () => {
     expect(nextPodcastPlaybackSpeed(0.75)).toBe(1);
@@ -113,15 +126,29 @@ describe('PodcastPlayerPage immersive presentation', () => {
   let page: PodcastPlayerPage;
   let store: PodcastPlayerStoreMock;
   let immersiveMode: PodcastImmersiveModeServiceMock;
+  let screenAwake: PodcastScreenAwakeServiceMock;
+  let episodeParams: BehaviorSubject<ParamMap>;
+  let playbackQueryParams: BehaviorSubject<ParamMap>;
 
   beforeEach(async () => {
     store = new PodcastPlayerStoreMock();
     immersiveMode = new PodcastImmersiveModeServiceMock();
+    screenAwake = new PodcastScreenAwakeServiceMock();
+    episodeParams = new BehaviorSubject(convertToParamMap({ episodeId: 'episode-1' }));
+    playbackQueryParams = new BehaviorSubject(convertToParamMap({}));
     TestBed.overrideComponent(PodcastPlayerPage, {
       set: {
         providers: [
           { provide: PodcastPlayerStore, useValue: store },
           { provide: PodcastImmersiveModeService, useValue: immersiveMode },
+          { provide: PodcastScreenAwakeService, useValue: screenAwake },
+          {
+            provide: ActivatedRoute,
+            useValue: {
+              paramMap: episodeParams,
+              queryParamMap: playbackQueryParams,
+            },
+          },
         ],
       },
     });
@@ -229,6 +256,42 @@ describe('PodcastPlayerPage immersive presentation', () => {
     expect(store.playbackStateChanged).toHaveBeenLastCalledWith(false);
     expect(store.isPlaying()).toBe(false);
     expect(page.chromeVisible()).toBe(true);
+    expect(screenAwake.playbackStopped).toHaveBeenCalledTimes(1);
+  });
+
+  it('keeps the screen awake while playing and lets the listener allow sleep', async () => {
+    page.started();
+
+    expect(screenAwake.playbackStarted).toHaveBeenCalledTimes(1);
+
+    const sleepButton = playerRoot().querySelector('ion-icon[name="sunny-outline"]')
+      ?.closest('ion-button');
+    sleepButton?.dispatchEvent(new MouseEvent('click', { bubbles: true }));
+    await fixture.whenStable();
+    fixture.detectChanges();
+
+    expect(screenAwake.toggleSleepAllowed).toHaveBeenCalledTimes(1);
+    expect(screenAwake.isSleepAllowed()).toBe(true);
+  });
+
+  it('distinguishes episode repeat from topic repeat', () => {
+    store.repeatMode.set('episode');
+    fixture.detectChanges();
+    expect(playerRoot().querySelector('.repeat-mode-badge')?.textContent?.trim()).toBe('1');
+
+    store.repeatMode.set('topic');
+    fixture.detectChanges();
+    expect(playerRoot().querySelector('.repeat-mode-badge')?.textContent?.trim()).toBe('∞');
+  });
+
+  it('turns off either active repeat mode before enabling episode repeat again', () => {
+    store.repeatMode.set('topic');
+    page.toggleRepeat();
+    expect(store.repeatModeChanged).toHaveBeenLastCalledWith('off');
+
+    store.repeatMode.set('off');
+    page.toggleRepeat();
+    expect(store.repeatModeChanged).toHaveBeenLastCalledWith('episode');
   });
 
   it('supports manual landscape rotation without immersive entry', () => {
@@ -240,6 +303,20 @@ describe('PodcastPlayerPage immersive presentation', () => {
 
     expect(page.chromeVisible()).toBe(false);
     expect(playerRoot().classList.contains('player--landscape')).toBe(true);
+  });
+
+  it('loads the next episode when Angular reuses the player route', () => {
+    store.loadEpisode.mockClear();
+
+    playbackQueryParams.next(convertToParamMap({
+      scope: 'topic', autoplay: '1', repeat: 'topic', queue: 'episode-1,episode-2',
+    }));
+    episodeParams.next(convertToParamMap({ episodeId: 'episode-2' }));
+
+    expect(store.playbackScopeChanged).toHaveBeenLastCalledWith(true);
+    expect(store.playbackQueueChanged).toHaveBeenLastCalledWith(['episode-1', 'episode-2']);
+    expect(store.repeatModeChanged).toHaveBeenLastCalledWith('topic');
+    expect(store.loadEpisode).toHaveBeenLastCalledWith('episode-2');
   });
 
   it('returns to portrait without replacing the audio element', async () => {

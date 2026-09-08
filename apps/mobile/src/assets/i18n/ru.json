@@ -1156,6 +1156,8 @@
       "playbackSpeed": "Скорость воспроизведения {{speed}}. Нажмите, чтобы изменить.",
       "repeatEpisode": "Повторять эпизод",
       "turnOffRepeat": "Отключить повтор",
+      "allowScreenSleep": "Разрешить экрану выключаться",
+      "keepScreenAwake": "Не выключать экран",
       "showSubtitles": "Показать субтитры",
       "hideSubtitles": "Скрыть субтитры",
       "rotateDevice": "Поверните устройство для альбомного просмотра.",

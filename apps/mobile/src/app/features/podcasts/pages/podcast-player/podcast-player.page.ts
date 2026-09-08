@@ -6,18 +6,22 @@ import { ActivatedRoute, Router } from '@angular/router';
 import {
   IonButton, IonContent, IonIcon, IonRange, IonSpinner,
 } from '@ionic/angular/standalone';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import type { ViewWillLeave } from '@ionic/angular';
 import { addIcons } from 'ionicons';
 import { TranslatePipe } from '@ngx-translate/core';
 import {
   arrowBackOutline, arrowRedoOutline, arrowUndoOutline, eyeOffOutline, eyeOutline,
-  contractOutline, expandOutline, pause, play, repeatOutline, speedometerOutline,
+  contractOutline, expandOutline, moonOutline, pause, play, repeatOutline, speedometerOutline,
+  sunnyOutline,
 } from 'ionicons/icons';
+import { combineLatest, distinctUntilChanged, map } from 'rxjs';
 import {
   type PodcastPlayerError, PodcastPlayerStore,
 } from '../../store/podcast-player.store';
 import { OfflineImageDirective } from '../../../../shared/image/offline-image.directive';
 import { PodcastImmersiveModeService } from '../../services/podcast-immersive-mode.service';
+import { PodcastScreenAwakeService } from '../../services/podcast-screen-awake.service';
 
 const PODCAST_PLAYBACK_SPEEDS = [0.75, 1, 1.25, 1.5] as const;
 export const PODCAST_CHROME_AUTO_HIDE_MS = 3000;
@@ -46,12 +50,13 @@ export function nextPodcastPlaybackSpeed(currentSpeed: number): number {
   imports: [
     IonButton, IonContent, IonIcon, IonRange, IonSpinner, OfflineImageDirective, TranslatePipe,
   ],
-  providers: [PodcastPlayerStore, PodcastImmersiveModeService], templateUrl: './podcast-player.page.html',
+  providers: [PodcastPlayerStore, PodcastImmersiveModeService, PodcastScreenAwakeService], templateUrl: './podcast-player.page.html',
   styleUrl: './podcast-player.page.scss', changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class PodcastPlayerPage implements OnInit, ViewWillLeave {
   readonly store = inject(PodcastPlayerStore);
   readonly immersiveMode = inject(PodcastImmersiveModeService);
+  readonly screenAwake = inject(PodcastScreenAwakeService);
   readonly chromeVisible = signal(true);
   readonly isChromeVisible = computed(
     () => !this.immersiveMode.isLandscape() || this.chromeVisible(),
@@ -68,7 +73,8 @@ export class PodcastPlayerPage implements OnInit, ViewWillLeave {
   constructor() {
     addIcons({
       arrowBackOutline, arrowRedoOutline, arrowUndoOutline, eyeOffOutline, eyeOutline,
-      contractOutline, expandOutline, pause, play, repeatOutline, speedometerOutline,
+      contractOutline, expandOutline, moonOutline, pause, play, repeatOutline, speedometerOutline,
+      sunnyOutline,
     });
     this.destroyRef.onDestroy(() => {
       this.clearChromeAutoHide();
@@ -77,19 +83,37 @@ export class PodcastPlayerPage implements OnInit, ViewWillLeave {
   }
 
   ngOnInit(): void {
-    const queryParams = this.route.snapshot.queryParamMap;
-    this.store.playbackScopeChanged(queryParams.get('scope') === 'topic');
-    this.store.playbackQueueChanged(
-      queryParams.get('queue')?.split(',').filter(episodeId => episodeId.length > 0) ?? [],
-    );
-    this.store.repeatModeChanged(queryParams.get('repeat') === 'topic' ? 'topic' : 'off');
-    this.autoplayNext = queryParams.get('autoplay') === '1';
-    this.store.loadEpisode(this.route.snapshot.paramMap.get('episodeId') ?? '');
+    combineLatest([this.route.paramMap, this.route.queryParamMap]).pipe(
+      map(([pathParams, queryParams]) => ({
+        episodeId: pathParams.get('episodeId') ?? '',
+        isTopicQueue: queryParams.get('scope') === 'topic',
+        playbackQueue: queryParams.get('queue') ?? '',
+        repeatTopic: queryParams.get('repeat') === 'topic',
+        autoplay: queryParams.get('autoplay') === '1',
+      })),
+      distinctUntilChanged((previous, current) => (
+        previous.episodeId === current.episodeId
+        && previous.isTopicQueue === current.isTopicQueue
+        && previous.playbackQueue === current.playbackQueue
+        && previous.repeatTopic === current.repeatTopic
+        && previous.autoplay === current.autoplay
+      )),
+      takeUntilDestroyed(this.destroyRef),
+    ).subscribe(config => {
+      this.store.playbackScopeChanged(config.isTopicQueue);
+      this.store.playbackQueueChanged(
+        config.playbackQueue.split(',').filter(episodeId => episodeId.length > 0),
+      );
+      this.store.repeatModeChanged(config.repeatTopic ? 'topic' : 'off');
+      this.autoplayNext = config.autoplay;
+      this.store.loadEpisode(config.episodeId);
+    });
   }
 
   ionViewWillLeave(): void {
     this.clearChromeAutoHide();
     this.stopAudioPlayback();
+    void this.screenAwake.playbackStopped();
     void this.immersiveMode.restorePortrait();
   }
   async goBack(topicId: string): Promise<void> {
@@ -174,6 +198,7 @@ export class PodcastPlayerPage implements OnInit, ViewWillLeave {
   }
   started(): void {
     this.store.playbackStateChanged(true);
+    void this.screenAwake.playbackStarted();
     this.scheduleChromeAutoHide();
   }
   paused(event: Event): void {
@@ -183,18 +208,23 @@ export class PodcastPlayerPage implements OnInit, ViewWillLeave {
       this.chromeVisible.set(true);
     }
     if (event.target instanceof HTMLAudioElement && event.target.ended) return;
+    void this.screenAwake.playbackStopped();
     this.store.persistProgress(false);
   }
   playbackFailed(): void {
     this.store.playbackStateChanged(false);
     this.clearChromeAutoHide();
     this.chromeVisible.set(true);
+    void this.screenAwake.playbackStopped();
   }
   async completed(): Promise<void> {
     const currentEpisodeId = this.store.episode()?.id;
     const nextEpisodeId = this.store.nextPlaybackTarget();
     const pointsAwarded = await this.store.completeCurrentEpisode();
-    if (pointsAwarded === null || !currentEpisodeId) return;
+    if (pointsAwarded === null || !currentEpisodeId) {
+      void this.screenAwake.playbackStopped();
+      return;
+    }
     if (currentEpisodeId && nextEpisodeId === currentEpisodeId) {
       const audio = this.audio()?.nativeElement;
       if (audio) {
@@ -205,6 +235,7 @@ export class PodcastPlayerPage implements OnInit, ViewWillLeave {
       return;
     }
     if (!nextEpisodeId) {
+      void this.screenAwake.playbackStopped();
       await this.router.navigate(
         ['/podcasts/episodes', currentEpisodeId, 'complete'], {
           replaceUrl: true,
@@ -217,11 +248,11 @@ export class PodcastPlayerPage implements OnInit, ViewWillLeave {
     await this.router.navigate(['/podcasts/episodes', nextEpisodeId, 'player'], {
       replaceUrl: true, queryParams: this.playbackQueryParams(),
     });
-    this.store.loadEpisode(nextEpisodeId);
   }
   toggleRepeat(): void {
-    this.store.repeatModeChanged(this.store.repeatMode() === 'episode' ? 'off' : 'episode');
+    this.store.repeatModeChanged(this.store.repeatMode() === 'off' ? 'episode' : 'off');
   }
+  toggleSleepAllowed(): void { void this.screenAwake.toggleSleepAllowed(); }
   toggleSubtitles(): void {
     this.store.translationModeChanged(
       this.store.translationMode() === 'target' ? 'both' : 'target',

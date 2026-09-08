@@ -1156,6 +1156,8 @@
       "playbackSpeed": "Oynatma hızı {{speed}}. Değiştirmek için dokunun.",
       "repeatEpisode": "Bölümü tekrarla",
       "turnOffRepeat": "Tekrarı kapat",
+      "allowScreenSleep": "Ekranın uyumasına izin ver",
+      "keepScreenAwake": "Ekranı açık tut",
       "showSubtitles": "Altyazıları göster",
       "hideSubtitles": "Altyazıları gizle",
       "rotateDevice": "Yatay görünüm için cihazınızı döndürün.",

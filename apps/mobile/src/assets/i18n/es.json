@@ -1156,6 +1156,8 @@
       "playbackSpeed": "Velocidad de reproducción {{speed}}. Toca para cambiar.",
       "repeatEpisode": "Repetir episodio",
       "turnOffRepeat": "Desactivar repetición",
+      "allowScreenSleep": "Permitir que la pantalla se apague",
+      "keepScreenAwake": "Mantener la pantalla activa",
       "showSubtitles": "Mostrar subtítulos",
       "hideSubtitles": "Ocultar subtítulos",
       "rotateDevice": "Gira el dispositivo para usar la vista horizontal.",

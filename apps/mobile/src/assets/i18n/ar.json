@@ -1156,6 +1156,8 @@
       "playbackSpeed": "سرعة التشغيل {{speed}}. اضغط للتغيير.",
       "repeatEpisode": "تكرار الحلقة",
       "turnOffRepeat": "إيقاف التكرار",
+      "allowScreenSleep": "السماح للشاشة بالسكون",
+      "keepScreenAwake": "إبقاء الشاشة نشطة",
       "showSubtitles": "إظهار الترجمة النصية",
       "hideSubtitles": "إخفاء الترجمة النصية",
       "rotateDevice": "أدر جهازك للعرض الأفقي.",

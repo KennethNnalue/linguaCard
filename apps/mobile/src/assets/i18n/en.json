@@ -1234,6 +1234,8 @@
       "playbackSpeed": "Playback speed {{speed}} times. Tap to change.",
       "repeatEpisode": "Repeat episode",
       "turnOffRepeat": "Turn off repeat",
+      "allowScreenSleep": "Allow the screen to sleep",
+      "keepScreenAwake": "Keep the screen awake",
       "showSubtitles": "Show subtitles",
       "hideSubtitles": "Hide subtitles",
       "rotateDevice": "Rotate your device for landscape view.",
