@@ -31,7 +31,12 @@
 </ion-header>
 
 <ion-content [class.rv-keyboard-active]="mode() === 'typing' && !isFlipped()">
-  @if (mode() === 'typing') {
+  @if (reviewStore.operation().kind === 'starting') {
+    <div class="lc-empty-state" role="status">
+      <ion-spinner name="crescent"></ion-spinner>
+      <p class="lc-empty-title">{{ 'common.loading' | translate }}</p>
+    </div>
+  } @else if (mode() === 'typing') {
     <div class="rv-scene" [class.rv-scene--revealed]="isFlipped()">
       <div class="rv-card-stage" [class.rv-card-stage--front]="!isFlipped()" [class.rv-card-stage--back]="isFlipped()">
         <lc-rv-front-type

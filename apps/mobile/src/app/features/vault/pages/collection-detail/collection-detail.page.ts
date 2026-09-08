@@ -19,7 +19,7 @@ import {FabButtonComponent} from '../../../../shared/components/fab-button/fab-b
 import {ReviewFilterService} from '../../../review/services/review-filter.service';
 import {ReviewPlayerService} from '../../../review/services/review-player.service';
 import {AudioReadinessStore} from '../../../../shared/audio/audio-readiness.store';
-import {normalizeForAudio} from '../../../../shared/audio/normalize';
+import {audioCacheKey} from '../../../../shared/audio/audio-cache-key';
 import {ImageImportApiService} from '../../import/services/image-import-api.service';
 import {addIcons} from 'ionicons';
 import {shareOutline, trashOutline, closeCircleOutline, syncOutline} from 'ionicons/icons';
@@ -105,10 +105,10 @@ export class CollectionDetailPage implements OnInit {
       const headword = typeof article === 'string' && article.trim()
         ? `${article.trim()} ${c.lexeme.text}`
         : c.lexeme.text;
-      keys.add(`wa-${locale}-${normalizeForAudio(headword, locale)}`);
+      keys.add(audioCacheKey(headword, locale));
       for (const ex of c.examples) {
         if (ex.targetText.trim()) {
-          keys.add(`wa-${locale}-${normalizeForAudio(ex.targetText.trim(), locale)}`);
+          keys.add(audioCacheKey(ex.targetText.trim(), locale));
         }
       }
     }

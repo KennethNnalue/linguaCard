@@ -4,11 +4,16 @@ import { AiAudioCacheService } from '../../features/ai/audio/ai-audio-cache.serv
 import { WordAudioApiService } from './word-audio-api.service';
 import { AudioReadinessStore, AudioReadinessStatus } from './audio-readiness.store';
 import { normalizeForAudio } from './normalize';
+import { audioCacheKey, legacyAudioCacheKey } from './audio-cache-key';
 
 export interface AudioPreWarmResult {
   requestedCount: number;
   availableCount: number;
   savedOfflineCount: number;
+}
+
+export function cardPronunciationText(card: Card): string {
+  return `${card.content.article ? `${card.content.article} ` : ''}${card.content.back}`;
 }
 
 @Injectable({ providedIn: 'root' })
@@ -29,6 +34,11 @@ export class WordAudioService {
 
   // In-memory: cacheKey → audioUrl. Populated from API responses and device cache.
   private readonly _urlMap = new Map<string, string>();
+
+  // Contains only device/IndexedDB-backed URLs. Review playback deliberately
+  // reads from this map (or the device cache) so it never starts a network
+  // resolve after a card has been presented.
+  private readonly _offlineUrlMap = new Map<string, string>();
 
   // Deduplicates concurrent requests for the same word.
   private readonly _inflight = new Map<string, Promise<string | null>>();
@@ -74,8 +84,11 @@ export class WordAudioService {
    * Builds text from article + back, then resolves via the word audio registry.
    */
   async playCard(card: Card, language = 'de-DE'): Promise<void> {
-    const text = (card.content.article ? `${card.content.article} ` : '') + card.content.back;
-    await this.play(text, language);
+    await this.play(cardPronunciationText(card), language);
+  }
+
+  async playPreparedCard(card: Card, language = 'de-DE'): Promise<void> {
+    await this.playPrepared(cardPronunciationText(card), language);
   }
 
   /**
@@ -97,7 +110,7 @@ export class WordAudioService {
    * raised during resolution so callers can show a spinner.
    */
   async play(text: string, language = 'de-DE'): Promise<void> {
-    const cacheKey = this._cacheKey(normalizeForAudio(text, language), language);
+    const cacheKey = audioCacheKey(text, language);
     const cached = this._urlMap.get(cacheKey);
 
     if (cached) {
@@ -231,6 +244,17 @@ export class WordAudioService {
     return this._playUrl(url, rate);
   }
 
+  async playPrepared(text: string, language = 'de-DE', rate = 1): Promise<void> {
+    const sequence = ++this._tapSeq;
+    const url = await this.resolvePreparedUrl(text, language);
+    if (sequence !== this._tapSeq) return;
+    if (!url) {
+      this._playbackError.set(true);
+      return;
+    }
+    return this._playUrl(url, rate);
+  }
+
   async playRequired(text: string, language: string, rate = 1): Promise<void> {
     const url = await this.resolveUrl(text, language);
     if (!url) {
@@ -246,7 +270,7 @@ export class WordAudioService {
    * without triggering an API call.
    */
   hasCached(text: string, language = 'de-DE'): boolean {
-    const cacheKey = this._cacheKey(normalizeForAudio(text, language), language);
+    const cacheKey = audioCacheKey(text, language);
     return this._urlMap.has(cacheKey);
   }
 
@@ -257,7 +281,7 @@ export class WordAudioService {
    * wrap it in a computed() and it re-evaluates as words become ready.
    */
   readinessFor(text: string, language = 'de-DE'): AudioReadinessStatus | 'unknown' {
-    const cacheKey = this._cacheKey(normalizeForAudio(text, language), language);
+    const cacheKey = audioCacheKey(text, language);
     const status = this.audioReadiness.statusFor(cacheKey);
     if (status !== 'unknown') return status;
     return this._urlMap.has(cacheKey) ? 'ready' : 'unknown';
@@ -269,12 +293,11 @@ export class WordAudioService {
    * survives app restarts without a network round-trip.
    * Call after card creation or import to trigger background generation.
    */
-  async preWarm(words: { text: string; language?: string }[]): Promise<AudioPreWarmResult> {
+  async preWarm(words: readonly { text: string; language?: string }[]): Promise<AudioPreWarmResult> {
     const uniqueRequests = new Map<string, WordAudioResolveRequest>();
     for (const word of words) {
       const language = word.language ?? 'de-DE';
-      const normalized = normalizeForAudio(word.text, language);
-      uniqueRequests.set(this._cacheKey(normalized, language), {text: word.text, language});
+      uniqueRequests.set(audioCacheKey(word.text, language), {text: word.text, language});
     }
     const requests = [...uniqueRequests.values()];
     const summary: AudioPreWarmResult = {
@@ -283,12 +306,42 @@ export class WordAudioService {
       savedOfflineCount: 0,
     };
     if (!requests.length) return summary;
+
+    const missingRequests: WordAudioResolveRequest[] = [];
+    for (const request of requests) {
+      const language = request.language ?? 'de-DE';
+      const key = audioCacheKey(request.text, language);
+      let cached: string | null = null;
+      try {
+        cached = await this._getPersistedUrl(request.text, language);
+      } catch {
+        // A local-cache failure can recover from the registry while online.
+      }
+      if (cached) {
+        this._urlMap.set(key, cached);
+        this._offlineUrlMap.set(key, cached);
+        this.audioReadiness.markReady(key);
+        summary.availableCount += 1;
+        summary.savedOfflineCount += 1;
+      } else {
+        this.audioReadiness.markPending(key);
+        missingRequests.push(request);
+      }
+    }
+    if (!missingRequests.length) return summary;
+    if (!navigator.onLine) {
+      for (const request of missingRequests) {
+        const language = request.language ?? 'de-DE';
+        this.audioReadiness.markFailed(audioCacheKey(request.text, language));
+      }
+      return summary;
+    }
     try {
-      const response = await this.api.batchResolve(requests);
+      const response = await this.api.batchResolve(missingRequests);
       const available = response.results.filter(result => Boolean(result.wordAudio.audioUrl));
-      summary.availableCount = available.length;
+      summary.availableCount += available.length;
       const persisted = await Promise.all(available.map(async result => {
-        const key = this._cacheKey(result.wordAudio.normalizedText, result.wordAudio.language);
+        const key = audioCacheKey(result.wordAudio.normalizedText, result.wordAudio.language);
         const remoteUrl = result.wordAudio.audioUrl;
         if (!remoteUrl) return null;
         const localUrl = await this.cache.saveFromUrl(key, remoteUrl);
@@ -296,14 +349,54 @@ export class WordAudioService {
       }));
       for (const result of persisted) {
         if (!result) continue;
-        if (result.localUrl) summary.savedOfflineCount += 1;
+        if (result.localUrl) {
+          summary.savedOfflineCount += 1;
+          this._offlineUrlMap.set(result.key, result.localUrl);
+        }
         this._urlMap.set(result.key, result.localUrl ?? result.remoteUrl);
-        this.audioReadiness.markReady(result.key);
+        if (result.localUrl) this.audioReadiness.markReady(result.key);
+        else this.audioReadiness.markFailed(result.key);
+      }
+      const returnedKeys = new Set(response.results.map(result => audioCacheKey(
+        result.wordAudio.normalizedText,
+        result.wordAudio.language,
+      )));
+      for (const result of response.results) {
+        if (result.wordAudio.audioUrl) continue;
+        this.audioReadiness.markFailed(audioCacheKey(
+          result.wordAudio.normalizedText,
+          result.wordAudio.language,
+        ));
+      }
+      for (const request of missingRequests) {
+        const language = request.language ?? 'de-DE';
+        const key = audioCacheKey(request.text, language);
+        if (!returnedKeys.has(key)) this.audioReadiness.markFailed(key);
       }
     } catch {
-      // Pre-warm failure is non-fatal
+      for (const request of missingRequests) {
+        const language = request.language ?? 'de-DE';
+        this.audioReadiness.markFailed(audioCacheKey(request.text, language));
+      }
     }
     return summary;
+  }
+
+  /** Resolve only audio already persisted locally. Never calls the API. */
+  async resolvePreparedUrl(text: string, language = 'de-DE'): Promise<string | null> {
+    const cacheKey = audioCacheKey(text, language);
+    const inMemory = this._offlineUrlMap.get(cacheKey);
+    if (inMemory) return inMemory;
+
+    const cached = await this._getPersistedUrl(text, language);
+    if (!cached) {
+      this.audioReadiness.markFailed(cacheKey);
+      return null;
+    }
+    this._offlineUrlMap.set(cacheKey, cached);
+    this._urlMap.set(cacheKey, cached);
+    this.audioReadiness.markReady(cacheKey);
+    return cached;
   }
 
   /**
@@ -312,15 +405,16 @@ export class WordAudioService {
    */
   async resolveUrl(text: string, language = 'de-DE'): Promise<string | null> {
     const normalized = normalizeForAudio(text, language);
-    const cacheKey = this._cacheKey(normalized, language);
+    const cacheKey = audioCacheKey(normalized, language);
 
     // 1. In-memory
     if (this._urlMap.has(cacheKey)) return this._urlMap.get(cacheKey)!;
 
     // 2. Device cache (native only)
-    const deviceCached = await this.cache.getFromCache(cacheKey);
+    const deviceCached = await this._getPersistedUrl(text, language);
     if (deviceCached) {
       this._urlMap.set(cacheKey, deviceCached);
+      this._offlineUrlMap.set(cacheKey, deviceCached);
       this.audioReadiness.markReady(cacheKey);
       return deviceCached;
     }
@@ -361,11 +455,11 @@ export class WordAudioService {
 
       this._urlMap.set(cacheKey, audioUrl);
 
-      // Download to device for offline use (no-op on web).
-      // Use saveFromUrl so subsequent sessions hit Capacitor Filesystem immediately.
+      // Persist before returning so subsequent sessions can play without network access.
       const localUrl = await this.cache.saveFromUrl(cacheKey, audioUrl);
       if (localUrl && localUrl !== audioUrl) {
         this._urlMap.set(cacheKey, localUrl);
+        this._offlineUrlMap.set(cacheKey, localUrl);
         this.audioReadiness.markReady(cacheKey);
         return localUrl;
       }
@@ -410,23 +504,12 @@ export class WordAudioService {
       this._player.dispatchEvent(new Event('lc-stop'));
     }
     this._isPlaying.set(false);
+    this._playbackError.set(false);
   }
 
-  /**
-   * Write a batch of already-resolved audio URLs into the in-memory cache.
-   * Called by CollectionAudioPrefetchService after a successful batchResolve
-   * so the first play() after prefetch is an instant memory-cache hit instead
-   * of falling back to Web Speech.
-   */
-  populateMemoryCache(entries: { normalizedText: string; language: string; url: string }[]): void {
-    for (const e of entries) {
-      const key = this._cacheKey(e.normalizedText, e.language);
-      this._urlMap.set(key, e.url);
-      this.audioReadiness.markReady(key);
-    }
-  }
-
-  private _cacheKey(normalizedText: string, language: string): string {
-    return `wa-${language}-${normalizedText}`;
+  private async _getPersistedUrl(text: string, language: string): Promise<string | null> {
+    const current = await this.cache.getFromCache(audioCacheKey(text, language));
+    if (current) return current;
+    return this.cache.getFromCache(legacyAudioCacheKey(text, language));
   }
 }

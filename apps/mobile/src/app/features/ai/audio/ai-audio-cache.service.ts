@@ -63,8 +63,8 @@ export class AiAudioCacheService {
   /**
    * Download a remote audio file and persist it under the given cacheKey.
    * Native downloads are idempotent and return a playable Capacitor URI.
-   * Web only reads previously cached buffers; remote URLs are played directly by
-   * callers because fetching an object-storage URL requires bucket CORS access.
+   * Web downloads the bytes once and persists them in IndexedDB so later
+   * playback is backed by a local blob URL and remains available offline.
    */
   async saveFromUrl(
     cacheKey: string,
@@ -75,7 +75,16 @@ export class AiAudioCacheService {
     if (this.isNative) {
       return this._nativeSaveFromUrl(cacheKey, remoteUrl, resolvedExt);
     }
-    return this._webGet(cacheKey);
+    const existing = await this._webGet(cacheKey);
+    if (existing) return existing;
+
+    try {
+      const response = await fetch(remoteUrl);
+      if (!response.ok) return null;
+      return this.saveBuffer(cacheKey, await response.arrayBuffer(), resolvedExt);
+    } catch {
+      return null;
+    }
   }
 
   async saveBuffer(cacheKey: string, audioBuffer: ArrayBuffer, ext: 'wav' | 'mp3' = 'wav'): Promise<string | null> {

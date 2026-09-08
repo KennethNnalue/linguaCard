@@ -33,6 +33,7 @@ import { ReviewLocalRepository } from '../services/review-local.repository';
 import { EngagementStore } from '../../engagement/state/engagement.store';
 import { CardAdministrationService } from '../services/card-administration.service';
 import { SettingsStore } from '../../settings/store/settings.store';
+import { ReviewAudioPreparationService } from '../services/review-audio-preparation.service';
 
 export interface ReviewCommitContext {
   reviewMode?: 'typing' | 'recall';
@@ -40,6 +41,8 @@ export interface ReviewCommitContext {
   responseType?: 'self_rated' | 'typed_answer' | 'dont_know';
   answerEvaluation?: import('../domain/review-domain').AnswerEvaluation;
 }
+
+export type ReviewSessionStartResult = StartSessionResult | { kind: 'cancelled' };
 
 export type ReviewOperation =
   | { kind: 'idle' }
@@ -131,7 +134,9 @@ export const ReviewStore = signalStore(
     const engagementStore = inject(EngagementStore);
     const cardAdministration = inject(CardAdministrationService);
     const settingsStore = inject(SettingsStore);
+    const reviewAudioPreparation = inject(ReviewAudioPreparationService);
     let persistenceChain: Promise<void> = Promise.resolve();
+    let sessionStartSequence = 0;
 
     function serializePersistence(work: () => Promise<void>): Promise<void> {
       const current = persistenceChain.then(work);
@@ -143,6 +148,21 @@ export const ReviewStore = signalStore(
     }
     function schedulingStates(): Map<string, ReturnType<typeof schedulingStateFor>> {
       return new Map(cardStore.cards().map(card => [card.id, schedulingStateFor(card)]));
+    }
+    function beginSessionStart(): number {
+      sessionStartSequence += 1;
+      return sessionStartSequence;
+    }
+    function isCurrentSessionStart(sequence: number, sessionId: string): boolean {
+      return sequence === sessionStartSequence
+        && store.operation().kind === 'starting'
+        && store.session()?.definition.id === sessionId;
+    }
+    async function prepareSessionAudio(session: ReviewSessionState): Promise<void> {
+      const cards = session.definition.originalCardIds
+        .map(cardById)
+        .filter((card): card is ScheduledCard => card !== undefined);
+      await reviewAudioPreparation.prepare(cards);
     }
     async function persistActiveSession(
       session: ReviewSessionState,
@@ -218,17 +238,24 @@ export const ReviewStore = signalStore(
         if (navigator.onLine) void syncService.processQueue();
       }).catch(() => patchState(store, { commitError: 'Session synchronization could not be queued.' }));
     }
-    async function presentNextCard(session: ReviewSessionState, now: Date): Promise<void> {
+    async function presentNextCard(
+      session: ReviewSessionState,
+      now: Date,
+      canPresent: () => boolean = () => true,
+    ): Promise<boolean> {
       const selection = selectNextCard(session, schedulingStates(), now);
       if (selection.kind === 'complete') {
+        if (!canPresent()) return false;
         await completeActiveSession(selection.state);
-        return;
+        return true;
       }
       const nextSession = recordPresentation(session, selection);
       await persistActiveSession(nextSession);
+      if (!canPresent()) return false;
       patchState(store, {
         session: nextSession, presentation: resolvePresentation(nextSession, selection), operation: { kind: 'ready' },
       });
+      return true;
     }
     async function commitCardReview(
       card: ScheduledCard, sessionId: string, rating: ReviewRating, context: ReviewCommitContext,
@@ -283,7 +310,8 @@ export const ReviewStore = signalStore(
           await syncService.enqueue({ type: SyncOperationType.FLUSH_CARD_ADMINISTRATIONS, payload: { userId } });
         }
       },
-      async startSession(source: ReviewSessionSource, limit: number): Promise<StartSessionResult> {
+      async startSession(source: ReviewSessionSource, limit: number): Promise<ReviewSessionStartResult> {
+        const startSequence = beginSessionStart();
         patchState(store, {
           session: null, presentation: null, operation: { kind: 'starting' }, sessionRatings: {},
           sessionNewCardCount: 0, completedSession: null, commitError: null, lastReviewedCardId: null,
@@ -294,6 +322,7 @@ export const ReviewStore = signalStore(
         const timeZone = settingsStore.settings()?.timezone
           ?? Intl.DateTimeFormat().resolvedOptions().timeZone;
         const result = await sessionBuilder.start(request, new Date(), generateUuid(), { timeZone });
+        if (startSequence !== sessionStartSequence) return { kind: 'cancelled' };
         if (result.kind !== 'started') {
           patchState(store, {
             operation: result.kind === 'load_failed'
@@ -308,8 +337,15 @@ export const ReviewStore = signalStore(
           sessionNewCardCount: result.session.definition.originalCardIds.filter(cardId => cards.get(cardId)?.reviewState.stage === 'new').length,
         });
         try {
-          await presentNextCard(result.session, new Date());
+          await prepareSessionAudio(result.session);
+          const isCurrent = () => isCurrentSessionStart(startSequence, result.session.definition.id);
+          if (!isCurrent() || !await presentNextCard(result.session, new Date(), isCurrent)) {
+            return { kind: 'cancelled' };
+          }
         } catch {
+          if (!isCurrentSessionStart(startSequence, result.session.definition.id)) {
+            return { kind: 'cancelled' };
+          }
           patchState(store, {
             session: result.session,
             presentation: null,
@@ -322,7 +358,8 @@ export const ReviewStore = signalStore(
         }
         return result;
       },
-      async startSessionForCards(source: ReviewSessionSource, cardIds: readonly string[]): Promise<StartSessionResult> {
+      async startSessionForCards(source: ReviewSessionSource, cardIds: readonly string[]): Promise<ReviewSessionStartResult> {
+        const startSequence = beginSessionStart();
         patchState(store, {
           session: null, presentation: null, operation: { kind: 'starting' }, sessionRatings: {},
           sessionNewCardCount: 0, completedSession: null, commitError: null, lastReviewedCardId: null,
@@ -343,9 +380,16 @@ export const ReviewStore = signalStore(
           sessionNewCardCount: originalCardIds.filter(cardId => availableCards.get(cardId)?.reviewState.stage === 'new').length,
         });
         try {
-          await presentNextCard(session, new Date());
+          await prepareSessionAudio(session);
+          const isCurrent = () => isCurrentSessionStart(startSequence, session.definition.id);
+          if (!isCurrent() || !await presentNextCard(session, new Date(), isCurrent)) {
+            return { kind: 'cancelled' };
+          }
           return { kind: 'started', session };
         } catch {
+          if (!isCurrentSessionStart(startSequence, session.definition.id)) {
+            return { kind: 'cancelled' };
+          }
           patchState(store, {
             session, presentation: null,
             operation: { kind: 'error', message: 'The review session could not be saved on this device.', recoverable: true },
@@ -357,9 +401,11 @@ export const ReviewStore = signalStore(
         }
       },
       async resumeSession(sessionId: string): Promise<boolean> {
+        const startSequence = beginSessionStart();
         const userId = authService.currentUser()?.id;
         if (!userId) return false;
         const persisted = await localData.getActiveReviewSession(userId);
+        if (startSequence !== sessionStartSequence) return false;
         if (!persisted || persisted.session.definition.id !== sessionId) return false;
         const persistedSession = deserializeReviewSessionState(persisted.session);
         if (persistedSession.status !== 'active') {
@@ -380,9 +426,12 @@ export const ReviewStore = signalStore(
           commitError: null,
         });
         try {
-          await presentNextCard(session, new Date());
+          await prepareSessionAudio(session);
+          const isCurrent = () => isCurrentSessionStart(startSequence, session.definition.id);
+          if (!isCurrent() || !await presentNextCard(session, new Date(), isCurrent)) return false;
           return true;
         } catch {
+          if (!isCurrentSessionStart(startSequence, session.definition.id)) return false;
           patchState(store, {
             operation: { kind: 'error', message: 'The review session could not be resumed.', recoverable: true },
           });
@@ -492,10 +541,12 @@ export const ReviewStore = signalStore(
         return true;
       },
       leaveSession(): void {
+        sessionStartSequence += 1;
         if (store.session()?.status !== 'active') return;
         patchState(store, { presentation: null, operation: { kind: 'idle' } });
       },
       clearSession(): void {
+        sessionStartSequence += 1;
         patchState(store, {
           session: null, presentation: null, operation: { kind: 'idle' }, sessionRatings: {},
           sessionNewCardCount: 0, completedSession: null, lastReviewedCardId: null,

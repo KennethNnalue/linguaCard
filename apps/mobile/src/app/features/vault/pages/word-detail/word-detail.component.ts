@@ -19,7 +19,7 @@ import {WordAudioService} from '../../../../shared/audio/word-audio.service';
 import {AudioReadinessStore} from '../../../../shared/audio/audio-readiness.store';
 import {ArticleBadgeComponent} from '../../../../shared/components/article-badge/article-badge.component';
 import {AddWordSheetComponent} from '../../components/add-word-sheet/add-word-sheet.component';
-import {normalizeForAudio} from '../../../../shared/audio/normalize';
+import {audioCacheKey} from '../../../../shared/audio/audio-cache-key';
 import {stageIndicator} from '../../../review/domain/review-status';
 import {MASTERY_LABEL_KEYS} from '../../../review/models/review.model';
 import {CardAdministrationService} from '../../../review/services/card-administration.service';
@@ -156,7 +156,7 @@ export class WordDetailComponent {
     if (!card) return '';
     const text = (card.content.article ? `${card.content.article} ` : '') + card.content.back;
     const locale = this.targetLocale();
-    return `wa-${locale}-${normalizeForAudio(text, locale)}`;
+    return audioCacheKey(text, locale);
   });
 
   /** 'ready' | 'pending' | 'failed' | 'unknown' — drives the readiness dot. */

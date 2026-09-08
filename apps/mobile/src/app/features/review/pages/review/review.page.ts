@@ -1,9 +1,9 @@
 import { ChangeDetectionStrategy, Component, HostListener, Input, computed, effect, inject, signal, viewChild } from '@angular/core';
-import { AlertController, IonContent, IonHeader, IonIcon, IonToolbar, ModalController } from '@ionic/angular/standalone';
+import { AlertController, IonContent, IonHeader, IonIcon, IonSpinner, IonToolbar, ModalController } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
 import { closeOutline, volumeHighOutline, volumeMuteOutline } from 'ionicons/icons';
 import type { ReviewRating, ScheduledCard } from '@lingua-card/shared/domain';
-import { WordAudioService } from '../../../../shared/audio/word-audio.service';
+import { cardPronunciationText, WordAudioService } from '../../../../shared/audio/word-audio.service';
 import { CardStore } from '../../../vault/store/card.store';
 import { ReviewStore } from '../../store/review.store';
 import { TranslatePipe, TranslateService } from '@ngx-translate/core';
@@ -36,6 +36,7 @@ const SLOW_RATE = 0.7;
   imports: [
     IonContent,
     IonIcon,
+    IonSpinner,
     IonToolbar,
     IonHeader,
     TranslatePipe,
@@ -372,19 +373,19 @@ export class ReviewPage {
     if (this.sessionMuted()) return;
     const card = this.currentCard();
     if (!card) return;
-    void this.wordAudio.playCard(card);
+    void this.wordAudio.playPreparedCard(card);
   }
 
   playSlow(): void {
     if (this.sessionMuted()) return;
     const card = this.currentCard();
     if (!card) return;
-    void this.wordAudio.playTarget(card.content.back, 'de-DE', SLOW_RATE);
+    void this.wordAudio.playPrepared(cardPronunciationText(card), 'de-DE', SLOW_RATE);
   }
 
   playExample(sentence: string): void {
     if (this.sessionMuted()) return;
-    void this.wordAudio.play(sentence, 'de-DE');
+    void this.wordAudio.playPrepared(sentence, 'de-DE');
   }
 
   toggleSessionMute(): void {
@@ -414,14 +415,14 @@ export class ReviewPage {
     } as const;
     if (!shouldAutoplayReviewAnswer(policy)) return;
     const sequence = ++this.audioSequence;
-    const answer = `${card.content.article ? `${card.content.article} ` : ''}${card.content.back}`;
+    const answer = cardPronunciationText(card);
     await new Promise(resolve => setTimeout(resolve, 300));
     if (sequence !== this.audioSequence) return;
-    await this.wordAudio.playTarget(answer, 'de-DE');
+    await this.wordAudio.playPrepared(answer, 'de-DE');
     if (!shouldAutoplayFirstExample(policy) || sequence !== this.audioSequence || !card.content.examples[0]) return;
     await new Promise(resolve => setTimeout(resolve, 500));
     if (sequence !== this.audioSequence) return;
-    await this.wordAudio.playTarget(card.content.examples[0].target, 'de-DE');
+    await this.wordAudio.playPrepared(card.content.examples[0].target, 'de-DE');
   }
 
   async requestExit(): Promise<void> {
