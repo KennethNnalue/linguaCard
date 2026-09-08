@@ -1,5 +1,6 @@
 import { computed, signal } from '@angular/core';
 import { type ComponentFixture, TestBed } from '@angular/core/testing';
+import { Location } from '@angular/common';
 import { ActivatedRoute, convertToParamMap, type ParamMap } from '@angular/router';
 import type { PodcastEpisodePlayer, PodcastPlayerTurn } from '@lingua-card/shared/domain';
 import { BehaviorSubject } from 'rxjs';
@@ -62,7 +63,7 @@ class PodcastPlayerStoreMock {
   readonly playbackStateChanged = jest.fn((playing: boolean) => this.isPlaying.set(playing));
   readonly persistProgress = jest.fn();
   readonly completeCurrentEpisode = jest.fn(async () => 0);
-  readonly nextPlaybackTarget = jest.fn(() => null);
+  readonly nextPlaybackTarget = jest.fn<string | null, []>(() => null);
   readonly translationModeChanged = jest.fn();
   readonly speedChanged = jest.fn((speed: number) => this.speed.set(speed));
   readonly revealTranslation = jest.fn();
@@ -129,6 +130,7 @@ describe('PodcastPlayerPage immersive presentation', () => {
   let screenAwake: ScreenAwakeServiceMock;
   let episodeParams: BehaviorSubject<ParamMap>;
   let playbackQueryParams: BehaviorSubject<ParamMap>;
+  let location: { replaceState: jest.Mock };
 
   beforeEach(async () => {
     store = new PodcastPlayerStoreMock();
@@ -136,12 +138,14 @@ describe('PodcastPlayerPage immersive presentation', () => {
     screenAwake = new ScreenAwakeServiceMock();
     episodeParams = new BehaviorSubject(convertToParamMap({ episodeId: 'episode-1' }));
     playbackQueryParams = new BehaviorSubject(convertToParamMap({}));
+    location = { replaceState: jest.fn() };
     TestBed.overrideComponent(PodcastPlayerPage, {
       set: {
         providers: [
           { provide: PodcastPlayerStore, useValue: store },
           { provide: PodcastImmersiveModeService, useValue: immersiveMode },
           { provide: ScreenAwakeService, useValue: screenAwake },
+          { provide: Location, useValue: location },
           {
             provide: ActivatedRoute,
             useValue: {
@@ -338,6 +342,30 @@ describe('PodcastPlayerPage immersive presentation', () => {
     page.readyToPlay();
     await fixture.whenStable();
 
+    expect(playAudio).toHaveBeenCalledTimes(1);
+  });
+
+  it('advances a topic inside the active player and arms native autoplay', async () => {
+    const audioBefore = playerRoot().querySelector('audio');
+    if (!(audioBefore instanceof HTMLAudioElement)) throw new Error('Expected audio element');
+    const playAudio = jest.spyOn(audioBefore, 'play').mockResolvedValue(undefined);
+    store.nextPlaybackTarget.mockReturnValue('episode-2');
+    store.playbackQueue.set(['episode-1', 'episode-2']);
+    store.loadEpisode.mockImplementationOnce(() => {
+      store.episode.set({ ...episode, id: 'episode-2', audioUrl: '/episode-2.mp3' });
+    });
+
+    await page.completed();
+    fixture.detectChanges();
+    page.readyToPlay();
+
+    expect(location.replaceState).toHaveBeenCalledWith(
+      '/podcasts/episodes/episode-2/player',
+      'scope=topic&autoplay=1&queue=episode-1%2Cepisode-2',
+    );
+    expect(store.loadEpisode).toHaveBeenCalledWith('episode-2');
+    expect(playerRoot().querySelector('audio')).toBe(audioBefore);
+    expect(audioBefore.autoplay).toBe(true);
     expect(playAudio).toHaveBeenCalledTimes(1);
   });
 

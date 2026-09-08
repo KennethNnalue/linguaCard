@@ -2,6 +2,7 @@ import {
   ChangeDetectionStrategy, Component, computed, DestroyRef, ElementRef, inject, OnInit, signal,
   viewChild,
 } from '@angular/core';
+import { Location } from '@angular/common';
 import { ActivatedRoute, Router } from '@angular/router';
 import {
   IonButton, IonContent, IonIcon, IonRange, IonSpinner,
@@ -64,6 +65,7 @@ export class PodcastPlayerPage implements OnInit, ViewWillLeave {
   readonly errorMessageKey = podcastPlayerErrorMessageKey;
   private readonly route = inject(ActivatedRoute);
   private readonly router = inject(Router);
+  private readonly location = inject(Location);
   private readonly destroyRef = inject(DestroyRef);
   private readonly playerHost = viewChild<ElementRef<HTMLElement>>('playerHost');
   private readonly audio = viewChild<ElementRef<HTMLAudioElement>>('audioPlayer');
@@ -208,11 +210,13 @@ export class PodcastPlayerPage implements OnInit, ViewWillLeave {
     if (this.immersiveMode.isImmersive() || this.immersiveMode.isLandscape()) {
       this.chromeVisible.set(true);
     }
+    if (this.autoplayNext) return;
     if (event.target instanceof HTMLAudioElement && event.target.ended) return;
     void this.screenAwake.playbackStopped();
     this.store.persistProgress(false);
   }
   playbackFailed(): void {
+    this.autoplayNext = false;
     this.store.playbackStateChanged(false);
     this.clearChromeAutoHide();
     this.chromeVisible.set(true);
@@ -246,9 +250,10 @@ export class PodcastPlayerPage implements OnInit, ViewWillLeave {
       return;
     }
     this.autoplayNext = true;
-    await this.router.navigate(['/podcasts/episodes', nextEpisodeId, 'player'], {
-      replaceUrl: true, queryParams: this.playbackQueryParams(),
-    });
+    const audio = this.audio()?.nativeElement;
+    if (audio) audio.autoplay = true;
+    this.replacePlayerUrl(nextEpisodeId);
+    this.store.loadEpisode(nextEpisodeId);
   }
   toggleRepeat(): void {
     this.store.repeatModeChanged(this.store.repeatMode() === 'off' ? 'episode' : 'off');
@@ -310,5 +315,12 @@ export class PodcastPlayerPage implements OnInit, ViewWillLeave {
       ...(playbackQueue.length ? { queue: playbackQueue.join(',') } : {}),
       ...(this.store.repeatMode() === 'topic' ? { repeat: 'topic' } : {}),
     };
+  }
+
+  private replacePlayerUrl(episodeId: string): void {
+    this.location.replaceState(
+      `/podcasts/episodes/${encodeURIComponent(episodeId)}/player`,
+      new URLSearchParams(this.playbackQueryParams()).toString(),
+    );
   }
 }
