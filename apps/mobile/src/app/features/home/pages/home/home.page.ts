@@ -19,6 +19,7 @@ import {CategoryStore} from '../../../vault/store/category.store';
 import {CollectionStore} from '../../../vault/store/collection.store';
 import {ReviewFilterService} from '../../../review/services/review-filter.service';
 import {ReviewPlayerService} from '../../../review/services/review-player.service';
+import {ReviewAudioPreparationService} from '../../../review/services/review-audio-preparation.service';
 import {getCategoryName} from '../../../../shared/helpers/helpers';
 import {UserMenuComponent} from '../../../../shared/components/user-menu/user-menu.component';
 import {AddWordSheetComponent} from '../../../vault/components/add-word-sheet/add-word-sheet.component';
@@ -73,6 +74,8 @@ export class HomePage {
   private readonly languageService = inject(LanguageService);
   private readonly router = inject(Router);
   private readonly reviewPlayer = inject(ReviewPlayerService);
+  private readonly reviewAudioPreparation = inject(ReviewAudioPreparationService);
+  readonly reviewLaunching = this.reviewPlayer.isLaunching;
   private readonly filterService = inject(ReviewFilterService);
   private readonly goalPromptPolicy = inject(GoalPromptPolicyService);
   readonly homePresentation = inject(HomePresentationStore);
@@ -92,6 +95,13 @@ export class HomePage {
     });
     effect(() => {
       if (this.settingsStore.needsGoalSetup()) void this.showGoalsPromptIfEligible();
+    });
+    effect(() => {
+      const collectionId = this.selectedCollectionId();
+      const source = collectionId
+        ? {kind: 'collection' as const, collectionId}
+        : {kind: 'daily' as const};
+      this.reviewAudioPreparation.prepareSource(source, this.settingsStore.dailyGoal());
     });
   }
 

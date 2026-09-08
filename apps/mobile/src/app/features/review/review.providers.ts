@@ -4,6 +4,7 @@ import { SessionSyncHandler } from './services/session-sync.handler';
 import { SessionRefresher } from './services/session.refresher';
 import { ReviewCommitSyncHandler } from './services/review-commit-sync.handler';
 import { CardAdministrationSyncHandler } from './services/card-administration-sync.handler';
+import { ReviewAudioPreparationService } from './services/review-audio-preparation.service';
 
 export function provideReview(): EnvironmentProviders {
   return makeEnvironmentProviders([
@@ -13,6 +14,7 @@ export function provideReview(): EnvironmentProviders {
       sync.registerHandler(inject(SessionSyncHandler));
       sync.registerHandler(inject(CardAdministrationSyncHandler));
       sync.registerRefresher(inject(SessionRefresher));
+      inject(ReviewAudioPreparationService).initialize();
     }),
   ]);
 }

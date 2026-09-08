@@ -13,6 +13,7 @@ export interface AudioPreWarmResult {
   requestedCount: number;
   availableCount: number;
   savedOfflineCount: number;
+  failedRequests: readonly WordAudioResolveRequest[];
 }
 
 const AUDIO_DOWNLOAD_CONCURRENCY = 6;
@@ -309,6 +310,7 @@ export class WordAudioService {
       requestedCount: requests.length,
       availableCount: 0,
       savedOfflineCount: 0,
+      failedRequests: [],
     };
     if (!requests.length) return summary;
 
@@ -316,9 +318,9 @@ export class WordAudioService {
     for (const request of requests) {
       const language = request.language ?? 'de-DE';
       const key = audioCacheKey(request.text, language);
-      let cached: string | null = null;
+      let cached: string | null = this._offlineUrlMap.get(key) ?? null;
       try {
-        cached = await this._getPersistedUrl(request.text, language);
+        cached ??= await this._getPersistedUrl(request.text, language);
       } catch {
         // A local-cache failure can recover from the registry while online.
       }
@@ -339,6 +341,7 @@ export class WordAudioService {
         const language = request.language ?? 'de-DE';
         this.audioReadiness.markFailed(audioCacheKey(request.text, language));
       }
+      summary.failedRequests = missingRequests;
       return summary;
     }
     try {
@@ -389,6 +392,10 @@ export class WordAudioService {
         this.audioReadiness.markFailed(audioCacheKey(request.text, language));
       }
     }
+    summary.failedRequests = requests.filter(request => {
+      const language = request.language ?? 'de-DE';
+      return !this._offlineUrlMap.has(audioCacheKey(request.text, language));
+    });
     return summary;
   }
 

@@ -71,11 +71,19 @@ describe('WordAudioService prepared audio', () => {
       { text: 'Die Rechnung, bitte.', language: 'de-DE' },
     ]);
 
-    expect(result).toEqual({ requestedCount: 2, availableCount: 2, savedOfflineCount: 2 });
+    expect(result).toEqual({ requestedCount: 2, availableCount: 2, savedOfflineCount: 2, failedRequests: [] });
     expect(api.download).toHaveBeenCalledTimes(2);
     await expect(service.resolvePreparedUrl('die Rechnung', 'de-DE')).resolves.toBe('blob:word');
     await expect(service.resolvePreparedUrl('Die Rechnung, bitte.', 'de-DE')).resolves.toBe('blob:example');
     expect(api.resolve).not.toHaveBeenCalled();
+
+    expect(cache.getFromCache).toHaveBeenCalledTimes(4);
+    await expect(service.preWarm([
+      { text: 'die Rechnung', language: 'de-DE' },
+      { text: 'Die Rechnung, bitte.', language: 'de-DE' },
+    ])).resolves.toEqual({requestedCount: 2, availableCount: 2, savedOfflineCount: 2, failedRequests: []});
+    expect(cache.getFromCache).toHaveBeenCalledTimes(4);
+    expect(api.batchResolve).toHaveBeenCalledTimes(1);
   });
 
   it('does not call the API when prepared audio is missing', async () => {
@@ -107,7 +115,12 @@ describe('WordAudioService prepared audio', () => {
     const service = TestBed.inject(WordAudioService);
 
     await expect(service.preWarm([{ text: 'nicht gespeichert', language: 'de-DE' }]))
-      .resolves.toEqual({ requestedCount: 1, availableCount: 0, savedOfflineCount: 0 });
+      .resolves.toEqual({
+        requestedCount: 1,
+        availableCount: 0,
+        savedOfflineCount: 0,
+        failedRequests: [{text: 'nicht gespeichert', language: 'de-DE'}],
+      });
 
     expect(api.batchResolve).not.toHaveBeenCalled();
   });

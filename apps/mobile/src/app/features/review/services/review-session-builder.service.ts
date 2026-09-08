@@ -7,20 +7,25 @@ import { deserializeSchedulingState } from '../domain/review-persistence';
 import { ReviewLocalRepository } from './review-local.repository';
 import {
   ApplicationError,
+  CandidateSelectionResult,
   DEFAULT_DAILY_NEW_CARD_LIMIT,
   DEFAULT_NEW_CARD_RATIO,
   ReviewCandidate,
   ReviewSessionRequest,
   SessionBuilderPolicy,
   StartSessionResult,
-  buildReviewSession,
   remainingDailyNewCardLimit,
+  selectSessionCandidates,
 } from '../domain/session-builder';
+import { createReviewSession } from '../domain/review-domain';
 
 export interface ReviewSessionStartOptions {
   policy?: SessionBuilderPolicy;
   timeZone: string;
 }
+
+export type ReviewSessionSelectionResult = CandidateSelectionResult
+  | { kind: 'load_failed'; error: ApplicationError };
 
 @Injectable({ providedIn: 'root' })
 export class ReviewSessionBuilderService {
@@ -35,6 +40,26 @@ export class ReviewSessionBuilderService {
     sessionId: string,
     options: ReviewSessionStartOptions,
   ): Promise<StartSessionResult> {
+    const selection = await this.select(request, now, options);
+    if (selection.kind !== 'selected') return selection;
+    return {
+      kind: 'started',
+      session: createReviewSession({
+        id: sessionId,
+        source: request.source,
+        mode: request.mode,
+        direction: request.direction,
+        originalCardIds: selection.cardIds,
+        startedAt: now,
+      }),
+    };
+  }
+
+  async select(
+    request: ReviewSessionRequest,
+    now: Date,
+    options: ReviewSessionStartOptions,
+  ): Promise<ReviewSessionSelectionResult> {
     const readiness = await this.awaitCardReadiness();
     if (readiness) return { kind: 'load_failed', error: readiness };
 
@@ -48,7 +73,7 @@ export class ReviewSessionBuilderService {
       });
     }
     const resolvedPolicy = options.policy ?? await this.dailyPolicy(now, options.timeZone);
-    return buildReviewSession(candidates, request, resolvedPolicy, now, sessionId);
+    return selectSessionCandidates(candidates, request, resolvedPolicy, now);
   }
 
   private async dailyPolicy(now: Date, timeZone: string): Promise<SessionBuilderPolicy> {

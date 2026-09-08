@@ -1,4 +1,4 @@
-import {inject, Injectable} from '@angular/core';
+import {inject, Injectable, signal} from '@angular/core';
 import {ModalController} from '@ionic/angular/standalone';
 import {Router} from '@angular/router';
 import type {ScheduledCard} from '@lingua-card/shared/domain';
@@ -16,6 +16,8 @@ export class ReviewPlayerService {
   private readonly reviewStore = inject(ReviewStore);
   private readonly router = inject(Router);
   private readonly reviewPrefs = inject(ReviewPrefsService);
+  private readonly launching = signal(false);
+  readonly isLaunching = this.launching.asReadonly();
 
   async open(cards: readonly ScheduledCard[], source: ReviewSessionSource): Promise<boolean> {
     if (cards.length === 0) return false;
@@ -37,16 +39,19 @@ export class ReviewPlayerService {
   }
 
   private async launch(startSession: () => Promise<boolean>): Promise<boolean> {
-    const focusBridge = this.captureIosTypingFocus();
+    if (this.launching()) return false;
+    this.launching.set(true);
     try {
-      return await this.present(focusBridge, startSession);
+      return await this.present(startSession);
     } finally {
-      focusBridge?.remove();
+      this.launching.set(false);
     }
   }
 
-  private async present(focusBridge: HTMLInputElement | null, startSession: () => Promise<boolean>): Promise<boolean> {
+  private async present(startSession: () => Promise<boolean>): Promise<boolean> {
     const launchInTypingMode = this.reviewPrefs.mode() === 'type';
+    if (!await startSession()) return false;
+    const focusBridge = this.captureIosTypingFocus();
     const modal = await this.modalController.create({
       component: ReviewPage,
       componentProps: {launchInTypingMode},
@@ -71,17 +76,13 @@ export class ReviewPlayerService {
           modal.focusTrap = true;
         }
       }
-      const sessionStarted = startSession();
       await presenting;
       if (!focusBridge) await this.prepareTypingInput(modal, launchInTypingMode);
-      if (!await sessionStarted) {
-        await modal.dismiss(undefined, 'session-unavailable');
-        return false;
-      }
       const result = await modal.onWillDismiss<{ completed?: boolean }>();
       completed = result.data?.completed === true;
     } finally {
       disconnectKeyboardBridge();
+      focusBridge?.remove();
       stopTrackingViewport();
       await this.restoreKeyboardBehavior();
     }
@@ -161,6 +162,7 @@ export class ReviewPlayerService {
 
   private captureIosTypingFocus(): HTMLInputElement | null {
     if (Capacitor.isNativePlatform() || this.reviewPrefs.mode() !== 'type' || !this.isIosBrowser()) return null;
+    if (navigator.userActivation && !navigator.userActivation.isActive) return null;
     const input = document.createElement('input');
     input.className = 'lc-ios-keyboard-focus-bridge';
     input.type = 'text';

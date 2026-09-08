@@ -80,7 +80,12 @@
             <p class="daily-support">{{ 'home.daily.caughtUpSupport' | translate }}</p>
           }
         }
-        <lc-button variant="filled-inverse" size="lg" [fullWidth]="true" (click)="performHeroAction()">
+        <lc-button
+          variant="filled-inverse"
+          size="lg"
+          [fullWidth]="true"
+          [loading]="reviewLaunching()"
+          (click)="performHeroAction()">
           @switch (hero.action) {
             @case ('add-vocabulary') { {{ 'home.daily.addWords' | translate }} }
             @case ('keep-practicing') { {{ 'home.daily.keepPracticing' | translate }} }
