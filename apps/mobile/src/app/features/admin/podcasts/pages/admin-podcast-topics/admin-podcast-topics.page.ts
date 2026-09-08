@@ -13,7 +13,14 @@ import {
   IonSpinner,
   IonTextarea,
 } from '@ionic/angular/standalone';
-import type {AdminPodcastTranscriptPayload, CefrLevel, LanguageCode} from '@lingua-card/shared/domain';
+import type {
+  AdminPodcastTranscriptPayload,
+  AdminPodcastTranscriptPromptNeedsResolutionResult,
+  AdminPodcastVocabularyResolutionCandidate,
+  AdminPodcastVocabularySelection,
+  CefrLevel,
+  LanguageCode,
+} from '@lingua-card/shared/domain';
 import {addIcons} from 'ionicons';
 import {
   addOutline,
@@ -40,6 +47,12 @@ import {AdminPodcastStore} from '../../store/admin-podcast.store';
 
 type StudioView = 'library' | 'topic' | 'new-topic' | 'new-episode' | 'review';
 
+interface PromptCopyRequest {
+  episodeId: string;
+  words: readonly string[];
+  direction?: string;
+}
+
 @Component({
   selector: 'lc-admin-podcast-topics',
   standalone: true,
@@ -62,6 +75,10 @@ export class AdminPodcastTopicsPage implements OnInit {
   readonly topicId = signal<string | null>(null);
   readonly pendingTranscript = signal<AdminPodcastTranscriptPayload | null>(null);
   readonly pendingPrompt = signal<{ words: readonly string[]; direction?: string } | null>(null);
+  readonly promptCopyRequest = signal<PromptCopyRequest | null>(null);
+  readonly promptResolution = signal<AdminPodcastTranscriptPromptNeedsResolutionResult | null>(null);
+  readonly promptSelections = signal<Readonly<Record<string, string>>>({});
+  readonly promptCopying = signal(false);
   readonly transcriptOpen = signal(false);
   readonly transcriptReviewed = signal(false);
   readonly topic = computed(() => this.store.topics().find(item => item.id === this.topicId()) ?? null);
@@ -73,6 +90,13 @@ export class AdminPodcastTopicsPage implements OnInit {
     return createdEpisodeId
       ? topic?.episodes.find(item => item.id === createdEpisodeId) ?? null
       : null;
+  });
+  readonly canCopyResolvedPrompt = computed(() => {
+    const resolution = this.promptResolution();
+    const selections = this.promptSelections();
+    return resolution !== null
+      && resolution.ambiguities.length > 0
+      && resolution.ambiguities.every(ambiguity => Boolean(selections[ambiguity.key]));
   });
   readonly topicForm = new FormGroup({
     title: new FormControl('', {nonNullable: true, validators: Validators.required}),
@@ -381,6 +405,35 @@ export class AdminPodcastTopicsPage implements OnInit {
     this.store.createEpisodeDraft(topicId);
   }
 
+  selectPromptResolution(key: string, lexemeId: unknown): void {
+    if (typeof lexemeId !== 'string') return;
+    this.promptSelections.update(selections => ({ ...selections, [key]: lexemeId }));
+  }
+
+  async copyResolvedPrompt(): Promise<void> {
+    const request = this.promptCopyRequest();
+    const resolution = this.promptResolution();
+    if (!request || !resolution || !this.canCopyResolvedPrompt()) return;
+    const selections = resolution.ambiguities.map((ambiguity): AdminPodcastVocabularySelection => ({
+      key: ambiguity.key,
+      lexemeId: this.promptSelections()[ambiguity.key],
+    }));
+    await this.copyPromptForEpisode(request.episodeId, request.words, request.direction, selections);
+  }
+
+  cancelPromptResolution(): void {
+    this.promptCopyRequest.set(null);
+    this.promptResolution.set(null);
+    this.promptSelections.set({});
+  }
+
+  promptCandidateLabel(candidate: AdminPodcastVocabularyResolutionCandidate): string {
+    const grammar = [candidate.article, candidate.partOfSpeech].filter(Boolean).join(' · ');
+    return [candidate.translation ?? 'No translation', grammar, candidate.definition]
+      .filter(Boolean)
+      .join(' — ');
+  }
+
   async uploadTranscript(event: Event): Promise<void> {
     const file = this.selectedFile(event);
     if (!file) return;
@@ -434,12 +487,24 @@ export class AdminPodcastTopicsPage implements OnInit {
     episodeId: string,
     words: readonly string[],
     direction?: string,
+    resolutions?: AdminPodcastVocabularySelection[],
   ): Promise<void> {
+    if (this.promptCopying()) return;
+    this.promptCopying.set(true);
     try {
-      await this.clipboard.copy(episodeId, [...words], direction);
+      const result = await this.clipboard.copy(episodeId, [...words], direction, resolutions);
+      if (result.status === 'needs_resolution') {
+        this.promptCopyRequest.set({ episodeId, words: [...words], direction });
+        this.promptResolution.set(result);
+        this.promptSelections.set({});
+        return;
+      }
+      this.cancelPromptResolution();
       await this.notifications.present({message: 'Generation prompt copied.', duration: 1800, color: 'success'});
     } catch {
       this.store.setLocalError('Could not copy the generation prompt.');
+    } finally {
+      this.promptCopying.set(false);
     }
   }
 

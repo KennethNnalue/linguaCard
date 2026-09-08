@@ -33,7 +33,9 @@ describe('PodcastTranscriptGenerationService prompt', () => {
       { provide: DataSource, useValue: dataSource },
       { provide: OpenRouterAdapter, useValue: {} },
       { provide: PodcastTranscriptImportService, useValue: {} },
-      { provide: PodcastTranscriptManifestService, useValue: { create: jest.fn().mockResolvedValue(manifest) } },
+      { provide: PodcastTranscriptManifestService, useValue: {
+        prepare: jest.fn().mockResolvedValue({ manifest, ambiguities: [] }),
+      } },
     ] }).compile();
     const service = module.get(PodcastTranscriptGenerationService);
 
@@ -44,6 +46,7 @@ describe('PodcastTranscriptGenerationService prompt', () => {
       vocabulary: ['die Vermieterin, -nen', 'bald'],
       transcriptManifest: manifest,
     });
+    if (result.status !== 'ready') throw new Error('Expected a ready prompt');
     expect(result.manifestId).toBe(manifest.id);
     expect(result.prompt).toContain('Required vocabulary (2 supplied; use every item');
     expect(result.prompt).toContain('"key":"vermieterin"');
@@ -51,7 +54,7 @@ describe('PodcastTranscriptGenerationService prompt', () => {
     await module.close();
   });
 
-  it('reuses saved generation vocabulary when the UI supplies no replacement list', async () => {
+  it('revalidates unresolved saved vocabulary when the UI supplies no replacement list', async () => {
     const manifest = createPodcastTranscriptManifestDraft(['die Vermieterin, -nen', 'bald'], 'de', 'en');
     const episode = Object.assign(new PodcastEpisodeEntity(), {
       id: 'episode', topicId: 'topic',
@@ -70,19 +73,68 @@ describe('PodcastTranscriptGenerationService prompt', () => {
         ? episodeRepository
         : { findOneBy: jest.fn().mockResolvedValue(topic) }),
     };
+    const prepare = jest.fn().mockResolvedValue({ manifest, ambiguities: [] });
     const module = await Test.createTestingModule({ providers: [
       PodcastTranscriptGenerationService,
       { provide: DataSource, useValue: dataSource },
       { provide: OpenRouterAdapter, useValue: {} },
       { provide: PodcastTranscriptImportService, useValue: {} },
-      { provide: PodcastTranscriptManifestService, useValue: { create: jest.fn() } },
+      { provide: PodcastTranscriptManifestService, useValue: { prepare } },
     ] }).compile();
     const service = module.get(PodcastTranscriptGenerationService);
 
     const result = await service.prompt('episode', []);
 
     expect(episodeRepository.save).toHaveBeenCalledWith(episode);
+    expect(prepare).toHaveBeenCalledWith(
+      ['die Vermieterin, -nen', 'bald'], 'de', 'en', [],
+    );
+    if (result.status !== 'ready') throw new Error('Expected a ready prompt');
     expect(result.prompt).toContain('Required vocabulary (2 supplied; use every item');
     await module.close();
+  });
+
+  it('returns ambiguities without saving an unusable manifest', async () => {
+    const manifest = createPodcastTranscriptManifestDraft(['Band'], 'de', 'en');
+    const episode = Object.assign(new PodcastEpisodeEntity(), {
+      id: 'episode', topicId: 'topic', generationInput: null,
+    });
+    const topic = Object.assign(new PodcastTopicEntity(), {
+      id: 'topic', title: 'Musik', description: '',
+      targetLanguage: 'de', translationLanguage: 'en', level: 'A1',
+    });
+    const episodeRepository = {
+      findOneBy: jest.fn().mockResolvedValue(episode),
+      save: jest.fn().mockResolvedValue(episode),
+    };
+    const ambiguity = {
+      key: 'band', text: 'Band', article: null,
+      candidates: [{
+        lexemeId: '11111111-1111-5111-a111-111111111111', text: 'Band',
+        translation: 'volume', definition: null, partOfSpeech: 'noun', article: 'der',
+      }],
+    };
+    const dataSource = {
+      getRepository: jest.fn(entity => entity === PodcastEpisodeEntity
+        ? episodeRepository
+        : { findOneBy: jest.fn().mockResolvedValue(topic) }),
+    };
+    const module = await Test.createTestingModule({ providers: [
+      PodcastTranscriptGenerationService,
+      { provide: DataSource, useValue: dataSource },
+      { provide: OpenRouterAdapter, useValue: {} },
+      { provide: PodcastTranscriptImportService, useValue: {} },
+      { provide: PodcastTranscriptManifestService, useValue: {
+        prepare: jest.fn().mockResolvedValue({ manifest, ambiguities: [ambiguity] }),
+      } },
+    ] }).compile();
+    try {
+      const result = await module.get(PodcastTranscriptGenerationService).prompt('episode', ['Band']);
+
+      expect(result).toEqual({ status: 'needs_resolution', ambiguities: [ambiguity] });
+      expect(episodeRepository.save).not.toHaveBeenCalled();
+    } finally {
+      await module.close();
+    }
   });
 });

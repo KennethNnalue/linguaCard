@@ -1963,9 +1963,40 @@ export interface AdminCreateElevenLabsPodcastResult {
   status: 'processing';
 }
 
-export interface AdminPodcastTranscriptPromptResult {
+export interface AdminPodcastTranscriptPromptReadyResult {
+  status: 'ready';
   prompt: string;
   manifestId: string;
+}
+
+export interface AdminPodcastVocabularyResolutionCandidate {
+  lexemeId: string;
+  text: string;
+  translation: string | null;
+  definition: string | null;
+  partOfSpeech: string;
+  article: string | null;
+}
+
+export interface AdminPodcastVocabularyAmbiguity {
+  key: string;
+  text: string;
+  article: string | null;
+  candidates: AdminPodcastVocabularyResolutionCandidate[];
+}
+
+export interface AdminPodcastTranscriptPromptNeedsResolutionResult {
+  status: 'needs_resolution';
+  ambiguities: AdminPodcastVocabularyAmbiguity[];
+}
+
+export type AdminPodcastTranscriptPromptResult =
+  | AdminPodcastTranscriptPromptReadyResult
+  | AdminPodcastTranscriptPromptNeedsResolutionResult;
+
+export interface AdminPodcastVocabularySelection {
+  key: string;
+  lexemeId: string;
 }
 
 export type PodcastVocabularyImportance = 'essential' | 'supporting';

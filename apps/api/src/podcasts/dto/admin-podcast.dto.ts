@@ -8,6 +8,7 @@ import type { CefrLevel, LanguageCode } from '@lingua-card/shared/domain';
 const CEFR_LEVELS = ['A1', 'A2', 'B1', 'B2', 'C1'] as const;
 const LANGUAGE_CODES = ['en', 'de', 'fr', 'es', 'it', 'pt', 'ja', 'zh', 'ko', 'ar', 'uk', 'tr', 'ru'] as const;
 const CONTAINS_NON_WHITESPACE = /\S/u;
+const CANONICAL_LEXEME_ID = /^(?:[a-f0-9]{32}|[a-f0-9]{8}-[a-f0-9]{4}-[1-5][a-f0-9]{3}-[89ab][a-f0-9]{3}-[a-f0-9]{12})$/iu;
 
 export class CreatePodcastTopicDto {
   @IsString()
@@ -100,6 +101,18 @@ export class CreatePodcastTranscriptPromptDto {
 
   @IsOptional() @IsString() @Matches(CONTAINS_NON_WHITESPACE) @MaxLength(500)
   direction?: string;
+
+  @IsOptional() @IsArray() @ArrayMaxSize(40)
+  @ValidateNested({ each: true }) @Type(() => PodcastVocabularySelectionDto)
+  resolutions?: PodcastVocabularySelectionDto[];
+}
+
+export class PodcastVocabularySelectionDto {
+  @IsString() @Matches(/^[a-z0-9]+(?:-[a-z0-9]+)*$/) @MaxLength(60)
+  key!: string;
+
+  @IsString() @Matches(CANONICAL_LEXEME_ID)
+  lexemeId!: string;
 }
 
 export class CreateElevenLabsPodcastDto extends GeneratePodcastTranscriptDto {}

@@ -1,5 +1,5 @@
 import { createHash } from 'node:crypto';
-import type { LanguageCode } from '@lingua-card/shared/domain';
+import type { AdminPodcastVocabularyAmbiguity, LanguageCode } from '@lingua-card/shared/domain';
 import { normalizePodcastVocabulary, normalizePodcastVocabularyItem } from './podcast-transcript-prompt';
 
 export interface PodcastTranscriptManifestItem {
@@ -16,6 +16,11 @@ export interface PodcastTranscriptManifest {
   targetLanguage: LanguageCode;
   translationLanguage: LanguageCode;
   items: PodcastTranscriptManifestItem[];
+}
+
+export interface PodcastTranscriptManifestPreparation {
+  manifest: PodcastTranscriptManifest;
+  ambiguities: AdminPodcastVocabularyAmbiguity[];
 }
 
 export function createPodcastTranscriptManifestDraft(

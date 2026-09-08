@@ -23,7 +23,31 @@
           @if (generatedEpisode.status === 'failed') { <p class="step-warning" role="alert">Generation failed. Resolve the error before continuing to review.</p> }
           <div class="management-actions"><ion-button color="danger" fill="outline" [disabled]="store.isMutating()" (click)="deleteEpisode()"><ion-icon slot="start" name="trash-outline"></ion-icon>Delete episode</ion-button></div>
         }
-        <details [open]="!episode()?.hasTranscript"><summary>Import a transcript instead</summary><p>Copy the generation prompt and use it unchanged in the external AI system. Then upload the returned JSON here; its manifest ID and vocabulary keys link it to this episode.</p><ion-button class="outline" fill="outline" expand="block" type="button" [disabled]="store.isMutating() || store.transcriptStatus() === 'loading'" (click)="copyPrompt()">Copy generation prompt</ion-button><label class="upload-button">Upload transcript JSON<input type="file" accept="application/json,.json" [disabled]="store.isMutating() || store.transcriptStatus() === 'loading'" (change)="uploadTranscript($event)" /></label></details>
+        <details [open]="!episode()?.hasTranscript">
+          <summary>Import a transcript instead</summary>
+          <p>Copy the generation prompt and use it unchanged in the external AI system. Then upload the returned JSON here; its manifest ID and vocabulary keys link it to this episode.</p>
+          <ion-button class="outline" fill="outline" expand="block" type="button" [disabled]="store.isMutating() || store.transcriptStatus() === 'loading' || promptCopying()" (click)="copyPrompt()">{{ promptCopying() ? 'Preparing prompt…' : 'Copy generation prompt' }}</ion-button>
+          @if (promptResolution(); as resolution) {
+            <section class="vocabulary-resolution" aria-labelledby="vocabulary-resolution-title">
+              <h3 id="vocabulary-resolution-title">Choose the intended meaning</h3>
+              <p>LinguaCard resolved the other words automatically. Select a meaning only for these {{ resolution.ambiguities.length }} ambiguous {{ resolution.ambiguities.length === 1 ? 'entry' : 'entries' }}.</p>
+              @for (ambiguity of resolution.ambiguities; track ambiguity.key) {
+                <ion-item>
+                  <ion-select label="{{ ambiguity.article ? ambiguity.article + ' ' : '' }}{{ ambiguity.text }}" labelPlacement="stacked" placeholder="Choose a meaning" (ionChange)="selectPromptResolution(ambiguity.key, $event.detail.value)">
+                    @for (candidate of ambiguity.candidates; track candidate.lexemeId) {
+                      <ion-select-option [value]="candidate.lexemeId">{{ promptCandidateLabel(candidate) }}</ion-select-option>
+                    }
+                  </ion-select>
+                </ion-item>
+              }
+              <div class="resolution-actions">
+                <ion-button fill="clear" type="button" [disabled]="promptCopying()" (click)="cancelPromptResolution()">Cancel</ion-button>
+                <ion-button class="primary" type="button" [disabled]="!canCopyResolvedPrompt() || promptCopying()" (click)="copyResolvedPrompt()">{{ promptCopying() ? 'Preparing prompt…' : 'Confirm and copy prompt' }}</ion-button>
+              </div>
+            </section>
+          }
+          <label class="upload-button">Upload transcript JSON<input type="file" accept="application/json,.json" [disabled]="store.isMutating() || store.transcriptStatus() === 'loading'" (change)="uploadTranscript($event)" /></label>
+        </details>
       } @else { <p>Open a topic before creating an episode.</p><ion-button fill="outline" (click)="show('library')">Choose a topic</ion-button> }
     </section>
   }

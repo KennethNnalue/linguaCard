@@ -188,4 +188,57 @@ describe('AdminPodcastStore transcript completion', () => {
     expect(store.topics()[0].episodes).toEqual([]);
     expect(navigate).toHaveBeenCalledWith(['/admin/podcasts', 'topic']);
   });
+
+  it('collects exceptional vocabulary choices before copying the prompt once', async () => {
+    const present = jest.fn().mockResolvedValue(undefined);
+    const copy = jest.fn()
+      .mockResolvedValueOnce({
+        status: 'needs_resolution',
+        ambiguities: [{
+          key: 'band', text: 'Band', article: null,
+          candidates: [
+            {
+              lexemeId: '11111111-1111-5111-a111-111111111111', text: 'Band',
+              translation: 'volume', definition: null, partOfSpeech: 'noun', article: 'der',
+            },
+            {
+              lexemeId: '22222222-2222-5222-a222-222222222222', text: 'Band',
+              translation: 'ribbon', definition: null, partOfSpeech: 'noun', article: 'das',
+            },
+          ],
+        }],
+      })
+      .mockResolvedValueOnce({ status: 'ready', prompt: 'Prompt', manifestId: 'a'.repeat(64) });
+    TestBed.configureTestingModule({ providers: [
+      { provide: Router, useValue: { navigate: jest.fn().mockResolvedValue(true) } },
+      { provide: ActivatedRoute, useValue: {
+        snapshot: {
+          paramMap: { get: (key: string) => key === 'episodeId' ? 'episode' : key === 'topicId' ? 'topic' : null },
+          data: { podcastView: 'new-episode' },
+        },
+      } },
+      { provide: AppNotificationService, useValue: { present } },
+      { provide: PodcastTranscriptClipboardService, useValue: { copy } },
+      { provide: AlertController, useValue: {} },
+    ] });
+    setup();
+    const page = TestBed.runInInjectionContext(() => new AdminPodcastTopicsPage());
+    page.topicId.set('topic');
+    page.episodeForm.patchValue({ vocabulary: 'Band', direction: 'Books' });
+
+    await page.copyPrompt();
+
+    expect(page.promptResolution()?.ambiguities).toHaveLength(1);
+    expect(page.canCopyResolvedPrompt()).toBe(false);
+    expect(present).not.toHaveBeenCalled();
+
+    page.selectPromptResolution('band', '11111111-1111-5111-a111-111111111111');
+    await page.copyResolvedPrompt();
+
+    expect(copy).toHaveBeenNthCalledWith(2, 'episode', ['Band'], 'Books', [{
+      key: 'band', lexemeId: '11111111-1111-5111-a111-111111111111',
+    }]);
+    expect(page.promptResolution()).toBeNull();
+    expect(present).toHaveBeenCalledWith(expect.objectContaining({ color: 'success' }));
+  });
 });

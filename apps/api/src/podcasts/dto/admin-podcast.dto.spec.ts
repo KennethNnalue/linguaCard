@@ -54,4 +54,25 @@ describe('CreatePodcastTranscriptPromptDto', () => {
 
     await expect(validate(dto)).resolves.toHaveLength(0);
   });
+
+  test.each([
+    '668ec369359332c7430d8d687703bd10',
+    'cc5504b3-d1b2-5af5-a31b-363befa1ba50',
+  ])('accepts canonical vocabulary selection ID %s', async lexemeId => {
+    const dto = plainToInstance(CreatePodcastTranscriptPromptDto, {
+      vocabulary: ['besonders'],
+      resolutions: [{ key: 'besonders', lexemeId }],
+    });
+
+    await expect(validate(dto)).resolves.toHaveLength(0);
+  });
+
+  test('rejects a malformed canonical vocabulary selection', async () => {
+    const dto = plainToInstance(CreatePodcastTranscriptPromptDto, {
+      vocabulary: ['besonders'],
+      resolutions: [{ key: 'besonders', lexemeId: 'not-a-lexeme' }],
+    });
+
+    await expect(validate(dto)).resolves.not.toHaveLength(0);
+  });
 });

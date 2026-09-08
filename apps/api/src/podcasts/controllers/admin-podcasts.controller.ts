@@ -165,7 +165,12 @@ export class AdminPodcastEpisodesController {
     @Param('episodeId') episodeId: string,
     @Body() dto: CreatePodcastTranscriptPromptDto,
   ): Promise<AdminPodcastTranscriptPromptResult> {
-    return this.transcriptGeneration.prompt(episodeId, dto.vocabulary, dto.direction);
+    return this.transcriptGeneration.prompt(
+      episodeId,
+      dto.vocabulary,
+      dto.direction,
+      dto.resolutions,
+    );
   }
 
   @Post(':episodeId/elevenlabs-podcast')

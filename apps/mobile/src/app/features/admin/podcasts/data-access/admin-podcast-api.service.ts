@@ -15,6 +15,7 @@ import type {
   AdminGeneratePodcastTranscriptResult,
   AdminCreateElevenLabsPodcastResult,
   AdminPodcastTranscriptPromptResult,
+  AdminPodcastVocabularySelection,
   AdminUpdatePodcastTopicDto,
   PodcastThumbnail,
   AdminPublishPodcastVocabularyResult,
@@ -152,9 +153,10 @@ export class AdminPodcastApiService {
     episodeId: string,
     vocabulary: string[],
     direction?: string,
+    resolutions?: AdminPodcastVocabularySelection[],
   ): Observable<AdminPodcastTranscriptPromptResult> {
     return this.http.post<AdminPodcastTranscriptPromptResult>(
-      `${this.episodeUrl}/${episodeId}/transcript/prompt`, { vocabulary, direction },
+      `${this.episodeUrl}/${episodeId}/transcript/prompt`, { vocabulary, direction, resolutions },
     );
   }
 

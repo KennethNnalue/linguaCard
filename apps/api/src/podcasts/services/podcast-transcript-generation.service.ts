@@ -5,6 +5,7 @@ import type {
   AdminGeneratePodcastTranscriptResult,
   AdminPodcastTranscriptPromptResult,
   AdminPodcastTranscriptPayload,
+  AdminPodcastVocabularySelection,
 } from '@lingua-card/shared/domain';
 import { DataSource } from 'typeorm';
 import { OpenRouterAdapter } from '../../ai/providers/openrouter.adapter';
@@ -51,6 +52,7 @@ export class PodcastTranscriptGenerationService {
     episodeId: string,
     vocabulary: readonly string[],
     direction?: string,
+    selections: readonly AdminPodcastVocabularySelection[] = [],
   ): Promise<AdminPodcastTranscriptPromptResult> {
     const episode = await this.dataSource.getRepository(PodcastEpisodeEntity).findOneBy({ id: episodeId });
     if (!episode) throw new NotFoundException(`Podcast episode ${episodeId} not found`);
@@ -64,14 +66,20 @@ export class PodcastTranscriptGenerationService {
     const canReuseManifest = !vocabulary.length
       && existingManifest
       && existingManifest.targetLanguage === topic.targetLanguage
-      && existingManifest.translationLanguage === topic.translationLanguage;
-    const manifest = canReuseManifest
-      ? existingManifest
-      : await this.transcriptManifests.create(
+      && existingManifest.translationLanguage === topic.translationLanguage
+      && existingManifest.items.every(item => item.canonicalLexemeId !== null);
+    const preparation = canReuseManifest
+      ? { manifest: existingManifest, ambiguities: [] }
+      : await this.transcriptManifests.prepare(
         requiredVocabulary,
         topic.targetLanguage,
         topic.translationLanguage,
+        selections,
       );
+    if (preparation.ambiguities.length) {
+      return { status: 'needs_resolution', ambiguities: preparation.ambiguities };
+    }
+    const manifest = preparation.manifest;
     episode.generationInput = {
       vocabulary: requiredVocabulary,
       ...(creativeDirection ? { direction: creativeDirection } : {}),
@@ -79,6 +87,7 @@ export class PodcastTranscriptGenerationService {
     };
     await this.dataSource.getRepository(PodcastEpisodeEntity).save(episode);
     return {
+      status: 'ready',
       prompt: this.buildPrompt(topic, requiredVocabulary, creativeDirection, manifest),
       manifestId: manifest.id,
     };
