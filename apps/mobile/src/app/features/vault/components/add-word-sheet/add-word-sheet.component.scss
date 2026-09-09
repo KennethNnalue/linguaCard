@@ -17,6 +17,7 @@
 .aw-field { display: flex; flex-direction: column; gap: 7px; }
 .aw-lbl { @include u.lc-font('xxs', t.$lc-font-weight-semibold); letter-spacing: 0.07em; text-transform: uppercase; color: var(--lc-text-hint); margin: 0; }
 .aw-lbl-hint { @include u.lc-font('xxs'); letter-spacing: 0; text-transform: none; color: var(--lc-text-hint); opacity: 0.7; }
+.aw-error { @include u.lc-font('xxs', t.$lc-font-weight-medium); color: var(--lc-fem-text); margin: 0; }
 
 .aw-lang-row { display: flex; align-items: center; gap: t.$lc-space-3; }
 .aw-lang-chip {

@@ -535,12 +535,17 @@
       "text": "¿Añadir varias palabras? Importa un CSV →"
     },
     "errors": {
-      "autoGenFailed": "La generación automática falló. Complétalo manualmente o inténtalo de nuevo."
+      "autoGenFailed": "La generación automática falló. Complétalo manualmente o inténtalo de nuevo.",
+      "required": "Este campo es obligatorio.",
+      "collectionRequired": "Selecciona una colección.",
+      "saveFailed": "No se pudo guardar la palabra. Inténtalo de nuevo."
     }
   },
   "assignCollection": {
     "title": "Añadir a colección",
     "closeAria": "Cerrar",
+    "searchPlaceholder": "Buscar colecciones",
+    "noResults": "No hay colecciones coincidentes",
     "wordsLabel": "palabras",
     "createNewLabel": "Crear nueva colección…",
     "newCollection": {

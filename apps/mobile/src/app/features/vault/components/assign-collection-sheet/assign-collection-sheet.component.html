@@ -8,6 +8,13 @@
           <ion-icon name="close-outline"></ion-icon>
         </button>
       </div>
+      <ion-searchbar
+        class="acs-search"
+        [formControl]="searchCtrl"
+        [placeholder]="'assignCollection.searchPlaceholder' | translate"
+        [debounce]="100"
+        show-clear-button="focus">
+      </ion-searchbar>
     </div>
   </ion-toolbar>
 </ion-header>
@@ -15,7 +22,7 @@
 <ion-content>
   <div class="acs-list">
 
-    @for (col of collections(); track col.id) {
+    @for (col of filteredCollections(); track col.id) {
       <button
         class="acs-row"
         [class.acs-row--selected]="selected() === col.id"
@@ -29,6 +36,10 @@
           <ion-icon name="checkmark-outline" class="acs-check"></ion-icon>
         }
       </button>
+    }
+
+    @if (filteredCollections().length === 0) {
+      <p class="acs-empty">{{ 'assignCollection.noResults' | translate }}</p>
     }
 
     <!-- Create new -->
@@ -58,6 +69,9 @@
 
   </div>
 
+</ion-content>
+
+<ion-footer class="ion-no-border">
   <div class="acs-footer">
     <button class="acs-confirm-btn" [disabled]="required && !selected()" (click)="confirm()">
       {{ 'assignCollection.confirmButton' | translate }}
@@ -66,4 +80,4 @@
       <button class="acs-skip-btn" (click)="skip()">{{ 'assignCollection.skipButton' | translate }}</button>
     }
   </div>
-</ion-content>
+</ion-footer>

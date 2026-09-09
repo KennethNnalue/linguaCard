@@ -543,12 +543,17 @@
       "text": "Add multiple words? Import a CSV →"
     },
     "errors": {
-      "autoGenFailed": "Auto-generate failed. Fill in manually or try again."
+      "autoGenFailed": "Auto-generate failed. Fill in manually or try again.",
+      "required": "This field is required.",
+      "collectionRequired": "Select a collection.",
+      "saveFailed": "The word could not be saved. Please try again."
     }
   },
   "assignCollection": {
     "title": "Add to Collection",
     "closeAria": "Close",
+    "searchPlaceholder": "Search collections",
+    "noResults": "No matching collections",
     "wordsLabel": "words",
     "createNewLabel": "Create new collection…",
     "newCollection": {

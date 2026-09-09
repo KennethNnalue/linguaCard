@@ -5,6 +5,14 @@
 .acs-handle { width: 36px; height: 4px; border-radius: 2px; background: var(--lc-border); margin: t.$lc-space-2 auto t.$lc-space-3; }
 .acs-title-row { @include u.flex-between; }
 .acs-title { @include u.lc-font('lg', t.$lc-font-weight-semibold); color: var(--lc-text-primary); }
+.acs-search {
+  --background: var(--lc-card);
+  --border-radius: #{t.$lc-radius-md};
+  --box-shadow: none;
+  --color: var(--lc-text-primary);
+  --placeholder-color: var(--lc-text-hint);
+  padding: t.$lc-space-3 0 0;
+}
 
 .acs-close {
   @include u.circle(30px); @include u.flex-center;
@@ -31,6 +39,7 @@
 }
 .acs-row-count { @include u.lc-font('xxs'); color: var(--lc-text-hint); }
 .acs-check { font-size: t.$lc-text-xl; color: var(--lc-brand); flex-shrink: 0; }
+.acs-empty { @include u.lc-font('sm'); color: var(--lc-text-hint); text-align: center; margin: t.$lc-space-6 0; }
 
 .acs-create-icon {
   @include u.circle(28px); @include u.flex-center;
@@ -52,7 +61,7 @@
   &:disabled { opacity: 0.6; }
 }
 
-.acs-footer { padding: t.$lc-space-4 14px t.$lc-space-2; display: flex; flex-direction: column; gap: t.$lc-space-2; }
+.acs-footer { background: var(--lc-background); padding: t.$lc-space-3 14px calc(env(safe-area-inset-bottom, 0px) + t.$lc-space-2); display: flex; flex-direction: column; gap: t.$lc-space-2; }
 .acs-confirm-btn {
   width: 100%; background: var(--lc-brand); color: white; border: none;
   border-radius: t.$lc-radius-md; padding: 13px;

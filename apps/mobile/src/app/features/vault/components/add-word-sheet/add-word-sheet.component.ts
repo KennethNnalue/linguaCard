@@ -1,7 +1,7 @@
 import { AppNotificationService } from '@lingua-card/mobile/notifications';
 import { ChangeDetectionStrategy, Component, computed, DestroyRef, inject, Input, OnInit, signal } from '@angular/core';
 import { Router } from '@angular/router';
-import { FormArray, FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
+import { AbstractControl, FormArray, FormControl, FormGroup, ReactiveFormsModule, ValidationErrors, Validators } from '@angular/forms';
 import { takeUntilDestroyed, toSignal } from '@angular/core/rxjs-interop';
 import { distinctUntilChanged, of, switchMap } from 'rxjs';
 import {
@@ -39,12 +39,18 @@ import { DictionaryApiService } from '../../services/dictionary-api.service';
 
 function makeSynonymGroup(s?: Partial<Synonym>): FormGroup {
   return new FormGroup({
-    word:          new FormControl(s?.word ?? '', [Validators.required]),
+    word:          new FormControl(s?.word ?? '', [trimmedRequired]),
     article:       new FormControl<ArticleType | null>(s?.article ?? null),
-    translation:   new FormControl(s?.translation ?? '', [Validators.required]),
+    translation:   new FormControl(s?.translation ?? '', [trimmedRequired]),
     example:       new FormControl(s?.example ?? ''),
     exampleNative: new FormControl(s?.exampleNative ?? ''),
   });
+}
+
+function trimmedRequired(control: AbstractControl): ValidationErrors | null {
+  return typeof control.value === 'string' && control.value.trim().length > 0
+    ? null
+    : { required: true };
 }
 
 @Component({
@@ -73,14 +79,28 @@ export class AddWordSheetComponent implements OnInit {
 
   // @Input() required — Ionic ModalController sets componentProps via Object.assign(),
   // bypassing Angular's setInput() API. input() signals are overwritten with plain values.
-  @Input() lockedCollectionId: string | null = null;
-  @Input() cardToEdit: Card | null = null;
+  private _lockedCollectionId: string | null = null;
+  private _cardToEdit: Card | null = null;
+
+  @Input()
+  set lockedCollectionId(value: string | null) {
+    this._lockedCollectionId = value;
+    this.fillFormFromInputs();
+  }
+  get lockedCollectionId(): string | null { return this._lockedCollectionId; }
+
+  @Input()
+  set cardToEdit(value: Card | null) {
+    this._cardToEdit = value;
+    this.fillFormFromInputs();
+  }
+  get cardToEdit(): Card | null { return this._cardToEdit; }
 
   get isEditing(): boolean { return !!this.cardToEdit; }
 
   readonly form = new FormGroup({
-    front:         new FormControl('', [Validators.required]),
-    back:          new FormControl('', [Validators.required]),
+    front:         new FormControl('', [trimmedRequired]),
+    back:          new FormControl('', [trimmedRequired]),
     article:       new FormControl<ArticleType | null>(null),
     plural:        new FormControl(''),
     collectionId:  new FormControl<string | null>(null, [Validators.required]),
@@ -149,6 +169,11 @@ export class AddWordSheetComponent implements OnInit {
   // ─── Lifecycle ─────────────────────────────────────────────────────────────
 
   ngOnInit(): void {
+    this.collectionStore.loadCollections();
+    this.fillFormFromInputs();
+  }
+
+  private fillFormFromInputs(): void {
     const card = this.cardToEdit;
     if (card) {
       const c = card.content;
@@ -170,7 +195,10 @@ export class AddWordSheetComponent implements OnInit {
       for (const syn of (c.synonyms ?? [])) {
         this.synonymsArray.push(makeSynonymGroup(syn), { emitEvent: false });
       }
-    } else if (this.lockedCollectionId) {
+      return;
+    }
+
+    if (this.lockedCollectionId) {
       this.form.patchValue({ collectionId: this.lockedCollectionId });
       this._collectionId.set(this.lockedCollectionId);
     }
@@ -357,7 +385,11 @@ export class AddWordSheetComponent implements OnInit {
 
   save(): void {
     this.form.markAllAsTouched();
-    if (this.form.invalid || this.saving()) return;
+    if (this.form.invalid || this.saving()) {
+      const invalidSynonymIndex = this.synonymsArray.controls.findIndex(control => control.invalid);
+      if (invalidSynonymIndex >= 0) this.expandedSynonymIdx.set(invalidSynonymIndex);
+      return;
+    }
     this.saving.set(true);
 
     const v = this.form.getRawValue();
@@ -397,13 +429,17 @@ export class AddWordSheetComponent implements OnInit {
     };
 
     if (this.isEditing) {
-      this.cardApi.update(card!.id, { content, categoryIds: [], collectionId: v.collectionId ?? null } satisfies UpdateCardDto).subscribe({
+      this.cardApi.update(card!.id, { content, categoryIds: card!.categoryIds, collectionId: v.collectionId ?? null } satisfies UpdateCardDto).subscribe({
         next: updated => {
           this.cardStore.updateCard(updated);
+          this.collectionStore.loadCollections();
           this.saving.set(false);
-          this.modalCtrl.dismiss({ created: true });
+          this.modalCtrl.dismiss({ created: true, collectionId: updated.collectionId });
         },
-        error: () => this.saving.set(false),
+        error: () => {
+          this.saving.set(false);
+          void this.showSaveError();
+        },
       });
       return;
     }
@@ -422,9 +458,26 @@ export class AddWordSheetComponent implements OnInit {
       updatedAt: now,
       version: 1,
     }).subscribe({
-      next: () => { this.saving.set(false); this.modalCtrl.dismiss({ created: true }); },
-      error: () => this.saving.set(false),
+      next: created => {
+        this.collectionStore.loadCollections();
+        this.saving.set(false);
+        this.modalCtrl.dismiss({ created: true, collectionId: created.collectionId });
+      },
+      error: () => {
+        this.saving.set(false);
+        void this.showSaveError();
+      },
     });
+  }
+
+  private async showSaveError(): Promise<void> {
+    const toast = await this.toastCtrl.create({
+      message: this.translate.instant('addWord.errors.saveFailed'),
+      duration: 3000,
+      color: 'danger',
+      position: 'bottom',
+    });
+    await toast.present();
   }
 
   // ─── Navigation / overlay ──────────────────────────────────────────────────
@@ -434,9 +487,8 @@ export class AddWordSheetComponent implements OnInit {
   async openCollectionSheet(): Promise<void> {
     const modal = await this.modalCtrl.create({
       component: AssignCollectionSheetComponent,
-      breakpoints: [0, 0.6, 0.85],
-      initialBreakpoint: 0.6,
-      handleBehavior: 'cycle',
+      breakpoints: [0, 1],
+      initialBreakpoint: 1,
       componentProps: { selectedCollectionId: this.form.get('collectionId')!.value, required: true },
     });
     await modal.present();

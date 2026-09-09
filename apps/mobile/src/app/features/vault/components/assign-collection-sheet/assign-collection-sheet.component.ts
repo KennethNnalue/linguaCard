@@ -1,9 +1,12 @@
-import { ChangeDetectionStrategy, Component, inject, Input, OnInit, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, inject, Input, OnInit, signal } from '@angular/core';
+import { toSignal } from '@angular/core/rxjs-interop';
 import { ReactiveFormsModule, FormControl, Validators } from '@angular/forms';
 import {
   IonContent,
+  IonFooter,
   IonHeader,
   IonIcon,
+  IonSearchbar,
   IonToolbar,
   ModalController,
 } from '@ionic/angular/standalone';
@@ -18,7 +21,7 @@ import { CollectionStore } from '../../store/collection.store';
   templateUrl: './assign-collection-sheet.component.html',
   styleUrls: ['./assign-collection-sheet.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [IonHeader, IonToolbar, IonContent, IonIcon, ReactiveFormsModule, TranslatePipe],
+  imports: [IonHeader, IonToolbar, IonContent, IonFooter, IonIcon, IonSearchbar, ReactiveFormsModule, TranslatePipe],
 })
 export class AssignCollectionSheetComponent implements OnInit {
   @Input() selectedCollectionId: string | null = null;
@@ -30,6 +33,15 @@ export class AssignCollectionSheetComponent implements OnInit {
   private readonly modalCtrl = inject(ModalController);
 
   readonly collections = this.collectionStore.collections;
+  readonly searchCtrl = new FormControl('', { nonNullable: true });
+  private readonly searchQuery = toSignal(this.searchCtrl.valueChanges, { initialValue: '' });
+  readonly filteredCollections = computed(() => {
+    const query = this.searchQuery().trim().toLocaleLowerCase();
+    if (!query) return this.collections();
+    return this.collections().filter(collection =>
+      collection.name.toLocaleLowerCase().includes(query),
+    );
+  });
   readonly selected = signal<string | null>(null);
   readonly showCreateForm = signal(false);
   readonly creating = signal(false);
@@ -42,6 +54,7 @@ export class AssignCollectionSheetComponent implements OnInit {
 
   ngOnInit(): void {
     this.selected.set(this.selectedCollectionId);
+    this.collectionStore.loadCollections();
   }
 
   select(id: string): void {

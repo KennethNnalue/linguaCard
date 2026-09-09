@@ -535,12 +535,17 @@
       "text": "تريد إضافة كلمات متعددة؟ استورد ملف CSV →"
     },
     "errors": {
-      "autoGenFailed": "فشل التوليد التلقائي. أكمل يدويًا أو حاول مرة أخرى."
+      "autoGenFailed": "فشل التوليد التلقائي. أكمل يدويًا أو حاول مرة أخرى.",
+      "required": "هذا الحقل مطلوب.",
+      "collectionRequired": "اختر مجموعة.",
+      "saveFailed": "تعذر حفظ الكلمة. حاول مرة أخرى."
     }
   },
   "assignCollection": {
     "title": "إضافة إلى مجموعة",
     "closeAria": "إغلاق",
+    "searchPlaceholder": "البحث في المجموعات",
+    "noResults": "لا توجد مجموعات مطابقة",
     "wordsLabel": "كلمات",
     "createNewLabel": "إنشاء مجموعة جديدة…",
     "newCollection": {

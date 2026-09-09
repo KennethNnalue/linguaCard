@@ -1,5 +1,8 @@
 import {ChangeDetectionStrategy, Component, computed, inject, input, output} from '@angular/core';
+import {IonButton, IonIcon} from '@ionic/angular/standalone';
 import {TranslatePipe, TranslateService} from '@ngx-translate/core';
+import {addIcons} from 'ionicons';
+import {volumeHighOutline} from 'ionicons/icons';
 import {ScheduledCard} from '@lingua-card/shared/domain';
 import {LanguageService} from '../../../../core/services/language.service';
 import {ArticleBadgeComponent} from '../../../../shared/components/article-badge/article-badge.component';
@@ -16,14 +19,20 @@ import { MASTERY_LABEL_KEYS } from '../../../review/models/review.model';
   templateUrl: './word-row.component.html',
   styleUrls: ['./word-row.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [ArticleBadgeComponent, TranslatePipe],
+  imports: [ArticleBadgeComponent, IonButton, IonIcon, TranslatePipe],
 })
 export class WordRowComponent {
   readonly card = input.required<ScheduledCard>();
+  readonly showAudio = input(false);
   readonly rowClick = output<void>();
+  readonly playAudio = output<void>();
 
   private readonly translate = inject(TranslateService);
   private readonly languageService = inject(LanguageService);
+
+  constructor() {
+    addIcons({volumeHighOutline});
+  }
 
   readonly masteryLevel = computed(() => stageIndicator(this.card().reviewState.stage));
 

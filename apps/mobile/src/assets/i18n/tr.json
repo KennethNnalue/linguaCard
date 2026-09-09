@@ -535,12 +535,17 @@
       "text": "Birden fazla kelime mi ekleyeceksiniz? CSV içe aktarın →"
     },
     "errors": {
-      "autoGenFailed": "Otomatik oluşturma başarısız oldu. Elle doldurun veya tekrar deneyin."
+      "autoGenFailed": "Otomatik oluşturma başarısız oldu. Elle doldurun veya tekrar deneyin.",
+      "required": "Bu alan zorunludur.",
+      "collectionRequired": "Bir koleksiyon seçin.",
+      "saveFailed": "Kelime kaydedilemedi. Lütfen tekrar deneyin."
     }
   },
   "assignCollection": {
     "title": "Koleksiyona Ekle",
     "closeAria": "Kapat",
+    "searchPlaceholder": "Koleksiyonlarda ara",
+    "noResults": "Eşleşen koleksiyon yok",
     "wordsLabel": "kelime",
     "createNewLabel": "Yeni koleksiyon oluştur…",
     "newCollection": {

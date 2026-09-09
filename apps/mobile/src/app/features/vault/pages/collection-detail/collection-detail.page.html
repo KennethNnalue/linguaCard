@@ -89,14 +89,13 @@
         <div class="row-skeleton"></div>
       }
     } @else {
-      @for (card of allCards(); track card.id) {
-        <button class="detail-word-row" type="button" (click)="openDetail(card)">
-          <span>
-            <strong>{{ card.lexeme.text }}</strong>
-            <small>{{ card.localization.translation }}</small>
-          </span>
-          <em>{{ card.reviewState.stage }}</em>
-        </button>
+      @for (card of displayCards(); track card.id) {
+        <lc-word-row
+          [card]="card"
+          [showAudio]="true"
+          (rowClick)="openDetail(card)"
+          (playAudio)="playPronunciation(card)"
+        />
       } @empty {
         <div class="empty">
           <span class="empty-icon">📖</span>

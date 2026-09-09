@@ -118,6 +118,8 @@
   align-items: center;
 }
 
+.aw-syn-required-field { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: t.$lc-space-1; }
+
 .aw-input--sm { @include u.lc-font('xs'); padding: t.$lc-space-2 t.$lc-space-2 + 2px; }
 
 .aw-syn-art-seg {

@@ -1,5 +1,5 @@
 import { AppNotificationService } from '@lingua-card/mobile/notifications';
-import {Component, computed, effect, inject, OnInit, signal, untracked} from '@angular/core';
+import {ChangeDetectionStrategy, Component, computed, effect, inject, OnInit, signal, untracked} from '@angular/core';
 import {ActivatedRoute, Router} from '@angular/router';
 import {
   ActionSheetButton,
@@ -9,7 +9,7 @@ import {
   ModalController,
   } from '@ionic/angular/standalone';
 import {TranslateService, TranslatePipe} from '@ngx-translate/core';
-import {Card, CardView, Collection, ScheduledCard} from '@lingua-card/shared/domain';
+import {ArticleType, CardView, Collection, GenderType, ScheduledCard} from '@lingua-card/shared/domain';
 import {firstValueFrom} from 'rxjs';
 import {CollectionApiService} from '../../services/collection-api.service';
 import {CardStore} from '../../store/card.store';
@@ -30,13 +30,49 @@ import {toVocabularyPlaylistItem} from '../../../listen/models/listen.models';
 import {VaultV2Store} from '../../store/vault-v2.store';
 import {CollectionCoverComponent} from '../../components/collection-cover/collection-cover.component';
 import {CollectionAudioPrefetchService} from '../../../../shared/audio/collection-audio-prefetch.service';
+import {WordAudioService} from '../../../../shared/audio/word-audio.service';
+import {WordRowComponent} from '../../components/word-row/word-row.component';
+
+function articleFromGrammar(value: unknown): ArticleType {
+  switch (value) {
+    case 'der':
+    case 'die':
+    case 'das':
+    case 'le':
+    case 'la':
+    case 'el':
+    case 'un':
+    case 'une':
+      return value;
+    default:
+      return null;
+  }
+}
+
+function genderFromGrammar(value: unknown): GenderType {
+  switch (value) {
+    case 'masculine':
+    case 'feminine':
+    case 'neuter':
+      return value;
+    default:
+      return null;
+  }
+}
+
+function firstPluralFromGrammar(value: unknown): string | null {
+  if (!Array.isArray(value)) return null;
+  const firstPlural = value[0];
+  return typeof firstPlural === 'string' ? firstPlural : null;
+}
 
 @Component({
   selector: 'lc-collection-detail',
   standalone: true,
   templateUrl: './collection-detail.page.html',
   styleUrls: ['./collection-detail.page.scss'],
-  imports: [IonContent, FabButtonComponent, TranslatePipe, CollectionCoverComponent],
+  changeDetection: ChangeDetectionStrategy.OnPush,
+  imports: [IonContent, FabButtonComponent, TranslatePipe, CollectionCoverComponent, WordRowComponent],
 })
 export class CollectionDetailPage implements OnInit {
   private readonly route = inject(ActivatedRoute);
@@ -51,6 +87,7 @@ export class CollectionDetailPage implements OnInit {
   private readonly reviewPlayer = inject(ReviewPlayerService);
   private readonly audioReadiness = inject(AudioReadinessStore);
   private readonly audioPrefetch = inject(CollectionAudioPrefetchService);
+  private readonly wordAudio = inject(WordAudioService);
   private readonly importApi = inject(ImageImportApiService);
   private readonly translate = inject(TranslateService);
   private readonly cardStore = inject(CardStore);
@@ -70,6 +107,7 @@ export class CollectionDetailPage implements OnInit {
     if (!id) return [];
     return this.vaultStore.learningItems().filter(item => item.collectionIds.includes(id));
   });
+  readonly displayCards = computed(() => this.allCards().map(item => this.toScheduledCard(item)));
   readonly loading = signal(true);
   readonly isSynced = signal(false);
 
@@ -424,8 +462,12 @@ export class CollectionDetailPage implements OnInit {
     await alert.present();
   }
 
-  openDetail(card: CardView): void {
+  openDetail(card: { readonly id: string }): void {
     this.router.navigate(['/vault', card.id]);
+  }
+
+  playPronunciation(card: ScheduledCard): void {
+    void this.wordAudio.playCard(card, this.targetLocale());
   }
 
   coverSeed(): string {
@@ -435,11 +477,11 @@ export class CollectionDetailPage implements OnInit {
   }
 
   private reviewCards(): ScheduledCard[] {
-    return this.allCards().map(item => this.toScheduledCard(item));
+    return this.displayCards();
   }
 
   private toScheduledCard(item: CardView): ScheduledCard {
-    const grammar = item.lexeme.grammar as { article?: Card['content']['article']; gender?: Card['content']['gender']; plurals?: string[] };
+    const grammar = item.lexeme.grammar;
     return {
       id: item.id,
       deckId: '',
@@ -450,9 +492,9 @@ export class CollectionDetailPage implements OnInit {
       content: {
         front: item.localization.translation,
         back: item.lexeme.text,
-        article: grammar.article ?? null,
-        gender: grammar.gender ?? null,
-        plural: grammar.plurals?.[0] ?? null,
+        article: articleFromGrammar(grammar['article']),
+        gender: genderFromGrammar(grammar['gender']),
+        plural: firstPluralFromGrammar(grammar['plurals']),
         examples: item.examples.map(example => ({
           id: example.id,
           target: example.targetText,

@@ -14,7 +14,14 @@
   white-space: nowrap;
   text-transform: uppercase;
 
-  &--der { background: color-mix(in srgb, var(--lc-masc-text) 74%, #06182d); color: #fff; border-color: var(--lc-masc-border); }
-  &--die { background: color-mix(in srgb, var(--lc-fem-text) 74%, #3b0824); color: #fff; border-color: var(--lc-fem-border); }
+  &--der,
+  &--le,
+  &--el,
+  &--un { background: color-mix(in srgb, var(--lc-masc-text) 74%, #06182d); color: #fff; border-color: var(--lc-masc-border); }
+
+  &--die,
+  &--la,
+  &--une { background: color-mix(in srgb, var(--lc-fem-text) 74%, #3b0824); color: #fff; border-color: var(--lc-fem-border); }
+
   &--das { background: color-mix(in srgb, var(--lc-neut-text) 72%, #20242b); color: #fff; border-color: var(--lc-neut-border); }
 }

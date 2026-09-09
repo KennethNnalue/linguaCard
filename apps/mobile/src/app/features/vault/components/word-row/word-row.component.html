@@ -1,16 +1,30 @@
-<button class="row" (click)="rowClick.emit()">
+<article class="row">
   <span class="strip" [style.background]="masteryColor()"></span>
 
-  <lc-article-badge [article]="card().content.article" />
+  <button class="row-main" type="button" (click)="rowClick.emit()">
+    <lc-article-badge [article]="card().content.article" />
 
-  <span class="body">
-    <span class="headword">{{ card().content.back }}</span>
-    <span class="translation">{{ card().content.front }}</span>
-  </span>
+    <span class="body">
+      <span class="headword">{{ card().content.back }}</span>
+      <span class="translation">{{ card().content.front }}</span>
+    </span>
 
-  @if (isDue()) {
-    <span class="due-pill">{{ 'vault.lexicon.dueTag' | translate }}</span>
-  } @else {
-    <span class="mastery-label">{{ masteryLabel() }}</span>
+    @if (isDue()) {
+      <span class="due-pill">{{ 'vault.lexicon.dueTag' | translate }}</span>
+    } @else {
+      <span class="mastery-label">{{ masteryLabel() }}</span>
+    }
+  </button>
+
+  @if (showAudio()) {
+    <ion-button
+      class="audio-button"
+      fill="clear"
+      type="button"
+      (click)="playAudio.emit()"
+      [attr.aria-label]="'common.aria.playPronunciation' | translate"
+    >
+      <ion-icon slot="icon-only" name="volume-high-outline"></ion-icon>
+    </ion-button>
   }
-</button>
+</article>

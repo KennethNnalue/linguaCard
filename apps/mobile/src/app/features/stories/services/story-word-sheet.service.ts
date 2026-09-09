@@ -140,8 +140,8 @@ export class StoryWordSheetService {
     const modal = await this.modalCtrl.create({
       component: AssignCollectionSheetComponent,
       componentProps: { selectedCollectionId: null, required: true },
-      breakpoints: [0, 0.75, 1],
-      initialBreakpoint: 0.75,
+      breakpoints: [0, 1],
+      initialBreakpoint: 1,
     });
     await modal.present();
     const { data } = await modal.onWillDismiss<{ collectionId: string | null }>();

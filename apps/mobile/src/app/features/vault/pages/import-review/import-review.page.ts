@@ -307,9 +307,8 @@ export class ImportReviewPage implements OnInit {
   async openCollectionSheet(): Promise<void> {
     const modal = await this.modalCtrl.create({
       component: AssignCollectionSheetComponent,
-      breakpoints: [0, 0.6, 0.85],
-      initialBreakpoint: 0.6,
-      handleBehavior: 'cycle',
+      breakpoints: [0, 1],
+      initialBreakpoint: 1,
       componentProps: { selectedCollectionId: this.selectedCollectionId(), required: true },
     });
     await modal.present();

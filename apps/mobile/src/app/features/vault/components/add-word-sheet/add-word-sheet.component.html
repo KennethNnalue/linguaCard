@@ -33,6 +33,7 @@
           type="text"
           [placeholder]="'addWord.back.placeholder' | translate"
           formControlName="back"
+          aria-describedby="add-word-back-error"
           autocomplete="off" />
         <button
           type="button"
@@ -50,6 +51,9 @@
           }
         </button>
       </div>
+      @if (form.get('back')?.hasError('required') && form.get('back')?.touched) {
+        <p id="add-word-back-error" class="aw-error" role="alert">{{ 'addWord.errors.required' | translate }}</p>
+      }
 
       <!-- Library fill banner (LC-WD10) -->
       @if (fromLibrary()) {
@@ -92,7 +96,11 @@
         type="text"
         [placeholder]="'addWord.front.placeholder' | translate"
         formControlName="front"
+        aria-describedby="add-word-front-error"
         autocomplete="off" />
+      @if (form.get('front')?.hasError('required') && form.get('front')?.touched) {
+        <p id="add-word-front-error" class="aw-error" role="alert">{{ 'addWord.errors.required' | translate }}</p>
+      }
     </div>
 
     <!-- Plural — only shown when an article is selected -->
@@ -135,7 +143,12 @@
             @if (expandedSynonymIdx() === i) {
               <div class="aw-syn-fields">
                 <div class="aw-syn-field-row">
-                  <input class="aw-input aw-input--sm" [placeholder]="'addWord.synonyms.wordPlaceholder' | translate" formControlName="word" autocomplete="off" />
+                  <div class="aw-syn-required-field">
+                    <input class="aw-input aw-input--sm" [class.aw-input--error]="getSynonymGroup(i).get('word')?.invalid && getSynonymGroup(i).get('word')?.touched" [placeholder]="'addWord.synonyms.wordPlaceholder' | translate" formControlName="word" autocomplete="off" />
+                    @if (getSynonymGroup(i).get('word')?.hasError('required') && getSynonymGroup(i).get('word')?.touched) {
+                      <p class="aw-error" role="alert">{{ 'addWord.errors.required' | translate }}</p>
+                    }
+                  </div>
                   <div class="aw-syn-art-seg">
                     <button type="button" class="aw-syn-art-btn" [class.active]="!getSynonymGroup(i).get('article')?.value" (click)="getSynonymGroup(i).get('article')!.setValue(null)">—</button>
                     @for (art of articles; track art) {
@@ -143,7 +156,10 @@
                     }
                   </div>
                 </div>
-                <input class="aw-input aw-input--sm" [placeholder]="'addWord.synonyms.translationPlaceholder' | translate" formControlName="translation" autocomplete="off" />
+                <input class="aw-input aw-input--sm" [class.aw-input--error]="getSynonymGroup(i).get('translation')?.invalid && getSynonymGroup(i).get('translation')?.touched" [placeholder]="'addWord.synonyms.translationPlaceholder' | translate" formControlName="translation" autocomplete="off" />
+                @if (getSynonymGroup(i).get('translation')?.hasError('required') && getSynonymGroup(i).get('translation')?.touched) {
+                  <p class="aw-error" role="alert">{{ 'addWord.errors.required' | translate }}</p>
+                }
                 <input class="aw-input aw-input--sm" [placeholder]="'addWord.synonyms.examplePlaceholder' | translate" formControlName="example" autocomplete="off" />
                 <input class="aw-input aw-input--sm" [placeholder]="'addWord.synonyms.exampleNativePlaceholder' | translate" formControlName="exampleNative" autocomplete="off" />
               </div>
@@ -182,10 +198,14 @@
           type="button"
           class="aw-collection-btn"
           [class.aw-input--error]="form.get('collectionId')?.invalid && form.get('collectionId')?.touched"
+          aria-describedby="add-word-collection-error"
           (click)="openCollectionSheet()">
           <span>{{ selectedCollectionLabel() }}</span>
           <span class="aw-collection-caret">▼</span>
         </button>
+      }
+      @if (form.get('collectionId')?.hasError('required') && form.get('collectionId')?.touched) {
+        <p id="add-word-collection-error" class="aw-error" role="alert">{{ 'addWord.errors.collectionRequired' | translate }}</p>
       }
     </div>
 

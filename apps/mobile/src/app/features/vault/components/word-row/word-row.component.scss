@@ -10,12 +10,26 @@
   width: 100%;
   display: flex;
   align-items: center;
-  gap: t.$lc-space-3;
-  padding: t.$lc-space-3;
+  padding: t.$lc-space-2 t.$lc-space-2 t.$lc-space-2 t.$lc-space-3;
   background: var(--lc-card);
   border: 1px solid var(--lc-border);
   border-radius: t.$lc-radius-md;
   box-shadow: var(--lc-shadow-card);
+  text-align: start;
+  overflow: hidden;
+}
+
+.row-main {
+  align-self: stretch;
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  gap: t.$lc-space-3;
+  padding: t.$lc-space-1 t.$lc-space-2;
+  border: 0;
+  background: transparent;
+  color: inherit;
   text-align: start;
   cursor: pointer;
   @include u.touch-state;
@@ -67,4 +81,19 @@
   flex-shrink: 0;
   @include u.lc-font('xs', t.$lc-font-weight-semibold);
   color: var(--lc-text-hint);
+}
+
+.audio-button {
+  flex-shrink: 0;
+  width: 42px;
+  height: 42px;
+  margin: 0;
+  color: var(--lc-brand);
+  --border-radius: #{t.$lc-radius-full};
+  --padding-start: 0;
+  --padding-end: 0;
+
+  ion-icon {
+    font-size: 19px;
+  }
 }
