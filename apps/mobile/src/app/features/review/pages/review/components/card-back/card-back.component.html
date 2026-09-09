@@ -1,5 +1,5 @@
 @if (card(); as card) {
-  <div class="cb-card">
+  <div #scrollContainer class="cb-card" (scroll)="onCardScroll($event)">
 
     <!-- Type-mode result banner -->
     @if (banner(); as b) {
@@ -141,4 +141,10 @@
       }
     }
   </div>
+  @if (showScrollCue()) {
+    <div class="cb-scroll-cue" aria-hidden="true">
+      <span>{{ 'review.session.scrollForMore' | translate }}</span>
+      <ion-icon name="chevron-down-outline"></ion-icon>
+    </div>
+  }
 }

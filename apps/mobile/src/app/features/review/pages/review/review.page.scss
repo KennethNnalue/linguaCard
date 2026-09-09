@@ -30,7 +30,7 @@ ion-header ion-toolbar {
   grid-template-columns: 48px minmax(0, 1fr) 82px;
   align-items: center;
   gap: t.$lc-space-2;
-  padding: calc(env(safe-area-inset-top, 0px) + #{t.$lc-space-3}) t.$lc-space-4 t.$lc-space-2;
+  padding: calc(env(safe-area-inset-top, 0px) + #{t.$lc-space-1}) t.$lc-space-4 t.$lc-space-2;
   width: min(100%, 560px);
   margin-inline: auto;
 }
@@ -116,13 +116,14 @@ ion-header ion-toolbar {
   overflow: hidden;
   max-width: 528px;
   margin-inline: auto;
-}
 
-.rv-prog-fill {
-  height: 100%;
-  border-radius: t.$lc-radius-full;
-  background: linear-gradient(90deg, #71D8BC 0%, #D8B981 100%);
-  transition: width 0.4s t.$lc-easing-standard;
+  ion-progress-bar {
+    height: 100%;
+    --background: color-mix(in srgb, var(--lc-rv-inset) 88%, var(--lc-rv-bg));
+    --progress-background: linear-gradient(90deg, #71D8BC 0%, #D8B981 100%);
+    border-radius: inherit;
+    overflow: hidden;
+  }
 }
 
 .rv-prog-checkpoint {
@@ -260,7 +261,7 @@ ion-header ion-toolbar {
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .rv-prog-fill,
+  ion-progress-bar,
   .rv-prog-checkpoint {
     transition-duration: 1ms;
   }
@@ -282,7 +283,7 @@ ion-header ion-toolbar {
 
 // ─── Footer ──────────────────────────────────────────────────────────────────
 .rv-footer {
-  padding: t.$lc-space-3 t.$lc-space-4 calc(#{t.$lc-space-3} + env(safe-area-inset-bottom));
+  padding: t.$lc-space-5 t.$lc-space-4 calc(#{t.$lc-space-1} + env(safe-area-inset-bottom));
   background: var(--lc-rv-bg);
   border-top: 1px solid var(--lc-rv-border);
 

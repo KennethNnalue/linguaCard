@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, computed, effect, input, output, signal } from '@angular/core';
+import { afterNextRender, ChangeDetectionStrategy, Component, computed, DestroyRef, effect, ElementRef, inject, input, output, signal, viewChild } from '@angular/core';
 import { IonIcon } from '@ionic/angular';
 import { addIcons } from 'ionicons';
 import { chevronDownOutline, ellipsisVerticalOutline, volumeHighOutline } from 'ionicons/icons';
@@ -18,6 +18,8 @@ import { buildReviewEnrichment, nextReviewEnrichmentTab, ReviewEnrichmentTab } f
   imports: [IonIcon, ArticleBadgeComponent, HighlightWordPipe, TranslatePipe],
 })
 export class CardBackComponent {
+  private readonly destroyRef = inject(DestroyRef);
+  private readonly scrollContainer = viewChild<ElementRef<HTMLElement>>('scrollContainer');
   readonly card = input.required<Card>();
   readonly typedResult = input<TypedAnswerFeedback | null>(null);
   readonly expandedSynonym = input<number | null>(null);
@@ -32,6 +34,7 @@ export class CardBackComponent {
   readonly playExample = output<string>();
   readonly cardActionsRequested = output<void>();
   readonly selectedTab = signal<ReviewEnrichmentTab | null>(null);
+  readonly showScrollCue = signal(false);
 
   constructor() {
     addIcons({ chevronDownOutline, ellipsisVerticalOutline, volumeHighOutline });
@@ -39,6 +42,7 @@ export class CardBackComponent {
       const enrichment = buildReviewEnrichment(this.card().content);
       this.selectedTab.set(enrichment.initialTab);
     });
+    afterNextRender(() => this.observeScrollableContent());
   }
 
   readonly reveal = computed(() => buildReviewReveal(this.card().content.article, this.typedResult()));
@@ -66,5 +70,32 @@ export class CardBackComponent {
   toggleActionsMenu(): void {
     if (this.busy() || this.readOnly()) return;
     this.cardActionsRequested.emit();
+  }
+
+  onCardScroll(event: Event): void {
+    if (event.currentTarget instanceof HTMLElement) this.updateScrollCue(event.currentTarget);
+  }
+
+  private observeScrollableContent(): void {
+    const container = this.scrollContainer()?.nativeElement;
+    if (!container) return;
+
+    const update = () => this.updateScrollCue(container);
+    const mutationObserver = new MutationObserver(update);
+    mutationObserver.observe(container, { childList: true, subtree: true, characterData: true });
+
+    const resizeObserver = typeof ResizeObserver === 'undefined' ? null : new ResizeObserver(update);
+    resizeObserver?.observe(container);
+    update();
+
+    this.destroyRef.onDestroy(() => {
+      mutationObserver.disconnect();
+      resizeObserver?.disconnect();
+    });
+  }
+
+  private updateScrollCue(container: HTMLElement): void {
+    const remainingScroll = container.scrollHeight - container.clientHeight - container.scrollTop;
+    this.showScrollCue.set(remainingScroll > 12);
   }
 }

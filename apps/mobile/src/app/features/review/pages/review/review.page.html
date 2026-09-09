@@ -15,13 +15,11 @@
           </button>
         </div>
       </div>
-      <div
-        class="rv-prog-track"
-        role="progressbar"
-        [attr.aria-valuemin]="0"
-        [attr.aria-valuemax]="header.totalCards"
-        [attr.aria-valuenow]="header.currentPosition">
-        <div class="rv-prog-fill" [style.width.%]="header.progressPercent"></div>
+      <div class="rv-prog-track">
+        <ion-progress-bar
+          [value]="header.progressValue"
+          [attr.aria-label]="'review.session.cardOf' | translate:{ n: displayedPosition(), total: header.totalCards }">
+        </ion-progress-bar>
         @for (checkpoint of header.checkpoints; track checkpoint.positionPercent) {
           <span class="rv-prog-checkpoint" [class.rv-prog-checkpoint--reached]="checkpoint.reached" [style.left.%]="checkpoint.positionPercent" aria-hidden="true"></span>
         }
@@ -141,7 +139,7 @@
 }
 
 @if (reviewStore.presentation()) {
-  <div class="rv-footer" [class.rv-footer--keyboard]="mode() === 'typing' && !isFlipped()">
+  <ion-footer class="rv-footer ion-no-border" [class.rv-footer--keyboard]="mode() === 'typing' && !isFlipped()">
     <lc-rv-rating-footer
       [options]="ratingOptionsWithPreviews()"
       [flipped]="isFlipped()"
@@ -153,5 +151,5 @@
       (previous)="showPrevious()"
       (returnToCurrent)="returnToCurrent()"
       (continueReview)="submitDisplayedRating()" />
-  </div>
+  </ion-footer>
 }

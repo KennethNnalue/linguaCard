@@ -1,5 +1,5 @@
 import { ChangeDetectionStrategy, Component, HostListener, Input, computed, effect, inject, signal, viewChild } from '@angular/core';
-import { AlertController, IonContent, IonHeader, IonIcon, IonSpinner, IonToolbar, ModalController } from '@ionic/angular';
+import { AlertController, IonContent, IonFooter, IonHeader, IonIcon, IonProgressBar, IonSpinner, IonToolbar, ModalController } from '@ionic/angular';
 import { addIcons } from 'ionicons';
 import { closeOutline, volumeHighOutline, volumeMuteOutline } from 'ionicons/icons';
 import type { ReviewRating, ScheduledCard } from '@lingua-card/shared/domain';
@@ -35,7 +35,9 @@ const SLOW_RATE = 0.7;
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [
     IonContent,
+    IonFooter,
     IonIcon,
+    IonProgressBar,
     IonSpinner,
     IonToolbar,
     IonHeader,

@@ -2,6 +2,7 @@
 @use 'theme/utils' as u;
 
 :host {
+  position: relative;
   display: flex;
   flex: 1;
   min-height: 0;
@@ -16,6 +17,42 @@
   border-radius: t.$lc-radius-xl;
   box-shadow: t.$lc-rv-shadow-flashcard;
   padding: t.$lc-space-5;
+}
+
+.cb-scroll-cue {
+  position: absolute;
+  right: 1px;
+  bottom: 1px;
+  left: 1px;
+  z-index: 3;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: t.$lc-space-1;
+  min-height: 48px;
+  padding: t.$lc-space-4 t.$lc-space-3 t.$lc-space-2;
+  border-radius: 0 0 t.$lc-radius-xl t.$lc-radius-xl;
+  background: linear-gradient(transparent, color-mix(in srgb, var(--lc-rv-card) 96%, transparent) 48%);
+  color: var(--lc-rv-text-soft);
+  font-family: t.$lc-font-rv-mono;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+  pointer-events: none;
+  @include u.lc-font('3xs', t.$lc-font-weight-semibold);
+
+  ion-icon {
+    font-size: t.$lc-text-sm;
+    animation: cb-scroll-cue 1.4s ease-in-out infinite;
+  }
+}
+
+@keyframes cb-scroll-cue {
+  0%, 100% { transform: translateY(-1px); }
+  50% { transform: translateY(3px); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .cb-scroll-cue ion-icon { animation: none; }
 }
 
 // ─── Result banner (type mode) ───────────────────────────────────────────────

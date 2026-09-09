@@ -894,6 +894,7 @@
       "synonymsTab": "Synonyms",
       "formsTab": "Forms",
       "learningDetailsLabel": "Learning details",
+      "scrollForMore": "More below",
       "singularLabel": "Singular",
       "cardOf": "Card {{n}} of {{total}}",
       "whatDoesThisMean": "What does this mean",

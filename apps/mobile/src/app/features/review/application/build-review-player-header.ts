@@ -7,6 +7,7 @@ export interface ReviewPlayerHeaderView {
   currentPosition: number;
   totalCards: number;
   remainingCards: number;
+  progressValue: number;
   progressPercent: number;
   checkpoints: readonly { positionPercent: number; reached: boolean }[];
 }
@@ -25,6 +26,7 @@ export function buildReviewPlayerHeader(input: ReviewPlayerHeaderInput): ReviewP
     currentPosition,
     totalCards,
     remainingCards: Math.max(0, totalCards - currentPosition),
+    progressValue: progressPercent / 100,
     progressPercent,
     checkpoints: Array.from({ length: CHECKPOINT_COUNT }, (_, index) => {
       const positionPercent = ((index + 1) / (CHECKPOINT_COUNT + 1)) * 100;
