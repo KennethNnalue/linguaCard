@@ -5,7 +5,7 @@ import {
   IonContent,
   IonIcon,
   ModalController,
-  } from '@ionic/angular/standalone';
+  } from '@ionic/angular';
 import { firstValueFrom } from 'rxjs';
 import { addIcons } from 'ionicons';
 import { alertCircleOutline, trashOutline } from 'ionicons/icons';

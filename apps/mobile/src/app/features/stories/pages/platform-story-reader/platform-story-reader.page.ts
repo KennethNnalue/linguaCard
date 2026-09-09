@@ -18,7 +18,7 @@ import {
   IonContent,
   IonIcon,
   ViewWillLeave,
-} from '@ionic/angular/standalone';
+} from '@ionic/angular';
 import { addIcons } from 'ionicons';
 import { arrowBackOutline } from 'ionicons/icons';
 import type {

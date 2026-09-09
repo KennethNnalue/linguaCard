@@ -1,6 +1,6 @@
 import { ChangeDetectionStrategy, Component, computed, inject } from '@angular/core';
 import { Router } from '@angular/router';
-import { IonContent } from '@ionic/angular/standalone';
+import { IonContent } from '@ionic/angular';
 import { TranslatePipe } from '@ngx-translate/core';
 import {ReviewPlayerService} from '../../services/review-player.service';
 import {ReviewFilterService} from '../../services/review-filter.service';

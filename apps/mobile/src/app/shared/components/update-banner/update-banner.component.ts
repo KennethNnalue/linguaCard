@@ -1,6 +1,6 @@
 import { Component, inject, signal } from '@angular/core';
 import { animate, style, transition, trigger } from '@angular/animations';
-import { IonIcon } from '@ionic/angular/standalone';
+import { IonIcon } from '@ionic/angular';
 import { TranslatePipe } from '@ngx-translate/core';
 import { addIcons } from 'ionicons';
 import { sparklesOutline } from 'ionicons/icons';

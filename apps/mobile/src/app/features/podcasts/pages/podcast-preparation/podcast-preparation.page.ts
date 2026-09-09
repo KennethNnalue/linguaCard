@@ -1,6 +1,6 @@
 import { ChangeDetectionStrategy, Component, ElementRef, inject, OnInit, viewChild } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
-import { IonButton, IonContent, IonIcon, IonSpinner } from '@ionic/angular/standalone';
+import { IonButton, IonContent, IonIcon, IonSpinner } from '@ionic/angular';
 import { addIcons } from 'ionicons';
 import { arrowBackOutline, libraryOutline, play, schoolOutline } from 'ionicons/icons';
 import { ReviewPlayerService } from '../../../review/services/review-player.service';

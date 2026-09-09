@@ -2,7 +2,7 @@ import { HttpErrorResponse } from '@angular/common/http';
 import { TestBed } from '@angular/core/testing';
 import type { AdminPodcastTopicListItem, AdminPodcastTranscriptPayload, AdminPodcastTranscriptPreview } from '@lingua-card/shared/domain';
 import { ActivatedRoute, Router } from '@angular/router';
-import { AlertController } from '@ionic/angular/standalone';
+import { AlertController } from '@ionic/angular';
 import { AppNotificationService } from '@lingua-card/mobile/notifications';
 import { PodcastTranscriptClipboardService } from '../application/podcast-transcript-clipboard.service';
 import { AdminPodcastTopicsPage } from '../pages/admin-podcast-topics/admin-podcast-topics.page';

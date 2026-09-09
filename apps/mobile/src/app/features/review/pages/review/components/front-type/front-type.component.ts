@@ -1,5 +1,5 @@
 import {ChangeDetectionStrategy, Component, ElementRef, input, model, output, viewChild} from '@angular/core';
-import {IonIcon} from '@ionic/angular/standalone';
+import {IonIcon} from '@ionic/angular';
 import {addIcons} from 'ionicons';
 import {checkmarkOutline} from 'ionicons/icons';
 import {TranslatePipe} from '@ngx-translate/core';

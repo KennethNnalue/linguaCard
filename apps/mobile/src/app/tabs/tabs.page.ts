@@ -1,7 +1,7 @@
 import { Component, computed, EnvironmentInjector, inject, signal } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import {NavigationEnd, Router} from '@angular/router';
-import {IonBadge, IonIcon, IonLabel, IonTabBar, IonTabButton, IonTabs} from '@ionic/angular/standalone';
+import {IonBadge, IonIcon, IonLabel, IonTabBar, IonTabButton, IonTabs} from '@ionic/angular';
 import {TranslatePipe} from '@ngx-translate/core';
 import {ShareStore} from '../features/sharing/store/share.store';
 import {addIcons} from 'ionicons';

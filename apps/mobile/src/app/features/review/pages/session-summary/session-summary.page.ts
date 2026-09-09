@@ -1,6 +1,6 @@
 import { ChangeDetectionStrategy, Component, computed, inject, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
-import { IonContent, IonIcon } from '@ionic/angular/standalone';
+import { IonContent, IonIcon } from '@ionic/angular';
 import { addIcons } from 'ionicons';
 import { checkmarkOutline, refreshOutline, sparklesOutline } from 'ionicons/icons';
 import { ReviewRating } from '@lingua-card/shared/domain';

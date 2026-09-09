@@ -18,7 +18,7 @@ import {
   IonRefresher,
   IonRefresherContent,
   ModalController,
-  } from '@ionic/angular/standalone';
+  } from '@ionic/angular';
 import { addIcons } from 'ionicons';
 import {
   bookOutline,

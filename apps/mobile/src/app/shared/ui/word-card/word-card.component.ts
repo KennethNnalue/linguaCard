@@ -1,5 +1,5 @@
 import {ChangeDetectionStrategy, Component, computed, inject, input, output} from '@angular/core';
-import {IonIcon} from '@ionic/angular/standalone';
+import {IonIcon} from '@ionic/angular';
 import {TranslateService} from '@ngx-translate/core';
 import {addIcons} from 'ionicons';
 import {volumeHighOutline} from 'ionicons/icons';

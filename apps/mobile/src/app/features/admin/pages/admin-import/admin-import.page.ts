@@ -4,7 +4,7 @@ import {takeUntilDestroyed, toSignal} from '@angular/core/rxjs-interop';
 import {FormControl, FormGroup, ReactiveFormsModule, Validators} from '@angular/forms';
 import {HttpErrorResponse} from '@angular/common/http';
 import {Router} from '@angular/router';
-import {AlertController, IonContent, IonHeader, IonIcon, IonToolbar} from '@ionic/angular/standalone';
+import {AlertController, IonContent, IonHeader, IonIcon, IonToolbar} from '@ionic/angular';
 import {addIcons} from 'ionicons';
 import {
   arrowBackOutline,

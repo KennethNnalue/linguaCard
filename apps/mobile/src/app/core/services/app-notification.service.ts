@@ -1,5 +1,5 @@
 import { inject, Injectable } from '@angular/core';
-import { ToastController } from '@ionic/angular/standalone';
+import { ToastController } from '@ionic/angular';
 
 type ToastOptions = NonNullable<Parameters<ToastController['create']>[0]>;
 

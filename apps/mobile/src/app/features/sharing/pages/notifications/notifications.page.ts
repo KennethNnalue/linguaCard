@@ -2,7 +2,7 @@ import { AppNotificationService } from '@lingua-card/mobile/notifications';
 import { Component, ChangeDetectionStrategy, inject, OnInit, signal } from '@angular/core';
 import {
   AlertController, IonContent, IonHeader, IonToolbar, IonTitle, IonButtons, IonBackButton,
-  IonSegment, IonSegmentButton, IonLabel, } from '@ionic/angular/standalone';
+  IonSegment, IonSegmentButton, IonLabel, } from '@ionic/angular';
 import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { firstValueFrom } from 'rxjs';
 import type { ShareNotification, ShareRecord, ShareStatus } from '@lingua-card/shared/domain';

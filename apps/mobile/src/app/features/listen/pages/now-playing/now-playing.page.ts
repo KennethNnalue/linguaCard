@@ -9,9 +9,9 @@ import {
   signal,
 } from '@angular/core';
 import { Router } from '@angular/router';
-import { NavController } from '@ionic/angular';
-import type { ViewWillLeave } from '@ionic/angular';
-import { IonContent, IonHeader, IonToolbar, IonSpinner } from '@ionic/angular/standalone';
+import { NavController } from '@ionic/angular/lazy';
+import type { ViewWillLeave } from '@ionic/angular/lazy';
+import { IonContent, IonHeader, IonToolbar, IonSpinner } from '@ionic/angular';
 import { TranslatePipe } from '@ngx-translate/core';
 import { PlayMode } from '@lingua-card/shared/domain';
 import { ListenStore } from '../../store/listen.store';

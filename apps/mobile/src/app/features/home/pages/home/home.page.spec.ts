@@ -1,6 +1,6 @@
 import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
 import { provideRouter } from '@angular/router';
-import { provideIonicAngular } from '@ionic/angular/standalone';
+import { provideIonicAngular } from '@ionic/angular';
 
 import { HomePage } from './home.page';
 import { ReviewAudioPreparationService } from '../../../review/services/review-audio-preparation.service';

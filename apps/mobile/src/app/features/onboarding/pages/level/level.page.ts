@@ -1,5 +1,5 @@
 import { ChangeDetectionStrategy, Component, inject, signal } from '@angular/core';
-import { IonContent } from '@ionic/angular/standalone';
+import { IonContent } from '@ionic/angular';
 import { TranslatePipe } from '@ngx-translate/core';
 import type { OnboardingLevel } from '@lingua-card/shared/domain';
 import { OnboardingShellComponent } from '../../components/onboarding-shell/onboarding-shell.component';

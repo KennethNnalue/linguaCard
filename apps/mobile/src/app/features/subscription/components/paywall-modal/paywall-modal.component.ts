@@ -1,5 +1,5 @@
 import { Component, ChangeDetectionStrategy, inject } from '@angular/core';
-import { IonContent, IonIcon, ModalController } from '@ionic/angular/standalone';
+import { IonContent, IonIcon, ModalController } from '@ionic/angular';
 import { addIcons } from 'ionicons';
 import { sparklesOutline, checkmarkCircleOutline } from 'ionicons/icons';
 import { TranslatePipe } from '@ngx-translate/core';

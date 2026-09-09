@@ -1,6 +1,6 @@
 import {ChangeDetectionStrategy, Component, computed, effect, inject, signal} from '@angular/core';
 import {ActivatedRoute, Router} from '@angular/router';
-import {IonContent, IonHeader, IonToolbar, ModalController, ViewWillEnter} from '@ionic/angular/standalone';
+import {IonContent, IonHeader, IonToolbar, ModalController, ViewWillEnter} from '@ionic/angular';
 import {PlayMode} from '@lingua-card/shared/domain';
 import {TranslatePipe, TranslateService} from '@ngx-translate/core';
 import {CollectionStore} from '../../../vault/store/collection.store';

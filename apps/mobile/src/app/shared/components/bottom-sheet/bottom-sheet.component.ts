@@ -1,5 +1,5 @@
 import {ChangeDetectionStrategy, Component, inject, signal} from '@angular/core';
-import {IonIcon, ModalController} from '@ionic/angular/standalone';
+import {IonIcon, ModalController} from '@ionic/angular';
 import {addIcons} from 'ionicons';
 import {chevronForwardOutline, closeOutline, createOutline, libraryOutline, optionsOutline, starOutline} from 'ionicons/icons';
 

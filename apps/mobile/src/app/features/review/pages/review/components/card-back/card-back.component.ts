@@ -1,5 +1,5 @@
 import { ChangeDetectionStrategy, Component, computed, effect, input, output, signal } from '@angular/core';
-import { IonIcon } from '@ionic/angular/standalone';
+import { IonIcon } from '@ionic/angular';
 import { addIcons } from 'ionicons';
 import { chevronDownOutline, ellipsisVerticalOutline, volumeHighOutline } from 'ionicons/icons';
 import { TranslatePipe } from '@ngx-translate/core';

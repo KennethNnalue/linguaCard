@@ -1,6 +1,6 @@
 import { AppNotificationService } from '@lingua-card/mobile/notifications';
 import { inject, Injectable } from '@angular/core';
-import { ModalController } from '@ionic/angular/standalone';
+import { ModalController } from '@ionic/angular';
 import { TranslateService } from '@ngx-translate/core';
 import { firstValueFrom } from 'rxjs';
 import type { StoryKeyword, StoryVocabWord, WordDictionaryEntry } from '@lingua-card/shared/domain';

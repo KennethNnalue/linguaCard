@@ -1,7 +1,7 @@
 import { TestBed } from '@angular/core/testing';
 import { provideRouter } from '@angular/router';
 import { SwUpdate } from '@angular/service-worker';
-import { provideIonicAngular } from '@ionic/angular/standalone';
+import { provideIonicAngular } from '@ionic/angular';
 import { Storage } from '@ionic/storage-angular';
 import { provideTranslateService } from '@ngx-translate/core';
 import { setupZoneTestEnv } from 'jest-preset-angular/setup-env/zone';

@@ -1,5 +1,5 @@
 import {ChangeDetectionStrategy, Component, output, signal} from '@angular/core';
-import {IonIcon} from '@ionic/angular/standalone';
+import {IonIcon} from '@ionic/angular';
 import {TranslatePipe} from '@ngx-translate/core';
 import {addIcons} from 'ionicons';
 import {addOutline, cloudUploadOutline, closeOutline, folderOpenOutline} from 'ionicons/icons';

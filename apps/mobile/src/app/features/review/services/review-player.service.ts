@@ -1,5 +1,5 @@
 import {inject, Injectable, signal} from '@angular/core';
-import {ModalController} from '@ionic/angular/standalone';
+import {ModalController} from '@ionic/angular';
 import {Router} from '@angular/router';
 import type {ScheduledCard} from '@lingua-card/shared/domain';
 import type {ReviewSessionSource} from '../domain/review-domain';

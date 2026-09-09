@@ -1,5 +1,5 @@
 import { ChangeDetectionStrategy, Component, HostListener, Input, computed, effect, inject, signal, viewChild } from '@angular/core';
-import { AlertController, IonContent, IonHeader, IonIcon, IonSpinner, IonToolbar, ModalController } from '@ionic/angular/standalone';
+import { AlertController, IonContent, IonHeader, IonIcon, IonSpinner, IonToolbar, ModalController } from '@ionic/angular';
 import { addIcons } from 'ionicons';
 import { closeOutline, volumeHighOutline, volumeMuteOutline } from 'ionicons/icons';
 import type { ReviewRating, ScheduledCard } from '@lingua-card/shared/domain';

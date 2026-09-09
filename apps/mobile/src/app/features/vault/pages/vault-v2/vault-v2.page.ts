@@ -1,6 +1,6 @@
 import { ChangeDetectionStrategy, Component, computed, inject, OnInit, signal } from '@angular/core';
 import { Router } from '@angular/router';
-import { IonContent, IonRefresher, IonRefresherContent } from '@ionic/angular/standalone';
+import { IonContent, IonRefresher, IonRefresherContent } from '@ionic/angular';
 import type { CefrLevel, CollectionSummaryView, PlatformCollectionSummary } from '@lingua-card/shared/domain';
 import { CollectionCoverComponent } from '../../components/collection-cover/collection-cover.component';
 import { PlatformCollectionStore } from '../../store/platform-collection.store';

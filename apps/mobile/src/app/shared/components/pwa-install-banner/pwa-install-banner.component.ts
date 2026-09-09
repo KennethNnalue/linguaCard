@@ -1,5 +1,5 @@
 import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
-import { IonButton } from '@ionic/angular/standalone';
+import { IonButton } from '@ionic/angular';
 import { TranslatePipe } from '@ngx-translate/core';
 import { PwaInstallService } from '../../../core/services/pwa-install.service';
 

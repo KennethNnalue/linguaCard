@@ -1,5 +1,5 @@
 import {Component, inject, OnInit, signal} from '@angular/core';
-import {IonApp, IonRouterOutlet} from '@ionic/angular/standalone';
+import {IonApp, IonRouterOutlet} from '@ionic/angular';
 import {App} from '@capacitor/app';
 import {Capacitor} from '@capacitor/core';
 import {Network} from '@capacitor/network';

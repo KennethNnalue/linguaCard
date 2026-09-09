@@ -1,6 +1,6 @@
 import { Component, ChangeDetectionStrategy, inject, OnInit, signal } from '@angular/core';
 import { ReactiveFormsModule, FormBuilder, Validators } from '@angular/forms';
-import { IonContent, IonHeader, IonToolbar, IonTitle, IonIcon, ModalController } from '@ionic/angular/standalone';
+import { IonContent, IonHeader, IonToolbar, IonTitle, IonIcon, ModalController } from '@ionic/angular';
 import { addIcons } from 'ionicons';
 import { closeOutline, checkmarkCircleOutline } from 'ionicons/icons';
 import { ButtonComponent } from '../../../../shared/ui/button/button.component';

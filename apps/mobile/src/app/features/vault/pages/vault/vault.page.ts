@@ -1,6 +1,6 @@
 import {ChangeDetectionStrategy, Component, computed, inject, OnDestroy, OnInit, signal} from '@angular/core';
 import {ActivatedRoute, Router} from '@angular/router';
-import {IonContent, IonRefresher, IonRefresherContent, ModalController} from '@ionic/angular/standalone';
+import {IonContent, IonRefresher, IonRefresherContent, ModalController} from '@ionic/angular';
 import {TranslatePipe, TranslateService} from '@ngx-translate/core';
 import type {CardView, CefrLevel, CollectionSummaryView, PlatformCollectionSummary} from '@lingua-card/shared/domain';
 import {CardStore} from '../../store/card.store';

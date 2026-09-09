@@ -7,7 +7,7 @@ import {
   AlertController,
   IonContent,
   ModalController,
-  } from '@ionic/angular/standalone';
+  } from '@ionic/angular';
 import {TranslateService, TranslatePipe} from '@ngx-translate/core';
 import {ArticleType, CardView, Collection, GenderType, ScheduledCard} from '@lingua-card/shared/domain';
 import {firstValueFrom} from 'rxjs';

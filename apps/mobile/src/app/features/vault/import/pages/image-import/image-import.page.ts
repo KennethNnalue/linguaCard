@@ -7,7 +7,7 @@ import {
   IonIcon,
   IonToolbar,
   ModalController,
-  } from '@ionic/angular/standalone';
+  } from '@ionic/angular';
 import { addIcons } from 'ionicons';
 import { arrowBackOutline, closeCircleOutline, documentOutline } from 'ionicons/icons';
 import { TranslatePipe } from '@ngx-translate/core';

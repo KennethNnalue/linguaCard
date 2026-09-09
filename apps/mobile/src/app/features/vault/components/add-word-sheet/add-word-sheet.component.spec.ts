@@ -1,7 +1,7 @@
 import { signal } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { Router } from '@angular/router';
-import { ModalController } from '@ionic/angular/standalone';
+import { ModalController } from '@ionic/angular';
 import { MOCK_CARDS, MOCK_COLLECTIONS } from '@lingua-card/shared/testing';
 import { of } from 'rxjs';
 

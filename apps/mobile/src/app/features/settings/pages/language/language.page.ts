@@ -1,6 +1,6 @@
 import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
 import { Router } from '@angular/router';
-import { IonContent, IonHeader, IonToolbar } from '@ionic/angular/standalone';
+import { IonContent, IonHeader, IonToolbar } from '@ionic/angular';
 import { TranslatePipe } from '@ngx-translate/core';
 import { LanguageCode } from '@lingua-card/shared/domain';
 import { LanguageService } from '../../../../core/services/language.service';

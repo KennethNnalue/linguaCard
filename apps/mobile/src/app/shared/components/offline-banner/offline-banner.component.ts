@@ -1,6 +1,6 @@
 import { Component, effect, inject, OnDestroy, signal } from '@angular/core';
 import { animate, style, transition, trigger } from '@angular/animations';
-import { IonIcon } from '@ionic/angular/standalone';
+import { IonIcon } from '@ionic/angular';
 import { addIcons } from 'ionicons';
 import { cloudOfflineOutline } from 'ionicons/icons';
 import { NetworkService } from '../../../core/services/network.service';

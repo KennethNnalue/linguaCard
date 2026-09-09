@@ -2,7 +2,7 @@ import {ChangeDetectionStrategy, Component, computed, inject, signal} from '@ang
 import {ActivatedRoute, Router} from '@angular/router';
 import {toSignal} from '@angular/core/rxjs-interop';
 import { map } from 'rxjs';
-import {AlertController, IonContent, IonIcon, ModalController, NavController,} from '@ionic/angular/standalone';
+import {AlertController, IonContent, IonIcon, ModalController, NavController,} from '@ionic/angular';
 import {TranslatePipe, TranslateService} from '@ngx-translate/core';
 import {addIcons} from 'ionicons';
 import {

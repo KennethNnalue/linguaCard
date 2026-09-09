@@ -8,7 +8,7 @@ import {
   RouteReuseStrategy,
   withPreloading,
 } from '@angular/router';
-import { IonicRouteStrategy, provideIonicAngular } from '@ionic/angular/standalone';
+import { IonicRouteStrategy, provideIonicAngular } from '@ionic/angular';
 import { provideServiceWorker } from '@angular/service-worker';
 import { Drivers } from '@ionic/storage';
 import { IonicStorageModule } from '@ionic/storage-angular';

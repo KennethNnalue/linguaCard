@@ -7,7 +7,7 @@ import {
   IonIcon,
   IonSpinner,
   ModalController,
-} from '@ionic/angular/standalone';
+} from '@ionic/angular';
 import { addIcons } from 'ionicons';
 import { sparklesOutline, closeOutline, checkmarkOutline, lockClosedOutline } from 'ionicons/icons';
 import type { GenerateStoryDto, StoryDifficulty, StoryLength } from '@lingua-card/shared/domain';

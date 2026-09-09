@@ -1,6 +1,6 @@
 import { TestBed } from '@angular/core/testing';
 import { Router } from '@angular/router';
-import { ModalController } from '@ionic/angular/standalone';
+import { ModalController } from '@ionic/angular';
 import { ReviewStore } from '../store/review.store';
 import { ReviewPlayerService } from './review-player.service';
 import { ReviewPrefsService } from './review-prefs.service';

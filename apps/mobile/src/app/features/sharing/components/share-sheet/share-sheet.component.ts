@@ -4,7 +4,7 @@ import { FormsModule } from '@angular/forms';
 import {
   IonContent, IonHeader, IonToolbar, IonTitle, IonButtons, IonButton,
   IonItem, IonLabel, IonInput, IonToggle, IonSpinner,
-  ModalController, } from '@ionic/angular/standalone';
+  ModalController, } from '@ionic/angular';
 import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { firstValueFrom } from 'rxjs';
 import type { ShareResourceType, ShareSyncMode } from '@lingua-card/shared/domain';

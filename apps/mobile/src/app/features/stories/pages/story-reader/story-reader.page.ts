@@ -16,7 +16,7 @@ import {
   IonIcon,
   ViewWillEnter,
   ViewWillLeave,
-} from '@ionic/angular/standalone';
+} from '@ionic/angular';
 import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { addIcons } from 'ionicons';
 import { arrowBackOutline, chevronBackOutline } from 'ionicons/icons';

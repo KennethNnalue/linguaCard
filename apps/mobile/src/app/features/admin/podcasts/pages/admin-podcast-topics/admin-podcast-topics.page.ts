@@ -12,7 +12,7 @@ import {
   IonSelectOption,
   IonSpinner,
   IonTextarea,
-} from '@ionic/angular/standalone';
+} from '@ionic/angular';
 import type {
   AdminPodcastTranscriptPayload,
   AdminPodcastTranscriptPromptNeedsResolutionResult,

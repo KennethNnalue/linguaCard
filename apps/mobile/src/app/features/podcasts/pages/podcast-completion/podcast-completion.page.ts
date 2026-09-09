@@ -1,6 +1,6 @@
 import { ChangeDetectionStrategy, Component, inject, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
-import { IonButton, IonContent, IonIcon } from '@ionic/angular/standalone';
+import { IonButton, IonContent, IonIcon } from '@ionic/angular';
 import { addIcons } from 'ionicons';
 import { arrowBackOutline, arrowForward, checkmark, refresh } from 'ionicons/icons';
 import { PodcastCatalogueStore } from '../../store/podcast-catalogue.store';

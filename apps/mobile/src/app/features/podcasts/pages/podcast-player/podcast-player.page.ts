@@ -6,9 +6,9 @@ import { Location } from '@angular/common';
 import { ActivatedRoute, Router } from '@angular/router';
 import {
   IonButton, IonContent, IonIcon, IonRange, IonSpinner,
-} from '@ionic/angular/standalone';
+} from '@ionic/angular';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import type { ViewWillLeave } from '@ionic/angular';
+import type { ViewWillLeave } from '@ionic/angular/lazy';
 import { addIcons } from 'ionicons';
 import { TranslatePipe } from '@ngx-translate/core';
 import {

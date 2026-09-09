@@ -1,7 +1,7 @@
 import { AppNotificationService } from '@lingua-card/mobile/notifications';
 import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
 import { Router } from '@angular/router';
-import { AlertController, IonContent, IonHeader, IonIcon, IonToolbar } from '@ionic/angular/standalone';
+import { AlertController, IonContent, IonHeader, IonIcon, IonToolbar } from '@ionic/angular';
 import { addIcons } from 'ionicons';
 import { chevronBackOutline, flashOutline, refreshOutline, moonOutline } from 'ionicons/icons';
 import { TranslatePipe, TranslateService } from '@ngx-translate/core';

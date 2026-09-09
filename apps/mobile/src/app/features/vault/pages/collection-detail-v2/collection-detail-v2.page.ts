@@ -1,6 +1,6 @@
 import { ChangeDetectionStrategy, Component, computed, inject, OnInit, signal } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
-import { IonContent } from '@ionic/angular/standalone';
+import { IonContent } from '@ionic/angular';
 import type { CardView } from '@lingua-card/shared/domain';
 import { WordAudioService } from '../../../../shared/audio/word-audio.service';
 import { VocabularyPlayerService } from '../../../listen/services/vocabulary-player.service';

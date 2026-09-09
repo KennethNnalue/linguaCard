@@ -1,6 +1,6 @@
 import { ChangeDetectionStrategy, Component, computed, inject, signal } from '@angular/core';
 import { Router } from '@angular/router';
-import { IonContent, IonHeader, IonToolbar } from '@ionic/angular/standalone';
+import { IonContent, IonHeader, IonToolbar } from '@ionic/angular';
 import { TranslatePipe } from '@ngx-translate/core';
 import { SettingsStore } from '../../store/settings.store';
 import { PushService } from '../../../../core/services/push.service';

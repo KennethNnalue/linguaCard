@@ -1,6 +1,6 @@
 import { ChangeDetectionStrategy, Component, computed, inject, OnInit, signal } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
-import { IonContent } from '@ionic/angular/standalone';
+import { IonContent } from '@ionic/angular';
 import { Story } from '@lingua-card/shared/domain';
 import { StoryStore } from '../../store/story.store';
 import { StoryApiService } from '../../services/story-api.service';

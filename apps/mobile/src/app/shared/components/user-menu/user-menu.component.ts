@@ -1,6 +1,6 @@
 import { ChangeDetectionStrategy, Component, inject, output } from '@angular/core';
 import { Router, RouterLink } from '@angular/router';
-import { IonIcon, IonToggle, ModalController } from '@ionic/angular/standalone';
+import { IonIcon, IonToggle, ModalController } from '@ionic/angular';
 import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { addIcons } from 'ionicons';
 import {

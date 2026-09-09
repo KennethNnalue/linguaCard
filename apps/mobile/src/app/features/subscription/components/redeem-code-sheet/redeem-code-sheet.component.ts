@@ -2,7 +2,7 @@ import { AppNotificationService } from '@lingua-card/mobile/notifications';
 import { ChangeDetectionStrategy, Component, DestroyRef, inject, signal } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { ReactiveFormsModule, FormBuilder, Validators } from '@angular/forms';
-import { IonContent, IonHeader, IonToolbar, IonTitle, IonIcon, ModalController } from '@ionic/angular/standalone';
+import { IonContent, IonHeader, IonToolbar, IonTitle, IonIcon, ModalController } from '@ionic/angular';
 import { addIcons } from 'ionicons';
 import { closeOutline, checkmarkCircleOutline, giftOutline } from 'ionicons/icons';
 import { TranslatePipe, TranslateService } from '@ngx-translate/core';

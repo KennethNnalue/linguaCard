@@ -1,6 +1,6 @@
 import { ChangeDetectionStrategy, Component, inject, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
-import { IonButton, IonContent, IonIcon, IonItem, IonLabel, IonList, IonSpinner } from '@ionic/angular/standalone';
+import { IonButton, IonContent, IonIcon, IonItem, IonLabel, IonList, IonSpinner } from '@ionic/angular';
 import { addIcons } from 'ionicons';
 import { arrowBackOutline, chevronForwardOutline, play, repeatOutline, shuffleOutline } from 'ionicons/icons';
 import { PodcastCatalogueStore } from '../../store/podcast-catalogue.store';

@@ -1,5 +1,5 @@
 import { ChangeDetectionStrategy, Component, ElementRef, output, viewChild } from '@angular/core';
-import { IonIcon } from '@ionic/angular/standalone';
+import { IonIcon } from '@ionic/angular';
 import { TranslatePipe } from '@ngx-translate/core';
 import { addIcons } from 'ionicons';
 import { cameraOutline, imagesOutline } from 'ionicons/icons';

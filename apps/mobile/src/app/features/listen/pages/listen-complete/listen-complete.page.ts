@@ -1,7 +1,7 @@
 import { ChangeDetectionStrategy, Component, computed, inject } from '@angular/core';
 import { Router } from '@angular/router';
-import { NavController } from '@ionic/angular';
-import { IonContent, IonHeader, IonToolbar } from '@ionic/angular/standalone';
+import { NavController } from '@ionic/angular/lazy';
+import { IonContent, IonHeader, IonToolbar } from '@ionic/angular';
 import { TranslatePipe } from '@ngx-translate/core';
 import { ListenStore } from '../../store/listen.store';
 import { MIN_ESTIMATED_MINUTES, PlayModeLabelKey } from '../../models/listen.models';

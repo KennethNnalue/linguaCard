@@ -1,6 +1,6 @@
 import { ChangeDetectionStrategy, Component, computed, inject } from '@angular/core';
 import { Router } from '@angular/router';
-import { IonContent, IonHeader, IonIcon, IonToolbar } from '@ionic/angular/standalone';
+import { IonContent, IonHeader, IonIcon, IonToolbar } from '@ionic/angular';
 import { addIcons } from 'ionicons';
 import {
   alertCircleOutline,

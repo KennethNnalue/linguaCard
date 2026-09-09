@@ -8,7 +8,7 @@ import {
   IonRefresherContent,
   IonToolbar,
   ModalController,
-} from '@ionic/angular/standalone';
+} from '@ionic/angular';
 import {TranslatePipe, TranslateService} from '@ngx-translate/core';
 import {addIcons} from 'ionicons';
 import {libraryOutline, notificationsOutline, playOutline} from 'ionicons/icons';

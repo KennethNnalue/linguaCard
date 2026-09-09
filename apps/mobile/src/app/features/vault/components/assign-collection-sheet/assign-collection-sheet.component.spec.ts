@@ -1,6 +1,6 @@
 import { signal } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { ModalController } from '@ionic/angular/standalone';
+import { ModalController } from '@ionic/angular';
 import { MOCK_COLLECTIONS } from '@lingua-card/shared/testing';
 
 import { CollectionStore } from '../../store/collection.store';

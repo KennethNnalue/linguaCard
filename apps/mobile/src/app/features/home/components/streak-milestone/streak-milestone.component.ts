@@ -1,5 +1,5 @@
 import { ChangeDetectionStrategy, Component, inject, input, OnInit, signal } from '@angular/core';
-import { ModalController } from '@ionic/angular/standalone';
+import { ModalController } from '@ionic/angular';
 
 const MILESTONES = [3, 7, 14, 30, 50, 100, 365];
 const STORAGE_KEY = 'lc_last_celebrated_milestone';

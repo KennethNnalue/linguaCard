@@ -9,7 +9,7 @@ import {
   signal,
 } from '@angular/core';
 import { NgClass } from '@angular/common';
-import { IonToggle } from '@ionic/angular/standalone';
+import { IonToggle } from '@ionic/angular';
 import { TranslatePipe } from '@ngx-translate/core';
 import type { StoryQuizQuestion } from '@lingua-card/shared/domain';
 import { WordAudioService } from '../../../../shared/audio/word-audio.service';

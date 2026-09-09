@@ -1,7 +1,7 @@
 import { AppNotificationService } from '@lingua-card/mobile/notifications';
 import { Component, computed, inject, OnDestroy, OnInit, signal } from '@angular/core';
 import { Router } from '@angular/router';
-import { IonContent } from '@ionic/angular/standalone';
+import { IonContent } from '@ionic/angular';
 import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { firstValueFrom } from 'rxjs';
 import { EnrichWordsResult, WordExtractionResult } from '@lingua-card/shared/domain';

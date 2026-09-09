@@ -1,7 +1,7 @@
 import { AppNotificationService } from '@lingua-card/mobile/notifications';
 import { ChangeDetectionStrategy, Component, computed, inject, signal } from '@angular/core';
 import { Router } from '@angular/router';
-import { IonContent, IonHeader, IonIcon, IonToolbar, ModalController } from '@ionic/angular/standalone';
+import { IonContent, IonHeader, IonIcon, IonToolbar, ModalController } from '@ionic/angular';
 import { addIcons } from 'ionicons';
 import { chevronBackOutline, chevronForwardOutline } from 'ionicons/icons';
 import type { ScheduledCard } from '@lingua-card/shared/domain';

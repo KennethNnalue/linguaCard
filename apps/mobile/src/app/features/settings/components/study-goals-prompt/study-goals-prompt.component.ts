@@ -1,6 +1,6 @@
 import { ChangeDetectionStrategy, Component, computed, inject } from '@angular/core';
 import { Router } from '@angular/router';
-import { ModalController } from '@ionic/angular/standalone';
+import { ModalController } from '@ionic/angular';
 import { TranslatePipe } from '@ngx-translate/core';
 import { SettingsStore } from '../../store/settings.store';
 import { DEFAULT_STUDY_GOALS } from '@lingua-card/shared/domain';

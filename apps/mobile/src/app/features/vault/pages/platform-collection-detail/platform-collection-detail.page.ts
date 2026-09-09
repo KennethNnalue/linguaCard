@@ -5,7 +5,7 @@ import {
   IonContent,
   IonIcon,
   ModalController,
-  } from '@ionic/angular/standalone';
+  } from '@ionic/angular';
 import { TranslateService, TranslatePipe } from '@ngx-translate/core';
 import { addIcons } from 'ionicons';
 import { volumeHighOutline } from 'ionicons/icons';

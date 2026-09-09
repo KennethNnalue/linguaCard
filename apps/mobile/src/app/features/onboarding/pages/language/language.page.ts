@@ -1,5 +1,5 @@
 import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
-import { IonContent } from '@ionic/angular/standalone';
+import { IonContent } from '@ionic/angular';
 import { LanguageCode } from '@lingua-card/shared/domain';
 import { LanguageService } from '../../../../core/services/language.service';
 import { SUPPORTED_LANGUAGES } from '../../../../core/i18n/supported-languages';

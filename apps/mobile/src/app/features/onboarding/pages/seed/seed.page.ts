@@ -1,5 +1,5 @@
 import { ChangeDetectionStrategy, Component, computed, effect, inject } from '@angular/core';
-import { IonContent, IonSpinner, ModalController } from '@ionic/angular/standalone';
+import { IonContent, IonSpinner, ModalController } from '@ionic/angular';
 import { TranslatePipe } from '@ngx-translate/core';
 import type { CefrLevel, OnboardingLevel, PlatformCollectionSummary } from '@lingua-card/shared/domain';
 import { OnboardingShellComponent } from '../../components/onboarding-shell/onboarding-shell.component';

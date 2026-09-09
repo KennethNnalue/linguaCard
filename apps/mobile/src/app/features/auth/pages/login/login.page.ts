@@ -2,7 +2,7 @@ import { AppNotificationService } from '@lingua-card/mobile/notifications';
 import { Component, inject, signal } from '@angular/core';
 import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
-import { IonContent, IonIcon, IonSpinner } from '@ionic/angular/standalone';
+import { IonContent, IonIcon, IonSpinner } from '@ionic/angular';
 import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { addIcons } from 'ionicons';
 import { alertCircleOutline, eyeOffOutline, eyeOutline, logoGoogle } from 'ionicons/icons';
