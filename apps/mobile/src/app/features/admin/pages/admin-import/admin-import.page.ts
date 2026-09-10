@@ -51,7 +51,7 @@ import {AdminCollectionAudioStore} from '../../store/admin-collection-audio.stor
 @Component({
   selector: 'lc-admin-import',
   templateUrl: './admin-import.page.html',
-  styleUrls: ['./admin-import.page.scss'],
+  styleUrls: ['./admin-import.page.scss', './admin-import-refinement.page.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [IonHeader, IonToolbar, IonContent, IonIcon, ReactiveFormsModule, TranslatePipe, DatePipe],
 })

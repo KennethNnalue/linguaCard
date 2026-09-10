@@ -49,4 +49,26 @@ describe('CardBackComponent scroll affordance', () => {
     expect(component.showScrollCue()).toBe(false);
     expect(fixture.nativeElement.querySelector('.cb-scroll-cue')).toBeNull();
   });
+
+  it('shows synonym enrichment received with the review card', () => {
+    fixture.componentRef.setInput('card', {
+      ...MOCK_CARDS[0],
+      content: {
+        ...MOCK_CARDS[0].content,
+        synonyms: [{
+          word: 'Stubentiger',
+          article: 'der',
+          translation: 'house cat',
+          example: '',
+          exampleNative: '',
+        }],
+      },
+    });
+    fixture.detectChanges();
+    component.selectTab('synonyms');
+    fixture.detectChanges();
+
+    expect(fixture.nativeElement.querySelector('.cb-syn-word')?.textContent).toContain('Stubentiger');
+    expect(fixture.nativeElement.querySelector('.cb-syn-trans')?.textContent).toContain('house cat');
+  });
 });
