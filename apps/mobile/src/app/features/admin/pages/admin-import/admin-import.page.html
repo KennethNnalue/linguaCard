@@ -51,6 +51,11 @@
     }
 
     @if (activeTab() === 'upload') {
+      <ol class="adm-create-steps" aria-label="Collection creation steps">
+        <li class="adm-create-steps__active"><span>1</span><div><strong>Choose input</strong><small>Quick list or enriched JSON</small></div></li>
+        <li><span>2</span><div><strong>Add details</strong><small>Title, level and cover</small></div></li>
+        <li><span>3</span><div><strong>Create draft</strong><small>Review before publishing</small></div></li>
+      </ol>
       <div class="adm-import-mode" aria-label="Collection input type">
         <button type="button" [class.adm-import-mode--active]="importMode() === 'words'" (click)="selectImportMode('words')"><strong>Quick word list</strong><small>One German word per line</small></button>
         <button type="button" [class.adm-import-mode--active]="importMode() === 'json'" (click)="selectImportMode('json')"><strong>Enriched JSON</strong><small>Translations and examples included</small></button>
@@ -75,6 +80,9 @@
           <label class="adm-label">Collection title</label>
           <input class="adm-input" formControlName="title" placeholder="e.g. Food & Drink" />
           <small class="adm-field-hint">Use the learner-facing name. The level appears separately.</small>
+          @if (collectionForm.controls.title.touched && collectionForm.controls.title.hasError('required')) {
+            <small class="adm-field-error">Enter a title for this collection.</small>
+          }
         </div>
 
         <div class="adm-field">
@@ -94,6 +102,9 @@
             rows="10"
             placeholder="der Apfel&#10;die Banane&#10;bestellen&#10;trinken"></textarea>
           <small class="adm-field-hint">One word per line. Articles are optional. Blank lines and # comments are ignored.</small>
+          @if (collectionForm.controls.wordListRaw.touched && collectionForm.controls.wordListRaw.hasError('required')) {
+            <small class="adm-field-error">Add at least one German word.</small>
+          }
         </div>
 
         <!-- Result banner -->
@@ -102,8 +113,12 @@
             <span class="adm-result-bar__icon">⚡</span>
             <div class="adm-result-bar__body">
               <strong>{{ r.title }}</strong>
-              <span>{{ r.created }} words · <strong>{{ r.reused }}</strong> reused · <strong>{{ r.enriched }}</strong> enriched · <strong>{{ r.duplicatesSkipped }}</strong> duplicates skipped</span>
-              <span class="adm-result-bar__id">ID: {{ r.collectionId }}</span>
+              <span>Draft created with {{ r.created }} words. {{ r.reused }} reused, {{ r.enriched }} enriched, {{ r.duplicatesSkipped }} duplicates skipped.</span>
+              <span class="adm-result-bar__id">Collection ID: {{ r.collectionId }}</span>
+              <span class="adm-result-bar__actions">
+                <button type="button" class="adm-primary-action" (click)="openCreatedCollection(r.collectionId)">Open collection</button>
+                <button type="button" class="adm-secondary-action" (click)="resetCollectionCreation()">Create another</button>
+              </span>
             </div>
           </div>
         }
@@ -111,7 +126,7 @@
         <button
           type="submit"
           class="adm-submit-btn"
-          [disabled]="importing() || collectionForm.invalid">
+          [disabled]="importing()">
           @if (importing()) {
             {{ 'admin.import.status.loading' | translate }}
           } @else {
@@ -146,6 +161,9 @@
         <div class="adm-field">
           <label class="adm-label">Collection title</label>
           <input class="adm-input" formControlName="title" placeholder="e.g. Food & Drink" />
+          @if (jsonForm.controls.title.touched && jsonForm.controls.title.hasError('required')) {
+            <small class="adm-field-error">Enter a title for this collection.</small>
+          }
         </div>
 
         <div class="adm-field">
@@ -164,6 +182,10 @@
             formControlName="wordsJson"
             rows="14"
             placeholder='[{"back": "Apfel", "front": "apple", "article": "der", "plural": "die Äpfel"}]'></textarea>
+          <small class="adm-field-hint">Paste a JSON array or choose a JSON file above. We validate it before anything is saved.</small>
+          @if (jsonForm.controls.wordsJson.touched && jsonForm.controls.wordsJson.hasError('required')) {
+            <small class="adm-field-error">Add the enriched vocabulary JSON.</small>
+          }
         </div>
 
         @if (jsonImportStage() !== 'idle') {
@@ -192,6 +214,10 @@
               }
               <span>Audio generation is separate. Open Collections to prepare or retry it.</span>
               <span class="adm-result-bar__id">ID: {{ r.collectionId }}</span>
+              <span class="adm-result-bar__actions">
+                <button type="button" class="adm-primary-action" (click)="openCreatedCollection(r.collectionId)">Open collection</button>
+                <button type="button" class="adm-secondary-action" (click)="resetCollectionCreation()">Create another</button>
+              </span>
             </div>
           </div>
         }
@@ -199,7 +225,7 @@
         <button
           type="submit"
           class="adm-submit-btn"
-          [disabled]="importingJson() || jsonForm.invalid">
+          [disabled]="importingJson()">
           @if (importingJson()) {
             {{ 'admin.import.status.loading' | translate }}
           } @else {
@@ -289,165 +315,243 @@
       <div class="adm-manage">
 
         @if (activeTab() === 'collections') {
-
-        <div class="adm-manage-header">
-          <span class="adm-manage-count">{{ collections().length }} collections</span>
-          <button class="adm-refresh-btn" (click)="loadCollections()" [disabled]="collectionsLoading()">
-            @if (collectionsLoading()) { {{ 'admin.import.status.loading' | translate }} } @else { {{ 'common.refresh' | translate }} }
-          </button>
-        </div>
-
-        @if (collectionsLoading() && !collections().length) {
-          <div class="adm-manage-empty">{{ 'admin.import.status.loading' | translate }}</div>
-        }
-
-        @for (item of collections(); track item.id) {
-          <div class="adm-coll-row" [class.adm-coll-row--published]="item.isPublished">
-            <div class="adm-coll-thumbnail">
-              @if (item.coverImageUrl) {
-                <img [src]="item.coverImageUrl" [alt]="item.title + ' thumbnail'" />
-              } @else {
-                <span>▦</span>
-              }
+          <div class="adm-collection-toolbar">
+            <div>
+              <span class="adm-manage-count">{{ collections().length }} collections</span>
+              <p>Select a collection to review its details and manage it.</p>
             </div>
-            <div class="adm-coll-body">
-              <div class="adm-coll-title">{{ item.title }}</div>
-              <div class="adm-coll-meta">
-                <span class="adm-lvl-badge">{{ item.level }}</span>
-                <span>{{ item.sourceLanguage.toUpperCase() }} → {{ item.targetLanguage.toUpperCase() }}</span>
-                <span>{{ item.status.replace('_', ' ') }}</span>
-                <span>{{ item.wordCount }} words</span>
-                <span>{{ item.dictionaryLinked }} linked</span>
-                <span class="adm-coll-id">{{ item.id.slice(0, 8) }}</span>
-              </div>
-              <!-- Story category pairing (LC-414) -->
-              <div class="adm-coll-cat-row">
-                <span class="adm-coll-cat-lbl">Story:</span>
-                <select
-                  class="adm-cat-select"
-                  [value]="item.storyCategory ?? ''"
-                  [disabled]="settingCategoryId() === item.id"
-                  (change)="setStoryCategory(item, $any($event.target).value)">
-                  <option value="">None</option>
-                  @for (cat of storyCategories; track cat.value) {
-                    <option [value]="cat.value">{{ cat.icon }} {{ cat.label }}</option>
-                  }
-                </select>
-              </div>
-            </div>
-            <div class="adm-coll-actions">
-              <button class="adm-publish-btn" (click)="startEditingMetadata(item)">
-                {{ editingMetadataId() === item.id ? 'Cancel' : 'Edit' }}
+            <div class="adm-collection-toolbar__actions">
+              <button class="adm-refresh-btn" (click)="loadCollections()" [disabled]="collectionsLoading()">
+                @if (collectionsLoading()) { {{ 'admin.import.status.loading' | translate }} } @else { {{ 'common.refresh' | translate }} }
               </button>
-              <button class="adm-publish-btn" (click)="toggleCollectionEditor(item)">
-                {{ editingCollectionId() === item.id ? 'Close' : 'Words' }}
-              </button>
-              <button
-                class="adm-publish-btn"
-                [disabled]="item.isPublished || collectionAudio.isPreparing() || collectionAudio.isReadyCollection()(item.id)"
-                (click)="prepareCollectionAudio(item)">
-                <ion-icon name="volume-high-outline"></ion-icon>
-                {{ collectionAudio.isPreparingCollection()(item.id) ? 'Preparing…' : collectionAudio.isReadyCollection()(item.id) ? 'Audio ready' : item.status === 'needs_attention' ? 'Retry audio' : 'Prepare audio' }}
-              </button>
-              <button
-                class="adm-publish-btn"
-                [class.adm-publish-btn--live]="item.isPublished"
-                [disabled]="togglingId() === item.id"
-                (click)="togglePublish(item)"
-                [attr.aria-label]="item.isPublished ? 'Unpublish' : 'Publish'">
-                <ion-icon [name]="item.isPublished ? 'eye-outline' : 'eye-off-outline'"></ion-icon>
-                {{ item.isPublished ? 'Live' : 'Draft' }}
-              </button>
-              <button
-                class="adm-delete-btn"
-                [disabled]="deletingCollectionId() === item.id"
-                (click)="deleteCollection(item)"
-                aria-label="Delete collection">
-                <ion-icon name="trash-outline"></ion-icon>
+              <button class="adm-primary-action" (click)="showCreateCollection()">
+                <ion-icon name="add-outline"></ion-icon>
+                New collection
               </button>
             </div>
           </div>
-          @if (collectionAudio.activeCollectionId() === item.id) {
-            @if (collectionAudio.status(); as audio) {
-              <div class="adm-import-progress" aria-live="polite">
-                <strong>{{ audio.ready }}/{{ audio.required }} audio clips ready</strong>
-                <span>{{ audio.pending }} pending · {{ audio.failed }} failed</span>
+
+          <div class="adm-collection-layout" [class.adm-collection-layout--selected]="!!selectedCollection()">
+            <section class="adm-collection-browser" aria-label="Collection list">
+              <div class="adm-collection-filters">
+                <label class="adm-search-field">
+                  <ion-icon name="search-outline"></ion-icon>
+                  <span class="sr-only">Search collections</span>
+                  <input
+                    type="search"
+                    placeholder="Search by title, level or ID"
+                    [value]="collectionQuery()"
+                    (input)="updateCollectionQuery($event)" />
+                </label>
+                <label class="adm-filter-field">
+                  <span class="sr-only">Filter collection status</span>
+                  <select [value]="collectionStatusFilter()" (change)="updateCollectionStatusFilter($event)">
+                    <option value="all">All statuses</option>
+                    <option value="draft">Drafts</option>
+                    <option value="live">Live</option>
+                    <option value="attention">Needs attention</option>
+                  </select>
+                </label>
               </div>
-            }
-            @if (collectionAudio.error(); as error) {
-              <div class="adm-import-progress adm-import-progress--error" aria-live="polite">
-                <strong>{{ error }}</strong>
-              </div>
-            }
-          }
-          @if (editingMetadataId() === item.id) {
-            <div class="adm-metadata-editor">
-              <label class="adm-image-upload adm-image-upload--compact">
-                @if (editCoverPreview(); as preview) {
-                  <img [src]="preview" alt="Updated collection thumbnail preview" />
-                } @else {
-                  <span>＋</span>
-                }
-                <span>{{ editCoverPreview() ? 'Replace thumbnail' : 'Add thumbnail' }}</span>
-                <input type="file" accept="image/jpeg,image/png,image/webp" (change)="selectEditCover($event)" />
-              </label>
-              <label class="adm-field">
-                <span class="adm-label">Title</span>
-                <input class="adm-input" [value]="editTitle()" (input)="updateEditTitle($event)" />
-              </label>
-              <label class="adm-field">
-                <span class="adm-label">Level</span>
-                <select class="adm-select" [value]="editLevel()" (change)="updateEditLevel($event)">
-                  @for (level of levels; track level) { <option [value]="level">{{ level }}</option> }
-                </select>
-              </label>
-              <div class="adm-metadata-editor__actions">
-                <button type="button" class="adm-publish-btn" (click)="cancelEditingMetadata()">Cancel</button>
-                <button
-                  type="button"
-                  class="adm-publish-btn adm-publish-btn--live"
-                  [disabled]="!editTitle().trim() || savingMetadataId() === item.id"
-                  (click)="saveCollectionMetadata(item)">
-                  {{ savingMetadataId() === item.id ? 'Saving…' : 'Save changes' }}
-                </button>
-              </div>
-            </div>
-          }
-          @if (editingCollectionId() === item.id) {
-            <div class="adm-word-editor">
-              @if (item.isPublished) {
-                <p class="adm-word-editor__notice">Unpublish this collection before removing or reordering words.</p>
-              }
-              @if (collectionWordsLoading()) {
-                <div class="adm-manage-empty">Loading words…</div>
+
+              @if (collectionsLoading() && !collections().length) {
+                <div class="adm-manage-empty" aria-live="polite">Loading collections…</div>
               } @else {
-                @for (word of collectionWords(); track word.id; let index = $index) {
-                  <div class="adm-word-row">
-                    <span class="adm-word-row__position">{{ index + 1 }}</span>
-                    <span class="adm-word-row__content">
-                      <strong>{{ word.targetText }}</strong>
-                      <small>{{ word.translation }}</small>
+                <div class="adm-collection-list">
+                  @for (item of filteredCollections(); track item.id) {
+                    <button
+                      type="button"
+                      class="adm-collection-list-item"
+                      [class.adm-collection-list-item--active]="selectedCollectionId() === item.id"
+                      (click)="selectCollection(item)"
+                      [attr.aria-pressed]="selectedCollectionId() === item.id">
+                      <span class="adm-coll-thumbnail">
+                        @if (item.coverImageUrl) {
+                          <img [src]="item.coverImageUrl" [alt]="item.title + ' thumbnail'" />
+                        } @else {
+                          <ion-icon name="documents-outline"></ion-icon>
+                        }
+                      </span>
+                      <span class="adm-collection-list-item__body">
+                        <span class="adm-collection-list-item__title">{{ item.title }}</span>
+                        <span class="adm-collection-list-item__meta">{{ item.level }} · {{ item.wordCount }} words · {{ item.sourceLanguage.toUpperCase() }} → {{ item.targetLanguage.toUpperCase() }}</span>
+                      </span>
+                      <span class="adm-status-pill" [class.adm-status-pill--live]="item.isPublished" [class.adm-status-pill--attention]="item.status === 'needs_attention' || item.status === 'failed'">
+                        {{ item.isPublished ? 'Live' : item.status === 'needs_attention' || item.status === 'failed' ? 'Attention' : 'Draft' }}
+                      </span>
+                      <ion-icon class="adm-collection-list-item__chevron" name="chevron-forward-outline"></ion-icon>
+                    </button>
+                  } @empty {
+                    <div class="adm-manage-empty">
+                      <strong>No matching collections</strong>
+                      <span>Try another search or status filter.</span>
+                    </div>
+                  }
+                </div>
+              }
+            </section>
+
+            <section class="adm-collection-detail" [class.adm-collection-detail--empty]="!selectedCollection()" aria-label="Selected collection details">
+              @if (selectedCollection(); as item) {
+                <header class="adm-detail-header">
+                  <button class="adm-detail-back" type="button" (click)="closeCollection()" aria-label="Back to collection list">
+                    <ion-icon name="arrow-back-outline"></ion-icon>
+                  </button>
+                  <div class="adm-detail-cover">
+                    @if (item.coverImageUrl) {
+                      <img [src]="item.coverImageUrl" [alt]="item.title + ' cover'" />
+                    } @else {
+                      <ion-icon name="documents-outline"></ion-icon>
+                    }
+                  </div>
+                  <div class="adm-detail-heading">
+                    <span class="adm-status-pill" [class.adm-status-pill--live]="item.isPublished" [class.adm-status-pill--attention]="item.status === 'needs_attention' || item.status === 'failed'">
+                      {{ item.isPublished ? 'Published' : item.status.replace('_', ' ') }}
                     </span>
-                    <span class="adm-word-row__readiness" [class.adm-word-row__readiness--missing]="!word.localizationReady">
-                      {{ word.localizationReady ? 'Ready' : 'Needs attention' }}
-                    </span>
-                    <button type="button" (click)="moveCollectionWord(item, index, -1)" [disabled]="item.isPublished || index === 0 || mutatingCollectionWord()" aria-label="Move word up">↑</button>
-                    <button type="button" (click)="moveCollectionWord(item, index, 1)" [disabled]="item.isPublished || index === collectionWords().length - 1 || mutatingCollectionWord()" aria-label="Move word down">↓</button>
-                    <button type="button" class="adm-delete-btn" (click)="removeCollectionWord(item, word)" [disabled]="item.isPublished || mutatingCollectionWord()" aria-label="Remove word">
-                      <ion-icon name="trash-outline"></ion-icon>
+                    <h2>{{ item.title }}</h2>
+                    <p>{{ item.level }} · {{ item.wordCount }} words · Updated {{ item.updatedAt | date:'mediumDate' }}</p>
+                  </div>
+                  <button class="adm-secondary-action" type="button" (click)="startEditingMetadata(item)">
+                    {{ editingMetadataId() === item.id ? 'Close editor' : 'Edit details' }}
+                  </button>
+                </header>
+
+                @if (editingMetadataId() === item.id) {
+                  <form class="adm-metadata-editor" (ngSubmit)="saveCollectionMetadata(item)">
+                    <label class="adm-image-upload adm-image-upload--compact">
+                      @if (editCoverPreview(); as preview) {
+                        <img [src]="preview" alt="Updated collection thumbnail preview" />
+                      } @else {
+                        <span><ion-icon name="cloud-upload-outline"></ion-icon></span>
+                      }
+                      <span><strong>{{ editCoverPreview() ? 'Replace cover' : 'Add cover' }}</strong><small>JPG, PNG or WebP</small></span>
+                      <input type="file" accept="image/jpeg,image/png,image/webp" (change)="selectEditCover($event)" />
+                    </label>
+                    <label class="adm-field">
+                      <span class="adm-label">Title</span>
+                      <input class="adm-input" [value]="editTitle()" (input)="updateEditTitle($event)" />
+                    </label>
+                    <label class="adm-field">
+                      <span class="adm-label">Level</span>
+                      <select class="adm-select" [value]="editLevel()" (change)="updateEditLevel($event)">
+                        @for (level of levels; track level) { <option [value]="level">{{ level }}</option> }
+                      </select>
+                    </label>
+                    <div class="adm-metadata-editor__actions">
+                      <button type="button" class="adm-secondary-action" (click)="cancelEditingMetadata()">Cancel</button>
+                      <button type="submit" class="adm-primary-action" [disabled]="!editTitle().trim() || savingMetadataId() === item.id">
+                        {{ savingMetadataId() === item.id ? 'Saving…' : 'Save changes' }}
+                      </button>
+                    </div>
+                  </form>
+                }
+
+                <div class="adm-detail-section">
+                  <div class="adm-detail-section__heading">
+                    <div><span>Visibility</span><small>Control whether learners can find this collection.</small></div>
+                    <button
+                      class="adm-publish-btn"
+                      [class.adm-publish-btn--live]="item.isPublished"
+                      [disabled]="togglingId() === item.id"
+                      (click)="togglePublish(item)">
+                      <ion-icon [name]="item.isPublished ? 'eye-outline' : 'eye-off-outline'"></ion-icon>
+                      {{ togglingId() === item.id ? 'Updating…' : item.isPublished ? 'Unpublish' : 'Publish collection' }}
                     </button>
                   </div>
-                } @empty {
-                  <div class="adm-manage-empty">This collection has no words.</div>
-                }
-              }
-            </div>
-          }
-        }
+                  <div class="adm-inline-feedback" [class.adm-inline-feedback--success]="item.isPublished">
+                    <ion-icon [name]="item.isPublished ? 'checkmark-circle-outline' : 'alert-circle-outline'"></ion-icon>
+                    <span>{{ item.isPublished ? 'Live for learners. Unpublish it before changing word order or removing words.' : 'Draft — only administrators can see it.' }}</span>
+                  </div>
+                </div>
 
-        @if (!collectionsLoading() && !collections().length) {
-          <div class="adm-manage-empty">{{ 'admin.import.status.noCollections' | translate }}</div>
-        }
+                <div class="adm-detail-section">
+                  <div class="adm-detail-section__heading">
+                    <div><span>Audio readiness</span><small>Prepare pronunciation audio before publishing.</small></div>
+                    <button
+                      class="adm-secondary-action"
+                      [disabled]="item.isPublished || collectionAudio.isPreparing() || collectionAudio.isReadyCollection()(item.id)"
+                      (click)="prepareCollectionAudio(item)">
+                      <ion-icon name="volume-high-outline"></ion-icon>
+                      {{ collectionAudio.isPreparingCollection()(item.id) ? 'Preparing…' : collectionAudio.isReadyCollection()(item.id) ? 'Audio ready' : item.status === 'needs_attention' ? 'Retry audio' : 'Prepare audio' }}
+                    </button>
+                  </div>
+                  @if (collectionAudio.activeCollectionId() === item.id) {
+                    @if (collectionAudio.status(); as audio) {
+                      <div class="adm-import-progress" aria-live="polite">
+                        <strong>{{ audio.ready }}/{{ audio.required }} audio clips ready</strong>
+                        <span>{{ audio.pending }} pending · {{ audio.failed }} failed</span>
+                      </div>
+                    }
+                    @if (collectionAudio.error(); as error) {
+                      <div class="adm-import-progress adm-import-progress--error" aria-live="polite"><strong>{{ error }}</strong></div>
+                    }
+                  } @else {
+                    <div class="adm-inline-feedback"><ion-icon name="volume-high-outline"></ion-icon><span>Audio preparation has not been started in this session.</span></div>
+                  }
+                </div>
+
+                <div class="adm-detail-section">
+                  <label class="adm-detail-section__heading" for="story-category">
+                    <div><span>Story pairing</span><small>Choose which story category this collection supports.</small></div>
+                  </label>
+                  <select
+                    id="story-category"
+                    class="adm-select"
+                    [value]="item.storyCategory ?? ''"
+                    [disabled]="settingCategoryId() === item.id"
+                    (change)="setStoryCategoryFromEvent(item, $event)">
+                    <option value="">No story category</option>
+                    @for (cat of storyCategories; track cat.value) {
+                      <option [value]="cat.value">{{ cat.icon }} {{ cat.label }}</option>
+                    }
+                  </select>
+                </div>
+
+                <div class="adm-detail-section adm-detail-section--words">
+                  <div class="adm-detail-section__heading">
+                    <div><span>Vocabulary</span><small>{{ item.wordCount }} words · {{ item.dictionaryLinked }} linked to the dictionary</small></div>
+                  </div>
+                  @if (item.isPublished) {
+                    <div class="adm-inline-feedback"><ion-icon name="alert-circle-outline"></ion-icon><span>Unpublish this collection to reorder or remove words.</span></div>
+                  }
+                  @if (collectionWordsLoading()) {
+                    <div class="adm-manage-empty" aria-live="polite">Loading vocabulary…</div>
+                  } @else {
+                    <div class="adm-word-editor">
+                      @for (word of collectionWords(); track word.id; let index = $index) {
+                        <div class="adm-word-row">
+                          <span class="adm-word-row__position">{{ index + 1 }}</span>
+                          <span class="adm-word-row__content"><strong>{{ word.targetText }}</strong><small>{{ word.translation }}</small></span>
+                          <span class="adm-word-row__readiness" [class.adm-word-row__readiness--missing]="!word.localizationReady">
+                            {{ word.localizationReady ? 'Ready' : 'Needs attention' }}
+                          </span>
+                          <button type="button" (click)="moveCollectionWord(item, index, -1)" [disabled]="item.isPublished || index === 0 || mutatingCollectionWord()" aria-label="Move word up"><ion-icon name="arrow-up-outline"></ion-icon></button>
+                          <button type="button" (click)="moveCollectionWord(item, index, 1)" [disabled]="item.isPublished || index === collectionWords().length - 1 || mutatingCollectionWord()" aria-label="Move word down"><ion-icon name="arrow-down-outline"></ion-icon></button>
+                          <button type="button" class="adm-delete-btn" (click)="removeCollectionWord(item, word)" [disabled]="item.isPublished || mutatingCollectionWord()" [attr.aria-label]="'Remove ' + word.targetText"><ion-icon name="trash-outline"></ion-icon></button>
+                        </div>
+                      } @empty {
+                        <div class="adm-manage-empty">This collection has no words.</div>
+                      }
+                    </div>
+                  }
+                </div>
+
+                <div class="adm-danger-zone">
+                  <div><strong>Delete collection</strong><span>Permanently removes the collection and detaches paired stories.</span></div>
+                  <button class="adm-delete-action" [disabled]="deletingCollectionId() === item.id" (click)="deleteCollection(item)">
+                    <ion-icon name="trash-outline"></ion-icon>
+                    {{ deletingCollectionId() === item.id ? 'Deleting…' : 'Delete collection' }}
+                  </button>
+                </div>
+              } @else {
+                <div class="adm-detail-placeholder">
+                  <span><ion-icon name="folder-open-outline"></ion-icon></span>
+                  <strong>Select a collection</strong>
+                  <p>Choose an item from the list to edit details, manage words, prepare audio, publish, or delete it.</p>
+                </div>
+              }
+            </section>
+          </div>
         }
 
         @if (activeTab() === 'stories') {

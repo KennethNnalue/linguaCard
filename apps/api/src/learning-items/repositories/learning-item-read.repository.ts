@@ -100,6 +100,7 @@ export class LearningItemReadRepository implements LearningItemReadPort {
          context."sourceLanguage" AS "localizationLanguage",
          COALESCE(localization.translation, '') AS translation,
          localization.definition,
+         COALESCE(localization.synonyms, '[]'::jsonb) AS synonyms,
          COALESCE(examples.items, '[]'::jsonb) AS examples,
          item."personalNote",
          scheduling.state AS "reviewState",

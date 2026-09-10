@@ -2,13 +2,20 @@ import {AppNotificationService} from '@lingua-card/mobile/notifications';
 import {ChangeDetectionStrategy, Component, computed, DestroyRef, inject, signal} from '@angular/core';
 import {takeUntilDestroyed, toSignal} from '@angular/core/rxjs-interop';
 import {FormControl, FormGroup, ReactiveFormsModule, Validators} from '@angular/forms';
+import {DatePipe} from '@angular/common';
 import {HttpErrorResponse} from '@angular/common/http';
 import {Router} from '@angular/router';
 import {AlertController, IonContent, IonHeader, IonIcon, IonToolbar} from '@ionic/angular';
 import {addIcons} from 'ionicons';
 import {
   arrowBackOutline,
+  addOutline,
+  alertCircleOutline,
+  arrowDownOutline,
+  arrowUpOutline,
   bookOutline,
+  checkmarkCircleOutline,
+  chevronForwardOutline,
   cloudUploadOutline,
   createOutline,
   documentsOutline,
@@ -16,6 +23,7 @@ import {
   eyeOutline,
   folderOpenOutline,
   musicalNotesOutline,
+  searchOutline,
   sparklesOutline,
   trashOutline,
   volumeHighOutline
@@ -45,7 +53,7 @@ import {AdminCollectionAudioStore} from '../../store/admin-collection-audio.stor
   templateUrl: './admin-import.page.html',
   styleUrls: ['./admin-import.page.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [IonHeader, IonToolbar, IonContent, IonIcon, ReactiveFormsModule, TranslatePipe],
+  imports: [IonHeader, IonToolbar, IonContent, IonIcon, ReactiveFormsModule, TranslatePipe, DatePipe],
 })
 export class AdminImportPage {
   private readonly adminApi = inject(AdminApiService);
@@ -219,10 +227,13 @@ OUTPUT — valid JSON ONLY, no markdown fences, no commentary:
 
   readonly collections = signal<AdminPlatformCollectionListItem[]>([]);
   readonly collectionsLoading = signal(false);
+  readonly collectionQuery = signal('');
+  readonly collectionStatusFilter = signal<'all' | 'draft' | 'live' | 'attention'>('all');
+  readonly selectedCollectionId = signal<string | null>(null);
+  readonly pendingCollectionSelectionId = signal<string | null>(null);
   readonly togglingId = signal<string | null>(null);
   readonly settingCategoryId = signal<string | null>(null);
   readonly deletingCollectionId = signal<string | null>(null);
-  readonly editingCollectionId = signal<string | null>(null);
   readonly editingMetadataId = signal<string | null>(null);
   readonly editTitle = signal('');
   readonly editLevel = signal<CefrLevel>('A1');
@@ -241,16 +252,44 @@ OUTPUT — valid JSON ONLY, no markdown fences, no commentary:
 
   readonly storyCategories = STORY_CATEGORIES;
 
+  readonly filteredCollections = computed(() => {
+    const query = this.collectionQuery().trim().toLocaleLowerCase();
+    const status = this.collectionStatusFilter();
+    return this.collections().filter(collection => {
+      const matchesQuery = !query
+        || collection.title.toLocaleLowerCase().includes(query)
+        || collection.id.toLocaleLowerCase().includes(query)
+        || collection.level.toLocaleLowerCase().includes(query);
+      const matchesStatus = status === 'all'
+        || (status === 'live' && collection.isPublished)
+        || (status === 'draft' && !collection.isPublished && collection.status !== 'needs_attention' && collection.status !== 'failed')
+        || (status === 'attention' && (collection.status === 'needs_attention' || collection.status === 'failed'));
+      return matchesQuery && matchesStatus;
+    });
+  });
+
+  readonly selectedCollection = computed(() => {
+    const selectedId = this.selectedCollectionId();
+    return selectedId ? this.collections().find(collection => collection.id === selectedId) ?? null : null;
+  });
+
   constructor() {
     addIcons({
       arrowBackOutline,
+      addOutline,
+      alertCircleOutline,
+      arrowDownOutline,
+      arrowUpOutline,
       bookOutline,
+      checkmarkCircleOutline,
+      chevronForwardOutline,
       cloudUploadOutline,
       createOutline,
       documentsOutline,
       sparklesOutline,
       folderOpenOutline,
       musicalNotesOutline,
+      searchOutline,
       eyeOutline,
       eyeOffOutline,
       trashOutline,
@@ -277,6 +316,14 @@ OUTPUT — valid JSON ONLY, no markdown fences, no commentary:
       next: items => {
         this.collections.set(items);
         this.collectionsLoading.set(false);
+        const pendingId = this.pendingCollectionSelectionId();
+        if (pendingId) {
+          this.pendingCollectionSelectionId.set(null);
+          const pendingCollection = items.find(item => item.id === pendingId);
+          if (pendingCollection) this.selectCollection(pendingCollection);
+        } else if (this.selectedCollectionId() && !items.some(item => item.id === this.selectedCollectionId())) {
+          this.closeCollection();
+        }
       },
       error: () => {
         this.collectionsLoading.set(false);
@@ -289,9 +336,81 @@ OUTPUT — valid JSON ONLY, no markdown fences, no commentary:
     this.collectionAudio.prepare(item.id);
   }
 
+  updateCollectionQuery(event: Event): void {
+    const input = event.target;
+    if (input instanceof HTMLInputElement) this.collectionQuery.set(input.value);
+  }
+
+  updateCollectionStatusFilter(event: Event): void {
+    const select = event.target;
+    if (!(select instanceof HTMLSelectElement)) return;
+    const value = select.value;
+    if (value === 'all' || value === 'draft' || value === 'live' || value === 'attention') {
+      this.collectionStatusFilter.set(value);
+    }
+  }
+
+  selectCollection(item: AdminPlatformCollectionListItem): void {
+    this.selectedCollectionId.set(item.id);
+    this.cancelEditingMetadata();
+    this.collectionWords.set([]);
+    this.collectionWordsLoading.set(true);
+    this.adminApi.listCollectionWords(item.id).pipe(takeUntilDestroyed(this._destroyRef)).subscribe({
+      next: words => {
+        if (this.selectedCollectionId() !== item.id) return;
+        this.collectionWords.set(words);
+        this.collectionWordsLoading.set(false);
+      },
+      error: () => {
+        if (this.selectedCollectionId() !== item.id) return;
+        this.collectionWordsLoading.set(false);
+        void this._toast('Failed to load collection words', 'danger');
+      },
+    });
+  }
+
+  closeCollection(): void {
+    this.selectedCollectionId.set(null);
+    this.cancelEditingMetadata();
+    this.collectionWords.set([]);
+    this.collectionWordsLoading.set(false);
+    this.collectionAudio.clear();
+  }
+
+  showCreateCollection(): void {
+    this.switchTab('upload');
+  }
+
+  openCreatedCollection(collectionId: string): void {
+    this.pendingCollectionSelectionId.set(collectionId);
+    this.switchTab('collections');
+    this.loadCollections();
+  }
+
+  resetCollectionCreation(): void {
+    this.collectionForm.reset({title: '', level: 'A1', wordListRaw: ''});
+    this.jsonForm.reset({title: '', level: 'A1', wordsJson: ''});
+    this.collectionImage.set(null);
+    this.collectionImagePreview.set(null);
+    this.lastCollectionResult.set(null);
+    this.lastJsonResult.set(null);
+    this.jsonImportStage.set('idle');
+    this.jsonImportError.set(null);
+    this.jsonImportWarning.set(null);
+  }
+
+  setStoryCategoryFromEvent(item: AdminPlatformCollectionListItem, event: Event): void {
+    const select = event.target;
+    if (select instanceof HTMLSelectElement) this.setStoryCategory(item, select.value);
+  }
+
   setStoryCategory(item: AdminPlatformCollectionListItem, value: string): void {
     if (this.settingCategoryId()) return;
-    const storyCategory: StoryCategory | null = value === '' ? null : (value as StoryCategory);
+    if (value !== '' && !this.isStoryCategory(value)) {
+      void this._toast('Select a valid story category', 'warning');
+      return;
+    }
+    const storyCategory: StoryCategory | null = value === '' ? null : value;
     this.settingCategoryId.set(item.id);
     this.adminApi.setStoryCategory(item.id, storyCategory).pipe(takeUntilDestroyed(this._destroyRef)).subscribe({
       next: () => {
@@ -299,6 +418,7 @@ OUTPUT — valid JSON ONLY, no markdown fences, no commentary:
         this.collections.update(list =>
           list.map(c => c.id === item.id ? {...c, storyCategory} : c),
         );
+        void this._toast(`Story category ${storyCategory ? 'updated' : 'removed'}`, 'success');
       },
       error: () => {
         this.settingCategoryId.set(null);
@@ -320,27 +440,6 @@ OUTPUT — valid JSON ONLY, no markdown fences, no commentary:
       error: error => {
         this.togglingId.set(null);
         void this._toast(this.apiErrorMessage(error, 'Publishing failed'), 'danger');
-      },
-    });
-  }
-
-  toggleCollectionEditor(item: AdminPlatformCollectionListItem): void {
-    if (this.editingCollectionId() === item.id) {
-      this.editingCollectionId.set(null);
-      this.collectionWords.set([]);
-      return;
-    }
-    this.editingCollectionId.set(item.id);
-    this.collectionWords.set([]);
-    this.collectionWordsLoading.set(true);
-    this.adminApi.listCollectionWords(item.id).pipe(takeUntilDestroyed(this._destroyRef)).subscribe({
-      next: words => {
-        this.collectionWords.set(words);
-        this.collectionWordsLoading.set(false);
-      },
-      error: () => {
-        this.collectionWordsLoading.set(false);
-        void this._toast('Failed to load collection words', 'danger');
       },
     });
   }
@@ -426,6 +525,7 @@ OUTPUT — valid JSON ONLY, no markdown fences, no commentary:
       next: () => {
         this.collectionWords.set(reordered.map((word, position) => ({...word, position})));
         this.mutatingCollectionWord.set(false);
+        void this._toast(`Word moved ${direction === -1 ? 'up' : 'down'}`, 'success');
       },
       error: () => {
         this.mutatingCollectionWord.set(false);
@@ -434,8 +534,27 @@ OUTPUT — valid JSON ONLY, no markdown fences, no commentary:
     });
   }
 
-  removeCollectionWord(collection: AdminPlatformCollectionListItem, word: AdminPlatformCollectionWordItem): void {
+  async removeCollectionWord(collection: AdminPlatformCollectionListItem, word: AdminPlatformCollectionWordItem): Promise<void> {
     if (collection.isPublished || this.mutatingCollectionWord()) return;
+    const alert = await this.alertCtrl.create({
+      header: 'Remove word?',
+      message: `Remove “${word.targetText}” from “${collection.title}”? The dictionary entry will not be deleted.`,
+      buttons: [
+        {text: 'Cancel', role: 'cancel'},
+        {
+          text: 'Remove',
+          role: 'destructive',
+          handler: () => this.confirmRemoveCollectionWord(collection, word),
+        },
+      ],
+    });
+    await alert.present();
+  }
+
+  private confirmRemoveCollectionWord(
+    collection: AdminPlatformCollectionListItem,
+    word: AdminPlatformCollectionWordItem,
+  ): void {
     this.mutatingCollectionWord.set(true);
     this.adminApi.removeCollectionWord(collection.id, word.id).pipe(takeUntilDestroyed(this._destroyRef)).subscribe({
       next: () => {
@@ -452,6 +571,7 @@ OUTPUT — valid JSON ONLY, no markdown fences, no commentary:
           }
           : item));
         this.mutatingCollectionWord.set(false);
+        void this._toast(`“${word.targetText}” removed from the collection`, 'success');
       },
       error: () => {
         this.mutatingCollectionWord.set(false);
@@ -491,6 +611,7 @@ OUTPUT — valid JSON ONLY, no markdown fences, no commentary:
               next: () => {
                 this.deletingCollectionId.set(null);
                 this.collections.update(list => list.filter(c => c.id !== item.id));
+                if (this.selectedCollectionId() === item.id) this.closeCollection();
                 void this._toast(`"${item.title}" deleted`, 'success');
               },
               error: () => {
@@ -866,6 +987,10 @@ OUTPUT — valid JSON ONLY, no markdown fences, no commentary:
 
   private isCefrLevel(value: unknown): value is CefrLevel {
     return value === 'A1' || value === 'A2' || value === 'B1' || value === 'B2' || value === 'C1';
+  }
+
+  private isStoryCategory(value: string): value is StoryCategory {
+    return STORY_CATEGORIES.some(category => category.value === value);
   }
 
   private isWordType(value: unknown): value is 'noun' | 'verb' | 'adjective' | 'adverb' | 'other' {

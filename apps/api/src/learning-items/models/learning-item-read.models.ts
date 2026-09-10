@@ -1,4 +1,4 @@
-import type { ReviewSchedulingState } from '@lingua-card/shared/domain';
+import type { ReviewSchedulingState, Synonym } from '@lingua-card/shared/domain';
 
 export interface LearningItemCursor {
   createdAt: string;
@@ -24,6 +24,7 @@ export interface LearningItemReadRow {
   localizationLanguage: string;
   translation: string;
   definition: string | null;
+  synonyms: Synonym[];
   examples: LearningItemExampleRow[];
   personalNote: string;
   reviewState: ReviewSchedulingState | null;

@@ -37,6 +37,13 @@ function learningItemRow(id: string, createdAt: string): LearningItemReadRow {
     localizationLanguage: 'en',
     translation: 'house',
     definition: null,
+    synonyms: [{
+      word: 'Gebäude',
+      article: 'das',
+      translation: 'building',
+      example: 'Das Gebäude ist groß.',
+      exampleNative: 'The building is big.',
+    }],
     examples: [{ id: 'example-1', targetText: 'Das Haus ist groß.', sourceText: 'The house is big.' }],
     personalNote: '',
     reviewState: null,
@@ -99,7 +106,10 @@ describe('LearningItemReadService', () => {
         id: 'item-2',
         sourceLanguage: 'en',
         targetLanguage: 'de',
-        localization: expect.objectContaining({ translation: 'house' }),
+        localization: expect.objectContaining({
+          translation: 'house',
+          synonyms: [expect.objectContaining({ word: 'Gebäude', translation: 'building' })],
+        }),
         reviewState: expect.objectContaining({ cardId: 'item-2', stage: 'new' }),
       }),
     ]);

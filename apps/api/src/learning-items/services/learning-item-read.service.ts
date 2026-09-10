@@ -114,6 +114,7 @@ export class LearningItemReadService {
         language: this.toLanguageCode(row.localizationLanguage),
         translation: row.translation,
         definition: row.definition,
+        synonyms: row.synonyms.map(synonym => ({ ...synonym })),
       },
       examples: row.examples,
       personalNote: row.personalNote,

@@ -15,7 +15,7 @@ describe('learningItemAudioRequests', () => {
         grammar: {article: 'die'},
         phonetic: null,
       },
-      localization: {language: 'en', translation: 'invoice', definition: null},
+      localization: {language: 'en', translation: 'invoice', definition: null, synonyms: []},
       examples: [
         {id: 'example-1', targetText: 'Die Rechnung, bitte.', sourceText: 'The bill, please.'},
         {id: 'example-2', targetText: '   ', sourceText: null},

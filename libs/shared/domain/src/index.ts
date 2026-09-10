@@ -540,6 +540,7 @@ export interface CardView {
     language: LanguageCode;
     translation: string;
     definition: string | null;
+    synonyms: Synonym[];
   };
   examples: Array<{
     id: string;

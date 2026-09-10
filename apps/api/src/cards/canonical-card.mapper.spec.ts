@@ -16,7 +16,18 @@ describe('canonicalCardToScheduledCard', () => {
         grammar: { article: 'das', gender: 'neuter', plurals: ['Häuser'] },
         phonetic: null,
       },
-      localization: { language: 'en', translation: 'house', definition: null },
+      localization: {
+        language: 'en',
+        translation: 'house',
+        definition: null,
+        synonyms: [{
+          word: 'Gebäude',
+          article: 'das',
+          translation: 'building',
+          example: 'Das Gebäude ist groß.',
+          exampleNative: 'The building is big.',
+        }],
+      },
       examples: [{ id: 'example-1', targetText: 'Das Haus ist groß.', sourceText: 'The house is big.' }],
       personalNote: 'Building',
       reviewState: createNewReviewSchedulingState('item-1'),
@@ -36,6 +47,7 @@ describe('canonicalCardToScheduledCard', () => {
         gender: 'neuter',
         plural: 'Häuser',
         notes: 'Building',
+        synonyms: [expect.objectContaining({ word: 'Gebäude', translation: 'building' })],
       }),
     }));
   });

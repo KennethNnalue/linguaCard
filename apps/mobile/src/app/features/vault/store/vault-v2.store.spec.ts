@@ -25,7 +25,7 @@ const learningItem: CardView = {
   sourceLanguage: 'en',
   targetLanguage: 'de',
   lexeme: { id: 'lexeme-1', text: 'Haus', partOfSpeech: 'noun', grammar: {}, phonetic: null },
-  localization: { language: 'en', translation: 'house', definition: null },
+  localization: { language: 'en', translation: 'house', definition: null, synonyms: [] },
   examples: [],
   personalNote: '',
   reviewState: {

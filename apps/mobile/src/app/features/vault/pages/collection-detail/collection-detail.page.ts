@@ -500,7 +500,7 @@ export class CollectionDetailPage implements OnInit {
           target: example.targetText,
           native: example.sourceText ?? '',
         })),
-        synonyms: [],
+        synonyms: item.localization.synonyms.map(synonym => ({ ...synonym })),
         notes: item.personalNote,
         imageUrl: null,
         phonetic: item.lexeme.phonetic,

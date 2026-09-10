@@ -61,7 +61,7 @@ export function canonicalCardToScheduledCard(userId: string, card: CardView): Sc
         target: example.targetText,
         native: example.sourceText ?? '',
       })),
-      synonyms: [],
+      synonyms: card.localization.synonyms.map(synonym => ({ ...synonym })),
       notes: card.personalNote,
       imageUrl: null,
       phonetic: card.lexeme.phonetic,
