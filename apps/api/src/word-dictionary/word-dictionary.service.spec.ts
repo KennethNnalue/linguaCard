@@ -30,12 +30,14 @@ function enrichedWord(): EnrichedWordInput {
 describe('WordDictionaryService enriched content persistence', () => {
   const repository = {
     findByKey: jest.fn(),
+    findByKeys: jest.fn(),
     create: jest.fn(),
+    insertMissing: jest.fn(),
     upsertOnConflict: jest.fn(),
     save: jest.fn(),
   };
   const wordAudio = {resolve: jest.fn()};
-  const vocabularyProjection = {project: jest.fn()};
+  const vocabularyProjection = {project: jest.fn(), projectMany: jest.fn(), projectMissing: jest.fn()};
   let service: WordDictionaryService;
 
   beforeEach(async () => {
@@ -44,8 +46,11 @@ describe('WordDictionaryService enriched content persistence', () => {
     repository.create.mockImplementation((values: Partial<WordDictionaryEntity>) =>
       Object.assign(new WordDictionaryEntity(), values));
     repository.upsertOnConflict.mockImplementation((entity: WordDictionaryEntity) => Promise.resolve(entity));
+    repository.insertMissing.mockResolvedValue(undefined);
     repository.save.mockImplementation((entity: WordDictionaryEntity) => Promise.resolve(entity));
     vocabularyProjection.project.mockResolvedValue({lexemeId: 'lexeme-1'});
+    vocabularyProjection.projectMany.mockResolvedValue(undefined);
+    vocabularyProjection.projectMissing.mockResolvedValue(undefined);
     wordAudio.resolve.mockResolvedValue({
       wordAudio: {id: 'audio-1', status: 'ready'},
       cached: false,
@@ -81,5 +86,48 @@ describe('WordDictionaryService enriched content persistence', () => {
     expect(wordAudio.resolve).toHaveBeenCalledWith('der Apfel', 'de-DE');
     expect(repository.save).toHaveBeenCalledWith(expect.objectContaining({wordAudioId: 'audio-1'}));
     expect(saved.wordAudioId).toBe('audio-1');
+  });
+
+  it('persists and projects enriched content through set-based batch operations', async () => {
+    repository.findByKeys
+      .mockResolvedValueOnce(new Map())
+      .mockResolvedValueOnce(new Map([[
+        'der apfel',
+        Object.assign(new WordDictionaryEntity(), {
+          id: 'dictionary-1',
+          lemmaKey: 'der apfel',
+          targetLang: 'de-DE',
+          nativeLang: 'en',
+          displayText: 'Apfel',
+          article: 'der',
+          wordType: 'noun',
+          translation: 'apple',
+          examples: [],
+          synonyms: [],
+          plurals: ['Äpfel'],
+          wordAudioId: null,
+          source: 'admin',
+        }),
+      ]]));
+
+    const result = await service.persistEnrichedContentBatch([
+      enrichedWord(),
+      {...enrichedWord(), back: 'apfel'},
+    ]);
+
+    expect(repository.findByKeys).toHaveBeenCalledTimes(2);
+    expect(repository.insertMissing).toHaveBeenCalledWith([
+      expect.objectContaining({lemmaKey: 'der apfel', wordAudioId: null}),
+    ]);
+    expect(vocabularyProjection.projectMissing).toHaveBeenCalledWith([
+      expect.objectContaining({legacyDictionaryWordId: 'dictionary-1'}),
+    ]);
+    expect(vocabularyProjection.projectMany).not.toHaveBeenCalled();
+    expect(wordAudio.resolve).not.toHaveBeenCalled();
+    expect(result).toEqual(expect.objectContaining({
+      inserted: 1,
+      reused: 0,
+      duplicatesSkipped: 1,
+    }));
   });
 });

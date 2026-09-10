@@ -37,8 +37,12 @@ describe('AdminService collection import staging', () => {
     const dictRepo = {findBy: jest.fn().mockResolvedValue([dictionaryEntry])};
     const importRepo = {findOneBy: jest.fn().mockResolvedValue(null)};
     const dictionary = {
-      lookup: jest.fn().mockResolvedValue(null),
-      persistEnrichedContent: jest.fn().mockResolvedValue(dictionaryEntry),
+      persistEnrichedContentBatch: jest.fn().mockResolvedValue({
+        entries: [dictionaryEntry],
+        inserted: 1,
+        reused: 0,
+        duplicatesSkipped: 1,
+      }),
     };
     const wordAudio = {
       batchResolve: jest.fn().mockResolvedValue({
@@ -51,7 +55,7 @@ describe('AdminService collection import staging', () => {
       }),
     };
     const dictionaryLexemeRepo = {
-      findOneBy: jest.fn().mockResolvedValue({dictionaryWordId: 'dictionary-1', lexemeId: 'lexeme-1'}),
+      findBy: jest.fn().mockResolvedValue([{dictionaryWordId: 'dictionary-1', lexemeId: 'lexeme-1'}]),
     };
     const service = new AdminService(
       collectionRepo as never,
@@ -84,7 +88,7 @@ describe('AdminService collection import staging', () => {
 
     const result = await service.importCollectionJson(dto);
 
-    expect(dictionary.persistEnrichedContent).toHaveBeenCalledTimes(2);
+    expect(dictionary.persistEnrichedContentBatch).toHaveBeenCalledWith(dto.words, 'de-DE', 'en');
     expect(wordAudio.batchResolve).not.toHaveBeenCalled();
     expect(transactionManager.save).toHaveBeenCalledTimes(2);
     expect(transactionManager.save).toHaveBeenCalledWith(

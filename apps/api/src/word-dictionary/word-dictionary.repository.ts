@@ -47,16 +47,25 @@ export class WordDictionaryRepository {
     return this.repo.find({ where: { id: In(ids) } });
   }
 
+  async insertMissing(entities: WordDictionaryEntity[]): Promise<void> {
+    if (!entities.length) return;
+    await this.repo.createQueryBuilder()
+      .insert()
+      .values(entities)
+      .orIgnore()
+      .execute();
+  }
+
   async upsertOnConflict(entity: WordDictionaryEntity): Promise<WordDictionaryEntity> {
     // On unique-key conflict the existing row wins — return it.
     try {
       return await this.repo.save(entity);
-    } catch (err: any) {
-      if (err?.code === '23505') {
+    } catch (error: unknown) {
+      if (this.isUniqueViolation(error)) {
         const existing = await this.findByKey(entity.lemmaKey, entity.targetLang, entity.nativeLang);
         if (existing) return existing;
       }
-      throw err;
+      throw error;
     }
   }
 
@@ -66,5 +75,12 @@ export class WordDictionaryRepository {
 
   async findAllPaginated(offset: number, limit: number): Promise<WordDictionaryEntity[]> {
     return this.repo.find({ skip: offset, take: limit, order: { enrichedAt: 'ASC' } });
+  }
+
+  private isUniqueViolation(error: unknown): boolean {
+    return typeof error === 'object'
+      && error !== null
+      && 'code' in error
+      && error.code === '23505';
   }
 }

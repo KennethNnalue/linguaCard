@@ -2,12 +2,34 @@ import { Injectable, Logger } from '@nestjs/common';
 import { Cron, CronExpression } from '@nestjs/schedule';
 import { DataSource } from 'typeorm';
 import { StorageService } from '../storage/storage.service';
-import { ObjectDeletionJobEntity } from './object-deletion-job.entity';
 
 const BATCH_SIZE = 25;
 const STALE_LOCK_MINUTES = 15;
 const MAX_RETRY_DELAY_MINUTES = 24 * 60;
 const COMPLETED_JOB_RETENTION_DAYS = 30;
+
+interface ClaimedDeletionJob {
+  id: string;
+  storageKey: string;
+  attempts: number;
+}
+
+function isRecord(value: unknown): value is Record<string, unknown> {
+  return typeof value === 'object' && value !== null;
+}
+
+function isClaimedDeletionJob(value: unknown): value is ClaimedDeletionJob {
+  return isRecord(value)
+    && typeof value['id'] === 'string'
+    && typeof value['storageKey'] === 'string'
+    && typeof value['attempts'] === 'number';
+}
+
+function claimedDeletionJobs(value: unknown): ClaimedDeletionJob[] {
+  if (!Array.isArray(value)) return [];
+  const rows = Array.isArray(value[0]) ? value[0] : value;
+  return rows.filter(isClaimedDeletionJob);
+}
 
 @Injectable()
 export class ObjectDeletionProcessorService {
@@ -35,9 +57,9 @@ export class ObjectDeletionProcessorService {
     );
   }
 
-  private async claimDueJobs(): Promise<ObjectDeletionJobEntity[]> {
-    return this.dataSource.transaction(async manager => {
-      const rows: ObjectDeletionJobEntity[] = await manager.query(
+  private async claimDueJobs(): Promise<ClaimedDeletionJob[]> {
+    const result: unknown = await this.dataSource.transaction(manager =>
+      manager.query(
         `UPDATE "object_deletion_jobs"
          SET "status" = 'processing', "locked_at" = NOW(), "updated_at" = NOW()
          WHERE "id" IN (
@@ -56,12 +78,12 @@ export class ObjectDeletionProcessorService {
                    "last_error" AS "lastError", "completed_at" AS "completedAt",
                    "created_at" AS "createdAt", "updated_at" AS "updatedAt"`,
         [BATCH_SIZE],
-      );
-      return rows;
-    });
+      ),
+    );
+    return claimedDeletionJobs(result);
   }
 
-  private async processJob(job: ObjectDeletionJobEntity): Promise<void> {
+  private async processJob(job: ClaimedDeletionJob): Promise<void> {
     try {
       await this.storage.deleteOrThrow(job.storageKey);
       await this.dataSource.query(

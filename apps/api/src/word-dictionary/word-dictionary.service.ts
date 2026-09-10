@@ -27,6 +27,13 @@ function normaliseLang(lang: string): string {
   return lang;
 }
 
+export interface EnrichedContentBatchResult {
+  entries: WordDictionaryEntity[];
+  inserted: number;
+  reused: number;
+  duplicatesSkipped: number;
+}
+
 @Injectable()
 export class WordDictionaryService {
   private readonly logger = new Logger(WordDictionaryService.name);
@@ -107,42 +114,52 @@ export class WordDictionaryService {
       return existing;
     }
 
-    const examples: ExampleSentence[] = (word.examples ?? []).map(e => ({
-      id: randomUUID(),
-      target: e.target,
-      native: e.native,
-    }));
-
-    const entity = this.repo.create({
-      id: randomUUID(),
-      lemmaKey: key,
-      targetLang,
-      nativeLang,
-      displayText: word.back,
-      article: word.article,
-      gender: this.articleToGender(word.article),
-      translation: word.front,
-      wordType: word.wordType ?? (word.article ? 'noun' : 'other'),
-      phonetic: word.phonetic ?? null,
-      cefrLevel: word.cefrLevel ?? null,
-      categoryName: word.categoryName ?? 'Other',
-      examples,
-      synonyms: (word.synonyms ?? []).map(s => ({
-        word: s.word,
-        article: (s.article ?? null) as 'der' | 'die' | 'das' | null,
-        translation: s.translation,
-        example: s.example ?? '',
-        exampleNative: s.exampleNative ?? '',
-      })),
-      plurals: word.plural ? [word.plural] : [],
-      wordAudioId: null,
-      source: 'admin',
-      model: null,
-    });
+    const entity = this.createEnrichedContentEntity(word, key, targetLang, nativeLang);
 
     const saved = await this.repo.upsertOnConflict(entity);
     await this.projectToMultilingualVocabulary(saved);
     return saved;
+  }
+
+  async persistEnrichedContentBatch(
+    words: readonly EnrichedWordInput[],
+    targetLang = 'de-DE',
+    nativeLang = 'en',
+  ): Promise<EnrichedContentBatchResult> {
+    targetLang = normaliseLang(targetLang);
+    nativeLang = normaliseLang(nativeLang);
+    const uniqueWords = new Map<string, EnrichedWordInput>();
+    for (const word of words) {
+      const key = normalizeLemma(word.back, word.article);
+      if (!uniqueWords.has(key)) uniqueWords.set(key, word);
+    }
+    const keys = [...uniqueWords.keys()];
+    const existing = await this.repo.findByKeys(keys, targetLang, nativeLang);
+    const missing: WordDictionaryEntity[] = [];
+    for (const [key, word] of uniqueWords) {
+      if (!existing.has(key)) {
+        missing.push(this.createEnrichedContentEntity(word, key, targetLang, nativeLang));
+      }
+    }
+    await this.repo.insertMissing(missing);
+    const resolved = await this.repo.findByKeys(keys, targetLang, nativeLang);
+    const entries = keys
+      .map(key => resolved.get(key))
+      .filter((entry): entry is WordDictionaryEntity => entry !== undefined);
+    if (entries.length !== keys.length) {
+      const missingKeys = keys.filter(key => !resolved.has(key));
+      throw new Error(`Unable to resolve persisted dictionary entries: ${missingKeys.join(', ')}`);
+    }
+    await this.vocabularyProjection.projectMissing(entries.map(entry => ({
+      input: legacyDictionaryEntryToProjectionInput(entry),
+      legacyDictionaryWordId: entry.id,
+    })));
+    return {
+      entries,
+      inserted: missing.length,
+      reused: existing.size,
+      duplicatesSkipped: words.length - keys.length,
+    };
   }
 
   /**
@@ -270,6 +287,49 @@ export class WordDictionaryService {
     );
 
     return { entries, reused: hits.length, enriched: enrichedEntities.length };
+  }
+
+  private createEnrichedContentEntity(
+    word: EnrichedWordInput,
+    key: string,
+    targetLang: string,
+    nativeLang: string,
+  ): WordDictionaryEntity {
+    const examples: ExampleSentence[] = (word.examples ?? []).map(example => ({
+      id: randomUUID(),
+      target: example.target,
+      native: example.native,
+    }));
+    return this.repo.create({
+      id: randomUUID(),
+      lemmaKey: key,
+      targetLang,
+      nativeLang,
+      displayText: word.back,
+      article: word.article,
+      gender: this.articleToGender(word.article),
+      translation: word.front,
+      wordType: word.wordType ?? (word.article ? 'noun' : 'other'),
+      phonetic: word.phonetic ?? null,
+      cefrLevel: word.cefrLevel ?? null,
+      categoryName: word.categoryName ?? 'Other',
+      examples,
+      synonyms: (word.synonyms ?? []).map(synonym => ({
+        word: synonym.word,
+        article: this.germanArticle(synonym.article),
+        translation: synonym.translation,
+        example: synonym.example ?? '',
+        exampleNative: synonym.exampleNative ?? '',
+      })),
+      plurals: word.plural ? [word.plural] : [],
+      wordAudioId: null,
+      source: 'admin',
+      model: null,
+    });
+  }
+
+  private germanArticle(article: string | null | undefined): 'der' | 'die' | 'das' | null {
+    return article === 'der' || article === 'die' || article === 'das' ? article : null;
   }
 
   private async enrichAndPersistContent(

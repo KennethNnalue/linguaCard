@@ -1,3 +1,7 @@
+jest.mock('../storage/storage.service', () => ({
+  StorageService: class StorageService {},
+}));
+
 import { DataSource } from 'typeorm';
 import { StorageService } from '../storage/storage.service';
 import { ObjectDeletionJobEntity } from './object-deletion-job.entity';
@@ -25,7 +29,7 @@ describe('ObjectDeletionProcessorService', () => {
   it('marks a claimed object as completed after storage deletion', async () => {
     const job = createJob();
     const dataSource = new DataSource({ type: 'postgres' });
-    jest.spyOn(dataSource, 'transaction').mockResolvedValue([job]);
+    jest.spyOn(dataSource, 'transaction').mockResolvedValue([[job], 1]);
     jest.spyOn(dataSource, 'query').mockResolvedValue([]);
     const storage = Object.create(StorageService.prototype) as StorageService;
     storage.deleteOrThrow = jest.fn().mockResolvedValue(undefined);
@@ -47,7 +51,7 @@ describe('ObjectDeletionProcessorService', () => {
   it('schedules a retry when storage deletion fails', async () => {
     const job = createJob();
     const dataSource = new DataSource({ type: 'postgres' });
-    jest.spyOn(dataSource, 'transaction').mockResolvedValue([job]);
+    jest.spyOn(dataSource, 'transaction').mockResolvedValue([[job], 1]);
     jest.spyOn(dataSource, 'query').mockResolvedValue([]);
     const storage = Object.create(StorageService.prototype) as StorageService;
     storage.deleteOrThrow = jest.fn().mockRejectedValue(new Error('R2 unavailable'));
