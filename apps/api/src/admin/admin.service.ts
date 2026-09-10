@@ -19,6 +19,8 @@ import type {
   AdminImportCollectionResult,
   AdminImportCollectionJsonDto,
   AdminImportCollectionJsonResult,
+  AdminCollectionAudioPreparationResult,
+  AdminCollectionAudioPreparationStartResult,
   AdminImportStoryDto,
   AdminImportStoryResult,
   AdminPlatformCollectionListItem,
@@ -28,6 +30,7 @@ import type {
   StoryKeyword,
 } from '@lingua-card/shared/domain';
 import {platformCollectionAudioRequests} from './platform-collection-audio';
+import {validateQuickWordList} from '@lingua-card/shared/utils';
 
 @Injectable()
 export class AdminService {
@@ -56,6 +59,7 @@ export class AdminService {
 
   /** Guard so two admins can't kick off overlapping backfills (wasted TTS spend). */
   private backfillRunning = false;
+  private readonly collectionAudioRunning = new Set<string>();
 
   /**
    * Kick off the published-collection audio backfill in the background and return
@@ -78,9 +82,8 @@ export class AdminService {
 
   /**
    * Backfill: generate (and cache) HD audio for every word in every PUBLISHED
-   * platform collection that doesn't already have it. New imports already seed
-   * audio at import time ([collection-complete.service.ts]); this covers
-   * collections published before that, or where generation previously failed.
+   * platform collection that doesn't already have it. Collection imports now
+   * prepare audio separately; this covers older published collections.
    * Internal path → ungated (always generates), so the global cache is seeded for
    * all users (incl. free) to reuse. Idempotent: already-cached words are reused.
    */
@@ -126,12 +129,12 @@ export class AdminService {
 
     for (const word of dto.words) {
       const before = await this.dictionary.lookup(word.back, word.article, 'de-DE', 'en');
-      const entity = await this.dictionary.persistEnriched(word, 'de-DE', 'en');
+      const entity = await this.dictionary.persistEnrichedContent(word, 'de-DE', 'en');
+      if (entity.wordAudioId) audioLinked++;
       if (before) {
         reused++;
       } else {
         inserted++;
-        if (entity.wordAudioId) audioLinked++;
       }
       const mapping = await this.dictionaryLexemeRepo.findOneBy({ dictionaryWordId: entity.id });
       if (!mapping) {
@@ -155,13 +158,13 @@ export class AdminService {
       level: dto.level,
       topic: dto.topic ?? dto.title,
       isPublished: false,
+      status: 'needs_attention',
       wordCount: wordRows.length,
     });
     await this.collectionRepo.manager.transaction(async manager => {
       await manager.save(PlatformCollectionEntity, collection);
       await manager.save(PlatformCollectionWordEntity, wordRows);
     });
-
     return { collectionId, title: dto.title, inserted, reused, audioLinked };
   }
 
@@ -169,7 +172,10 @@ export class AdminService {
     if (!dto.title?.trim() || !dto.level || !Array.isArray(dto.words) || dto.words.length === 0) {
       throw new BadRequestException('Title, level, and at least one word are required');
     }
-    const batchResult = await this.dictionary.batchResolve(dto.words, 'de-DE', 'en');
+    const validation = validateQuickWordList(dto.words.map(word => word.back));
+    if (!validation.valid) throw new BadRequestException(validation.message);
+
+    const batchResult = await this.dictionary.batchResolveContent(dto.words, 'de-DE', 'en');
 
     const mappings = await this.dictionaryLexemeRepo.findBy({
       dictionaryWordId: In(batchResult.entries.map(entry => entry.id)),
@@ -188,6 +194,7 @@ export class AdminService {
       level: dto.level,
       topic: dto.topic ?? dto.title,
       isPublished: false,
+      status: 'needs_attention',
       wordCount: batchResult.entries.length,
     });
     const wordRows = batchResult.entries.map((entry, i) =>
@@ -203,13 +210,88 @@ export class AdminService {
       await manager.save(PlatformCollectionEntity, collection);
       await manager.save(PlatformCollectionWordEntity, wordRows);
     });
-
     return {
       collectionId,
       title: dto.title,
       created: batchResult.entries.length,
       reused: batchResult.reused,
       enriched: batchResult.enriched,
+    };
+  }
+
+  async getCollectionAudioStatus(id: string): Promise<AdminCollectionAudioPreparationResult> {
+    return this.collectionAudioStatus(id, false, false);
+  }
+
+  async prepareCollectionAudio(id: string): Promise<AdminCollectionAudioPreparationResult> {
+    return this.collectionAudioStatus(id, true, true);
+  }
+
+  async startCollectionAudioPreparation(
+    id: string,
+  ): Promise<AdminCollectionAudioPreparationStartResult> {
+    const current = await this.getCollectionAudioStatus(id);
+    if (current.status === 'ready_to_publish' || this.collectionAudioRunning.has(id)) {
+      return { ...current, started: false };
+    }
+
+    this.collectionAudioRunning.add(id);
+    void this.prepareCollectionAudio(id)
+      .then(result => this.logger.log(
+        `Collection audio preparation ${id}: ${result.ready}/${result.required} ready`,
+      ))
+      .catch(error => this.logger.error(`Collection audio preparation ${id} failed`, error))
+      .finally(() => this.collectionAudioRunning.delete(id));
+    return { ...current, running: true, started: true };
+  }
+
+  private async refreshCollectionAudioStatus(id: string): Promise<AdminCollectionAudioPreparationResult> {
+    return this.collectionAudioStatus(id, false, true);
+  }
+
+  private async collectionAudioStatus(
+    id: string,
+    generate: boolean,
+    verifyStorage: boolean,
+  ): Promise<AdminCollectionAudioPreparationResult> {
+    const collection = await this.collectionRepo.findOneBy({ id });
+    if (!collection) throw new NotFoundException(`Platform collection ${id} not found`);
+    const wordRows = await this.wordRepo.find({ where: { platformCollectionId: id } });
+    const dictionaryIds = [...new Set(wordRows.map(row => row.dictionaryWordId))];
+    const entries = dictionaryIds.length ? await this.dictRepo.findBy({ id: In(dictionaryIds) }) : [];
+    const requests = platformCollectionAudioRequests(entries);
+    const result = await this.wordAudio.batchResolve(
+      requests,
+      generate
+        ? { generate: true, retryUnready: true, verifyStorage }
+        : { generate: false, verifyStorage },
+    );
+    const ready = result.results.filter(item => item.wordAudio.status === 'ready').length;
+    const failed = result.results.filter(item => item.wordAudio.status === 'failed').length;
+    const pending = requests.length - ready - failed;
+    const status = ready === requests.length ? 'ready_to_publish' : 'needs_attention';
+
+    if (!collection.isPublished && collection.status !== status) {
+      collection.status = status;
+      await this.collectionRepo.save(collection);
+    }
+    const importRecord = await this.importRepo.findOneBy({ collectionId: id });
+    if (importRecord) {
+      importRecord.audioLinked = ready;
+      importRecord.status = status;
+      await this.importRepo.save(importRecord);
+    }
+
+    return {
+      collectionId: id,
+      running: this.collectionAudioRunning.has(id),
+      required: requests.length,
+      ready,
+      pending,
+      failed,
+      generated: result.generated,
+      reused: result.reused,
+      status,
     };
   }
 
@@ -442,6 +524,12 @@ export class AdminService {
     const entity = await this.collectionRepo.findOneBy({ id });
     if (!entity) throw new NotFoundException(`Platform collection ${id} not found`);
     if (isPublished) {
+      const audio = await this.refreshCollectionAudioStatus(id);
+      if (audio.status !== 'ready_to_publish') {
+        throw new ConflictException(
+          `Collection cannot be published until target audio is ready (${audio.ready}/${audio.required})`,
+        );
+      }
       const importRecord = await this.importRepo.findOneBy({ collectionId: id });
       if (importRecord && importRecord.status !== 'ready_to_publish') {
         throw new ConflictException('Collection cannot be published until localization and target audio are ready');
@@ -453,7 +541,7 @@ export class AdminService {
       }
     }
     entity.isPublished = isPublished;
-    entity.status = isPublished ? 'published' : 'draft';
+    entity.status = isPublished ? 'published' : 'ready_to_publish';
     entity.publishedAt = isPublished ? new Date() : null;
     await this.collectionRepo.save(entity);
   }

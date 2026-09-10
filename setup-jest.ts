@@ -5,9 +5,17 @@ import { provideIonicAngular } from '@ionic/angular';
 import { Storage } from '@ionic/storage-angular';
 import { provideTranslateService } from '@ngx-translate/core';
 import { setupZoneTestEnv } from 'jest-preset-angular/setup-env/zone';
+import {ReadableStream} from 'node:stream/web';
 import { NEVER } from 'rxjs';
 
 setupZoneTestEnv();
+
+if (!globalThis.ReadableStream) {
+  Object.defineProperty(globalThis, 'ReadableStream', {
+    configurable: true,
+    value: ReadableStream,
+  });
+}
 
 Object.defineProperty(window, 'matchMedia', {
   configurable: true,

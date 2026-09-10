@@ -43,7 +43,7 @@ export class PlatformCollectionEntity {
   isPublished!: boolean;
 
   @Column({ type: 'varchar', length: 20, default: 'draft' })
-  status!: 'draft' | 'published' | 'archived';
+  status!: 'draft' | 'needs_attention' | 'ready_to_publish' | 'published' | 'archived' | 'failed';
 
   @Column({ default: 0 })
   wordCount!: number;

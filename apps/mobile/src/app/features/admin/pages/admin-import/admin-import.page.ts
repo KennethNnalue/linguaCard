@@ -34,9 +34,11 @@ import type {
   StoryCategory,
 } from '@lingua-card/shared/domain';
 import {STORY_CATEGORIES} from '@lingua-card/shared/domain';
+import {validateQuickWordList} from '@lingua-card/shared/utils';
 import {TranslatePipe} from '@ngx-translate/core';
 import {catchError, concatMap, map, Observable, of, startWith} from 'rxjs';
 import {AdminApiService} from '../../services/admin-api.service';
+import {AdminCollectionAudioStore} from '../../store/admin-collection-audio.store';
 
 @Component({
   selector: 'lc-admin-import',
@@ -51,6 +53,7 @@ export class AdminImportPage {
   private readonly alertCtrl = inject(AlertController);
   private readonly router = inject(Router);
   private readonly _destroyRef = inject(DestroyRef);
+  readonly collectionAudio = inject(AdminCollectionAudioStore);
 
   readonly collectionForm = new FormGroup({
     title: new FormControl('', [Validators.required]),
@@ -280,6 +283,10 @@ OUTPUT — valid JSON ONLY, no markdown fences, no commentary:
         void this._toast('Failed to load collections', 'danger');
       },
     });
+  }
+
+  prepareCollectionAudio(item: AdminPlatformCollectionListItem): void {
+    this.collectionAudio.prepare(item.id);
   }
 
   setStoryCategory(item: AdminPlatformCollectionListItem, value: string): void {
@@ -605,6 +612,11 @@ OUTPUT — valid JSON ONLY, no markdown fences, no commentary:
     const words = this._parseWordList(v.wordListRaw ?? '');
     if (!words.length) {
       void this._toast('Word list is empty. Use one word per line: "der Apfel" or "bestellen"', 'warning');
+      return;
+    }
+    const validation = validateQuickWordList(words.map(word => word.back));
+    if (!validation.valid) {
+      void this._toast(validation.message, 'warning');
       return;
     }
 

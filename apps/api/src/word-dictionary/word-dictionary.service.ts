@@ -5,6 +5,7 @@ import type {
   RawWordInput,
   DictionaryResolveResult,
   DictionaryBatchResolveResult,
+  EnrichedWordInput,
   ExampleSentence,
 } from '@lingua-card/shared/domain';
 import { WordDictionaryRepository } from './word-dictionary.repository';
@@ -76,10 +77,11 @@ export class WordDictionaryService {
       return { entry: this.toModel(entity), reused: true };
     }
 
-    const gen = this.enrichAndPersist(raw, key, targetLang, nativeLang);
+    const gen = this.enrichAndPersistContent(raw, key, targetLang, nativeLang);
     this.inflight.set(inflightKey, gen);
     try {
       const entity = await gen;
+      await this.linkAudioForAll([entity], targetLang);
       await this.projectToMultilingualVocabulary(entity);
       return { entry: this.toModel(entity), reused: false };
     } finally {
@@ -88,23 +90,10 @@ export class WordDictionaryService {
   }
 
   /**
-   * Persist a pre-enriched word directly — no AI call.
-   * Resolves audio server-side, then upserts into word_dictionary.
-   * Returns the persisted or existing entry.
+   * Persist pre-enriched lexical content without invoking a speech provider.
    */
-  async persistEnriched(
-    word: {
-      back: string;
-      article: 'der' | 'die' | 'das' | null;
-      front: string;
-      plural?: string | null;
-      phonetic?: string | null;
-      cefrLevel?: 'A1' | 'A2' | 'B1' | 'B2' | 'C1' | null;
-      categoryName?: string;
-      examples?: Array<{ target: string; native: string }>;
-      synonyms?: Array<{ word: string; article?: string | null; translation: string; example?: string; exampleNative?: string }>;
-      wordType?: 'noun' | 'verb' | 'adjective' | 'adverb' | 'other';
-    },
+  async persistEnrichedContent(
+    word: EnrichedWordInput,
     targetLang = 'de-DE',
     nativeLang = 'en',
   ): Promise<WordDictionaryEntity> {
@@ -117,11 +106,6 @@ export class WordDictionaryService {
       await this.projectToMultilingualVocabulary(existing);
       return existing;
     }
-
-    const audio = await this.wordAudio.resolve(
-      word.article ? `${word.article} ${word.back}` : word.back,
-      targetLang,
-    );
 
     const examples: ExampleSentence[] = (word.examples ?? []).map(e => ({
       id: randomUUID(),
@@ -151,7 +135,7 @@ export class WordDictionaryService {
         exampleNative: s.exampleNative ?? '',
       })),
       plurals: word.plural ? [word.plural] : [],
-      wordAudioId: audio.wordAudio.id,
+      wordAudioId: null,
       source: 'admin',
       model: null,
     });
@@ -159,6 +143,27 @@ export class WordDictionaryService {
     const saved = await this.repo.upsertOnConflict(entity);
     await this.projectToMultilingualVocabulary(saved);
     return saved;
+  }
+
+  /**
+   * Compatibility operation for callers that still require immediate headword audio.
+   */
+  async persistEnriched(
+    word: EnrichedWordInput,
+    targetLang = 'de-DE',
+    nativeLang = 'en',
+  ): Promise<WordDictionaryEntity> {
+    const entity = await this.persistEnrichedContent(word, targetLang, nativeLang);
+    if (entity.wordAudioId) return entity;
+
+    const audio = await this.wordAudio.resolve(
+      word.article ? `${word.article} ${word.back}` : word.back,
+      normaliseLang(targetLang),
+    );
+    if (!audio.wordAudio.id) return entity;
+
+    entity.wordAudioId = audio.wordAudio.id;
+    return this.repo.save(entity);
   }
 
   /** Pure DB read — never calls AI. Returns only words already in the dictionary. */
@@ -183,6 +188,24 @@ export class WordDictionaryService {
     targetLang = 'de-DE',
     nativeLang = 'en',
   ): Promise<DictionaryBatchResolveResult> {
+    return this.resolveBatch(raws, targetLang, nativeLang, true);
+  }
+
+  /** Resolve lexical content without requesting or generating speech audio. */
+  async batchResolveContent(
+    raws: RawWordInput[],
+    targetLang = 'de-DE',
+    nativeLang = 'en',
+  ): Promise<DictionaryBatchResolveResult> {
+    return this.resolveBatch(raws, targetLang, nativeLang, false);
+  }
+
+  private async resolveBatch(
+    raws: RawWordInput[],
+    targetLang: string,
+    nativeLang: string,
+    prepareAudio: boolean,
+  ): Promise<DictionaryBatchResolveResult> {
     targetLang = normaliseLang(targetLang);
     nativeLang = normaliseLang(nativeLang);
     if (!raws.length) return { entries: [], reused: 0, enriched: 0 };
@@ -193,7 +216,8 @@ export class WordDictionaryService {
     const hits: WordDictionaryEntity[] = [];
     const misses: Array<{ raw: RawWordInput; key: string; idx: number }> = [];
 
-    raws.forEach((raw, idx) => {
+    for (let idx = 0; idx < raws.length; idx++) {
+      const raw = raws[idx];
       const key = keys[idx];
       const row = existing.get(key);
       if (row) {
@@ -201,7 +225,7 @@ export class WordDictionaryService {
       } else {
         misses.push({ raw, key, idx });
       }
-    });
+    }
 
     // Dedup misses by key — if a batch contains the same word twice, enrich only once
     const seenMissKeys = new Set<string>();
@@ -215,7 +239,9 @@ export class WordDictionaryService {
       ? await this.enrichBatchOnce(dedupedMisses, targetLang, nativeLang)
       : [];
 
-    await this.linkAudioForAll([...hits, ...enrichedEntities], targetLang);
+    if (prepareAudio) {
+      await this.linkAudioForAll([...hits, ...enrichedEntities], targetLang);
+    }
     await this.vocabularyProjection.projectMany(
       [...hits, ...enrichedEntities].map(entity => ({
         input: legacyDictionaryEntryToProjectionInput(entity),
@@ -238,25 +264,21 @@ export class WordDictionaryService {
     this._tokensSaved += hits.length * 10;
 
     this.logger.log(
-      `batchResolve: ${hits.length} reused, ${enrichedEntities.length} enriched, ` +
+      `${prepareAudio ? 'batchResolve' : 'batchResolveContent'}: ` +
+      `${hits.length} reused, ${enrichedEntities.length} enriched, ` +
       `tokens saved ≈ ${hits.length * 10}`,
     );
 
     return { entries, reused: hits.length, enriched: enrichedEntities.length };
   }
 
-  private async enrichAndPersist(
+  private async enrichAndPersistContent(
     raw: RawWordInput,
     key: string,
     targetLang: string,
     nativeLang: string,
   ): Promise<WordDictionaryEntity> {
     const result = await this.enrich.enrichRaw(raw, targetLang, nativeLang);
-    const audio = await this.wordAudio.resolve(
-      raw.article ? `${raw.article} ${raw.back}` : raw.back,
-      targetLang,
-    );
-
     const examples: ExampleSentence[] = result.exampleTarget
       ? [{ id: randomUUID(), target: result.exampleTarget, native: result.exampleNative }]
       : [];
@@ -275,7 +297,7 @@ export class WordDictionaryService {
       examples,
       synonyms: result.synonyms ?? [],
       plurals: result.plural ? [result.plural] : [],
-      wordAudioId: audio.wordAudio.id,
+      wordAudioId: null,
       source: 'ai-enrich',
       model: result.model ?? null,
     });
@@ -295,7 +317,7 @@ export class WordDictionaryService {
       if (i > 0) await this.sleep(INTER_BATCH_DELAY_MS);
       const chunk = chunks[i];
       const settled = await Promise.allSettled(
-        chunk.map(({ raw, key }) => this.enrichAndPersist(raw, key, targetLang, nativeLang)),
+        chunk.map(({ raw, key }) => this.enrichAndPersistContent(raw, key, targetLang, nativeLang)),
       );
       for (const r of settled) {
         if (r.status === 'fulfilled') results.push(r.value);

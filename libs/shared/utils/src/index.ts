@@ -40,3 +40,41 @@ export function generateUuid(): string {
 
   return `${hex.slice(0, 4).join('')}-${hex.slice(4, 6).join('')}-${hex.slice(6, 8).join('')}-${hex.slice(8, 10).join('')}-${hex.slice(10).join('')}`;
 }
+
+export const QUICK_WORD_LIST_MAX_ITEMS = 500;
+
+export type QuickWordListValidation =
+  | { valid: true }
+  | {
+      valid: false;
+      code: 'enriched-json' | 'too-many-items';
+      message: string;
+    };
+
+export function validateQuickWordList(words: readonly string[]): QuickWordListValidation {
+  const normalizedWords = words.map(word => word.trim()).filter(Boolean);
+  const preview = normalizedWords.slice(0, 30).join('\n');
+  const startsLikeJson = normalizedWords[0] === '['
+    || normalizedWords[0] === '{'
+    || normalizedWords[0]?.startsWith('[{')
+    || false;
+  const containsEnrichedFields = /["'](?:back|front|article|examples|synonyms)["']\s*:/u.test(preview);
+
+  if (startsLikeJson && containsEnrichedFields) {
+    return {
+      valid: false,
+      code: 'enriched-json',
+      message: 'This looks like enriched JSON. Use the Enriched JSON import instead.',
+    };
+  }
+
+  if (normalizedWords.length > QUICK_WORD_LIST_MAX_ITEMS) {
+    return {
+      valid: false,
+      code: 'too-many-items',
+      message: `Quick word lists support at most ${QUICK_WORD_LIST_MAX_ITEMS} words.`,
+    };
+  }
+
+  return { valid: true };
+}

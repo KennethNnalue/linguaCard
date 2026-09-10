@@ -8,6 +8,8 @@ import type {
   AdminImportCollectionResult,
   AdminImportCollectionJsonDto,
   AdminImportCollectionJsonResult,
+  AdminCollectionAudioPreparationResult,
+  AdminCollectionAudioPreparationStartResult,
   AdminImportStoryDto,
   AdminImportStoryResult,
   AdminPlatformCollectionListItem,
@@ -121,6 +123,21 @@ export class AdminController {
       throw new BadRequestException('Upload a JPEG, PNG, or WebP image up to 5 MB');
     }
     return this.adminService.uploadCollectionCover(id, file.buffer, file.mimetype);
+  }
+
+  @Get('platform-collections/:id/audio-status')
+  getCollectionAudioStatus(
+    @Param('id') id: string,
+  ): Promise<AdminCollectionAudioPreparationResult> {
+    return this.adminService.getCollectionAudioStatus(id);
+  }
+
+  @Post('platform-collections/:id/prepare-audio')
+  @HttpCode(202)
+  startCollectionAudioPreparation(
+    @Param('id') id: string,
+  ): Promise<AdminCollectionAudioPreparationStartResult> {
+    return this.adminService.startCollectionAudioPreparation(id);
   }
 
   @Post('platform-stories/import')

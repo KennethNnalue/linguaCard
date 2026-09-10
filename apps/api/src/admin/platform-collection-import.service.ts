@@ -215,26 +215,17 @@ export class PlatformCollectionImportService implements OnApplicationBootstrap {
       importRecord.processedItems = 0;
       importRecord.rowErrors = [];
       const resolvedItems = await this.resolveItems(payload, targetLanguageConfig.defaultLocale, importRecord);
-      importRecord.stage = 'prepare_audio';
-      await this.repository.saveImport(importRecord);
-      await this.wordAudio.batchResolve(payload.items.flatMap(item => [
-        {
-          text: this.spokenHeadword(item.lexeme.text, item.lexeme.grammar.article),
-          language: targetLanguageConfig.defaultLocale,
-        },
-        ...item.examples.map(example => ({ text: example.targetText, language: targetLanguageConfig.defaultLocale })),
-      ]));
-      const readinessAfterGeneration = await this.audioReadiness(payload, preview.targetLanguage);
+      const audioReadiness = await this.audioReadiness(payload, preview.targetLanguage);
       const collectionId = randomUUID();
       importRecord.stage = 'commit_collection';
       await this.repository.saveImport(importRecord);
-      importRecord.status = readinessAfterGeneration.ready === readinessAfterGeneration.required
+      importRecord.status = audioReadiness.ready === audioReadiness.required
         ? 'ready_to_publish'
         : 'needs_attention';
       importRecord.collectionId = collectionId;
       importRecord.inserted = preview.counts.new;
       importRecord.reused = preview.counts.reused;
-      importRecord.audioLinked = readinessAfterGeneration.ready;
+      importRecord.audioLinked = audioReadiness.ready;
       importRecord.stage = 'complete';
       await this.repository.commitCollection({
         collection: {
@@ -250,7 +241,7 @@ export class PlatformCollectionImportService implements OnApplicationBootstrap {
           level: payload.collection.level,
           topic: payload.collection.topic,
           isPublished: false,
-          status: 'draft',
+          status: importRecord.status,
           wordCount: resolvedItems.length,
           sourcePodcastEpisodeId: null,
           storyCategory: null,
@@ -291,7 +282,7 @@ export class PlatformCollectionImportService implements OnApplicationBootstrap {
       await this.wordAudio.batchResolve(record.payload.items.flatMap(item => [
         { text: this.spokenHeadword(item.lexeme.text, item.lexeme.grammar.article), language: language.defaultLocale },
         ...item.examples.map(example => ({ text: example.targetText, language: language.defaultLocale })),
-      ]));
+      ]), { generate: true, retryUnready: true });
       const readiness = await this.audioReadiness(record.payload, targetLanguage);
       record.audioLinked = readiness.ready;
       record.status = readiness.ready === readiness.required ? 'ready_to_publish' : 'needs_attention';
@@ -415,33 +406,33 @@ export class PlatformCollectionImportService implements OnApplicationBootstrap {
       const { item, itemIndex } = orderedItems[index];
       try {
         const article = this.germanArticle(item.lexeme.grammar.article);
-        const dictionaryWord = await this.dictionary.persistEnriched({
-        back: item.lexeme.text,
-        front: item.localization.translation,
-        article,
-        plural: item.lexeme.grammar.plurals[0] ?? null,
-        phonetic: item.lexeme.phonetic,
-        cefrLevel: item.lexeme.cefrLevel,
-        categoryName: payload.collection.topic,
-        wordType: item.lexeme.partOfSpeech,
-        examples: item.examples.map(example => ({ target: example.targetText, native: example.sourceText })),
+        const dictionaryWord = await this.dictionary.persistEnrichedContent({
+          back: item.lexeme.text,
+          front: item.localization.translation,
+          article,
+          plural: item.lexeme.grammar.plurals[0] ?? null,
+          phonetic: item.lexeme.phonetic,
+          cefrLevel: item.lexeme.cefrLevel,
+          categoryName: payload.collection.topic,
+          wordType: item.lexeme.partOfSpeech,
+          examples: item.examples.map(example => ({ target: example.targetText, native: example.sourceText })),
         }, targetSpeechLocale, sourceLanguage);
         const projection = await this.vocabularyProjection.project({
-        targetLanguage,
-        sourceLanguage,
-        displayText: item.lexeme.text,
-        article: item.lexeme.grammar.article,
-        gender: item.lexeme.grammar.gender,
-        translation: item.localization.translation,
-        definition: item.localization.definition,
-        partOfSpeech: item.lexeme.partOfSpeech,
-        phonetic: item.lexeme.phonetic,
-        cefrLevel: item.lexeme.cefrLevel,
-        plurals: item.lexeme.grammar.plurals,
-        examples: item.examples.map(example => ({ target: example.targetText, source: example.sourceText })),
-        synonyms: [],
-        source: 'admin',
-        model: null,
+          targetLanguage,
+          sourceLanguage,
+          displayText: item.lexeme.text,
+          article: item.lexeme.grammar.article,
+          gender: item.lexeme.grammar.gender,
+          translation: item.localization.translation,
+          definition: item.localization.definition,
+          partOfSpeech: item.lexeme.partOfSpeech,
+          phonetic: item.lexeme.phonetic,
+          cefrLevel: item.lexeme.cefrLevel,
+          plurals: item.lexeme.grammar.plurals,
+          examples: item.examples.map(example => ({ target: example.targetText, source: example.sourceText })),
+          synonyms: [],
+          source: 'admin',
+          model: null,
         }, dictionaryWord.id);
         resolved.push({ dictionaryWordId: dictionaryWord.id, lexemeId: projection.lexemeId, position: item.position - 1 });
         importRecord.processedItems = index + 1;

@@ -1340,7 +1340,7 @@ export interface AdminImportStoryResult {
   audioGenerated: boolean;
 }
 
-// Pre-enriched word — no AI call needed, audio resolved server-side
+// Pre-enriched lexical content — no AI or TTS call is required to persist it.
 export interface EnrichedWordInput {
   back: string;
   article: 'der' | 'die' | 'das' | null;
@@ -1368,6 +1368,22 @@ export interface AdminImportCollectionJsonResult {
   inserted: number;
   reused: number;
   audioLinked: number;
+}
+
+export interface AdminCollectionAudioPreparationResult {
+  collectionId: string;
+  running: boolean;
+  required: number;
+  ready: number;
+  pending: number;
+  failed: number;
+  generated: number;
+  reused: number;
+  status: 'needs_attention' | 'ready_to_publish';
+}
+
+export interface AdminCollectionAudioPreparationStartResult extends AdminCollectionAudioPreparationResult {
+  started: boolean;
 }
 
 export interface AdminPlatformCollectionImportPayload {

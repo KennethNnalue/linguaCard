@@ -6,6 +6,8 @@ import type {
   AdminImportCollectionResult,
   AdminImportCollectionJsonDto,
   AdminImportCollectionJsonResult,
+  AdminCollectionAudioPreparationResult,
+  AdminCollectionAudioPreparationStartResult,
   AdminImportStoryDto,
   AdminImportStoryResult,
   AdminPlatformCollectionListItem,
@@ -67,6 +69,19 @@ export class AdminApiService {
 
   importCollectionJson(dto: AdminImportCollectionJsonDto): Observable<AdminImportCollectionJsonResult> {
     return this.http.post<AdminImportCollectionJsonResult>(`${this.apiUrl}/platform-collections/import-json`, dto);
+  }
+
+  getCollectionAudioStatus(id: string): Observable<AdminCollectionAudioPreparationResult> {
+    return this.http.get<AdminCollectionAudioPreparationResult>(
+      `${this.apiUrl}/platform-collections/${id}/audio-status`,
+    );
+  }
+
+  startCollectionAudioPreparation(id: string): Observable<AdminCollectionAudioPreparationStartResult> {
+    return this.http.post<AdminCollectionAudioPreparationStartResult>(
+      `${this.apiUrl}/platform-collections/${id}/prepare-audio`,
+      {},
+    );
   }
 
   uploadCollectionCover(id: string, image: File): Observable<{ coverImageUrl: string }> {

@@ -170,7 +170,7 @@
           <div class="adm-import-progress" [class.adm-import-progress--error]="jsonImportStage() === 'failed'" aria-live="polite">
             @switch (jsonImportStage()) {
               @case ('validating') { <strong>1/3 Validating JSON…</strong> }
-              @case ('vocabulary') { <strong>2/3 Resolving vocabulary and preparing collection…</strong> }
+              @case ('vocabulary') { <strong>2/3 Saving vocabulary and creating the draft…</strong> }
               @case ('thumbnail') { <strong>3/3 Uploading thumbnail…</strong> }
               @case ('complete') {
                 <strong>✓ Collection import complete and ready for review.</strong>
@@ -186,7 +186,8 @@
             <span class="adm-result-bar__icon">⚡</span>
             <div class="adm-result-bar__body">
               <strong>{{ r.title }}</strong>
-              <span><strong>{{ r.inserted }}</strong> inserted · <strong>{{ r.reused }}</strong> reused · <strong>{{ r.audioLinked }}</strong> audio linked</span>
+              <span><strong>{{ r.inserted }}</strong> inserted · <strong>{{ r.reused }}</strong> reused · <strong>{{ r.audioLinked }}</strong> cached audio ready</span>
+              <span>Audio generation is separate. Open Collections to prepare or retry it.</span>
               <span class="adm-result-bar__id">ID: {{ r.collectionId }}</span>
             </div>
           </div>
@@ -340,6 +341,13 @@
               </button>
               <button
                 class="adm-publish-btn"
+                [disabled]="item.isPublished || collectionAudio.isPreparing() || collectionAudio.isReadyCollection()(item.id)"
+                (click)="prepareCollectionAudio(item)">
+                <ion-icon name="volume-high-outline"></ion-icon>
+                {{ collectionAudio.isPreparingCollection()(item.id) ? 'Preparing…' : collectionAudio.isReadyCollection()(item.id) ? 'Audio ready' : item.status === 'needs_attention' ? 'Retry audio' : 'Prepare audio' }}
+              </button>
+              <button
+                class="adm-publish-btn"
                 [class.adm-publish-btn--live]="item.isPublished"
                 [disabled]="togglingId() === item.id"
                 (click)="togglePublish(item)"
@@ -356,6 +364,19 @@
               </button>
             </div>
           </div>
+          @if (collectionAudio.activeCollectionId() === item.id) {
+            @if (collectionAudio.status(); as audio) {
+              <div class="adm-import-progress" aria-live="polite">
+                <strong>{{ audio.ready }}/{{ audio.required }} audio clips ready</strong>
+                <span>{{ audio.pending }} pending · {{ audio.failed }} failed</span>
+              </div>
+            }
+            @if (collectionAudio.error(); as error) {
+              <div class="adm-import-progress adm-import-progress--error" aria-live="polite">
+                <strong>{{ error }}</strong>
+              </div>
+            }
+          }
           @if (editingMetadataId() === item.id) {
             <div class="adm-metadata-editor">
               <label class="adm-image-upload adm-image-upload--compact">

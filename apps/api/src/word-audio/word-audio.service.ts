@@ -61,7 +61,7 @@ export class WordAudioService {
   async resolve(
     text: string,
     language = 'de-DE',
-    opts: { generate?: boolean } = {},
+    opts: { generate?: boolean; retryUnready?: boolean; verifyStorage?: boolean } = {},
   ): Promise<WordAudioResolveResponse> {
     const generate = opts.generate ?? true;
     const normalizedText = normalizeForAudio(text, language);
@@ -99,7 +99,7 @@ export class WordAudioService {
 
     // If the last generation failed recently, return the failed record with a
     // retryAfterMs hint instead of hammering the TTS API again immediately.
-    if (existing?.status === 'failed' && existing.failedAt) {
+    if (existing?.status === 'failed' && existing.failedAt && !opts.retryUnready) {
       const msSinceFailed = Date.now() - existing.failedAt.getTime();
       if (msSinceFailed < FAILED_RETRY_COOLDOWN_MS) {
         const retryAfterMs = FAILED_RETRY_COOLDOWN_MS - msSinceFailed;
@@ -121,6 +121,7 @@ export class WordAudioService {
       // Return a graceful 200 with the pending entity so the client can fall back.
       // Include retryAfterMs so the client knows when to try again.
       const pending = await this.repo.findByNormalizedText(normalizedText, language);
+      if (pending) await this.projectToSpeechAsset(pending);
       const retryAfterMs =
         readNestedNumber(error, 'response', 'retryAfterMs') ?? readNumber(error, 'retryAfterMs');
       return {
@@ -155,7 +156,7 @@ export class WordAudioService {
 
   async batchResolve(
     words: WordAudioResolveRequest[],
-    opts: { generate?: boolean } = {},
+    opts: { generate?: boolean; retryUnready?: boolean; verifyStorage?: boolean } = {},
   ): Promise<WordAudioBatchResolveResponse> {
     const generate = opts.generate ?? true;
     // If callers send more than BATCH_MAX words, process them in sequential passes
@@ -196,10 +197,12 @@ export class WordAudioService {
       existingArrays.flat().map(e => [`${e.language}:${e.normalizedText}`, e]),
     );
     const missingReadyAssets = new Set<string>();
-    await Promise.all([...existingMap.entries()].map(async ([key, entity]) => {
-      if (entity.status !== 'ready') return;
-      if (!await this.verifyReadyAsset(entity)) missingReadyAssets.add(key);
-    }));
+    if (opts.verifyStorage !== false) {
+      await Promise.all([...existingMap.entries()].map(async ([key, entity]) => {
+        if (entity.status !== 'ready') return;
+        if (!await this.verifyReadyAsset(entity)) missingReadyAssets.add(key);
+      }));
+    }
 
     const resultMap = new Map<string, WordAudioResolveResponse>();
     let generated = 0;
@@ -233,13 +236,16 @@ export class WordAudioService {
     // absent    → must generate
     const needsGeneration = normalized.filter(n => {
       const e = existingMap.get(`${n.language}:${n.normalizedText}`);
-      return !e || e.status === 'failed' || missingReadyAssets.has(`${n.language}:${n.normalizedText}`);
+      return !e
+        || e.status === 'failed'
+        || (opts.retryUnready === true && e.status === 'pending')
+        || missingReadyAssets.has(`${n.language}:${n.normalizedText}`);
     });
     const alreadyHandled = normalized.filter(n => {
       const e = existingMap.get(`${n.language}:${n.normalizedText}`);
       return e
         && !missingReadyAssets.has(`${n.language}:${n.normalizedText}`)
-        && (e.status === 'ready' || e.status === 'pending');
+        && (e.status === 'ready' || (e.status === 'pending' && opts.retryUnready !== true));
     });
 
     for (const n of alreadyHandled) {
@@ -259,8 +265,10 @@ export class WordAudioService {
         const key = `${normalizedWord.language}:${normalizedWord.normalizedText}`;
         if (result.status === 'fulfilled') {
           resultMap.set(key, result.value);
-          if (!result.value.cached) generated++;
-          else reused++;
+          if (result.value.wordAudio.status === 'ready') {
+            if (result.value.cached) reused++;
+            else generated++;
+          }
         } else {
           this.logger.warn(`Audio batch item failed for ${key}: ${readString(result.reason, 'message') ?? 'unknown error'}`);
           resultMap.set(key, {

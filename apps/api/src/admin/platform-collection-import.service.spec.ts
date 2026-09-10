@@ -1,6 +1,12 @@
+jest.mock('../word-dictionary/word-dictionary.service', () => ({
+  WordDictionaryService: class WordDictionaryService {},
+}));
+jest.mock('../word-audio/word-audio.service', () => ({
+  WordAudioService: class WordAudioService {},
+}));
+
 import { Test } from '@nestjs/testing';
 import { ConfigService } from '@nestjs/config';
-import { beforeEach, describe, expect, it, jest } from '@jest/globals';
 import type { AdminPlatformCollectionImportPayload } from '@lingua-card/shared/domain';
 import { WordDictionaryService } from '../word-dictionary/word-dictionary.service';
 import { WordAudioService } from '../word-audio/word-audio.service';
@@ -55,7 +61,7 @@ describe('PlatformCollectionImportService', () => {
         LexemeIdentityService,
         SpeechIdentityService,
         { provide: ConfigService, useValue: { get: () => ({ googleCloudTtsVoice: 'de-DE-test' }) } },
-        { provide: WordDictionaryService, useValue: { persistEnriched: dictionaryPersist } },
+        { provide: WordDictionaryService, useValue: { persistEnrichedContent: dictionaryPersist } },
         { provide: WordAudioService, useValue: { batchResolve: jest.fn() } },
         { provide: LegacyVocabularyProjectionService, useValue: { project: jest.fn() } },
         {

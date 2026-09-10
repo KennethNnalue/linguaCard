@@ -1,3 +1,7 @@
+jest.mock('../storage/storage.service', () => ({
+  StorageService: class StorageService {},
+}));
+
 import {WordAudioService} from './word-audio.service';
 import {WordAudioEntity} from './word-audio.entity';
 
@@ -116,5 +120,72 @@ describe('WordAudioService storage verification', () => {
 
     await expect(service.readAudio(entity.id)).resolves.toBeNull();
     expect(storage.read).not.toHaveBeenCalled();
+  });
+
+  it('explicitly retries a recently failed item and counts only ready output as generated', async () => {
+    const entity = readyEntity();
+    entity.status = 'failed';
+    entity.audioUrl = null;
+    entity.failedAt = new Date();
+    const repo = {
+      findByNormalizedTexts: jest.fn().mockResolvedValue([entity]),
+      findByNormalizedText: jest.fn().mockResolvedValue(entity),
+      save: jest.fn().mockImplementation(value => Promise.resolve(value)),
+    };
+    const storage = {
+      getUrlIfExists: jest.fn().mockResolvedValue(null),
+      upload: jest.fn().mockResolvedValue('https://dev-r2.example/word-audio/hash.mp3'),
+    };
+    const tts = {
+      generateSpeech: jest.fn().mockResolvedValue({
+        audioBuffer: new Uint8Array([1, 2, 3]).buffer,
+        durationMs: 500,
+      }),
+    };
+    const projection = {project: jest.fn().mockResolvedValue(undefined)};
+    const service = new WordAudioService(
+      repo as never,
+      tts as never,
+      {} as never,
+      storage as never,
+      projection as never,
+    );
+
+    const result = await service.batchResolve(
+      [{text: 'der Hund', language: 'de-DE'}],
+      {generate: true, retryUnready: true},
+    );
+
+    expect(tts.generateSpeech).toHaveBeenCalledTimes(1);
+    expect(result.generated).toBe(1);
+    expect(result.reused).toBe(0);
+    expect(result.results[0].wordAudio.status).toBe('ready');
+  });
+
+  it('projects a failed generation so its retry state remains durable', async () => {
+    const entity = readyEntity();
+    entity.status = 'pending';
+    entity.audioUrl = null;
+    const repo = {
+      findByNormalizedText: jest.fn()
+        .mockResolvedValueOnce(entity)
+        .mockResolvedValueOnce(entity),
+      save: jest.fn().mockImplementation(value => Promise.resolve(value)),
+    };
+    const storage = {getUrlIfExists: jest.fn().mockResolvedValue(null)};
+    const tts = {generateSpeech: jest.fn().mockRejectedValue({code: 3, message: 'invalid'})};
+    const projection = {project: jest.fn().mockResolvedValue(undefined)};
+    const service = new WordAudioService(
+      repo as never,
+      tts as never,
+      {} as never,
+      storage as never,
+      projection as never,
+    );
+
+    const result = await service.resolve('der Hund', 'de-DE', {retryUnready: true});
+
+    expect(result.wordAudio.status).toBe('failed');
+    expect(projection.project).toHaveBeenCalledWith(expect.objectContaining({status: 'failed'}));
   });
 });

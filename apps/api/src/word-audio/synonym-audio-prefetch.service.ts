@@ -9,7 +9,7 @@ interface AudioItem {
 /**
  * Throttled background queue for lower-priority audio generation (plural forms
  * and synonym examples). Runs at 1 call per 400 ms so it never competes with
- * the primary word/example audio that batchResolve handles at import time.
+ * the primary word/example audio that collection audio preparation handles.
  *
  * Fire-and-forget — callers enqueue items and return immediately.
  * A shared drain loop processes the queue in the background.
