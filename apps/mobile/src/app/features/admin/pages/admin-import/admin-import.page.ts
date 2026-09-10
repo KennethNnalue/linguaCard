@@ -82,6 +82,11 @@ export class AdminImportPage {
     wordsJson: new FormControl('', [Validators.required]),
   });
 
+  readonly metadataForm = new FormGroup({
+    title: new FormControl('', {nonNullable: true, validators: [Validators.required, Validators.pattern(/\S/)]}),
+    level: new FormControl<CefrLevel>('A1', {nonNullable: true, validators: [Validators.required]}),
+  });
+
   readonly promptCopied = signal(false);
   readonly storyPromptCopied = signal(false);
 
@@ -235,8 +240,6 @@ OUTPUT — valid JSON ONLY, no markdown fences, no commentary:
   readonly settingCategoryId = signal<string | null>(null);
   readonly deletingCollectionId = signal<string | null>(null);
   readonly editingMetadataId = signal<string | null>(null);
-  readonly editTitle = signal('');
-  readonly editLevel = signal<CefrLevel>('A1');
   readonly editCover = signal<File | null>(null);
   readonly editCoverPreview = signal<string | null>(null);
   readonly savingMetadataId = signal<string | null>(null);
@@ -450,8 +453,10 @@ OUTPUT — valid JSON ONLY, no markdown fences, no commentary:
       return;
     }
     this.editingMetadataId.set(item.id);
-    this.editTitle.set(item.title);
-    this.editLevel.set(this.isCefrLevel(item.level) ? item.level : 'A1');
+    this.metadataForm.reset({
+      title: item.title,
+      level: this.isCefrLevel(item.level) ? item.level : 'A1',
+    });
     this.editCover.set(null);
     this.editCoverPreview.set(item.coverImageUrl);
   }
@@ -460,16 +465,6 @@ OUTPUT — valid JSON ONLY, no markdown fences, no commentary:
     this.editingMetadataId.set(null);
     this.editCover.set(null);
     this.editCoverPreview.set(null);
-  }
-
-  updateEditTitle(event: Event): void {
-    const input = event.target;
-    if (input instanceof HTMLInputElement) this.editTitle.set(input.value);
-  }
-
-  updateEditLevel(event: Event): void {
-    const select = event.target;
-    if (select instanceof HTMLSelectElement && this.isCefrLevel(select.value)) this.editLevel.set(select.value);
   }
 
   selectEditCover(event: Event): void {
@@ -486,10 +481,13 @@ OUTPUT — valid JSON ONLY, no markdown fences, no commentary:
   }
 
   saveCollectionMetadata(item: AdminPlatformCollectionListItem): void {
-    const title = this.editTitle().trim();
-    if (!title || this.savingMetadataId()) return;
+    this.metadataForm.markAllAsTouched();
+    if (this.metadataForm.invalid || this.savingMetadataId()) return;
+    const {title: rawTitle, level} = this.metadataForm.getRawValue();
+    const title = rawTitle.trim();
+    if (!title) return;
     this.savingMetadataId.set(item.id);
-    this.adminApi.updateCollection(item.id, {title, level: this.editLevel()}).pipe(
+    this.adminApi.updateCollection(item.id, {title, level}).pipe(
       concatMap(updated => {
         const cover = this.editCover();
         if (!cover) return of(updated);

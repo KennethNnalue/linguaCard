@@ -417,7 +417,7 @@
                 </header>
 
                 @if (editingMetadataId() === item.id) {
-                  <form class="adm-metadata-editor" (ngSubmit)="saveCollectionMetadata(item)">
+                  <form class="adm-metadata-editor" [formGroup]="metadataForm" (ngSubmit)="saveCollectionMetadata(item)">
                     <label class="adm-image-upload adm-image-upload--compact">
                       @if (editCoverPreview(); as preview) {
                         <img [src]="preview" alt="Updated collection thumbnail preview" />
@@ -429,17 +429,17 @@
                     </label>
                     <label class="adm-field">
                       <span class="adm-label">Title</span>
-                      <input class="adm-input" [value]="editTitle()" (input)="updateEditTitle($event)" />
+                      <input class="adm-input" formControlName="title" />
                     </label>
                     <label class="adm-field">
                       <span class="adm-label">Level</span>
-                      <select class="adm-select" [value]="editLevel()" (change)="updateEditLevel($event)">
-                        @for (level of levels; track level) { <option [value]="level">{{ level }}</option> }
+                      <select class="adm-select" formControlName="level">
+                        @for (level of levels; track level) { <option [ngValue]="level">{{ level }}</option> }
                       </select>
                     </label>
                     <div class="adm-metadata-editor__actions">
                       <button type="button" class="adm-secondary-action" (click)="cancelEditingMetadata()">Cancel</button>
-                      <button type="submit" class="adm-primary-action" [disabled]="!editTitle().trim() || savingMetadataId() === item.id">
+                      <button type="submit" class="adm-primary-action" [disabled]="metadataForm.invalid || savingMetadataId() === item.id">
                         {{ savingMetadataId() === item.id ? 'Saving…' : 'Save changes' }}
                       </button>
                     </div>
