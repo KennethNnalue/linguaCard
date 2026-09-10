@@ -8,11 +8,11 @@ jest.mock('../storage/storage.service', () => ({
   StorageService: class StorageService {},
 }));
 
-import type {AdminImportCollectionJsonDto} from '@lingua-card/shared/domain';
+import type {AdminImportCollectionJsonDto, EnrichedWordInput} from '@lingua-card/shared/domain';
 import {AdminService} from './admin.service';
 
 describe('AdminService collection import staging', () => {
-  it('commits an enriched JSON draft without generating TTS', async () => {
+  it('commits a deduplicated enriched JSON draft without generating TTS', async () => {
     const dictionaryEntry = {
       id: 'dictionary-1',
       article: 'der',
@@ -66,30 +66,41 @@ describe('AdminService collection import staging', () => {
       {} as never,
       {} as never,
     );
+    const word: EnrichedWordInput = {
+      back: 'Apfel',
+      front: 'apple',
+      article: 'der',
+      plural: 'Äpfel',
+      cefrLevel: 'A1',
+      wordType: 'noun',
+      examples: [{target: 'Der Apfel ist rot.', native: 'The apple is red.'}],
+      synonyms: [{word: 'Frucht', article: 'die', translation: 'fruit'}],
+    };
     const dto: AdminImportCollectionJsonDto = {
       title: 'Fruit',
       level: 'A1',
-      words: [{
-        back: 'Apfel',
-        front: 'apple',
-        article: 'der',
-        plural: 'Äpfel',
-        cefrLevel: 'A1',
-        wordType: 'noun',
-        examples: [{target: 'Der Apfel ist rot.', native: 'The apple is red.'}],
-        synonyms: [{word: 'Frucht', article: 'die', translation: 'fruit'}],
-      }],
+      words: [word, {...word}],
     };
 
     const result = await service.importCollectionJson(dto);
 
-    expect(dictionary.persistEnrichedContent).toHaveBeenCalledTimes(1);
+    expect(dictionary.persistEnrichedContent).toHaveBeenCalledTimes(2);
     expect(wordAudio.batchResolve).not.toHaveBeenCalled();
     expect(transactionManager.save).toHaveBeenCalledTimes(2);
     expect(transactionManager.save).toHaveBeenCalledWith(
       expect.any(Function),
       expect.objectContaining({status: 'needs_attention'}),
     );
-    expect(result).toEqual(expect.objectContaining({inserted: 1, reused: 0, audioLinked: 0}));
+    expect(transactionManager.save).toHaveBeenNthCalledWith(
+      2,
+      expect.any(Function),
+      [expect.objectContaining({lexemeId: 'lexeme-1', position: 0})],
+    );
+    expect(result).toEqual(expect.objectContaining({
+      inserted: 1,
+      reused: 0,
+      audioLinked: 0,
+      duplicatesSkipped: 1,
+    }));
   });
 });

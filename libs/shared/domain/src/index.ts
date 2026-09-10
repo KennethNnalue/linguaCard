@@ -1271,6 +1271,7 @@ export interface AdminImportCollectionResult {
   created: number;
   reused: number;
   enriched: number;
+  duplicatesSkipped: number;
 }
 
 export interface GeneratedPlatformStorySentence {
@@ -1368,6 +1369,7 @@ export interface AdminImportCollectionJsonResult {
   inserted: number;
   reused: number;
   audioLinked: number;
+  duplicatesSkipped: number;
 }
 
 export interface AdminCollectionAudioPreparationResult {

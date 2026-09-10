@@ -634,7 +634,7 @@ OUTPUT — valid JSON ONLY, no markdown fences, no commentary:
       next: result => {
         this.importing.set(false);
         this.lastCollectionResult.set(result);
-        void this._toast(`✓ Collection "${result.title}" created — ${result.reused} reused, ${result.enriched} enriched`, 'success');
+        void this._toast(`✓ Collection "${result.title}" created — ${result.reused} reused, ${result.enriched} enriched, ${result.duplicatesSkipped} duplicates skipped`, 'success');
       },
       error: () => {
         this.importing.set(false);
@@ -716,7 +716,7 @@ OUTPUT — valid JSON ONLY, no markdown fences, no commentary:
         this.importingJson.set(false);
         this.jsonImportStage.set('complete');
         this.lastJsonResult.set(result);
-        void this._toast(`✓ "${result.title}" — ${result.inserted} inserted, ${result.reused} reused, ${result.audioLinked} audio linked`, 'success');
+        void this._toast(`✓ "${result.title}" — ${result.inserted} inserted, ${result.reused} reused, ${result.duplicatesSkipped} duplicates skipped`, 'success');
       },
       error: error => {
         this.importingJson.set(false);

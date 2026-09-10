@@ -124,22 +124,26 @@ export class AdminService {
     let inserted = 0;
     let reused = 0;
     let audioLinked = 0;
+    let duplicatesSkipped = 0;
 
     const wordRows: PlatformCollectionWordEntity[] = [];
+    const includedLexemeIds = new Set<string>();
 
     for (const word of dto.words) {
       const before = await this.dictionary.lookup(word.back, word.article, 'de-DE', 'en');
       const entity = await this.dictionary.persistEnrichedContent(word, 'de-DE', 'en');
-      if (entity.wordAudioId) audioLinked++;
-      if (before) {
-        reused++;
-      } else {
-        inserted++;
-      }
       const mapping = await this.dictionaryLexemeRepo.findOneBy({ dictionaryWordId: entity.id });
       if (!mapping) {
         throw new ConflictException(`Vocabulary projection failed for words[${wordRows.length}].back (${word.back})`);
       }
+      if (includedLexemeIds.has(mapping.lexemeId)) {
+        duplicatesSkipped++;
+        continue;
+      }
+      includedLexemeIds.add(mapping.lexemeId);
+      if (entity.wordAudioId) audioLinked++;
+      if (before) reused++;
+      else inserted++;
       wordRows.push(
         this.wordRepo.create({
           id: randomUUID(),
@@ -165,7 +169,7 @@ export class AdminService {
       await manager.save(PlatformCollectionEntity, collection);
       await manager.save(PlatformCollectionWordEntity, wordRows);
     });
-    return { collectionId, title: dto.title, inserted, reused, audioLinked };
+    return { collectionId, title: dto.title, inserted, reused, audioLinked, duplicatesSkipped };
   }
 
   async importCollection(dto: AdminImportCollectionDto): Promise<AdminImportCollectionResult> {
@@ -187,6 +191,25 @@ export class AdminService {
     }
 
     const collectionId = crypto.randomUUID();
+    const includedLexemeIds = new Set<string>();
+    let duplicatesSkipped = 0;
+    const wordRows: PlatformCollectionWordEntity[] = [];
+    for (const entry of batchResult.entries) {
+      const lexemeId = lexemeIdByDictionaryId.get(entry.id);
+      if (!lexemeId) continue;
+      if (includedLexemeIds.has(lexemeId)) {
+        duplicatesSkipped++;
+        continue;
+      }
+      includedLexemeIds.add(lexemeId);
+      wordRows.push(this.wordRepo.create({
+        id: crypto.randomUUID(),
+        platformCollectionId: collectionId,
+        dictionaryWordId: entry.id,
+        lexemeId,
+        position: wordRows.length,
+      }));
+    }
     const collection = this.collectionRepo.create({
       id: collectionId,
       title: dto.title,
@@ -195,17 +218,8 @@ export class AdminService {
       topic: dto.topic ?? dto.title,
       isPublished: false,
       status: 'needs_attention',
-      wordCount: batchResult.entries.length,
+      wordCount: wordRows.length,
     });
-    const wordRows = batchResult.entries.map((entry, i) =>
-      this.wordRepo.create({
-        id: crypto.randomUUID(),
-        platformCollectionId: collectionId,
-        dictionaryWordId: entry.id,
-        lexemeId: lexemeIdByDictionaryId.get(entry.id),
-        position: i,
-      }),
-    );
     await this.collectionRepo.manager.transaction(async manager => {
       await manager.save(PlatformCollectionEntity, collection);
       await manager.save(PlatformCollectionWordEntity, wordRows);
@@ -213,9 +227,10 @@ export class AdminService {
     return {
       collectionId,
       title: dto.title,
-      created: batchResult.entries.length,
+      created: wordRows.length,
       reused: batchResult.reused,
       enriched: batchResult.enriched,
+      duplicatesSkipped,
     };
   }
 
