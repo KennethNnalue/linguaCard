@@ -102,6 +102,20 @@ export class CollectionDetailPage implements OnInit {
   readonly collection = signal<Collection | null>(null);
   readonly completing = signal(false);
   readonly justCompleted = signal(false);
+  private readonly collectionSummary = computed(() =>
+    this.vaultStore.vault()?.collections.find(item => item.id === this.collectionId()) ?? null,
+  );
+  readonly coverSeed = computed(() =>
+    this.collectionSummary()?.coverSeed
+      ?? this.collection()?.coverSeed
+      ?? this.collection()?.name
+      ?? '',
+  );
+  readonly coverImageUrl = computed(() =>
+    this.collectionSummary()?.coverImageUrl
+      ?? this.collection()?.coverImageUrl
+      ?? null,
+  );
   readonly allCards = computed(() => {
     const id = this.collectionId();
     if (!id) return [];
@@ -468,12 +482,6 @@ export class CollectionDetailPage implements OnInit {
 
   playPronunciation(card: ScheduledCard): void {
     void this.wordAudio.playCard(card, this.targetLocale());
-  }
-
-  coverSeed(): string {
-    return this.vaultStore.vault()?.collections.find(item => item.id === this.collectionId())?.coverSeed
-      ?? this.collection()?.name
-      ?? '';
   }
 
   private reviewCards(): ScheduledCard[] {

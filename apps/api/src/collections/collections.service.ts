@@ -125,6 +125,8 @@ export class CollectionsService {
       emoji: e.emoji,
       colour: e.colour,
       contextId: e.contextId,
+      coverSeed: e.coverSeed,
+      coverImageUrl: e.coverImageUrl,
       cardCount: counts.cardCount,
       masteredCount: counts.masteredCount,
       dueCount: counts.dueCount,

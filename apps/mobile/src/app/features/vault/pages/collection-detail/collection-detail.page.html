@@ -2,7 +2,7 @@
 
   <!-- Cover hero -->
   <header class="cover">
-    <lc-collection-cover class="cover-artwork" [name]="collection()?.name ?? ''" [seed]="coverSeed()" [imageUrl]="collection()?.coverImageUrl ?? null" />
+    <lc-collection-cover class="cover-artwork" [name]="collection()?.name ?? ''" [seed]="coverSeed()" [imageUrl]="coverImageUrl()" />
     <span class="cover-glow"></span>
     <div class="cover-nav">
       <button class="cover-btn" (click)="goBack()" [attr.aria-label]="'collectionDetail.nav.backAria' | translate">
@@ -13,7 +13,7 @@
       </button>
     </div>
     <div class="cover-id">
-      <div>
+      <div class="cover-text-surface">
         <div class="cover-eyebrow">{{ eyebrow() }}</div>
         <h1 class="cover-name" [class.cover-name--completed]="justCompleted()">{{ collection()?.name ?? '' }}</h1>
       </div>
