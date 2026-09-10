@@ -1,0 +1,60 @@
+@use 'theme/tokens' as t;
+
+:host {
+  position:absolute;
+  z-index:10;
+  inset:0;
+  display:block;
+  background:linear-gradient(180deg,#111914 0%,#07100b 100%);
+  color:white;
+}
+.transcript {
+  display:grid;
+  grid-template-rows:auto minmax(0,1fr);
+  height:100%;
+  padding:
+    calc(12px + var(--player-safe-top))
+    calc(14px + var(--player-safe-right))
+    calc(12px + var(--player-safe-bottom))
+    calc(14px + var(--player-safe-left));
+}
+header {
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:16px;
+  padding:8px 4px 16px;
+  border-bottom:1px solid rgba(255,255,255,.1);
+}
+header div { min-width:0; }
+header p { margin:0 0 2px; color:#f2cf67; font-size:.72rem; font-weight:700; letter-spacing:.08em; text-transform:uppercase; }
+h2 { margin:0; overflow:hidden; font-size:1.4rem; text-overflow:ellipsis; white-space:nowrap; }
+header ion-button { flex:0 0 44px; width:44px; height:44px; margin:0; --color:white; }
+ion-list {
+  overflow-y:auto;
+  padding:12px 0 32px;
+  background:transparent;
+  scrollbar-width:thin;
+}
+.transcript-turn {
+  margin:4px 0;
+  --min-height:0;
+  --padding-start:12px;
+  --inner-padding-end:14px;
+  --background:transparent;
+  --border-radius:#{t.$lc-radius-lg};
+  --color:white;
+}
+.transcript-turn::part(native) { align-items:flex-start; padding-block:14px; }
+.transcript-turn ion-icon { margin-top:3px; color:rgba(255,255,255,.38); font-size:1.35rem; }
+.transcript-turn ion-label { margin:0; white-space:normal; }
+.transcript-turn strong { display:block; margin-bottom:5px; color:#f2cf67; font-size:.68rem; letter-spacing:.06em; text-transform:uppercase; }
+.transcript-turn ion-label p { white-space:normal; }
+.target-text { margin:0; color:white; font-family:t.$lc-font-display; font-size:1.18rem; line-height:1.4; }
+.translation { margin:5px 0 0; color:rgba(255,255,255,.62); font-size:.9rem; line-height:1.45; }
+.transcript-turn--active { --background:rgba(242,207,103,.1); }
+.transcript-turn--active ion-icon { color:#f2cf67; }
+
+@media(orientation:landscape) {
+  .transcript { width:min(100%,920px); margin:auto; }
+}

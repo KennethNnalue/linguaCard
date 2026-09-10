@@ -1,0 +1,28 @@
+<section class="transcript" role="dialog" aria-modal="true" aria-labelledby="transcript-title">
+  <header>
+    <div>
+      <p>{{ episode().topicTitle }}</p>
+      <h2 id="transcript-title">{{ 'podcasts.player.transcriptTitle' | translate }}</h2>
+    </div>
+    <ion-button fill="clear" shape="round" (click)="dismissed.emit()"
+      [attr.aria-label]="'podcasts.player.closeTranscript' | translate">
+      <ion-icon slot="icon-only" name="close-outline" />
+    </ion-button>
+  </header>
+
+  <ion-list lines="none">
+    @for (turn of episode().turns; track turn.id) {
+      <ion-item button detail="false" class="transcript-turn"
+        [class.transcript-turn--active]="turn.id === currentTurnId()"
+        [attr.aria-current]="turn.id === currentTurnId() ? 'true' : null"
+        (click)="turnSelected.emit(turn.startMs)">
+        <ion-icon slot="start" name="play-circle-outline" aria-hidden="true" />
+        <ion-label>
+          <strong>{{ speakerNames().get(turn.speakerId) ?? ('podcasts.player.unknownSpeaker' | translate) }}</strong>
+          <p class="target-text">{{ turn.targetText }}</p>
+          <p class="translation">{{ turn.translation }}</p>
+        </ion-label>
+      </ion-item>
+    }
+  </ion-list>
+</section>

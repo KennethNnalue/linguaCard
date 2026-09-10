@@ -13,8 +13,8 @@ import { addIcons } from 'ionicons';
 import { TranslatePipe } from '@ngx-translate/core';
 import {
   arrowBackOutline, arrowRedoOutline, arrowUndoOutline, eyeOffOutline, eyeOutline,
-  contractOutline, expandOutline, moonOutline, pause, play, repeatOutline, speedometerOutline,
-  sunnyOutline,
+  contractOutline, documentTextOutline, expandOutline, moonOutline, pause, play, repeatOutline,
+  speedometerOutline, sunnyOutline,
 } from 'ionicons/icons';
 import { combineLatest, distinctUntilChanged, map } from 'rxjs';
 import {
@@ -23,6 +23,7 @@ import {
 import { OfflineImageDirective } from '../../../../shared/image/offline-image.directive';
 import { PodcastImmersiveModeService } from '../../services/podcast-immersive-mode.service';
 import { ScreenAwakeService } from '../../../../shared/audio/screen-awake.service';
+import { PodcastTranscriptComponent } from '../../components/podcast-transcript/podcast-transcript.component';
 
 const PODCAST_PLAYBACK_SPEEDS = [0.75, 1, 1.25, 1.5] as const;
 export const PODCAST_CHROME_AUTO_HIDE_MS = 3000;
@@ -49,7 +50,8 @@ export function nextPodcastPlaybackSpeed(currentSpeed: number): number {
 @Component({
   selector: 'lc-podcast-player', standalone: true,
   imports: [
-    IonButton, IonContent, IonIcon, IonRange, IonSpinner, OfflineImageDirective, TranslatePipe,
+    IonButton, IonContent, IonIcon, IonRange, IonSpinner, OfflineImageDirective,
+    PodcastTranscriptComponent, TranslatePipe,
   ],
   providers: [PodcastPlayerStore, PodcastImmersiveModeService, ScreenAwakeService], templateUrl: './podcast-player.page.html',
   styleUrl: './podcast-player.page.scss', changeDetection: ChangeDetectionStrategy.OnPush,
@@ -59,8 +61,9 @@ export class PodcastPlayerPage implements OnInit, ViewWillLeave {
   readonly immersiveMode = inject(PodcastImmersiveModeService);
   readonly screenAwake = inject(ScreenAwakeService);
   readonly chromeVisible = signal(true);
+  readonly transcriptOpen = signal(false);
   readonly isChromeVisible = computed(
-    () => !this.immersiveMode.isLandscape() || this.chromeVisible(),
+    () => this.transcriptOpen() || !this.immersiveMode.isLandscape() || this.chromeVisible(),
   );
   readonly errorMessageKey = podcastPlayerErrorMessageKey;
   private readonly route = inject(ActivatedRoute);
@@ -75,8 +78,8 @@ export class PodcastPlayerPage implements OnInit, ViewWillLeave {
   constructor() {
     addIcons({
       arrowBackOutline, arrowRedoOutline, arrowUndoOutline, eyeOffOutline, eyeOutline,
-      contractOutline, expandOutline, moonOutline, pause, play, repeatOutline, speedometerOutline,
-      sunnyOutline,
+      contractOutline, documentTextOutline, expandOutline, moonOutline, pause, play, repeatOutline,
+      speedometerOutline, sunnyOutline,
     });
     this.destroyRef.onDestroy(() => {
       this.clearChromeAutoHide();
@@ -102,6 +105,7 @@ export class PodcastPlayerPage implements OnInit, ViewWillLeave {
       )),
       takeUntilDestroyed(this.destroyRef),
     ).subscribe(config => {
+      this.transcriptOpen.set(false);
       this.store.playbackScopeChanged(config.isTopicQueue);
       this.store.playbackQueueChanged(
         config.playbackQueue.split(',').filter(episodeId => episodeId.length > 0),
@@ -140,6 +144,7 @@ export class PodcastPlayerPage implements OnInit, ViewWillLeave {
     this.chromeVisible.set(true);
   }
   playerSurfaceTapped(event: MouseEvent): void {
+    if (this.transcriptOpen()) return;
     if (!this.immersiveMode.isLandscape()) return;
     if (this.isInteractiveTarget(event.target)) return;
 
@@ -264,6 +269,15 @@ export class PodcastPlayerPage implements OnInit, ViewWillLeave {
       this.store.translationMode() === 'target' ? 'both' : 'target',
     );
   }
+  openTranscript(): void {
+    this.clearChromeAutoHide();
+    this.chromeVisible.set(true);
+    this.transcriptOpen.set(true);
+  }
+  closeTranscript(): void {
+    this.transcriptOpen.set(false);
+    this.scheduleChromeAutoHide();
+  }
   changeSpeed(): void {
     const speed = nextPodcastPlaybackSpeed(this.store.speed());
     this.store.speedChanged(speed);
@@ -287,7 +301,7 @@ export class PodcastPlayerPage implements OnInit, ViewWillLeave {
 
   private scheduleChromeAutoHide(): void {
     this.clearChromeAutoHide();
-    if (!this.chromeVisible() || !this.store.isPlaying()) return;
+    if (!this.chromeVisible() || !this.store.isPlaying() || this.transcriptOpen()) return;
     if (!this.immersiveMode.isLandscape()) return;
 
     this.chromeAutoHideTimer = setTimeout(() => {

@@ -278,6 +278,39 @@ describe('PodcastPlayerPage immersive presentation', () => {
     expect(screenAwake.isSleepAllowed()).toBe(true);
   });
 
+  it('opens a readable transcript and seeks playback from a selected turn', () => {
+    const audioBefore = playerRoot().querySelector('audio');
+    if (!(audioBefore instanceof HTMLAudioElement)) throw new Error('Expected audio element');
+    const transcriptButton = playerRoot().querySelector('.transcript-control');
+
+    transcriptButton?.dispatchEvent(new MouseEvent('click', { bubbles: true }));
+    fixture.detectChanges();
+
+    const transcript = playerRoot().querySelector('lc-podcast-transcript');
+    expect(transcript).not.toBeNull();
+    expect(transcript?.textContent).toContain(currentTurn.targetText);
+    expect(transcript?.textContent).toContain(currentTurn.translation);
+    expect(transcript?.querySelector('[aria-current="true"]')).not.toBeNull();
+    expect(playerRoot().querySelector('audio')).toBe(audioBefore);
+
+    transcript?.querySelector('.transcript-turn')
+      ?.dispatchEvent(new MouseEvent('click', { bubbles: true }));
+
+    expect(audioBefore.currentTime).toBe(currentTurn.startMs / 1000);
+  });
+
+  it('returns to the player when the transcript is closed', () => {
+    page.openTranscript();
+    fixture.detectChanges();
+
+    const closeButton = playerRoot().querySelector('lc-podcast-transcript header ion-button');
+    closeButton?.dispatchEvent(new MouseEvent('click', { bubbles: true }));
+    fixture.detectChanges();
+
+    expect(page.transcriptOpen()).toBe(false);
+    expect(playerRoot().querySelector('lc-podcast-transcript')).toBeNull();
+  });
+
   it('distinguishes episode repeat from topic repeat', () => {
     store.repeatMode.set('episode');
     fixture.detectChanges();
