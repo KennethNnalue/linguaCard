@@ -60,7 +60,7 @@ export class ReviewSessionBuilderService {
     now: Date,
     options: ReviewSessionStartOptions,
   ): Promise<ReviewSessionSelectionResult> {
-    const readiness = await this.awaitCardReadiness();
+    const readiness = await this.ensureCardsReady();
     if (readiness) return { kind: 'load_failed', error: readiness };
 
     const candidates: ReviewCandidate[] = [];
@@ -100,7 +100,7 @@ export class ReviewSessionBuilderService {
     return { newCardLimit, newCardRatio: DEFAULT_NEW_CARD_RATIO };
   }
 
-  private async awaitCardReadiness(): Promise<ApplicationError | null> {
+  async ensureCardsReady(): Promise<ApplicationError | null> {
     let state = this.cardStore.loadState();
     if (state.status === 'idle' || state.status === 'error') {
       state = await this.cardStore.loadCards();

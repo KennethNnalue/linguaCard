@@ -41,7 +41,7 @@ describe('ReviewStore audio preparation', () => {
         { provide: LocalDataService, useValue: { setActiveReviewSession } },
         { provide: AuthService, useValue: { currentUser: () => ({ id: 'user-1' }) } },
         { provide: SyncService, useValue: {} },
-        { provide: ReviewSessionBuilderService, useValue: {} },
+        { provide: ReviewSessionBuilderService, useValue: {ensureCardsReady: jest.fn().mockResolvedValue(null)} },
         { provide: ReviewPrefsService, useValue: { mode: () => 'flip', dir: () => 'en-de' } },
         { provide: ReviewCommitService, useValue: {} },
         { provide: ReviewLocalRepository, useValue: {} },

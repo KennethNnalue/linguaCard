@@ -334,7 +334,6 @@ export const ReviewStore = signalStore(
         }
       },
       async startSession(source: ReviewSessionSource, limit: number): Promise<ReviewSessionStartResult> {
-        if (store.session()?.status === 'active') return { kind: 'cancelled' };
         const startSequence = beginSessionStart();
         patchState(store, {
           session: null, presentation: null, operation: { kind: 'starting' }, sessionRatings: {},
@@ -383,12 +382,19 @@ export const ReviewStore = signalStore(
         return result;
       },
       async startSessionForCards(source: ReviewSessionSource, cardIds: readonly string[]): Promise<ReviewSessionStartResult> {
-        if (store.session()?.status === 'active') return { kind: 'cancelled' };
         const startSequence = beginSessionStart();
         patchState(store, {
           session: null, presentation: null, operation: { kind: 'starting' }, sessionRatings: {},
           sessionNewCardCount: 0, completedSession: null, commitError: null, lastReviewedCardId: null,
         });
+        const readinessError = await sessionBuilder.ensureCardsReady();
+        if (startSequence !== sessionStartSequence) return { kind: 'cancelled' };
+        if (readinessError) {
+          patchState(store, {
+            operation: { kind: 'error', message: readinessError.message, recoverable: true },
+          });
+          return { kind: 'load_failed', error: readinessError };
+        }
         const availableCards = new Map(cardStore.cards().map(card => [card.id, card]));
         const originalCardIds = [...new Set(cardIds)].filter(cardId => availableCards.has(cardId));
         if (originalCardIds.length === 0) {
@@ -451,6 +457,13 @@ export const ReviewStore = signalStore(
           commitError: null,
         });
         try {
+          const readinessError = await sessionBuilder.ensureCardsReady();
+          if (readinessError) {
+            patchState(store, {
+              operation: { kind: 'error', message: readinessError.message, recoverable: true },
+            });
+            return false;
+          }
           await prepareSessionAudio(session);
           const isCurrent = () => isCurrentSessionStart(startSequence, session.definition.id);
           if (!isCurrent() || !await presentNextCard(session, new Date(), isCurrent)) return false;
@@ -567,7 +580,6 @@ export const ReviewStore = signalStore(
       },
       leaveSession(): void {
         sessionStartSequence += 1;
-        if (store.session()?.status !== 'active') return;
         patchState(store, { presentation: null, operation: { kind: 'idle' } });
       },
       clearSession(): void {
