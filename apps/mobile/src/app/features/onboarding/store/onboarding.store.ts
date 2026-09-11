@@ -110,14 +110,14 @@ export const OnboardingStore = signalStore(
           timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
           completeOnboarding: true,
         });
-        void router.navigateByUrl('/home').then(() => {
+        void router.navigateByUrl('/review').then(() => {
           patchState(store, initial);
         });
       },
 
       skip(): void {
         void settings.update({ completeOnboarding: true });
-        void router.navigateByUrl('/home').then(() => {
+        void router.navigateByUrl('/review').then(() => {
           patchState(store, initial);
         });
       },

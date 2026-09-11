@@ -43,7 +43,7 @@ export class LoginPage {
     this.authService.login({ email: email!, password: password! }).subscribe({
       next: () => {
         this.loading.set(false);
-        this.router.navigateByUrl('/home');
+        this.router.navigateByUrl('/review');
       },
       error: (err: Error) => {
         this.loading.set(false);

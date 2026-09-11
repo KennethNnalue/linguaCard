@@ -28,6 +28,6 @@ export class LanguagePage {
   }
 
   goBack(): void {
-    this.router.navigate(['/home']);
+    this.router.navigate(['/review']);
   }
 }

@@ -1,0 +1,63 @@
+<ion-header class="ion-no-border">
+  <ion-toolbar>
+    <div class="more-practice__nav">
+      <ion-button fill="clear" (click)="back()" [attr.aria-label]="'common.back' | translate">
+        <ion-icon slot="icon-only" name="chevron-back-outline" />
+      </ion-button>
+      <span>{{ 'common.appName' | translate }}</span>
+    </div>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+  <main class="more-practice">
+    <header>
+      <span>{{ 'review.more.eyebrow' | translate }}</span>
+      <h1>{{ 'review.more.title' | translate }}</h1>
+      <p>{{ 'review.more.support' | translate }}</p>
+    </header>
+
+    <ion-list class="more-practice__options" [attr.aria-label]="'review.more.title' | translate" lines="none">
+      <ion-item button="true" detail="false" (click)="startNewWords()" [disabled]="newCount() === 0 || launching()">
+        <ion-icon slot="start" name="document-text-outline" />
+        <ion-label>
+          <span class="more-practice__option-copy">
+            <strong>{{ 'review.more.newWords' | translate }}</strong>
+            <small>{{ 'review.more.newAvailable' | translate:{count: newCount()} }}</small>
+          </span>
+        </ion-label>
+        <ion-icon slot="end" name="chevron-forward-outline" />
+      </ion-item>
+      <ion-item button="true" detail="false" (click)="openStruggling()">
+        <ion-icon slot="start" name="flame-outline" />
+        <ion-label>
+          <span class="more-practice__option-copy">
+            <strong>{{ 'review.more.struggling' | translate }}</strong>
+            <small>{{ 'review.more.needAttention' | translate:{count: strugglingCount()} }}</small>
+          </span>
+        </ion-label>
+        <ion-icon slot="end" name="chevron-forward-outline" />
+      </ion-item>
+      <ion-item button="true" detail="false" (click)="openLeeches()">
+        <ion-icon slot="start" name="refresh-outline" />
+        <ion-label>
+          <span class="more-practice__option-copy">
+            <strong>{{ 'review.more.leeches' | translate }}</strong>
+            <small>{{ 'review.more.repeatedlyMissed' | translate:{count: leechCount()} }}</small>
+          </span>
+        </ion-label>
+        <ion-icon slot="end" name="chevron-forward-outline" />
+      </ion-item>
+      <ion-item button="true" detail="false" (click)="openCustom()">
+        <ion-icon slot="start" name="options-outline" />
+        <ion-label>
+          <span class="more-practice__option-copy">
+            <strong>{{ 'review.more.custom' | translate }}</strong>
+            <small>{{ 'review.more.customSupport' | translate }}</small>
+          </span>
+        </ion-label>
+        <ion-icon slot="end" name="chevron-forward-outline" />
+      </ion-item>
+    </ion-list>
+  </main>
+</ion-content>

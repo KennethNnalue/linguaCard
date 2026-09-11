@@ -29,7 +29,7 @@ import { StoryReaderLoaderService } from '../../services/story-reader-loader.ser
 import { StoryReaderInteractionService } from '../../services/story-reader-interaction.service';
 import { WordAudioService } from '../../../../shared/audio/word-audio.service';
 import { QuizTabComponent } from '../../components/quiz-tab/quiz-tab.component';
-import { KeywordsTabComponent } from '../../components/keywords-tab/keywords-tab.component';
+import { KeywordsTabComponent, StoryKeywordUsage } from '../../components/keywords-tab/keywords-tab.component';
 import { GrammarTabComponent } from '../../components/grammar-tab/grammar-tab.component';
 import { StoryTextComponent, StoryWordTap } from '../../components/story-text/story-text.component';
 import { computeQuizScore, type ReaderTab, type WordDetail } from '../../models/reader.model';
@@ -424,6 +424,10 @@ export class StoryReaderPage implements OnInit, ViewWillEnter, ViewWillLeave {
    */
   openKeyword(keyword: StoryKeyword): void {
     this.interaction.openKeyword(keyword);
+  }
+
+  playKeywordUsage(usage: StoryKeywordUsage): void {
+    void this.wordAudio.playUsage(usage.keyword.german, usage.example?.german, 'de-DE');
   }
 
   // ── Tap-on-word (from <lc-story-text>) ───────────────────────────

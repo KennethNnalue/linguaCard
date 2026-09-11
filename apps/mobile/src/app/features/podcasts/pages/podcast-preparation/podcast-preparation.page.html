@@ -60,12 +60,40 @@
       <section #wordList class="words">
         <h2>Essential vocabulary</h2>
         @for(item of store.essentialVocabulary(); track item.lexemeId) {
-          <article><div><strong>{{ item.text }}</strong><span>{{ item.translation }}</span></div><small [attr.data-mastery]="item.mastery">{{ item.mastery }}</small></article>
+          <article>
+            <lc-article-badge [article]="item.article" />
+            <div class="word-copy">
+              <strong>{{ item.text }}</strong>
+              <span>{{ item.translation }}</span>
+              @if (item.example; as example) {
+                <span class="example">{{ example.target }}</span>
+                @if (example.native) { <span class="example-native">{{ example.native }}</span> }
+              }
+            </div>
+            <small [attr.data-mastery]="item.mastery">{{ item.mastery }}</small>
+            <ion-button class="word-audio" fill="clear" type="button" (click)="playVocabulary(item)" [attr.aria-label]="'common.aria.playPronunciation' | translate">
+              <ion-icon slot="icon-only" name="volume-high-outline" />
+            </ion-button>
+          </article>
         }
         @if(store.supportingVocabulary().length) {
           <h2>Supporting vocabulary</h2>
           @for(item of store.supportingVocabulary(); track item.lexemeId) {
-            <article><div><strong>{{ item.text }}</strong><span>{{ item.translation }}</span></div><small [attr.data-mastery]="item.mastery">{{ item.mastery }}</small></article>
+            <article>
+              <lc-article-badge [article]="item.article" />
+              <div class="word-copy">
+                <strong>{{ item.text }}</strong>
+                <span>{{ item.translation }}</span>
+                @if (item.example; as example) {
+                  <span class="example">{{ example.target }}</span>
+                  @if (example.native) { <span class="example-native">{{ example.native }}</span> }
+                }
+              </div>
+              <small [attr.data-mastery]="item.mastery">{{ item.mastery }}</small>
+              <ion-button class="word-audio" fill="clear" type="button" (click)="playVocabulary(item)" [attr.aria-label]="'common.aria.playPronunciation' | translate">
+                <ion-icon slot="icon-only" name="volume-high-outline" />
+              </ion-button>
+            </article>
           }
         }
       </section>

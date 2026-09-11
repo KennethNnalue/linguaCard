@@ -56,6 +56,7 @@ export class WordAudioService {
   // newer tap or a stop() bumps it so a still-resolving older tap abandons its
   // play() instead of firing late. Also lets stop() cancel a pending resolve.
   private _tapSeq = 0;
+  private _usageSeq = 0;
 
   // Lazily-created silent WAV blob URL used to unlock the shared player.
   private _silentUrl: string | null = null;
@@ -93,6 +94,31 @@ export class WordAudioService {
     await this.play(cardPronunciationText(card), language);
   }
 
+  async playCardWithExample(card: Card, language = 'de-DE'): Promise<void> {
+    await this.playUsage(cardPronunciationText(card), card.content.examples[0]?.target, language);
+  }
+
+  async playUsage(word: string, example: string | null | undefined, language = 'de-DE'): Promise<void> {
+    const sequence = ++this._usageSeq;
+    const exampleText = example?.trim() || null;
+    const [wordUrl, exampleUrl] = await Promise.all([
+      this.resolveUrl(word, language),
+      exampleText ? this.resolveUrl(exampleText, language) : Promise.resolve(null),
+    ]);
+    if (sequence !== this._usageSeq) return;
+    if (!wordUrl) {
+      this._playbackError.set(true);
+      return;
+    }
+    await this._playUrl(wordUrl, 1);
+    if (sequence !== this._usageSeq || !exampleText) return;
+    if (!exampleUrl) {
+      this._playbackError.set(true);
+      return;
+    }
+    await this._playUrl(exampleUrl, 1);
+  }
+
   async playPreparedCard(card: Card, language = 'de-DE'): Promise<void> {
     await this.playPrepared(cardPronunciationText(card), language);
   }
@@ -116,6 +142,7 @@ export class WordAudioService {
    * raised during resolution so callers can show a spinner.
    */
   async play(text: string, language = 'de-DE'): Promise<void> {
+    this._usageSeq++;
     const cacheKey = audioCacheKey(text, language);
     const cached = this._urlMap.get(cacheKey);
 
@@ -170,7 +197,7 @@ export class WordAudioService {
    * autoplay unlock that `new Audio()` would require on iOS.
    */
   private _playUrl(url: string, rate: number): Promise<void> {
-    this.stop();
+    this._stopPlayer();
     return new Promise(resolve => {
       const player = this._ensurePlayer();
       this._playbackError.set(false);
@@ -242,6 +269,11 @@ export class WordAudioService {
    * `rate` is the playback speed applied to the element's playbackRate.
    */
   async playTarget(text: string, language = 'de-DE', rate = 1): Promise<void> {
+    this._usageSeq++;
+    return this._playTarget(text, language, rate);
+  }
+
+  private async _playTarget(text: string, language: string, rate = 1): Promise<void> {
     const url = await this.resolveUrl(text, language);
     if (!url) {
       this._playbackError.set(true);
@@ -251,6 +283,7 @@ export class WordAudioService {
   }
 
   async playPrepared(text: string, language = 'de-DE', rate = 1): Promise<void> {
+    this._usageSeq++;
     const sequence = ++this._tapSeq;
     const url = await this.resolvePreparedUrl(text, language);
     if (sequence !== this._tapSeq) return;
@@ -262,6 +295,7 @@ export class WordAudioService {
   }
 
   async playRequired(text: string, language: string, rate = 1): Promise<void> {
+    this._usageSeq++;
     const url = await this.resolveUrl(text, language);
     if (!url) {
       this._playbackError.set(true);
@@ -513,6 +547,11 @@ export class WordAudioService {
    */
   stop(): void {
     this._tapSeq++;
+    this._usageSeq++;
+    this._stopPlayer();
+  }
+
+  private _stopPlayer(): void {
     if (this._player) {
       this._player.pause();
       this._player.currentTime = 0;

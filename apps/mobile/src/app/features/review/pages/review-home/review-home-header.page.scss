@@ -1,0 +1,70 @@
+@use 'theme/tokens' as t;
+
+.review-home__nav {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  min-height: 68px;
+  padding: calc(t.$lc-space-1 + env(safe-area-inset-top)) t.$lc-space-4 t.$lc-space-2;
+}
+
+.review-home__brand {
+  font-family: t.$lc-font-rv-display;
+  font-size: t.$lc-text-3xl;
+  font-weight: t.$lc-font-weight-semibold;
+  letter-spacing: -0.02em;
+}
+
+.review-home__nav-actions {
+  display: flex;
+  align-items: center;
+  gap: t.$lc-space-2;
+}
+
+.review-home__notifications {
+  --color: var(--lc-rv-text);
+  --padding-end: #{t.$lc-space-2};
+  --padding-start: #{t.$lc-space-2};
+  position: relative;
+  width: 40px;
+  height: 40px;
+  margin: 0;
+
+  ion-icon { font-size: t.$lc-text-3xl; }
+
+  span {
+    position: absolute;
+    top: 5px;
+    right: 5px;
+    width: 7px;
+    height: 7px;
+    border: 1px solid var(--lc-rv-bg);
+    border-radius: t.$lc-radius-full;
+    background: var(--lc-rv-mid);
+  }
+}
+
+.review-home__avatar {
+  --background: var(--lc-rv-mid);
+  --border-radius: 50%;
+  --box-shadow: none;
+  --color: var(--lc-rv-bg);
+  flex: 0 0 40px;
+  width: 40px;
+  height: 40px;
+  margin: 0;
+  font-family: t.$lc-font-rv-body;
+  font-size: t.$lc-text-md;
+  font-weight: t.$lc-font-weight-semibold;
+}
+
+.review-home__account-popover {
+  --background: var(--lc-card);
+  --box-shadow: var(--lc-shadow-float);
+  --width: min(300px, calc(100vw - 24px));
+
+  &::part(content) {
+    border: 1px solid var(--lc-border);
+    border-radius: t.$lc-radius-md + 2;
+  }
+}

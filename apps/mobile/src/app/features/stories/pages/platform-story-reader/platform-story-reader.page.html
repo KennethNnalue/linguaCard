@@ -119,8 +119,10 @@
     @if (activeTab() === 'keywords') {
       <lc-keywords-tab
         [keywords]="s.keywords"
+        [sentences]="s.sentences"
         [loading]="false"
         (wordClick)="openKeyword($event)"
+        (playAudio)="playKeywordUsage($event)"
       />
     }
 

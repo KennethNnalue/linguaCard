@@ -50,7 +50,7 @@ export const onboardingCompleteGuard: CanActivateFn = async () => {
 
   const s = settings.settings();
   if (s && s.onboardingCompletedAt !== null) {
-    return router.createUrlTree(['/home']);
+    return router.createUrlTree(['/review']);
   }
 
   return true;

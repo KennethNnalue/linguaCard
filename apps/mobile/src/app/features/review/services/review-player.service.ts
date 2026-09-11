@@ -20,9 +20,13 @@ export class ReviewPlayerService {
   readonly isLaunching = this.launching.asReadonly();
 
   async open(cards: readonly ScheduledCard[], source: ReviewSessionSource): Promise<boolean> {
-    if (cards.length === 0) return false;
+    return this.openPlanned(cards.map(card => card.id), source);
+  }
+
+  async openPlanned(cardIds: readonly string[], source: ReviewSessionSource): Promise<boolean> {
+    if (cardIds.length === 0) return false;
     return this.launch(async () => {
-      const result = await this.reviewStore.startSessionForCards(source, cards.map(card => card.id));
+      const result = await this.reviewStore.startSessionForCards(source, cardIds);
       return result.kind === 'started';
     });
   }

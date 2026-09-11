@@ -93,6 +93,9 @@
               <span class="translation">{{ w.translation }}</span>
               @if (w.exampleTarget) {
                 <span class="example">{{ w.exampleTarget }}</span>
+                @if (w.exampleNative) {
+                  <span class="example-native">{{ w.exampleNative }}</span>
+                }
               }
             </span>
             <button class="mini-play" (click)="playWord(w)" [attr.aria-label]="'platformCollectionDetail.playWordAria' | translate">
@@ -119,7 +122,16 @@
               <span class="row-body">
                 <span class="headword">{{ w.displayText }}</span>
                 <span class="translation">{{ w.translation }}</span>
+                @if (w.exampleTarget) {
+                  <span class="example">{{ w.exampleTarget }}</span>
+                  @if (w.exampleNative) {
+                    <span class="example-native">{{ w.exampleNative }}</span>
+                  }
+                }
               </span>
+              <button class="mini-play" (click)="playWord(w)" [attr.aria-label]="'platformCollectionDetail.playWordAria' | translate">
+                <ion-icon name="volume-high-outline"></ion-icon>
+              </button>
               <span class="owned-chip">{{ 'platformCollectionDetail.wordGroups.yoursChip' | translate }}</span>
             </div>
           }

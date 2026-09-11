@@ -117,6 +117,19 @@ lc-import-review ion-content::part(scroll) {
   --box-shadow: 0 -8px 40px rgba(45, 90, 78, 0.14), 0 -2px 8px rgba(0, 0, 0, 0.06);
 }
 
+/* Unified Review preferences — dark, focused bottom sheet. */
+ion-modal.lc-review-settings-modal {
+  --background: var(--lc-rv-card);
+  --border-radius: 28px 28px 0 0;
+  --box-shadow: 0 -16px 48px rgba(0, 0, 0, 0.42);
+  align-items: flex-end;
+}
+
+ion-modal.lc-review-settings-modal::part(content) {
+  border: 1px solid var(--lc-rv-border-strong);
+  border-bottom: 0;
+}
+
 /* Confirmation / alert dialogs.
  * Bind the surface and text to LDS tokens so the title and message keep readable
  * contrast in BOTH themes. Ionic's defaults render the message at a near-invisible

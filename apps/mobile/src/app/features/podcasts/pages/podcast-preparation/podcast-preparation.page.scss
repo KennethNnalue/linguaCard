@@ -22,8 +22,12 @@ ion-content { --background:var(--bg); --color:var(--text); }
 .secondary { --border-color:var(--line); --background:var(--surface); --color:var(--text); }
 .words { margin:28px 18px; }
 .words h2 { margin-top:24px; }
-.words article { display:flex; justify-content:space-between; align-items:center; padding:14px 0; border-top:1px solid var(--line); }
-.words article div { display:grid; gap:4px; }
+.words article { display:flex; align-items:flex-start; gap:10px; padding:14px 0; border-top:1px solid var(--line); }
+.words .word-copy { display:grid; flex:1; min-width:0; gap:4px; }
+.words .example,.words .example-native { overflow:hidden; font-size:.78rem; text-overflow:ellipsis; white-space:nowrap; }
+.words .example { margin-top:4px; color:var(--text); font-style:italic; }
+.words .example-native { color:var(--muted); }
 .words small { padding:5px 8px; border-radius:99px; background:var(--surface); color:var(--muted); text-transform:capitalize; }
+.word-audio { width:40px; height:40px; flex:none; margin:-7px 0 0; --padding-start:0; --padding-end:0; --color:var(--lc-ss-sage); }
 .state { display:flex; min-height:60vh; align-items:center; justify-content:center; gap:10px; text-align:center; }
 @media(max-width:500px) { .readiness{grid-template-columns:90px 1fr}.ring{width:82px}.actions{grid-template-columns:1fr} }

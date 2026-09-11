@@ -36,7 +36,7 @@ export class StudyGoalsPage {
   private saveTimer: ReturnType<typeof setTimeout> | null = null;
 
   goBack(): void {
-    void this.router.navigate(['/home']);
+    void this.router.navigate(['/review']);
   }
 
   setDailyGoal(value: number): void {

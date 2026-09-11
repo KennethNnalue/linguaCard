@@ -860,7 +860,7 @@ OUTPUT — valid JSON ONLY, no markdown fences, no commentary:
   }
 
   goBack(): void {
-    this.router.navigate(['/home']);
+    this.router.navigate(['/review']);
   }
 
   private _parseWordList(raw: string): RawWordInput[] {

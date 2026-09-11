@@ -1787,7 +1787,9 @@ export interface PodcastTopicDetail extends PodcastLibraryTopic {
 export interface PodcastPreparationVocabulary {
   lexemeId: string;
   text: string;
+  article: ArticleType;
   translation: string;
+  example: ExampleSentence | null;
   importance: PodcastVocabularyImportance;
   mastery: PodcastVocabularyMastery;
   masteryWeight: number;
@@ -1795,6 +1797,8 @@ export interface PodcastPreparationVocabulary {
 }
 
 export interface PodcastEpisodePreparation {
+  targetLanguage: LanguageCode;
+  translationLanguage: LanguageCode;
   episode: PodcastLibraryEpisode & {
     topicId: string;
     topicTitle: string;

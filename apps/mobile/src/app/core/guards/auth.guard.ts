@@ -11,5 +11,5 @@ export const AuthGuard: CanActivateFn = () => {
 export const noAuthGuard: CanActivateFn = () => {
   const auth = inject(AuthService);
   const router = inject(Router);
-  return auth.isAuthenticated() ? router.createUrlTree(['/home']) : true;
+  return auth.isAuthenticated() ? router.createUrlTree(['/review']) : true;
 };

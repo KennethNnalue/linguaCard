@@ -1,0 +1,65 @@
+<ion-content>
+  <div class="settings-sheet">
+    <div class="settings-sheet__handle" aria-hidden="true"></div>
+    <header class="settings-sheet__header">
+      <h1>{{ 'review.home.settings.title' | translate }}</h1>
+      <ion-button fill="clear" (click)="dismiss()" [attr.aria-label]="'common.close' | translate">
+        <ion-icon slot="icon-only" name="close-outline"></ion-icon>
+      </ion-button>
+    </header>
+
+    <section aria-labelledby="study-mode-label">
+      <h2 id="study-mode-label">{{ 'review.home.settings.studyMode' | translate }}</h2>
+      <ion-radio-group [(ngModel)]="mode">
+        <ion-list lines="none" class="settings-sheet__list">
+          <ion-item button="true" detail="false" (click)="mode = 'type'">
+            <ion-radio slot="start" value="type" [attr.aria-label]="'review.mode.type' | translate"></ion-radio>
+            <ion-label>
+              <span class="settings-sheet__option-copy">
+                <strong>{{ 'review.mode.type' | translate }}</strong>
+                <span>{{ 'review.mode.typeSub' | translate }}</span>
+              </span>
+            </ion-label>
+          </ion-item>
+          <ion-item button="true" detail="false" (click)="mode = 'flip'">
+            <ion-radio slot="start" value="flip" [attr.aria-label]="'review.mode.flip' | translate"></ion-radio>
+            <ion-label>
+              <span class="settings-sheet__option-copy">
+                <strong>{{ 'review.mode.flip' | translate }}</strong>
+                <span>{{ 'review.mode.flipSub' | translate }}</span>
+              </span>
+            </ion-label>
+          </ion-item>
+        </ion-list>
+      </ion-radio-group>
+    </section>
+
+    <section aria-labelledby="audio-mode-label">
+      <h2 id="audio-mode-label">{{ 'review.audioAutoplay.title' | translate }}</h2>
+      <ion-radio-group [(ngModel)]="autoplay">
+        <ion-list lines="none" class="settings-sheet__audio">
+          <ion-item button="true" detail="false" (click)="autoplay = 'off'">
+            <ion-radio slot="start" value="off" [attr.aria-label]="'review.audioAutoplay.off' | translate"></ion-radio>
+            <ion-label>{{ 'review.audioAutoplay.off' | translate }}</ion-label>
+          </ion-item>
+          <ion-item button="true" detail="false" (click)="autoplay = 'answer'">
+            <ion-radio slot="start" value="answer" [attr.aria-label]="'review.audioAutoplay.answer' | translate"></ion-radio>
+            <ion-label>{{ 'review.audioAutoplay.answer' | translate }}</ion-label>
+          </ion-item>
+          <ion-item button="true" detail="false" (click)="autoplay = 'answer_and_example'">
+            <ion-radio
+              slot="start"
+              value="answer_and_example"
+              [attr.aria-label]="'review.audioAutoplay.answer_and_example' | translate"
+            ></ion-radio>
+            <ion-label>{{ 'review.audioAutoplay.answer_and_example' | translate }}</ion-label>
+          </ion-item>
+        </ion-list>
+      </ion-radio-group>
+    </section>
+
+    <ion-button expand="block" class="settings-sheet__save" (click)="save()">
+      {{ 'common.done' | translate }}
+    </ion-button>
+  </div>
+</ion-content>

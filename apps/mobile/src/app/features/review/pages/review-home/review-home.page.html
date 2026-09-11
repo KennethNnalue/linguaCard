@@ -1,0 +1,198 @@
+<ion-header class="ion-no-border">
+  <ion-toolbar>
+    <div class="review-home__nav">
+      <span class="review-home__brand">{{ 'common.appName' | translate }}</span>
+      <div class="review-home__nav-actions">
+        <ion-button
+          fill="clear"
+          class="review-home__notifications"
+          routerLink="/notifications"
+          [attr.aria-label]="'sharing.notifications.title' | translate"
+        >
+          <ion-icon name="notifications-outline" />
+          @if (shareStore.hasPending()) { <span aria-hidden="true"></span> }
+        </ion-button>
+        <ion-fab-button
+          class="review-home__avatar"
+          (click)="toggleMenu($event)"
+          [attr.aria-expanded]="menuOpen()"
+          [attr.aria-label]="'review.home.accountMenu' | translate"
+        >
+          {{ user()?.avatarInitials ?? '?' }}
+        </ion-fab-button>
+      </div>
+    </div>
+  </ion-toolbar>
+</ion-header>
+
+<ion-popover
+  class="review-home__account-popover"
+  [isOpen]="menuOpen()"
+  [event]="menuEvent()"
+  side="bottom"
+  alignment="end"
+  (didDismiss)="closeMenu()"
+>
+  <ng-template>
+    <lc-user-menu
+      (closed)="closeMenu()"
+      (resetRequested)="openResetSheet()"
+      (accountDeletionRequested)="openDeleteAccountSheet()"
+    />
+  </ng-template>
+</ion-popover>
+
+<ion-content>
+  <ion-refresher slot="fixed" (ionRefresh)="handleRefresh($event)">
+    <ion-refresher-content />
+  </ion-refresher>
+
+  <main class="review-home">
+    @if (store.viewModel(); as vm) {
+      @switch (vm.kind) {
+        @case ('loading') {
+          <section class="review-home__state review-home__state--loading" aria-live="polite">
+            <ion-spinner name="crescent" />
+            <p>{{ 'review.home.loading' | translate }}</p>
+          </section>
+        }
+        @case ('ready') {
+          <section class="review-home__hero">
+            <span class="review-home__eyebrow">{{ 'review.home.today' | translate }}</span>
+            <h1>{{ 'review.home.readyTitle' | translate }}</h1>
+            <p>{{ 'review.home.cardsAndMinutes' | translate:{cards: vm.plan.cardIds.length, minutes: vm.plan.estimatedMinutes} }}</p>
+            <ion-button expand="block" class="review-home__primary" [disabled]="reviewLaunching()" (click)="performPrimaryAction(vm)">
+              @if (reviewLaunching()) { <ion-spinner name="crescent" /> }
+              @else { {{ 'review.home.start' | translate }} <ion-icon slot="end" name="arrow-forward-outline" /> }
+            </ion-button>
+          </section>
+
+          <ion-item button="true" detail="false" class="review-home__preference" (click)="openReviewSettings()">
+            <ion-icon slot="start" name="settings-outline" />
+            <ion-label>
+            @for (key of preferenceLabel(vm).split('|'); track key) {
+              <span>{{ key | translate }}@if (!$last) { · }</span>
+            }
+            </ion-label>
+            <ion-icon slot="end" name="chevron-forward-outline" />
+          </ion-item>
+
+          <nav class="review-home__links" aria-label="Review links">
+            <ion-item button="true" detail="false" (click)="openProgress()">
+              <span slot="start" class="review-home__progress-ring">{{ vm.completedToday }}</span>
+              <ion-label>{{ 'review.home.todayProgress' | translate:{completed: vm.completedToday, goal: vm.goal} }}</ion-label>
+              <ion-icon slot="end" name="chevron-forward-outline" />
+            </ion-item>
+            <ion-item button="true" detail="false" (click)="openMorePractice()">
+              <ion-icon slot="start" name="book-outline" />
+              <ion-label>{{ 'review.home.morePractice' | translate }}</ion-label>
+              <ion-icon slot="end" name="chevron-forward-outline" />
+            </ion-item>
+          </nav>
+        }
+        @case ('resume') {
+          <section class="review-home__hero review-home__hero--resume">
+            <span class="review-home__eyebrow">{{ 'review.home.inProgress' | translate }}</span>
+            <h1>{{ 'review.home.resumeTitle' | translate }}</h1>
+            <p>{{ 'review.home.cardsLeftAndMinutes' | translate:{cards: vm.remainingCards, minutes: vm.estimatedMinutes} }}</p>
+            <ion-progress-bar [value]="vm.sessionProgress" />
+            <ion-button expand="block" class="review-home__primary" [disabled]="reviewLaunching()" (click)="performPrimaryAction(vm)">
+              @if (reviewLaunching()) { <ion-spinner name="crescent" /> }
+              @else { {{ 'review.home.resume' | translate }} }
+            </ion-button>
+          </section>
+          <ion-item button="true" detail="false" class="review-home__preference" (click)="openReviewSettings()">
+            <ion-icon slot="start" name="settings-outline" />
+            <ion-label>
+            @for (key of preferenceLabel(vm).split('|'); track key) {
+              <span>{{ key | translate }}@if (!$last) { · }</span>
+            }
+            </ion-label>
+            <ion-icon slot="end" name="chevron-forward-outline" />
+          </ion-item>
+          <ion-item button="true" detail="false" class="review-home__daily-summary" (click)="openProgress()">
+            <span><ion-icon name="stats-chart-outline" />{{ 'review.home.todayProgress' | translate:{completed: vm.completedToday, goal: vm.goal} }}</span>
+            <span>
+              <ion-icon name="flame-outline" />
+              {{ 'review.home.streak' | translate:{count: vm.streak} }}
+              <ion-icon size="small" name="chevron-forward-outline" />
+            </span>
+          </ion-item>
+          <ion-item button="true" detail="false" class="review-home__more" (click)="openMorePractice()">
+            <ion-icon slot="start" name="ellipsis-horizontal-circle-outline" />
+            <ion-label>{{ 'review.home.morePractice' | translate }}</ion-label>
+            <ion-icon slot="end" name="chevron-forward-outline" />
+          </ion-item>
+        }
+        @case ('complete') {
+          <section class="review-home__hero review-home__hero--complete">
+            <span class="review-home__complete-icon"><ion-icon name="checkmark-outline" /></span>
+            <span class="review-home__eyebrow">{{ 'review.home.complete' | translate }}</span>
+            <h1>{{ 'review.home.completeTitle' | translate }}</h1>
+            <p>{{ 'review.home.reviewed' | translate:{count: vm.reviewedToday} }}</p>
+          </section>
+          <div class="review-home__summary">
+            <span><ion-icon name="stats-chart-outline" />{{ 'review.home.goalComplete' | translate }}</span>
+            <span><ion-icon name="flame-outline" />{{ 'review.home.streak' | translate:{count: vm.streak} }}</span>
+          </div>
+          <nav class="review-home__links" aria-label="Review links">
+            <ion-item button="true" detail="false" (click)="openProgress()"><ion-icon slot="start" name="stats-chart-outline" /><ion-label>{{ 'review.home.viewProgress' | translate }}</ion-label><ion-icon slot="end" name="chevron-forward-outline" /></ion-item>
+            <ion-item button="true" detail="false" (click)="openMorePractice()"><ion-icon slot="start" name="book-outline" /><ion-label>{{ 'review.home.optionalPractice' | translate }}</ion-label><ion-icon slot="end" name="chevron-forward-outline" /></ion-item>
+          </nav>
+        }
+        @case ('empty') {
+          <section class="review-home__empty">
+            <span class="review-home__empty-illustration" aria-hidden="true">
+              <ion-icon name="copy-outline" />
+              <ion-icon name="reorder-two-outline" />
+            </span>
+            <span class="review-home__eyebrow">{{ 'review.home.getStarted' | translate }}</span>
+            <h1>{{ 'review.home.emptyTitle' | translate }}</h1>
+            <p>{{ 'review.home.emptySupport' | translate }}</p>
+            <div class="review-home__empty-actions">
+              <ion-button
+                expand="block"
+                class="review-home__primary"
+                routerLink="/vault"
+                [queryParams]="{view: 'explore'}"
+              >
+                {{ 'review.home.importPlatformCollection' | translate }}
+                <ion-icon slot="end" name="chevron-forward-outline" />
+              </ion-button>
+              <ion-button expand="block" fill="outline" class="review-home__secondary" routerLink="/vault/import">
+                <ion-icon slot="start" name="document-outline" />
+                {{ 'review.home.importPersonalCollection' | translate }}
+              </ion-button>
+              <ion-button fill="clear" class="review-home__tertiary" (click)="performPrimaryAction(vm)">
+                <ion-icon slot="start" name="add-circle-outline" />
+                {{ 'review.home.addWords' | translate }}
+              </ion-button>
+            </div>
+          </section>
+        }
+        @case ('nothing-eligible') {
+          <section class="review-home__hero review-home__hero--message">
+            <span class="review-home__complete-icon"><ion-icon name="checkmark-outline" /></span>
+            <span class="review-home__eyebrow">{{ 'review.home.caughtUp' | translate }}</span>
+            <h1>{{ 'review.home.nothingDueTitle' | translate }}</h1>
+            <p>{{ 'review.home.nothingDueSupport' | translate }}</p>
+          </section>
+          <nav class="review-home__links" aria-label="Review links">
+            <ion-item button="true" detail="false" (click)="openMorePractice()"><ion-icon slot="start" name="book-outline" /><ion-label>{{ 'review.home.morePractice' | translate }}</ion-label><ion-icon slot="end" name="chevron-forward-outline" /></ion-item>
+            <ion-item button="true" detail="false" (click)="performPrimaryAction(vm)"><ion-icon slot="start" name="book-outline" /><ion-label>{{ 'review.home.addWords' | translate }}</ion-label><ion-icon slot="end" name="chevron-forward-outline" /></ion-item>
+          </nav>
+        }
+        @case ('error') {
+          <section class="review-home__hero review-home__hero--message">
+            <span class="review-home__eyebrow">{{ 'review.home.tryAgain' | translate }}</span>
+            <h1>{{ 'review.home.errorTitle' | translate }}</h1>
+            <p>{{ 'review.home.errorSupport' | translate }}</p>
+            <ion-button expand="block" class="review-home__primary" (click)="performPrimaryAction(vm)">
+              <ion-icon name="refresh-outline" />{{ 'review.home.retry' | translate }}
+            </ion-button>
+          </section>
+        }
+      }
+    }
+  </main>
+</ion-content>

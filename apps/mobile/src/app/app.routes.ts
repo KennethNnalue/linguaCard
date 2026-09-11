@@ -7,7 +7,7 @@ import {TabsPage} from './tabs/tabs.page';
 export const routes: Routes = [
   {
     path: '',
-    redirectTo: 'home',
+    redirectTo: 'review',
     pathMatch: 'full',
   },
   {
@@ -28,8 +28,8 @@ export const routes: Routes = [
     children: [
       {
         path: 'home',
-        loadComponent: () =>
-          import('./features/home/pages/home/home.page').then(m => m.HomePage),
+        redirectTo: 'review',
+        pathMatch: 'full',
       },
       {
         path: 'vault',
@@ -90,7 +90,12 @@ export const routes: Routes = [
         path: 'review',
         data: { preload: true },
         loadComponent: () =>
-          import('./features/review/pages/review-hub/review-hub.page').then(m => m.ReviewHubPage),
+          import('./features/review/pages/review-home/review-home.page').then(m => m.ReviewHomePage),
+      },
+      {
+        path: 'review/more',
+        loadComponent: () =>
+          import('./features/review/pages/more-practice/more-practice.page').then(m => m.MorePracticePage),
       },
       {
         path: 'review/player',
@@ -290,6 +295,6 @@ export const routes: Routes = [
   },
   {
     path: '**',
-    redirectTo: 'home',
+    redirectTo: 'review',
   },
 ];

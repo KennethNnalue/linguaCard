@@ -1,0 +1,259 @@
+@use 'theme/tokens' as t;
+
+:host {
+  display: block;
+  color: var(--lc-rv-text);
+  font-family: t.$lc-font-rv-body;
+}
+
+ion-header,
+ion-toolbar,
+ion-content {
+  --background: var(--lc-rv-bg);
+  --color: var(--lc-rv-text);
+}
+
+.review-home {
+  display: grid;
+  gap: t.$lc-space-4;
+  width: min(100%, 680px);
+  margin: 0 auto;
+  padding: t.$lc-space-5 t.$lc-space-4 calc(t.$lc-space-10 + env(safe-area-inset-bottom));
+}
+
+.review-home__hero {
+  display: grid;
+  gap: t.$lc-space-4;
+  padding: t.$lc-space-10 t.$lc-space-5 t.$lc-space-6;
+  overflow: hidden;
+  border: 1px solid var(--lc-rv-border);
+  border-radius: t.$lc-radius-xl;
+  background: var(--lc-rv-card);
+  text-align: center;
+
+  h1 {
+    margin: t.$lc-space-1 0 0;
+    color: var(--lc-rv-text);
+    font-family: t.$lc-font-rv-display;
+    font-size: t.$lc-text-7xl;
+    font-weight: t.$lc-font-weight-semibold;
+    line-height: 1.05;
+    letter-spacing: -0.035em;
+  }
+
+  p {
+    margin: 0 0 t.$lc-space-4;
+    color: var(--lc-rv-text-soft);
+    font-size: t.$lc-text-xl;
+    line-height: 1.45;
+  }
+
+}
+
+.review-home__hero--resume {
+  gap: t.$lc-space-5;
+  padding: t.$lc-space-8 t.$lc-space-6 t.$lc-space-6;
+  text-align: start;
+
+  h1 {
+    margin: 0;
+    font-size: t.$lc-text-7xl;
+    line-height: 1.08;
+  }
+
+  p {
+    margin: 0;
+    color: var(--lc-rv-text);
+    font-size: t.$lc-text-xl;
+  }
+
+  .review-home__eyebrow { color: var(--lc-rv-mid); }
+
+  ion-progress-bar {
+    --background: var(--lc-rv-inset);
+    --progress-background: var(--lc-rv-mid);
+    height: 9px;
+    border-radius: t.$lc-radius-full;
+  }
+}
+
+.review-home__hero--complete,
+.review-home__hero--message { padding-bottom: t.$lc-space-8; }
+
+.review-home__eyebrow {
+  color: var(--lc-rv-brass-ink);
+  font-family: t.$lc-font-rv-mono;
+  font-size: t.$lc-text-xxs;
+  font-weight: t.$lc-font-weight-semibold;
+  letter-spacing: 0.24em;
+  text-transform: uppercase;
+}
+
+.review-home__primary {
+  --background: var(--lc-rv-mid);
+  --background-hover: var(--lc-rv-mid-soft);
+  --background-activated: var(--lc-rv-mid-soft);
+  --color: var(--lc-rv-bg);
+  --border-radius: #{t.$lc-radius-md};
+  --box-shadow: none;
+  min-height: 58px;
+  margin: 0;
+  font-family: t.$lc-font-rv-body;
+  font-size: t.$lc-text-lg;
+  font-weight: t.$lc-font-weight-semibold;
+
+  ion-spinner { width: 20px; height: 20px; }
+}
+
+.review-home__complete-icon {
+  display: grid;
+  width: 64px;
+  height: 64px;
+  margin: 0 auto t.$lc-space-2;
+  place-items: center;
+  border: 2px solid var(--lc-rv-mid);
+  border-radius: t.$lc-radius-full;
+  color: var(--lc-rv-mid);
+  font-size: t.$lc-text-7xl;
+}
+
+.review-home__preference,
+.review-home__links ion-item,
+.review-home__more {
+  --padding-start: #{t.$lc-space-4};
+  --inner-padding-end: #{t.$lc-space-4};
+  --color: var(--lc-rv-text);
+  width: 100%;
+  min-height: 72px;
+  margin: 0;
+}
+
+.review-home__preference {
+  --background: var(--lc-rv-card-alt);
+  --border-color: var(--lc-rv-border);
+  --border-style: solid;
+  --border-width: 1px;
+  --border-radius: #{t.$lc-radius-lg};
+
+  ion-icon[slot='start'] { margin-right: t.$lc-space-3; color: var(--lc-rv-mid); font-size: t.$lc-text-8xl; }
+  ion-icon[slot='end'] { color: var(--lc-rv-muted); }
+  ion-label { color: var(--lc-rv-text); }
+}
+
+.review-home__links {
+  display: grid;
+  border-top: 1px solid var(--lc-rv-border);
+
+  ion-item {
+    --background: transparent;
+    --border-radius: 0;
+    --border-color: var(--lc-rv-border);
+    --border-style: solid;
+    --border-width: 0 0 1px 0;
+    font-size: t.$lc-text-xl;
+
+    ion-icon[slot='start'] { color: var(--lc-rv-mid); font-size: t.$lc-text-5xl; }
+    ion-icon[slot='end'] { color: var(--lc-rv-muted); }
+  }
+}
+
+.review-home__daily-summary {
+  --padding-start: 0;
+  --padding-end: 0;
+  --background: var(--lc-rv-card-alt);
+  --border-color: var(--lc-rv-border);
+  --border-style: solid;
+  --border-width: 1px;
+  --border-radius: #{t.$lc-radius-lg};
+  --color: var(--lc-rv-text);
+  --inner-padding-end: 0;
+  width: 100%;
+  min-height: 74px;
+  margin: 0;
+
+  span {
+    display: flex;
+    flex: 1;
+    align-items: center;
+    justify-content: center;
+    gap: t.$lc-space-3;
+    min-width: 0;
+    font-size: t.$lc-text-xl;
+
+    + span { border-left: 1px solid var(--lc-rv-border); }
+  }
+
+  ion-icon { color: var(--lc-rv-mid); font-size: t.$lc-text-7xl; }
+  span:last-child ion-icon { color: var(--lc-rv-brass-ink); }
+}
+
+.review-home__more {
+  --background: var(--lc-rv-card-alt);
+  --border-color: var(--lc-rv-border);
+  --border-style: solid;
+  --border-width: 1px;
+  --border-radius: #{t.$lc-radius-lg};
+  --padding-start: #{t.$lc-space-4};
+  --inner-padding-end: #{t.$lc-space-4};
+  font-size: t.$lc-text-xl;
+
+  ion-icon[slot='start'] { margin-right: t.$lc-space-3; color: var(--lc-rv-mid); font-size: t.$lc-text-8xl; }
+  ion-icon[slot='end'] { color: var(--lc-rv-muted); }
+}
+
+.review-home__progress-ring {
+  display: grid;
+  width: 30px;
+  height: 30px;
+  place-items: center;
+  border: 3px solid var(--lc-rv-mid);
+  border-radius: t.$lc-radius-full;
+  color: var(--lc-rv-text-soft);
+  font-size: t.$lc-text-xs;
+}
+
+.review-home__summary {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  padding: t.$lc-space-4 0;
+  border: 1px solid var(--lc-rv-border);
+  border-radius: t.$lc-radius-lg;
+  background: var(--lc-rv-card-alt);
+
+  span {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: t.$lc-space-2;
+    min-height: 42px;
+    color: var(--lc-rv-text-soft);
+    text-align: center;
+
+    + span { border-left: 1px solid var(--lc-rv-border); }
+  }
+
+  ion-icon { color: var(--lc-rv-brass-ink); }
+}
+
+.review-home__state--loading {
+  display: grid;
+  min-height: 45vh;
+  place-content: center;
+  justify-items: center;
+  color: var(--lc-rv-muted);
+
+  ion-spinner { color: var(--lc-rv-mid); }
+}
+
+@media (min-width: 600px) {
+  .review-home { padding-inline: t.$lc-space-8; }
+}
+
+@media (max-width: 390px) {
+  .review-home__hero--resume { padding-inline: t.$lc-space-5; }
+  .review-home__daily-summary span { font-size: t.$lc-text-lg; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  * { scroll-behavior: auto; }
+}

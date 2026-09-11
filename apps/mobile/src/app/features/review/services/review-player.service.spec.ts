@@ -6,6 +6,47 @@ import { ReviewPlayerService } from './review-player.service';
 import { ReviewPrefsService } from './review-prefs.service';
 
 describe('ReviewPlayerService launch', () => {
+  it('starts a planned session with the exact ordered card ids', async () => {
+    const startSessionForCards = jest.fn().mockResolvedValue({kind: 'nothing_eligible'});
+    const create = jest.fn();
+    TestBed.configureTestingModule({
+      providers: [
+        ReviewPlayerService,
+        {provide: ModalController, useValue: {create}},
+        {provide: ReviewStore, useValue: {startSessionForCards}},
+        {provide: Router, useValue: {}},
+        {provide: ReviewPrefsService, useValue: {mode: () => 'flip'}},
+      ],
+    });
+    const service = TestBed.inject(ReviewPlayerService);
+    const cardIds = ['card-b', 'card-a'];
+
+    await expect(service.openPlanned(cardIds, {kind: 'daily'})).resolves.toBe(false);
+
+    expect(startSessionForCards).toHaveBeenCalledWith({kind: 'daily'}, cardIds);
+    expect(create).not.toHaveBeenCalled();
+  });
+
+  it('does not start or present an empty planned session', async () => {
+    const startSessionForCards = jest.fn();
+    const create = jest.fn();
+    TestBed.configureTestingModule({
+      providers: [
+        ReviewPlayerService,
+        {provide: ModalController, useValue: {create}},
+        {provide: ReviewStore, useValue: {startSessionForCards}},
+        {provide: Router, useValue: {}},
+        {provide: ReviewPrefsService, useValue: {mode: () => 'flip'}},
+      ],
+    });
+    const service = TestBed.inject(ReviewPlayerService);
+
+    await expect(service.openPlanned([], {kind: 'daily'})).resolves.toBe(false);
+
+    expect(startSessionForCards).not.toHaveBeenCalled();
+    expect(create).not.toHaveBeenCalled();
+  });
+
   it('keeps the current page visible until session preparation finishes', async () => {
     let finishStart: (result: {kind: 'nothing_eligible'}) => void = () => undefined;
     const startResult = new Promise<{kind: 'nothing_eligible'}>(resolve => {

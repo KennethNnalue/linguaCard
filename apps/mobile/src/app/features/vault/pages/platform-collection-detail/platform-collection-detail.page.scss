@@ -322,6 +322,12 @@
   @include u.text-overflow;
 }
 
+.example-native {
+  @include u.lc-font('xs');
+  color: var(--lc-text-hint);
+  @include u.text-overflow;
+}
+
 .mini-play {
   @include u.square(30px);
   @include u.flex-center;

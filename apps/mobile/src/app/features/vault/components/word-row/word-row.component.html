@@ -7,6 +7,12 @@
     <span class="body">
       <span class="headword">{{ card().content.back }}</span>
       <span class="translation">{{ card().content.front }}</span>
+      @if (card().content.examples[0]; as example) {
+        <span class="example-target">{{ example.target }}</span>
+        @if (example.native) {
+          <span class="example-native">{{ example.native }}</span>
+        }
+      }
     </span>
 
     @if (isDue()) {

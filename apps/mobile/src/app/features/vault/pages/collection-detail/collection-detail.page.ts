@@ -481,7 +481,7 @@ export class CollectionDetailPage implements OnInit {
   }
 
   playPronunciation(card: ScheduledCard): void {
-    void this.wordAudio.playCard(card, this.targetLocale());
+    void this.wordAudio.playCardWithExample(card, this.targetLocale());
   }
 
   private reviewCards(): ScheduledCard[] {

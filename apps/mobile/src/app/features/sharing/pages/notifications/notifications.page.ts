@@ -35,7 +35,7 @@ const STATUS_LABEL_KEYS: Record<ShareStatus, string> = {
     <ion-header>
       <ion-toolbar>
         <ion-buttons slot="start">
-          <ion-back-button defaultHref="/home" />
+          <ion-back-button defaultHref="/review" />
         </ion-buttons>
         <ion-title>{{ 'sharing.notifications.title' | translate }}</ion-title>
       </ion-toolbar>

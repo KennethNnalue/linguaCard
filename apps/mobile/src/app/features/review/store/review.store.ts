@@ -302,7 +302,30 @@ export const ReviewStore = signalStore(
             manuallyMasteredCardIds: session.manuallyMasteredCardIds ?? [],
           }));
         const committedEvents = (await reviewLocal.committedEvents(userId)).filter(isCommittedReviewEvent);
-        patchState(store, { sessionHistory: sessions, committedEvents });
+        let activeSessionState: Partial<ReviewState> = {};
+        try {
+          const persisted = await localData.getActiveReviewSession(userId);
+          if (persisted) {
+            const session = deserializeReviewSessionState(persisted.session);
+            const startedAtIsValid = Number.isFinite(session.definition.startedAt.getTime());
+            if (session.status === 'active' && startedAtIsValid) {
+              activeSessionState = {
+                session,
+                presentation: null,
+                operation: { kind: 'idle' },
+                sessionRatings: persisted.ratings,
+                sessionNewCardCount: persisted.newCardCount,
+              };
+            } else {
+              await localData.clearActiveReviewSession(userId);
+            }
+          }
+        } catch {
+          activeSessionState = {
+            commitError: 'The saved review session could not be restored.',
+          };
+        }
+        patchState(store, { sessionHistory: sessions, committedEvents, ...activeSessionState });
         if ((await reviewLocal.pendingCommits(userId)).length > 0) {
           await syncService.enqueue({ type: SyncOperationType.FLUSH_REVIEW_COMMITS, payload: { userId } });
         }
@@ -311,6 +334,7 @@ export const ReviewStore = signalStore(
         }
       },
       async startSession(source: ReviewSessionSource, limit: number): Promise<ReviewSessionStartResult> {
+        if (store.session()?.status === 'active') return { kind: 'cancelled' };
         const startSequence = beginSessionStart();
         patchState(store, {
           session: null, presentation: null, operation: { kind: 'starting' }, sessionRatings: {},
@@ -359,6 +383,7 @@ export const ReviewStore = signalStore(
         return result;
       },
       async startSessionForCards(source: ReviewSessionSource, cardIds: readonly string[]): Promise<ReviewSessionStartResult> {
+        if (store.session()?.status === 'active') return { kind: 'cancelled' };
         const startSequence = beginSessionStart();
         patchState(store, {
           session: null, presentation: null, operation: { kind: 'starting' }, sessionRatings: {},

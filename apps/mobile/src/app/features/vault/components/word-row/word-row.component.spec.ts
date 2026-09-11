@@ -26,6 +26,16 @@ describe('WordRowComponent', () => {
     expect(article?.classList.contains('badge--die')).toBe(true);
   });
 
+  it('renders the first bilingual usage example', () => {
+    fixture.detectChanges();
+
+    const target = fixture.nativeElement.querySelector('.example-target');
+    const native = fixture.nativeElement.querySelector('.example-native');
+
+    expect(target?.textContent.trim()).toBe(MOCK_CARDS[0].content.examples[0]?.target);
+    expect(native?.textContent.trim()).toBe(MOCK_CARDS[0].content.examples[0]?.native);
+  });
+
   it('emits pronunciation separately from opening the card', () => {
     const playAudio = jest.spyOn(fixture.componentInstance.playAudio, 'emit');
     const rowClick = jest.spyOn(fixture.componentInstance.rowClick, 'emit');

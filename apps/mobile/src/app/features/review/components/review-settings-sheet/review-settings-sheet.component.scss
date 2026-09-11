@@ -1,0 +1,119 @@
+@use 'theme/tokens' as t;
+
+:host,
+ion-content {
+  --background: var(--lc-rv-card);
+  color: var(--lc-rv-text);
+  font-family: t.$lc-font-rv-body;
+}
+
+.settings-sheet {
+  display: grid;
+  gap: t.$lc-space-5;
+  padding: t.$lc-space-2 t.$lc-space-5 calc(t.$lc-space-6 + env(safe-area-inset-bottom));
+}
+
+.settings-sheet__handle {
+  width: 44px;
+  height: 5px;
+  margin: 0 auto;
+  border-radius: t.$lc-radius-full;
+  background: var(--lc-rv-hint);
+}
+
+.settings-sheet__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  h1 {
+    margin: 0;
+    color: var(--lc-rv-text);
+    font-family: t.$lc-font-rv-display;
+    font-size: t.$lc-text-7xl;
+    font-weight: t.$lc-font-weight-semibold;
+  }
+
+  ion-button {
+    --color: var(--lc-rv-text-soft);
+    margin: 0 -#{t.$lc-space-3} 0 0;
+  }
+}
+
+section {
+  display: grid;
+  gap: t.$lc-space-3;
+}
+
+h2 {
+  margin: 0;
+  color: var(--lc-rv-text-soft);
+  font-size: t.$lc-text-xl;
+}
+
+ion-list {
+  padding: 0;
+  overflow: hidden;
+  border: 1px solid var(--lc-rv-border-strong);
+  border-radius: t.$lc-radius-lg;
+  background: transparent;
+}
+
+ion-item {
+  --background: transparent;
+  --background-hover: var(--lc-rv-inset);
+  --color: var(--lc-rv-text);
+  --min-height: 64px;
+  --padding-start: #{t.$lc-space-4};
+  --inner-padding-end: #{t.$lc-space-4};
+  border-bottom: 1px solid var(--lc-rv-border);
+
+  &:last-child { border-bottom: 0; }
+}
+
+ion-radio {
+  --color: var(--lc-rv-muted);
+  --color-checked: var(--lc-rv-mid);
+  margin-inline-end: t.$lc-space-4;
+}
+
+ion-label {
+  white-space: normal;
+}
+
+.settings-sheet__option-copy {
+  display: flex;
+  flex-direction: column;
+  gap: t.$lc-space-1;
+
+  strong {
+    display: block;
+    color: var(--lc-rv-text);
+    font-weight: t.$lc-font-weight-medium;
+    line-height: 1.3;
+  }
+
+  > span {
+    display: block;
+    color: var(--lc-rv-muted);
+    font-size: t.$lc-text-md;
+    line-height: 1.4;
+  }
+}
+
+.settings-sheet__audio ion-item { --min-height: 54px; }
+
+.settings-sheet__save {
+  --background: var(--lc-rv-mid);
+  --color: var(--lc-rv-bg);
+  --border-radius: #{t.$lc-radius-md};
+  --box-shadow: none;
+  min-height: 56px;
+  margin: 0;
+  font-weight: t.$lc-font-weight-semibold;
+}
+
+@media (max-height: 680px) {
+  .settings-sheet { gap: t.$lc-space-3; }
+  ion-item { --min-height: 52px; }
+}

@@ -124,4 +124,27 @@ describe('WordAudioService prepared audio', () => {
 
     expect(api.batchResolve).not.toHaveBeenCalled();
   });
+
+  it('plays a headword followed by its usage example', async () => {
+    const play = jest.spyOn(HTMLMediaElement.prototype, 'play').mockImplementation(function (this: HTMLMediaElement) {
+      queueMicrotask(() => this.dispatchEvent(new Event('ended')));
+      return Promise.resolve();
+    });
+    const pause = jest.spyOn(HTMLMediaElement.prototype, 'pause').mockImplementation(() => undefined);
+    const service = TestBed.inject(WordAudioService);
+    const resolveUrl = jest.spyOn(service, 'resolveUrl')
+      .mockResolvedValueOnce('blob:word')
+      .mockResolvedValueOnce('blob:example');
+
+    try {
+      await service.playUsage('die Rechnung', 'Die Rechnung, bitte.', 'de-DE');
+
+      expect(resolveUrl).toHaveBeenNthCalledWith(1, 'die Rechnung', 'de-DE');
+      expect(resolveUrl).toHaveBeenNthCalledWith(2, 'Die Rechnung, bitte.', 'de-DE');
+      expect(play).toHaveBeenCalledTimes(2);
+    } finally {
+      play.mockRestore();
+      pause.mockRestore();
+    }
+  });
 });

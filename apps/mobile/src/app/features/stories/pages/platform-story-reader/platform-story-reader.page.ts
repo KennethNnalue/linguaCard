@@ -33,7 +33,7 @@ import { StoryAudioEngine } from '../../services/story-audio-engine.service';
 import { StoryReaderInteractionService } from '../../services/story-reader-interaction.service';
 import { WordAudioService } from '../../../../shared/audio/word-audio.service';
 import { QuizTabComponent } from '../../components/quiz-tab/quiz-tab.component';
-import { KeywordsTabComponent } from '../../components/keywords-tab/keywords-tab.component';
+import { KeywordsTabComponent, StoryKeywordUsage } from '../../components/keywords-tab/keywords-tab.component';
 import { GrammarTabComponent } from '../../components/grammar-tab/grammar-tab.component';
 import { ButtonComponent } from '../../../../shared/ui/button/button.component';
 import { StoryWordSheetService } from '../../services/story-word-sheet.service';
@@ -277,6 +277,10 @@ export class PlatformStoryReaderPage implements OnInit, ViewWillLeave {
   openKeyword(keyword: StoryKeyword): void {
     this.activeTab.set('story');
     this.interaction.openKeyword(keyword);
+  }
+
+  playKeywordUsage(usage: StoryKeywordUsage): void {
+    void this.wordAudio.playUsage(usage.keyword.german, usage.example?.german, 'de-DE');
   }
 
   tapWord(sentenceIdx: number, token: WordToken): void {

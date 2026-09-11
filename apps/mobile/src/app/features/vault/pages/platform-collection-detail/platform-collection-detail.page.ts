@@ -69,7 +69,7 @@ export class PlatformCollectionDetailPage {
     const text = (w.article ? `${w.article} ` : '') + w.displayText;
     const localeByLanguage: Record<string, string> = { de: 'de-DE', en: 'en-US', es: 'es-ES', ar: 'ar-SA' };
     const targetLanguage = this.detail()?.targetLanguage ?? 'de';
-    void this.wordAudio.play(text, localeByLanguage[targetLanguage] ?? targetLanguage);
+    void this.wordAudio.playUsage(text, w.exampleTarget, localeByLanguage[targetLanguage] ?? targetLanguage);
   }
 
   constructor() {

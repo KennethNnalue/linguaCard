@@ -2,17 +2,21 @@ import { ChangeDetectionStrategy, Component, ElementRef, inject, OnInit, viewChi
 import { ActivatedRoute, Router } from '@angular/router';
 import { IonButton, IonContent, IonIcon, IonSpinner } from '@ionic/angular';
 import { addIcons } from 'ionicons';
-import { arrowBackOutline, libraryOutline, play, schoolOutline } from 'ionicons/icons';
+import { arrowBackOutline, libraryOutline, play, schoolOutline, volumeHighOutline } from 'ionicons/icons';
+import type { PodcastPreparationVocabulary } from '@lingua-card/shared/domain';
+import { TranslatePipe } from '@ngx-translate/core';
 import { ReviewPlayerService } from '../../../review/services/review-player.service';
 import { PodcastCatalogueStore } from '../../store/podcast-catalogue.store';
 import { CardStore } from '../../../vault/store/card.store';
 import { CollectionStore } from '../../../vault/store/collection.store';
 import { VaultV2Store } from '../../../vault/store/vault-v2.store';
 import { OfflineImageDirective } from '../../../../shared/image/offline-image.directive';
+import { ArticleBadgeComponent } from '../../../../shared/components/article-badge/article-badge.component';
+import { WordAudioService } from '../../../../shared/audio/word-audio.service';
 
 @Component({
   selector: 'lc-podcast-preparation', standalone: true,
-  imports: [IonButton, IonContent, IonIcon, IonSpinner, OfflineImageDirective],
+  imports: [ArticleBadgeComponent, IonButton, IonContent, IonIcon, IonSpinner, OfflineImageDirective, TranslatePipe],
   providers: [PodcastCatalogueStore], templateUrl: './podcast-preparation.page.html',
   styleUrls: ['./podcast-preparation.page.scss', './podcast-preparation-actions.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -25,9 +29,10 @@ export class PodcastPreparationPage implements OnInit {
   private readonly cardStore = inject(CardStore);
   private readonly collectionStore = inject(CollectionStore);
   private readonly vaultStore = inject(VaultV2Store);
+  private readonly wordAudio = inject(WordAudioService);
   private readonly wordList = viewChild<ElementRef<HTMLElement>>('wordList');
   constructor() {
-    addIcons({ arrowBackOutline, libraryOutline, play, schoolOutline });
+    addIcons({ arrowBackOutline, libraryOutline, play, schoolOutline, volumeHighOutline });
   }
   ngOnInit(): void { this.store.loadPreparation(this.route.snapshot.paramMap.get('episodeId') ?? ''); }
   goBack(topicId: string): void { void this.router.navigate(['/podcasts/topics', topicId]); }
@@ -61,10 +66,22 @@ export class PodcastPreparationPage implements OnInit {
     await this.router.navigate(['/vault/collections', collectionId]);
   }
 
+  playVocabulary(item: PodcastPreparationVocabulary): void {
+    const prep = this.store.preparation();
+    const language = this.targetLocale(prep?.targetLanguage ?? 'de');
+    const word = `${item.article ? `${item.article} ` : ''}${item.text}`;
+    void this.wordAudio.playUsage(word, item.example?.target, language);
+  }
+
   private async refreshVaultState(): Promise<void> {
     this.collectionStore.loadCollections();
     this.vaultStore.reset();
     this.vaultStore.ensureActiveVault();
     await this.cardStore.loadCards();
+  }
+
+  private targetLocale(language: string): string {
+    const locales: Record<string, string> = { de: 'de-DE', en: 'en-US', es: 'es-ES', ar: 'ar-SA' };
+    return locales[language] ?? language;
   }
 }

@@ -10,18 +10,27 @@
   </div>
 } @else {
   <div class="ss-kw-list">
-    @for (kw of keywords(); track kw.germanBase) {
-      <div class="ss-kw-row" (click)="wordClick.emit(kw)" role="button"
-           [attr.aria-label]="kw.german">
-        <div class="ss-kw-info">
-          <div class="ss-kw-word">{{ kw.german }}</div>
-          <div class="ss-kw-gloss">{{ kw.translation }}</div>
-        </div>
-        <span class="ss-kw-type" [class.verb]="isVerb(kw)">{{ 'stories.wordType.' + kw.wordType | translate }}</span>
-        <svg class="ss-kw-chevron" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-          <polyline points="9,6 15,12 9,18"/>
-        </svg>
-      </div>
+    @for (usage of keywordUsages(); track usage.keyword.germanBase) {
+      <article class="ss-kw-row">
+        <button class="ss-kw-main" type="button" (click)="wordClick.emit(usage.keyword)" [attr.aria-label]="usage.keyword.german">
+          <lc-article-badge [article]="usage.keyword.article" />
+          <span class="ss-kw-info">
+            <span class="ss-kw-word">{{ usage.keyword.article ? usage.keyword.germanBase : usage.keyword.german }}</span>
+            <span class="ss-kw-gloss">{{ usage.keyword.translation }}</span>
+            @if (usage.example; as example) {
+              <span class="ss-kw-example">{{ example.german }}</span>
+              <span class="ss-kw-example-native">{{ example.native }}</span>
+            }
+          </span>
+          <span class="ss-kw-type" [class.verb]="isVerb(usage.keyword)">{{ 'stories.wordType.' + usage.keyword.wordType | translate }}</span>
+          <svg class="ss-kw-chevron" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="9,6 15,12 9,18"/>
+          </svg>
+        </button>
+        <ion-button class="ss-kw-audio" fill="clear" type="button" (click)="playAudio.emit(usage)" [attr.aria-label]="'common.aria.playPronunciation' | translate">
+          <ion-icon slot="icon-only" name="volume-high-outline" />
+        </ion-button>
+      </article>
     }
   </div>
 }

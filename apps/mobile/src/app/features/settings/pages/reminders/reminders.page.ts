@@ -26,7 +26,7 @@ export class RemindersPage {
   readonly toggling = signal(false);
 
   goBack(): void {
-    void this.router.navigate(['/home']);
+    void this.router.navigate(['/review']);
   }
 
   async toggleReminders(enabled: boolean): Promise<void> {

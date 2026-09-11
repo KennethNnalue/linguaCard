@@ -1,7 +1,7 @@
 import { ConflictException, Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import type {
-  LearningStage, PodcastEpisodeActivity, PodcastEpisodeCompletion, PodcastEpisodePlayer,
+  ArticleType, LearningStage, PodcastEpisodeActivity, PodcastEpisodeCompletion, PodcastEpisodePlayer,
   PodcastEpisodePreparation, PodcastLibraryEpisode, PodcastLibraryResponse, PodcastLibraryTopic,
   PodcastPreparationVocabulary, PodcastThumbnail,
   PodcastTopicDetail,
@@ -10,6 +10,8 @@ import { DataSource, In, Repository } from 'typeorm';
 import { CollectionEntity } from '../../collections/collection.entity';
 import { LexemeEntity } from '../../vocabulary/entities/lexeme.entity';
 import { LexemeLocalizationEntity } from '../../vocabulary/entities/lexeme-localization.entity';
+import { ExampleSentenceEntity } from '../../vocabulary/entities/example-sentence.entity';
+import { ExampleLocalizationEntity } from '../../vocabulary/entities/example-localization.entity';
 import { calculatePodcastReadiness, podcastMasteryWeight } from '../domain/podcast-readiness';
 import { PodcastEpisodeVocabularyEntity } from '../entities/podcast-episode-vocabulary.entity';
 import { PodcastEpisodeEntity } from '../entities/podcast-episode.entity';
@@ -25,6 +27,22 @@ interface MasteryRow {
   lexemeId: string;
   learningItemId: string | null;
   mastery: string | null;
+}
+
+function articleFromGrammar(value: unknown): ArticleType {
+  switch (value) {
+    case 'der':
+    case 'die':
+    case 'das':
+    case 'le':
+    case 'la':
+    case 'el':
+    case 'un':
+    case 'une':
+      return value;
+    default:
+      return null;
+  }
 }
 
 @Injectable()
@@ -123,7 +141,7 @@ export class PodcastCatalogueService {
     if (!topic) throw new NotFoundException(`Podcast topic ${episode.topicId} not found`);
     const vocabularyLinks = await this.vocabularyRepo.find({ where: { episodeId }, order: { position: 'ASC' } });
     const lexemeIds = vocabularyLinks.map(link => link.lexemeId);
-    const [lexemes, localizations, masteryRows, thumbnailEntity, preparationCollection] = await Promise.all([
+    const [lexemes, localizations, masteryRows, thumbnailEntity, preparationCollection, examples] = await Promise.all([
       lexemeIds.length ? this.dataSource.getRepository(LexemeEntity).findBy({ id: In(lexemeIds) }) : [],
       lexemeIds.length ? this.dataSource.getRepository(LexemeLocalizationEntity).find({
         where: { lexemeId: In(lexemeIds), language: topic.translationLanguage, isActive: true },
@@ -134,11 +152,35 @@ export class PodcastCatalogueService {
         userId,
         sourcePodcastEpisodeId: episodeId,
       }),
+      lexemeIds.length ? this.dataSource.getRepository(ExampleSentenceEntity).find({
+        where: { lexemeId: In(lexemeIds), language: topic.targetLanguage },
+        order: { position: 'ASC' },
+      }) : [],
     ]);
     if (!thumbnailEntity) throw new NotFoundException(`Podcast episode ${episodeId} thumbnail not found`);
     const lexemeById = new Map(lexemes.map(lexeme => [lexeme.id, lexeme]));
     const localizationByLexeme = new Map(localizations.map(item => [item.lexemeId, item]));
     const masteryByLexeme = new Map(masteryRows.map(row => [row.lexemeId, row]));
+    const exampleLocalizations = examples.length
+      ? await this.dataSource.getRepository(ExampleLocalizationEntity).findBy({
+        exampleSentenceId: In(examples.map(example => example.id)),
+        language: topic.translationLanguage,
+        isActive: true,
+      })
+      : [];
+    const exampleLocalizationById = new Map(
+      exampleLocalizations.map(localization => [localization.exampleSentenceId, localization]),
+    );
+    const firstExampleByLexeme = new Map<string, PodcastPreparationVocabulary['example']>();
+    for (const example of examples) {
+      if (firstExampleByLexeme.has(example.lexemeId)) continue;
+      const native = exampleLocalizationById.get(example.id)?.text;
+      firstExampleByLexeme.set(example.lexemeId, {
+        id: example.id,
+        target: example.displayText,
+        native: native ?? '',
+      });
+    }
     const vocabulary: PodcastPreparationVocabulary[] = vocabularyLinks.map(link => {
       const lexeme = lexemeById.get(link.lexemeId);
       const localization = localizationByLexeme.get(link.lexemeId);
@@ -146,12 +188,17 @@ export class PodcastCatalogueService {
       const masteryRow = masteryByLexeme.get(link.lexemeId);
       const mastery = this.toMastery(masteryRow?.mastery);
       return {
-        lexemeId: link.lexemeId, text: lexeme.displayText, translation: localization.translation,
+        lexemeId: link.lexemeId, text: lexeme.displayText,
+        article: articleFromGrammar(lexeme.grammar['article']),
+        translation: localization.translation,
+        example: firstExampleByLexeme.get(link.lexemeId) ?? null,
         importance: link.importance, mastery, masteryWeight: podcastMasteryWeight(mastery),
         isInVault: masteryRow?.learningItemId !== null && masteryRow?.learningItemId !== undefined,
       };
     });
     return {
+      targetLanguage: topic.targetLanguage,
+      translationLanguage: topic.translationLanguage,
       episode: {
         ...this.toLibraryEpisode(episode, toPodcastThumbnail(thumbnailEntity), vocabulary.length),
         topicId: topic.id, topicTitle: topic.title, description: episode.description,

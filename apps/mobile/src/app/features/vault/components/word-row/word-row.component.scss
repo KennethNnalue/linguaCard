@@ -64,6 +64,22 @@
   @include u.text-overflow;
 }
 
+.example-target,
+.example-native {
+  @include u.lc-font('xs');
+  @include u.text-overflow;
+}
+
+.example-target {
+  margin-top: t.$lc-space-1;
+  color: var(--lc-text-primary);
+  font-style: italic;
+}
+
+.example-native {
+  color: var(--lc-text-hint);
+}
+
 .due-pill {
   flex-shrink: 0;
   font-family: t.$lc-font-mono;
