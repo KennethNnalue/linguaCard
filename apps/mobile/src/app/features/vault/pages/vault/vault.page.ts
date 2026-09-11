@@ -130,8 +130,7 @@ export class VaultPage implements OnInit, OnDestroy {
     return cols.filter(c => c.name.toLowerCase().includes(q));
   });
 
-  /** Rail preview on the home (capped) vs. the full in-page Explore grid. */
-  readonly exploreCards = computed(() => this.platformStore.visible().slice(0, 12));
+  readonly exploreCards = this.platformStore.visible;
   readonly exploreAll = this.platformStore.visible;
 
   // ─── Library data ──────────────────────────────────────────────────────────
