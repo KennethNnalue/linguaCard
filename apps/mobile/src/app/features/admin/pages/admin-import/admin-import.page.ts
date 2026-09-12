@@ -65,6 +65,7 @@ export class AdminImportPage {
 
   readonly collectionForm = new FormGroup({
     title: new FormControl('', [Validators.required]),
+    titleTranslation: new FormControl(''),
     level: new FormControl<CefrLevel>('A1', [Validators.required]),
     wordListRaw: new FormControl('', [Validators.required]),
   });
@@ -78,12 +79,14 @@ export class AdminImportPage {
 
   readonly jsonForm = new FormGroup({
     title: new FormControl('', [Validators.required]),
+    titleTranslation: new FormControl(''),
     level: new FormControl<CefrLevel>('A1', [Validators.required]),
     wordsJson: new FormControl('', [Validators.required]),
   });
 
   readonly metadataForm = new FormGroup({
     title: new FormControl('', {nonNullable: true, validators: [Validators.required, Validators.pattern(/\S/)]}),
+    titleTranslation: new FormControl('', {nonNullable: true, validators: [Validators.maxLength(120)]}),
     level: new FormControl<CefrLevel>('A1', {nonNullable: true, validators: [Validators.required]}),
   });
 
@@ -261,6 +264,7 @@ OUTPUT — valid JSON ONLY, no markdown fences, no commentary:
     return this.collections().filter(collection => {
       const matchesQuery = !query
         || collection.title.toLocaleLowerCase().includes(query)
+        || collection.titleTranslation?.toLocaleLowerCase().includes(query)
         || collection.id.toLocaleLowerCase().includes(query)
         || collection.level.toLocaleLowerCase().includes(query);
       const matchesStatus = status === 'all'
@@ -391,8 +395,8 @@ OUTPUT — valid JSON ONLY, no markdown fences, no commentary:
   }
 
   resetCollectionCreation(): void {
-    this.collectionForm.reset({title: '', level: 'A1', wordListRaw: ''});
-    this.jsonForm.reset({title: '', level: 'A1', wordsJson: ''});
+    this.collectionForm.reset({title: '', titleTranslation: '', level: 'A1', wordListRaw: ''});
+    this.jsonForm.reset({title: '', titleTranslation: '', level: 'A1', wordsJson: ''});
     this.collectionImage.set(null);
     this.collectionImagePreview.set(null);
     this.lastCollectionResult.set(null);
@@ -455,6 +459,7 @@ OUTPUT — valid JSON ONLY, no markdown fences, no commentary:
     this.editingMetadataId.set(item.id);
     this.metadataForm.reset({
       title: item.title,
+      titleTranslation: item.titleTranslation ?? '',
       level: this.isCefrLevel(item.level) ? item.level : 'A1',
     });
     this.editCover.set(null);
@@ -483,11 +488,11 @@ OUTPUT — valid JSON ONLY, no markdown fences, no commentary:
   saveCollectionMetadata(item: AdminPlatformCollectionListItem): void {
     this.metadataForm.markAllAsTouched();
     if (this.metadataForm.invalid || this.savingMetadataId()) return;
-    const {title: rawTitle, level} = this.metadataForm.getRawValue();
+    const {title: rawTitle, titleTranslation, level} = this.metadataForm.getRawValue();
     const title = rawTitle.trim();
     if (!title) return;
     this.savingMetadataId.set(item.id);
-    this.adminApi.updateCollection(item.id, {title, level}).pipe(
+    this.adminApi.updateCollection(item.id, {title, titleTranslation: titleTranslation.trim() || null, level}).pipe(
       concatMap(updated => {
         const cover = this.editCover();
         if (!cover) return of(updated);
@@ -744,6 +749,7 @@ OUTPUT — valid JSON ONLY, no markdown fences, no commentary:
 
     this.adminApi.importCollection({
       title: v.title!.trim(),
+      titleTranslation: v.titleTranslation?.trim() || null,
       level: v.level!,
       words,
     }).pipe(
@@ -822,6 +828,7 @@ OUTPUT — valid JSON ONLY, no markdown fences, no commentary:
 
     this.adminApi.importCollectionJson({
       title: v.title!.trim(),
+      titleTranslation: v.titleTranslation?.trim() || null,
       level: v.level!,
       words,
     }).pipe(

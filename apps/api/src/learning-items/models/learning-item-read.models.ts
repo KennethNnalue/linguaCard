@@ -37,6 +37,7 @@ export interface CollectionSummaryRow {
   id: string;
   learningContextId: string;
   name: string;
+  titleTranslation: string | null;
   description: string;
   coverSeed: string;
   coverImageUrl: string | null;

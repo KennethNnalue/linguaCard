@@ -97,7 +97,7 @@
               class="col-row"
               [class.active]="activeSource() === 'collection:' + col.id"
               (click)="selectCollection(col.id)">
-              <span class="col-name">{{ col.name }}</span>
+              <span class="col-name">{{ col.name }} @if (col.titleTranslation) { · {{ col.titleTranslation }} }</span>
               <span class="col-count">{{ listenStore.collectionCounts().get(col.id) ?? 0 }}</span>
               @if (activeSource() === 'collection:' + col.id) {
                 <span class="check check-sm">

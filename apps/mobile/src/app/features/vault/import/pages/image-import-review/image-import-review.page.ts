@@ -89,7 +89,7 @@ export class ImageImportReviewPage implements OnInit {
     const placeholder = this.translate.instant('imageImportReview.collection.selectPlaceholder');
     if (!id) return placeholder;
     const col = this.collectionStore.collections().find(c => c.id === id);
-    return col ? `${col.emoji} ${col.name}` : placeholder;
+    return col ? `${col.emoji} ${col.name}${col.titleTranslation ? ` · ${col.titleTranslation}` : ''}` : placeholder;
   });
 
   readonly duplicateCount = computed(() => this.wordList().filter(w => w.isDuplicate).length);

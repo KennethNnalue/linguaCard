@@ -88,7 +88,7 @@
                   <span class="level-badge">{{ collection.level }}</span>
                   @if (collection.adoptionStatus === 'adopted') { <span class="owned">✓</span> }
                 </span>
-                <span class="cover-copy"><strong>{{ collection.title }}</strong><small>{{ platformMeta(collection) }}</small></span>
+                <span class="cover-copy"><strong>{{ collection.title }}</strong>@if (collection.titleTranslation) { <small>{{ collection.titleTranslation }}</small> }<small>{{ platformMeta(collection) }}</small></span>
               </button>
             } @empty { <p class="empty">No curated collections at this level.</p> }
           </div>
@@ -106,6 +106,7 @@
                   <span class="personal-cover"><lc-collection-cover [name]="collection.name" [seed]="collection.coverSeed" [imageUrl]="collection.coverImageUrl" /></span>
                   <span class="personal-copy">
                     <span><strong>{{ collection.name }}</strong>@if (collection.level) { <b>{{ collection.level }}</b> }</span>
+                    @if (collection.titleTranslation) { <small>{{ collection.titleTranslation }}</small> }
                     <small>{{ collectionMeta(collection) }}</small>
                     <i><span [style.width.%]="collection.itemCount ? (collection.masteredCount / collection.itemCount) * 100 : 0"></span></i>
                   </span>

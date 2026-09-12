@@ -27,7 +27,7 @@
       <button type="button" class="cps-row" [class.cps-row--on]="isSelected(col.id)" (click)="toggle(col.id)">
         <div class="cps-row-icon">{{ col.emoji }}</div>
         <div class="cps-row-info">
-          <span class="cps-row-name">{{ col.name }}</span>
+          <span class="cps-row-name">{{ col.name }} @if (col.titleTranslation) { · {{ col.titleTranslation }} }</span>
           <span class="cps-row-meta">{{ 'review.custom.wordsCount' | translate:{ count: col.count } }}</span>
         </div>
         <span class="cps-radio" [class.cps-radio--on]="isSelected(col.id)">

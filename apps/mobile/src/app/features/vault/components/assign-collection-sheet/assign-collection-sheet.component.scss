@@ -48,11 +48,19 @@
 }
 .acs-create-label { @include u.lc-font('xs', t.$lc-font-weight-semibold); color: var(--lc-brand); }
 
-.acs-create-form { display: flex; gap: t.$lc-space-2; padding: t.$lc-space-1 0; }
+.acs-create-form { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: t.$lc-space-2; padding: t.$lc-space-1 0; }
 .acs-name-input {
-  flex: 1; background: var(--lc-card); border: 1px solid var(--lc-brand);
+  grid-column: 1 / -1; min-width: 0; background: var(--lc-card); border: 1px solid var(--lc-brand);
   border-radius: t.$lc-radius-sm; padding: 9px t.$lc-space-3;
   @include u.lc-font('xs'); font-family: t.$lc-font-body; color: var(--lc-text-primary); outline: none;
+}
+.acs-level-label {
+  display: flex; align-items: center; gap: t.$lc-space-2;
+  color: var(--lc-text-secondary); @include u.lc-font('xs');
+  select {
+    min-width: 0; padding: 8px; border: 1px solid var(--lc-border);
+    border-radius: t.$lc-radius-sm; background: var(--lc-card); color: var(--lc-text-primary);
+  }
 }
 .acs-create-btn {
   background: var(--lc-brand); color: white; border: none; border-radius: t.$lc-radius-sm;

@@ -9,6 +9,7 @@ function createCollectionEntity(): CollectionEntity {
   entity.id = 'collection-1';
   entity.userId = 'user-1';
   entity.name = 'Guten tag';
+  entity.titleTranslation = 'Good day';
   entity.description = '';
   entity.emoji = '📚';
   entity.colour = '#2D5A4E';
@@ -52,6 +53,8 @@ describe('CollectionsService', () => {
     expect(collection).toEqual(expect.objectContaining({
       coverSeed: entity.coverSeed,
       coverImageUrl: entity.coverImageUrl,
+      titleTranslation: 'Good day',
+      level: 'A1',
     }));
   });
 });

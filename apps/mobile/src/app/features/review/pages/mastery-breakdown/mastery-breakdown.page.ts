@@ -22,6 +22,7 @@ interface LifecycleBucket {
 interface CollectionMastery {
   id: string;
   name: string;
+  titleTranslation: string | null;
   mastered: number;
   total: number;
   pct: number;
@@ -93,6 +94,7 @@ export class MasteryBreakdownPage {
       .map(collection => ({
         id: collection.id,
         name: collection.name,
+        titleTranslation: collection.titleTranslation,
         mastered: collection.masteredCount,
         total: collection.itemCount,
         pct: collection.itemCount ? Math.round((collection.masteredCount / collection.itemCount) * 100) : 0,

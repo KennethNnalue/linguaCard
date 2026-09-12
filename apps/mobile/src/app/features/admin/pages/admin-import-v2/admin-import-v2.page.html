@@ -79,6 +79,7 @@
           <div class="cover"><lc-collection-cover [name]="preview.collection.title" [seed]="preview.collection.coverSeed" /></div>
           <div class="collection-copy">
             <strong>{{ preview.collection.title }}</strong>
+            @if (preview.collection.titleTranslation) { <small>{{ preview.collection.titleTranslation }}</small> }
             <span>{{ preview.collection.level }} · {{ preview.counts.items }} words · {{ preview.collection.status }}</span>
           </div>
         </article>

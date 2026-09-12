@@ -47,6 +47,8 @@ export class AssignCollectionSheetComponent implements OnInit {
   readonly creating = signal(false);
 
   readonly newNameCtrl = new FormControl('', [Validators.required, Validators.minLength(1)]);
+  readonly newLevelCtrl = new FormControl<'all' | 'A1' | 'A2' | 'B1' | 'B2'>('all', {nonNullable: true});
+  readonly levels = ['all', 'A1', 'A2', 'B1', 'B2'] as const;
 
   constructor() {
     addIcons({ addOutline, checkmarkOutline, closeOutline });
@@ -66,6 +68,7 @@ export class AssignCollectionSheetComponent implements OnInit {
     this.showCreateForm.update(v => !v);
     if (this.showCreateForm()) {
       this.newNameCtrl.reset();
+      this.newLevelCtrl.reset();
     }
   }
 
@@ -76,6 +79,7 @@ export class AssignCollectionSheetComponent implements OnInit {
       name: this.newNameCtrl.value!.trim(),
       contextId: 'german-vocab',
       emoji: '📚',
+      level: this.newLevelCtrl.value === 'all' ? null : this.newLevelCtrl.value,
     };
     this.collectionStore.createCollection(dto).subscribe({
       next: col => {

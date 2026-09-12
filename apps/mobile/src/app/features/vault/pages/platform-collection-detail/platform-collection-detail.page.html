@@ -27,6 +27,7 @@
         <div class="cover-text-surface">
           <div class="cover-eyebrow">{{ d.level }} · {{ d.topic }}</div>
           <h1 class="cover-name">{{ d.title }}</h1>
+          @if (d.titleTranslation) { <p class="cover-title-translation">{{ d.titleTranslation }}</p> }
         </div>
       </div>
     </header>

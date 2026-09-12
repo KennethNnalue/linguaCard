@@ -15,8 +15,9 @@
       </div>
       <div class="cover-id">
         <div class="cover-text-surface">
-          <div class="cover-eyebrow">{{ eyebrow() }}</div>
+          <div class="cover-eyebrow">{{ collection()?.level || eyebrow() }}</div>
           <h1 class="cover-name" [class.cover-name--completed]="justCompleted()">{{ collection()?.name ?? '' }}</h1>
+          @if (collection()?.titleTranslation) { <p class="cover-title-translation">{{ collection()?.titleTranslation }}</p> }
         </div>
       </div>
     </header>

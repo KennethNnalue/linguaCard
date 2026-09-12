@@ -202,6 +202,7 @@ export class LearningItemReadRepository implements LearningItemReadPort {
          collection.id,
          collection."learningContextId",
          collection.name,
+         collection."titleTranslation",
          collection.description,
          COALESCE(collection."coverSeed", lower(trim(collection.name))) AS "coverSeed",
          collection."coverImageUrl",

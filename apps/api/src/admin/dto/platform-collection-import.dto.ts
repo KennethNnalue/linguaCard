@@ -11,6 +11,7 @@ class ImportCoverDto {
 class ImportCollectionMetadataDto {
   @IsString() @MinLength(1) @MaxLength(120) externalId!: string;
   @IsString() @MinLength(1) @MaxLength(120) title!: string;
+  @IsOptional() @IsString() @MaxLength(120) titleTranslation?: string | null;
   @IsString() @MaxLength(1000) description!: string;
   @IsString() @Matches(/^[a-z]{2,3}(?:-[a-z0-9]{2,8})*$/i) sourceLanguage!: string;
   @IsString() @Matches(/^[a-z]{2,3}(?:-[a-z0-9]{2,8})*$/i) targetLanguage!: string;

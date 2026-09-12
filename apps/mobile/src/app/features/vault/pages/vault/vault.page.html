@@ -41,110 +41,140 @@
       <ion-progress-bar [value]="masteryProgress()" />
     </section>
 
-    <section class="library-section" aria-labelledby="personal-collections-title">
-      <div class="section-heading">
-        <div>
-          <h2 id="personal-collections-title">{{ 'vault.collections.yoursTitle' | translate }}</h2>
-          <p>{{ 'vault.lexicon.shelves' | translate:{count: filteredCollections().length} }}</p>
-        </div>
-      </div>
+    @if (showPersonalTab()) {
+      <ion-segment
+        class="vault-tabs"
+        [value]="activeTab()"
+        [attr.aria-label]="'vault.title' | translate"
+        (ionChange)="onTabChange($event)"
+      >
+        <ion-segment-button value="personal">
+          <ion-label>{{ 'vault.collections.yoursTitle' | translate }}</ion-label>
+        </ion-segment-button>
+        <ion-segment-button value="platform">
+          <ion-label>{{ 'vault.explore.platformTitle' | translate }}</ion-label>
+        </ion-segment-button>
+      </ion-segment>
+    }
 
-      <div class="personal-collections">
-        @if (collectionsLoading() && collections().length === 0) {
-          @for (item of [1, 2, 3]; track item) {
-            <div class="personal-card personal-card--skeleton" aria-hidden="true"></div>
+    @if (activeTab() === 'personal') {
+      <section class="library-section" [attr.aria-label]="'vault.collections.yoursTitle' | translate">
+        <div class="section-heading">
+          <div>
+            <p>{{ 'vault.lexicon.shelves' | translate:{count: filteredCollections().length} }}</p>
+          </div>
+        </div>
+
+        <ion-segment class="level-filters" [value]="personalLevel()" [scrollable]="false" (ionChange)="onPersonalLevelChange($event)">
+          @for (level of levelFilters; track level) {
+            <ion-segment-button [value]="level">
+              <ion-label>{{ level === 'all' ? ('vault.filter.allLabel' | translate) : level }}</ion-label>
+            </ion-segment-button>
           }
-        } @else {
-          @for (collection of filteredCollections(); track collection.id) {
-            <button class="personal-card" type="button" (click)="openCollectionDetail(collection)">
-              <span class="personal-card__cover">
-                <lc-collection-cover
-                  [name]="collection.name"
-                  [seed]="coverSeedFor(collection)"
-                  [imageUrl]="collection.coverImageUrl"
-                />
-              </span>
-              <span class="personal-card__body">
-                <span class="personal-card__topline">
-                  <strong>{{ collection.name }}</strong>
-                  @if (collection.dueCount > 0) {
-                    <span class="due-badge">{{ collection.dueCount }} {{ 'common.due' | translate }}</span>
+        </ion-segment>
+
+        <div class="personal-collections">
+          @if (collectionsLoading() && collections().length === 0) {
+            @for (item of [1, 2, 3]; track item) {
+              <div class="personal-card personal-card--skeleton" aria-hidden="true"></div>
+            }
+          } @else {
+            @for (collection of filteredCollections(); track collection.id) {
+              <button class="personal-card" type="button" (click)="openCollectionDetail(collection)">
+                <span class="personal-card__cover">
+                  <lc-collection-cover
+                    [name]="collection.name"
+                    [seed]="coverSeedFor(collection)"
+                    [imageUrl]="collection.coverImageUrl"
+                  />
+                  @if (collection.level) { <span class="level-badge">{{ collection.level }}</span> }
+                </span>
+                <span class="personal-card__body">
+                  <span class="personal-card__topline">
+                    <strong>{{ collection.name }}</strong>
+                    @if (collection.dueCount > 0) {
+                      <span class="due-badge">{{ collection.dueCount }} {{ 'common.due' | translate }}</span>
+                    }
+                  </span>
+                  @if (collection.titleTranslation) { <span class="collection-title-translation">{{ collection.titleTranslation }}</span> }
+                  <span class="personal-card__meta">
+                    {{ collection.itemCount }} {{ 'common.words' | translate }}
+                    <span aria-hidden="true">·</span>
+                    {{ collection.masteredCount }} {{ 'collections.card.masteredLabel' | translate }}
+                  </span>
+                  <span class="personal-card__meter" aria-hidden="true">
+                    <span [style.width.%]="collectionProgressPercent(collection)"></span>
+                  </span>
+                </span>
+              </button>
+            } @empty {
+              <div class="empty-state">
+                <ion-icon [name]="collectionQuery() || personalLevel() !== 'all' ? 'search-outline' : 'folder-open-outline'" />
+                <h3>{{ (collectionQuery() || personalLevel() !== 'all' ? 'vault.explore.empty' : 'vault.collections.emptyTitle') | translate }}</h3>
+                @if (!collectionQuery() && personalLevel() === 'all') {
+                  <p>{{ 'vault.collections.emptySubtitle' | translate }}</p>
+                }
+              </div>
+            }
+          }
+        </div>
+      </section>
+    } @else {
+      <section class="library-section library-section--platform" [attr.aria-label]="'vault.explore.platformTitle' | translate">
+        <div class="section-heading">
+          <div>
+            @if (!showPersonalTab()) {
+              <h2>{{ 'vault.explore.platformTitle' | translate }}</h2>
+            }
+            <p>{{ 'vault.explore.subtitle' | translate }}</p>
+          </div>
+        </div>
+
+        <ion-segment class="level-filters" [value]="exploreLevel()" [scrollable]="false" (ionChange)="onLevelChange($event)">
+          @for (level of levelFilters; track level) {
+            <ion-segment-button [value]="level">
+              <ion-label>{{ level === 'all' ? ('vault.filter.allLabel' | translate) : level }}</ion-label>
+            </ion-segment-button>
+          }
+        </ion-segment>
+
+        <div class="platform-grid">
+          @if (exploreLoading() && platformCollections().length === 0) {
+            @for (item of [1, 2, 3, 4]; track item) {
+              <div class="platform-card platform-card--skeleton" aria-hidden="true"></div>
+            }
+          } @else {
+            @for (collection of platformCollections(); track collection.id) {
+              <button class="platform-card" type="button" (click)="openPlatformDetail(collection)">
+                <span class="platform-card__cover">
+                  <lc-collection-cover
+                    [name]="collection.title"
+                    [seed]="collection.coverSeed"
+                    [imageUrl]="collection.coverImageUrl"
+                  />
+                  <span class="level-badge">{{ collection.level }}</span>
+                  @if (collection.adoptionStatus === 'adopted') {
+                    <span class="adopted-badge" [attr.aria-label]="'platformCollectionDetail.adoptedBanner.inSetsLabel' | translate">
+                      <ion-icon name="checkmark-outline" />
+                    </span>
                   }
                 </span>
-                <span class="personal-card__meta">
-                  {{ collection.itemCount }} {{ 'common.words' | translate }}
-                  <span aria-hidden="true">·</span>
-                  {{ collection.masteredCount }} {{ 'collections.card.masteredLabel' | translate }}
+                <span class="platform-card__body">
+                  <strong>{{ collection.title }}</strong>
+                  @if (collection.titleTranslation) { <span class="collection-title-translation">{{ collection.titleTranslation }}</span> }
+                  <span>{{ collection.wordCount }} {{ 'common.words' | translate }}</span>
                 </span>
-                <span class="personal-card__meter" aria-hidden="true">
-                  <span [style.width.%]="collectionProgressPercent(collection)"></span>
-                </span>
-              </span>
-            </button>
-          } @empty {
-            <div class="empty-state">
-              <ion-icon [name]="collectionQuery() ? 'search-outline' : 'folder-open-outline'" />
-              <h3>{{ (collectionQuery() ? 'vault.explore.empty' : 'vault.collections.emptyTitle') | translate }}</h3>
-              @if (!collectionQuery()) {
-                <p>{{ 'vault.collections.emptySubtitle' | translate }}</p>
-              }
-            </div>
+              </button>
+            } @empty {
+              <div class="empty-state empty-state--wide">
+                <ion-icon name="search-outline" />
+                <h3>{{ 'vault.explore.empty' | translate }}</h3>
+              </div>
+            }
           }
-        }
-      </div>
-    </section>
-
-    <section class="library-section library-section--platform" aria-labelledby="platform-collections-title">
-      <div class="section-heading">
-        <div>
-          <h2 id="platform-collections-title">{{ 'vault.explore.platformTitle' | translate }}</h2>
-          <p>{{ 'vault.explore.subtitle' | translate }}</p>
         </div>
-      </div>
-
-      <ion-segment [value]="exploreLevel()" [scrollable]="false" (ionChange)="onLevelChange($event)">
-        @for (level of levelFilters; track level) {
-          <ion-segment-button [value]="level">
-            <ion-label>{{ level === 'all' ? ('vault.filter.allLabel' | translate) : level }}</ion-label>
-          </ion-segment-button>
-        }
-      </ion-segment>
-
-      <div class="platform-grid">
-        @if (exploreLoading() && platformCollections().length === 0) {
-          @for (item of [1, 2, 3, 4]; track item) {
-            <div class="platform-card platform-card--skeleton" aria-hidden="true"></div>
-          }
-        } @else {
-          @for (collection of platformCollections(); track collection.id) {
-            <button class="platform-card" type="button" (click)="openPlatformDetail(collection)">
-              <span class="platform-card__cover">
-                <lc-collection-cover
-                  [name]="collection.title"
-                  [seed]="collection.coverSeed"
-                  [imageUrl]="collection.coverImageUrl"
-                />
-                <span class="level-badge">{{ collection.level }}</span>
-                @if (collection.adoptionStatus === 'adopted') {
-                  <span class="adopted-badge" [attr.aria-label]="'platformCollectionDetail.adoptedBanner.inSetsLabel' | translate">
-                    <ion-icon name="checkmark-outline" />
-                  </span>
-                }
-              </span>
-              <span class="platform-card__body">
-                <strong>{{ collection.title }}</strong>
-                <span>{{ collection.wordCount }} {{ 'common.words' | translate }}</span>
-              </span>
-            </button>
-          } @empty {
-            <div class="empty-state empty-state--wide">
-              <ion-icon name="search-outline" />
-              <h3>{{ 'vault.explore.empty' | translate }}</h3>
-            </div>
-          }
-        }
-      </div>
-    </section>
+      </section>
+    }
   </main>
 </ion-content>
 

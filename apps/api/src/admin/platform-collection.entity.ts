@@ -10,6 +10,9 @@ export class PlatformCollectionEntity {
   @Column({ length: 120 })
   title!: string;
 
+  @Column({ type: 'varchar', length: 120, nullable: true, default: null })
+  titleTranslation!: string | null;
+
   @Column({ type: 'varchar', length: 120, nullable: true })
   externalId!: string | null;
 

@@ -162,6 +162,7 @@ export class AdminService {
     const collection = this.collectionRepo.create({
       id: collectionId,
       title: dto.title,
+      titleTranslation: dto.titleTranslation?.trim() || null,
       emoji: null,
       level: dto.level,
       topic: dto.topic ?? dto.title,
@@ -190,6 +191,7 @@ export class AdminService {
     if (!dto.title?.trim() || !dto.level || !Array.isArray(dto.words) || dto.words.length === 0) {
       throw new BadRequestException('Title, level, and at least one word are required');
     }
+    this.validateTitleTranslation(dto.titleTranslation);
     const validation = validateQuickWordList(dto.words.map(word => word.back));
     if (!validation.valid) throw new BadRequestException(validation.message);
 
@@ -227,6 +229,7 @@ export class AdminService {
     const collection = this.collectionRepo.create({
       id: collectionId,
       title: dto.title,
+      titleTranslation: dto.titleTranslation?.trim() || null,
       emoji: null,
       level: dto.level,
       topic: dto.topic ?? dto.title,
@@ -496,6 +499,7 @@ export class AdminService {
     return collections.map(c => ({
       id: c.id,
       title: c.title,
+      titleTranslation: c.titleTranslation ?? null,
       emoji: c.emoji,
       coverImageUrl: c.coverImageUrl,
       level: c.level,
@@ -538,12 +542,22 @@ export class AdminService {
     if (!['A1', 'A2', 'B1', 'B2', 'C1'].includes(dto.level)) {
       throw new BadRequestException('level must be one of A1, A2, B1, B2, or C1');
     }
+    this.validateTitleTranslation(dto.titleTranslation);
     const collection = await this.collectionRepo.findOneBy({ id });
     if (!collection) throw new NotFoundException(`Platform collection ${id} not found`);
     collection.title = title;
+    if (dto.titleTranslation !== undefined) {
+      collection.titleTranslation = dto.titleTranslation?.trim() || null;
+    }
     collection.topic = title;
     collection.level = dto.level;
-    await this.collectionRepo.save(collection);
+    await this.collectionRepo.manager.transaction(async manager => {
+      await manager.save(PlatformCollectionEntity, collection);
+      await manager.update(CollectionEntity, {sourcePlatformCollectionId: id}, {
+        titleTranslation: collection.titleTranslation,
+        level: collection.level,
+      });
+    });
     const updated = (await this.listCollections()).find(item => item.id === id);
     if (!updated) throw new NotFoundException(`Platform collection ${id} not found`);
     return updated;
@@ -590,6 +604,7 @@ export class AdminService {
 
   private validateJsonCollection(dto: AdminImportCollectionJsonDto): void {
     if (!dto.title?.trim()) throw new BadRequestException('title must be a non-empty string');
+    this.validateTitleTranslation(dto.titleTranslation);
     if (!['A1', 'A2', 'B1', 'B2', 'C1'].includes(dto.level)) {
       throw new BadRequestException('level must be one of A1, A2, B1, B2, or C1');
     }
@@ -650,6 +665,12 @@ export class AdminService {
           );
         }
       }
+    }
+  }
+
+  private validateTitleTranslation(value: string | null | undefined): void {
+    if (value != null && (typeof value !== 'string' || value.trim().length > 120)) {
+      throw new BadRequestException('titleTranslation must be a string of at most 120 characters');
     }
   }
 

@@ -99,6 +99,7 @@ export class PodcastPlatformCollectionService {
         const collection = manager.create(PlatformCollectionEntity, {
           id: randomUUID(),
           title: `Podcast · ${lockedEpisode.title}`.slice(0, 120),
+          titleTranslation: lockedEpisode.titleTranslation ? `Podcast · ${lockedEpisode.titleTranslation}`.slice(0, 120) : null,
           externalId,
           description: `Essential vocabulary for ${lockedEpisode.title}`,
           sourceLanguage: lockedTopic.translationLanguage,
@@ -278,6 +279,7 @@ export class PodcastPlatformCollectionService {
     const model: AdminPlatformCollectionListItem = {
       id: collection.id,
       title: collection.title,
+      titleTranslation: collection.titleTranslation ?? null,
       emoji: collection.emoji,
       coverImageUrl: collection.coverImageUrl,
       level: collection.level,

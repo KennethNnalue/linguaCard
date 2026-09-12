@@ -86,6 +86,11 @@
         </div>
 
         <div class="adm-field">
+          <label class="adm-label">Title translation (optional)</label>
+          <input class="adm-input" formControlName="titleTranslation" maxlength="120" placeholder="e.g. Essen und Trinken" />
+        </div>
+
+        <div class="adm-field">
             <label class="adm-label">{{ 'admin.import.fields.level' | translate }}</label>
             <select class="adm-select" formControlName="level">
               @for (lvl of levels; track lvl) {
@@ -113,6 +118,7 @@
             <span class="adm-result-bar__icon">⚡</span>
             <div class="adm-result-bar__body">
               <strong>{{ r.title }}</strong>
+              @if (collectionForm.controls.titleTranslation.value) { <span>{{ collectionForm.controls.titleTranslation.value }}</span> }
               <span>Draft created with {{ r.created }} words. {{ r.reused }} reused, {{ r.enriched }} enriched, {{ r.duplicatesSkipped }} duplicates skipped.</span>
               <span class="adm-result-bar__id">Collection ID: {{ r.collectionId }}</span>
               <span class="adm-result-bar__actions">
@@ -167,6 +173,11 @@
         </div>
 
         <div class="adm-field">
+          <label class="adm-label">Title translation (optional)</label>
+          <input class="adm-input" formControlName="titleTranslation" maxlength="120" placeholder="e.g. Essen und Trinken" />
+        </div>
+
+        <div class="adm-field">
             <label class="adm-label">{{ 'admin.import.fields.level' | translate }}</label>
             <select class="adm-select" formControlName="level">
               @for (lvl of levels; track lvl) {
@@ -208,6 +219,7 @@
             <span class="adm-result-bar__icon">⚡</span>
             <div class="adm-result-bar__body">
               <strong>{{ r.title }}</strong>
+              @if (jsonForm.controls.titleTranslation.value) { <span>{{ jsonForm.controls.titleTranslation.value }}</span> }
               <span><strong>{{ r.inserted }}</strong> inserted · <strong>{{ r.reused }}</strong> reused · <strong>{{ r.audioLinked }}</strong> cached audio ready</span>
               @if (r.duplicatesSkipped) {
                 <span><strong>{{ r.duplicatesSkipped }}</strong> duplicate vocabulary entries skipped</span>
@@ -374,6 +386,7 @@
                       </span>
                       <span class="adm-collection-list-item__body">
                         <span class="adm-collection-list-item__title">{{ item.title }}</span>
+                        @if (item.titleTranslation) { <small>{{ item.titleTranslation }}</small> }
                         <span class="adm-collection-list-item__meta">{{ item.level }} · {{ item.wordCount }} words · {{ item.sourceLanguage.toUpperCase() }} → {{ item.targetLanguage.toUpperCase() }}</span>
                       </span>
                       <span class="adm-status-pill" [class.adm-status-pill--live]="item.isPublished" [class.adm-status-pill--attention]="item.status === 'needs_attention' || item.status === 'failed'">
@@ -409,6 +422,7 @@
                       {{ item.isPublished ? 'Published' : item.status.replace('_', ' ') }}
                     </span>
                     <h2>{{ item.title }}</h2>
+                    @if (item.titleTranslation) { <span>{{ item.titleTranslation }}</span> }
                     <p>{{ item.level }} · {{ item.wordCount }} words · Updated {{ item.updatedAt | date:'mediumDate' }}</p>
                   </div>
                   <button class="adm-secondary-action" type="button" (click)="startEditingMetadata(item)">
@@ -430,6 +444,10 @@
                     <label class="adm-field">
                       <span class="adm-label">Title</span>
                       <input class="adm-input" formControlName="title" />
+                    </label>
+                    <label class="adm-field">
+                      <span class="adm-label">Title translation (optional)</span>
+                      <input class="adm-input" formControlName="titleTranslation" maxlength="120" />
                     </label>
                     <label class="adm-field">
                       <span class="adm-label">Level</span>

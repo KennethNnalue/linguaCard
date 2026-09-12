@@ -104,6 +104,12 @@
   &--completed { opacity: 0.6; }
 }
 
+.cover-title-translation {
+  margin: t.$lc-space-1 0 0;
+  color: rgba(255, 255, 255, 0.78);
+  @include u.lc-font('sm', t.$lc-font-weight-medium);
+}
+
 // ─── STATS + ACTIONS CARD (overlapping) ──────────────────────────────────────
 
 .stats-card {

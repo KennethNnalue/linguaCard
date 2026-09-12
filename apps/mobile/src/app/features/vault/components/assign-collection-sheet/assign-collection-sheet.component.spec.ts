@@ -1,6 +1,7 @@
 import { signal } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { ModalController } from '@ionic/angular';
+import { of } from 'rxjs';
 import { MOCK_COLLECTIONS } from '@lingua-card/shared/testing';
 
 import { CollectionStore } from '../../store/collection.store';
@@ -42,5 +43,16 @@ describe('AssignCollectionSheetComponent', () => {
     component.searchCtrl.setValue('FAMILY');
 
     expect(component.filteredCollections()).toEqual([MOCK_COLLECTIONS[1]]);
+  });
+
+  it('includes the selected German level when creating a personal collection', () => {
+    const createCollection = jest.spyOn(TestBed.inject(CollectionStore), 'createCollection');
+    createCollection.mockReturnValue(of({...MOCK_COLLECTIONS[0], id: 'new-collection'}));
+    component.newNameCtrl.setValue('Travel');
+    component.newLevelCtrl.setValue('B1');
+
+    component.createAndSelect();
+
+    expect(createCollection).toHaveBeenCalledWith(expect.objectContaining({name: 'Travel', level: 'B1'}));
   });
 });

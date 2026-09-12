@@ -159,6 +159,7 @@ export class PlatformCollectionImportService implements OnApplicationBootstrap {
       conflicts,
       collection: {
         title: payload.collection.title,
+        titleTranslation: payload.collection.titleTranslation?.trim() || null,
         level: payload.collection.level,
         topic: payload.collection.topic,
         coverSeed: this.coverSeed(payload.collection.title),
@@ -232,6 +233,7 @@ export class PlatformCollectionImportService implements OnApplicationBootstrap {
           id: collectionId,
           externalId: payload.collection.externalId,
           title: payload.collection.title,
+          titleTranslation: payload.collection.titleTranslation?.trim() || null,
           description: payload.collection.description,
           sourceLanguage: preview.sourceLanguage,
           targetLanguage: preview.targetLanguage,

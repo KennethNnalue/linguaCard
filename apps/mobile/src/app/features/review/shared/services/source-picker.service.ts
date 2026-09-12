@@ -28,7 +28,7 @@ export class SourcePickerService {
           handler: () => resolve(ReviewSource.ALL),
         },
         ...collections.map(col => ({
-          label: `${col.emoji ?? '📚'} ${col.name}`,
+          label: `${col.emoji ?? '📚'} ${col.name}${col.titleTranslation ? ` · ${col.titleTranslation}` : ''}`,
           handler: () => resolve(col.id),
         })),
         {
@@ -45,6 +45,6 @@ export class SourcePickerService {
     const allLabel = `📚 ${this.translate.instant('srs.allCollections')}`;
     if (sourceId === ReviewSource.ALL) return allLabel;
     const col = this.collectionStore.collections().find(c => c.id === sourceId);
-    return col ? `${col.emoji ?? '📚'} ${col.name}` : allLabel;
+    return col ? `${col.emoji ?? '📚'} ${col.name}${col.titleTranslation ? ` · ${col.titleTranslation}` : ''}` : allLabel;
   }
 }

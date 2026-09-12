@@ -98,11 +98,7 @@
 }
 
 .library-section {
-  margin-bottom: t.$lc-space-10;
-
-  &--platform {
-    margin-bottom: 0;
-  }
+  margin-bottom: 0;
 }
 
 .section-heading {
@@ -221,17 +217,27 @@
   @include u.lc-font('xxs', t.$lc-font-weight-semibold);
 }
 
-ion-segment {
+.vault-tabs,
+.level-filters {
   --background: transparent;
   display: grid;
-  grid-template-columns: repeat(5, minmax(0, 1fr));
   margin-bottom: t.$lc-space-4;
   padding: 3px;
   border: 1px solid var(--lc-border);
   border-radius: t.$lc-radius-full;
 }
 
-ion-segment-button {
+.vault-tabs {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  margin-bottom: t.$lc-space-6;
+}
+
+.level-filters {
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+}
+
+.vault-tabs ion-segment-button,
+.level-filters ion-segment-button {
   --border-radius: #{t.$lc-radius-full};
   --color: var(--lc-text-secondary);
   --color-checked: var(--lc-text-inverse);
@@ -241,6 +247,10 @@ ion-segment-button {
   min-height: 36px;
   font-family: t.$lc-font-body;
   @include u.lc-font('sm', t.$lc-font-weight-semibold);
+}
+
+.vault-tabs ion-label {
+  white-space: normal;
 }
 
 .platform-grid {
@@ -320,6 +330,12 @@ ion-segment-button {
   color: #fff;
   font-family: t.$lc-font-mono;
   @include u.lc-font('xxs', t.$lc-font-weight-semibold);
+}
+
+.collection-title-translation {
+  display: block;
+  color: var(--lc-text-secondary);
+  @include u.lc-font('xs', t.$lc-font-weight-medium);
 }
 
 .adopted-badge {

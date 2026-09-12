@@ -55,7 +55,8 @@ export class VaultV2Page implements OnInit {
     const results = this.platformStore.collections().filter(item =>
       (level === 'all' || item.level === level)
       && (!topic || item.topic === topic)
-      && (!search || item.title.toLocaleLowerCase().includes(search)),
+      && (!search || item.title.toLocaleLowerCase().includes(search)
+        || item.titleTranslation?.toLocaleLowerCase().includes(search)),
     );
     return this.showAllPlatform() ? results : results.slice(0, 3);
   });
@@ -65,7 +66,8 @@ export class VaultV2Page implements OnInit {
     const level = this.selectedLevel();
     const results = (this.vault()?.collections ?? []).filter(item =>
       (level === 'all' || item.level === level)
-      && (!search || item.name.toLocaleLowerCase().includes(search)),
+      && (!search || item.name.toLocaleLowerCase().includes(search)
+        || item.titleTranslation?.toLocaleLowerCase().includes(search)),
     );
     return this.showAllPersonal() ? results : results.slice(0, 4);
   });

@@ -14,6 +14,7 @@ function createCollection(
   return {
     id: 'collection-1',
     title: 'Und was machst du?',
+    titleTranslation: null,
     emoji: null,
     coverImageUrl: null,
     level: 'A2',
@@ -60,7 +61,7 @@ describe('AdminImportPage collection metadata editor', () => {
 
   it('retains the collection level and saves edits without a native form submission', async () => {
     const collection = createCollection();
-    const updated = createCollection({title: 'Updated title', level: 'B1'});
+    const updated = createCollection({title: 'Updated title', titleTranslation: 'Aktualisierter Titel', level: 'B1'});
     updateCollection.mockReturnValue(of(updated));
     const fixture = TestBed.createComponent(AdminImportPage);
     const page = fixture.componentInstance;
@@ -75,11 +76,14 @@ describe('AdminImportPage collection metadata editor', () => {
 
     const form = fixture.nativeElement.querySelector('.adm-metadata-editor') as HTMLFormElement;
     const title = form.querySelector('input[formControlName="title"]') as HTMLInputElement;
+    const translation = form.querySelector('input[formControlName="titleTranslation"]') as HTMLInputElement;
     const level = form.querySelector('select[formControlName="level"]') as HTMLSelectElement;
     expect(level.selectedOptions[0].textContent).toBe('A2');
 
     title.value = '  Updated title  ';
     title.dispatchEvent(new Event('input'));
+    translation.value = ' Aktualisierter Titel ';
+    translation.dispatchEvent(new Event('input'));
     level.selectedIndex = 2;
     level.dispatchEvent(new Event('change'));
     const submit = new Event('submit', {bubbles: true, cancelable: true});
@@ -88,6 +92,7 @@ describe('AdminImportPage collection metadata editor', () => {
     expect(submit.defaultPrevented).toBe(true);
     expect(updateCollection).toHaveBeenCalledWith(collection.id, {
       title: 'Updated title',
+      titleTranslation: 'Aktualisierter Titel',
       level: 'B1',
     });
     expect(page.collections()).toEqual([updated]);

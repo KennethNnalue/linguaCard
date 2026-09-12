@@ -92,6 +92,7 @@ export class PlatformCollectionsService {
       return {
         id: c.id,
         title: c.title,
+        titleTranslation: c.titleTranslation ?? null,
         sourceLanguage: c.sourceLanguage as LanguageCode,
         targetLanguage: c.targetLanguage as LanguageCode,
         coverSeed: c.coverSeed ?? c.externalId ?? c.title,
@@ -179,6 +180,7 @@ export class PlatformCollectionsService {
     return {
       id: collection.id,
       title: collection.title,
+      titleTranslation: collection.titleTranslation ?? null,
       sourceLanguage: collection.sourceLanguage as LanguageCode,
       targetLanguage: collection.targetLanguage as LanguageCode,
       coverSeed: collection.coverSeed ?? collection.externalId ?? collection.title,
@@ -267,6 +269,7 @@ export class PlatformCollectionsService {
         id: colId,
         userId,
         name: platform.title,
+        titleTranslation: platform.titleTranslation ?? null,
         description: '',
         emoji: platform.emoji ?? '📚',
         colour: '#2D5A4E',
@@ -383,6 +386,7 @@ export class PlatformCollectionsService {
       id: e.id,
       userId: e.userId,
       name: e.name,
+      titleTranslation: e.titleTranslation ?? null,
       description: e.description,
       emoji: e.emoji,
       colour: e.colour,

@@ -349,6 +349,10 @@ export class CollectionDetailPage implements OnInit {
 
     const buttons: ActionSheetButton[] = [
       {
+        text: 'Set German level',
+        handler: () => this.editGermanLevel(col),
+      },
+      {
         text: this.translate.instant('collectionDetail.menu.shareOption'),
         icon: 'share-outline',
         handler: () => this.openShareSheet(),
@@ -384,6 +388,32 @@ export class CollectionDetailPage implements OnInit {
 
     const sheet = await this.actionSheetCtrl.create({ header: col.name, buttons });
     await sheet.present();
+  }
+
+  private async editGermanLevel(col: Collection): Promise<void> {
+    const alert = await this.alertCtrl.create({
+      header: 'German level',
+      inputs: [
+        {type: 'radio', label: 'No level', value: '', checked: !col.level},
+        ...(['A1', 'A2', 'B1', 'B2'] as const).map(level => ({
+          type: 'radio' as const, label: level, value: level, checked: col.level === level,
+        })),
+      ],
+      buttons: [
+        {text: 'Cancel', role: 'cancel'},
+        {text: 'Save', handler: (value: string) => {
+          if (value !== '' && value !== 'A1' && value !== 'A2' && value !== 'B1' && value !== 'B2') return false;
+          this.collectionStore.updateCollection(col.id, {level: value || null}).subscribe({
+            next: updated => {
+              this.collection.set(updated);
+              void this.vaultStore.loadActiveVault();
+            },
+          });
+          return true;
+        }},
+      ],
+    });
+    await alert.present();
   }
 
   private async confirmUnsync(resourceId: string): Promise<void> {

@@ -113,6 +113,7 @@ export const CollectionStore = signalStore(
           id: tempId,
           userId: uid() ?? '',
           name: dto.name,
+          level: dto.level ?? null,
           description: dto.description ?? '',
           emoji: dto.emoji ?? '📚',
           colour: dto.colour ?? '#2D5A4E',

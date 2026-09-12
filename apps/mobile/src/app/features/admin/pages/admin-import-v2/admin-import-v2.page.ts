@@ -62,6 +62,7 @@ export class AdminImportV2Page {
       collection: {
         externalId: this.requiredString(rawCollection, 'externalId'),
         title: this.requiredString(rawCollection, 'title'),
+        titleTranslation: this.nullableString(rawCollection['titleTranslation']),
         description: this.requiredString(rawCollection, 'description'),
         sourceLanguage: this.requiredString(rawCollection, 'sourceLanguage'),
         targetLanguage: this.requiredString(rawCollection, 'targetLanguage'),

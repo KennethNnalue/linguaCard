@@ -37,7 +37,7 @@ export class CollectionPickerSheetComponent implements OnInit {
     }
     return this.collectionStore
       .collections()
-      .map(col => ({ id: col.id, name: col.name, emoji: col.emoji ?? '📚', count: counts.get(col.id) ?? 0 }))
+      .map(col => ({ id: col.id, name: col.name, titleTranslation: col.titleTranslation, emoji: col.emoji ?? '📚', count: counts.get(col.id) ?? 0 }))
       .filter(c => c.count > 0);
   });
 

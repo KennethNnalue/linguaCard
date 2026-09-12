@@ -1,5 +1,4 @@
 import { BadRequestException, NotFoundException } from '@nestjs/common';
-import { describe, expect, it, jest } from '@jest/globals';
 import { LearningContextEntity } from '../entities/learning-context.entity';
 import type {
   CollectionSummaryRow,
@@ -58,6 +57,7 @@ function collectionSummary(): CollectionSummaryRow {
     id: 'collection-1',
     learningContextId: 'context-1',
     name: 'Home',
+    titleTranslation: null,
     description: '',
     coverSeed: 'home',
     coverImageUrl: null,

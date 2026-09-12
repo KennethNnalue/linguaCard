@@ -63,6 +63,7 @@ export class CreateCollectionDto {
   @IsOptional() @IsString() colour?: string;
   @IsString() contextId!: string;
   @IsOptional() @IsString() description?: string;
+  @IsOptional() @IsIn(['A1', 'A2', 'B1', 'B2', null]) level?: 'A1' | 'A2' | 'B1' | 'B2' | null;
 }
 
 export class UpdateCollectionDto {
@@ -70,6 +71,7 @@ export class UpdateCollectionDto {
   @IsOptional() @IsString() emoji?: string;
   @IsOptional() @IsString() colour?: string;
   @IsOptional() @IsString() description?: string;
+  @IsOptional() @IsIn(['A1', 'A2', 'B1', 'B2', null]) level?: 'A1' | 'A2' | 'B1' | 'B2' | null;
   @IsOptional() @IsString() importStatus?: string;
   @IsOptional() @IsArray() pendingWords?: unknown[];
   @IsOptional() @IsString() sourceImageDescription?: string;

@@ -479,6 +479,7 @@ export interface CreateCollectionDto {
   colour?: string;
   contextId: string;
   description?: string;
+  level?: CefrLevel | null;
 }
 
 export interface UpdateCollectionDto {
@@ -486,12 +487,14 @@ export interface UpdateCollectionDto {
   emoji?: string;
   colour?: string;
   description?: string;
+  level?: CefrLevel | null;
 }
 
 export interface Collection {
   id: string;
   userId: string;
   name: string;
+  titleTranslation?: string | null;
   description: string;
   emoji: string;
   colour: string;
@@ -563,6 +566,7 @@ export interface CollectionSummaryView {
   id: string;
   learningContextId: string;
   name: string;
+  titleTranslation: string | null;
   description: string;
   coverSeed: string;
   coverImageUrl: string | null;
@@ -1261,6 +1265,7 @@ export interface AdminImportCollectionDto {
   level: CefrLevel;
   topic?: CollectionTopic;
   title: string;
+  titleTranslation?: string | null;
   emoji?: string;
   words: RawWordInput[];
   reuseExisting?: boolean;
@@ -1358,6 +1363,7 @@ export interface EnrichedWordInput {
 
 export interface AdminImportCollectionJsonDto {
   title: string;
+  titleTranslation?: string | null;
   level: CefrLevel;
   topic?: CollectionTopic;
   emoji?: string;
@@ -1395,6 +1401,7 @@ export interface AdminPlatformCollectionImportPayload {
   collection: {
     externalId: string;
     title: string;
+    titleTranslation?: string | null;
     description: string;
     sourceLanguage: string;
     targetLanguage: string;
@@ -1448,6 +1455,7 @@ export interface AdminPlatformCollectionImportPreview {
   conflicts: AdminPlatformCollectionImportConflict[];
   collection: {
     title: string;
+    titleTranslation: string | null;
     level: CefrLevel;
     topic: CollectionTopic;
     coverSeed: string;
@@ -1489,6 +1497,7 @@ export interface AdminPlatformCollectionImportStatus {
 export interface AdminPlatformCollectionListItem {
   id: string;
   title: string;
+  titleTranslation: string | null;
   emoji: string | null;
   coverImageUrl: string | null;
   level: string;
@@ -1542,6 +1551,7 @@ export interface AdminSetStoryCategoryDto {
 
 export interface AdminUpdatePlatformCollectionDto {
   title: string;
+  titleTranslation?: string | null;
   level: CefrLevel;
 }
 
@@ -1552,6 +1562,7 @@ export type PlatformCollectionAdoptionStatus = 'not-adopted' | 'adopted';
 export interface PlatformCollectionSummary {
   id: string;
   title: string;
+  titleTranslation: string | null;
   sourceLanguage: LanguageCode;
   targetLanguage: LanguageCode;
   coverSeed: string;

@@ -77,7 +77,7 @@
       @for (col of masteryByCollection(); track col.id) {
         <div class="mb-col-row">
           <div class="mb-col-head">
-            <span class="mb-col-name">{{ col.name }}</span>
+            <span class="mb-col-name">{{ col.name }} @if (col.titleTranslation) { · {{ col.titleTranslation }} }</span>
             <span class="mb-col-stat">{{ col.mastered }} / {{ col.total }} · {{ col.pct }}%</span>
           </div>
           <div class="mb-col-track">

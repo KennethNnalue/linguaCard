@@ -5,8 +5,9 @@
         <lc-collection-cover [name]="data.name" [seed]="data.coverSeed" [imageUrl]="data.coverImageUrl" />
         <button class="back" type="button" (click)="goBack()" aria-label="Back">‹</button>
         <div class="hero-copy">
-          <p>{{ languagePair() }}</p>
+          <p>{{ languagePair() }} @if (data.level) { · {{ data.level }} }</p>
           <h1>{{ data.name }}</h1>
+          @if (data.titleTranslation) { <p>{{ data.titleTranslation }}</p> }
         </div>
       </header>
 

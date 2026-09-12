@@ -29,7 +29,7 @@
         (click)="select(col.id)">
         <span class="acs-emoji">{{ col.emoji }}</span>
         <div class="acs-row-info">
-          <span class="acs-row-name">{{ col.name }}</span>
+          <span class="acs-row-name">{{ col.name }} @if (col.titleTranslation) { · {{ col.titleTranslation }} }</span>
           <span class="acs-row-count">{{ col.cardCount }} {{ 'assignCollection.wordsLabel' | translate }}</span>
         </div>
         @if (selected() === col.id) {
@@ -58,6 +58,13 @@
           [placeholder]="'assignCollection.newCollection.placeholder' | translate"
           [formControl]="newNameCtrl"
           (keyup.enter)="createAndSelect()" />
+        <label class="acs-level-label">German level (optional)
+          <select [formControl]="newLevelCtrl">
+            @for (level of levels; track level) {
+              <option [value]="level">{{ level === 'all' ? 'No level' : level }}</option>
+            }
+          </select>
+        </label>
         <button
           class="acs-create-btn"
           [disabled]="newNameCtrl.invalid || creating()"

@@ -1,4 +1,4 @@
-import {ChangeDetectionStrategy, Component, computed, inject, OnDestroy, OnInit, signal} from '@angular/core';
+import {ChangeDetectionStrategy, Component, computed, effect, inject, OnDestroy, OnInit, signal} from '@angular/core';
 import {Router} from '@angular/router';
 import {
   IonButton,
@@ -32,6 +32,7 @@ import {VaultV2Store} from '../../store/vault-v2.store';
 import {ImportPage} from '../import/import.page';
 
 const LEVEL_FILTERS: ReadonlyArray<CefrLevel | 'all'> = ['all', 'A1', 'A2', 'B1', 'B2'];
+type CollectionTab = 'personal' | 'platform';
 
 @Component({
   selector: 'lc-vault',
@@ -66,12 +67,18 @@ export class VaultPage implements OnInit, OnDestroy {
   readonly vaultStore = inject(VaultV2Store);
   readonly searchOpen = signal(false);
   readonly collectionQuery = signal('');
+  readonly selectedTab = signal<CollectionTab>('personal');
+  readonly personalLevel = signal<CefrLevel | 'all'>('all');
   readonly levelFilters = LEVEL_FILTERS;
   readonly exploreLevel = this.platformStore.selectedLevel;
   readonly exploreLoading = this.platformStore.isLoading;
   readonly platformCollections = this.platformStore.visible;
   readonly collections = computed(() => this.vaultStore.vault()?.collections ?? []);
   readonly collectionsLoading = this.vaultStore.isVaultLoading;
+  readonly showPersonalTab = computed(() =>
+    this.collections().length > 0 || (this.vaultStore.vault() === null && this.collectionsLoading()),
+  );
+  readonly activeTab = computed(() => this.showPersonalTab() ? this.selectedTab() : 'platform');
   readonly totalCount = computed(() => this.vaultStore.vault()?.allWords.itemCount ?? 0);
   readonly masteredCount = computed(() => this.vaultStore.learningItems().filter(item =>
     item.reviewState.stage === 'mastered' && item.reviewState.relearning === undefined,
@@ -80,13 +87,21 @@ export class VaultPage implements OnInit, OnDestroy {
   readonly masteryProgress = computed(() => this.masteryPercent() / 100);
   readonly filteredCollections = computed(() => {
     const query = this.collectionQuery().trim().toLocaleLowerCase();
-    return query
-      ? this.collections().filter(collection => collection.name.toLocaleLowerCase().includes(query))
-      : this.collections();
+    const level = this.personalLevel();
+    return this.collections().filter(collection =>
+      (level === 'all' || collection.level === level)
+      && (!query || collection.name.toLocaleLowerCase().includes(query)
+        || collection.titleTranslation?.toLocaleLowerCase().includes(query)),
+    );
   });
 
   constructor() {
     addIcons({checkmarkOutline, closeOutline, folderOpenOutline, searchOutline});
+    effect(() => {
+      if (this.platformStore.lastAdoptEvent()?.type === 'success') {
+        this.selectedTab.set('personal');
+      }
+    });
     if (!this.platformStore.hasEverLoaded()) {
       this.platformStore.loadCollections();
     }
@@ -121,6 +136,20 @@ export class VaultPage implements OnInit, OnDestroy {
     const level = event.detail.value;
     if (typeof level === 'string' && this.isLevelFilter(level)) {
       this.platformStore.setLevel(level);
+    }
+  }
+
+  onPersonalLevelChange(event: SegmentCustomEvent): void {
+    const level = event.detail.value;
+    if (typeof level === 'string' && this.isLevelFilter(level)) {
+      this.personalLevel.set(level);
+    }
+  }
+
+  onTabChange(event: SegmentCustomEvent): void {
+    const tab = event.detail.value;
+    if (tab === 'personal' || tab === 'platform') {
+      this.selectedTab.set(tab);
     }
   }
 

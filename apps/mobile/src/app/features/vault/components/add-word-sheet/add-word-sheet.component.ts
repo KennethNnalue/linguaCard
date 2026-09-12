@@ -137,7 +137,7 @@ export class AddWordSheetComponent implements OnInit {
     const id = this._collectionId();
     if (!id) return this.translate.instant('addWord.collection.noSelectionLabel');
     const col = this.collectionStore.collections().find(c => c.id === id);
-    return col ? `${col.emoji} ${col.name}` : this.translate.instant('addWord.collection.noSelectionLabel');
+    return col ? `${col.emoji} ${col.name}${col.titleTranslation ? ` · ${col.titleTranslation}` : ''}` : this.translate.instant('addWord.collection.noSelectionLabel');
   });
 
   readonly canAutoGenerate = computed(() =>
@@ -152,7 +152,7 @@ export class AddWordSheetComponent implements OnInit {
     const card = this.duplicateCard();
     if (!card?.collectionId) return null;
     const col = this.collectionStore.collections().find(c => c.id === card.collectionId);
-    return col ? `${col.emoji ? col.emoji + ' ' : ''}${col.name}` : null;
+    return col ? `${col.emoji ? col.emoji + ' ' : ''}${col.name}${col.titleTranslation ? ` · ${col.titleTranslation}` : ''}` : null;
   });
 
   // ─── Local state ───────────────────────────────────────────────────────────

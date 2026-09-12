@@ -49,7 +49,7 @@
             >
               <span class="gs-col-emoji">{{ col.emoji }}</span>
               <div class="gs-col-info">
-                <span class="gs-col-name">{{ col.name }}</span>
+                <span class="gs-col-name">{{ col.name }} @if (col.titleTranslation) { · {{ col.titleTranslation }} }</span>
                 <span class="gs-col-count">{{ col.cardCount }} {{ 'stories.generate.wordsLabel' | translate }}</span>
               </div>
               <div class="gs-col-check" [ngClass]="{ visible: isSelected(col.id) }">

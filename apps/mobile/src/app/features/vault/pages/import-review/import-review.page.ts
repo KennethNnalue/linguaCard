@@ -85,7 +85,7 @@ export class ImportReviewPage implements OnInit {
     const noCol = this.translate.instant('importReview.collection.noSelectionLabel');
     if (!id) return noCol;
     const col = this.collectionStore.collections().find(c => c.id === id);
-    return col ? `${col.emoji} ${col.name}` : noCol;
+    return col ? `${col.emoji} ${col.name}${col.titleTranslation ? ` · ${col.titleTranslation}` : ''}` : noCol;
   });
 
   readonly selectedWords = computed(() => this.wordList().filter(w => w.selected));
