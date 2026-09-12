@@ -18,7 +18,7 @@ ion-content {
   gap: t.$lc-space-4;
   width: min(100%, 680px);
   margin: 0 auto;
-  padding: t.$lc-space-5 t.$lc-space-4 calc(t.$lc-space-10 + env(safe-area-inset-bottom));
+  padding: t.$lc-space-5 t.$lc-space-4 calc(88px + env(safe-area-inset-bottom, 0px));
 }
 
 .review-home__hero {

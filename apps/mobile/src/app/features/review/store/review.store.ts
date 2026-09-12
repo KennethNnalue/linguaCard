@@ -189,6 +189,15 @@ export const ReviewStore = signalStore(
       if (!userId) return;
       await localData.setSessionHistory(userId, sessions);
     }
+    async function readPersistedSessionHistory(userId: string): Promise<ReviewSessionHistoryEntry[]> {
+      return (await localData.getSessionHistory(userId))
+        .filter(isPersistedSessionHistoryEntry)
+        .map(session => ({
+          ...session,
+          originalCardIds: session.originalCardIds ?? session.reviewedCardIds,
+          manuallyMasteredCardIds: session.manuallyMasteredCardIds ?? [],
+        }));
+    }
     function toUpsertDto(session: ReviewSessionHistoryEntry): UpsertSessionDto {
       return {
         id: session.id, collectionId: session.collectionId, collectionName: session.collectionName,
@@ -294,16 +303,10 @@ export const ReviewStore = signalStore(
     }
 
     return {
-      async loadHistory(): Promise<void> {
+      async initializeFromPersistence(): Promise<void> {
         const userId = authService.currentUser()?.id;
         if (!userId) return;
-        const sessions: ReviewSessionHistoryEntry[] = (await localData.getSessionHistory(userId))
-          .filter(isPersistedSessionHistoryEntry)
-          .map(session => ({
-            ...session,
-            originalCardIds: session.originalCardIds ?? session.reviewedCardIds,
-            manuallyMasteredCardIds: session.manuallyMasteredCardIds ?? [],
-          }));
+        const sessionHistory = await readPersistedSessionHistory(userId);
         const committedEvents = (await reviewLocal.committedEvents(userId)).filter(isCommittedReviewEvent);
         let activeSessionState: Partial<ReviewState> = {};
         try {
@@ -329,13 +332,24 @@ export const ReviewStore = signalStore(
             commitError: 'The saved review session could not be restored.',
           };
         }
-        patchState(store, { sessionHistory: sessions, committedEvents, ...activeSessionState });
-        if ((await reviewLocal.pendingCommits(userId)).length > 0) {
+        if (authService.currentUser()?.id !== userId) return;
+        patchState(store, { sessionHistory, committedEvents, ...activeSessionState });
+        const pendingCommits = await reviewLocal.pendingCommits(userId);
+        if (authService.currentUser()?.id !== userId) return;
+        if (pendingCommits.length > 0) {
           await syncService.enqueue({ type: SyncOperationType.FLUSH_REVIEW_COMMITS, payload: { userId } });
         }
-        if ((await reviewLocal.pendingAdministrations(userId)).length > 0) {
+        const pendingAdministrations = await reviewLocal.pendingAdministrations(userId);
+        if (authService.currentUser()?.id !== userId) return;
+        if (pendingAdministrations.length > 0) {
           await syncService.enqueue({ type: SyncOperationType.FLUSH_CARD_ADMINISTRATIONS, payload: { userId } });
         }
+      },
+      async refreshHistory(userId: string): Promise<void> {
+        if (authService.currentUser()?.id !== userId) return;
+        const sessionHistory = await readPersistedSessionHistory(userId);
+        if (authService.currentUser()?.id !== userId) return;
+        patchState(store, { sessionHistory });
       },
       async startSession(source: ReviewSessionSource, limit: number): Promise<ReviewSessionStartResult> {
         const startSequence = beginSessionStart();

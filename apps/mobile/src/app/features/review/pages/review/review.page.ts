@@ -247,6 +247,7 @@ export class ReviewPage {
   }
 
   async dontKnow(): Promise<void> {
+    if (!this.currentCard() || this.reviewStore.operation().kind !== 'ready') return;
     this.typingFront()?.blurInput();
     this.isTypingFocused.set(false);
     this.dontKnowSelected.set(true);

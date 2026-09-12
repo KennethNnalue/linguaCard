@@ -34,39 +34,39 @@
       <ion-spinner name="crescent"></ion-spinner>
       <p class="lc-empty-title">{{ 'common.loading' | translate }}</p>
     </div>
-  } @else if (mode() === 'typing') {
-    <div class="rv-scene" [class.rv-scene--revealed]="isFlipped()">
-      <div class="rv-card-stage" [class.rv-card-stage--front]="!isFlipped()" [class.rv-card-stage--back]="isFlipped()">
-        <lc-rv-front-type
-          [class.rv-typing-front--inactive]="isFlipped()"
-          [attr.aria-hidden]="isFlipped()"
-          [prompt]="flipPrompt()"
-          [expectsGermanAnswer]="expectsGermanAnswer()"
-          [compact]="true"
-          [typed]="typed()"
-          (typedChange)="typed.set($event)"
-          (focusChanged)="isTypingFocused.set($event)"
-          (check)="checkTyped()"
-          (dontKnow)="dontKnow()" />
-        @if (isFlipped() && currentCard(); as card) {
-          <lc-rv-card-back
-            [card]="card"
-            [typedResult]="typedResult()?.feedback ?? null"
-            [expandedSynonym]="expandedSynonym()"
-            [isPronunciationLoading]="isPronunciationLoading()"
-            [isAudioPlaying]="isAudioPlaying()"
-            [audioPlaybackError]="audioPlaybackError()"
-            [busy]="reviewStore.isBusy()"
-            [readOnly]="isViewingPrevious()"
-            (toggleSynonym)="toggleSynonym($event)"
-            (playAudio)="playAudio()"
-            (playExample)="playExample($event)"
-            (cardActionsRequested)="openCardActions()" />
-        }
+  } @else if (currentCard(); as card) {
+    @if (mode() === 'typing') {
+      <div class="rv-scene" [class.rv-scene--revealed]="isFlipped()">
+        <div class="rv-card-stage" [class.rv-card-stage--front]="!isFlipped()" [class.rv-card-stage--back]="isFlipped()">
+          <lc-rv-front-type
+            [class.rv-typing-front--inactive]="isFlipped()"
+            [attr.aria-hidden]="isFlipped()"
+            [prompt]="flipPrompt()"
+            [expectsGermanAnswer]="expectsGermanAnswer()"
+            [compact]="true"
+            [typed]="typed()"
+            (typedChange)="typed.set($event)"
+            (focusChanged)="isTypingFocused.set($event)"
+            (check)="checkTyped()"
+            (dontKnow)="dontKnow()" />
+          @if (isFlipped()) {
+            <lc-rv-card-back
+              [card]="card"
+              [typedResult]="typedResult()?.feedback ?? null"
+              [expandedSynonym]="expandedSynonym()"
+              [isPronunciationLoading]="isPronunciationLoading()"
+              [isAudioPlaying]="isAudioPlaying()"
+              [audioPlaybackError]="audioPlaybackError()"
+              [busy]="reviewStore.isBusy()"
+              [readOnly]="isViewingPrevious()"
+              (toggleSynonym)="toggleSynonym($event)"
+              (playAudio)="playAudio()"
+              (playExample)="playExample($event)"
+              (cardActionsRequested)="openCardActions()" />
+          }
+        </div>
       </div>
-    </div>
-  } @else if (reviewStore.presentation()) {
-    @if (currentCard(); as card) {
+    } @else {
       <div class="rv-scene" [class.rv-scene--revealed]="isFlipped()">
         <div class="rv-card-stage" [class.rv-card-stage--front]="!isFlipped()" [class.rv-card-stage--back]="isFlipped()">
           @if (!isFlipped()) {
@@ -90,6 +90,11 @@
         </div>
       </div>
     }
+  } @else if (reviewStore.session()?.status === 'active') {
+    <div class="lc-empty-state" role="alert">
+      <p class="lc-empty-title">{{ 'common.error.generic' | translate }}</p>
+      <button class="rv-exit-btn" (click)="requestExit()">{{ 'review.session.backToHomeBtn' | translate }}</button>
+    </div>
   } @else {
     <div class="lc-empty-state">
       <span class="lc-empty-icon">🎉</span>
@@ -138,7 +143,7 @@
   </div>
 }
 
-@if (reviewStore.presentation()) {
+@if (currentCard()) {
   <ion-footer class="rv-footer ion-no-border" [class.rv-footer--keyboard]="mode() === 'typing' && !isFlipped()">
     <lc-rv-rating-footer
       [options]="ratingOptionsWithPreviews()"

@@ -14,6 +14,7 @@ import { ReviewCommitService } from '../services/review-commit.service';
 import { ReviewLocalRepository } from '../services/review-local.repository';
 import { ReviewPrefsService } from '../services/review-prefs.service';
 import { ReviewSessionBuilderService } from '../services/review-session-builder.service';
+import type { ReviewSessionHistoryEntry } from '../models/review.model';
 import { ReviewStore } from './review.store';
 
 function reviewCard(id: string): ScheduledCard {
@@ -95,7 +96,7 @@ describe('ReviewStore persisted active session', () => {
     });
     const store = TestBed.inject(ReviewStore);
 
-    await store.loadHistory();
+    await store.initializeFromPersistence();
 
     expect(store.resumableSessionId()).toBe('persisted-session');
     expect(store.totalOriginalCount()).toBe(2);
@@ -108,7 +109,7 @@ describe('ReviewStore persisted active session', () => {
     )).resolves.toEqual({kind: 'empty_library'});
     expect(store.resumableSessionId()).toBeNull();
 
-    await store.loadHistory();
+    await store.initializeFromPersistence();
     await expect(store.startSession({kind: 'daily'}, 20)).resolves.toEqual({kind: 'empty_library'});
     expect(store.resumableSessionId()).toBeNull();
   });
@@ -161,7 +162,7 @@ describe('ReviewStore persisted active session', () => {
       ],
     });
     const store = TestBed.inject(ReviewStore);
-    await store.loadHistory();
+    await store.initializeFromPersistence();
 
     const resuming = store.resumeSession('persisted-session');
 
@@ -171,5 +172,121 @@ describe('ReviewStore persisted active session', () => {
     await expect(resuming).resolves.toBe(true);
     expect(store.presentation()?.cardId).toBe('card-1');
     expect(localData.setActiveReviewSession).toHaveBeenCalled();
+  });
+
+  it('preserves a live presentation when synchronized history is refreshed', async () => {
+    const card = reviewCard('card-1');
+    const localData = {
+      getSessionHistory: jest.fn().mockResolvedValue([]),
+      getActiveReviewSession: jest.fn().mockResolvedValue(null),
+      setActiveReviewSession: jest.fn().mockResolvedValue(undefined),
+      clearActiveReviewSession: jest.fn().mockResolvedValue(undefined),
+    };
+    const reviewLocal = {
+      committedEvents: jest.fn().mockResolvedValue([]),
+      pendingCommits: jest.fn().mockResolvedValue([]),
+      pendingAdministrations: jest.fn().mockResolvedValue([]),
+    };
+    TestBed.configureTestingModule({
+      providers: [
+        ReviewStore,
+        {provide: CardStore, useValue: {cards: () => [card]}},
+        {provide: LocalDataService, useValue: localData},
+        {provide: AuthService, useValue: {currentUser: () => ({id: 'user-1'})}},
+        {provide: SyncService, useValue: {enqueue: jest.fn()}},
+        {provide: ReviewSessionBuilderService, useValue: {ensureCardsReady: jest.fn().mockResolvedValue(null)}},
+        {provide: ReviewPrefsService, useValue: {mode: () => 'type', dir: () => 'en-de'}},
+        {provide: ReviewCommitService, useValue: {}},
+        {provide: ReviewLocalRepository, useValue: reviewLocal},
+        {provide: EngagementStore, useValue: {}},
+        {provide: CardAdministrationService, useValue: {}},
+        {provide: SettingsStore, useValue: {}},
+        {provide: ReviewAudioPreparationService, useValue: {prepare: jest.fn().mockResolvedValue(undefined)}},
+      ],
+    });
+    const store = TestBed.inject(ReviewStore);
+    await expect(store.startSessionForCards(
+      {kind: 'explicit', cardIds: [card.id]},
+      [card.id],
+    )).resolves.toMatchObject({kind: 'started'});
+    const session = store.session();
+    const presentation = store.presentation();
+    const sessionCards = store.sessionCards();
+    const committedEvents = store.committedEvents();
+
+    localData.getSessionHistory.mockResolvedValue([{
+      id: 'completed-session',
+      startedAt: '2026-09-11T07:00:00.000Z',
+      completedAt: '2026-09-11T07:10:00.000Z',
+      totalCards: 1,
+      newCards: 0,
+      collectionId: null,
+      collectionName: null,
+      ratings: {'older-card': 'good'},
+      reviewedCardIds: ['older-card'],
+    }]);
+
+    await store.refreshHistory('user-1');
+
+    expect(store.session()).toBe(session);
+    expect(store.presentation()).toBe(presentation);
+    expect(store.sessionCards()).toBe(sessionCards);
+    expect(store.committedEvents()).toBe(committedEvents);
+    expect(store.operation()).toEqual({kind: 'ready'});
+    expect(store.sessionHistory()).toHaveLength(1);
+  });
+
+  it('ignores a synchronized history result after the authenticated user changes', async () => {
+    let userId = 'user-1';
+    let finishHistoryLoading: () => void = () => undefined;
+    const synchronizedHistory: ReviewSessionHistoryEntry[] = [{
+      id: 'other-user-session',
+      startedAt: '2026-09-11T07:00:00.000Z',
+      completedAt: '2026-09-11T07:10:00.000Z',
+      totalCards: 1,
+      newCards: 0,
+      collectionId: null,
+      collectionName: null,
+      ratings: {'card-1': 'good'},
+      originalCardIds: ['card-1'],
+      reviewedCardIds: ['card-1'],
+      manuallyMasteredCardIds: [],
+    }];
+    const historyLoaded = new Promise<ReviewSessionHistoryEntry[]>(resolve => {
+      finishHistoryLoading = () => resolve(synchronizedHistory);
+    });
+    TestBed.configureTestingModule({
+      providers: [
+        ReviewStore,
+        {provide: CardStore, useValue: {cards: () => []}},
+        {
+          provide: LocalDataService,
+          useValue: {
+            getSessionHistory: jest.fn().mockReturnValue(historyLoaded),
+          },
+        },
+        {provide: AuthService, useValue: {currentUser: () => ({id: userId})}},
+        {provide: SyncService, useValue: {}},
+        {provide: ReviewSessionBuilderService, useValue: {}},
+        {provide: ReviewPrefsService, useValue: {}},
+        {provide: ReviewCommitService, useValue: {}},
+        {
+          provide: ReviewLocalRepository,
+          useValue: {committedEvents: jest.fn().mockResolvedValue([])},
+        },
+        {provide: EngagementStore, useValue: {}},
+        {provide: CardAdministrationService, useValue: {}},
+        {provide: SettingsStore, useValue: {}},
+        {provide: ReviewAudioPreparationService, useValue: {}},
+      ],
+    });
+    const store = TestBed.inject(ReviewStore);
+
+    const refreshing = store.refreshHistory('user-1');
+    userId = 'user-2';
+    finishHistoryLoading();
+    await refreshing;
+
+    expect(store.sessionHistory()).toEqual([]);
   });
 });

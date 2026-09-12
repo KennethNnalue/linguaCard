@@ -4,15 +4,18 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  min-height: 68px;
-  padding: calc(t.$lc-space-1 + env(safe-area-inset-top)) t.$lc-space-4 t.$lc-space-2;
+  min-height: 64px;
+  padding: t.$lc-space-2 t.$lc-space-5 t.$lc-space-3;
 }
 
 .review-home__brand {
-  font-family: t.$lc-font-rv-display;
-  font-size: t.$lc-text-3xl;
-  font-weight: t.$lc-font-weight-semibold;
-  letter-spacing: -0.02em;
+  margin: 0;
+  color: var(--lc-rv-text);
+  font-family: t.$lc-font-display;
+  font-size: 34px;
+  font-weight: t.$lc-font-weight-medium;
+  line-height: 0.95;
+  letter-spacing: -0.5px;
 }
 
 .review-home__nav-actions {

@@ -51,8 +51,7 @@ export class AppComponent implements OnInit {
   async ngOnInit(): Promise<void> {
     await this.localData.init();
 
-    // Load persisted session history before any UI renders
-    await this.reviewStore.loadHistory();
+    await this.reviewStore.initializeFromPersistence();
 
     if (this.authService.isAuthenticated()) {
       this.subscriptionStore.loadStatus();

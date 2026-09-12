@@ -6,9 +6,10 @@ import {TranslatePipe} from '@ngx-translate/core';
 import {addIcons} from 'ionicons';
 import {
   bookOutline,
-  documentTextOutline,
-  fileTrayOutline,
-  headsetOutline,
+  folderOpenOutline,
+  homeOutline,
+  playCircleOutline,
+  volumeHighOutline,
 } from 'ionicons/icons';
 
 const IMMERSIVE_PLAYER_ROUTES = [
@@ -35,7 +36,7 @@ export class TabsPage {
   );
 
   constructor() {
-    addIcons({bookOutline, documentTextOutline, fileTrayOutline, headsetOutline});
+    addIcons({bookOutline, folderOpenOutline, homeOutline, playCircleOutline, volumeHighOutline});
 
     this.router.events.pipe(takeUntilDestroyed()).subscribe(event => {
       if (event instanceof NavigationEnd) {
