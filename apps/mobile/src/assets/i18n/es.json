@@ -249,6 +249,7 @@
       "title": "Filtrar por colección"
     },
     "collections": {
+      "yoursTitle": "Tus colecciones",
       "totalWordsLabel": "Total de palabras",
       "collectionsLabel": "Colecciones",
       "dueTodayLabel": "Pendientes hoy",
@@ -273,6 +274,7 @@
       "reviewCount": "Repasar {{count}}"
     },
     "explore": {
+      "platformTitle": "Colecciones de la plataforma",
       "title": "Explorar",
       "subtitle": "Seleccionado por LinguaCard",
       "seeAll": "Ver todo",
@@ -754,7 +756,7 @@
       "continueAction": "Seguir repasando",
       "viewProgress": "Ver progreso",
       "optionalPractice": "Práctica opcional",
-      "settings": {"title": "Ajustes de repaso", "studyMode": "Modo de estudio"}
+      "settings": {"title": "Ajustes de repaso", "studyMode": "Modo de estudio", "current": "Actual:"}
     },
     "more": {
       "eyebrow": "Práctica",

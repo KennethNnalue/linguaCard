@@ -249,6 +249,7 @@
       "title": "Фильтр по коллекции"
     },
     "collections": {
+      "yoursTitle": "Ваши коллекции",
       "totalWordsLabel": "Всего слов",
       "collectionsLabel": "Коллекции",
       "dueTodayLabel": "К повторению сегодня",
@@ -273,6 +274,7 @@
       "reviewCount": "Повторить {{count}}"
     },
     "explore": {
+      "platformTitle": "Коллекции платформы",
       "title": "Обзор",
       "subtitle": "Подборка LinguaCard",
       "seeAll": "Все",
@@ -754,7 +756,7 @@
       "continueAction": "Продолжить повторение",
       "viewProgress": "Посмотреть прогресс",
       "optionalPractice": "Дополнительная практика",
-      "settings": {"title": "Настройки повторения", "studyMode": "Режим обучения"}
+      "settings": {"title": "Настройки повторения", "studyMode": "Режим обучения", "current": "Выбрано:"}
     },
     "more": {
       "eyebrow": "Практика",

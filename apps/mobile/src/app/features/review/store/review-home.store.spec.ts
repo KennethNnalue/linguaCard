@@ -108,6 +108,12 @@ describe('ReviewHomeStore', () => {
     const {store} = configure();
 
     expect(store.viewModel()).toEqual({kind: 'loading'});
+    expect(store.dashboard()).toEqual({
+      completedToday: 0,
+      goal: 20,
+      streak: 6,
+      preferences: {mode: 'type', autoplay: 'answer_and_example'},
+    });
   });
 
   it('prioritizes an active session without calculating a replacement plan', async () => {
@@ -125,10 +131,6 @@ describe('ReviewHomeStore', () => {
       remainingCards: 1,
       estimatedMinutes: 1,
       sessionProgress: 0.5,
-      completedToday: 20,
-      goal: 20,
-      streak: 6,
-      preferences: { mode: 'type', autoplay: 'answer_and_example' },
     });
     expect(plan).not.toHaveBeenCalled();
   });
@@ -150,11 +152,7 @@ describe('ReviewHomeStore', () => {
 
     expect(store.viewModel()).toEqual({
       kind: 'ready',
-      completedToday: 8,
-      goal: 20,
-      streak: 6,
       plan: planResult.plan,
-      preferences: { mode: 'type', autoplay: 'answer_and_example' },
     });
   });
 
@@ -167,13 +165,15 @@ describe('ReviewHomeStore', () => {
       kind: 'complete',
       reviewedToday: 20,
       goal: 20,
-      streak: 6,
-      continuationPlan: {
-        cardIds: ['review-1'],
-        dueCards: 0,
-        newCards: 0,
-        reviewCards: 1,
-        estimatedMinutes: 1,
+      continuation: {
+        kind: 'ready',
+        plan: {
+          cardIds: ['review-1'],
+          dueCards: 0,
+          newCards: 0,
+          reviewCards: 1,
+          estimatedMinutes: 1,
+        },
       },
     });
     expect(plan).toHaveBeenCalledWith(
@@ -196,8 +196,26 @@ describe('ReviewHomeStore', () => {
       kind: 'complete',
       reviewedToday: 20,
       goal: 20,
-      streak: 6,
-      continuationPlan: null,
+      continuation: {kind: 'none'},
+    });
+  });
+
+  it('updates a previously ready continuation when no cards remain eligible', async () => {
+    const {store, plan} = configure({completedToday: 20, goal: 20});
+    await store.refresh();
+    expect(store.viewModel()).toMatchObject({
+      kind: 'complete',
+      continuation: {kind: 'ready'},
+    });
+
+    plan.mockResolvedValueOnce({kind: 'nothing_eligible'});
+    await store.refresh();
+
+    expect(store.viewModel()).toEqual({
+      kind: 'complete',
+      reviewedToday: 20,
+      goal: 20,
+      continuation: {kind: 'none'},
     });
   });
 
@@ -217,8 +235,7 @@ describe('ReviewHomeStore', () => {
       kind: 'complete',
       reviewedToday: 20,
       goal: 20,
-      streak: 6,
-      continuationPlan: null,
+      continuation: {kind: 'error'},
     });
   });
 
@@ -235,11 +252,7 @@ describe('ReviewHomeStore', () => {
       },
     }).store;
     await failed.refresh();
-    expect(failed.viewModel()).toEqual({
-      kind: 'error',
-      message: 'Cards could not be loaded.',
-      recoverable: true,
-    });
+    expect(failed.viewModel()).toEqual({kind: 'error'});
   });
 
   it('maps an ineligible queue to the caught-up landing state', async () => {
@@ -247,6 +260,6 @@ describe('ReviewHomeStore', () => {
 
     await store.refresh();
 
-    expect(store.viewModel()).toEqual({kind: 'nothing-eligible', canAddWords: true});
+    expect(store.viewModel()).toEqual({kind: 'nothing-eligible'});
   });
 });

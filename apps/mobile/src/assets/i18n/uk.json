@@ -249,6 +249,7 @@
       "title": "Фільтрувати за колекцією"
     },
     "collections": {
+      "yoursTitle": "Ваші колекції",
       "totalWordsLabel": "Загалом слів",
       "collectionsLabel": "Колекцій",
       "dueTodayLabel": "На сьогодні",
@@ -273,6 +274,7 @@
       "reviewCount": "Повторити {{count}}"
     },
     "explore": {
+      "platformTitle": "Колекції платформи",
       "title": "Огляд",
       "subtitle": "Дібрано LinguaCard",
       "seeAll": "Усі",
@@ -754,7 +756,7 @@
       "continueAction": "Продовжити повторення",
       "viewProgress": "Переглянути прогрес",
       "optionalPractice": "Додаткова практика",
-      "settings": {"title": "Налаштування повторення", "studyMode": "Режим навчання"}
+      "settings": {"title": "Налаштування повторення", "studyMode": "Режим навчання", "current": "Вибрано:"}
     },
     "more": {
       "eyebrow": "Практика",

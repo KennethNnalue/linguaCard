@@ -7,55 +7,20 @@ import { SettingsStore } from '../../settings/store/settings.store';
 import { estimateReviewMinutes } from '../application/estimate-review-time';
 import {
   ReviewSessionPlanningService,
-  type ReviewSessionPlan,
   type ReviewSessionPlanResult,
 } from '../application/review-session-planning.service';
 import type { ReviewSessionState } from '../domain/review-domain';
-import type { ReviewAutoplayMode } from '../application/review-audio-policy';
 import {
   ReviewPrefsService,
-  type StudyMode,
   toPromptDirection,
   toReviewMode,
 } from '../services/review-prefs.service';
+import type {
+  ReviewHomeContinuation,
+  ReviewHomeDashboard,
+  ReviewHomeViewModel,
+} from '../models/review-home.model';
 import { ReviewStore } from './review.store';
-
-export interface ReviewPreferenceSummary {
-  mode: StudyMode;
-  autoplay: ReviewAutoplayMode;
-}
-
-export type ReviewHomeViewModel =
-  | { kind: 'loading' }
-  | { kind: 'error'; message: string; recoverable: true }
-  | {
-      kind: 'resume';
-      sessionId: string;
-      remainingCards: number;
-      estimatedMinutes: number;
-      sessionProgress: number;
-      completedToday: number;
-      goal: number;
-      streak: number;
-      preferences: ReviewPreferenceSummary;
-    }
-  | { kind: 'empty' }
-  | {
-      kind: 'complete';
-      reviewedToday: number;
-      goal: number;
-      streak: number;
-      continuationPlan: ReviewSessionPlan | null;
-    }
-  | {
-      kind: 'ready';
-      completedToday: number;
-      goal: number;
-      streak: number;
-      plan: ReviewSessionPlan;
-      preferences: ReviewPreferenceSummary;
-    }
-  | { kind: 'nothing-eligible'; canAddWords: boolean };
 
 type ReviewHomePlanState =
   | { status: 'idle' }
@@ -69,6 +34,12 @@ interface ReviewHomeState {
 const initialState: ReviewHomeState = {
   planState: { status: 'idle' },
 };
+
+function continuationFromPlan(result: ReviewSessionPlanResult): ReviewHomeContinuation {
+  if (result.kind === 'ready') return {kind: 'ready', plan: result.plan};
+  if (result.kind === 'load_failed') return {kind: 'error'};
+  return {kind: 'none'};
+}
 
 function buildRemainingSessionEstimate(
   session: ReviewSessionState,
@@ -102,13 +73,17 @@ export const ReviewHomeStore = signalStore(
     const engagement = inject(EngagementStore);
     const prefs = inject(ReviewPrefsService);
     const cards = inject(CardStore);
+    const dashboard = computed<ReviewHomeDashboard>(() => ({
+      completedToday: engagement.completedToday(),
+      goal: Math.max(1, engagement.dailyGoal()),
+      streak: engagement.streak().current,
+      preferences: {mode: prefs.mode(), autoplay: prefs.autoplay()},
+    }));
 
     return {
+      dashboard,
       viewModel: computed<ReviewHomeViewModel>(() => {
-        const completedToday = engagement.completedToday();
-        const goal = Math.max(1, engagement.dailyGoal());
-        const streak = engagement.streak().current;
-        const preferences = { mode: prefs.mode(), autoplay: prefs.autoplay() };
+        const {completedToday, goal} = dashboard();
         const session = review.session();
 
         if (session?.status === 'active') {
@@ -117,10 +92,6 @@ export const ReviewHomeStore = signalStore(
             kind: 'resume',
             sessionId: session.definition.id,
             ...remaining,
-            completedToday,
-            goal,
-            streak,
-            preferences,
           };
         }
 
@@ -134,17 +105,16 @@ export const ReviewHomeStore = signalStore(
             kind: 'complete',
             reviewedToday: completedToday,
             goal,
-            streak,
-            continuationPlan: result.kind === 'ready' ? result.plan : null,
+            continuation: continuationFromPlan(result),
           };
         }
         if (result.kind === 'load_failed') {
-          return { kind: 'error', message: result.error.message, recoverable: true };
+          return {kind: 'error'};
         }
         if (result.kind === 'nothing_eligible' || result.kind === 'source_matched_nothing') {
-          return { kind: 'nothing-eligible', canAddWords: true };
+          return {kind: 'nothing-eligible'};
         }
-        return { kind: 'ready', completedToday, goal, streak, plan: result.plan, preferences };
+        return {kind: 'ready', plan: result.plan};
       }),
     };
   }),

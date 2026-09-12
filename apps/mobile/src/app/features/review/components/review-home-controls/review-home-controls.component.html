@@ -1,0 +1,68 @@
+<section class="review-home-controls">
+  <ion-item
+    button="true"
+    detail="false"
+    class="review-home-controls__settings"
+    (click)="reviewSettingsRequested.emit()"
+  >
+    <ion-icon slot="start" name="settings-outline"/>
+    <ion-label class="review-home-controls__settings-label">
+      <span class="review-home-controls__settings-title">
+        {{ 'review.home.settings.title' | translate }}
+      </span>
+      <span class="review-home-controls__settings-summary">
+        <span class="review-home-controls__settings-label-title">
+          {{ 'review.home.settings.studyMode' | translate }}:
+        </span>
+        <span>{{ studyModeLabelKey() | translate }}</span>
+        <span aria-hidden="true">·</span>
+        <span class="review-home-controls__settings-label-title">
+          {{ 'review.audioAutoplay.title' | translate }}:
+        </span>
+        <span>          {{ autoplayLabelKey() | translate }}</span>
+      </span>
+    </ion-label>
+    <ion-icon slot="end" name="chevron-forward-outline"/>
+  </ion-item>
+
+  <ion-item
+    button="true"
+    detail="false"
+    class="review-home-controls__daily-status"
+    (click)="progressRequested.emit()"
+  >
+    <span class="review-home-controls__metric">
+      <ion-icon name="stats-chart-outline"/>
+      @if (dailyGoalComplete()) {
+        {{ 'review.home.goalComplete' | translate }}
+      } @else {
+        {{
+          'review.home.todayProgress' | translate:{
+            completed: dashboard().completedToday,
+            goal: dashboard().goal
+          }
+        }}
+      }
+    </span>
+    <span class="review-home-controls__metric review-home-controls__metric--streak">
+      <ion-icon name="flame-outline"/>
+      {{ 'review.home.streak' | translate:{count: dashboard().streak} }}
+      <ion-icon class="review-home-controls__metric-chevron" name="chevron-forward-outline"/>
+    </span>
+  </ion-item>
+
+  <ng-content select="[review-home-continuation]"/>
+
+  @if (morePracticeAvailable()) {
+    <ion-item
+      button="true"
+      detail="false"
+      class="review-home-controls__more-practice"
+      (click)="morePracticeRequested.emit()"
+    >
+      <ion-icon slot="start" name="book-outline"/>
+      <ion-label>{{ 'review.home.morePractice' | translate }}</ion-label>
+      <ion-icon slot="end" name="chevron-forward-outline"/>
+    </ion-item>
+  }
+</section>

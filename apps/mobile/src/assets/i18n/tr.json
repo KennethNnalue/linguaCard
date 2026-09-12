@@ -249,6 +249,7 @@
       "title": "Koleksiyona göre filtrele"
     },
     "collections": {
+      "yoursTitle": "Koleksiyonların",
       "totalWordsLabel": "Toplam kelime",
       "collectionsLabel": "Koleksiyon",
       "dueTodayLabel": "Bugün bekleyen",
@@ -273,6 +274,7 @@
       "reviewCount": "{{count}} tekrar"
     },
     "explore": {
+      "platformTitle": "Platform koleksiyonları",
       "title": "Keşfet",
       "subtitle": "LinguaCard seçkisi",
       "seeAll": "Tümünü gör",
@@ -754,7 +756,7 @@
       "continueAction": "Tekrara devam et",
       "viewProgress": "İlerlemeyi gör",
       "optionalPractice": "İsteğe bağlı pratik",
-      "settings": {"title": "Tekrar ayarları", "studyMode": "Çalışma modu"}
+      "settings": {"title": "Tekrar ayarları", "studyMode": "Çalışma modu", "current": "Şu anda:"}
     },
     "more": {
       "eyebrow": "Pratik",

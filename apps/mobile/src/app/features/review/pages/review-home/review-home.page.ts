@@ -7,8 +7,6 @@ import {
   IonFabButton,
   IonHeader,
   IonIcon,
-  IonItem,
-  IonLabel,
   IonPopover,
   IonRefresher,
   IonRefresherContent,
@@ -22,18 +20,13 @@ import {addIcons} from 'ionicons';
 import {
   addCircleOutline,
   arrowForwardOutline,
-  bookOutline,
   checkmarkOutline,
   chevronForwardOutline,
   copyOutline,
   documentOutline,
-  ellipsisHorizontalCircleOutline,
-  flameOutline,
   notificationsOutline,
   refreshOutline,
   reorderTwoOutline,
-  settingsOutline,
-  statsChartOutline,
 } from 'ionicons/icons';
 import {filter} from 'rxjs';
 import {AuthService} from '../../../../core/services/auth.service';
@@ -41,14 +34,16 @@ import {UserMenuComponent} from '../../../../shared/components/user-menu/user-me
 import {ResetDataSheetComponent} from '../../../auth/components/reset-data-sheet/reset-data-sheet.component';
 import {ShareStore} from '../../../sharing/store/share.store';
 import {AddWordSheetComponent} from '../../../vault/components/add-word-sheet/add-word-sheet.component';
+import {ReviewHomeControlsComponent} from '../../components/review-home-controls/review-home-controls.component';
 import {
   ReviewSettingsSheetComponent,
   type ReviewSettingsResult,
 } from '../../components/review-settings-sheet/review-settings-sheet.component';
 import {ReviewRoute} from '../../models/review.model';
+import type {ReviewHomeViewModel} from '../../models/review-home.model';
 import {ReviewPlayerService} from '../../services/review-player.service';
 import {ReviewPrefsService} from '../../services/review-prefs.service';
-import {ReviewHomeStore, type ReviewHomeViewModel} from '../../store/review-home.store';
+import {ReviewHomeStore} from '../../store/review-home.store';
 
 @Component({
   selector: 'lc-review-home',
@@ -67,8 +62,6 @@ import {ReviewHomeStore, type ReviewHomeViewModel} from '../../store/review-home
     IonFabButton,
     IonHeader,
     IonIcon,
-    IonItem,
-    IonLabel,
     IonPopover,
     IonRefresher,
     IonRefresherContent,
@@ -76,6 +69,7 @@ import {ReviewHomeStore, type ReviewHomeViewModel} from '../../store/review-home
     IonSpinner,
     IonToolbar,
     TranslatePipe,
+    ReviewHomeControlsComponent,
     UserMenuComponent,
   ],
 })
@@ -96,18 +90,13 @@ export class ReviewHomePage {
     addIcons({
       addCircleOutline,
       arrowForwardOutline,
-      bookOutline,
       checkmarkOutline,
       chevronForwardOutline,
       copyOutline,
       documentOutline,
-      ellipsisHorizontalCircleOutline,
-      flameOutline,
       notificationsOutline,
       refreshOutline,
       reorderTwoOutline,
-      settingsOutline,
-      statsChartOutline,
     });
 
     this.router.events.pipe(
@@ -135,8 +124,8 @@ export class ReviewHomePage {
       await this.store.refresh();
       return;
     }
-    if (viewModel.kind === 'complete' && viewModel.continuationPlan) {
-      await this.reviewPlayer.openPlanned(viewModel.continuationPlan.cardIds, {kind: 'daily'});
+    if (viewModel.kind === 'complete' && viewModel.continuation.kind === 'ready') {
+      await this.reviewPlayer.openPlanned(viewModel.continuation.plan.cardIds, {kind: 'daily'});
       await this.store.refresh();
       return;
     }
@@ -222,10 +211,5 @@ export class ReviewHomePage {
     void this.store.refresh().finally(() => {
       void (event.target as HTMLIonRefresherElement).complete();
     });
-  }
-
-  preferenceLabel(viewModel: Extract<ReviewHomeViewModel, {kind: 'ready' | 'resume'}>): string {
-    const mode = viewModel.preferences.mode === 'type' ? 'review.mode.type' : 'review.mode.flip';
-    return `${mode}|review.audioAutoplay.${viewModel.preferences.autoplay}`;
   }
 }

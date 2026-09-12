@@ -1,468 +1,155 @@
 <ion-content [fullscreen]="true" class="vault-content">
   <ion-refresher slot="fixed" (ionRefresh)="handleRefresh($event)">
-    <ion-refresher-content></ion-refresher-content>
+    <ion-refresher-content />
   </ion-refresher>
 
-  @switch (view()) {
+  <main class="vault">
+    <div class="vault__sticky-header">
+      <header class="vault__header">
+        <h1>{{ 'vault.title' | translate }}</h1>
+        <ion-button
+          fill="clear"
+          shape="round"
+          class="vault__search-toggle"
+          [class.vault__search-toggle--active]="searchOpen()"
+          [attr.aria-label]="searchOpen() ? ('common.close' | translate) : ('vault.explore.searchAria' | translate)"
+          [attr.aria-pressed]="searchOpen()"
+          (click)="toggleSearch()"
+        >
+          <ion-icon slot="icon-only" [name]="searchOpen() ? 'close-outline' : 'search-outline'" />
+        </ion-button>
+      </header>
 
-    @case ('home') {
-      <!-- ═══════════ HOME / LIBRARY ═══════════ -->
-      <div class="home" [class.home--searching]="searchOpen()">
+      @if (searchOpen()) {
+        <ion-searchbar
+          class="vault__search"
+          [value]="collectionQuery()"
+          [placeholder]="'vault.explore.searchPlaceholder' | translate"
+          [attr.aria-label]="'vault.explore.searchAria' | translate"
+          [debounce]="100"
+          show-clear-button="focus"
+          (ionInput)="onCollectionSearch($event)"
+        />
+      }
+    </div>
 
-        <!-- Header + inline search -->
-        <div class="home-top">
-          <!-- Header -->
-          <header class="page-head">
-            <div>
-              <h1 class="page-title">{{ 'vault.title' | translate }}</h1>
-            </div>
-            <button class="icon-btn" [class.icon-btn--active]="searchOpen()" (click)="toggleSearch()"
-                    [attr.aria-label]="'vault.explore.searchAria' | translate">
-              @if (searchOpen()) {
-                <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.2"
-                     stroke-linecap="round">
-                  <line x1="6" y1="6" x2="18" y2="18"/>
-                  <line x1="18" y1="6" x2="6" y2="18"/>
-                </svg>
-              } @else {
-                <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2"
-                     stroke-linecap="round">
-                  <circle cx="11" cy="11" r="7"/>
-                  <line x1="21" y1="21" x2="16.5" y2="16.5"/>
-                </svg>
-              }
-            </button>
-          </header>
+    <section class="vault-progress" [attr.aria-label]="'vault.lexicon.masteredOf' | translate:{mastered: masteredCount(), total: totalCount()}">
+      <div class="vault-progress__copy">
+        <span>{{ 'vault.lexicon.masteredOf' | translate:{mastered: masteredCount(), total: totalCount()} }}</span>
+        <strong>{{ masteryPercent() }}%</strong>
+      </div>
+      <ion-progress-bar [value]="masteryProgress()" />
+    </section>
 
-          <!-- Inline collection search (personal + platform) -->
-          @if (searchOpen()) {
-            <div class="search search--home">
-              <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"
-                   stroke-linecap="round">
-                <circle cx="11" cy="11" r="7"/>
-                <line x1="21" y1="21" x2="16.5" y2="16.5"/>
-              </svg>
-              <input
-                class="search-input"
-                type="search"
-                [value]="collectionQuery()"
-                [placeholder]="'vault.explore.searchPlaceholder' | translate"
-                (input)="onCollectionSearch($event)"
-                [attr.aria-label]="'vault.explore.searchAria' | translate"
-              />
-              @if (collectionQuery()) {
-                <button class="search-clear" (click)="clearSearch()" [attr.aria-label]="'common.close' | translate">
-                  <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.2"
-                       stroke-linecap="round">
-                    <line x1="6" y1="6" x2="18" y2="18"/>
-                    <line x1="18" y1="6" x2="6" y2="18"/>
-                  </svg>
-                </button>
-              }
-            </div>
-          }
-        </div>
-        <!-- /home-top -->
-
-        <!-- Hero + All Words are hidden while searching so results lead. -->
-        @if (!searchOpen()) {
-          <!-- Focus hero -->
-          <section class="hero">
-            <span class="hero-glow"></span>
-            <span class="hero-glow hero-glow--soft"></span>
-
-            <div class="hero-top">
-              <span class="eyebrow eyebrow--hero">{{ 'vault.lexicon.readyToReview' | translate }}</span>
-              <span class="streak-chip">
-              <span class="streak-dot"></span>
-                {{ 'vault.lexicon.streakChip' | translate:{count: dayStreak()} }}
-            </span>
-            </div>
-
-            <div class="hero-due">
-              <span class="hero-number">{{ dueCount() }}</span>
-              <span class="hero-due-label">{{ 'vault.lexicon.wordsDue' | translate }}</span>
-            </div>
-            <p class="hero-sub">{{ 'vault.lexicon.acrossCollections' | translate:{count: collectionCount()} }}</p>
-
-            <div class="hero-dist">
-              <div class="dist-bar">
-                @for (seg of distSegments(); track seg.level) {
-                  <span class="dist-seg" [style.width.%]="seg.width" [style.background]="seg.color"></span>
-                }
-              </div>
-              <div class="dist-meta">
-                <span>{{
-                    'vault.lexicon.masteredOf' | translate:{
-                      mastered: masteredCount(),
-                      total: totalCount()
-                    }
-                  }}</span>
-                <span class="dist-pct">{{ masteryPct() }}%</span>
-              </div>
-            </div>
-
-            <div class="hero-actions">
-              <button class="btn-paper" (click)="startReview()">
-                <svg viewBox="0 0 24 24" width="15" height="15" fill="currentColor">
-                  <polygon points="6,4 20,12 6,20"/>
-                </svg>
-                {{ 'vault.lexicon.startReview' | translate }}
-              </button>
-              <button class="btn-ghost" (click)="startListen()">
-                <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"
-                     stroke-linecap="round">
-                  <polygon points="11,5 6,9 2,9 2,15 6,15 11,19 11,5"/>
-                  <path d="M15.5,8.5a5,5,0,0,1,0,7"/>
-                </svg>
-                {{ 'vault.lexicon.listen' | translate }}
-              </button>
-            </div>
-          </section>
-
-          <!-- All Words index card -->
-          <button class="all-words" (click)="openIndex()">
-          <span class="all-words-icon">
-            <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8"
-                 stroke-linecap="round" stroke-linejoin="round"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12"
-                                                                                                          x2="21"
-                                                                                                          y2="12"/><line
-              x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01"
-                                                                                          y2="12"/><line x1="3" y1="18"
-                                                                                                         x2="3.01"
-                                                                                                         y2="18"/></svg>
-          </span>
-            <span class="all-words-body">
-            <span class="all-words-title">{{ 'vault.lexicon.allWords' | translate }}</span>
-            <span class="all-words-sub">{{ 'vault.lexicon.allWordsSub' | translate }}</span>
-          </span>
-            <span class="all-words-trail">
-            <span class="all-words-count">{{ totalCount() }}</span>
-            <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2.2"
-                 stroke-linecap="round"><polyline points="9,6 15,12 9,18"/></svg>
-          </span>
-          </button>
-        }
-        <!-- /hero + all-words -->
-
-        <!-- Explore — curated platform collections (mirrors Story home) -->
-        @if (exploreLoading() || exploreCards().length > 0) {
-          <div class="section-head section-head--explore">
-            <div>
-              <h2 class="section-title">{{ 'vault.explore.title' | translate }}</h2>
-              <span class="section-sub">{{ 'vault.explore.subtitle' | translate }}</span>
-            </div>
-            <button class="see-all" (click)="openExploreAll()">
-              {{ 'vault.explore.seeAll' | translate }}
-              <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.4"
-                   stroke-linecap="round">
-                <polyline points="9,6 15,12 9,18"/>
-              </svg>
-            </button>
-          </div>
-
-          <div class="segment">
-            @for (f of levelFilters; track f.value) {
-              <button class="segment-btn" [class.segment-btn--active]="exploreLevel() === f.value"
-                      (click)="setExploreLevel(f.value)">
-                {{ f.value === 'all' ? ('vault.filter.allLabel' | translate) : f.label }}
-              </button>
-            }
-          </div>
-
-          <div class="rail">
-            @if (exploreLoading() && exploreCards().length === 0) {
-              @for (i of [1, 2, 3]; track i) {
-                <div class="cover-card cover-card--skeleton"></div>
-              }
-            } @else {
-              @for (c of exploreCards(); track c.id) {
-                <button class="cover-card" (click)="openPlatformDetail(c)">
-                  <span class="cover-art">
-                    <lc-collection-cover [name]="c.title" [seed]="c.coverSeed" [imageUrl]="c.coverImageUrl" />
-                    <span class="cover-level">{{ c.level }}</span>
-                    @if (c.emoji) {
-                      <span class="cover-emoji-art">{{ c.emoji }}</span>
-                    }
-                    @if (c.adoptionStatus === 'adopted') {
-                      <span class="cover-owned">✓</span>
-                    }
-                  </span>
-                  <span class="cover-body">
-                    <span class="cover-title">{{ c.title }}</span>
-                    <span class="cover-meta">{{ c.wordCount }} {{ 'common.words' | translate }}</span>
-                  </span>
-                </button>
-              } @empty {
-                <div class="rail-empty">{{ 'vault.explore.empty' | translate }}</div>
-              }
-            }
-          </div>
-        }
-
-        <!-- Collections (personal) -->
-        <div class="section-head section-head--explore">
-          <div>
-            <h2 class="section-title">{{ 'vault.lexicon.collections' | translate }}</h2>
-            <span
-              class="section-sub">{{ 'vault.lexicon.shelves' | translate:{count: filteredCollections().length} }}</span>
-          </div>
-          @if (filteredCollections().length > 0) {
-            <button class="see-all" (click)="openCollectionsAll()">
-              {{ 'vault.explore.seeAll' | translate }}
-              <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.4"
-                   stroke-linecap="round">
-                <polyline points="9,6 15,12 9,18"/>
-              </svg>
-            </button>
-          }
-        </div>
-
-        <div class="collections">
-          @if (collectionsLoading() && collections().length === 0) {
-            @for (i of [1, 2, 3]; track i) {
-              <div class="col-skeleton"></div>
-            }
-          } @else {
-            @for (col of filteredCollections(); track col.id) {
-              @let s = statsFor(col.id);
-              @let urgency = urgencyLevel(s);
-              <button class="col-card" (click)="openCollectionDetail(col)">
-                <span class="col-cover">
-                  <lc-collection-cover [name]="col.name" [seed]="coverSeedFor(col)" [imageUrl]="col.coverImageUrl" />
-                </span>
-                <span class="col-body">
-                  <span class="col-top">
-                    <span class="col-name">{{ col.name }}</span>
-                    @if (s.dueCount > 0) {
-                      <span class="due-badge"
-                            [class.due-badge--high]="urgency === 'high'"
-                            [class.due-badge--medium]="urgency === 'medium'">
-                        {{ s.dueCount }} {{ 'common.due' | translate }}
-                      </span>
-                    } @else if (s.cardCount > 0) {
-                      <span class="due-badge due-badge--ok">✓ {{ 'collections.card.upToDateLabel' | translate }}</span>
-                    }
-                  </span>
-                  <span class="col-meta">
-                    <span><strong>{{ s.cardCount }}</strong> {{ 'common.words' | translate }}</span>
-                    <span class="col-dot"></span>
-                    <span><strong>{{ s.masteredCount }}</strong> {{ 'collections.card.masteredLabel' | translate }}</span>
-                  </span>
-                  <span class="meter">
-                    <span class="meter-fill" [style.width.%]="progressPercent(s)"></span>
-                  </span>
-                </span>
-              </button>
-            } @empty {
-              <div class="empty">
-                <span class="empty-icon">{{ collectionQuery() ? '🔍' : '📚' }}</span>
-                <p
-                  class="empty-title">{{ (collectionQuery() ? 'vault.emptyState.title' : 'vault.collections.emptyTitle') | translate }}</p>
-                <p
-                  class="empty-sub">{{ (collectionQuery() ? 'vault.emptyState.subtitle' : 'vault.collections.emptySubtitle') | translate }}</p>
-              </div>
-            }
-          }
+    <section class="library-section" aria-labelledby="personal-collections-title">
+      <div class="section-heading">
+        <div>
+          <h2 id="personal-collections-title">{{ 'vault.collections.yoursTitle' | translate }}</h2>
+          <p>{{ 'vault.lexicon.shelves' | translate:{count: filteredCollections().length} }}</p>
         </div>
       </div>
-    }
-    @case ('index') {
-      <!-- ═══════════ WORD INDEX ═══════════ -->
-      <div class="index">
-        <div class="index-sticky">
-          <div class="index-head">
-            <button class="icon-btn" (click)="goHome()" [attr.aria-label]="'common.back' | translate">
-              <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.2"
-                   stroke-linecap="round">
-                <polyline points="15,18 9,12 15,6"/>
-              </svg>
-            </button>
-            <h1 class="index-title">{{ 'vault.lexicon.allWords' | translate }}</h1>
-            <span class="index-count">{{ indexCards().length }}</span>
-          </div>
 
-          <div class="search">
-            <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"
-                 stroke-linecap="round">
-              <circle cx="11" cy="11" r="7"/>
-              <line x1="21" y1="21" x2="16.5" y2="16.5"/>
-            </svg>
-            <input
-              class="search-input"
-              type="search"
-              [placeholder]="'vault.lexicon.indexSearchPlaceholder' | translate"
-              (input)="onSearch($event)"
-              [attr.aria-label]="'vault.search.aria' | translate"
-            />
-          </div>
-
-          <div class="chips">
-            <button class="chip" [class.chip--active]="masteryFilter() === 'all'" (click)="setMasteryFilter('all')">
-              {{ 'vault.filter.allLabel' | translate }} <span class="chip-badge">{{ totalCount() }}</span>
-            </button>
-            <button class="chip" [class.chip--active]="masteryFilter() === 'due'" (click)="setMasteryFilter('due')">
-              {{ 'vault.filter.dueLabel' | translate }} <span class="chip-badge chip-badge--due">{{ dueCount() }}</span>
-            </button>
-            <button class="chip" [class.chip--active]="masteryFilter() === 'new'" (click)="setMasteryFilter('new')">
-              {{ 'vault.filter.newLabel' | translate }} <span class="chip-badge">{{ newCount() }}</span>
-            </button>
-            <button class="chip" [class.chip--active]="masteryFilter() === 'mastered'"
-                    (click)="setMasteryFilter('mastered')">
-              {{ 'vault.filter.masteredLabel' | translate }} <span class="chip-badge">{{ masteredCount() }}</span>
-            </button>
-          </div>
-        </div>
-
-        <div class="index-list">
-          @if (loading()) {
-            @for (i of [1, 2, 3, 4, 5, 6]; track i) {
-              <div class="row-skeleton"></div>
-            }
-          } @else {
-            @for (card of indexCards(); track card.id) {
-              <button class="index-word-row" type="button" (click)="openDetail(card)">
-                <span class="index-word-copy">
-                  <strong>{{ card.lexeme.text }}</strong>
-                  <small>{{ card.localization.translation }}</small>
-                </span>
-                <span class="index-word-stage">{{ card.reviewState.stage }}</span>
-              </button>
-            } @empty {
-              <div class="empty">
-                <span class="empty-icon">🔍</span>
-                <p class="empty-title">{{ 'vault.emptyState.title' | translate }}</p>
-                <p class="empty-sub">{{ 'vault.emptyState.subtitle' | translate }}</p>
-              </div>
-            }
+      <div class="personal-collections">
+        @if (collectionsLoading() && collections().length === 0) {
+          @for (item of [1, 2, 3]; track item) {
+            <div class="personal-card personal-card--skeleton" aria-hidden="true"></div>
           }
-        </div>
-      </div>
-    }
-    @case ('explore') {
-      <!-- ═══════════ EXPLORE (FULL PLATFORM GRID) ═══════════ -->
-      <div class="index">
-        <div class="index-sticky">
-          <div class="index-head">
-            <button class="icon-btn" (click)="backFromExplore()" [attr.aria-label]="'common.back' | translate">
-              <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.2"
-                   stroke-linecap="round">
-                <polyline points="15,18 9,12 15,6"/>
-              </svg>
-            </button>
-            <h1 class="index-title">{{ 'vault.explore.title' | translate }}</h1>
-            <span class="index-count">{{ exploreAll().length }}</span>
-          </div>
-
-          <div class="search">
-            <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"
-                 stroke-linecap="round">
-              <circle cx="11" cy="11" r="7"/>
-              <line x1="21" y1="21" x2="16.5" y2="16.5"/>
-            </svg>
-            <input
-              class="search-input"
-              type="search"
-              [value]="collectionQuery()"
-              [placeholder]="'vault.explore.searchPlaceholder' | translate"
-              (input)="onCollectionSearch($event)"
-              [attr.aria-label]="'vault.explore.searchAria' | translate"
-            />
-          </div>
-
-          <div class="segment segment--flush">
-            @for (f of levelFilters; track f.value) {
-              <button class="segment-btn" [class.segment-btn--active]="exploreLevel() === f.value"
-                      (click)="setExploreLevel(f.value)">
-                {{ f.value === 'all' ? ('vault.filter.allLabel' | translate) : f.label }}
-              </button>
-            }
-          </div>
-
-        </div>
-
-        <div class="grid">
-          @if (exploreLoading() && exploreAll().length === 0) {
-            @for (i of [1, 2, 3, 4]; track i) {
-              <div class="cover-card cover-card--skeleton cover-card--grid"></div>
-            }
-          } @else {
-            @for (c of exploreAll(); track c.id) {
-              <button class="cover-card cover-card--grid" (click)="openPlatformDetail(c)">
-                <span class="cover-art">
-                  <lc-collection-cover [name]="c.title" [seed]="c.coverSeed" [imageUrl]="c.coverImageUrl" />
-                  <span class="cover-level">{{ c.level }}</span>
-                  @if (c.emoji) {
-                    <span class="cover-emoji-art">{{ c.emoji }}</span>
-                  }
-                  @if (c.adoptionStatus === 'adopted') {
-                    <span class="cover-owned">✓</span>
-                  }
-                </span>
-                <span class="cover-body">
-                  <span class="cover-title">{{ c.title }}</span>
-                  <span class="cover-meta">{{ c.wordCount }} {{ 'common.words' | translate }}</span>
-                </span>
-              </button>
-            } @empty {
-              <div class="empty empty--grid">
-                <span class="empty-icon">🔍</span>
-                <p class="empty-title">{{ 'vault.explore.empty' | translate }}</p>
-              </div>
-            }
-          }
-        </div>
-      </div>
-    }
-    @case ('collections') {
-      <!-- ═══════════ COLLECTIONS (FULL GRID) ═══════════ -->
-      <div class="index">
-        <div class="index-sticky">
-          <div class="index-head">
-            <button class="icon-btn" (click)="backFromCollections()" [attr.aria-label]="'common.back' | translate">
-              <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.2"
-                   stroke-linecap="round">
-                <polyline points="15,18 9,12 15,6"/>
-              </svg>
-            </button>
-            <h1 class="index-title">{{ 'vault.lexicon.collections' | translate }}</h1>
-            <span class="index-count">{{ collections().length }}</span>
-          </div>
-        </div>
-
-        <div class="grid">
-          @for (col of collections(); track col.id) {
-            @let s = statsFor(col.id);
-            <button class="cover-card cover-card--grid" (click)="openCollectionDetail(col)">
-              <span class="cover-art">
-                <lc-collection-cover [name]="col.name" [seed]="coverSeedFor(col)" [imageUrl]="col.coverImageUrl" />
-                @if (s.dueCount > 0) {
-                  <span class="cover-due-badge">{{ s.dueCount }} {{ 'common.due' | translate }}</span>
-                }
+        } @else {
+          @for (collection of filteredCollections(); track collection.id) {
+            <button class="personal-card" type="button" (click)="openCollectionDetail(collection)">
+              <span class="personal-card__cover">
+                <lc-collection-cover
+                  [name]="collection.name"
+                  [seed]="coverSeedFor(collection)"
+                  [imageUrl]="collection.coverImageUrl"
+                />
               </span>
-              <span class="cover-body">
-                <span class="cover-title">{{ col.name }}</span>
-                <span class="cover-meta">{{ s.cardCount }} {{ 'common.words' | translate }}
-                  · {{ s.masteredCount }} {{ 'collections.card.masteredLabel' | translate }}</span>
+              <span class="personal-card__body">
+                <span class="personal-card__topline">
+                  <strong>{{ collection.name }}</strong>
+                  @if (collection.dueCount > 0) {
+                    <span class="due-badge">{{ collection.dueCount }} {{ 'common.due' | translate }}</span>
+                  }
+                </span>
+                <span class="personal-card__meta">
+                  {{ collection.itemCount }} {{ 'common.words' | translate }}
+                  <span aria-hidden="true">·</span>
+                  {{ collection.masteredCount }} {{ 'collections.card.masteredLabel' | translate }}
+                </span>
+                <span class="personal-card__meter" aria-hidden="true">
+                  <span [style.width.%]="collectionProgressPercent(collection)"></span>
+                </span>
               </span>
             </button>
           } @empty {
-            <div class="empty empty--grid">
-              <span class="empty-icon">📚</span>
-              <p class="empty-title">{{ 'vault.collections.emptyTitle' | translate }}</p>
-              <p class="empty-sub">{{ 'vault.collections.emptySubtitle' | translate }}</p>
+            <div class="empty-state">
+              <ion-icon [name]="collectionQuery() ? 'search-outline' : 'folder-open-outline'" />
+              <h3>{{ (collectionQuery() ? 'vault.explore.empty' : 'vault.collections.emptyTitle') | translate }}</h3>
+              @if (!collectionQuery()) {
+                <p>{{ 'vault.collections.emptySubtitle' | translate }}</p>
+              }
             </div>
           }
+        }
+      </div>
+    </section>
+
+    <section class="library-section library-section--platform" aria-labelledby="platform-collections-title">
+      <div class="section-heading">
+        <div>
+          <h2 id="platform-collections-title">{{ 'vault.explore.platformTitle' | translate }}</h2>
+          <p>{{ 'vault.explore.subtitle' | translate }}</p>
         </div>
       </div>
-    }
-  }
+
+      <ion-segment [value]="exploreLevel()" [scrollable]="false" (ionChange)="onLevelChange($event)">
+        @for (level of levelFilters; track level) {
+          <ion-segment-button [value]="level">
+            <ion-label>{{ level === 'all' ? ('vault.filter.allLabel' | translate) : level }}</ion-label>
+          </ion-segment-button>
+        }
+      </ion-segment>
+
+      <div class="platform-grid">
+        @if (exploreLoading() && platformCollections().length === 0) {
+          @for (item of [1, 2, 3, 4]; track item) {
+            <div class="platform-card platform-card--skeleton" aria-hidden="true"></div>
+          }
+        } @else {
+          @for (collection of platformCollections(); track collection.id) {
+            <button class="platform-card" type="button" (click)="openPlatformDetail(collection)">
+              <span class="platform-card__cover">
+                <lc-collection-cover
+                  [name]="collection.title"
+                  [seed]="collection.coverSeed"
+                  [imageUrl]="collection.coverImageUrl"
+                />
+                <span class="level-badge">{{ collection.level }}</span>
+                @if (collection.adoptionStatus === 'adopted') {
+                  <span class="adopted-badge" [attr.aria-label]="'platformCollectionDetail.adoptedBanner.inSetsLabel' | translate">
+                    <ion-icon name="checkmark-outline" />
+                  </span>
+                }
+              </span>
+              <span class="platform-card__body">
+                <strong>{{ collection.title }}</strong>
+                <span>{{ collection.wordCount }} {{ 'common.words' | translate }}</span>
+              </span>
+            </button>
+          } @empty {
+            <div class="empty-state empty-state--wide">
+              <ion-icon name="search-outline" />
+              <h3>{{ 'vault.explore.empty' | translate }}</h3>
+            </div>
+          }
+        }
+      </div>
+    </section>
+  </main>
 </ion-content>
 
-@if (view() !== 'explore' && view() !== 'collections') {
-  <lc-speed-dial-fab
-    (addCard)="openAddWord()"
-    (newCollection)="openCreateCollection()"
-    (import)="openImportSheet()"
-  />
-}
+<lc-speed-dial-fab
+  (addCard)="openAddWord()"
+  (newCollection)="openCreateCollection()"
+  (import)="openImportSheet()"
+/>

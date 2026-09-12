@@ -256,6 +256,7 @@
       "title": "Filter by collection"
     },
     "collections": {
+      "yoursTitle": "Your collections",
       "totalWordsLabel": "Total words",
       "collectionsLabel": "Collections",
       "dueTodayLabel": "Due today",
@@ -280,6 +281,7 @@
       "reviewCount": "Review {{count}}"
     },
     "explore": {
+      "platformTitle": "Platform collections",
       "title": "Explore",
       "subtitle": "Curated by LinguaCard",
       "seeAll": "See all",
@@ -830,7 +832,8 @@
       "optionalPractice": "Optional practice",
       "settings": {
         "title": "Review settings",
-        "studyMode": "Study mode"
+        "studyMode": "Study mode",
+        "current": "Current:"
       }
     },
     "more": {

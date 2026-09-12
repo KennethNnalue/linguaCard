@@ -1,0 +1,118 @@
+@use 'theme/tokens' as t;
+
+:host {
+  display: block;
+}
+
+.review-home-controls {
+  display: grid;
+  gap: t.$lc-space-4;
+}
+
+.review-home-controls__settings,
+.review-home-controls__daily-status,
+.review-home-controls__more-practice {
+  --background: var(--lc-rv-card-alt);
+  --border-color: var(--lc-rv-border);
+  --border-radius: #{t.$lc-radius-lg};
+  --border-style: solid;
+  --border-width: 1px;
+  --color: var(--lc-rv-text);
+  --inner-padding-end: #{t.$lc-space-4};
+  --padding-start: #{t.$lc-space-4};
+  width: 100%;
+  min-height: 72px;
+  margin: 0;
+}
+
+.review-home-controls__settings ion-icon[slot='start'],
+.review-home-controls__more-practice ion-icon[slot='start'] {
+  margin-right: t.$lc-space-3;
+  color: var(--lc-rv-mid);
+  font-size: t.$lc-text-8xl;
+}
+
+.review-home-controls__settings ion-icon[slot='end'],
+.review-home-controls__more-practice ion-icon[slot='end'] {
+  color: var(--lc-rv-muted);
+}
+
+.review-home-controls__settings-label {
+  display: grid;
+  gap: t.$lc-space-1;
+  min-width: 0;
+  margin: t.$lc-space-3 0;
+}
+
+.review-home-controls__settings-title {
+  color: var(--lc-rv-text);
+  font-size: t.$lc-text-xl;
+  font-weight: t.$lc-font-weight-semibold;
+  line-height: 1.3;
+}
+
+.review-home-controls__settings-summary {
+  display: flex;
+  flex-wrap: wrap;
+  justify-items: center;
+  align-items: center;
+  gap: 0 t.$lc-space-1;
+  color: var(--lc-rv-text-soft);
+  font-size: t.$lc-text-sm;
+  line-height: 1.4;
+}
+
+.review-home-controls__settings-label-title {
+  font-size: t.$lc-text-lg;
+  font-weight: t.$lc-font-weight-semibold;
+
+
+}
+
+.review-home-controls__daily-status {
+  --inner-padding-end: 0;
+  --padding-start: 0;
+  min-height: 74px;
+}
+
+.review-home-controls__metric {
+  display: flex;
+  flex: 1;
+  align-items: center;
+  justify-content: center;
+  gap: t.$lc-space-3;
+  min-width: 0;
+  padding-inline: t.$lc-space-2;
+  color: var(--lc-rv-text);
+  font-size: t.$lc-text-xl;
+  text-align: center;
+
+  ion-icon {
+    flex: 0 0 auto;
+    color: var(--lc-rv-mid);
+    font-size: t.$lc-text-7xl;
+  }
+}
+
+.review-home-controls__metric--streak {
+  border-left: 1px solid var(--lc-rv-border);
+
+  ion-icon {
+    color: var(--lc-rv-brass-ink);
+  }
+
+  .review-home-controls__metric-chevron {
+    font-size: t.$lc-text-xl;
+  }
+}
+
+.review-home-controls__more-practice {
+  font-size: t.$lc-text-xl;
+}
+
+@media (max-width: 390px) {
+  .review-home-controls__metric {
+    gap: t.$lc-space-2;
+    font-size: t.$lc-text-lg;
+  }
+}

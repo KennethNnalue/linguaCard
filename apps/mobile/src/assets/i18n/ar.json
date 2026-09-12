@@ -248,6 +248,7 @@
       "title": "التصفية حسب المجموعة"
     },
     "collections": {
+      "yoursTitle": "مجموعاتك",
       "totalWordsLabel": "إجمالي الكلمات",
       "collectionsLabel": "المجموعات",
       "dueTodayLabel": "مستحقة اليوم",
@@ -272,6 +273,7 @@
       "reviewCount": "راجع {{count}}"
     },
     "explore": {
+      "platformTitle": "مجموعات المنصة",
       "title": "استكشف",
       "subtitle": "مختارات LinguaCard",
       "seeAll": "عرض الكل",
@@ -754,7 +756,7 @@
       "continueAction": "متابعة المراجعة",
       "viewProgress": "عرض التقدم",
       "optionalPractice": "تدريب اختياري",
-      "settings": {"title": "إعدادات المراجعة", "studyMode": "وضع الدراسة"}
+      "settings": {"title": "إعدادات المراجعة", "studyMode": "وضع الدراسة", "current": "الحالي:"}
     },
     "more": {
       "eyebrow": "تدريب",
