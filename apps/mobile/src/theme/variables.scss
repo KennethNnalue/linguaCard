@@ -116,7 +116,7 @@
   --lc-flip-duration:    #{t.$lc-duration-flip};
 
   // ─── REVIEW (Spaced Practice) — Epic Review redesign ──────────────────────
-  // Light values; dark overrides live in body.ion-palette-dark. Components use
+  // Light values; dark overrides live in the .ion-palette-dark block. Components use
   // var(--lc-rv-*). Fixed forest/leech/brass surfaces come from t.$lc-rv-* SCSS.
   --lc-font-rv-display: #{t.$lc-font-rv-display};
   --lc-font-rv-body:    #{t.$lc-font-rv-body};
@@ -162,7 +162,7 @@
 
   // ─── STORY STUDIO 2.0 PALETTE (Epic 15) ───────────────────────────────────
   // Light values mirror the $lc-ss-* SCSS tokens. Dark overrides live in the
-  // body.ion-palette-dark block. Components reference var(--lc-ss-*).
+  // .ion-palette-dark block. Components reference var(--lc-ss-*).
   --lc-ss-pine:            #{t.$lc-ss-pine};
   --lc-ss-pine-deep:       #{t.$lc-ss-pine-deep};
   --lc-ss-ink:             #{t.$lc-ss-ink};
@@ -245,7 +245,9 @@
 }
 
 // ─── DARK MODE ───────────────────────────────────────────────────────────────
-// Applied by ThemeService via body.ion-palette-dark class.
+// Applied by ThemeService to both document elements so the outer viewport and
+// the application content resolve the same surface tokens.
+:root.ion-palette-dark,
 body.ion-palette-dark {
   // Brand — brighter teal for dark surfaces so it reads at full contrast
   --lc-brand:           #5ABFA3;

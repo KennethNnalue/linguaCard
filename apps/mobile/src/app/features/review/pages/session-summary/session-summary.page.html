@@ -1,5 +1,15 @@
 <ion-content>
   <div class="ss-content">
+    <ion-button
+      class="ss-close"
+      type="button"
+      fill="clear"
+      shape="round"
+      [attr.aria-label]="'common.close' | translate"
+      (click)="goToHub()">
+      <ion-icon slot="icon-only" name="close-outline" aria-hidden="true"></ion-icon>
+    </ion-button>
+
     @if (celebration(); as celebrationView) {
       <lc-session-celebration
         [celebration]="celebrationView"

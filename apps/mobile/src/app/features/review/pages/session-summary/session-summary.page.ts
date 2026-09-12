@@ -1,8 +1,8 @@
 import { ChangeDetectionStrategy, Component, computed, inject, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
-import { IonContent, IonIcon } from '@ionic/angular';
+import { IonButton, IonContent, IonIcon } from '@ionic/angular';
 import { addIcons } from 'ionicons';
-import { checkmarkOutline, refreshOutline, sparklesOutline } from 'ionicons/icons';
+import { checkmarkOutline, closeOutline, refreshOutline, sparklesOutline } from 'ionicons/icons';
 import { ReviewRating } from '@lingua-card/shared/domain';
 import { ReviewStore } from '../../store/review.store';
 import { TranslatePipe } from '@ngx-translate/core';
@@ -34,7 +34,7 @@ const RATING_BAR_CLS: Record<ReviewRating, string> = {
   templateUrl: './session-summary.page.html',
   styleUrls: ['./session-summary.page.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [IonContent, IonIcon, TranslatePipe, SessionCelebrationComponent],
+  imports: [IonButton, IonContent, IonIcon, TranslatePipe, SessionCelebrationComponent],
 })
 export class SessionSummaryPage implements OnInit {
   private readonly reviewStore = inject(ReviewStore);
@@ -46,7 +46,7 @@ export class SessionSummaryPage implements OnInit {
   private readonly reviewPlayer = inject(ReviewPlayerService);
 
   constructor() {
-    addIcons({ checkmarkOutline, refreshOutline, sparklesOutline });
+    addIcons({ checkmarkOutline, closeOutline, refreshOutline, sparklesOutline });
   }
 
   readonly session = this.reviewStore.completedSession;

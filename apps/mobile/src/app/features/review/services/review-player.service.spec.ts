@@ -1,6 +1,7 @@
 import { TestBed } from '@angular/core/testing';
 import { Router } from '@angular/router';
 import { ModalController } from '@ionic/angular';
+import { Capacitor } from '@capacitor/core';
 import { ReviewStore } from '../store/review.store';
 import { ReviewPlayerService } from './review-player.service';
 import { ReviewPrefsService } from './review-prefs.service';
@@ -120,5 +121,35 @@ describe('ReviewPlayerService launch', () => {
     expect(document.querySelector('.lc-ios-keyboard-focus-bridge')).toBeNull();
     scrollTo.mockRestore();
     Object.defineProperty(navigator, 'userAgent', {configurable: true, value: originalUserAgent});
+  });
+
+  it('covers the document safe area while the native review player is open', async () => {
+    const isNativePlatform = jest.spyOn(Capacitor, 'isNativePlatform').mockReturnValue(true);
+    const modalElement = document.createElement('div');
+    const modal = Object.assign(modalElement, {
+      present: jest.fn().mockImplementation(async () => {
+        expect(document.documentElement.classList.contains('lc-review-player-open')).toBe(true);
+        expect(document.body.classList.contains('lc-review-player-open')).toBe(true);
+      }),
+      onWillDismiss: jest.fn().mockResolvedValue({data: {completed: false}}),
+    });
+    TestBed.configureTestingModule({
+      providers: [
+        ReviewPlayerService,
+        {provide: ModalController, useValue: {create: jest.fn().mockResolvedValue(modal)}},
+        {provide: ReviewStore, useValue: {startSession: jest.fn().mockResolvedValue({kind: 'started'})}},
+        {provide: Router, useValue: {navigate: jest.fn()}},
+        {provide: ReviewPrefsService, useValue: {mode: () => 'flip'}},
+      ],
+    });
+
+    try {
+      await expect(TestBed.inject(ReviewPlayerService).openSource({kind: 'daily'}, 20)).resolves.toBe(false);
+
+      expect(document.documentElement.classList.contains('lc-review-player-open')).toBe(false);
+      expect(document.body.classList.contains('lc-review-player-open')).toBe(false);
+    } finally {
+      isNativePlatform.mockRestore();
+    }
   });
 });

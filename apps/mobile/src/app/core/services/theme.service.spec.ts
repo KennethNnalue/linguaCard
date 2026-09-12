@@ -3,6 +3,7 @@ import {ThemeService} from './theme.service';
 describe('ThemeService', () => {
   beforeEach(() => {
     localStorage.clear();
+    document.documentElement.classList.remove('ion-palette-dark');
     document.body.classList.remove('ion-palette-dark');
   });
 
@@ -12,6 +13,7 @@ describe('ThemeService', () => {
     service.initialize();
 
     expect(service.isDark()).toBe(true);
+    expect(document.documentElement.classList.contains('ion-palette-dark')).toBe(true);
     expect(document.body.classList.contains('ion-palette-dark')).toBe(true);
   });
 
@@ -22,6 +24,7 @@ describe('ThemeService', () => {
     service.initialize();
 
     expect(service.isDark()).toBe(false);
+    expect(document.documentElement.classList.contains('ion-palette-dark')).toBe(false);
     expect(document.body.classList.contains('ion-palette-dark')).toBe(false);
   });
 });

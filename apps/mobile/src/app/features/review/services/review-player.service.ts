@@ -184,11 +184,16 @@ export class ReviewPlayerService {
   }
 
   private trackVisibleViewport(modal: HTMLIonModalElement): () => void {
-    if (Capacitor.isNativePlatform()) return () => undefined;
-    const viewport = window.visualViewport;
-    const initialScrollY = window.scrollY;
     document.documentElement.classList.add('lc-review-player-open');
     document.body.classList.add('lc-review-player-open');
+    const removeReviewPlayerState = () => {
+      document.documentElement.classList.remove('lc-review-player-open');
+      document.body.classList.remove('lc-review-player-open');
+    };
+    if (Capacitor.isNativePlatform()) return removeReviewPlayerState;
+
+    const viewport = window.visualViewport;
+    const initialScrollY = window.scrollY;
     const updateViewport = () => {
       const height = viewport?.height ?? window.innerHeight;
       modal.style.setProperty('--review-player-visible-height', `${Math.ceil(height)}px`);
@@ -203,8 +208,7 @@ export class ReviewPlayerService {
       viewport?.removeEventListener('scroll', updateViewport);
       window.removeEventListener('resize', updateViewport);
       modal.style.removeProperty('--review-player-visible-height');
-      document.documentElement.classList.remove('lc-review-player-open');
-      document.body.classList.remove('lc-review-player-open');
+      removeReviewPlayerState();
       window.scrollTo({top: initialScrollY, left: 0, behavior: 'instant'});
     };
   }

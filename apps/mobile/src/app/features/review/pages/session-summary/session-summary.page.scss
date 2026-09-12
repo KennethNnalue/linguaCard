@@ -6,10 +6,35 @@ ion-content {
 }
 
 .ss-content {
+  position: relative;
   padding: calc(#{t.$lc-space-6} + env(safe-area-inset-top)) t.$lc-space-5 t.$lc-space-16;
   display: flex;
   flex-direction: column;
   gap: t.$lc-space-4;
+}
+
+.ss-close {
+  position: absolute;
+  z-index: 2;
+  top: calc(env(safe-area-inset-top, 0px) + #{t.$lc-space-6} + #{t.$lc-space-2});
+  right: calc(#{t.$lc-space-5} + #{t.$lc-space-2});
+  width: 44px;
+  height: 44px;
+  margin: 0;
+  --background: var(--lc-rv-card);
+  --background-hover: var(--lc-rv-inset);
+  --background-activated: var(--lc-rv-inset);
+  --border-color: var(--lc-rv-border-strong);
+  --border-style: solid;
+  --border-width: 1px;
+  --box-shadow: #{t.$lc-shadow-card};
+  --color: var(--lc-rv-text);
+  --padding-start: 0;
+  --padding-end: 0;
+
+  ion-icon {
+    font-size: t.$lc-text-2xl;
+  }
 }
 
 // ─── Celebration hero ────────────────────────────────────────────────────────

@@ -22,6 +22,7 @@ export class ThemeService {
 
   private apply(dark: boolean): void {
     this._isDark.set(dark);
+    document.documentElement.classList.toggle('ion-palette-dark', dark);
     document.body.classList.toggle('ion-palette-dark', dark);
     localStorage.setItem(STORAGE_KEY, dark ? 'dark' : 'light');
   }

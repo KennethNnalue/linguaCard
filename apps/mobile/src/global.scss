@@ -73,6 +73,13 @@
 /* @import "@ionic/angular/css/palettes/dark.class.css"; */
 @import '@ionic/angular/css/palettes/dark.class.css';
 
+html,
+body,
+lc-root,
+ion-app {
+  background: var(--ion-background-color);
+}
+
 /* Make import pages fill the full viewport height */
 lc-import ion-content::part(scroll),
 lc-import-review ion-content::part(scroll) {
@@ -188,6 +195,7 @@ html.lc-review-player-open,
 body.lc-review-player-open {
   width: 100%;
   height: 100%;
+  background: var(--lc-rv-bg);
   overflow: hidden;
   overscroll-behavior: none;
 }
