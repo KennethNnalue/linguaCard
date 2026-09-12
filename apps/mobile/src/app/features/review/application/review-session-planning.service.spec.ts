@@ -18,7 +18,7 @@ const request: ReviewSessionRequest = {
   limit: 20,
 };
 
-function card(id: string, stage: 'new' | 'familiar'): ScheduledCard {
+function card(id: string, stage: 'new' | 'familiar', dueAt?: string): ScheduledCard {
   return {
     id,
     deckId: 'deck-1',
@@ -45,6 +45,7 @@ function card(id: string, stage: 'new' | 'familiar'): ScheduledCard {
     reviewState: {
       ...createNewReviewSchedulingState(id),
       stage,
+      dueAt,
     },
   };
 }
@@ -70,7 +71,8 @@ describe('ReviewSessionPlanningService', () => {
   it('derives the displayed counts and estimate from the selected session cards', async () => {
     const cards = [
       ...Array.from({ length: 10 }, (_, index) => card(`new-${index}`, 'new')),
-      ...Array.from({ length: 10 }, (_, index) => card(`review-${index}`, 'familiar')),
+      card('review-due', 'familiar', '2026-09-10T08:00:00.000Z'),
+      ...Array.from({ length: 9 }, (_, index) => card(`review-${index}`, 'familiar')),
     ];
     const cardIds = cards.map(candidate => candidate.id);
     const { service } = configure(cards, { kind: 'selected', cardIds });
@@ -79,6 +81,7 @@ describe('ReviewSessionPlanningService', () => {
       kind: 'ready',
       plan: {
         cardIds,
+        dueCards: 1,
         newCards: 10,
         reviewCards: 10,
         estimatedMinutes: 8,

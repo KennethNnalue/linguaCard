@@ -80,6 +80,13 @@ ion-content {
 .review-home__hero--complete,
 .review-home__hero--message { padding-bottom: t.$lc-space-8; }
 
+.review-home__hero--complete {
+  gap: t.$lc-space-3;
+  padding-top: t.$lc-space-8;
+
+  p { margin-bottom: 0; }
+}
+
 .review-home__eyebrow {
   color: var(--lc-rv-brass-ink);
   font-family: t.$lc-font-rv-mono;
@@ -233,6 +240,32 @@ ion-content {
   }
 
   ion-icon { color: var(--lc-rv-brass-ink); }
+}
+
+.review-home__continue {
+  display: grid;
+  gap: t.$lc-space-5;
+  padding: t.$lc-space-6;
+  border: 1px solid var(--lc-rv-border);
+  border-radius: t.$lc-radius-lg;
+  background: var(--lc-rv-card-alt);
+
+  h2 {
+    margin: t.$lc-space-2 0 0;
+    color: var(--lc-rv-text);
+    font-family: t.$lc-font-rv-display;
+    font-size: t.$lc-text-5xl;
+    font-weight: t.$lc-font-weight-semibold;
+    line-height: 1.15;
+  }
+
+  p {
+    margin: t.$lc-space-2 0 0;
+    color: var(--lc-rv-text-soft);
+    line-height: 1.45;
+  }
+
+  .review-home__eyebrow { color: var(--lc-rv-mid); }
 }
 
 .review-home__state--loading {

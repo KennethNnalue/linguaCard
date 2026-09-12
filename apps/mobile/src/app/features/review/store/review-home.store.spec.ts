@@ -67,6 +67,7 @@ describe('ReviewHomeStore', () => {
       kind: 'ready',
       plan: {
         cardIds: ['review-1'],
+        dueCards: 0,
         newCards: 0,
         reviewCards: 1,
         estimatedMinutes: 1,
@@ -137,6 +138,7 @@ describe('ReviewHomeStore', () => {
       kind: 'ready',
       plan: {
         cardIds: ['new-1', 'review-1'],
+        dueCards: 0,
         newCards: 1,
         reviewCards: 1,
         estimatedMinutes: 2,
@@ -156,8 +158,8 @@ describe('ReviewHomeStore', () => {
     });
   });
 
-  it('shows completion instead of promoting the available extra plan', async () => {
-    const { store } = configure({ completedToday: 20, goal: 20 });
+  it('keeps the completed goal visible while offering another bounded session', async () => {
+    const { store, plan } = configure({ completedToday: 20, goal: 20 });
 
     await store.refresh();
 
@@ -166,6 +168,57 @@ describe('ReviewHomeStore', () => {
       reviewedToday: 20,
       goal: 20,
       streak: 6,
+      continuationPlan: {
+        cardIds: ['review-1'],
+        dueCards: 0,
+        newCards: 0,
+        reviewCards: 1,
+        estimatedMinutes: 1,
+      },
+    });
+    expect(plan).toHaveBeenCalledWith(
+      expect.objectContaining({limit: 20}),
+      expect.any(Date),
+      {timeZone: 'Europe/Berlin'},
+    );
+  });
+
+  it('keeps completion non-blocking when there is no continuation plan', async () => {
+    const {store} = configure({
+      completedToday: 20,
+      goal: 20,
+      planResult: {kind: 'nothing_eligible'},
+    });
+
+    await store.refresh();
+
+    expect(store.viewModel()).toEqual({
+      kind: 'complete',
+      reviewedToday: 20,
+      goal: 20,
+      streak: 6,
+      continuationPlan: null,
+    });
+  });
+
+  it('preserves the completed goal when optional continuation planning fails', async () => {
+    const {store} = configure({
+      completedToday: 20,
+      goal: 20,
+      planResult: {
+        kind: 'load_failed',
+        error: {code: 'cards_unavailable', message: 'Cards could not be loaded.'},
+      },
+    });
+
+    await store.refresh();
+
+    expect(store.viewModel()).toEqual({
+      kind: 'complete',
+      reviewedToday: 20,
+      goal: 20,
+      streak: 6,
+      continuationPlan: null,
     });
   });
 

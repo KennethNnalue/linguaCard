@@ -135,6 +135,11 @@ export class ReviewHomePage {
       await this.store.refresh();
       return;
     }
+    if (viewModel.kind === 'complete' && viewModel.continuationPlan) {
+      await this.reviewPlayer.openPlanned(viewModel.continuationPlan.cardIds, {kind: 'daily'});
+      await this.store.refresh();
+      return;
+    }
     if (viewModel.kind === 'empty' || viewModel.kind === 'nothing-eligible') {
       await this.openAddWord();
       return;
@@ -185,7 +190,7 @@ export class ReviewHomePage {
   }
 
   openMorePractice(): void {
-    void this.router.navigate(['/review/more']);
+    void this.router.navigate([ReviewRoute.MORE]);
   }
 
   openProgress(): void {

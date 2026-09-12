@@ -40,7 +40,13 @@ export type ReviewHomeViewModel =
       preferences: ReviewPreferenceSummary;
     }
   | { kind: 'empty' }
-  | { kind: 'complete'; reviewedToday: number; goal: number; streak: number }
+  | {
+      kind: 'complete';
+      reviewedToday: number;
+      goal: number;
+      streak: number;
+      continuationPlan: ReviewSessionPlan | null;
+    }
   | {
       kind: 'ready';
       completedToday: number;
@@ -122,11 +128,19 @@ export const ReviewHomeStore = signalStore(
         if (planState.status === 'idle' || planState.status === 'loading') return { kind: 'loading' };
 
         const result = planState.result;
+        if (result.kind === 'empty_library') return { kind: 'empty' };
+        if (completedToday >= goal) {
+          return {
+            kind: 'complete',
+            reviewedToday: completedToday,
+            goal,
+            streak,
+            continuationPlan: result.kind === 'ready' ? result.plan : null,
+          };
+        }
         if (result.kind === 'load_failed') {
           return { kind: 'error', message: result.error.message, recoverable: true };
         }
-        if (result.kind === 'empty_library') return { kind: 'empty' };
-        if (completedToday >= goal) return { kind: 'complete', reviewedToday: completedToday, goal, streak };
         if (result.kind === 'nothing_eligible' || result.kind === 'source_matched_nothing') {
           return { kind: 'nothing-eligible', canAddWords: true };
         }
@@ -160,7 +174,7 @@ export const ReviewHomeStore = signalStore(
             source: { kind: 'daily' },
             mode: toReviewMode(prefs.mode()),
             direction: toPromptDirection(prefs.dir()),
-            limit: Math.max(1, goal - completedToday),
+            limit: completedToday >= goal ? goal : Math.max(1, goal - completedToday),
           }, new Date(), { timeZone });
           if (sequence !== refreshSequence) return;
           patchState(store, { planState: { status: 'resolved', result } });

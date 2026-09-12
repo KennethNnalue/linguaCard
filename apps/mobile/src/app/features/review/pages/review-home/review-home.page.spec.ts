@@ -7,23 +7,27 @@ import {AuthService} from '../../../../core/services/auth.service';
 import {ShareStore} from '../../../sharing/store/share.store';
 import {ReviewPlayerService} from '../../services/review-player.service';
 import {ReviewPrefsService} from '../../services/review-prefs.service';
-import {ReviewHomeStore} from '../../store/review-home.store';
+import {ReviewHomeStore, type ReviewHomeViewModel} from '../../store/review-home.store';
 import {ReviewHomePage} from './review-home.page';
 
 describe('ReviewHomePage account menu', () => {
   let fixture: ComponentFixture<ReviewHomePage>;
   let page: ReviewHomePage;
   let routerEvents: Subject<RouterEvent>;
+  let refresh: jest.Mock;
+  let openPlanned: jest.Mock;
 
   beforeEach(async () => {
     routerEvents = new Subject<RouterEvent>();
+    refresh = jest.fn().mockResolvedValue(undefined);
+    openPlanned = jest.fn().mockResolvedValue(true);
     TestBed.overrideComponent(ReviewHomePage, {
       set: {
         template: '',
         imports: [],
         providers: [
-          {provide: ReviewHomeStore, useValue: {refresh: jest.fn().mockResolvedValue(undefined)}},
-          {provide: ReviewPlayerService, useValue: {isLaunching: signal(false)}},
+          {provide: ReviewHomeStore, useValue: {refresh}},
+          {provide: ReviewPlayerService, useValue: {isLaunching: signal(false), openPlanned}},
           {provide: ReviewPrefsService, useValue: {}},
           {provide: AuthService, useValue: {currentUser: signal(null)}},
           {provide: ShareStore, useValue: {hasPending: signal(false)}},
@@ -50,5 +54,26 @@ describe('ReviewHomePage account menu', () => {
     routerEvents.next(new NavigationStart(1, '/vault'));
 
     expect(page.menuOpen()).toBe(false);
+  });
+
+  it('starts the exact continuation plan after the daily goal is complete', async () => {
+    const viewModel = {
+      kind: 'complete',
+      reviewedToday: 10,
+      goal: 10,
+      streak: 7,
+      continuationPlan: {
+        cardIds: ['due-1', 'new-1'],
+        dueCards: 1,
+        newCards: 1,
+        reviewCards: 1,
+        estimatedMinutes: 1,
+      },
+    } satisfies ReviewHomeViewModel;
+
+    await page.performPrimaryAction(viewModel);
+
+    expect(openPlanned).toHaveBeenCalledWith(['due-1', 'new-1'], {kind: 'daily'});
+    expect(refresh).toHaveBeenCalledTimes(1);
   });
 });

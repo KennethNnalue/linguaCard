@@ -1,6 +1,7 @@
 import { inject, Injectable } from '@angular/core';
 import type { ScheduledCard } from '@lingua-card/shared/domain';
 import { CardStore } from '../../vault/store/card.store';
+import { isDue } from '../domain/review-status';
 import type {
   ApplicationError,
   ReviewSessionRequest,
@@ -14,6 +15,7 @@ import {
 
 export interface ReviewSessionPlan {
   cardIds: readonly string[];
+  dueCards: number;
   newCards: number;
   reviewCards: number;
   estimatedMinutes: number;
@@ -47,11 +49,13 @@ export class ReviewSessionPlanningService {
 
     const newCards = selectedCards.filter(card => card.reviewState.stage === 'new').length;
     const reviewCards = selectedCards.length - newCards;
+    const dueCards = selectedCards.filter(card => isDue(card, now)).length;
 
     return {
       kind: 'ready',
       plan: {
         cardIds: selection.cardIds,
+        dueCards,
         newCards,
         reviewCards,
         estimatedMinutes: estimateReviewMinutes({
