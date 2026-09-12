@@ -31,8 +31,8 @@ export class ReviewHomeControlsComponent {
   readonly autoplayLabelKey = computed(() =>
     `review.audioAutoplay.${this.dashboard().preferences.autoplay}`,
   );
-  readonly dailyGoalComplete = computed(() =>
-    this.dashboard().completedToday >= this.dashboard().goal,
+  readonly streakReviewsCredited = computed(() =>
+    Math.min(this.dashboard().reviewedToday, this.dashboard().streakTarget),
   );
 
   constructor() {

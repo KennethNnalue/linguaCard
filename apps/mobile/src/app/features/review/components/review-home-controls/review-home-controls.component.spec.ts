@@ -1,27 +1,15 @@
-import {Component} from '@angular/core';
 import {ComponentFixture, TestBed} from '@angular/core/testing';
 import {provideTranslateService} from '@ngx-translate/core';
 import type {ReviewHomeDashboard} from '../../models/review-home.model';
 import {ReviewHomeControlsComponent} from './review-home-controls.component';
 
 const dashboard: ReviewHomeDashboard = {
-  completedToday: 5,
-  goal: 10,
+  reviewedToday: 5,
+  personalGoal: 10,
+  streakTarget: 10,
   streak: 3,
   preferences: {mode: 'type', autoplay: 'answer_and_example'},
 };
-
-@Component({
-  imports: [ReviewHomeControlsComponent],
-  template: `
-    <lc-review-home-controls [dashboard]="dashboard">
-      <section review-home-continuation>Continue reviewing</section>
-    </lc-review-home-controls>
-  `,
-})
-class ReviewHomeControlsHostComponent {
-  readonly dashboard = dashboard;
-}
 
 describe('ReviewHomeControlsComponent', () => {
   let fixture: ComponentFixture<ReviewHomeControlsComponent>;
@@ -40,17 +28,42 @@ describe('ReviewHomeControlsComponent', () => {
     const metrics = fixture.nativeElement.querySelectorAll('.review-home-controls__metric');
 
     expect(metrics).toHaveLength(2);
-    expect(metrics[0].textContent).toContain('review.home.todayProgress');
+    expect(metrics[0].textContent).toContain('review.home.personalGoalLabel');
+    expect(metrics[1].textContent).toContain('review.home.streakGoalLabel');
     expect(metrics[1].textContent).toContain('review.home.streak');
+    expect(fixture.nativeElement.querySelector('.review-home-controls__streak-progress')).not.toBeNull();
   });
 
-  it('shows goal completion without replacing the streak metric', () => {
-    fixture.componentRef.setInput('dashboard', {...dashboard, completedToday: 10});
+  it('hides completed streak progress while preserving the streak count', () => {
+    fixture.componentRef.setInput('dashboard', {...dashboard, reviewedToday: 10});
     fixture.detectChanges();
 
     const metrics = fixture.nativeElement.querySelectorAll('.review-home-controls__metric');
-    expect(metrics[0].textContent).toContain('review.home.goalComplete');
+    expect(metrics[0].textContent).toContain('review.home.personalGoalLabel');
     expect(metrics[1].textContent).toContain('review.home.streak');
+    expect(fixture.nativeElement.querySelector('.review-home-controls__streak-progress')).toBeNull();
+  });
+
+  it('places mode and audio on separate settings lines', () => {
+    const details = fixture.nativeElement.querySelectorAll('.review-home-controls__settings-detail');
+
+    expect(details).toHaveLength(2);
+    expect(details[0].textContent).toContain('review.home.settings.mode');
+    expect(details[0].textContent).toContain('review.mode.type');
+    expect(details[1].textContent).toContain('review.audioAutoplay.title');
+    expect(details[1].textContent).toContain('review.audioAutoplay.answer_and_example');
+  });
+
+  it('aligns the streak chevron using the same end slot as the other cards', () => {
+    const settingsChevron = fixture.nativeElement.querySelector(
+      '.review-home-controls__settings > ion-icon[slot="end"]',
+    );
+    const streakChevron = fixture.nativeElement.querySelector(
+      '.review-home-controls__daily-status > ion-icon[slot="end"]',
+    );
+
+    expect(settingsChevron).not.toBeNull();
+    expect(streakChevron).not.toBeNull();
   });
 
   it('emits settings, progress, and practice intents', () => {
@@ -79,13 +92,16 @@ describe('ReviewHomeControlsComponent', () => {
     expect(fixture.nativeElement.querySelector('.review-home-controls__more-practice')).toBeNull();
   });
 
-  it('places the optional continuation between daily status and more practice', () => {
-    const host = TestBed.createComponent(ReviewHomeControlsHostComponent);
-    host.detectChanges();
+  it('uses the configured personal goal and caps streak credit at the platform target', () => {
+    fixture.componentRef.setInput('dashboard', {
+      ...dashboard,
+      reviewedToday: 32,
+      personalGoal: 50,
+      streakTarget: 10,
+    });
+    fixture.detectChanges();
 
-    const sections = host.nativeElement.querySelector('.review-home-controls').children;
-    expect(sections[1].classList.contains('review-home-controls__daily-status')).toBe(true);
-    expect(sections[2].hasAttribute('review-home-continuation')).toBe(true);
-    expect(sections[3].classList.contains('review-home-controls__more-practice')).toBe(true);
+    expect(fixture.componentInstance.streakReviewsCredited()).toBe(10);
+    expect(fixture.nativeElement.querySelector('.review-home-controls__goals-explainer')).not.toBeNull();
   });
 });

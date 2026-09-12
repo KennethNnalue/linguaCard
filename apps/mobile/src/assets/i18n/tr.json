@@ -728,7 +728,7 @@
       "tryAgain": "Tekrar kullanılamıyor",
       "readyTitle": "Tekrarın hazır",
       "resumeTitle": "Kaldığın yerden devam et",
-      "completeTitle": "Günlük hedef tamamlandı",
+      "completeTitle": "Günlük hedefin tamamlandı",
       "emptyTitle": "Hatırlamak istediğin kelimeleri ekle",
       "emptySupport": "LinguaCard onları günlük bir tekrara dönüştürür.",
       "nothingDueTitle": "Şu anda tekrar edilecek bir şey yok",
@@ -744,11 +744,14 @@
       "importPersonalCollection": "Kişisel koleksiyonu içe aktar",
       "importWords": "Kelime içe aktar",
       "todayProgress": "Bugün {{completed}} / {{goal}}",
+      "personalGoalLabel": "Günlük hedefin",
+      "streakGoalLabel": "Seri hedefi",
+      "goalsExplainer": "Kişisel hedefini sen belirlersin. LinguaCard seri hedefini koleksiyonuna göre, en fazla 10 farklı kart olarak belirler.",
+      "streakRemaining": "Serini korumak için bugün {{count}} farklı kart daha tekrar et.",
       "morePractice": "Daha fazla pratik",
       "reviewed": "{{count}} kart tekrar edildi",
-      "goalReached": "Hedefe ulaşıldı",
-      "goalProgress": "Bugün {{reviewed}} tekrar · hedef {{goal}}",
-      "goalComplete": "Hedef tamamlandı",
+      "goalReached": "Hedefine ulaştın",
+      "goalProgress": "Bugün {{reviewed}} tekrar · hedefin {{goal}}",
       "streak": "{{count}} günlük seri",
       "continueEyebrow": "Öğrenmeye devam et",
       "continueTitle": "Bir tura daha hazır mısın?",
@@ -756,7 +759,7 @@
       "continueAction": "Tekrara devam et",
       "viewProgress": "İlerlemeyi gör",
       "optionalPractice": "İsteğe bağlı pratik",
-      "settings": {"title": "Tekrar ayarları", "studyMode": "Çalışma modu", "current": "Şu anda:"}
+      "settings": {"title": "Tekrar ayarları", "mode": "Mod", "current": "Şu anda:"}
     },
     "more": {
       "eyebrow": "Pratik",
@@ -1066,7 +1069,7 @@
       "encouragementMsg": "Harika gidiyorsun. Böyle devam et!"
     },
     "audioAutoplay": {
-      "title": "Otomatik ses",
+      "title": "Ses",
       "off": "Kapalı",
       "answer": "Yalnızca cevap",
       "answer_and_example": "Cevap ve kullanım örneği"
@@ -1475,7 +1478,7 @@
         "decreaseAria": "Aylık hedefi azalt",
         "increaseAria": "Aylık hedefi artır"
       },
-      "streakNote": "🔥 Serini uzatmak için 10 kartı tekrar et. Kişisel hedeflerin bu koşulu değiştirmez."
+      "streakNote": "Serini uzatmak için en fazla 10 farklı kartı tekrar et (koleksiyonun küçükse daha az). Kişisel hedefin bu koşulu değiştirmez."
     },
     "goalsPrompt": {
       "titleFirstTime": "Çalışma hedeflerini belirle",

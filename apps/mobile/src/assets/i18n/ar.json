@@ -727,7 +727,7 @@
       "tryAgain": "المراجعة غير متاحة",
       "readyTitle": "مراجعتك جاهزة",
       "resumeTitle": "تابع من حيث توقفت",
-      "completeTitle": "اكتمل الهدف اليومي",
+      "completeTitle": "اكتمل هدفك اليومي",
       "emptyTitle": "أضف الكلمات التي تريد تذكّرها",
       "emptySupport": "سيحوّلها LinguaCard إلى مراجعة يومية.",
       "nothingDueTitle": "لا توجد مراجعة مطلوبة الآن",
@@ -744,11 +744,14 @@
       "importPersonalCollection": "استيراد مجموعة شخصية",
       "importWords": "استورد كلمات",
       "todayProgress": "{{completed}} من {{goal}} اليوم",
+      "personalGoalLabel": "هدفك اليومي",
+      "streakGoalLabel": "هدف السلسلة",
+      "goalsExplainer": "أنت تحدد هدفك. تحدد LinguaCard هدف السلسلة حسب بطاقاتك، بحد أقصى 10 بطاقات مختلفة.",
+      "streakRemaining": "راجع {{count}} بطاقات مختلفة إضافية اليوم للحفاظ على سلسلتك.",
       "morePractice": "مزيد من التدريب",
       "reviewed": "تمت مراجعة {{count}} بطاقات",
-      "goalReached": "تم تحقيق الهدف",
-      "goalProgress": "تمت مراجعة {{reviewed}} اليوم · الهدف {{goal}}",
-      "goalComplete": "اكتمل الهدف",
+      "goalReached": "تم تحقيق هدفك",
+      "goalProgress": "تمت مراجعة {{reviewed}} اليوم · هدفك {{goal}}",
       "streak": "سلسلة {{count}} أيام",
       "continueEyebrow": "واصل التعلّم",
       "continueTitle": "هل أنت مستعد لجولة أخرى؟",
@@ -756,7 +759,7 @@
       "continueAction": "متابعة المراجعة",
       "viewProgress": "عرض التقدم",
       "optionalPractice": "تدريب اختياري",
-      "settings": {"title": "إعدادات المراجعة", "studyMode": "وضع الدراسة", "current": "الحالي:"}
+      "settings": {"title": "إعدادات المراجعة", "mode": "الوضع", "current": "الحالي:"}
     },
     "more": {
       "eyebrow": "تدريب",
@@ -1066,7 +1069,7 @@
       "encouragementMsg": "أداؤك ممتاز. استمر!"
     },
     "audioAutoplay": {
-      "title": "تشغيل الصوت تلقائيًا",
+      "title": "الصوت",
       "off": "إيقاف",
       "answer": "الإجابة فقط",
       "answer_and_example": "الإجابة ومثال الاستخدام"
@@ -1475,7 +1478,7 @@
         "decreaseAria": "تقليل الهدف الشهري",
         "increaseAria": "زيادة الهدف الشهري"
       },
-      "streakNote": "🔥 راجع 10 بطاقات لتمديد سلسلتك. أهدافك الشخصية لا تغيّر هذا الشرط."
+      "streakNote": "راجع ما يصل إلى 10 بطاقات مختلفة لتمديد سلسلتك (أقل إذا كانت مجموعتك أصغر). هدفك الشخصي لا يغيّر هذا الشرط."
     },
     "goalsPrompt": {
       "titleFirstTime": "حدد أهداف دراستك",

@@ -801,7 +801,7 @@
       "tryAgain": "Review unavailable",
       "readyTitle": "Your review is ready",
       "resumeTitle": "Keep going",
-      "completeTitle": "Daily goal complete",
+      "completeTitle": "Your daily goal is complete",
       "emptyTitle": "Add words you want to remember",
       "emptySupport": "LinguaCard will turn them into a daily review.",
       "nothingDueTitle": "Nothing needs review right now",
@@ -818,11 +818,14 @@
       "importPersonalCollection": "Import personal collection",
       "importWords": "Import words",
       "todayProgress": "{{completed}} of {{goal}} today",
+      "personalGoalLabel": "Your daily goal",
+      "streakGoalLabel": "Streak target",
+      "goalsExplainer": "Your goal is yours to set. LinguaCard sets the streak target from your library, up to 10 distinct cards.",
+      "streakRemaining": "Review {{count}} more distinct cards today to secure your streak.",
       "morePractice": "More practice",
       "reviewed": "{{count}} cards reviewed",
-      "goalReached": "Goal reached",
-      "goalProgress": "{{reviewed}} reviewed today · {{goal}}-card goal",
-      "goalComplete": "Goal complete",
+      "goalReached": "Personal goal reached",
+      "goalProgress": "{{reviewed}} reviewed today · your {{goal}}-card goal",
       "streak": "{{count}}-day streak",
       "continueEyebrow": "Keep learning",
       "continueTitle": "Ready for another round?",
@@ -832,7 +835,7 @@
       "optionalPractice": "Optional practice",
       "settings": {
         "title": "Review settings",
-        "studyMode": "Study mode",
+        "mode": "Mode",
         "current": "Current:"
       }
     },
@@ -1159,7 +1162,7 @@
       "audioSub": "Hear it, recall the meaning"
     },
     "audioAutoplay": {
-      "title": "Audio autoplay",
+      "title": "Audio",
       "off": "Off",
       "answer": "Answer only",
       "answer_and_example": "Answer and usage example"
@@ -1557,7 +1560,7 @@
         "decreaseAria": "Decrease monthly goal",
         "increaseAria": "Increase monthly goal"
       },
-      "streakNote": "🔥 Review 10 cards to extend your streak. Your personal targets do not change the streak requirement."
+      "streakNote": "Review up to 10 distinct cards to extend your streak (fewer if your library is smaller). Your personal goal does not change this requirement."
     },
     "goalsPrompt": {
       "titleFirstTime": "Set your study goals",

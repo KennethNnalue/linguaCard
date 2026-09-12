@@ -91,6 +91,11 @@ ion-content {
   p {
     margin-bottom: 0;
   }
+
+  .review-home__streak-remaining {
+    color: var(--lc-rv-brass-ink);
+    font-size: t.$lc-text-sm;
+  }
 }
 
 .review-home__eyebrow {

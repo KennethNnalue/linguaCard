@@ -60,6 +60,7 @@ describe('ReviewHomeStore', () => {
     session?: ReviewSessionState | null;
     completedToday?: number;
     goal?: number;
+    streakTarget?: number;
     planResult?: ReviewSessionPlanResult;
     cards?: readonly ScheduledCard[];
   } = {}): { store: InstanceType<typeof ReviewHomeStore>; plan: jest.Mock } {
@@ -82,11 +83,15 @@ describe('ReviewHomeStore', () => {
           provide: EngagementStore,
           useValue: {
             completedToday: signal(options.completedToday ?? 0),
-            dailyGoal: signal(options.goal ?? 20),
+            personalGoal: signal({goal: options.goal ?? 20}),
+            dailyGoal: signal(options.streakTarget ?? 10),
             streak: signal({ current: 6 }),
           },
         },
-        { provide: SettingsStore, useValue: { settings: signal({ timezone: 'Europe/Berlin' }) } },
+        { provide: SettingsStore, useValue: {
+          settings: signal({ timezone: 'Europe/Berlin' }),
+          dailyGoal: signal(options.goal ?? 20),
+        } },
         {
           provide: ReviewPrefsService,
           useValue: {
@@ -109,8 +114,9 @@ describe('ReviewHomeStore', () => {
 
     expect(store.viewModel()).toEqual({kind: 'loading'});
     expect(store.dashboard()).toEqual({
-      completedToday: 0,
-      goal: 20,
+      reviewedToday: 0,
+      personalGoal: 20,
+      streakTarget: 10,
       streak: 6,
       preferences: {mode: 'type', autoplay: 'answer_and_example'},
     });
@@ -181,6 +187,44 @@ describe('ReviewHomeStore', () => {
       expect.any(Date),
       {timeZone: 'Europe/Berlin'},
     );
+  });
+
+  it('continues toward the streak target after a smaller personal goal is met', async () => {
+    const {store, plan} = configure({completedToday: 5, goal: 5, streakTarget: 10});
+
+    await store.refresh();
+
+    expect(store.viewModel()).toMatchObject({kind: 'complete', goal: 5});
+    expect(store.streakReviewsRemaining()).toBe(5);
+    expect(plan).toHaveBeenCalledWith(
+      expect.objectContaining({limit: 5}),
+      expect.any(Date),
+      expect.any(Object),
+    );
+  });
+
+  it('keeps working toward a larger personal goal after the streak target is met', async () => {
+    const {store, plan} = configure({completedToday: 10, goal: 50, streakTarget: 10});
+
+    await store.refresh();
+
+    expect(store.viewModel()).toMatchObject({kind: 'ready'});
+    expect(store.streakReviewsRemaining()).toBe(0);
+    expect(plan).toHaveBeenCalledWith(
+      expect.objectContaining({limit: 40}),
+      expect.any(Date),
+      expect.any(Object),
+    );
+  });
+
+  it('respects a reduced streak target for a small library', async () => {
+    const {store} = configure({completedToday: 3, goal: 20, streakTarget: 3});
+
+    await store.refresh();
+
+    expect(store.dashboard()).toMatchObject({personalGoal: 20, streakTarget: 3});
+    expect(store.streakReviewsRemaining()).toBe(0);
+    expect(store.viewModel()).toMatchObject({kind: 'ready'});
   });
 
   it('keeps completion non-blocking when there is no continuation plan', async () => {

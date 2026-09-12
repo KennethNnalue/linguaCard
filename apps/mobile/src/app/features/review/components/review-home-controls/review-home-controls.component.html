@@ -11,15 +11,18 @@
         {{ 'review.home.settings.title' | translate }}
       </span>
       <span class="review-home-controls__settings-summary">
-        <span class="review-home-controls__settings-label-title">
-          {{ 'review.home.settings.studyMode' | translate }}:
+        <span class="review-home-controls__settings-detail">
+          <span class="review-home-controls__settings-label-title">
+            {{ 'review.home.settings.mode' | translate }}:
+          </span>
+          <span>{{ studyModeLabelKey() | translate }}</span>
         </span>
-        <span>{{ studyModeLabelKey() | translate }}</span>
-        <span aria-hidden="true">·</span>
-        <span class="review-home-controls__settings-label-title">
-          {{ 'review.audioAutoplay.title' | translate }}:
+        <span class="review-home-controls__settings-detail">
+          <span class="review-home-controls__settings-label-title">
+            {{ 'review.audioAutoplay.title' | translate }}:
+          </span>
+          <span>{{ autoplayLabelKey() | translate }}</span>
         </span>
-        <span>          {{ autoplayLabelKey() | translate }}</span>
       </span>
     </ion-label>
     <ion-icon slot="end" name="chevron-forward-outline"/>
@@ -33,25 +36,34 @@
   >
     <span class="review-home-controls__metric">
       <ion-icon name="stats-chart-outline"/>
-      @if (dailyGoalComplete()) {
-        {{ 'review.home.goalComplete' | translate }}
-      } @else {
-        {{
-          'review.home.todayProgress' | translate:{
-            completed: dashboard().completedToday,
-            goal: dashboard().goal
-          }
-        }}
-      }
+      <span class="review-home-controls__metric-copy">
+        <span class="review-home-controls__metric-title">{{ 'review.home.personalGoalLabel' | translate }}</span>
+        <span>{{ 'review.home.todayProgress' | translate:{
+          completed: dashboard().reviewedToday,
+          goal: dashboard().personalGoal
+        } }}</span>
+      </span>
     </span>
     <span class="review-home-controls__metric review-home-controls__metric--streak">
       <ion-icon name="flame-outline"/>
-      {{ 'review.home.streak' | translate:{count: dashboard().streak} }}
-      <ion-icon class="review-home-controls__metric-chevron" name="chevron-forward-outline"/>
+      <span class="review-home-controls__metric-copy">
+        <span class="review-home-controls__metric-title">{{ 'review.home.streakGoalLabel' | translate }}</span>
+        @if (streakReviewsCredited() < dashboard().streakTarget) {
+          <span class="review-home-controls__streak-progress">{{ 'review.home.todayProgress' | translate:{
+            completed: streakReviewsCredited(),
+            goal: dashboard().streakTarget
+          } }}</span>
+        }
+        <span class="review-home-controls__streak-count">
+          {{ 'review.home.streak' | translate:{count: dashboard().streak} }}
+        </span>
+      </span>
     </span>
+    <ion-icon slot="end" name="chevron-forward-outline"/>
   </ion-item>
-
-  <ng-content select="[review-home-continuation]"/>
+  <p class="review-home-controls__goals-explainer">
+    {{ 'review.home.goalsExplainer' | translate }}
+  </p>
 
   @if (morePracticeAvailable()) {
     <ion-item

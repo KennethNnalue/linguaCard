@@ -106,6 +106,53 @@
             <span class="review-home__eyebrow">{{ 'review.home.goalReached' | translate }}</span>
             <h1>{{ 'review.home.completeTitle' | translate }}</h1>
             <p>{{ 'review.home.goalProgress' | translate:{reviewed: vm.reviewedToday, goal: vm.goal} }}</p>
+            @if (store.streakReviewsRemaining() > 0) {
+              <p class="review-home__streak-remaining">
+                {{ 'review.home.streakRemaining' | translate:{count: store.streakReviewsRemaining()} }}
+              </p>
+            }
+          </section>
+          <section class="review-home__continue" aria-labelledby="continue-learning-title">
+            <div>
+              <span class="review-home__eyebrow">{{ 'review.home.continueEyebrow' | translate }}</span>
+              <h2 id="continue-learning-title">{{ 'review.home.continueTitle' | translate }}</h2>
+              @if (vm.continuation.kind === 'ready') {
+                @let plan = vm.continuation.plan;
+                <p>{{
+                    'review.home.continueSummary' | translate:{
+                      cards: plan.cardIds.length,
+                      due: plan.dueCards,
+                      new: plan.newCards,
+                      minutes: plan.estimatedMinutes
+                    }
+                  }}</p>
+              } @else if (vm.continuation.kind === 'error') {
+                <p>{{ 'review.home.errorSupport' | translate }}</p>
+              } @else {
+                <p>{{ 'review.home.nothingDueSupport' | translate }}</p>
+              }
+            </div>
+            @if (vm.continuation.kind === 'ready') {
+              <ion-button expand="block" class="review-home__primary" [disabled]="reviewLaunching()"
+                          (click)="performPrimaryAction(vm)">
+                @if (reviewLaunching()) {
+                  <ion-spinner name="crescent"/>
+                } @else {
+                  {{ 'review.home.continueAction' | translate }}
+                  <ion-icon slot="end" name="arrow-forward-outline"/>
+                }
+              </ion-button>
+            } @else if (vm.continuation.kind === 'error') {
+              <ion-button expand="block" class="review-home__primary" (click)="store.refresh()">
+                {{ 'review.home.retry' | translate }}
+                <ion-icon slot="end" name="refresh-outline"/>
+              </ion-button>
+            } @else {
+              <ion-button expand="block" class="review-home__primary" (click)="openMorePractice()">
+                {{ 'review.home.morePractice' | translate }}
+                <ion-icon slot="end" name="arrow-forward-outline"/>
+              </ion-button>
+            }
           </section>
         }
         @case ('empty') {
@@ -168,52 +215,7 @@
         (reviewSettingsRequested)="openReviewSettings()"
         (progressRequested)="openProgress()"
         (morePracticeRequested)="openMorePractice()"
-      >
-        @if (vm.kind === 'complete') {
-          <section review-home-continuation class="review-home__continue" aria-labelledby="continue-learning-title">
-            <div>
-              <span class="review-home__eyebrow">{{ 'review.home.continueEyebrow' | translate }}</span>
-              <h2 id="continue-learning-title">{{ 'review.home.continueTitle' | translate }}</h2>
-              @if (vm.continuation.kind === 'ready') {
-                @let plan = vm.continuation.plan;
-                <p>{{
-                    'review.home.continueSummary' | translate:{
-                      cards: plan.cardIds.length,
-                      due: plan.dueCards,
-                      new: plan.newCards,
-                      minutes: plan.estimatedMinutes
-                    }
-                  }}</p>
-              } @else if (vm.continuation.kind === 'error') {
-                <p>{{ 'review.home.errorSupport' | translate }}</p>
-              } @else {
-                <p>{{ 'review.home.nothingDueSupport' | translate }}</p>
-              }
-            </div>
-            @if (vm.continuation.kind === 'ready') {
-              <ion-button expand="block" class="review-home__primary" [disabled]="reviewLaunching()"
-                          (click)="performPrimaryAction(vm)">
-                @if (reviewLaunching()) {
-                  <ion-spinner name="crescent"/>
-                } @else {
-                  {{ 'review.home.continueAction' | translate }}
-                  <ion-icon slot="end" name="arrow-forward-outline"/>
-                }
-              </ion-button>
-            } @else if (vm.continuation.kind === 'error') {
-              <ion-button expand="block" class="review-home__primary" (click)="store.refresh()">
-                {{ 'review.home.retry' | translate }}
-                <ion-icon slot="end" name="refresh-outline"/>
-              </ion-button>
-            } @else {
-              <ion-button expand="block" class="review-home__primary" (click)="openMorePractice()">
-                {{ 'review.home.morePractice' | translate }}
-                <ion-icon slot="end" name="arrow-forward-outline"/>
-              </ion-button>
-            }
-          </section>
-        }
-      </lc-review-home-controls>
+      />
     }
   </main>
 </ion-content>

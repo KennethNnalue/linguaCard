@@ -728,7 +728,7 @@
       "tryAgain": "Repaso no disponible",
       "readyTitle": "Tu repaso está listo",
       "resumeTitle": "Continúa donde lo dejaste",
-      "completeTitle": "Objetivo diario completado",
+      "completeTitle": "Tu objetivo diario está completado",
       "emptyTitle": "Añade palabras que quieras recordar",
       "emptySupport": "LinguaCard las convertirá en un repaso diario.",
       "nothingDueTitle": "No hay nada que repasar ahora",
@@ -744,11 +744,14 @@
       "importPersonalCollection": "Importar colección personal",
       "importWords": "Importar palabras",
       "todayProgress": "{{completed}} de {{goal}} hoy",
+      "personalGoalLabel": "Tu objetivo diario",
+      "streakGoalLabel": "Meta de la racha",
+      "goalsExplainer": "Tú eliges tu objetivo. LinguaCard fija la meta de la racha según tu colección: hasta 10 tarjetas distintas.",
+      "streakRemaining": "Repasa {{count}} tarjetas distintas más hoy para asegurar tu racha.",
       "morePractice": "Más práctica",
       "reviewed": "{{count}} tarjetas repasadas",
-      "goalReached": "Objetivo alcanzado",
-      "goalProgress": "{{reviewed}} repasadas hoy · objetivo de {{goal}}",
-      "goalComplete": "Objetivo completado",
+      "goalReached": "Tu objetivo alcanzado",
+      "goalProgress": "{{reviewed}} repasadas hoy · tu objetivo de {{goal}}",
       "streak": "Racha de {{count}} días",
       "continueEyebrow": "Sigue aprendiendo",
       "continueTitle": "¿Lista otra ronda?",
@@ -756,7 +759,7 @@
       "continueAction": "Seguir repasando",
       "viewProgress": "Ver progreso",
       "optionalPractice": "Práctica opcional",
-      "settings": {"title": "Ajustes de repaso", "studyMode": "Modo de estudio", "current": "Actual:"}
+      "settings": {"title": "Ajustes de repaso", "mode": "Modo", "current": "Actual:"}
     },
     "more": {
       "eyebrow": "Práctica",
@@ -1066,7 +1069,7 @@
       "encouragementMsg": "Lo estás haciendo genial. ¡Sigue así!"
     },
     "audioAutoplay": {
-      "title": "Reproducción automática",
+      "title": "Audio",
       "off": "Desactivada",
       "answer": "Solo respuesta",
       "answer_and_example": "Respuesta y ejemplo de uso"
@@ -1475,7 +1478,7 @@
         "decreaseAria": "Reducir meta mensual",
         "increaseAria": "Aumentar meta mensual"
       },
-      "streakNote": "🔥 Repasa 10 tarjetas para extender tu racha. Tus objetivos personales no cambian este requisito."
+      "streakNote": "Repasa hasta 10 tarjetas distintas para extender tu racha (menos si tu colección es pequeña). Tu objetivo personal no cambia este requisito."
     },
     "goalsPrompt": {
       "titleFirstTime": "Establece tus metas de estudio",

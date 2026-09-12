@@ -8,8 +8,9 @@ export interface ReviewPreferenceSummary {
 }
 
 export interface ReviewHomeDashboard {
-  completedToday: number;
-  goal: number;
+  reviewedToday: number;
+  personalGoal: number;
+  streakTarget: number;
   streak: number;
   preferences: ReviewPreferenceSummary;
 }

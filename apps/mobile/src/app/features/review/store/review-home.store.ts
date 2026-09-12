@@ -1,6 +1,6 @@
 import { computed, inject } from '@angular/core';
 import { patchState, signalStore, withComputed, withMethods, withState } from '@ngrx/signals';
-import type { ScheduledCard } from '@lingua-card/shared/domain';
+import {DAILY_STREAK_POLICY, type ScheduledCard} from '@lingua-card/shared/domain';
 import { CardStore } from '../../vault/store/card.store';
 import { EngagementStore } from '../../engagement/state/engagement.store';
 import { SettingsStore } from '../../settings/store/settings.store';
@@ -73,17 +73,22 @@ export const ReviewHomeStore = signalStore(
     const engagement = inject(EngagementStore);
     const prefs = inject(ReviewPrefsService);
     const cards = inject(CardStore);
+    const settings = inject(SettingsStore);
     const dashboard = computed<ReviewHomeDashboard>(() => ({
-      completedToday: engagement.completedToday(),
-      goal: Math.max(1, engagement.dailyGoal()),
+      reviewedToday: engagement.completedToday(),
+      personalGoal: engagement.personalGoal().goal || settings.dailyGoal(),
+      streakTarget: engagement.dailyGoal() || DAILY_STREAK_POLICY.requiredUniqueReviews,
       streak: engagement.streak().current,
       preferences: {mode: prefs.mode(), autoplay: prefs.autoplay()},
     }));
 
     return {
       dashboard,
+      streakReviewsRemaining: computed(() =>
+        Math.max(0, dashboard().streakTarget - dashboard().reviewedToday),
+      ),
       viewModel: computed<ReviewHomeViewModel>(() => {
-        const {completedToday, goal} = dashboard();
+        const {reviewedToday, personalGoal} = dashboard();
         const session = review.session();
 
         if (session?.status === 'active') {
@@ -100,11 +105,11 @@ export const ReviewHomeStore = signalStore(
 
         const result = planState.result;
         if (result.kind === 'empty_library') return { kind: 'empty' };
-        if (completedToday >= goal) {
+        if (reviewedToday >= personalGoal) {
           return {
             kind: 'complete',
-            reviewedToday: completedToday,
-            goal,
+            reviewedToday,
+            goal: personalGoal,
             continuation: continuationFromPlan(result),
           };
         }
@@ -121,7 +126,6 @@ export const ReviewHomeStore = signalStore(
   withMethods(store => {
     const planning = inject(ReviewSessionPlanningService);
     const review = inject(ReviewStore);
-    const engagement = inject(EngagementStore);
     const settings = inject(SettingsStore);
     const prefs = inject(ReviewPrefsService);
     let refreshSequence = 0;
@@ -135,8 +139,10 @@ export const ReviewHomeStore = signalStore(
         }
 
         patchState(store, { planState: { status: 'loading' } });
-        const completedToday = engagement.completedToday();
-        const goal = Math.max(1, engagement.dailyGoal());
+        const {reviewedToday, personalGoal, streakTarget} = store.dashboard();
+        const remainingPersonalGoal = Math.max(0, personalGoal - reviewedToday);
+        const remainingStreakTarget = Math.max(0, streakTarget - reviewedToday);
+        const limit = remainingPersonalGoal || remainingStreakTarget || personalGoal;
         const timeZone = settings.settings()?.timezone
           ?? Intl.DateTimeFormat().resolvedOptions().timeZone;
         try {
@@ -144,7 +150,7 @@ export const ReviewHomeStore = signalStore(
             source: { kind: 'daily' },
             mode: toReviewMode(prefs.mode()),
             direction: toPromptDirection(prefs.dir()),
-            limit: completedToday >= goal ? goal : Math.max(1, goal - completedToday),
+            limit,
           }, new Date(), { timeZone });
           if (sequence !== refreshSequence) return;
           patchState(store, { planState: { status: 'resolved', result } });

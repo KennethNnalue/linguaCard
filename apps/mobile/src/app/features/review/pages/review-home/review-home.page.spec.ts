@@ -101,18 +101,25 @@ describe('ReviewHomePage completed state', () => {
       },
     });
     const dashboard = signal<ReviewHomeDashboard>({
-      completedToday: 10,
-      goal: 10,
+      reviewedToday: 10,
+      personalGoal: 10,
+      streakTarget: 10,
       streak: 2,
       preferences: {mode: 'type', autoplay: 'answer_and_example'},
     });
     const navigate = jest.fn().mockResolvedValue(true);
     const refresh = jest.fn().mockResolvedValue(undefined);
+    const streakReviewsRemaining = signal(0);
 
     TestBed.overrideComponent(ReviewHomePage, {
       set: {
         providers: [
-          {provide: ReviewHomeStore, useValue: {viewModel, dashboard, refresh}},
+          {provide: ReviewHomeStore, useValue: {
+            viewModel,
+            dashboard,
+            streakReviewsRemaining,
+            refresh,
+          }},
           {provide: ReviewPlayerService, useValue: {isLaunching: signal(false)}},
           {provide: ReviewPrefsService, useValue: {}},
           {provide: AuthService, useValue: {currentUser: signal(null)}},
@@ -132,6 +139,12 @@ describe('ReviewHomePage completed state', () => {
 
     expect(fixture.nativeElement.querySelector('.review-home__continue')).not.toBeNull();
     expect(fixture.nativeElement.textContent).toContain('review.home.continueAction');
+    const hero = fixture.nativeElement.querySelector('.review-home__hero') as HTMLElement;
+    expect(hero.nextElementSibling?.classList.contains('review-home__continue')).toBe(true);
+
+    streakReviewsRemaining.set(5);
+    fixture.detectChanges();
+    expect(hero.textContent).toContain('review.home.streakRemaining');
 
     viewModel.set({kind: 'complete', reviewedToday: 10, goal: 10, continuation: {kind: 'none'}});
     fixture.detectChanges();

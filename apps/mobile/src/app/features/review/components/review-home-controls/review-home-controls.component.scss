@@ -33,8 +33,10 @@
 }
 
 .review-home-controls__settings ion-icon[slot='end'],
+.review-home-controls__daily-status ion-icon[slot='end'],
 .review-home-controls__more-practice ion-icon[slot='end'] {
   color: var(--lc-rv-muted);
+  font-size: t.$lc-text-4xl;
 }
 
 .review-home-controls__settings-label {
@@ -52,27 +54,25 @@
 }
 
 .review-home-controls__settings-summary {
-  display: flex;
-  flex-wrap: wrap;
-  justify-items: center;
-  align-items: center;
-  gap: 0 t.$lc-space-1;
+  display: grid;
+  gap: t.$lc-space-1;
   color: var(--lc-rv-text-soft);
   font-size: t.$lc-text-sm;
   line-height: 1.4;
 }
 
+.review-home-controls__settings-detail {
+  display: block;
+}
+
 .review-home-controls__settings-label-title {
   font-size: t.$lc-text-lg;
   font-weight: t.$lc-font-weight-semibold;
-
-
 }
 
 .review-home-controls__daily-status {
-  --inner-padding-end: 0;
-  --padding-start: 0;
-  min-height: 74px;
+  --padding-start: #{t.$lc-space-3};
+  min-height: 104px;
 }
 
 .review-home-controls__metric {
@@ -80,12 +80,11 @@
   flex: 1;
   align-items: center;
   justify-content: center;
-  gap: t.$lc-space-3;
+  gap: t.$lc-space-2;
   min-width: 0;
-  padding-inline: t.$lc-space-2;
+  padding: t.$lc-space-3 t.$lc-space-2;
   color: var(--lc-rv-text);
-  font-size: t.$lc-text-xl;
-  text-align: center;
+  font-size: t.$lc-text-sm;
 
   ion-icon {
     flex: 0 0 auto;
@@ -94,15 +93,33 @@
   }
 }
 
+.review-home-controls__metric-copy {
+  display: grid;
+  gap: t.$lc-space-1;
+  min-width: 0;
+  text-align: start;
+}
+
+.review-home-controls__metric-title {
+  font-weight: t.$lc-font-weight-semibold;
+}
+
+.review-home-controls__streak-count,
+.review-home-controls__goals-explainer {
+  color: var(--lc-rv-text-soft);
+  font-size: t.$lc-text-xs;
+}
+
+.review-home-controls__goals-explainer {
+  margin: -#{t.$lc-space-2} t.$lc-space-2 0;
+  line-height: 1.45;
+}
+
 .review-home-controls__metric--streak {
   border-left: 1px solid var(--lc-rv-border);
 
   ion-icon {
     color: var(--lc-rv-brass-ink);
-  }
-
-  .review-home-controls__metric-chevron {
-    font-size: t.$lc-text-xl;
   }
 }
 
@@ -112,7 +129,6 @@
 
 @media (max-width: 390px) {
   .review-home-controls__metric {
-    gap: t.$lc-space-2;
-    font-size: t.$lc-text-lg;
+    gap: t.$lc-space-1;
   }
 }
