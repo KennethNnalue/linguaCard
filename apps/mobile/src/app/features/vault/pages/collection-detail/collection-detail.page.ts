@@ -6,6 +6,7 @@ import {
   ActionSheetController,
   AlertController,
   IonContent,
+  IonSpinner,
   ModalController,
   } from '@ionic/angular';
 import {TranslateService, TranslatePipe} from '@ngx-translate/core';
@@ -72,7 +73,7 @@ function firstPluralFromGrammar(value: unknown): string | null {
   templateUrl: './collection-detail.page.html',
   styleUrls: ['./collection-detail.page.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [IonContent, FabButtonComponent, TranslatePipe, CollectionCoverComponent, WordRowComponent],
+  imports: [IonContent, IonSpinner, FabButtonComponent, TranslatePipe, CollectionCoverComponent, WordRowComponent],
 })
 export class CollectionDetailPage implements OnInit {
   private readonly route = inject(ActivatedRoute);
@@ -94,6 +95,7 @@ export class CollectionDetailPage implements OnInit {
   private readonly shareApi = inject(ShareApiService);
   private readonly vocabularyPlayer = inject(VocabularyPlayerService);
   readonly vaultStore = inject(VaultV2Store);
+  readonly reviewLaunching = this.reviewPlayer.isLaunching;
 
   // Derived from the global CardStore — automatically reflects edits and deletes
   // made from word-detail without any manual reload.

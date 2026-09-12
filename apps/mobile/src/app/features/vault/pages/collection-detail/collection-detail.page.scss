@@ -3,6 +3,14 @@
 
 // ─── COVER HERO ──────────────────────────────────────────────────────────────
 
+.collection-hero {
+  position: sticky;
+  top: 0;
+  z-index: t.$lc-z-header;
+  padding-bottom: t.$lc-space-2;
+  background: var(--lc-surface);
+}
+
 .cover {
   position: relative;
   overflow: hidden;
@@ -150,6 +158,22 @@
 .stats-actions {
   display: flex;
   gap: 9px;
+}
+
+.review-preparing {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: t.$lc-space-2;
+  margin-top: t.$lc-space-3;
+  color: var(--lc-text-secondary);
+  @include u.lc-font('sm', t.$lc-font-weight-medium);
+
+  ion-spinner {
+    width: 16px;
+    height: 16px;
+    color: var(--lc-brand);
+  }
 }
 
 .btn-review,
