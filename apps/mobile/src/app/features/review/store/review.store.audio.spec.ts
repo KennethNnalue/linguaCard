@@ -1,4 +1,5 @@
 import { TestBed } from '@angular/core/testing';
+import { signal } from '@angular/core';
 import { createNewReviewSchedulingState, type ScheduledCard } from '@lingua-card/shared/domain';
 import { AuthService } from '../../../core/services/auth.service';
 import { LocalDataService } from '../../../core/services/local-data.service';
@@ -64,5 +65,41 @@ describe('ReviewStore audio preparation', () => {
     expect(store.operation()).toEqual({ kind: 'idle' });
     expect(store.presentation()).toBeNull();
     expect(setActiveReviewSession).not.toHaveBeenCalled();
+  });
+
+  it('keeps session card snapshots when background synchronization replaces the card store', async () => {
+    const cards = signal<ScheduledCard[]>([reviewCard()]);
+    TestBed.configureTestingModule({
+      providers: [
+        ReviewStore,
+        {provide: CardStore, useValue: {cards, updateCard: jest.fn()}},
+        {
+          provide: LocalDataService,
+          useValue: {setActiveReviewSession: jest.fn().mockResolvedValue(undefined)},
+        },
+        {provide: AuthService, useValue: {currentUser: () => ({id: 'user-1'})}},
+        {provide: SyncService, useValue: {}},
+        {provide: ReviewSessionBuilderService, useValue: {ensureCardsReady: jest.fn().mockResolvedValue(null)}},
+        {provide: ReviewPrefsService, useValue: {mode: () => 'flip', dir: () => 'en-de'}},
+        {provide: ReviewCommitService, useValue: {}},
+        {provide: ReviewLocalRepository, useValue: {}},
+        {provide: EngagementStore, useValue: {}},
+        {provide: CardAdministrationService, useValue: {}},
+        {provide: SettingsStore, useValue: {}},
+        {provide: ReviewAudioPreparationService, useValue: {prepare: jest.fn().mockResolvedValue(undefined)}},
+      ],
+    });
+    const store = TestBed.inject(ReviewStore);
+
+    await expect(store.startSessionForCards(
+      {kind: 'explicit', cardIds: ['card-1']},
+      ['card-1'],
+    )).resolves.toMatchObject({kind: 'started'});
+    expect(store.presentation()?.cardId).toBe('card-1');
+
+    cards.set([]);
+
+    expect(store.presentation()?.cardId).toBe('card-1');
+    expect(store.sessionCards()).toEqual([reviewCard()]);
   });
 });

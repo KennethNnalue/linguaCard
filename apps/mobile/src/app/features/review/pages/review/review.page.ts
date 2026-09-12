@@ -4,7 +4,6 @@ import { addIcons } from 'ionicons';
 import { closeOutline, volumeHighOutline, volumeMuteOutline } from 'ionicons/icons';
 import type { ReviewRating, ScheduledCard } from '@lingua-card/shared/domain';
 import { cardPronunciationText, WordAudioService } from '../../../../shared/audio/word-audio.service';
-import { CardStore } from '../../../vault/store/card.store';
 import { ReviewStore } from '../../store/review.store';
 import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { FrontFlipComponent } from './components/front-flip/front-flip.component';
@@ -51,7 +50,6 @@ const SLOW_RATE = 0.7;
 export class ReviewPage {
   @Input() launchInTypingMode = false;
   private readonly typingFront = viewChild(FrontTypeComponent);
-  private readonly cardStore = inject(CardStore);
   protected readonly reviewStore = inject(ReviewStore);
   private readonly wordAudio = inject(WordAudioService);
   private readonly answerEvaluator = inject(AnswerEvaluatorService);
@@ -113,7 +111,7 @@ export class ReviewPage {
 
   readonly currentCard = computed<ScheduledCard | null>(() => {
     const cardId = this.previousCardId() ?? this.reviewStore.presentation()?.cardId;
-    const card = cardId ? this.cardStore.cards().find(candidate => candidate.id === cardId) : undefined;
+    const card = cardId ? this.reviewStore.sessionCards().find(candidate => candidate.id === cardId) : undefined;
     if (!card) return null;
     return {
       ...card,

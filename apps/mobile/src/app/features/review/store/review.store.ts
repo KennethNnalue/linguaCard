@@ -55,6 +55,7 @@ export type ReviewOperation =
 
 interface ReviewState {
   session: ReviewSessionState | null;
+  sessionCards: ScheduledCard[];
   presentation: ReviewPresentation | null;
   operation: ReviewOperation;
   sessionRatings: Readonly<Record<string, ReviewRating>>;
@@ -72,7 +73,7 @@ type PersistedSessionHistoryEntry = Omit<ReviewSessionHistoryEntry, 'originalCar
 };
 
 const initialState: ReviewState = {
-  session: null, presentation: null, operation: { kind: 'idle' }, sessionRatings: {},
+  session: null, sessionCards: [], presentation: null, operation: { kind: 'idle' }, sessionRatings: {},
   sessionNewCardCount: 0, completedSession: null, sessionHistory: [], commitError: null,
   committedEvents: [],
   lastReviewedCardId: null,
@@ -144,10 +145,12 @@ export const ReviewStore = signalStore(
       return current;
     }
     function cardById(cardId: string): ScheduledCard | undefined {
-      return cardStore.cards().find(card => card.id === cardId);
+      return store.sessionCards().find(card => card.id === cardId)
+        ?? cardStore.cards().find(card => card.id === cardId);
     }
     function schedulingStates(): Map<string, ReturnType<typeof schedulingStateFor>> {
-      return new Map(cardStore.cards().map(card => [card.id, schedulingStateFor(card)]));
+      const cards = store.sessionCards().length > 0 ? store.sessionCards() : cardStore.cards();
+      return new Map(cards.map(card => [card.id, schedulingStateFor(card)]));
     }
     function beginSessionStart(): number {
       sessionStartSequence += 1;
@@ -311,6 +314,7 @@ export const ReviewStore = signalStore(
             if (session.status === 'active' && startedAtIsValid) {
               activeSessionState = {
                 session,
+                sessionCards: [],
                 presentation: null,
                 operation: { kind: 'idle' },
                 sessionRatings: persisted.ratings,
@@ -336,7 +340,7 @@ export const ReviewStore = signalStore(
       async startSession(source: ReviewSessionSource, limit: number): Promise<ReviewSessionStartResult> {
         const startSequence = beginSessionStart();
         patchState(store, {
-          session: null, presentation: null, operation: { kind: 'starting' }, sessionRatings: {},
+          session: null, sessionCards: [], presentation: null, operation: { kind: 'starting' }, sessionRatings: {},
           sessionNewCardCount: 0, completedSession: null, commitError: null, lastReviewedCardId: null,
         });
         const request = {
@@ -355,8 +359,12 @@ export const ReviewStore = signalStore(
           return result;
         }
         const cards = new Map(cardStore.cards().map(card => [card.id, card]));
+        const sessionCards = result.session.definition.originalCardIds
+          .map(cardId => cards.get(cardId))
+          .filter((card): card is ScheduledCard => card !== undefined);
         patchState(store, {
           session: result.session,
+          sessionCards,
           sessionNewCardCount: result.session.definition.originalCardIds.filter(cardId => cards.get(cardId)?.reviewState.stage === 'new').length,
         });
         try {
@@ -384,7 +392,7 @@ export const ReviewStore = signalStore(
       async startSessionForCards(source: ReviewSessionSource, cardIds: readonly string[]): Promise<ReviewSessionStartResult> {
         const startSequence = beginSessionStart();
         patchState(store, {
-          session: null, presentation: null, operation: { kind: 'starting' }, sessionRatings: {},
+          session: null, sessionCards: [], presentation: null, operation: { kind: 'starting' }, sessionRatings: {},
           sessionNewCardCount: 0, completedSession: null, commitError: null, lastReviewedCardId: null,
         });
         const readinessError = await sessionBuilder.ensureCardsReady();
@@ -408,6 +416,7 @@ export const ReviewStore = signalStore(
         });
         patchState(store, {
           session,
+          sessionCards: originalCardIds.map(cardId => availableCards.get(cardId)).filter((card): card is ScheduledCard => card !== undefined),
           sessionNewCardCount: originalCardIds.filter(cardId => availableCards.get(cardId)?.reviewState.stage === 'new').length,
         });
         try {
@@ -449,6 +458,7 @@ export const ReviewStore = signalStore(
         });
         patchState(store, {
           session,
+          sessionCards: [],
           presentation: null,
           operation: { kind: 'starting' },
           sessionRatings: persisted.ratings,
@@ -464,6 +474,17 @@ export const ReviewStore = signalStore(
             });
             return false;
           }
+          const availableCards = new Map(cardStore.cards().map(card => [card.id, card]));
+          const sessionCards = session.definition.originalCardIds
+            .map(cardId => availableCards.get(cardId))
+            .filter((card): card is ScheduledCard => card !== undefined);
+          if (sessionCards.length !== session.definition.originalCardIds.length) {
+            patchState(store, {
+              operation: { kind: 'error', message: 'Some cards in this review session are no longer available.', recoverable: true },
+            });
+            return false;
+          }
+          patchState(store, {sessionCards});
           await prepareSessionAudio(session);
           const isCurrent = () => isCurrentSessionStart(startSequence, session.definition.id);
           if (!isCurrent() || !await presentNextCard(session, new Date(), isCurrent)) return false;
@@ -495,6 +516,9 @@ export const ReviewStore = signalStore(
         const ratings = { ...store.sessionRatings(), [presentation.cardId]: rating };
         patchState(store, {
           session: reviewedSession,
+          sessionCards: store.sessionCards().map(card => card.id === currentCard.id
+            ? {...card, reviewState: pendingCommit.nextState}
+            : card),
           sessionRatings: ratings,
           lastReviewedCardId: presentation.cardId,
         });
@@ -548,8 +572,10 @@ export const ReviewStore = signalStore(
           return false;
         }
         patchState(store, { operation: { kind: 'administering', action: 'manual_mastery' }, commitError: null });
+        let nextCard: ScheduledCard;
         try {
-          await cardAdministration.manuallyMaster(card);
+          const result = await cardAdministration.manuallyMaster(card);
+          nextCard = {...card, reviewState: result.nextState};
         } catch {
           patchState(store, {
             operation: { kind: 'error', message: 'This card could not be marked as mastered. Check your connection and try again.', recoverable: true },
@@ -557,6 +583,9 @@ export const ReviewStore = signalStore(
           });
           return false;
         }
+        patchState(store, {
+          sessionCards: store.sessionCards().map(candidate => candidate.id === nextCard.id ? nextCard : candidate),
+        });
         const resolved = resolveManuallyMasteredCard(session, presentation.cardId, presentation.kind);
         try {
           await persistActiveSession(resolved);
@@ -585,7 +614,7 @@ export const ReviewStore = signalStore(
       clearSession(): void {
         sessionStartSequence += 1;
         patchState(store, {
-          session: null, presentation: null, operation: { kind: 'idle' }, sessionRatings: {},
+          session: null, sessionCards: [], presentation: null, operation: { kind: 'idle' }, sessionRatings: {},
           sessionNewCardCount: 0, completedSession: null, lastReviewedCardId: null,
         });
         void clearPersistedActiveSession();
