@@ -88,6 +88,7 @@ export class AdminPodcastsService {
       id: randomUUID(),
       externalId,
       title: dto.title.trim(),
+      titleTranslation: dto.titleTranslation.trim(),
       description: dto.description.trim(),
       targetLanguage: dto.targetLanguage,
       translationLanguage: dto.translationLanguage,
@@ -127,6 +128,7 @@ export class AdminPodcastsService {
         );
       }
       if (dto.title !== undefined) topic.title = dto.title.trim();
+      if (dto.titleTranslation !== undefined) topic.titleTranslation = dto.titleTranslation.trim();
       if (dto.description !== undefined) topic.description = dto.description.trim();
       topic.level = level;
       await manager.save(topic);
@@ -138,6 +140,7 @@ export class AdminPodcastsService {
     topicId: string,
     requestId: string,
     generationInput: PodcastEpisodeGenerationInput | null,
+    titles?: { title?: string; titleTranslation?: string },
   ): Promise<AdminPodcastEpisodeListItem> {
     const existing = await this.episodeRepo.findOneBy({ generationRequestId: requestId });
     if (existing) {
@@ -163,8 +166,8 @@ export class AdminPodcastsService {
           id: randomUUID(),
           topicId,
           externalId: podcastEpisodeExternalId(topic.externalId, `episode-${position + 1}`, position),
-          title: `Episode ${position + 1}`,
-          titleTranslation: '',
+          title: titles?.title?.trim() || `Episode ${position + 1}`,
+          titleTranslation: titles?.titleTranslation?.trim() || '',
           description: '',
           level: topic.level,
           position,
@@ -375,6 +378,7 @@ export class AdminPodcastsService {
         where: { id: episodeId }, lock: { mode: 'pessimistic_write' },
       });
       if (!episode) throw new NotFoundException(`Podcast episode ${episodeId} not found`);
+      if (!episode.titleTranslation.trim()) throw new ConflictException('Add an episode title translation before publishing');
       if (!episode.thumbnailAssetId) throw new ConflictException('Upload an episode thumbnail before publishing');
       if (!episode.audioUrl || episode.status !== 'ready_for_review') {
         throw new ConflictException('Generate and review episode audio before publishing');
@@ -392,6 +396,7 @@ export class AdminPodcastsService {
         where: { id: topicId }, lock: { mode: 'pessimistic_write' },
       });
       if (!topic) throw new NotFoundException(`Podcast topic ${topicId} not found`);
+      if (!topic.titleTranslation.trim()) throw new ConflictException('Add a topic title translation before publishing');
       if (!topic.thumbnailAssetId) throw new ConflictException('Upload a topic thumbnail before publishing');
       const publishedEpisodes = await manager.countBy(PodcastEpisodeEntity, {
         topicId, status: 'published',
@@ -435,6 +440,7 @@ export class AdminPodcastsService {
       id: topic.id,
       externalId: topic.externalId,
       title: topic.title,
+      titleTranslation: topic.titleTranslation,
       description: topic.description,
       targetLanguage: topic.targetLanguage,
       translationLanguage: topic.translationLanguage,

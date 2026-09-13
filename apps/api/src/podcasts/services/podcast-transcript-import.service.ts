@@ -97,8 +97,8 @@ export class PodcastTranscriptImportService {
       })));
       episode.transcriptFingerprint = dto.fingerprint;
       if (payload.episode) {
-        episode.title = payload.episode.title.trim();
-        episode.titleTranslation = payload.episode.titleTranslation.trim();
+        if (/^Episode \d+$/u.test(episode.title)) episode.title = payload.episode.title.trim();
+        if (!episode.titleTranslation.trim()) episode.titleTranslation = payload.episode.titleTranslation.trim();
         episode.description = payload.episode.description.trim();
       }
       episode.estimatedDurationMs = resolved.preview.estimatedDurationMs;

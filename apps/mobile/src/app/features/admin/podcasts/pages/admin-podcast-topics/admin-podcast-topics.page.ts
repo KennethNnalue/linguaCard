@@ -100,6 +100,7 @@ export class AdminPodcastTopicsPage implements OnInit {
   });
   readonly topicForm = new FormGroup({
     title: new FormControl('', {nonNullable: true, validators: Validators.required}),
+    titleTranslation: new FormControl('', {nonNullable: true, validators: [Validators.required, Validators.pattern(/\S/)]}),
     targetLanguage: new FormControl<LanguageCode>('de', {nonNullable: true}),
     translationLanguage: new FormControl<LanguageCode>('en', {nonNullable: true}),
     level: new FormControl<CefrLevel>('A1', {nonNullable: true}),
@@ -110,10 +111,13 @@ export class AdminPodcastTopicsPage implements OnInit {
       nonNullable: true,
       validators: Validators.required
     }),
+    titleTranslation: new FormControl('', {nonNullable: true, validators: [Validators.required, Validators.pattern(/\S/)]}),
     level: new FormControl<CefrLevel>('A1', {nonNullable: true}),
     description: new FormControl('', {nonNullable: true})
   });
   readonly episodeForm = new FormGroup({
+    title: new FormControl('', {nonNullable: true}),
+    titleTranslation: new FormControl('', {nonNullable: true}),
     vocabulary: new FormControl('', {
       nonNullable: true,
       validators: Validators.required
@@ -183,6 +187,7 @@ export class AdminPodcastTopicsPage implements OnInit {
       const item = this.topic();
       if (item) untracked(() => this.editTopicForm.patchValue({
         title: item.title,
+        titleTranslation: item.titleTranslation,
         level: item.level,
         description: item.description
       }));
@@ -283,6 +288,8 @@ export class AdminPodcastTopicsPage implements OnInit {
       dto: {
         requestId: crypto.randomUUID(),
         vocabulary,
+        title: value.title.trim() || undefined,
+        titleTranslation: value.titleTranslation.trim() || undefined,
         direction: podcastGenerationDirection(input.episodeTitle, value.direction),
       }
     });

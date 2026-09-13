@@ -118,7 +118,7 @@ export class VaultV2Page implements OnInit {
   }
 
   startListen(): void {
-    void this.router.navigateByUrl('/listen');
+    void this.router.navigateByUrl('/listen/words');
   }
 
   openCollection(collection: CollectionSummaryView): void {

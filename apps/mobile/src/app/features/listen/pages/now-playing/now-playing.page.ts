@@ -48,7 +48,10 @@ export class NowPlayingPage implements ViewWillLeave {
   private readonly _readyToRedirect = signal(false);
   private readonly _redirectEffect = effect(() => {
     if (this._readyToRedirect() && this.listenStore.status() === 'complete') {
-      this.router.navigate(['/listen/complete'], { replaceUrl: true });
+      this.router.navigate(['/listen/complete'], {
+        replaceUrl: true,
+        state: { returnUrl: history.state?.returnUrl },
+      });
     }
   });
 

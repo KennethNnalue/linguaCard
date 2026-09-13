@@ -67,7 +67,8 @@
     "vault": "Vault",
     "review": "Review",
     "stories": "Stories",
-    "listen": "Listen"
+    "listen": "Listen",
+    "podcasts": "Podcasts"
   },
   "auth": {
     "login": {
@@ -1019,6 +1020,12 @@
         "emptyHint": "Complete your first daily review to begin your progress history.",
         "learningPoints": "Learning Points",
         "pointsHint": "Earned from daily reviews and mastery",
+        "reviewHistory": "Review history",
+        "historyRetention": "Your sessions from the last three months. Older sessions are deleted automatically.",
+        "clearHistory": "Clear",
+        "clearHistoryTitle": "Clear review history?",
+        "clearHistoryMessage": "Your session history will be deleted from this device and your account. Streaks, Learning Points, and card progress will stay the same.",
+        "clearHistoryError": "We couldn't clear your review history. Try again.",
         "howFreezesWork": "How freezes work",
         "freezeExplanation": "If you miss a full day, one available freeze protects your streak automatically. It never adds reviews or Learning Points."
       }
@@ -1204,7 +1211,8 @@
   },
   "listen": {
     "main": {
-      "pageTitle": "Listen"
+      "pageTitle": "Listen",
+    "wordsTitle": "Listen to words"
     },
     "playlistMode": {
       "wordsLabel": "Words",
@@ -1291,6 +1299,20 @@
     }
   },
   "podcasts": {
+    "library": {
+      "retry": "Retry",
+      "exploreTopics": "Explore topics",
+      "showLess": "Show less",
+      "seeAll": "See all",
+      "levelPicks": "Picked for level {{level}}",
+      "episodesForYou": "Episodes for you",
+      "continue": "Continue",
+      "listened": "Listened",
+      "browseByScene": "Browse by scene",
+      "levelFilter": "Podcast episode level",
+      "loading": "Loading conversations…",
+      "empty": "No podcast topics are published yet."
+    },
     "player": {
       "backToTopic": "Back to topic",
       "openLandscape": "Open landscape player",

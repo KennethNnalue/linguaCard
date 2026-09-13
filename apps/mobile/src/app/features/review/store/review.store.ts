@@ -1,7 +1,7 @@
 import { computed, inject } from '@angular/core';
 import { patchState, signalStore, withComputed, withMethods, withState } from '@ngrx/signals';
 import { ReviewRating, ScheduledCard } from '@lingua-card/shared/domain';
-import { generateUuid } from '@lingua-card/shared/utils';
+import { generateUuid, reviewHistoryCutoff } from '@lingua-card/shared/utils';
 import { AuthService } from '../../../core/services/auth.service';
 import { LocalDataService } from '../../../core/services/local-data.service';
 import { SyncService } from '../../../core/services/sync.service';
@@ -27,7 +27,8 @@ import {
   toReviewMode,
 } from '../services/review-prefs.service';
 import { ReviewSessionBuilderService } from '../services/review-session-builder.service';
-import { UpsertSessionDto } from '../services/review-session-api.service';
+import { ReviewSessionApiService, UpsertSessionDto } from '../services/review-session-api.service';
+import { firstValueFrom } from 'rxjs';
 import { ReviewCommitService } from '../services/review-commit.service';
 import { ReviewLocalRepository } from '../services/review-local.repository';
 import { EngagementStore } from '../../engagement/state/engagement.store';
@@ -126,6 +127,7 @@ export const ReviewStore = signalStore(
   withMethods(store => {
     const cardStore = inject(CardStore);
     const localData = inject(LocalDataService);
+    const sessionApi = inject(ReviewSessionApiService);
     const authService = inject(AuthService);
     const syncService = inject(SyncService);
     const sessionBuilder = inject(ReviewSessionBuilderService);
@@ -190,13 +192,18 @@ export const ReviewStore = signalStore(
       await localData.setSessionHistory(userId, sessions);
     }
     async function readPersistedSessionHistory(userId: string): Promise<ReviewSessionHistoryEntry[]> {
-      return (await localData.getSessionHistory(userId))
+      const stored = await localData.getSessionHistory(userId);
+      const cutoff = reviewHistoryCutoff().getTime();
+      const recent = stored
         .filter(isPersistedSessionHistoryEntry)
+        .filter(session => new Date(session.startedAt).getTime() >= cutoff)
         .map(session => ({
           ...session,
           originalCardIds: session.originalCardIds ?? session.reviewedCardIds,
           manuallyMasteredCardIds: session.manuallyMasteredCardIds ?? [],
         }));
+      if (recent.length !== stored.length) await localData.setSessionHistory(userId, recent);
+      return recent;
     }
     function toUpsertDto(session: ReviewSessionHistoryEntry): UpsertSessionDto {
       return {
@@ -230,7 +237,10 @@ export const ReviewStore = signalStore(
     }
     async function completeActiveSession(session: ReviewSessionState): Promise<void> {
       const completed = projectCompletedSession(session);
-      const updated = [completed, ...store.sessionHistory()].slice(0, MAX_SESSION_HISTORY);
+      const cutoff = reviewHistoryCutoff().getTime();
+      const updated = [completed, ...store.sessionHistory()]
+        .filter(session => new Date(session.startedAt).getTime() >= cutoff)
+        .slice(0, MAX_SESSION_HISTORY);
       try {
         await clearPersistedActiveSession();
       } catch {
@@ -350,6 +360,16 @@ export const ReviewStore = signalStore(
         const sessionHistory = await readPersistedSessionHistory(userId);
         if (authService.currentUser()?.id !== userId) return;
         patchState(store, { sessionHistory });
+      },
+      async clearHistory(): Promise<void> {
+        const userId = authService.currentUser()?.id;
+        if (!userId) throw new Error('A signed-in user is required to clear review history');
+        await persistenceChain;
+        await firstValueFrom(sessionApi.clearHistory());
+        if (authService.currentUser()?.id !== userId) return;
+        await localData.setPendingSessions(userId, []);
+        await localData.setSessionHistory(userId, []);
+        patchState(store, { sessionHistory: [] });
       },
       async startSession(source: ReviewSessionSource, limit: number): Promise<ReviewSessionStartResult> {
         const startSequence = beginSessionStart();

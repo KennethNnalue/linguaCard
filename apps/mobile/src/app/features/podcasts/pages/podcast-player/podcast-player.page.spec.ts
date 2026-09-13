@@ -27,7 +27,7 @@ const currentTurn: PodcastPlayerTurn = {
 };
 
 const episode: PodcastEpisodePlayer = {
-  id: 'episode-1', topicId: 'topic-1', topicTitle: 'Meine Wohnung', title: 'Meine neue Wohnung',
+  id: 'episode-1', topicId: 'topic-1', topicTitle: 'Meine Wohnung', topicTitleTranslation: 'My Apartment', title: 'Meine neue Wohnung', titleTranslation: 'My New Apartment',
   audioUrl: '/episode.mp3', audioDurationMs: 60_000, audioVersion: 1,
   thumbnail: {
     assetId: 'thumbnail-1', cardUrl: '/card.webp', cardWidth: 640, cardHeight: 360,
@@ -163,6 +163,11 @@ describe('PodcastPlayerPage immersive presentation', () => {
   });
 
   afterEach(() => jest.useRealTimers());
+
+  it('shows the episode title translation beneath the original title', () => {
+    expect(playerRoot().querySelector('.top-chrome .title-translation')?.textContent?.trim())
+      .toBe('My New Apartment');
+  });
 
   it('opens immersive mode without replacing the audio element', async () => {
     const audioBefore = playerRoot().querySelector('audio');

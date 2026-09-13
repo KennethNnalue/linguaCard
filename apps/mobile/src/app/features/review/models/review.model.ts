@@ -111,7 +111,7 @@ export const SUCCESSFUL_REVIEW_RATINGS: readonly ReviewRating[] = ['good', 'easy
 
 // ─── SESSION HISTORY LIMITS ───────────────────────────────────────────────────
 
-export const MAX_SESSION_HISTORY = 50;
+export const MAX_SESSION_HISTORY = 500;
 
 // ─── REVIEW SORT ORDER ────────────────────────────────────────────────────────
 

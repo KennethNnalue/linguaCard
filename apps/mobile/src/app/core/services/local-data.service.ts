@@ -137,14 +137,14 @@ export class LocalDataService {
     await this.storage.set(`platform_stories_list:${nativeLang}`, stories);
   }
 
-  async getPodcastLibrary(userId: string): Promise<PodcastLibraryResponse | null> {
+  async getPodcastLibrary(userId: string, level: string): Promise<PodcastLibraryResponse | null> {
     await this.init();
-    return (await this.storage.get(`podcast_library:${userId}`)) ?? null;
+    return (await this.storage.get(`podcast_library:${userId}:${level}`)) ?? null;
   }
 
-  async setPodcastLibrary(userId: string, library: PodcastLibraryResponse): Promise<void> {
+  async setPodcastLibrary(userId: string, level: string, library: PodcastLibraryResponse): Promise<void> {
     await this.init();
-    await this.storage.set(`podcast_library:${userId}`, library);
+    await this.storage.set(`podcast_library:${userId}:${level}`, library);
   }
 
   async getPodcastTopic(topicId: string): Promise<PodcastTopicDetail | null> {

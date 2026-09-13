@@ -103,6 +103,46 @@
         <strong>{{ view.learningPoints }}</strong>
       </section>
 
+      <section class="ep-card ep-history" aria-labelledby="ep-history-title">
+        <div class="ep-card-head">
+          <div>
+            <h2 id="ep-history-title">{{ 'review.engagement.progress.reviewHistory' | translate }}</h2>
+            <p>{{ 'review.engagement.progress.historyRetention' | translate }}</p>
+          </div>
+          @if (sessions().length > 0) {
+            <button class="ep-clear" type="button" [disabled]="clearingHistory()" (click)="confirmClearHistory()">
+              {{ 'review.engagement.progress.clearHistory' | translate }}
+            </button>
+          }
+        </div>
+        @if (historyError()) {
+          <p class="ep-history-error" role="alert">{{ 'review.engagement.progress.clearHistoryError' | translate }}</p>
+        }
+        @if (sessions().length > 0) {
+          <div class="ep-sessions">
+            @for (session of sessions(); track session.id) {
+              <div class="ep-session">
+                <div class="ep-session-head">
+                  <strong>{{ session.collectionName ?? ('review.hub.allDueCardsLabel' | translate) }}</strong>
+                  <time [attr.datetime]="session.startedAt">{{ session.startedAt | sessionDate:true }}</time>
+                </div>
+                <div class="ep-session-stats">
+                  <span>{{ sessionCards(session) }} {{ 'review.history.cards' | translate }}</span>
+                  <span>{{ sessionNailed(session) }} {{ 'review.history.nailed' | translate }}</span>
+                  <span>{{ sessionStruggled(session) }} {{ 'review.history.struggled' | translate }}</span>
+                  <span>{{ sessionDuration(session) }}</span>
+                </div>
+              </div>
+            }
+          </div>
+        } @else {
+          <div class="ep-empty">
+            <strong>{{ 'review.history.emptyTitle' | translate }}</strong>
+            <span>{{ 'review.history.emptySub' | translate }}</span>
+          </div>
+        }
+      </section>
+
       <section class="ep-card ep-explainer">
         <div class="ep-explainer-icon"><ion-icon name="snow-outline" aria-hidden="true" /></div>
         <div>

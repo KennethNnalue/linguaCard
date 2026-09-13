@@ -29,7 +29,7 @@ const result = {
 describe('AdminPodcastStore transcript completion', () => {
   function setup() {
     const topic: AdminPodcastTopicListItem = {
-      id: 'topic', externalId: 'topic', title: 'Topic', description: '', targetLanguage: 'de',
+      id: 'topic', externalId: 'topic', title: 'Topic', titleTranslation: 'Topic translated', description: '', targetLanguage: 'de',
       translationLanguage: 'en', level: 'A1', status: 'draft', thumbnail: null, createdAt: '', updatedAt: '',
       episodes: [{
         id: 'episode', topicId: 'topic', externalId: 'episode', title: 'Draft', titleTranslation: '',

@@ -1,33 +1,30 @@
-import { ChangeDetectionStrategy, Component, inject, OnInit } from '@angular/core';
+import { ChangeDetectionStrategy, Component, inject, OnInit, signal } from '@angular/core';
 import { Router } from '@angular/router';
-import { IonButton, IonContent, IonHeader, IonIcon, IonSpinner, IonToolbar } from '@ionic/angular';
-import { addIcons } from 'ionicons';
-import { arrowBack, play } from 'ionicons/icons';
+import { IonContent, IonHeader, IonSpinner, IonToolbar } from '@ionic/angular';
 import { PodcastCatalogueStore } from '../../store/podcast-catalogue.store';
+import type { PodcastFeaturedEpisode } from '../../store/podcast-catalogue.store';
 import { OfflineImageDirective } from '../../../../shared/image/offline-image.directive';
+import { TranslatePipe } from '@ngx-translate/core';
+import type { CefrLevel } from '@lingua-card/shared/domain';
 
 @Component({
   selector: 'lc-podcast-library', standalone: true,
-  imports: [IonButton, IonContent, IonHeader, IonIcon, IonSpinner, IonToolbar, OfflineImageDirective], providers: [PodcastCatalogueStore],
+  imports: [IonContent, IonHeader, IonSpinner, IonToolbar, OfflineImageDirective, TranslatePipe], providers: [PodcastCatalogueStore],
   templateUrl: './podcast-library.page.html', styleUrl: './podcast-library.page.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class PodcastLibraryPage implements OnInit {
   readonly store = inject(PodcastCatalogueStore);
+  readonly showAllTopics = signal(false);
+  readonly levels: readonly CefrLevel[] = ['A1', 'A2', 'B1', 'B2', 'C1'];
   private readonly router = inject(Router);
-
-  constructor() { addIcons({ arrowBack, play }); }
 
   ngOnInit(): void { this.store.loadTopics(); }
   openTopic(topicId: string): void { void this.router.navigate(['/podcasts/topics', topicId]); }
-  continueEpisode(episodeId: string): void {
-    void this.router.navigate(['/podcasts/episodes', episodeId, 'player']);
+  openFeatured(item: PodcastFeaturedEpisode): void {
+    const episodeRoute = ['/podcasts/episodes', item.episode.id];
+    void this.router.navigate(item.source === 'continue' || (item.source === 'recent' && !item.completed)
+      ? [...episodeRoute, 'player'] : episodeRoute);
   }
-  openActivity(episodeId: string, completed: boolean): void {
-    void this.router.navigate(completed
-      ? ['/podcasts/episodes', episodeId, 'complete']
-      : ['/podcasts/episodes', episodeId, 'player']);
-  }
-  goBack(): void { void this.router.navigate(['/listen']); }
   duration(ms: number): string { return `${Math.max(1, Math.round(ms / 60000))} min`; }
 }

@@ -20,7 +20,7 @@
       </button>
 
       <span class="ss-rlevel">{{ s.difficultyLevel }}</span>
-      <div class="ss-rtitle">{{ s.title }}</div>
+      <div class="ss-rtitle">{{ s.title }}</div>@if (s.titleTranslation) { <div class="title-translation">{{ s.titleTranslation }}</div> }
       <div class="ss-rmeta">{{ readerMetaLine(s) }}</div>
     </div>
 
@@ -220,7 +220,7 @@
           <span class="ss-xp-level">{{ s.difficultyLevel }}</span>
         </div>
 
-        <div class="ss-xp-title">{{ s.title }}</div>
+        <div class="ss-xp-title">{{ s.title }}</div>@if (s.titleTranslation) { <div class="title-translation">{{ s.titleTranslation }}</div> }
         <div class="ss-xp-meta">{{ readerMetaLine(s) }}</div>
 
         <div class="ss-xp-track"><div class="ss-xp-track-fill" [style.width.%]="progressPct()"></div></div>
@@ -309,7 +309,7 @@
       </button>
 
       <div class="ss-mini-info" (click)="expandPlayer()">
-        <div class="ss-mini-title">{{ s.title }}</div>
+        <div class="ss-mini-title">{{ s.title }}</div>@if (s.titleTranslation) { <div class="title-translation">{{ s.titleTranslation }}</div> }
         <div class="ss-mini-time">{{ currentTimeLabel() }} / {{ durationLabel() }}</div>
       </div>
 

@@ -20,6 +20,7 @@ import type {
   AdminSetStoryCategoryDto,
   AdminUpdatePlatformCollectionDto,
 } from '@lingua-card/shared/domain';
+import { UpdatePlatformStoryTitlesDto } from './dto/update-platform-story-titles.dto';
 
 @Controller('admin')
 @UseGuards(JwtAuthGuard, AdminGuard)
@@ -54,6 +55,14 @@ export class AdminController {
   @Get('platform-stories')
   listStories(): Promise<AdminPlatformStoryListItem[]> {
     return this.adminService.listStories();
+  }
+
+  @Patch('platform-stories/:id/titles')
+  updateStoryTitles(
+    @Param('id') id: string,
+    @Body() dto: UpdatePlatformStoryTitlesDto,
+  ): Promise<AdminPlatformStoryListItem> {
+    return this.adminService.updateStoryTitles(id, dto);
   }
 
   @Delete('platform-collections/:id')

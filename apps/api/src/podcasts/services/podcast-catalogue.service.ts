@@ -1,7 +1,7 @@
 import { ConflictException, Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import type {
-  ArticleType, LearningStage, PodcastEpisodeActivity, PodcastEpisodeCompletion, PodcastEpisodePlayer,
+  ArticleType, CefrLevel, LearningStage, PodcastEpisodeActivity, PodcastEpisodeCompletion, PodcastEpisodePlayer,
   PodcastEpisodePreparation, PodcastLibraryEpisode, PodcastLibraryResponse, PodcastLibraryTopic,
   PodcastPreparationVocabulary, PodcastThumbnail,
   PodcastTopicDetail,
@@ -22,6 +22,7 @@ import { PodcastSpeakerEntity } from '../entities/podcast-speaker.entity';
 import { PodcastTurnEntity } from '../entities/podcast-turn.entity';
 import { toPodcastThumbnail } from '../podcast-thumbnail.mapper';
 import { PodcastLearningLoopService } from './podcast-learning-loop.service';
+import { selectPodcastSuggestions } from '../domain/podcast-suggestions';
 
 interface MasteryRow {
   lexemeId: string;
@@ -56,9 +57,9 @@ export class PodcastCatalogueService {
     private readonly learningLoop: PodcastLearningLoopService,
   ) {}
 
-  async listTopics(userId: string): Promise<PodcastLibraryResponse> {
+  async listTopics(userId: string, selectedLevel: CefrLevel = 'A1'): Promise<PodcastLibraryResponse> {
     const topics = await this.topicRepo.find({ where: { status: 'published' }, order: { publishedAt: 'DESC' } });
-    if (!topics.length) return { topics: [], continueListening: null, recentEpisodes: [] };
+    if (!topics.length) return { topics: [], continueListening: null, recentEpisodes: [], suggestedEpisodes: [] };
     const episodes = await this.episodeRepo.find({
       where: { topicId: In(topics.map(topic => topic.id)), status: 'published' },
       order: { topicId: 'ASC', position: 'ASC' },
@@ -73,10 +74,26 @@ export class PodcastCatalogueService {
     });
     const vocabularyCounts = await this.vocabularyCounts(episodes.map(episode => episode.id));
     const activities = await this.loadActivities(userId, topics, episodes, thumbnails, vocabularyCounts);
+    const topicById = new Map(topics.map(topic => [topic.id, topic]));
+    const listenedIds = new Set(activities.map(activity => activity.episode.id));
+    const suggestedEpisodes = selectPodcastSuggestions(episodes, selectedLevel, listenedIds).map(episode => {
+      const topic = topicById.get(episode.topicId);
+      if (!topic) throw new NotFoundException(`Podcast topic ${episode.topicId} not found`);
+      return {
+        ...this.toLibraryEpisode(
+          episode, this.requireThumbnail(thumbnails, episode.thumbnailAssetId),
+          vocabularyCounts.get(episode.id) ?? 0,
+        ),
+        topicId: topic.id,
+        topicTitle: topic.title,
+        topicTitleTranslation: topic.titleTranslation,
+      };
+    });
     return {
       topics: libraryTopics,
       continueListening: activities.find(activity => activity.status === 'in_progress') ?? null,
       recentEpisodes: activities.slice(0, 6),
+      suggestedEpisodes,
     };
   }
 
@@ -109,6 +126,7 @@ export class PodcastCatalogueService {
         focusVocabularyCount: preparation.episode.focusVocabularyCount,
         thumbnail: preparation.episode.thumbnail, topicId: preparation.episode.topicId,
         topicTitle: preparation.episode.topicTitle,
+        topicTitleTranslation: preparation.episode.topicTitleTranslation,
       },
       completedAt: progress.completedAt.toISOString(), vocabulary: preparation.vocabulary,
       nextEpisode: next,
@@ -201,7 +219,8 @@ export class PodcastCatalogueService {
       translationLanguage: topic.translationLanguage,
       episode: {
         ...this.toLibraryEpisode(episode, toPodcastThumbnail(thumbnailEntity), vocabulary.length),
-        topicId: topic.id, topicTitle: topic.title, description: episode.description,
+        topicId: topic.id, topicTitle: topic.title, topicTitleTranslation: topic.titleTranslation,
+        description: episode.description,
         audioUrl: episode.audioUrl,
       },
       readiness: calculatePodcastReadiness(vocabulary),
@@ -227,7 +246,9 @@ export class PodcastCatalogueService {
     ]);
     if (!topic || !thumbnail) throw new NotFoundException(`Podcast episode ${episodeId} is incomplete`);
     return {
-      id: episode.id, topicId: topic.id, topicTitle: topic.title, title: episode.title,
+      id: episode.id, topicId: topic.id, topicTitle: topic.title,
+      topicTitleTranslation: topic.titleTranslation, title: episode.title,
+      titleTranslation: episode.titleTranslation,
       audioUrl: episode.audioUrl, audioDurationMs: episode.audioDurationMs,
       audioVersion: episode.audioVersion, thumbnail: toPodcastThumbnail(thumbnail),
       speakers: speakers.map(speaker => ({
@@ -318,7 +339,7 @@ export class PodcastCatalogueService {
     const activities: PodcastEpisodeActivity[] = [];
     for (const progress of progressRows) {
       const episode = episodeById.get(progress.episodeId);
-      if (!episode || progress.audioVersion !== episode.audioVersion || progress.positionMs <= 0) continue;
+      if (!episode || progress.audioVersion !== episode.audioVersion || (progress.positionMs <= 0 && !progress.completedAt)) continue;
       const topic = topicById.get(episode.topicId);
       if (!topic) continue;
       activities.push({
@@ -328,6 +349,7 @@ export class PodcastCatalogueService {
             vocabularyCounts.get(episode.id) ?? 0,
           ),
           topicId: topic.id, topicTitle: topic.title,
+          topicTitleTranslation: topic.titleTranslation,
         },
         positionMs: progress.positionMs,
         progressPercent: episode.audioDurationMs
@@ -353,7 +375,8 @@ export class PodcastCatalogueService {
     thumbnails: ReadonlyMap<string, PodcastThumbnail>,
   ): PodcastLibraryTopic {
     return {
-      id: topic.id, title: topic.title, description: topic.description,
+      id: topic.id, title: topic.title, titleTranslation: topic.titleTranslation,
+      description: topic.description,
       targetLanguage: topic.targetLanguage, translationLanguage: topic.translationLanguage,
       minimumLevel: topic.level, maximumLevel: topic.level,
       episodeCount: episodes.length,

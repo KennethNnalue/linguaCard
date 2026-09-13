@@ -22,13 +22,18 @@ export class PodcastEpisodeCreationService implements OnApplicationBootstrap {
 
   async create(
     topicId: string,
-    input: { requestId: string; vocabulary: readonly string[]; direction?: string },
+    input: { requestId: string; vocabulary: readonly string[]; direction?: string; title?: string; titleTranslation?: string },
   ): Promise<AdminPodcastEpisodeListItem> {
     const generationInput = {
       vocabulary: normalizePodcastVocabulary(input.vocabulary),
       ...(input.direction?.trim() ? { direction: input.direction.trim() } : {}),
     };
-    const episode = await this.podcasts.reserveEpisode(topicId, input.requestId, generationInput);
+    const episode = input.title || input.titleTranslation
+      ? await this.podcasts.reserveEpisode(topicId, input.requestId, generationInput, {
+        title: input.title,
+        titleTranslation: input.titleTranslation,
+      })
+      : await this.podcasts.reserveEpisode(topicId, input.requestId, generationInput);
     if (episode.status === 'queued') this.schedule(episode.id);
     return episode;
   }

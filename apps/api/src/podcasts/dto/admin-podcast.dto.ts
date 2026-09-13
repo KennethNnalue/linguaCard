@@ -17,6 +17,9 @@ export class CreatePodcastTopicDto {
   @MaxLength(160)
   title!: string;
 
+  @IsString() @MinLength(1) @Matches(CONTAINS_NON_WHITESPACE) @MaxLength(160)
+  titleTranslation!: string;
+
   @IsString()
   @MaxLength(2000)
   description!: string;
@@ -41,6 +44,9 @@ export class UpdatePodcastTopicDto {
   @MaxLength(160)
   title?: string;
 
+  @IsOptional() @IsString() @MinLength(1) @Matches(CONTAINS_NON_WHITESPACE) @MaxLength(160)
+  titleTranslation?: string;
+
   @IsOptional()
   @IsString()
   @MaxLength(2000)
@@ -54,6 +60,12 @@ export class UpdatePodcastTopicDto {
 export class CreatePodcastEpisodeDto {
   @IsUUID()
   requestId!: string;
+
+  @IsOptional() @IsString() @Matches(CONTAINS_NON_WHITESPACE) @MaxLength(160)
+  title?: string;
+
+  @IsOptional() @IsString() @Matches(CONTAINS_NON_WHITESPACE) @MaxLength(160)
+  titleTranslation?: string;
 
   @IsArray() @ArrayMinSize(1) @ArrayMaxSize(40)
   @IsString({ each: true }) @MinLength(1, { each: true })

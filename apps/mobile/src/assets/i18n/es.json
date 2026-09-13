@@ -1122,7 +1122,8 @@
   },
   "listen": {
     "main": {
-      "pageTitle": "Escucha y aprende"
+      "pageTitle": "Escucha y aprende",
+    "wordsTitle": "Escuchar palabras"
     },
     "hero": {
       "playingFromLabel": "Reproduciendo de",
@@ -1209,6 +1210,20 @@
     }
   },
   "podcasts": {
+    "library": {
+      "retry": "Reintentar",
+      "exploreTopics": "Explorar temas",
+      "showLess": "Mostrar menos",
+      "seeAll": "Ver todos",
+      "levelPicks": "Elegidos para el nivel {{level}}",
+      "episodesForYou": "Episodios para ti",
+      "continue": "Continuar",
+      "listened": "Escuchado",
+      "browseByScene": "Explorar por escena",
+      "levelFilter": "Nivel de los episodios",
+      "loading": "Cargando conversaciones…",
+      "empty": "Aún no hay temas de pódcast publicados."
+    },
     "player": {
       "backToTopic": "Volver al tema",
       "openLandscape": "Abrir reproductor horizontal",
@@ -1808,7 +1823,8 @@
     "vault": "Bóveda",
     "review": "Repaso",
     "stories": "Historias",
-    "listen": "Escuchar"
+    "listen": "Escuchar",
+    "podcasts": "Pódcasts"
   },
   "onboarding": {
     "common": {

@@ -20,7 +20,7 @@ export const ListenSource = {
   Struggling: 'struggling',
 } as const;
 
-export type ListenSourceKey = typeof ListenSource[keyof typeof ListenSource] | `collection:${string}`;
+export type ListenSourceKey = typeof ListenSource[keyof typeof ListenSource] | `collection:${string}` | `custom:${string}`;
 
 // ─── Source Labels ────────────────────────────────────────────────────────────
 

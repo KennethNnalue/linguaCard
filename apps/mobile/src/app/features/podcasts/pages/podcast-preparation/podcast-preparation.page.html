@@ -8,7 +8,7 @@
         </ion-button>
         <div>
           <span>{{ prep.episode.topicTitle }} · {{ prep.episode.level }}</span>
-          <h1>{{ prep.episode.title }}</h1>
+          <h1>{{ prep.episode.title }}</h1>@if (prep.episode.titleTranslation) { <p class="title-translation">{{ prep.episode.titleTranslation }}</p> }
           <p>{{ prep.episode.description }}</p>
         </div>
       </header>

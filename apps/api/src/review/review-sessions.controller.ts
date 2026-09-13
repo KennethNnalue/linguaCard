@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Post, Query } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Post, Query } from '@nestjs/common';
 import { CurrentUser } from '../common/decorators/current-user.decorator';
 import { UpsertReviewSessionBatchDto, UpsertReviewSessionDto } from './review-session.dto';
 import { ReviewSessionsService } from './review-sessions.service';
@@ -25,6 +25,12 @@ export class ReviewSessionsController {
     @CurrentUser() userId: string,
     @Query('limit') limit?: string,
   ) {
-    return this.sessionsService.findRecent(userId, limit ? parseInt(limit, 10) : 50);
+    const parsedLimit = limit ? Number(limit) : 50;
+    return this.sessionsService.findRecent(userId, Number.isFinite(parsedLimit) ? parsedLimit : 50);
+  }
+
+  @Delete()
+  clearHistory(@CurrentUser() userId: string) {
+    return this.sessionsService.clearHistory(userId);
   }
 }

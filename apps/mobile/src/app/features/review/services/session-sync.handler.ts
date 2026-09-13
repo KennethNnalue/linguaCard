@@ -4,6 +4,7 @@ import type { SyncHandler } from '../../../core/models/sync-handler.model';
 import { LocalDataService } from '../../../core/services/local-data.service';
 import { ReviewSessionApiService } from './review-session-api.service';
 import { SyncOperationType } from '../models/review.model';
+import { reviewHistoryCutoff } from '@lingua-card/shared/utils';
 
 @Injectable({ providedIn: 'root' })
 export class SessionSyncHandler implements SyncHandler {
@@ -16,7 +17,10 @@ export class SessionSyncHandler implements SyncHandler {
     if (!isUserPayload(payload)) return;
     const { userId } = payload;
 
-    const pending = await this.localData.getPendingSessions(userId);
+    const queued = await this.localData.getPendingSessions(userId);
+    const cutoff = reviewHistoryCutoff();
+    const pending = queued.filter(session => new Date(session.startedAt) >= cutoff);
+    if (pending.length !== queued.length) await this.localData.setPendingSessions(userId, pending);
     if (pending.length === 0) return;
 
     await firstValueFrom(this.sessionApi.upsertBatch(pending));

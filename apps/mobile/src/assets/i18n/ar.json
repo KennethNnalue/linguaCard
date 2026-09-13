@@ -1122,7 +1122,8 @@
   },
   "listen": {
     "main": {
-      "pageTitle": "استمع وتعلم"
+      "pageTitle": "استمع وتعلم",
+    "wordsTitle": "الاستماع إلى الكلمات"
     },
     "hero": {
       "playingFromLabel": "يتم التشغيل من",
@@ -1209,6 +1210,20 @@
     }
   },
   "podcasts": {
+    "library": {
+      "retry": "إعادة المحاولة",
+      "exploreTopics": "استكشف المواضيع",
+      "showLess": "عرض أقل",
+      "seeAll": "عرض الكل",
+      "levelPicks": "مختارات لمستوى {{level}}",
+      "episodesForYou": "حلقات مقترحة لك",
+      "continue": "متابعة",
+      "listened": "تم الاستماع",
+      "browseByScene": "تصفح حسب الموضوع",
+      "levelFilter": "مستوى حلقات البودكاست",
+      "loading": "جارٍ تحميل المحادثات…",
+      "empty": "لا توجد مواضيع بودكاست منشورة بعد."
+    },
     "player": {
       "backToTopic": "العودة إلى الموضوع",
       "openLandscape": "فتح المشغل بالوضع الأفقي",
@@ -1808,7 +1823,8 @@
     "vault": "الخزنة",
     "review": "المراجعة",
     "stories": "القصص",
-    "listen": "استماع"
+    "listen": "استماع",
+    "podcasts": "بودكاست"
   },
   "onboarding": {
     "common": {

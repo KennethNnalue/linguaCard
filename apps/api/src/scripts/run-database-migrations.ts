@@ -55,6 +55,20 @@ function closeDeploymentPort(server: Server | null): Promise<void> {
   });
 }
 
+async function verifyReviewHistorySchema(dataSource: DataSource): Promise<void> {
+  const queryRunner = dataSource.createQueryRunner();
+  try {
+    const table = 'review_history_clearances';
+    if (!await queryRunner.hasTable(table)
+      || !await queryRunner.hasColumn(table, 'userId')
+      || !await queryRunner.hasColumn(table, 'clearedAt')) {
+      throw new Error('Review history migration did not create the required clearance schema. The API cannot start.');
+    }
+  } finally {
+    await queryRunner.release();
+  }
+}
+
 async function runDatabaseMigrations(): Promise<void> {
   ConfigModule.forRoot({
     envFilePath: ['apps/api/.env', '.env', '../../.env'],
@@ -88,11 +102,13 @@ async function runDatabaseMigrations(): Promise<void> {
         transaction: 'each',
         fake: true,
       });
+      await verifyReviewHistorySchema(dataSource);
       console.log(`Fresh database baseline complete: ${baselinedMigrations.length} migrations recorded.`);
       return;
     }
     console.log('Schema baseline is ready; applying pending TypeORM migrations.');
     const migrations = await dataSource.runMigrations({ transaction: 'each' });
+    await verifyReviewHistorySchema(dataSource);
     console.log(`Database migrations complete: ${migrations.length} applied.`);
   } finally {
     if (dataSource.isInitialized) await dataSource.destroy();

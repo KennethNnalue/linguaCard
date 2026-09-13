@@ -9,7 +9,7 @@
           [style.object-position]="(topic.thumbnail.focalPoint.x*100)+'% '+(topic.thumbnail.focalPoint.y*100)+'%'" />
         <div>
           <span>{{ topic.minimumLevel }}–{{ topic.maximumLevel }} · {{ topic.episodeCount }} episodes</span>
-          <h1>{{ topic.title }}</h1>
+          <h1>{{ topic.title }}</h1>@if (topic.titleTranslation) { <p class="title-translation">{{ topic.titleTranslation }}</p> }
           <p>{{ topic.description }}</p>
           @if (topic.episodes.length) {
             <div class="topic-actions">
@@ -35,7 +35,7 @@
               <img slot="start" [lcOfflineSrc]="episode.thumbnail.cardUrl" [alt]="episode.thumbnail.accessibilityDescription" />
               <ion-label>
                 <span>Episode {{ episode.position + 1 }} · {{ episode.level }} · {{ duration(episode.durationMs) }}</span>
-                <strong>{{ episode.title }}</strong>
+                <strong>{{ episode.title }}</strong>@if (episode.titleTranslation) { <small class="title-translation">{{ episode.titleTranslation }}</small> }
                 <small>{{ episode.focusVocabularyCount }} focus words</small>
               </ion-label>
               <ion-icon slot="end" name="chevron-forward-outline" />

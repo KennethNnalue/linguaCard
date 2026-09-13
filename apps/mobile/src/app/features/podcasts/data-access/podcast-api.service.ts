@@ -1,7 +1,7 @@
 import { HttpClient } from '@angular/common/http';
 import { inject, Injectable } from '@angular/core';
 import type {
-  PodcastEpisodeCompletion, PodcastEpisodePlayer, PodcastEpisodePreparation, PodcastLibraryResponse,
+  CefrLevel, PodcastEpisodeCompletion, PodcastEpisodePlayer, PodcastEpisodePreparation, PodcastLibraryResponse,
   PodcastListeningProgress, PodcastTopicDetail, PreparePodcastVocabularyResult,
   SavePodcastProgressDto,
 } from '@lingua-card/shared/domain';
@@ -13,8 +13,8 @@ export class PodcastApiService {
   private readonly http = inject(HttpClient);
   private readonly url = `${environment.apiUrl}/podcasts`;
 
-  listTopics(): Observable<PodcastLibraryResponse> {
-    return this.http.get<PodcastLibraryResponse>(this.url);
+  listTopics(level: CefrLevel): Observable<PodcastLibraryResponse> {
+    return this.http.get<PodcastLibraryResponse>(this.url, { params: { level } });
   }
 
   getTopic(topicId: string): Observable<PodcastTopicDetail> {

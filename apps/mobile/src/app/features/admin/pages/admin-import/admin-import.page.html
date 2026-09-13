@@ -287,9 +287,13 @@
           <textarea
             class="adm-textarea"
             formControlName="storyJson"
+            (input)="onStoryJsonInput($event)"
             rows="14"
             placeholder='{ "title": "...", "titleTranslation": "...", ... }'></textarea>
         </div>
+
+        <div class="adm-field"><label class="adm-label">Story title</label><input class="adm-input" formControlName="title" maxlength="160" /></div>
+        <div class="adm-field"><label class="adm-label">Title translation ({{ storyNativeLang() }})</label><input class="adm-input" formControlName="titleTranslation" maxlength="160" /></div>
 
         <!-- Result banner -->
         @if (lastStoryResult(); as r) {
@@ -588,7 +592,7 @@
           <div class="adm-coll-row" [class.adm-coll-row--published]="story.isPublished">
             <div class="adm-coll-emoji">📖</div>
             <div class="adm-coll-body">
-              <div class="adm-coll-title">{{ story.title }}</div>
+              <div class="adm-coll-title">{{ story.title }}</div>@if (story.titleTranslation) { <div>{{ story.titleTranslation }}</div> } @else { <small>Needs title translation</small> }
               <div class="adm-coll-meta">
                 <span class="adm-lvl-badge">{{ story.level }}</span>
                 <span>{{ story.category }}</span>
@@ -597,10 +601,11 @@
               </div>
             </div>
             <div class="adm-coll-actions">
+              <button type="button" class="adm-icon-btn" (click)="editStoryTitles(story)">Edit titles</button>
               <button
                 class="adm-publish-btn"
                 [class.adm-publish-btn--live]="story.isPublished"
-                [disabled]="togglingStoryId() === story.id"
+                [disabled]="togglingStoryId() === story.id || (!story.isPublished && !story.titleTranslation.trim())"
                 (click)="togglePublishStory(story)"
                 [attr.aria-label]="story.isPublished ? 'Unpublish' : 'Publish'">
                 <ion-icon [name]="story.isPublished ? 'eye-outline' : 'eye-off-outline'"></ion-icon>
@@ -622,6 +627,15 @@
               </button>
             </div>
           </div>
+          @if (editingStoryId() === story.id) {
+            <form class="adm-form-card" [formGroup]="storyTitleForm" (ngSubmit)="saveStoryTitles()">
+              <div class="adm-form-card__heading"><span>Edit story titles</span><small>Translation language: {{ story.nativeLang }}</small></div>
+              <div class="adm-field"><label class="adm-label">Story title</label><input class="adm-input" formControlName="title" maxlength="160" /></div>
+              <div class="adm-field"><label class="adm-label">Title translation</label><input class="adm-input" formControlName="titleTranslation" maxlength="160" /></div>
+              <button class="adm-submit-btn" type="submit" [disabled]="storyTitleForm.invalid">Save titles</button>
+              <button type="button" (click)="editingStoryId.set(null)">Cancel</button>
+            </form>
+          }
         }
 
         @if (!storiesLoading() && !stories().length) {

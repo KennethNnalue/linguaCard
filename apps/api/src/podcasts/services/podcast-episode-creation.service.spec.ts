@@ -5,6 +5,10 @@ import { PodcastEpisodeCreationService } from './podcast-episode-creation.servic
 import { PodcastTranscriptGenerationService } from './podcast-transcript-generation.service';
 import { PodcastTranscriptImportService } from './podcast-transcript-import.service';
 
+jest.mock('../../storage/storage.service', () => ({
+  StorageService: class StorageService {},
+}));
+
 function createEpisode(status: AdminPodcastEpisodeListItem['status'] = 'queued'): AdminPodcastEpisodeListItem {
   return {
     id: 'episode-1', topicId: 'topic-1', externalId: 'topic-episode-1', title: 'Episode 1',

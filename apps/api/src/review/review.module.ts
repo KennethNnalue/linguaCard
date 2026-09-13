@@ -1,6 +1,7 @@
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { ReviewSessionEntity } from './review-session.entity';
+import { ReviewHistoryClearanceEntity } from './review-history-clearance.entity';
 import { ReviewSessionsService } from './review-sessions.service';
 import { ReviewSessionsController } from './review-sessions.controller';
 import { ReviewCommitEntity } from './review-commit.entity';
@@ -16,7 +17,7 @@ import { SettingsModule } from '../settings/settings.module';
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([ReviewSessionEntity, ReviewCommitEntity, CardAdministrationEventEntity, CardEntity, ReviewSchedulingEntity]),
+    TypeOrmModule.forFeature([ReviewSessionEntity, ReviewHistoryClearanceEntity, ReviewCommitEntity, CardAdministrationEventEntity, CardEntity, ReviewSchedulingEntity]),
     EngagementModule,
     SettingsModule,
   ],

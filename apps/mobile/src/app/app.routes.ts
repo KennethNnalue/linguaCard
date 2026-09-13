@@ -143,6 +143,11 @@ export const routes: Routes = [
         path: 'listen',
         data: { preload: true },
         loadComponent: () =>
+          import('./features/podcasts/pages/podcast-library/podcast-library.page').then(m => m.PodcastLibraryPage),
+      },
+      {
+        path: 'listen/words',
+        loadComponent: () =>
           import('./features/listen/pages/listen/listen.component').then(m => m.ListenComponent),
       },
       {
@@ -157,8 +162,8 @@ export const routes: Routes = [
       },
       {
         path: 'podcasts',
-        loadComponent: () => import('./features/podcasts/pages/podcast-library/podcast-library.page')
-          .then(m => m.PodcastLibraryPage),
+        redirectTo: 'listen',
+        pathMatch: 'full',
       },
       {
         path: 'podcasts/topics/:topicId',

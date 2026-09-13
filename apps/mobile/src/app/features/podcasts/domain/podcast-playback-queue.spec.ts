@@ -8,7 +8,7 @@ function episode(
   nextTopicFirstEpisodeId: string | null = null,
 ): PodcastEpisodePlayer {
   return {
-    id: 'episode-2', topicId: 'topic-1', topicTitle: 'Topic', title: 'Episode',
+    id: 'episode-2', topicId: 'topic-1', topicTitle: 'Topic', topicTitleTranslation: 'Topic translated', title: 'Episode', titleTranslation: 'Episode translated',
     audioUrl: '/episode.mp3', audioDurationMs: 1_000, audioVersion: 1,
     thumbnail: {
       assetId: 'thumbnail-1', heroUrl: '/hero.webp', cardUrl: '/card.webp',

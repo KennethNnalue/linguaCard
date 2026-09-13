@@ -644,6 +644,8 @@ export interface ReviewSession {
   id: string;
   userId: string;
   deckId: string;
+  collectionId?: string | null;
+  collectionName?: string | null;
   startedAt: string;
   completedAt: string | null;
   totalCards: number;
@@ -1532,12 +1534,18 @@ export interface AdminPlatformStoryListItem {
   id: string;
   title: string;
   titleTranslation: string;
+  nativeLang: string;
   level: string;
   category: string;
   wordCount: number;
   isPublished: boolean;
   platformCollectionId: string | null;
   publishedAt: string;
+}
+
+export interface AdminUpdatePlatformStoryTitlesDto {
+  title: string;
+  titleTranslation: string;
 }
 
 export interface AdminPublishToggleDto {
@@ -1761,6 +1769,7 @@ export interface PodcastLibraryEpisode {
 export interface PodcastLibraryTopic {
   id: string;
   title: string;
+  titleTranslation: string;
   description: string;
   targetLanguage: LanguageCode;
   translationLanguage: LanguageCode;
@@ -1777,6 +1786,7 @@ export interface PodcastEpisodeActivity {
   episode: PodcastLibraryEpisode & {
     topicId: string;
     topicTitle: string;
+    topicTitleTranslation: string;
   };
   positionMs: number;
   progressPercent: number;
@@ -1785,10 +1795,13 @@ export interface PodcastEpisodeActivity {
   updatedAt: string;
 }
 
+export type PodcastLibraryFeaturedEpisode = PodcastEpisodeActivity['episode'];
+
 export interface PodcastLibraryResponse {
   topics: PodcastLibraryTopic[];
   continueListening: PodcastEpisodeActivity | null;
   recentEpisodes: PodcastEpisodeActivity[];
+  suggestedEpisodes: PodcastLibraryFeaturedEpisode[];
 }
 
 export interface PodcastTopicDetail extends PodcastLibraryTopic {
@@ -1813,6 +1826,7 @@ export interface PodcastEpisodePreparation {
   episode: PodcastLibraryEpisode & {
     topicId: string;
     topicTitle: string;
+    topicTitleTranslation: string;
     description: string;
     audioUrl: string;
   };
@@ -1829,6 +1843,7 @@ export interface PodcastEpisodeCompletion {
   episode: PodcastLibraryEpisode & {
     topicId: string;
     topicTitle: string;
+    topicTitleTranslation: string;
   };
   completedAt: string;
   vocabulary: PodcastPreparationVocabulary[];
@@ -1856,7 +1871,9 @@ export interface PodcastEpisodePlayer {
   id: string;
   topicId: string;
   topicTitle: string;
+  topicTitleTranslation: string;
   title: string;
+  titleTranslation: string;
   audioUrl: string;
   audioDurationMs: number;
   audioVersion: number;
@@ -1937,6 +1954,7 @@ export interface AdminPodcastTopicListItem {
   id: string;
   externalId: string;
   title: string;
+  titleTranslation: string;
   description: string;
   targetLanguage: LanguageCode;
   translationLanguage: LanguageCode;
@@ -1950,6 +1968,7 @@ export interface AdminPodcastTopicListItem {
 
 export interface AdminCreatePodcastTopicDto {
   title: string;
+  titleTranslation: string;
   description: string;
   targetLanguage: LanguageCode;
   translationLanguage: LanguageCode;
@@ -1958,6 +1977,7 @@ export interface AdminCreatePodcastTopicDto {
 
 export interface AdminUpdatePodcastTopicDto {
   title?: string;
+  titleTranslation?: string;
   description?: string;
   level?: CefrLevel;
 }
@@ -1966,6 +1986,8 @@ export interface AdminCreatePodcastEpisodeDto {
   requestId: string;
   vocabulary: string[];
   direction?: string;
+  title?: string;
+  titleTranslation?: string;
 }
 
 export interface AdminCreatePodcastEpisodeDraftDto {

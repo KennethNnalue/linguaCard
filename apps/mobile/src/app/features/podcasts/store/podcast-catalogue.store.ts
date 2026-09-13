@@ -2,13 +2,36 @@ import { computed, inject } from '@angular/core';
 import { patchState, signalStore, withComputed, withMethods, withState } from '@ngrx/signals';
 import { rxMethod } from '@ngrx/signals/rxjs-interop';
 import type {
-  PodcastEpisodeActivity, PodcastEpisodeCompletion, PodcastEpisodePreparation,
-  PodcastLibraryTopic, PodcastTopicDetail,
+  CefrLevel, OnboardingLevel, PodcastEpisodeActivity, PodcastEpisodeCompletion, PodcastEpisodePreparation,
+  PodcastLibraryFeaturedEpisode, PodcastLibraryResponse, PodcastLibraryTopic, PodcastTopicDetail,
 } from '@lingua-card/shared/domain';
 import { EMPTY, catchError, firstValueFrom, pipe, switchMap, tap } from 'rxjs';
 import { AuthService } from '../../../core/services/auth.service';
 import { LocalDataService } from '../../../core/services/local-data.service';
 import { PodcastApiService } from '../data-access/podcast-api.service';
+import { SettingsStore } from '../../settings/store/settings.store';
+
+const levelStorageKey = 'lc_podcast_level';
+const onboardingLevel: Record<OnboardingLevel, CefrLevel> = {
+  beginner: 'A1', some: 'A2', intermediate: 'B1',
+};
+
+function storedPodcastLevel(): CefrLevel | null {
+  try {
+    for (const key of [levelStorageKey, 'lc_explore_level']) {
+      const level = localStorage.getItem(key);
+      if (level === 'A1' || level === 'A2' || level === 'B1' || level === 'B2' || level === 'C1') return level;
+    }
+    return null;
+  } catch { return null; }
+}
+
+export interface PodcastFeaturedEpisode {
+  episode: PodcastLibraryFeaturedEpisode;
+  source: 'continue' | 'suggested' | 'recent';
+  progressPercent: number | null;
+  completed: boolean;
+}
 
 type LoadState = 'idle' | 'loading' | 'success' | 'error';
 
@@ -16,6 +39,8 @@ interface PodcastCatalogueState {
   topics: PodcastLibraryTopic[];
   continueListening: PodcastEpisodeActivity | null;
   recentEpisodes: PodcastEpisodeActivity[];
+  suggestedEpisodes: PodcastLibraryFeaturedEpisode[];
+  selectedLevel: CefrLevel;
   topic: PodcastTopicDetail | null;
   preparation: PodcastEpisodePreparation | null;
   completion: PodcastEpisodeCompletion | null;
@@ -26,14 +51,14 @@ interface PodcastCatalogueState {
 }
 
 const initialState: PodcastCatalogueState = {
-  topics: [], continueListening: null, recentEpisodes: [], topic: null,
+  topics: [], continueListening: null, recentEpisodes: [], suggestedEpisodes: [], selectedLevel: 'A1', topic: null,
   preparation: null, completion: null, status: 'idle', error: null,
   preparationCollectionId: null, preparationMutationStatus: 'idle',
 };
 
 export const PodcastCatalogueStore = signalStore(
   withState(initialState),
-  withComputed(({ status, preparation }) => ({
+  withComputed(({ status, preparation, continueListening, suggestedEpisodes, recentEpisodes }) => ({
     isLoading: computed(() => status() === 'loading'),
     essentialVocabulary: computed(() => preparation()?.vocabulary.filter(
       item => item.importance === 'essential',
@@ -44,22 +69,67 @@ export const PodcastCatalogueStore = signalStore(
     hasSuggestedVocabularyToAdd: computed(() => preparation()?.vocabulary.some(
       item => item.importance === 'essential' && !item.isInVault,
     ) ?? false),
+    featuredEpisodes: computed(() => {
+      const items: PodcastFeaturedEpisode[] = [];
+      const seen = new Set<string>();
+      const current = continueListening();
+      if (current) {
+        items.push({ episode: current.episode, source: 'continue', progressPercent: current.progressPercent, completed: false });
+        seen.add(current.episode.id);
+      }
+      const recentCandidates = recentEpisodes().filter(activity => !seen.has(activity.episode.id));
+      const suggestionLimit = 9 - Math.min(2, recentCandidates.length);
+      for (const episode of suggestedEpisodes()) {
+        if (seen.has(episode.id) || items.length >= suggestionLimit) continue;
+        items.push({ episode, source: 'suggested', progressPercent: null, completed: false });
+        seen.add(episode.id);
+      }
+      for (const activity of recentCandidates) {
+        if (seen.has(activity.episode.id) || items.length >= 9) continue;
+        items.push({
+          episode: activity.episode, source: 'recent', progressPercent: activity.progressPercent,
+          completed: activity.status === 'completed',
+        });
+        seen.add(activity.episode.id);
+      }
+      return items;
+    }),
   })),
-  withMethods((store, api = inject(PodcastApiService), localData = inject(LocalDataService), auth = inject(AuthService)) => ({
-    loadTopics(): void {
+  withMethods((store, api = inject(PodcastApiService), localData = inject(LocalDataService), auth = inject(AuthService), settings = inject(SettingsStore)) => {
+    let libraryRequest = 0;
+    let levelInitialized = false;
+    function loadForLevel(level: CefrLevel): void {
+      const request = ++libraryRequest;
+      patchState(store, { selectedLevel: level });
       void (async () => {
         const userId = auth.currentUser()?.id;
-        const cached = userId ? await localData.getPodcastLibrary(userId) : null;
+        let cached: PodcastLibraryResponse | null = null;
+        try { if (userId) cached = await localData.getPodcastLibrary(userId, level); } catch { /* Continue online without the cache. */ }
+        if (request !== libraryRequest) return;
         if (cached) patchState(store, { ...cached, status: 'success', error: null });
         else patchState(store, { status: 'loading', error: null });
         try {
-          const response = await firstValueFrom(api.listTopics());
+          const response = await firstValueFrom(api.listTopics(level));
+          if (request !== libraryRequest) return;
           patchState(store, { ...response, status: 'success', error: null });
-          if (userId) await localData.setPodcastLibrary(userId, response);
+          try { if (userId) await localData.setPodcastLibrary(userId, level, response); } catch { /* Keep the network result. */ }
         } catch {
-          if (!cached) patchState(store, { status: 'error', error: 'Could not load podcasts.' });
+          if (request === libraryRequest && !cached) patchState(store, { status: 'error', error: 'Could not load podcasts.' });
         }
       })();
+    }
+    return {
+    loadTopics(): void {
+      if (!levelInitialized) {
+        levelInitialized = true;
+        const userLevel = settings.settings()?.level;
+        loadForLevel(storedPodcastLevel() ?? (userLevel ? onboardingLevel[userLevel] : 'A1'));
+      } else loadForLevel(store.selectedLevel());
+    },
+    selectLevel(level: CefrLevel): void {
+      levelInitialized = true;
+      try { localStorage.setItem(levelStorageKey, level); } catch { /* Browser storage may be unavailable. */ }
+      loadForLevel(level);
     },
     loadTopic(topicId: string): void {
       void (async () => {
@@ -135,5 +205,5 @@ export const PodcastCatalogueStore = signalStore(
         return null;
       }
     },
-  })),
+  }; }),
 );

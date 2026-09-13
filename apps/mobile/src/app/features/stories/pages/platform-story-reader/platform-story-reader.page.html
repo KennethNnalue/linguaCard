@@ -42,7 +42,7 @@
     <!-- ── STORY TAB ──────────────────────────────────────────────── -->
     @if (activeTab() === 'story') {
       <div class="sr2-story-meta">
-        <div class="sr2-story-title">{{ s.title }}</div>
+        <div class="sr2-story-title">{{ s.title }}</div>@if (s.titleTranslation) { <div class="title-translation">{{ s.titleTranslation }}</div> }
         <div class="sr2-meta-row">
           <span class="sr2-level-pill" [class]="'level-' + s.level">{{ s.level }}</span>
           @if (progress()?.isRead) {

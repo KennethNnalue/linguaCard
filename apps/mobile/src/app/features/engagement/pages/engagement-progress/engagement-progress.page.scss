@@ -36,6 +36,15 @@ h1 { margin:0; font-family:t.$lc-font-rv-display; @include u.lc-font('5xl', t.$l
 .ep-dot--missed { background:var(--lc-rv-hard-text); }
 .ep-dot--untracked { background:transparent; border:1px solid var(--lc-rv-muted); }
 .ep-points strong { font-family:t.$lc-font-rv-display; font-size:36px; color:var(--lc-rv-mid); }
+.ep-clear { @include u.touch-state; flex-shrink:0; border:1px solid var(--lc-rv-border); border-radius:t.$lc-radius-full; background:var(--lc-rv-inset); color:var(--lc-rv-text-soft); padding:t.$lc-space-2 t.$lc-space-3; @include u.lc-font('xxs', t.$lc-font-weight-semibold); }
+.ep-clear:disabled { opacity:.5; }
+.ep-history-error { color:var(--lc-rv-hard-text) !important; }
+.ep-sessions { display:grid; gap:t.$lc-space-2; margin-top:t.$lc-space-4; }
+.ep-session { border:1px solid var(--lc-rv-border); background:var(--lc-rv-inset); border-radius:t.$lc-radius-md; padding:t.$lc-space-3; }
+.ep-session-head { @include u.flex-between; gap:t.$lc-space-2; }
+.ep-session-head strong { color:var(--lc-rv-text); @include u.lc-font('sm', t.$lc-font-weight-semibold); overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+.ep-session-head time { flex-shrink:0; color:var(--lc-rv-muted); @include u.lc-font('xxs'); }
+.ep-session-stats { display:flex; flex-wrap:wrap; gap:t.$lc-space-1 t.$lc-space-3; margin-top:t.$lc-space-2; color:var(--lc-rv-text-soft); @include u.lc-font('xxs'); }
 .ep-explainer { display:flex; gap:t.$lc-space-3; }
 .ep-explainer-icon { @include u.circle(38px); @include u.flex-center; flex-shrink:0; background:color-mix(in srgb, var(--ion-color-primary) 16%, var(--lc-rv-card)); color:var(--ion-color-primary); }
 .ep-status { @include u.lc-card; min-height:240px; padding:t.$lc-space-6; display:grid; place-items:center; align-content:center; gap:t.$lc-space-3; text-align:center; }

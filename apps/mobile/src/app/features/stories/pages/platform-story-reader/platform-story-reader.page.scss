@@ -339,3 +339,5 @@
   padding: 10px t.$lc-space-5; border-radius: t.$lc-space-5;
   border: none; cursor: pointer; font-family: t.$lc-font-body;
 }
+
+.title-translation { display:block; color:var(--lc-ss-muted); font-size:0.875rem; line-height:1.4; margin-block:0.2rem 0.5rem; overflow-wrap:anywhere; }

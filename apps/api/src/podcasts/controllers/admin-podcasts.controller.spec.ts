@@ -11,6 +11,10 @@ import { PodcastTranscriptImportService } from '../services/podcast-transcript-i
 import { JwtAuthGuard } from '../../auth/guards/jwt-auth.guard';
 import { AdminGuard } from '../../auth/guards/admin.guard';
 
+jest.mock('../../storage/storage.service', () => ({
+  StorageService: class StorageService {},
+}));
+
 describe('AdminPodcastEpisodesController', () => {
   const platformCollections = { publish: jest.fn() };
   let controller: AdminPodcastEpisodesController;
@@ -40,7 +44,7 @@ describe('AdminPodcastEpisodesController', () => {
   it('delegates vocabulary publication and returns its result contract', async () => {
     const result: AdminPublishPodcastVocabularyResult = {
       collection: {
-        id: 'collection-1', title: 'Podcast · Ordering coffee', emoji: '🎙️',
+        id: 'collection-1', title: 'Podcast · Ordering coffee', titleTranslation: null, emoji: '🎙️',
         coverImageUrl: null, level: 'A1', topic: 'At the café', sourceLanguage: 'en',
         targetLanguage: 'de', status: 'published', wordCount: 3, dictionaryLinked: 3,
         isPublished: true, storyCategory: null, createdAt: '', updatedAt: '',

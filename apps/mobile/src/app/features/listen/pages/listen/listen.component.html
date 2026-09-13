@@ -1,31 +1,16 @@
 <ion-header class="ion-no-border">
   <ion-toolbar>
     <div class="nav">
-      <button type="button" class="nav-icon" (click)="goHome()" [attr.aria-label]="'common.back' | translate">
+      <button type="button" class="nav-icon" (click)="goBackToVault()" [attr.aria-label]="'common.back' | translate">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="m15 18-6-6 6-6"/></svg>
       </button>
-      <div class="nav-title"><span>Audio practice</span><h1>{{ 'listen.main.pageTitle' | translate }}</h1></div>
-      <button type="button" class="nav-icon" (click)="openSourceSheet()" [attr.aria-label]="'listen.sourceSheet.title' | translate">
-        <svg viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="5" r="1.5"/><circle cx="12" cy="12" r="1.5"/><circle cx="12" cy="19" r="1.5"/></svg>
-      </button>
+      <div class="nav-title"><span>Audio practice</span><h1>{{ 'listen.main.wordsTitle' | translate }}</h1></div>
     </div>
   </ion-toolbar>
 </ion-header>
 
 <ion-content>
   <main class="listen-page">
-    <div class="experience-switch" role="tablist" aria-label="Choose an audio practice">
-      <button type="button" role="tab" [attr.aria-selected]="experience() === 'words'" [class.active]="experience() === 'words'" (click)="selectExperience('words')">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M8 6h12M8 12h12M8 18h8"/><circle cx="4" cy="6" r="1"/><circle cx="4" cy="12" r="1"/><circle cx="4" cy="18" r="1"/></svg>
-        <span><strong>My words</strong><small>Quick listening drill</small></span>
-      </button>
-      <button type="button" role="tab" [attr.aria-selected]="experience() === 'podcasts'" [class.active]="experience() === 'podcasts'" (click)="selectExperience('podcasts')">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="8" y="3" width="8" height="12" rx="4"/><path d="M5 11a7 7 0 0 0 14 0M12 18v3M9 21h6"/></svg>
-        <span><strong>Podcasts</strong><small>Stories in context</small></span>
-      </button>
-    </div>
-
-    @if (experience() === 'words') {
       <section class="experience-header"><span>Vocabulary listening</span><h2>Train your ear, one word at a time</h2><p>Listen to saved words alone or inside a natural example.</p></section>
       <section class="word-session">
         <div class="session-summary"><span class="eyebrow">{{ 'listen.hero.readyLabel' | translate }}</span><strong>{{ queueCount() }} <small>{{ 'common.words' | translate }}</small></strong><span>{{ 'listen.hero.languageDirection' | translate }} · {{ 'listen.queue.aboutDuration' | translate:{mins: listenStore.estimatedMinutes()} }}</span></div>
@@ -51,27 +36,5 @@
         @if (!queueCount()) {<lc-empty-state icon="🎧" [title]="'listen.queue.emptyTitle' | translate" [subtitle]="'listen.queue.emptyDesc' | translate"/>}
         @else {<div class="queue-list">@for (item of queuePreview(); track item.id; let index = $index) {<lc-listen-queue-item [item]="item" [position]="index + 1" (preview)="playItemAudio(index)"/>}</div>}
       </section>
-    } @else {
-      <section class="experience-header"><span>Conversation practice</span><h2>Hear the language come alive</h2><p>Short, natural conversations built for focused listening.</p></section>
-      @if (podcastStore.isLoading()) {<div class="podcast-state">Preparing your next listen…</div>}
-      @else if (featuredPodcast(); as activity) {
-        <section class="featured-podcast">
-          <img [lcOfflineSrc]="activity.episode.thumbnail.heroUrl" [alt]="activity.episode.thumbnail.accessibilityDescription" [style.object-position]="(activity.episode.thumbnail.focalPoint.x * 100) + '% ' + (activity.episode.thumbnail.focalPoint.y * 100) + '%'"/>
-          <div class="podcast-overlay"></div>
-          <div class="podcast-copy"><span>{{ activity.status === 'in_progress' ? 'Continue listening' : 'Listen again' }} · {{ activity.episode.level }}</span><h2>{{ activity.episode.title }}</h2><p>{{ activity.episode.topicTitle }} · {{ podcastDuration(activity.episode.durationMs) }}</p>
-            @if (activity.status === 'in_progress') {<div class="podcast-progress"><i [style.width.%]="activity.progressPercent"></i></div>}
-            <button type="button" class="primary-action podcast-play" (click)="playPodcast(activity.episode.id)"><svg viewBox="0 0 24 24" fill="currentColor"><path d="m8 5 11 7-11 7z"/></svg>{{ activity.status === 'in_progress' ? 'Continue episode' : 'Play episode' }}</button>
-          </div>
-        </section>
-      } @else {
-        <section class="podcast-empty"><span class="podcast-mark"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="8" y="3" width="8" height="12" rx="4"/><path d="M5 11a7 7 0 0 0 14 0M12 18v3M9 21h6"/></svg></span><h2>Find your first conversation</h2><p>Choose a scene below and start with any short episode.</p></section>
-      }
-      @if (podcastTopics().length) {
-        <section class="topics-section">
-          <div class="section-heading-row"><div class="section-title"><span>Made for your level</span><h2>Explore conversations</h2></div><button type="button" (click)="openPodcasts()">See all</button></div>
-          <div class="topic-grid">@for (topic of podcastTopics(); track topic.id) {<button type="button" class="topic-card" (click)="openPodcastTopic(topic.id)"><img [lcOfflineSrc]="topic.thumbnail.cardUrl" [alt]="topic.thumbnail.accessibilityDescription"/><span><small>{{ topic.minimumLevel }}–{{ topic.maximumLevel }} · {{ topic.episodeCount }} episodes</small><strong>{{ topic.title }}</strong><em>{{ podcastDuration(topic.totalDurationMs) }}</em></span></button>}</div>
-        </section>
-      }
-    }
   </main>
 </ion-content>

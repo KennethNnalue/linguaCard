@@ -32,16 +32,14 @@ describe('TabsPage', () => {
     expect(tabButtons.map(button => button.attributes['tab'])).toEqual([
       'home',
       'vault',
-      'review',
       'stories',
       'listen',
     ]);
     expect(icons.map(icon => icon.attributes['name'])).toEqual([
       'home-outline',
       'folder-open-outline',
-      'play-circle-outline',
       'book-outline',
-      'volume-high-outline',
+      'mic-outline',
     ]);
   });
 });

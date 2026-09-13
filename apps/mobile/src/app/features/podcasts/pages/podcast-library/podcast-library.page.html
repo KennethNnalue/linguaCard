@@ -1,32 +1,72 @@
-<ion-header class="ion-no-border"><ion-toolbar><div class="pod-nav"><ion-button fill="clear" shape="round" (click)="goBack()" aria-label="Back"><ion-icon slot="icon-only" name="arrow-back" /></ion-button><div><span>Real-world listening</span><h1>Podcasts</h1></div></div></ion-toolbar></ion-header>
-<ion-content><main class="pod-page">
-  <section class="pod-hero"><span>Short conversations</span><h2>Hear your vocabulary in real life</h2><p>Practice natural conversations in episodes under five minutes.</p></section>
-  @if (store.isLoading()) { <p class="pod-state"><ion-spinner name="crescent" /> Loading conversations…</p> }
-  @else if (store.error(); as error) { <p class="pod-state">{{ error }}</p> }
-  @else {
-    @if (store.continueListening(); as activity) {
-      <section class="pod-section"><div class="pod-section-title"><span>Pick up where you left off</span><h2>Continue listening</h2></div>
-        <button type="button" class="pod-continue" (click)="continueEpisode(activity.episode.id)">
-          <img [lcOfflineSrc]="activity.episode.thumbnail.cardUrl" [alt]="activity.episode.thumbnail.accessibilityDescription" [style.object-position]="(activity.episode.thumbnail.focalPoint.x * 100) + '% ' + (activity.episode.thumbnail.focalPoint.y * 100) + '%'" />
-          <div><span>{{ activity.episode.topicTitle }} · {{ activity.progressPercent }}% complete</span><h3>{{ activity.episode.title }}</h3><div class="pod-progress"><i [style.width.%]="activity.progressPercent"></i></div><strong><ion-icon name="play" /> Continue episode</strong></div>
-        </button>
-      </section>
+<ion-header class="ion-no-border">
+  <ion-toolbar>
+    <div class="pod-nav"><span>Real-world listening</span><h1>Podcasts</h1></div>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+  <main class="pod-page">
+    <div class="pod-levels" [attr.aria-label]="'podcasts.library.levelFilter' | translate">
+      @for (level of levels; track level) {
+        <button type="button" [class.selected]="store.selectedLevel() === level"
+          [attr.aria-pressed]="store.selectedLevel() === level" (click)="store.selectLevel(level)">{{ level }}</button>
+      }
+    </div>
+
+    @if (store.isLoading()) {
+      <p class="pod-state"><ion-spinner name="crescent" /> {{ 'podcasts.library.loading' | translate }}</p>
+    } @else if (store.error(); as error) {
+      <div class="pod-state"><span>{{ error }}</span><button type="button" (click)="store.loadTopics()">{{ 'podcasts.library.retry' | translate }}</button></div>
+    } @else {
+      @if (store.featuredEpisodes().length) {
+        <section class="pod-section" aria-labelledby="pod-featured-heading">
+          <div class="pod-section-title"><span>{{ 'podcasts.library.levelPicks' | translate:{ level: store.selectedLevel() } }}</span><h2 id="pod-featured-heading">{{ 'podcasts.library.episodesForYou' | translate }}</h2></div>
+          <div class="pod-featured-grid">
+            @for (item of store.featuredEpisodes(); track item.episode.id) {
+              <button type="button" class="pod-episode" (click)="openFeatured(item)">
+                <div class="pod-episode-art">
+                  <img [lcOfflineSrc]="item.episode.thumbnail.cardUrl"
+                    [alt]="item.episode.thumbnail.accessibilityDescription"
+                    [style.object-position]="(item.episode.thumbnail.focalPoint.x * 100) + '% ' + (item.episode.thumbnail.focalPoint.y * 100) + '%'" />
+                  @if (item.source === 'continue') { <span class="pod-episode-badge">{{ 'podcasts.library.continue' | translate }} · {{ item.progressPercent }}%</span> }
+                  @else if (item.completed) { <span class="pod-episode-badge">{{ 'podcasts.library.listened' | translate }}</span> }
+                  @else if (item.source === 'recent') { <span class="pod-episode-badge">{{ 'podcasts.library.continue' | translate }} · {{ item.progressPercent }}%</span> }
+                  <span class="pod-episode-title">{{ item.episode.title }}</span>
+                </div>
+                @if (item.episode.titleTranslation) { <span class="pod-episode-translation">{{ item.episode.titleTranslation }}</span> }
+                <span class="pod-episode-meta">{{ item.episode.level }} · {{ duration(item.episode.durationMs) }} · {{ item.episode.topicTitle }}</span>
+              </button>
+            }
+          </div>
+        </section>
+      }
+
+      @if (store.topics().length) {
+        <section class="pod-section" aria-labelledby="pod-topics-heading">
+          <div class="pod-section-title pod-section-title--action">
+            <div><span>{{ 'podcasts.library.browseByScene' | translate }}</span><h2 id="pod-topics-heading">{{ 'podcasts.library.exploreTopics' | translate }}</h2></div>
+            @if (store.topics().length > 3) {
+              <button type="button" class="pod-see-all" (click)="showAllTopics.update(value => !value)">
+                {{ (showAllTopics() ? 'podcasts.library.showLess' : 'podcasts.library.seeAll') | translate }}
+              </button>
+            }
+          </div>
+          <div class="pod-topics" [class.all]="showAllTopics()">
+            @for (topic of store.topics(); track topic.id) {
+              <button type="button" class="pod-topic" (click)="openTopic(topic.id)">
+                <img [lcOfflineSrc]="topic.thumbnail.cardUrl" [alt]="topic.thumbnail.accessibilityDescription"
+                  [style.object-position]="(topic.thumbnail.focalPoint.x * 100) + '% ' + (topic.thumbnail.focalPoint.y * 100) + '%'" />
+                <span class="pod-topic-copy"><small>{{ topic.minimumLevel }}–{{ topic.maximumLevel }} · {{ topic.episodeCount }} episodes</small>
+                  <strong>{{ topic.title }}</strong>
+                  @if (topic.titleTranslation) { <span class="pod-topic-translation">{{ topic.titleTranslation }}</span> }
+                </span>
+              </button>
+            }
+          </div>
+        </section>
+      } @else {
+        <p class="pod-state">{{ 'podcasts.library.empty' | translate }}</p>
+      }
     }
-    @if (store.recentEpisodes().length) {
-      <section class="pod-section"><div class="pod-section-title"><span>Your listening</span><h2>Recent episodes</h2></div><div class="pod-recent">
-        @for (activity of store.recentEpisodes(); track activity.episode.id) {
-          <button type="button" (click)="openActivity(activity.episode.id, activity.status === 'completed')"><img [lcOfflineSrc]="activity.episode.thumbnail.cardUrl" [alt]="activity.episode.thumbnail.accessibilityDescription" /><div><span>{{ activity.status === 'completed' ? 'Completed' : activity.progressPercent + '% complete' }}</span><h3>{{ activity.episode.title }}</h3><p>{{ activity.episode.topicTitle }}</p></div></button>
-        }
-      </div></section>
-    }
-    @if (!store.topics().length) { <p class="pod-state">No podcast topics are published yet.</p> }
-    @else { <section class="pod-section"><div class="pod-section-title"><span>Browse by scene</span><h2>Podcast topics</h2></div><div class="pod-grid" aria-label="Podcast topics">
-    @for (topic of store.topics(); track topic.id) {
-      <button type="button" class="pod-card" (click)="openTopic(topic.id)">
-        <img [lcOfflineSrc]="topic.thumbnail.cardUrl" [alt]="topic.thumbnail.accessibilityDescription" [style.object-position]="(topic.thumbnail.focalPoint.x * 100) + '% ' + (topic.thumbnail.focalPoint.y * 100) + '%'" />
-        <div><span>{{ topic.minimumLevel }}–{{ topic.maximumLevel }} · {{ topic.episodeCount }} episodes · {{ duration(topic.totalDurationMs) }}</span><h3>{{ topic.title }}</h3><p>{{ topic.description }}</p></div>
-      </button>
-    }
-  </div></section> }
-  }
-</main></ion-content>
+  </main>
+</ion-content>

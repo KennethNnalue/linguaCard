@@ -1122,7 +1122,8 @@
   },
   "listen": {
     "main": {
-      "pageTitle": "Dinle ve Öğren"
+      "pageTitle": "Dinle ve Öğren",
+    "wordsTitle": "Kelimeleri dinle"
     },
     "hero": {
       "playingFromLabel": "Kaynağı",
@@ -1209,6 +1210,20 @@
     }
   },
   "podcasts": {
+    "library": {
+      "retry": "Tekrar dene",
+      "exploreTopics": "Konuları keşfet",
+      "showLess": "Daha az göster",
+      "seeAll": "Tümünü gör",
+      "levelPicks": "{{level}} seviyesi için seçilenler",
+      "episodesForYou": "Sizin için bölümler",
+      "continue": "Devam et",
+      "listened": "Dinlendi",
+      "browseByScene": "Konuya göre keşfet",
+      "levelFilter": "Podcast bölümü seviyesi",
+      "loading": "Konuşmalar yükleniyor…",
+      "empty": "Henüz yayınlanmış podcast konusu yok."
+    },
     "player": {
       "backToTopic": "Konuya dön",
       "openLandscape": "Yatay oynatıcıyı aç",
@@ -1808,7 +1823,8 @@
     "vault": "Kasa",
     "review": "Tekrar",
     "stories": "Hikayeler",
-    "listen": "Dinle"
+    "listen": "Dinle",
+    "podcasts": "Podcastler"
   },
   "onboarding": {
     "common": {

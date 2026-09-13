@@ -30,7 +30,11 @@ export class ReviewSessionApiService {
     return this.http.post<{ upserted: number }>(`${this.apiUrl}/batch`, { sessions });
   }
 
-  findRecent(limit = 50): Observable<ReviewSession[]> {
+  findRecent(limit = 500): Observable<ReviewSession[]> {
     return this.http.get<ReviewSession[]>(this.apiUrl, { params: { limit } });
+  }
+
+  clearHistory(): Observable<void> {
+    return this.http.delete<void>(this.apiUrl);
   }
 }

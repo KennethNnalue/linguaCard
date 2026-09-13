@@ -20,6 +20,8 @@ describe('SessionRefresher', () => {
             findRecent: jest.fn().mockReturnValue(of([{
               id: 'session-1',
               deckId: 'deck-1',
+              collectionId: 'collection-1',
+              collectionName: 'Everyday words',
               startedAt: '2026-09-11T07:00:00.000Z',
               completedAt: '2026-09-11T07:10:00.000Z',
               totalCards: 1,
@@ -46,8 +48,8 @@ describe('SessionRefresher', () => {
     expect(setPendingSessions).toHaveBeenCalledWith('user-1', []);
     expect(setSessionHistory).toHaveBeenCalledWith('user-1', [{
       id: 'session-1',
-      collectionId: null,
-      collectionName: null,
+      collectionId: 'collection-1',
+      collectionName: 'Everyday words',
       startedAt: '2026-09-11T07:00:00.000Z',
       completedAt: '2026-09-11T07:10:00.000Z',
       totalCards: 1,

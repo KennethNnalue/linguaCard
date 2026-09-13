@@ -246,6 +246,11 @@ export const ListenStore = signalStore(
       const queue = settings.shuffle ? shuffleItems(rawQueue) : [...rawQueue];
       patchState(store, {
         playlistId: request.playlistId,
+        selectedSource: request.source.kind === 'collection'
+          ? `collection:${request.source.collectionId}`
+          : request.source.kind === 'custom'
+            ? `custom:${request.source.sourceId}`
+            : request.source.kind,
         languages: request.languages,
         sourceLabel: request.title,
         rawQueue,

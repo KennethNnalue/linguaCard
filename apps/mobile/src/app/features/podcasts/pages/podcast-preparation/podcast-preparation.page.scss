@@ -31,3 +31,5 @@ ion-content { --background:var(--bg); --color:var(--text); }
 .word-audio { width:40px; height:40px; flex:none; margin:-7px 0 0; --padding-start:0; --padding-end:0; --color:var(--lc-ss-sage); }
 .state { display:flex; min-height:60vh; align-items:center; justify-content:center; gap:10px; text-align:center; }
 @media(max-width:500px) { .readiness{grid-template-columns:90px 1fr}.ring{width:82px}.actions{grid-template-columns:1fr} }
+
+.title-translation { display:block; color:var(--lc-ss-muted); font-size:0.875rem; line-height:1.4; margin-block:0.2rem 0.5rem; overflow-wrap:anywhere; }

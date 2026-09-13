@@ -39,7 +39,14 @@ export class ListenCompletePage {
   }
 
   goBack(): void {
+    const source = this.listenStore.selectedSource();
+    const requestedReturnUrl: unknown = history.state?.returnUrl;
+    const destination = typeof requestedReturnUrl === 'string' && requestedReturnUrl.startsWith('/')
+      ? requestedReturnUrl
+      : source.startsWith('collection:')
+        ? `/vault/collections/${source.slice('collection:'.length)}`
+        : '/vault';
     this.listenStore.resetToIdle();
-    this.navCtrl.navigateBack(['/listen']);
+    this.navCtrl.navigateBack(destination);
   }
 }

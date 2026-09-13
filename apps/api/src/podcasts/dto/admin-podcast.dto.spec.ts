@@ -3,9 +3,25 @@ import { plainToInstance } from 'class-transformer';
 import { validate } from 'class-validator';
 import {
   CreatePodcastEpisodeDto,
+  CreatePodcastTopicDto,
   CreatePodcastTranscriptPromptDto,
   UpdatePodcastEpisodeDto,
 } from './admin-podcast.dto';
+
+describe('CreatePodcastTopicDto', () => {
+  test('requires a translated title for a new topic', async () => {
+    const topic = {
+      title: 'Im Café', description: '', targetLanguage: 'de', translationLanguage: 'en', level: 'A1',
+    };
+    const missing = plainToInstance(CreatePodcastTopicDto, topic);
+    const translated = plainToInstance(CreatePodcastTopicDto, {
+      ...topic, titleTranslation: 'At the café',
+    });
+
+    await expect(validate(missing)).resolves.not.toHaveLength(0);
+    await expect(validate(translated)).resolves.toHaveLength(0);
+  });
+});
 
 describe('CreatePodcastEpisodeDto', () => {
   test('rejects blank and oversized vocabulary items', async () => {

@@ -13,6 +13,7 @@ import type {
   AdminPlatformCollectionListItem,
   AdminPlatformCollectionWordItem,
   AdminPlatformStoryListItem,
+  AdminUpdatePlatformStoryTitlesDto,
   AdminSetStoryCategoryDto,
   AdminUpdatePlatformCollectionDto,
   AdminDiscountCodeListItem,
@@ -44,6 +45,10 @@ export class AdminApiService {
 
   listStories(): Observable<AdminPlatformStoryListItem[]> {
     return this.http.get<AdminPlatformStoryListItem[]>(`${this.apiUrl}/platform-stories`);
+  }
+
+  updateStoryTitles(id: string, dto: AdminUpdatePlatformStoryTitlesDto): Observable<AdminPlatformStoryListItem> {
+    return this.http.patch<AdminPlatformStoryListItem>(`${this.apiUrl}/platform-stories/${id}/titles`, dto);
   }
 
   deleteCollection(id: string): Observable<void> {

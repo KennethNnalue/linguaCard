@@ -15,6 +15,9 @@ export class PodcastTopicEntity {
   @Column({ type: 'varchar', length: 160 })
   title!: string;
 
+  @Column({ type: 'varchar', length: 160, default: '' })
+  titleTranslation!: string;
+
   @Column({ type: 'text', default: '' })
   description!: string;
 

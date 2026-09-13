@@ -67,7 +67,7 @@
         </div>
         <div class="ss-hero-body">
           <div class="ss-hero-eyebrow">{{ 'stories.library.continueReading' | translate }}</div>
-          <div class="ss-hero-title">{{ cont.title }}</div>
+          <div class="ss-hero-title">{{ cont.title }}</div>@if (cont.titleTranslation) { <div class="title-translation">{{ cont.titleTranslation }}</div> }
           <div class="ss-hero-meta">
             {{ 'stories.library.minReadMeta' | translate:{ mins: continueMins(cont), category: heroCategoryLabel(cont) } }}
           </div>
@@ -151,7 +151,7 @@
               }
             </div>
             <div class="ss-cover-body">
-              <div class="ss-cover-title">{{ story.title }}</div>
+              <div class="ss-cover-title">{{ story.title }}</div>@if (story.titleTranslation) { <div class="title-translation">{{ story.titleTranslation }}</div> }
               <div class="ss-cover-meta">{{ platformReadingTime(story) }} · {{ categoryLabel(story.category) }}</div>
             </div>
           </div>
@@ -196,7 +196,7 @@
                  [attr.aria-label]="'Open story: ' + story.title">
               <div class="ss-mine-tile" [style.background]="gradientFor(story.id)">{{ initialFor(story) }}</div>
               <div class="ss-mine-info">
-                <div class="ss-mine-title">{{ story.title }}</div>
+                <div class="ss-mine-title">{{ story.title }}</div>@if (story.titleTranslation) { <div class="title-translation">{{ story.titleTranslation }}</div> }
                 <div class="ss-mine-meta">{{ readingTime(story) }} · {{ storyWordCount(story) }} {{ 'stories.cardMeta.words' | translate }} · {{ story.difficultyLevel }}</div>
               </div>
               <button class="ss-mine-play" (click)="listenStory($event, story)"

@@ -73,9 +73,12 @@ export class AdminImportPage {
   readonly storyForm = new FormGroup({
     platformCollectionId: new FormControl('', [Validators.required]),
     storyJson: new FormControl('', [Validators.required]),
+    title: new FormControl('', [Validators.required, Validators.pattern(/\S/), Validators.maxLength(160)]),
+    titleTranslation: new FormControl('', [Validators.required, Validators.pattern(/\S/), Validators.maxLength(160)]),
     isFiction: new FormControl(true),
     generateAudio: new FormControl(false),
   });
+  readonly storyNativeLang = signal('en');
 
   readonly jsonForm = new FormGroup({
     title: new FormControl('', [Validators.required]),
@@ -251,6 +254,11 @@ OUTPUT — valid JSON ONLY, no markdown fences, no commentary:
   readonly mutatingCollectionWord = signal(false);
 
   readonly stories = signal<AdminPlatformStoryListItem[]>([]);
+  readonly editingStoryId = signal<string | null>(null);
+  readonly storyTitleForm = new FormGroup({
+    title: new FormControl('', { nonNullable: true, validators: [Validators.required, Validators.pattern(/\S/), Validators.maxLength(160)] }),
+    titleTranslation: new FormControl('', { nonNullable: true, validators: [Validators.required, Validators.pattern(/\S/), Validators.maxLength(160)] }),
+  });
   readonly storiesLoading = signal(false);
   readonly deletingStoryId = signal<string | null>(null);
   readonly regeneratingAudioId = signal<string | null>(null);
@@ -768,6 +776,45 @@ OUTPUT — valid JSON ONLY, no markdown fences, no commentary:
     });
   }
 
+  onStoryJsonInput(event: Event): void {
+    const input = event.target;
+    if (!(input instanceof HTMLTextAreaElement)) return;
+    try {
+      const story: unknown = JSON.parse(input.value);
+      if (typeof story !== 'object' || story === null) return;
+      this.storyForm.patchValue({
+        title: 'title' in story && typeof story.title === 'string' ? story.title : '',
+        titleTranslation: 'titleTranslation' in story && typeof story.titleTranslation === 'string'
+          ? story.titleTranslation : '',
+      });
+      this.storyNativeLang.set('nativeLang' in story && typeof story.nativeLang === 'string' ? story.nativeLang : 'en');
+    } catch {
+      this.storyForm.patchValue({ title: '', titleTranslation: '' });
+      this.storyNativeLang.set('en');
+    }
+  }
+
+  editStoryTitles(story: AdminPlatformStoryListItem): void {
+    this.editingStoryId.set(story.id);
+    this.storyTitleForm.setValue({ title: story.title, titleTranslation: story.titleTranslation });
+  }
+
+  saveStoryTitles(): void {
+    const id = this.editingStoryId();
+    if (!id || this.storyTitleForm.invalid) return;
+    const value = this.storyTitleForm.getRawValue();
+    this.adminApi.updateStoryTitles(id, {
+      title: value.title.trim(), titleTranslation: value.titleTranslation.trim(),
+    }).pipe(takeUntilDestroyed(this._destroyRef)).subscribe({
+      next: updated => {
+        this.stories.update(stories => stories.map(story => story.id === id ? updated : story));
+        this.editingStoryId.set(null);
+        void this._toast('Story titles saved', 'success');
+      },
+      error: () => void this._toast('Could not save story titles', 'danger'),
+    });
+  }
+
   importStory(): void {
     this.storyForm.markAllAsTouched();
     if (this.storyForm.invalid || this.importingStory()) return;
@@ -780,6 +827,11 @@ OUTPUT — valid JSON ONLY, no markdown fences, no commentary:
       void this._toast('Invalid JSON. Paste the raw JSON output from the AI prompt.', 'danger');
       return;
     }
+    story = {
+      ...story,
+      title: v.title!.trim(),
+      titleTranslation: v.titleTranslation!.trim(),
+    };
 
     this.importingStory.set(true);
     this.lastStoryResult.set(null);

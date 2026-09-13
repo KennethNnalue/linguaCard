@@ -21,6 +21,16 @@ export function isSameLocalDay(a: Date, b: Date): boolean {
   return localDayKey(a) === localDayKey(b);
 }
 
+export function reviewHistoryCutoff(now: Date = new Date()): Date {
+  const day = now.getUTCDate();
+  const cutoff = new Date(now);
+  cutoff.setUTCDate(1);
+  cutoff.setUTCMonth(cutoff.getUTCMonth() - 3);
+  const lastDay = new Date(Date.UTC(cutoff.getUTCFullYear(), cutoff.getUTCMonth() + 1, 0)).getUTCDate();
+  cutoff.setUTCDate(Math.min(day, lastDay));
+  return cutoff;
+}
+
 // ─── ARTICLE HELPERS ──────────────────────────────────────────────────────────
 
 export function articleCssClass(article: string | null | undefined): string {

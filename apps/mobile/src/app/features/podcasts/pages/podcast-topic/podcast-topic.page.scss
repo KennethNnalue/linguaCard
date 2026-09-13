@@ -25,3 +25,5 @@ ion-content { --background:var(--bg); --color:var(--text); }
 .state { display:flex; min-height:60vh; align-items:center; justify-content:center; gap:10px; text-align:center; }
 
 @media(max-width:480px) { .episodes img { width:92px; } }
+
+.title-translation { display:block; color:var(--lc-ss-muted); font-size:0.875rem; line-height:1.4; margin-block:0.2rem 0.5rem; overflow-wrap:anywhere; }

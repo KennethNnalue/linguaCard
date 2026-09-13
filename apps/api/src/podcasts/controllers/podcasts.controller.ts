@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Param, Patch, Post, UseGuards } from '@nestjs/common';
+import { Body, Controller, Get, Param, Patch, Post, Query, UseGuards } from '@nestjs/common';
 import type {
   PodcastEpisodeCompletion, PodcastEpisodePlayer, PodcastEpisodePreparation, PodcastLibraryResponse,
   PodcastListeningProgress, PodcastTopicDetail, PreparePodcastVocabularyResult,
@@ -8,6 +8,7 @@ import { CurrentUser } from '../../common/decorators/current-user.decorator';
 import { PodcastCatalogueService } from '../services/podcast-catalogue.service';
 import { PodcastLearningLoopService } from '../services/podcast-learning-loop.service';
 import { SavePodcastProgressDto } from '../dto/admin-podcast.dto';
+import { PodcastLibraryQueryDto } from '../dto/podcast-library-query.dto';
 
 @Controller('podcasts')
 @UseGuards(JwtAuthGuard)
@@ -18,8 +19,8 @@ export class PodcastsController {
   ) {}
 
   @Get()
-  listTopics(@CurrentUser() userId: string): Promise<PodcastLibraryResponse> {
-    return this.catalogue.listTopics(userId);
+  listTopics(@CurrentUser() userId: string, @Query() query: PodcastLibraryQueryDto): Promise<PodcastLibraryResponse> {
+    return this.catalogue.listTopics(userId, query.level ?? 'A1');
   }
 
   @Get('topics/:topicId')

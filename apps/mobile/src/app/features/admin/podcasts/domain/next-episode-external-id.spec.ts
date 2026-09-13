@@ -16,7 +16,7 @@ describe('nextEpisodeExternalId', () => {
 
 function createTopic(): AdminPodcastTopicListItem {
   return {
-    id: 'topic-1', externalId: 'at-the-cafe', title: 'At the café', description: '',
+    id: 'topic-1', externalId: 'at-the-cafe', title: 'At the café', titleTranslation: 'At the cafe', description: '',
     targetLanguage: 'de', translationLanguage: 'en', level: 'A1',
     status: 'draft', thumbnail: null, episodes: [], createdAt: '', updatedAt: '',
   };

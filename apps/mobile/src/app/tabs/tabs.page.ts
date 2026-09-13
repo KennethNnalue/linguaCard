@@ -9,11 +9,12 @@ import {
   folderOpenOutline,
   homeOutline,
   playCircleOutline,
-  volumeHighOutline,
+  micOutline,
 } from 'ionicons/icons';
 
 const IMMERSIVE_PLAYER_ROUTES = [
   /^\/listen\/now-playing(?:[/?#]|$)/,
+  /^\/listen\/complete(?:[/?#]|$)/,
   /^\/podcasts\/episodes\/[^/]+\/player(?:[/?#]|$)/,
   /^\/admin\/podcasts(?:[/?#]|$)/,
 ];
@@ -32,11 +33,11 @@ export class TabsPage {
     IMMERSIVE_PLAYER_ROUTES.some(route => route.test(this.currentUrl()))
   );
   readonly isListenArea = computed(() =>
-    this.currentUrl().startsWith('/listen') || this.currentUrl().startsWith('/podcasts')
+    this.currentUrl() === '/listen' || this.currentUrl().startsWith('/podcasts')
   );
 
   constructor() {
-    addIcons({bookOutline, folderOpenOutline, homeOutline, playCircleOutline, volumeHighOutline});
+    addIcons({bookOutline, folderOpenOutline, homeOutline, playCircleOutline, micOutline});
 
     this.router.events.pipe(takeUntilDestroyed()).subscribe(event => {
       if (event instanceof NavigationEnd) {

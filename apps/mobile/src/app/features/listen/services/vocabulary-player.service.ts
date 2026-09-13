@@ -9,8 +9,9 @@ export class VocabularyPlayerService {
   private readonly router = inject(Router);
 
   async open(request: VocabularyPlaylistRequest): Promise<void> {
+    const returnUrl = this.router.url;
     this.store.openPlaylist(request);
-    await this.router.navigate(['/listen/now-playing']);
+    await this.router.navigate(['/listen/now-playing'], { state: { returnUrl } });
     this.store.start({ shuffle: false });
   }
 }

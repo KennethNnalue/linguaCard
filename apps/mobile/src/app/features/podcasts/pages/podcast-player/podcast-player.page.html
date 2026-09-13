@@ -18,7 +18,7 @@
         <ion-button fill="clear" shape="round" (click)="goBack(episode.topicId)" [attr.aria-label]="'podcasts.player.backToTopic' | translate">
           <ion-icon slot="icon-only" name="arrow-back-outline" />
         </ion-button>
-        <div><small>{{episode.topicTitle}}</small><strong>{{episode.title}}</strong></div>
+        <div><small>{{episode.topicTitle}}</small><strong>{{episode.title}}</strong>@if (episode.titleTranslation) { <small class="title-translation">{{ episode.titleTranslation }}</small> }</div>
         @if (immersiveMode.isImmersive() || immersiveMode.isLandscape()) {
           <ion-button fill="clear" shape="round" (click)="exitImmersiveMode()"
             [disabled]="immersiveMode.isTransitioning()" [attr.aria-label]="'podcasts.player.returnPortrait' | translate">

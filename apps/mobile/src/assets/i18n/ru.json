@@ -1122,7 +1122,8 @@
   },
   "listen": {
     "main": {
-      "pageTitle": "Слушай и учись"
+      "pageTitle": "Слушай и учись",
+    "wordsTitle": "Слушать слова"
     },
     "hero": {
       "playingFromLabel": "Воспроизведение из",
@@ -1209,6 +1210,20 @@
     }
   },
   "podcasts": {
+    "library": {
+      "retry": "Повторить",
+      "exploreTopics": "Изучить темы",
+      "showLess": "Показать меньше",
+      "seeAll": "Посмотреть все",
+      "levelPicks": "Подборка для уровня {{level}}",
+      "episodesForYou": "Эпизоды для вас",
+      "continue": "Продолжить",
+      "listened": "Прослушано",
+      "browseByScene": "Выбор по теме",
+      "levelFilter": "Уровень эпизодов подкаста",
+      "loading": "Загрузка разговоров…",
+      "empty": "Опубликованных тем подкастов пока нет."
+    },
     "player": {
       "backToTopic": "Вернуться к теме",
       "openLandscape": "Открыть альбомный плеер",
@@ -1808,7 +1823,8 @@
     "vault": "Хранилище",
     "review": "Повторение",
     "stories": "Истории",
-    "listen": "Слушать"
+    "listen": "Слушать",
+    "podcasts": "Подкасты"
   },
   "onboarding": {
     "common": {

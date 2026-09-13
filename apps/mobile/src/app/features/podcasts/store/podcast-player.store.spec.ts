@@ -9,7 +9,7 @@ import { PodcastApiService } from '../data-access/podcast-api.service';
 import { PodcastPlayerStore } from './podcast-player.store';
 
 const episode: PodcastEpisodePlayer = {
-  id: 'episode-1', topicId: 'topic-1', topicTitle: 'Topic', title: 'First episode',
+  id: 'episode-1', topicId: 'topic-1', topicTitle: 'Topic', topicTitleTranslation: 'Topic translated', title: 'First episode', titleTranslation: 'First episode translated',
   audioUrl: '/episode-1.mp3', audioDurationMs: 60_000, audioVersion: 1,
   thumbnail: {
     assetId: 'thumbnail-1', cardUrl: '/card.webp', cardWidth: 640, cardHeight: 360,

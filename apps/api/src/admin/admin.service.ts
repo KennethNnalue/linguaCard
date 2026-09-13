@@ -1,6 +1,7 @@
 import { BadRequestException, ConflictException, Injectable, Logger, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { In, IsNull, Repository } from 'typeorm';
+import { StoryEntity } from '../stories/story.entity';
 import { randomUUID } from 'crypto';
 import { PlatformCollectionEntity } from './platform-collection.entity';
 import { PlatformCollectionWordEntity } from './platform-collection-word.entity';
@@ -26,6 +27,7 @@ import type {
   AdminPlatformCollectionListItem,
   AdminPlatformCollectionWordItem,
   AdminPlatformStoryListItem,
+  AdminUpdatePlatformStoryTitlesDto,
   AdminUpdatePlatformCollectionDto,
   StoryKeyword,
 } from '@lingua-card/shared/domain';
@@ -329,6 +331,11 @@ export class AdminService {
 
   async importStory(dto: AdminImportStoryDto): Promise<AdminImportStoryResult> {
     const { story } = dto;
+    if (typeof story.title !== 'string' || !story.title.trim()
+      || typeof story.titleTranslation !== 'string' || !story.titleTranslation.trim()
+      || story.title.length > 160 || story.titleTranslation.length > 160) {
+      throw new BadRequestException('Story title and title translation are required and must be at most 160 characters');
+    }
     const nativeLang = story.nativeLang ?? 'en';
     const storyId = crypto.randomUUID();
 
@@ -409,8 +416,8 @@ export class AdminService {
 
     const entity = Object.assign(new PlatformStoryEntity(), {
       id: storyId,
-      title: story.title,
-      titleTranslation: story.titleTranslation,
+      title: story.title.trim(),
+      titleTranslation: story.titleTranslation.trim(),
       bodyDe,
       bodyNative: story.sentences.map(s => s.native).join(' '),
       nativeLang,
@@ -766,6 +773,7 @@ export class AdminService {
       id: s.id,
       title: s.title,
       titleTranslation: s.titleTranslation,
+      nativeLang: s.nativeLang,
       level: s.level,
       category: s.category,
       wordCount: s.wordCount,
@@ -807,7 +815,33 @@ export class AdminService {
   async setPublishedStory(id: string, isPublished: boolean): Promise<void> {
     const entity = await this.storyRepo.findOneBy({ id });
     if (!entity) throw new NotFoundException(`Platform story ${id} not found`);
+    if (isPublished && !entity.titleTranslation.trim()) {
+      throw new ConflictException('Add a story title translation before publishing');
+    }
     entity.isPublished = isPublished;
     await this.storyRepo.save(entity);
+  }
+
+  async updateStoryTitles(id: string, dto: AdminUpdatePlatformStoryTitlesDto): Promise<AdminPlatformStoryListItem> {
+    await this.storyRepo.manager.transaction(async manager => {
+      const story = await manager.findOne(PlatformStoryEntity, {
+        where: { id }, lock: { mode: 'pessimistic_write' },
+      });
+      if (!story) throw new NotFoundException(`Platform story ${id} not found`);
+      const previousTitle = story.title;
+      const previousTranslation = story.titleTranslation;
+      story.title = dto.title.trim();
+      story.titleTranslation = dto.titleTranslation.trim();
+      await manager.save(story);
+      await manager.createQueryBuilder().update(StoryEntity)
+        .set({ title: story.title, titleTranslation: story.titleTranslation })
+        .where('"source_platform_story_id" = :id', { id })
+        .andWhere('title = :previousTitle', { previousTitle })
+        .andWhere('"titleTranslation" = :previousTranslation', { previousTranslation })
+        .execute();
+    });
+    const story = (await this.listStories()).find(item => item.id === id);
+    if (!story) throw new NotFoundException(`Platform story ${id} not found`);
+    return story;
   }
 }

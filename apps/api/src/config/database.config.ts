@@ -8,6 +8,7 @@ import { StoryEntity } from '../stories/story.entity';
 import { WordAudioEntity } from '../word-audio/word-audio.entity';
 import { SubscriptionEntity } from '../subscriptions/subscription.entity';
 import { ReviewSessionEntity } from '../review/review-session.entity';
+import { ReviewHistoryClearanceEntity } from '../review/review-history-clearance.entity';
 import { PlatformStoryEntity } from '../platform-stories/platform-story.entity';
 import { UserStoryProgressEntity } from '../platform-stories/user-story-progress.entity';
 import { UserSettingsEntity } from '../settings/user-settings.entity';
@@ -53,6 +54,8 @@ import { AccountDeletionRequestEntity } from '../data-deletion/account-deletion-
 import { CreateAccountDeletionRequests1787452000000 } from '../data-deletion/migration/CreateAccountDeletionRequests';
 import { AddPodcastPlatformCollections1787453000000 } from '../podcasts/migration/AddPodcastPlatformCollections';
 import { AddCollectionTitleTranslation1787454000000 } from '../admin/migration/AddCollectionTitleTranslation';
+import { AddPodcastTopicTitleTranslation1787455000000 } from '../podcasts/migration/AddPodcastTopicTitleTranslation';
+import { AddReviewHistoryClearances1787456000000 } from '../review/migration/AddReviewHistoryClearances';
 
 export default registerAs('database', (): TypeOrmModuleOptions => ({
   type: 'postgres',
@@ -60,8 +63,8 @@ export default registerAs('database', (): TypeOrmModuleOptions => ({
   ssl: process.env['NODE_ENV'] === 'production'
     ? { rejectUnauthorized: false }
     : false,
-  entities: [UserEntity, CardEntity, ReviewSchedulingEntity, CollectionEntity, CategoryEntity, StoryEntity, WordAudioEntity, SubscriptionEntity, ReviewSessionEntity, ReviewCommitEntity, CardAdministrationEventEntity, PlatformStoryEntity, UserStoryProgressEntity, UserSettingsEntity, PushSubscriptionEntity, WordDictionaryEntity, PlatformCollectionEntity, PlatformCollectionWordEntity, PlatformCollectionImportEntity, DiscountCodeEntity, DiscountRedemptionEntity, ShareEntity, ShareSyncLinkEntity, EngagementProcessedEventEntity, DailyReviewCardEntity, DailyProgressEntity, RewardTransactionEntity, StreakFreezeTransactionEntity, ObjectDeletionJobEntity, AccountDeletionRequestEntity, ...VOCABULARY_ENTITIES, ...LEARNING_ITEM_ENTITIES, ...PODCAST_ENTITIES],
-  migrations: [CreateEngagementTables1760000000000, CreateMultilingualVocabulary1787436000000, CreateLearningItems1787437000000, CreatePlatformCollectionImports1787438000000, AddPlatformCollectionVocabulary1787439000000, CompleteCanonicalCardProjection1787440000000, ProjectExistingCardsIntoCanonicalModel1787441000000, CreatePodcasts1787442000000, AddPodcastTranscripts1787443000000, AddPodcastAudioGeneration1787444000000, AddPodcastLearningLoop1787445000000, AddPodcastSpeakerVoiceGender1787446000000, BackfillPlatformStoryKeywordIds1787447000000, AddDailyStreakPolicyVersion1787448000000, AddPodcastQualifyingListening1787449000000, SimplifyPodcastProduction1787450000000, CreateObjectDeletionJobs1787451000000, CreateAccountDeletionRequests1787452000000, AddPodcastPlatformCollections1787453000000, AddCollectionTitleTranslation1787454000000],
+  entities: [UserEntity, CardEntity, ReviewSchedulingEntity, CollectionEntity, CategoryEntity, StoryEntity, WordAudioEntity, SubscriptionEntity, ReviewSessionEntity, ReviewHistoryClearanceEntity, ReviewCommitEntity, CardAdministrationEventEntity, PlatformStoryEntity, UserStoryProgressEntity, UserSettingsEntity, PushSubscriptionEntity, WordDictionaryEntity, PlatformCollectionEntity, PlatformCollectionWordEntity, PlatformCollectionImportEntity, DiscountCodeEntity, DiscountRedemptionEntity, ShareEntity, ShareSyncLinkEntity, EngagementProcessedEventEntity, DailyReviewCardEntity, DailyProgressEntity, RewardTransactionEntity, StreakFreezeTransactionEntity, ObjectDeletionJobEntity, AccountDeletionRequestEntity, ...VOCABULARY_ENTITIES, ...LEARNING_ITEM_ENTITIES, ...PODCAST_ENTITIES],
+  migrations: [CreateEngagementTables1760000000000, CreateMultilingualVocabulary1787436000000, CreateLearningItems1787437000000, CreatePlatformCollectionImports1787438000000, AddPlatformCollectionVocabulary1787439000000, CompleteCanonicalCardProjection1787440000000, ProjectExistingCardsIntoCanonicalModel1787441000000, CreatePodcasts1787442000000, AddPodcastTranscripts1787443000000, AddPodcastAudioGeneration1787444000000, AddPodcastLearningLoop1787445000000, AddPodcastSpeakerVoiceGender1787446000000, BackfillPlatformStoryKeywordIds1787447000000, AddDailyStreakPolicyVersion1787448000000, AddPodcastQualifyingListening1787449000000, SimplifyPodcastProduction1787450000000, CreateObjectDeletionJobs1787451000000, CreateAccountDeletionRequests1787452000000, AddPodcastPlatformCollections1787453000000, AddCollectionTitleTranslation1787454000000, AddPodcastTopicTitleTranslation1787455000000, AddReviewHistoryClearances1787456000000],
   migrationsRun: process.env['NODE_ENV'] !== 'production',
   synchronize: process.env['TYPEORM_SYNCHRONIZE'] === 'true' && process.env['NODE_ENV'] !== 'production',
   logging: process.env['NODE_ENV'] !== 'production',
