@@ -47,6 +47,13 @@ export function buildPodcastTranscriptPrompt(context: PodcastTranscriptPromptCon
     ? context.manifest.items.map(item => item.translation ? `${item.text} = ${item.translation}` : item.text)
     : normalizePodcastVocabulary(context.vocabulary);
   const vocabularyTarget = podcastVocabularyTarget(vocabulary.length);
+  const hasExtendedVocabulary = vocabulary.length >= 15;
+  const durationRequirement = hasExtendedVocabulary
+    ? 'Aim for 3–5 minutes of spoken audio, with at least 3 minutes for 15 or more supplied vocabulary items. Let a larger vocabulary list justify more conversation, while keeping the episode under 5 minutes.'
+    : 'Aim for a little over 2 minutes of spoken audio when fewer than 15 vocabulary items are supplied. Develop the scene enough to feel complete without stretching it to 3 minutes.';
+  const dialogueRequirement = hasExtendedVocabulary
+    ? 'Use about 26–36 concise turns. Give each required word a meaningful context, then revisit useful words in follow-up questions, answers, and reactions rather than listing definitions.'
+    : 'Use about 18–26 concise turns. Include natural greetings, transitions, follow-up questions, reactions, and a closing.';
   const vocabularyList = context.manifest
     ? context.manifest.items.map(item => `- ${JSON.stringify({
       key: item.key,
@@ -81,9 +88,10 @@ ${context.manifest
 Requirements:
 - Derive a concise natural episode title in the target language, its accurate translation, and a learner-facing description in the translation language.
 - Use exactly two speakers with consistent female or male voiceGender values.
-- Write a natural conversation appropriate for the CEFR level that is designed to produce at least 3 minutes of audio, aiming near the lower end of the 3–5 minute range.
-- Use 18–26 concise turns and natural greetings, transitions, follow-up questions, reactions, and a closing so the dialogue feels complete rather than padded.
-- Use most of the available dialogue budget: aim for 1,750–1,950 target-language characters in total, with an absolute maximum below 2,000 characters.
+- Write a natural conversation appropriate for the CEFR level. ${durationRequirement}
+- ${dialogueRequirement} Include a clear opening, a small development or change in the situation, and a natural closing so the dialogue feels complete rather than padded.
+- Use most of the available dialogue budget: aim for ${hasExtendedVocabulary ? '1,900–1,990' : '1,750–1,950'} target-language characters across all targetText fields, with an absolute maximum of 2,000 characters. Count only targetText, not translations or JSON syntax.
+- Before returning JSON, check the estimated spoken duration against the target above; revise short dialogue by adding relevant exchanges, not filler, while staying within the character limit.
 - Keep the speaking pace natural for ${context.level} learners. Prefer short sentences, brief pauses implied by punctuation, and useful repetition in context.
 - Treat vocabulary supplied under Required vocabulary or elsewhere alongside this prompt as required input.
 - Reduce dictionary notation to the headword before creating vocabulary entries: remove articles, plural endings, conjugation notes, grammar notes, example sentences, and separable-verb bars. For example, "neben (+ D.)" becomes "neben", "doch (Die Lampe ist doch toll!)" becomes "doch", "die Einweihungsfeier, -n" becomes "Einweihungsfeier", and "aus|sehen, er sieht aus, hat ausgesehen" becomes "aussehen".
