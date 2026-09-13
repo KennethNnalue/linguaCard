@@ -12,9 +12,9 @@ import type { ViewWillLeave } from '@ionic/angular/lazy';
 import { addIcons } from 'ionicons';
 import { TranslatePipe } from '@ngx-translate/core';
 import {
-  arrowBackOutline, arrowRedoOutline, arrowUndoOutline, eyeOffOutline, eyeOutline,
+  arrowBackOutline, arrowRedoOutline, arrowUndoOutline, chatbubbles, chatbubblesOutline,
   contractOutline, documentTextOutline, expandOutline, moonOutline, pause, play, repeatOutline,
-  speedometerOutline, sunnyOutline,
+  sunnyOutline,
 } from 'ionicons/icons';
 import { combineLatest, distinctUntilChanged, map } from 'rxjs';
 import {
@@ -77,9 +77,9 @@ export class PodcastPlayerPage implements OnInit, ViewWillLeave {
 
   constructor() {
     addIcons({
-      arrowBackOutline, arrowRedoOutline, arrowUndoOutline, eyeOffOutline, eyeOutline,
+      arrowBackOutline, arrowRedoOutline, arrowUndoOutline, chatbubbles, chatbubblesOutline,
       contractOutline, documentTextOutline, expandOutline, moonOutline, pause, play, repeatOutline,
-      speedometerOutline, sunnyOutline,
+      sunnyOutline,
     });
     this.destroyRef.onDestroy(() => {
       this.clearChromeAutoHide();

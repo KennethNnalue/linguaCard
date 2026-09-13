@@ -1,8 +1,8 @@
-import { ChangeDetectionStrategy, Component, ElementRef, inject, OnInit, viewChild } from '@angular/core';
+import { ChangeDetectionStrategy, Component, ElementRef, inject, OnInit, signal, viewChild } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { IonButton, IonContent, IonIcon, IonSpinner } from '@ionic/angular';
 import { addIcons } from 'ionicons';
-import { arrowBackOutline, libraryOutline, play, schoolOutline, volumeHighOutline } from 'ionicons/icons';
+import { arrowBackOutline, closeOutline, documentTextOutline, libraryOutline, play, schoolOutline, volumeHighOutline } from 'ionicons/icons';
 import type { PodcastPreparationVocabulary } from '@lingua-card/shared/domain';
 import { TranslatePipe } from '@ngx-translate/core';
 import { ReviewPlayerService } from '../../../review/services/review-player.service';
@@ -13,16 +13,18 @@ import { VaultV2Store } from '../../../vault/store/vault-v2.store';
 import { OfflineImageDirective } from '../../../../shared/image/offline-image.directive';
 import { ArticleBadgeComponent } from '../../../../shared/components/article-badge/article-badge.component';
 import { WordAudioService } from '../../../../shared/audio/word-audio.service';
+import { PodcastTranscriptComponent } from '../../components/podcast-transcript/podcast-transcript.component';
 
 @Component({
   selector: 'lc-podcast-preparation', standalone: true,
-  imports: [ArticleBadgeComponent, IonButton, IonContent, IonIcon, IonSpinner, OfflineImageDirective, TranslatePipe],
+  imports: [ArticleBadgeComponent, IonButton, IonContent, IonIcon, IonSpinner, OfflineImageDirective, PodcastTranscriptComponent, TranslatePipe],
   providers: [PodcastCatalogueStore], templateUrl: './podcast-preparation.page.html',
   styleUrls: ['./podcast-preparation.page.scss', './podcast-preparation-actions.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class PodcastPreparationPage implements OnInit {
   readonly store = inject(PodcastCatalogueStore);
+  readonly transcriptOpen = signal(false);
   private readonly route = inject(ActivatedRoute);
   private readonly router = inject(Router);
   private readonly reviewPlayer = inject(ReviewPlayerService);
@@ -32,7 +34,7 @@ export class PodcastPreparationPage implements OnInit {
   private readonly wordAudio = inject(WordAudioService);
   private readonly wordList = viewChild<ElementRef<HTMLElement>>('wordList');
   constructor() {
-    addIcons({ arrowBackOutline, libraryOutline, play, schoolOutline, volumeHighOutline });
+    addIcons({ arrowBackOutline, closeOutline, documentTextOutline, libraryOutline, play, schoolOutline, volumeHighOutline });
   }
   ngOnInit(): void { this.store.loadPreparation(this.route.snapshot.paramMap.get('episodeId') ?? ''); }
   goBack(topicId: string): void { void this.router.navigate(['/podcasts/topics', topicId]); }
@@ -42,6 +44,13 @@ export class PodcastPreparationPage implements OnInit {
       queryParams: { autoplay: '1' },
     });
   }
+  openTranscript(): void {
+    const episodeId = this.store.preparation()?.episode.id;
+    if (!episodeId) return;
+    this.transcriptOpen.set(true);
+    this.store.loadTranscript(episodeId);
+  }
+  closeTranscript(): void { this.transcriptOpen.set(false); }
   async reviewWords(): Promise<void> {
     const preparation = this.store.preparation();
     if (!preparation?.readiness.learnFirstCount) {

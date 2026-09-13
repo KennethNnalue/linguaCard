@@ -39,15 +39,14 @@ ion-content { --background:#050806; }
 .transport .seek ion-icon { font-size:1.45rem; }
 .transport .seek span { font-size:.6rem; font-weight:700; line-height:1; letter-spacing:.02em; }
 .transport .play { width:68px; height:68px; --background:white; --background-activated:#f2cf67; --box-shadow:0 10px 28px rgba(0,0,0,.3); --color:#102119; font-size:1.35rem; }
-.secondary-controls { display:grid; grid-template-columns:repeat(5,minmax(0,1fr)); align-items:start; gap:4px; padding-top:8px; border-top:1px solid rgba(255,255,255,.08); }
-.secondary-controls ion-button { width:100%; min-width:0; height:52px; margin:0; --background:transparent; --border-radius:#{t.$lc-radius-md}; --color:rgba(255,255,255,.66); font-size:1.08rem; }
-.secondary-controls ion-button::part(native) { display:flex; flex-direction:column; gap:3px; min-width:0; padding:4px 2px; }
-.secondary-controls ion-button ion-icon { flex:none; font-size:1.12rem; }
-.secondary-controls ion-button small { display:block; width:100%; overflow:hidden; font-size:.56rem; font-weight:650; line-height:1; text-overflow:ellipsis; white-space:nowrap; }
-.secondary-controls .speed span { position:absolute; top:4px; right:7px; padding:1px 3px; border-radius:t.$lc-radius-full; background:rgba(255,255,255,.12); font-size:.48rem; font-weight:800; line-height:1.2; }
-.secondary-controls ion-button.active { --background:rgba(242,207,103,.12); --color:#f2cf67; }
+.secondary-controls { display:grid; grid-template-columns:repeat(5,minmax(0,1fr)); justify-items:center; gap:4px; padding-top:12px; border-top:1px solid rgba(255,255,255,.1); }
+.secondary-controls ion-button { width:48px; min-width:44px; height:48px; margin:0; --background:transparent; --background-hover:rgba(255,255,255,.1); --background-activated:rgba(255,255,255,.16); --border-radius:50%; --color:rgba(255,255,255,.76); }
+.secondary-controls ion-button::part(native) { min-width:44px; padding:0; }
+.secondary-controls ion-button ion-icon { font-size:1.4rem; }
+.secondary-controls .speed span { font-size:.92rem; font-weight:750; letter-spacing:-.04em; font-variant-numeric:tabular-nums; }
+.secondary-controls ion-button.active { --background:rgba(242,207,103,.16); --color:#f2cf67; }
 .secondary-controls .repeat-control { position:relative; }
-.repeat-mode-badge { position:absolute; top:3px; right:7px; display:grid; min-width:14px; height:14px; place-items:center; padding:0 3px; border:1px solid #050806; border-radius:t.$lc-radius-full; background:#f2cf67; color:#102119; font-size:.52rem; font-weight:800; line-height:1; }
+.repeat-mode-badge { position:absolute; top:2px; right:1px; display:grid; min-width:15px; height:15px; place-items:center; padding:0 3px; border:1px solid #050806; border-radius:t.$lc-radius-full; background:#f2cf67; color:#102119; font-size:.55rem; font-weight:800; line-height:1; }
 .progress-error { position:absolute; z-index:3; inset:auto 18px 8px; color:var(--ion-color-danger,#ef6b68); text-align:center; }
 .immersive-status { position:absolute; z-index:4; top:calc(76px + var(--player-safe-top)); left:50%; width:max-content; max-width:calc(100% - 32px); margin:0; transform:translateX(-50%); padding:8px 14px; border-radius:t.$lc-radius-full; background:rgba(5,8,6,.9); color:white; font-size:.8rem; text-align:center; }
 .state { display:flex; height:100%; align-items:center; justify-content:center; gap:10px; padding:30px; color:white; text-align:center; }
@@ -158,8 +157,7 @@ ion-content { --background:#050806; }
     gap:3px;
     border:0;
   }
-  .secondary-controls ion-button { width:58px; height:46px; }
-  .secondary-controls ion-button small { font-size:.5rem; }
+  .secondary-controls ion-button { width:46px; height:46px; }
   .progress-error { right:calc(12px + var(--player-safe-right)); bottom:calc(48px + var(--player-safe-bottom)); left:calc(12px + var(--player-safe-left)); }
   .immersive-status { top:calc(58px + var(--player-safe-top)); }
 

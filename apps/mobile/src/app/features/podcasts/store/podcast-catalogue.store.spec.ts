@@ -1,7 +1,7 @@
 import { signal } from '@angular/core';
 import { TestBed } from '@angular/core/testing';
-import type { PodcastEpisodeActivity, PodcastLibraryFeaturedEpisode, PodcastLibraryResponse, PodcastLibraryTopic } from '@lingua-card/shared/domain';
-import { Subject, of } from 'rxjs';
+import type { PodcastEpisodeActivity, PodcastEpisodePlayer, PodcastLibraryFeaturedEpisode, PodcastLibraryResponse, PodcastLibraryTopic } from '@lingua-card/shared/domain';
+import { Subject, of, throwError } from 'rxjs';
 import { AuthService } from '../../../core/services/auth.service';
 import { LocalDataService } from '../../../core/services/local-data.service';
 import { SettingsStore } from '../../settings/store/settings.store';
@@ -19,6 +19,40 @@ const topic: PodcastLibraryTopic = {
   targetLanguage: 'de', translationLanguage: 'en', minimumLevel: 'A2', maximumLevel: 'A2',
   episodeCount: 1, totalDurationMs: 60_000, thumbnail,
 };
+
+const transcriptEpisode: PodcastEpisodePlayer = {
+  id: 'episode-1', topicId: topic.id, topicTitle: topic.title,
+  topicTitleTranslation: topic.titleTranslation, title: 'A conversation',
+  titleTranslation: 'A conversation', audioUrl: '/episode.mp3', audioDurationMs: 60_000,
+  audioVersion: 1, thumbnail, speakers: [{ id: 'speaker-1', key: 'host', name: 'Mia' }],
+  turns: [{ id: 'turn-1', speakerId: 'speaker-1', position: 0, targetText: 'Hallo!',
+    translation: 'Hello!', startMs: 0, endMs: 1000, wordTimings: [] }],
+  progress: null, playbackContext: {
+    firstEpisodeId: 'episode-1', previousEpisodeId: null, nextEpisodeId: null, nextTopic: null,
+  },
+};
+
+describe('PodcastCatalogueStore transcript preview', () => {
+  it('shows a cached transcript before playback when the network is unavailable', async () => {
+    const getPodcastPlayer = jest.fn(async () => transcriptEpisode);
+    const getPlayer = jest.fn(() => throwError(() => new Error('Offline')));
+    TestBed.configureTestingModule({ providers: [
+      PodcastCatalogueStore,
+      { provide: PodcastApiService, useValue: { getPlayer } },
+      { provide: LocalDataService, useValue: { getPodcastPlayer } },
+      { provide: AuthService, useValue: { currentUser: () => ({ id: 'learner' }) } },
+      { provide: SettingsStore, useValue: {} },
+    ] });
+    const store = TestBed.inject(PodcastCatalogueStore);
+
+    store.loadTranscript('episode-1');
+    await waitFor(() => store.transcriptStatus() === 'success');
+
+    expect(store.transcriptEpisode()?.turns[0].targetText).toBe('Hallo!');
+    expect(getPodcastPlayer).toHaveBeenCalledWith('learner', 'episode-1');
+    expect(getPlayer).toHaveBeenCalledWith('episode-1');
+  });
+});
 
 describe('PodcastCatalogueStore level selection', () => {
   afterEach(() => {

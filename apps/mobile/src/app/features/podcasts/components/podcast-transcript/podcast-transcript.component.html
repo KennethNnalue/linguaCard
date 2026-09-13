@@ -12,11 +12,11 @@
 
   <ion-list lines="none">
     @for (turn of episode().turns; track turn.id) {
-      <ion-item button detail="false" class="transcript-turn"
+      <ion-item [button]="!readOnly()" detail="false" class="transcript-turn"
         [class.transcript-turn--active]="turn.id === currentTurnId()"
         [attr.aria-current]="turn.id === currentTurnId() ? 'true' : null"
-        (click)="turnSelected.emit(turn.startMs)">
-        <ion-icon slot="start" name="play-circle-outline" aria-hidden="true" />
+        (click)="!readOnly() && turnSelected.emit(turn.startMs)">
+        @if (!readOnly()) { <ion-icon slot="start" name="play-circle-outline" aria-hidden="true" /> }
         <ion-label>
           <strong>{{ speakerNames().get(turn.speakerId) ?? ('podcasts.player.unknownSpeaker' | translate) }}</strong>
           <p class="target-text">{{ turn.targetText }}</p>

@@ -2,7 +2,7 @@ import { computed, inject } from '@angular/core';
 import { patchState, signalStore, withComputed, withMethods, withState } from '@ngrx/signals';
 import { rxMethod } from '@ngrx/signals/rxjs-interop';
 import type {
-  CefrLevel, OnboardingLevel, PodcastEpisodeActivity, PodcastEpisodeCompletion, PodcastEpisodePreparation,
+  CefrLevel, OnboardingLevel, PodcastEpisodeActivity, PodcastEpisodeCompletion, PodcastEpisodePlayer, PodcastEpisodePreparation,
   PodcastLibraryFeaturedEpisode, PodcastLibraryLevel, PodcastLibraryResponse, PodcastLibraryTopic, PodcastTopicDetail,
 } from '@lingua-card/shared/domain';
 import { EMPTY, catchError, firstValueFrom, pipe, switchMap, tap } from 'rxjs';
@@ -43,6 +43,8 @@ interface PodcastCatalogueState {
   selectedLevel: PodcastLibraryLevel;
   topic: PodcastTopicDetail | null;
   preparation: PodcastEpisodePreparation | null;
+  transcriptEpisode: PodcastEpisodePlayer | null;
+  transcriptStatus: LoadState;
   completion: PodcastEpisodeCompletion | null;
   status: LoadState;
   error: string | null;
@@ -52,7 +54,8 @@ interface PodcastCatalogueState {
 
 const initialState: PodcastCatalogueState = {
   topics: [], continueListening: null, recentEpisodes: [], suggestedEpisodes: [], selectedLevel: 'A1', topic: null,
-  preparation: null, completion: null, status: 'idle', error: null,
+  preparation: null, transcriptEpisode: null, transcriptStatus: 'idle',
+  completion: null, status: 'idle', error: null,
   preparationCollectionId: null, preparationMutationStatus: 'idle',
 };
 
@@ -160,6 +163,23 @@ export const PodcastCatalogueStore = signalStore(
           if (userId) await localData.setPodcastPreparation(userId, preparation);
         } catch {
           if (!cached) patchState(store, { status: 'error', error: 'Could not prepare this episode.' });
+        }
+      })();
+    },
+    loadTranscript(episodeId: string): void {
+      if (store.transcriptEpisode()?.id === episodeId || store.transcriptStatus() === 'loading') return;
+      patchState(store, { transcriptEpisode: null, transcriptStatus: 'loading' });
+      void (async () => {
+        const userId = auth.currentUser()?.id;
+        let cached: PodcastEpisodePlayer | null = null;
+        try { if (userId) cached = await localData.getPodcastPlayer(userId, episodeId); } catch { /* Try the API. */ }
+        if (cached) patchState(store, { transcriptEpisode: cached, transcriptStatus: 'success' });
+        try {
+          const episode = await firstValueFrom(api.getPlayer(episodeId));
+          patchState(store, { transcriptEpisode: episode, transcriptStatus: 'success' });
+          if (userId) await localData.setPodcastPlayer(userId, episode);
+        } catch {
+          if (!cached) patchState(store, { transcriptStatus: 'error' });
         }
       })();
     },

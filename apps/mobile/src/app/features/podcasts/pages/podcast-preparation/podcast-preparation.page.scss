@@ -20,6 +20,11 @@ ion-content { --background:var(--bg); --color:var(--text); }
 .actions ion-button { min-height:52px; --border-radius:#{t.$lc-radius-full}; font-weight:700; }
 .primary { --background:var(--lc-ss-sage); --color:#102119; }
 .secondary { --border-color:var(--line); --background:var(--surface); --color:var(--text); }
+.transcript-action { display:block; width:calc(100% - 36px); min-height:44px; margin:0 18px 20px; --color:var(--lc-ss-premium-star); font-weight:650; }
+.transcript-overlay { position:fixed; z-index:20; inset:0; background:#07100b; }
+.transcript-loading { display:flex; height:100%; flex-direction:column; align-items:center; justify-content:center; color:white; }
+.transcript-loading ion-button { position:absolute; top:calc(12px + env(safe-area-inset-top, 0px)); right:14px; width:44px; height:44px; --color:white; }
+.transcript-loading p { display:flex; align-items:center; gap:10px; }
 .words { margin:28px 18px; }
 .words h2 { margin-top:24px; }
 .words article { display:flex; align-items:flex-start; gap:10px; padding:14px 0; border-top:1px solid var(--line); }

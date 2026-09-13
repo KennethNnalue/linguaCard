@@ -75,9 +75,7 @@
         <div class="secondary-controls">
           <ion-button class="speed" fill="clear" shape="round" (click)="changeSpeed()"
             [attr.aria-label]="'podcasts.player.playbackSpeed' | translate:{ speed: store.speed() }">
-            <ion-icon name="speedometer-outline" />
             <span aria-hidden="true">{{ store.speed() }}×</span>
-            <small aria-hidden="true">{{ 'podcasts.player.speedLabel' | translate }}</small>
           </ion-button>
           <ion-button class="repeat-control" fill="clear" shape="round" (click)="toggleRepeat()"
             [class.active]="store.repeatMode() !== 'off'"
@@ -87,26 +85,22 @@
             @if (store.repeatMode() !== 'off') {
               <span class="repeat-mode-badge" aria-hidden="true">{{ store.repeatMode() === 'episode' ? '1' : '∞' }}</span>
             }
-            <small aria-hidden="true">{{ 'podcasts.player.repeatLabel' | translate }}</small>
           </ion-button>
           <ion-button fill="clear" shape="round" (click)="toggleSleepAllowed()"
             [class.active]="screenAwake.isKeepingScreenAwake()"
             [attr.aria-pressed]="screenAwake.isKeepingScreenAwake()"
             [attr.aria-label]="(screenAwake.isSleepAllowed() ? 'podcasts.player.keepScreenAwake' : 'podcasts.player.allowScreenSleep') | translate">
             <ion-icon [name]="screenAwake.isSleepAllowed() ? 'moon-outline' : 'sunny-outline'" />
-            <small aria-hidden="true">{{ 'podcasts.player.awakeLabel' | translate }}</small>
           </ion-button>
           <ion-button fill="clear" shape="round" (click)="toggleSubtitles()"
             [class.active]="store.translationMode() !== 'target'"
             [attr.aria-pressed]="store.translationMode() !== 'target'"
             [attr.aria-label]="(store.translationMode() === 'target' ? 'podcasts.player.showSubtitles' : 'podcasts.player.hideSubtitles') | translate">
-            <ion-icon [name]="store.translationMode() === 'target' ? 'eye-outline' : 'eye-off-outline'" />
-            <small aria-hidden="true">{{ 'podcasts.player.subtitlesLabel' | translate }}</small>
+            <ion-icon [name]="store.translationMode() === 'target' ? 'chatbubbles-outline' : 'chatbubbles'" />
           </ion-button>
           <ion-button class="transcript-control" fill="clear" shape="round" (click)="openTranscript()"
             [attr.aria-label]="'podcasts.player.openTranscript' | translate">
             <ion-icon name="document-text-outline" />
-            <small aria-hidden="true">{{ 'podcasts.player.transcriptLabel' | translate }}</small>
           </ion-button>
         </div>
       </section>

@@ -18,6 +18,7 @@ import { closeOutline, playCircleOutline } from 'ionicons/icons';
 export class PodcastTranscriptComponent implements AfterViewInit {
   readonly episode = input.required<PodcastEpisodePlayer>();
   readonly currentTurnId = input<string | null>(null);
+  readonly readOnly = input(false);
   readonly dismissed = output<void>();
   readonly turnSelected = output<number>();
   readonly speakerNames = computed(() => new Map(

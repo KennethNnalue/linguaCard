@@ -1,5 +1,6 @@
 <ion-content>
-  <main class="prep-page">
+  <main class="prep-page" [attr.inert]="transcriptOpen() ? '' : null"
+    [attr.aria-hidden]="transcriptOpen() ? 'true' : null">
     @if (store.preparation(); as prep) {
       <header class="scene">
         <img [lcOfflineSrc]="prep.episode.thumbnail.heroUrl" [alt]="prep.episode.thumbnail.accessibilityDescription" />
@@ -39,6 +40,10 @@
           <ion-icon slot="start" name="play" /> Listen now
         </ion-button>
       </div>
+      <ion-button class="transcript-action" fill="clear" (click)="openTranscript()">
+        <ion-icon slot="start" name="document-text-outline" />
+        {{ 'podcasts.player.openTranscript' | translate }}
+      </ion-button>
 
       @if (prep.readiness.learnFirstCount && store.hasSuggestedVocabularyToAdd() && !store.preparationCollectionId()) {
         <ion-button class="learn-action" fill="outline" expand="block"
@@ -103,4 +108,24 @@
       <p class="state">{{store.error()}}</p>
     }
   </main>
+  @if (transcriptOpen()) {
+    <div class="transcript-overlay">
+      @if (store.transcriptEpisode(); as episode) {
+        <lc-podcast-transcript [episode]="episode" [readOnly]="true" (dismissed)="closeTranscript()" />
+      } @else {
+        <div class="transcript-loading" role="dialog" aria-modal="true"
+          [attr.aria-label]="'podcasts.player.transcriptTitle' | translate">
+          <ion-button fill="clear" shape="round" (click)="closeTranscript()"
+            [attr.aria-label]="'podcasts.player.closeTranscript' | translate">
+            <ion-icon slot="icon-only" name="close-outline" />
+          </ion-button>
+          @if (store.transcriptStatus() === 'error') {
+            <p role="alert">{{ 'podcasts.player.errors.loadEpisode' | translate }}</p>
+          } @else {
+            <p><ion-spinner name="crescent" /> {{ 'podcasts.player.loadingConversation' | translate }}</p>
+          }
+        </div>
+      }
+    </div>
+  }
 </ion-content>
