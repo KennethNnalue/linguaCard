@@ -1,4 +1,51 @@
+import { ConflictException } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
+import { Test } from '@nestjs/testing';
+import { ElevenLabsDialogueAdapter } from './elevenlabs-dialogue.adapter';
 import { selectGenderedVoiceIds } from './elevenlabs-dialogue.adapter';
+
+describe('ElevenLabs voice discovery', () => {
+  afterEach(() => jest.restoreAllMocks());
+
+  it('includes available default voices without requiring a native-language label', async () => {
+    jest.spyOn(globalThis, 'fetch').mockImplementation(async input => {
+      const url = new URL(String(input));
+      const voices = url.searchParams.has('voice_type') || url.searchParams.has('language')
+        ? []
+        : [
+          { voice_id: 'female-default', labels: { gender: 'female', language: 'en' } },
+          { voice_id: 'male-default', labels: { gender: 'male', language: 'en' } },
+        ];
+      return Response.json({ voices, has_more: false });
+    });
+    const module = await Test.createTestingModule({
+      providers: [
+        ElevenLabsDialogueAdapter,
+        { provide: ConfigService, useValue: { get: () => ({ elevenLabsApiKey: 'test-key' }) } },
+      ],
+    }).compile();
+    const adapter = module.get(ElevenLabsDialogueAdapter);
+
+    await expect(adapter.resolveVoiceIds([
+      { gender: 'female', voiceId: '' },
+      { gender: 'male', voiceId: '' },
+    ], 'de', ['old-female', 'old-male'])).resolves.toEqual(['female-default', 'male-default']);
+  });
+
+  it('reports a voice-pool conflict when the account has no matching voices', async () => {
+    jest.spyOn(globalThis, 'fetch').mockResolvedValue(Response.json({ voices: [], has_more: false }));
+    const module = await Test.createTestingModule({
+      providers: [
+        ElevenLabsDialogueAdapter,
+        { provide: ConfigService, useValue: { get: () => ({ elevenLabsApiKey: 'test-key' }) } },
+      ],
+    }).compile();
+    const adapter = module.get(ElevenLabsDialogueAdapter);
+
+    await expect(adapter.resolveVoiceIds([{ gender: 'female', voiceId: '' }], 'de'))
+      .rejects.toBeInstanceOf(ConflictException);
+  });
+});
 
 describe('ElevenLabs gendered voice selection', () => {
   const configured = { female: ['preferred-female'], male: [] };

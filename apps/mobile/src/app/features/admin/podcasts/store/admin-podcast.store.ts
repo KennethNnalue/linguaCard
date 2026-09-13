@@ -261,7 +261,7 @@ export const AdminPodcastStore = signalStore(
                   mutationStatus: isPending ? 'loading' : failed ? 'error' : 'success',
                   error: !current ? 'The generated episode could not be found.'
                     : current.status === 'failed' ? current.generationError || 'Episode generation failed.' : null,
-                  success: isPending ? 'Episode generation is in progress.'
+                  success: isPending ? null
                     : failed ? null
                       : 'Episode conversation is ready. Add artwork and create the audio next.',
                 });

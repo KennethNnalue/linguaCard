@@ -151,13 +151,28 @@ export class AdminPodcastTopicsPage implements OnInit {
       trashOutline
     });
     effect(() => {
+      const error = this.store.error();
+      if (!error) return;
+      untracked(() => {
+        void this.notifications.present({
+          message: error, duration: 6000, color: 'danger',
+          buttons: [{ text: 'Dismiss', role: 'cancel' }],
+        });
+        this.store.clearError();
+      });
+    });
+    effect(() => {
+      const success = this.store.success();
+      if (!success) return;
+      untracked(() => {
+        void this.notifications.present({ message: success, duration: 3000, color: 'success' });
+        this.store.clearSuccess();
+      });
+    });
+    effect(() => {
       const id = this.store.completedTranscriptEpisodeId();
       if (!id || this.view() !== 'new-episode') return;
       untracked(() => {
-        void this.notifications.present({
-          message: this.store.success() ?? 'Transcript saved successfully.',
-          duration: 3000, color: 'success',
-        });
         void this.router.navigate(['/admin/podcasts', this.topicId(), 'episodes', id, 'review']);
       });
     });

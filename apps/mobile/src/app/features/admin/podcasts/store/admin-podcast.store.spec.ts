@@ -128,6 +128,27 @@ describe('AdminPodcastStore transcript completion', () => {
     expect(present).toHaveBeenCalledWith(expect.objectContaining({ color: 'success' }));
   });
 
+  it('shows operation errors in a notification from the current scroll position', () => {
+    const present = jest.fn().mockResolvedValue(undefined);
+    TestBed.configureTestingModule({ providers: [
+      { provide: Router, useValue: { navigate: jest.fn().mockResolvedValue(true) } },
+      { provide: ActivatedRoute, useValue: { snapshot: { paramMap: { get: () => null } } } },
+      { provide: AppNotificationService, useValue: { present } },
+      { provide: PodcastTranscriptClipboardService, useValue: {} },
+      { provide: AlertController, useValue: {} },
+    ] });
+    const { store } = setup();
+    TestBed.runInInjectionContext(() => new AdminPodcastTopicsPage());
+
+    store.setLocalError('Could not choose new voices.');
+    TestBed.tick();
+
+    expect(present).toHaveBeenCalledWith(expect.objectContaining({
+      message: 'Could not choose new voices.', color: 'danger',
+    }));
+    expect(store.error()).toBeNull();
+  });
+
   it('shows conflicts without committing and allows a corrected upload', () => {
     const { api, store } = setup();
     api.previewTranscript.mockReturnValueOnce(of({ ...preview, status: 'conflicts', conflicts: [{
@@ -198,7 +219,7 @@ describe('AdminPodcastStore transcript completion', () => {
     TestBed.configureTestingModule({ providers: [
       { provide: Router, useValue: { navigate } },
       { provide: ActivatedRoute, useValue: { snapshot: { paramMap: { get: () => null } } } },
-      { provide: AppNotificationService, useValue: {} },
+      { provide: AppNotificationService, useValue: { present: jest.fn().mockResolvedValue(undefined) } },
       { provide: PodcastTranscriptClipboardService, useValue: {} },
       { provide: AlertController, useValue: {} },
     ] });

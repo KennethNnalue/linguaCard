@@ -1,4 +1,4 @@
-import { Injectable, Logger, ServiceUnavailableException } from '@nestjs/common';
+import { ConflictException, Injectable, Logger, ServiceUnavailableException } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import type { AiConfig } from '../../config/ai.config';
 import type { PodcastVoiceGender } from '@lingua-card/shared/domain';
@@ -50,9 +50,7 @@ export class ElevenLabsDialogueAdapter {
   private readonly modelId: string;
   private readonly configuredVoiceIds: Readonly<Record<PodcastVoiceGender, readonly string[]>>;
   private readonly languageVoicePools: Readonly<Record<string, Readonly<Record<PodcastVoiceGender, readonly string[]>>>>;
-  private readonly discoveredVoices = new Map<string, {
-    voices: readonly ElevenLabsVoiceCandidate[]; expiresAt: number;
-  }>();
+  private discoveredVoices: { voices: readonly ElevenLabsVoiceCandidate[]; expiresAt: number } | null = null;
 
   constructor(config: ConfigService) {
     const ai = config.get<AiConfig>('ai');
@@ -75,11 +73,11 @@ export class ElevenLabsDialogueAdapter {
     const configuredForLanguage = this.languageVoicePools[languageCode] ?? this.configuredVoiceIds;
     const configured = selectGenderedVoiceIds(speakers, configuredForLanguage, [], randomInt, previousVoiceIds)
       ?? selectGenderedVoiceIds(speakers, configuredForLanguage, []);
-    let discovered = this.discoveredVoices.get(languageCode);
+    let discovered = this.discoveredVoices;
     if (!discovered || discovered.expiresAt <= Date.now()) {
       try {
-        discovered = { voices: await this.loadVoices(languageCode), expiresAt: Date.now() + 60 * 60 * 1000 };
-        this.discoveredVoices.set(languageCode, discovered);
+        discovered = { voices: await this.loadVoices(), expiresAt: Date.now() + 60 * 60 * 1000 };
+        this.discoveredVoices = discovered;
       } catch (error) {
         if (configured) return configured;
         throw error;
@@ -92,8 +90,8 @@ export class ElevenLabsDialogueAdapter {
       speakers, configuredForLanguage, discovered.voices,
     );
     if (!selected) {
-      throw new ServiceUnavailableException(
-        'ElevenLabs does not provide enough gender-matched voices for this dialogue',
+      throw new ConflictException(
+        'Add enough distinct gender-matched voices in ElevenLabs for this dialogue',
       );
     }
     return selected;
@@ -112,7 +110,7 @@ export class ElevenLabsDialogueAdapter {
     return { id: value['voice_id'], gender };
   }
 
-  private async loadVoices(languageCode: string): Promise<readonly ElevenLabsVoiceCandidate[]> {
+  private async loadVoices(): Promise<readonly ElevenLabsVoiceCandidate[]> {
     const controller = new AbortController();
     const timeout = setTimeout(() => controller.abort(), ELEVENLABS_REQUEST_TIMEOUT_MS);
     try {
@@ -122,8 +120,6 @@ export class ElevenLabsDialogueAdapter {
       do {
         const url = new URL('https://api.elevenlabs.io/v2/voices');
         url.searchParams.set('page_size', '100');
-        url.searchParams.set('language', languageCode);
-        url.searchParams.set('voice_type', 'saved');
         if (nextPageToken) url.searchParams.set('next_page_token', nextPageToken);
         const response = await fetch(url, {
           headers: { 'xi-api-key': this.apiKey }, signal: controller.signal,
