@@ -75,6 +75,15 @@ export class PodcastEpisodeEntity {
   @Column({ type: 'jsonb', nullable: true })
   generationInput!: PodcastEpisodeGenerationInput | null;
 
+  @Column({ type: 'varchar', length: 16, default: 'idle' })
+  audioGenerationStatus!: 'idle' | 'generating' | 'failed';
+
+  @Column({ type: 'varchar', length: 36, nullable: true })
+  audioGenerationAttemptId!: string | null;
+
+  @Column({ type: 'integer', nullable: true })
+  approvedAudioVersion!: number | null;
+
   @Column({ type: 'varchar', length: 160, nullable: true })
   elevenLabsProjectId!: string | null;
 

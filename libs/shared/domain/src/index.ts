@@ -1711,6 +1711,10 @@ export interface AdminPodcastEpisodeListItem {
   audioDurationMs: number;
   audioUrl: string | null;
   audioVersion: number;
+  contentVersion?: number;
+  audioGenerationStatus?: 'idle' | 'generating' | 'failed';
+  approvedAudioVersion?: number | null;
+  generationInput?: { vocabulary: string[]; direction?: string } | null;
   generationError: string | null;
   generationRequestId: string | null;
   elevenLabsProjectId: string | null;
@@ -1992,6 +1996,10 @@ export interface AdminCreatePodcastEpisodeDto {
 
 export interface AdminCreatePodcastEpisodeDraftDto {
   requestId: string;
+  title?: string;
+  titleTranslation?: string;
+  vocabulary?: string[];
+  direction?: string;
 }
 
 export interface AdminUpdatePodcastEpisodeDto {

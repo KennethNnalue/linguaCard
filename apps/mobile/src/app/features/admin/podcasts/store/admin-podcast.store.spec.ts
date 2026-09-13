@@ -44,6 +44,9 @@ describe('AdminPodcastStore transcript completion', () => {
       getTranscript: jest.fn(() => of({ episodeId: 'episode', speakers: payload.speakers, turns: payload.turns })),
       previewTranscript: jest.fn(() => of(preview)),
       generateTranscript: jest.fn(() => of({ payload, preview })),
+      updateDraftInput: jest.fn(() => of(topic.episodes[0])),
+      createEpisodeDraft: jest.fn(() => of(topic.episodes[0])),
+      approveAudio: jest.fn(() => of(topic.episodes[0])),
       commitTranscript: jest.fn(() => of(result)),
       deleteEpisode: jest.fn(() => of(undefined)),
       publishVocabularyCollection: jest.fn(() => of({
@@ -78,6 +81,28 @@ describe('AdminPodcastStore transcript completion', () => {
     expect(store.transcriptPayload()).toBeNull();
     expect(store.success()).toContain('successfully');
     expect(store.topics()[0].episodes[0]).toMatchObject({ hasTranscript: true, title: result.title, estimatedDurationMs: 1000 });
+  });
+
+  it('saves a draft without starting transcript or audio generation', () => {
+    const { api, store } = setup();
+    store.createEpisodeDraft({
+      topicId: 'topic', dto: { requestId: 'request', vocabulary: ['Hallo'], title: 'Greeting' },
+    });
+    expect(api.createEpisodeDraft).toHaveBeenCalledWith('topic', {
+      requestId: 'request', vocabulary: ['Hallo'], title: 'Greeting',
+    });
+    expect(api.generateTranscript).not.toHaveBeenCalled();
+    expect(store.lastCreatedEpisodeId()).toBe('episode');
+  });
+
+  it('saves edited draft input before requesting transcript generation', () => {
+    const { api, store } = setup();
+    store.generateTranscript({ episodeId: 'episode', vocabulary: ['Hallo'], direction: 'Short greeting' });
+    expect(api.updateDraftInput).toHaveBeenCalledWith('episode', {
+      vocabulary: ['Hallo'], direction: 'Short greeting',
+      title: undefined, titleTranslation: undefined,
+    });
+    expect(api.generateTranscript).toHaveBeenCalledWith('episode', ['Hallo'], 'Short greeting');
   });
 
   it.each(['import', 'generate'])('advances %s to review and announces success', path => {

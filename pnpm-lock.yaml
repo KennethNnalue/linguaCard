@@ -243,6 +243,9 @@ importers:
       '@ionic/angular-toolkit':
         specifier: ^12.0.0
         version: 12.3.0(chokidar@4.0.3)
+      '@jest/globals':
+        specifier: 30.5.1
+        version: 30.5.1(supports-color@7.2.0)
       '@nestjs/cli':
         specifier: ^11.0.21
         version: 11.0.24(@types/node@26.4.1)(esbuild@0.28.2)(postcss@8.5.27)(uglify-js@3.19.3)
@@ -10385,7 +10388,7 @@ snapshots:
 
   '@npmcli/fs@5.0.0':
     dependencies:
-      semver: 7.7.4
+      semver: 7.8.5
 
   '@npmcli/git@7.0.2':
     dependencies:
@@ -14086,7 +14089,7 @@ snapshots:
       graceful-fs: 4.2.11
       nopt: 9.0.0
       proc-log: 6.1.0
-      semver: 7.7.4
+      semver: 7.8.5
       tar: 7.5.22
       tinyglobby: 0.2.17
       undici: 6.28.0
@@ -14110,7 +14113,7 @@ snapshots:
 
   npm-install-checks@8.0.0:
     dependencies:
-      semver: 7.7.4
+      semver: 7.8.5
 
   npm-normalize-package-bin@5.0.0: {}
 

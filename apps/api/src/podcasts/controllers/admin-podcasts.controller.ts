@@ -26,6 +26,8 @@ import {
   CreatePodcastTranscriptPromptDto,
   CreateElevenLabsPodcastDto,
   UpdatePodcastEpisodeDto,
+  UpdatePodcastEpisodeDraftInputDto,
+  ApprovePodcastAudioDto,
 } from '../dto/admin-podcast.dto';
 import { AdminPodcastsService } from '../services/admin-podcasts.service';
 import { PodcastTranscriptImportService } from '../services/podcast-transcript-import.service';
@@ -78,7 +80,7 @@ export class AdminPodcastsController {
     @Param('topicId') topicId: string,
     @Body() dto: CreatePodcastEpisodeDraftDto,
   ): Promise<AdminPodcastEpisodeListItem> {
-    return this.podcasts.reserveEpisode(topicId, dto.requestId, null);
+    return this.podcasts.createDraft(topicId, dto);
   }
 
   @Post(':topicId/thumbnail')
@@ -129,6 +131,22 @@ export class AdminPodcastEpisodesController {
     @Body() dto: UpdatePodcastEpisodeDto,
   ): Promise<AdminPodcastEpisodeListItem> {
     return this.podcasts.updateEpisode(episodeId, dto);
+  }
+
+  @Patch(':episodeId/draft-input')
+  updateDraftInput(
+    @Param('episodeId') episodeId: string,
+    @Body() dto: UpdatePodcastEpisodeDraftInputDto,
+  ): Promise<AdminPodcastEpisodeListItem> {
+    return this.podcasts.updateDraftInput(episodeId, dto);
+  }
+
+  @Patch(':episodeId/audio/approve')
+  approveAudio(
+    @Param('episodeId') episodeId: string,
+    @Body() dto: ApprovePodcastAudioDto,
+  ): Promise<AdminPodcastEpisodeListItem> {
+    return this.podcasts.approveAudio(episodeId, dto.audioVersion);
   }
 
   @Delete(':episodeId')
@@ -194,6 +212,13 @@ export class AdminPodcastEpisodesController {
     @Param('episodeId') episodeId: string,
   ): Promise<AdminGeneratePodcastAudioResult> {
     return this.audioGeneration.generate(episodeId);
+  }
+
+  @Post(':episodeId/voices/recast')
+  recastVoices(
+    @Param('episodeId') episodeId: string,
+  ): Promise<AdminPodcastEpisodeListItem> {
+    return this.audioGeneration.recast(episodeId);
   }
 
   @Patch(':episodeId/publish')

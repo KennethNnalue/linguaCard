@@ -3,6 +3,7 @@ import { patchState, signalStore, withComputed, withMethods, withState } from '@
 import { rxMethod } from '@ngrx/signals/rxjs-interop';
 import type {
   AdminCreatePodcastEpisodeDto,
+  AdminCreatePodcastEpisodeDraftDto,
   AdminCreatePodcastTopicDto,
   AdminPodcastTopicListItem,
   AdminPodcastTranscriptPayload,
@@ -77,6 +78,11 @@ export interface CreateEpisodeCommand {
   dto: AdminCreatePodcastEpisodeDto;
 }
 
+export interface CreateEpisodeDraftCommand {
+  topicId: string;
+  dto: AdminCreatePodcastEpisodeDraftDto;
+}
+
 export interface UpdateEpisodeCommand {
   episodeId: string;
   dto: AdminUpdatePodcastEpisodeDto;
@@ -101,6 +107,8 @@ export interface GenerateTranscriptCommand {
   episodeId: string;
   vocabulary: string[];
   direction?: string;
+  title?: string;
+  titleTranslation?: string;
 }
 
 function pollEpisodeGeneration(
@@ -150,7 +158,10 @@ export const AdminPodcastStore = signalStore(
             ...topic,
             episodes: topic.episodes.map(episode => episode.id === episodeId
               ? { ...episode, title: result.title, titleTranslation: result.titleTranslation,
-                description: result.description, hasTranscript: true,
+                description: result.description, hasTranscript: true, status: 'draft' as const,
+                audioUrl: null, audioDurationMs: 0, audioVersion: 0,
+                contentVersion: (episode.contentVersion ?? 1) + 1,
+                approvedAudioVersion: null, audioGenerationStatus: 'idle' as const,
                 estimatedDurationMs: result.estimatedDurationMs }
               : episode),
           })),
@@ -351,18 +362,20 @@ export const AdminPodcastStore = signalStore(
         }),
       ),
     ),
-    createEpisodeDraft: rxMethod<string>(
+    createEpisodeDraft: rxMethod<CreateEpisodeDraftCommand>(
       pipe(
-        exhaustMap(topicId => {
-          patchState(store, { mutationStatus: 'loading', error: null, success: null });
-          return api.createEpisodeDraft(topicId, { requestId: crypto.randomUUID() }).pipe(
+        exhaustMap(command => {
+          patchState(store, {
+            mutationStatus: 'loading', lastCreatedEpisodeId: null, error: null, success: null,
+          });
+          return api.createEpisodeDraft(command.topicId, command.dto).pipe(
             tap(episode => patchState(store, {
-              topics: store.topics().map(topic => topic.id === topicId
+              topics: store.topics().map(topic => topic.id === command.topicId
                 ? { ...topic, episodes: [...topic.episodes, episode] }
                 : topic),
               mutationStatus: 'success',
               lastCreatedEpisodeId: episode.id,
-              success: 'Empty episode created. Upload the externally generated transcript next.',
+              success: 'Episode draft saved. Prepare its transcript when you are ready.',
             })),
             catchError(error => {
               patchState(store, {
@@ -482,7 +495,11 @@ export const AdminPodcastStore = signalStore(
             transcriptPreview: null, transcriptDetails: null, transcriptStatus: 'loading', completedTranscriptEpisodeId: null, error: null, success: null,
             transcriptRevision: store.transcriptRevision() + 1,
           });
-          return api.generateTranscript(command.episodeId, command.vocabulary, command.direction).pipe(
+          return api.updateDraftInput(command.episodeId, {
+            vocabulary: command.vocabulary, direction: command.direction,
+            title: command.title, titleTranslation: command.titleTranslation,
+          }).pipe(
+            switchMap(() => api.generateTranscript(command.episodeId, command.vocabulary, command.direction)),
             exhaustMap(generated => saveTranscript(
               command.episodeId, generated.payload, generated.preview,
               'Transcript generated successfully.',
@@ -491,6 +508,33 @@ export const AdminPodcastStore = signalStore(
               patchState(store, {
                 transcriptStatus: 'error',
                 error: adminPodcastErrorMessage(error, 'Could not generate the transcript.'),
+              });
+              return EMPTY;
+            }),
+          );
+        }),
+      ),
+    ),
+    saveDraftInput: rxMethod<GenerateTranscriptCommand>(
+      pipe(
+        exhaustMap(command => {
+          patchState(store, { mutationStatus: 'loading', error: null, success: null });
+          return api.updateDraftInput(command.episodeId, {
+            vocabulary: command.vocabulary, direction: command.direction,
+            title: command.title, titleTranslation: command.titleTranslation,
+          }).pipe(
+            tap(updated => patchState(store, {
+              topics: store.topics().map(topic => ({
+                ...topic,
+                episodes: topic.episodes.map(episode => episode.id === updated.id ? updated : episode),
+              })),
+              mutationStatus: 'success',
+              success: 'Draft changes saved.',
+            })),
+            catchError(error => {
+              patchState(store, {
+                mutationStatus: 'error',
+                error: adminPodcastErrorMessage(error, 'Could not save the draft changes.'),
               });
               return EMPTY;
             }),
@@ -563,7 +607,8 @@ export const AdminPodcastStore = signalStore(
                 ...topic,
                 episodes: topic.episodes.map(episode => episode.id === episodeId
                   ? {
-                    ...episode, status: result.status, audioUrl: result.audioUrl,
+                    ...episode, status: result.status, audioGenerationStatus: 'idle',
+                    approvedAudioVersion: null, audioUrl: result.audioUrl,
                     audioDurationMs: result.audioDurationMs, audioVersion: result.audioVersion,
                     generationError: null,
                   }
@@ -572,6 +617,12 @@ export const AdminPodcastStore = signalStore(
               audioGenerationStatus: 'success',
               success: 'Audio generation finished. Listen to the result before publishing the episode.',
             })),
+            switchMap(() => api.getTranscript(episodeId).pipe(
+              tap(transcriptDetails => patchState(store, {
+                transcriptDetails, transcriptStatus: 'success',
+              })),
+              catchError(() => EMPTY),
+            )),
             catchError(error => {
               patchState(store, {
                 audioGenerationStatus: 'error',
@@ -579,6 +630,61 @@ export const AdminPodcastStore = signalStore(
                   error,
                   'Podcast audio generation failed. Review the episode and try again.',
                 ),
+              });
+              return EMPTY;
+            }),
+          );
+        }),
+      ),
+    ),
+    recastVoices: rxMethod<string>(
+      pipe(
+        exhaustMap(episodeId => {
+          patchState(store, { mutationStatus: 'loading', error: null, success: null });
+          return api.recastVoices(episodeId).pipe(
+            tap(updated => patchState(store, {
+              topics: store.topics().map(topic => ({
+                ...topic,
+                episodes: topic.episodes.map(episode => episode.id === episodeId ? updated : episode),
+              })),
+              transcriptDetails: null,
+              transcriptStatus: 'idle',
+              mutationStatus: 'success',
+              success: 'New voices were chosen. Generate audio to hear them.',
+            })),
+            switchMap(() => api.getTranscript(episodeId).pipe(
+              tap(transcriptDetails => patchState(store, {
+                transcriptDetails, transcriptStatus: 'success',
+              })),
+            )),
+            catchError(error => {
+              patchState(store, {
+                mutationStatus: 'error',
+                error: adminPodcastErrorMessage(error, 'Could not choose new voices.'),
+              });
+              return EMPTY;
+            }),
+          );
+        }),
+      ),
+    ),
+    approveAudio: rxMethod<{ episodeId: string; audioVersion: number }>(
+      pipe(
+        exhaustMap(command => {
+          patchState(store, { mutationStatus: 'loading', error: null, success: null });
+          return api.approveAudio(command.episodeId, command.audioVersion).pipe(
+            tap(approved => patchState(store, {
+              topics: store.topics().map(topic => ({
+                ...topic,
+                episodes: topic.episodes.map(episode => episode.id === approved.id ? approved : episode),
+              })),
+              mutationStatus: 'success',
+              success: 'The current audio version was approved.',
+            })),
+            catchError(error => {
+              patchState(store, {
+                mutationStatus: 'error',
+                error: adminPodcastErrorMessage(error, 'Could not approve the audio.'),
               });
               return EMPTY;
             }),

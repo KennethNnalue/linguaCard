@@ -83,7 +83,7 @@ export class ReviewSessionsService {
       .andWhere('session."startedAt"::timestamptz >= :cutoff', { cutoff: reviewHistoryCutoff().toISOString() })
       .andWhere('(clearance."clearedAt" IS NULL OR session."startedAt"::timestamptz > clearance."clearedAt")')
       .orderBy('session."startedAt"::timestamptz', 'DESC')
-      .take(Math.min(Math.max(Math.trunc(limit), 1), 500))
+      .limit(Math.min(Math.max(Math.trunc(limit), 1), 500))
       .getMany();
     return rows.map(this.toModel);
   }

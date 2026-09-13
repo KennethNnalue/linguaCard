@@ -3,14 +3,14 @@ import {
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { randomUUID } from 'node:crypto';
-import { DataSource, In, QueryFailedError, Repository } from 'typeorm';
+import { DataSource, In, IsNull, Not, QueryFailedError, Repository } from 'typeorm';
 import type {
   AdminPodcastEpisodeListItem,
   AdminPodcastTranscriptDetails,
   AdminPodcastTopicListItem,
   PodcastThumbnail,
 } from '@lingua-card/shared/domain';
-import { CreatePodcastTopicDto, UpdatePodcastEpisodeDto, UpdatePodcastTopicDto } from '../dto/admin-podcast.dto';
+import { CreatePodcastEpisodeDraftDto, CreatePodcastTopicDto, UpdatePodcastEpisodeDto, UpdatePodcastTopicDto } from '../dto/admin-podcast.dto';
 import { PodcastEpisodeEntity, PodcastEpisodeGenerationInput } from '../entities/podcast-episode.entity';
 import { PodcastThumbnailAssetEntity } from '../entities/podcast-thumbnail-asset.entity';
 import { PodcastTopicEntity } from '../entities/podcast-topic.entity';
@@ -22,6 +22,7 @@ import { podcastEpisodeExternalId, podcastExternalId } from '../domain/podcast-e
 import { StorageService } from '../../storage/storage.service';
 import { PlatformCollectionEntity } from '../../admin/platform-collection.entity';
 import { PodcastEpisodeVocabularyEntity } from '../entities/podcast-episode-vocabulary.entity';
+import { normalizePodcastVocabulary } from '../domain/podcast-transcript-prompt';
 
 const PG_UNIQUE_VIOLATION = '23505';
 
@@ -136,11 +137,23 @@ export class AdminPodcastsService {
     return this.findTopicModel(topicId);
   }
 
+  async createDraft(topicId: string, dto: CreatePodcastEpisodeDraftDto): Promise<AdminPodcastEpisodeListItem> {
+    const vocabulary = normalizePodcastVocabulary(dto.vocabulary ?? []);
+    const direction = dto.direction?.trim();
+    const generationInput = vocabulary.length || direction
+      ? { vocabulary, ...(direction ? { direction } : {}) }
+      : null;
+    return this.reserveEpisode(topicId, dto.requestId, generationInput, {
+      title: dto.title, titleTranslation: dto.titleTranslation,
+    }, 'draft');
+  }
+
   async reserveEpisode(
     topicId: string,
     requestId: string,
     generationInput: PodcastEpisodeGenerationInput | null,
     titles?: { title?: string; titleTranslation?: string },
+    initialStatus: 'draft' | 'queued' = generationInput ? 'queued' : 'draft',
   ): Promise<AdminPodcastEpisodeListItem> {
     const existing = await this.episodeRepo.findOneBy({ generationRequestId: requestId });
     if (existing) {
@@ -171,7 +184,7 @@ export class AdminPodcastsService {
           description: '',
           level: topic.level,
           position,
-          status: generationInput ? 'queued' : 'draft',
+          status: initialStatus,
           thumbnailAssetId: null,
           audioUrl: null,
           audioStoragePath: null,
@@ -183,6 +196,9 @@ export class AdminPodcastsService {
           generationError: null,
           generationRequestId: requestId,
           generationInput,
+          audioGenerationStatus: 'idle',
+          audioGenerationAttemptId: null,
+          approvedAudioVersion: null,
           elevenLabsProjectId: null,
           publishedAt: null,
         });
@@ -190,6 +206,8 @@ export class AdminPodcastsService {
       });
     } catch (error) {
       if (this.isUniqueViolation(error)) {
+        const repeated = await this.episodeRepo.findOneBy({ generationRequestId: requestId });
+        if (repeated && repeated.topicId === topicId) return this.findEpisodeModel(repeated.id);
         throw new ConflictException('An episode with this derived identifier already exists');
       }
       throw error;
@@ -198,8 +216,12 @@ export class AdminPodcastsService {
   }
 
   async findPendingGeneratedEpisodes(): Promise<PodcastEpisodeEntity[]> {
-    await this.episodeRepo.update({ status: 'generating' }, { status: 'queued' });
-    return this.episodeRepo.find({ where: { status: 'queued' } });
+    await this.episodeRepo.update({
+      status: 'generating', generationInput: Not(IsNull()), transcriptFingerprint: IsNull(),
+    }, { status: 'queued' });
+    return this.episodeRepo.find({ where: {
+      status: 'queued', generationInput: Not(IsNull()), transcriptFingerprint: IsNull(),
+    } });
   }
 
   async findEpisodeEntity(episodeId: string): Promise<PodcastEpisodeEntity> {
@@ -217,6 +239,47 @@ export class AdminPodcastsService {
     if (dto.titleTranslation !== undefined) episode.titleTranslation = dto.titleTranslation.trim();
     if (dto.description !== undefined) episode.description = dto.description.trim();
     await this.episodeRepo.save(episode);
+    return this.findEpisodeModel(episodeId);
+  }
+
+  async updateDraftInput(
+    episodeId: string,
+    dto: { vocabulary: string[]; direction?: string; title?: string; titleTranslation?: string },
+  ): Promise<AdminPodcastEpisodeListItem> {
+    await this.dataSource.transaction(async manager => {
+      const episode = await manager.findOne(PodcastEpisodeEntity, {
+        where: { id: episodeId }, lock: { mode: 'pessimistic_write' },
+      });
+      if (!episode) throw new NotFoundException(`Podcast episode ${episodeId} not found`);
+      if (episode.status === 'published' || episode.status === 'queued' || episode.status === 'generating'
+        || episode.audioGenerationStatus === 'generating') {
+        throw new ConflictException('The episode cannot be edited during generation or after publication');
+      }
+      episode.generationInput = {
+        vocabulary: normalizePodcastVocabulary(dto.vocabulary),
+        ...(dto.direction?.trim() ? { direction: dto.direction.trim() } : {}),
+      };
+      if (dto.title !== undefined) episode.title = dto.title.trim();
+      if (dto.titleTranslation !== undefined) episode.titleTranslation = dto.titleTranslation.trim();
+      await manager.save(episode);
+    });
+    return this.findEpisodeModel(episodeId);
+  }
+
+  async approveAudio(episodeId: string, audioVersion: number): Promise<AdminPodcastEpisodeListItem> {
+    await this.dataSource.transaction(async manager => {
+      const episode = await manager.findOne(PodcastEpisodeEntity, {
+        where: { id: episodeId }, lock: { mode: 'pessimistic_write' },
+      });
+      if (!episode) throw new NotFoundException(`Podcast episode ${episodeId} not found`);
+      if (episode.status !== 'ready_for_review' || !episode.audioUrl
+        || episode.audioGenerationStatus === 'generating'
+        || !Number.isInteger(audioVersion) || audioVersion !== episode.audioVersion) {
+        throw new ConflictException('The current audio version is not ready for approval');
+      }
+      episode.approvedAudioVersion = audioVersion;
+      await manager.save(episode);
+    });
     return this.findEpisodeModel(episodeId);
   }
 
@@ -383,6 +446,12 @@ export class AdminPodcastsService {
       if (!episode.audioUrl || episode.status !== 'ready_for_review') {
         throw new ConflictException('Generate and review episode audio before publishing');
       }
+      if (episode.audioGenerationStatus === 'generating') {
+        throw new ConflictException('Wait for audio generation to finish before publishing');
+      }
+      if (episode.approvedAudioVersion !== episode.audioVersion) {
+        throw new ConflictException('Approve the current audio version before publishing');
+      }
       episode.status = 'published';
       episode.publishedAt = new Date();
       await manager.save(episode);
@@ -462,6 +531,8 @@ export class AdminPodcastsService {
     thumbnail: PodcastThumbnail | null,
     publicationMetadata: EpisodePublicationMetadata | undefined,
   ): AdminPodcastEpisodeListItem {
+    const audioAttemptExpired = episode.audioGenerationStatus === 'generating'
+      && episode.updatedAt.getTime() <= Date.now() - 5 * 60 * 1000;
     return {
       id: episode.id,
       topicId: episode.topicId,
@@ -474,7 +545,14 @@ export class AdminPodcastsService {
       audioDurationMs: episode.audioDurationMs,
       audioUrl: episode.audioUrl,
       audioVersion: episode.audioVersion,
-      generationError: episode.generationError,
+      contentVersion: episode.contentVersion,
+      audioGenerationStatus: audioAttemptExpired ? 'failed' : episode.audioGenerationStatus,
+      approvedAudioVersion: episode.approvedAudioVersion,
+      generationInput: episode.generationInput
+        ? { vocabulary: episode.generationInput.vocabulary, direction: episode.generationInput.direction }
+        : null,
+      generationError: audioAttemptExpired
+        ? 'The audio attempt timed out. You can retry it.' : episode.generationError,
       generationRequestId: episode.generationRequestId,
       elevenLabsProjectId: episode.elevenLabsProjectId,
       hasTranscript: episode.transcriptFingerprint !== null,

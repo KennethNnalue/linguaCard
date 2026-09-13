@@ -2,6 +2,7 @@ import { Injectable, Logger, ServiceUnavailableException } from '@nestjs/common'
 import { ConfigService } from '@nestjs/config';
 import type { AiConfig } from '../../config/ai.config';
 import type { PodcastVoiceGender } from '@lingua-card/shared/domain';
+import { randomInt } from 'node:crypto';
 
 export interface DialogueInput {
   text: string;
@@ -48,7 +49,10 @@ export class ElevenLabsDialogueAdapter {
   private readonly apiKey: string;
   private readonly modelId: string;
   private readonly configuredVoiceIds: Readonly<Record<PodcastVoiceGender, readonly string[]>>;
-  private discoveredVoices: readonly ElevenLabsVoiceCandidate[] | null = null;
+  private readonly languageVoicePools: Readonly<Record<string, Readonly<Record<PodcastVoiceGender, readonly string[]>>>>;
+  private readonly discoveredVoices = new Map<string, {
+    voices: readonly ElevenLabsVoiceCandidate[]; expiresAt: number;
+  }>();
 
   constructor(config: ConfigService) {
     const ai = config.get<AiConfig>('ai');
@@ -58,16 +62,34 @@ export class ElevenLabsDialogueAdapter {
       female: ai?.elevenLabsFemaleVoiceIds ?? [],
       male: ai?.elevenLabsMaleVoiceIds ?? [],
     };
+    this.languageVoicePools = ai?.elevenLabsVoicePools ?? {};
   }
 
-  async resolveVoiceIds(genders: readonly PodcastVoiceGender[]): Promise<readonly string[]> {
-    if (!genders.length) return [];
-    const configured = selectGenderedVoiceIds(genders, this.configuredVoiceIds, []);
-    if (configured) return configured;
+  async resolveVoiceIds(
+    speakers: readonly { gender: PodcastVoiceGender; voiceId: string }[],
+    languageCode: string,
+    previousVoiceIds: readonly string[] = [],
+  ): Promise<readonly string[]> {
+    if (!speakers.length) return [];
     if (!this.apiKey) throw new ServiceUnavailableException('ElevenLabs is not configured');
-    if (!this.discoveredVoices) this.discoveredVoices = await this.loadVoices();
-    const selected = selectGenderedVoiceIds(
-      genders, this.configuredVoiceIds, this.discoveredVoices,
+    const configuredForLanguage = this.languageVoicePools[languageCode] ?? this.configuredVoiceIds;
+    const configured = selectGenderedVoiceIds(speakers, configuredForLanguage, [], randomInt, previousVoiceIds)
+      ?? selectGenderedVoiceIds(speakers, configuredForLanguage, []);
+    let discovered = this.discoveredVoices.get(languageCode);
+    if (!discovered || discovered.expiresAt <= Date.now()) {
+      try {
+        discovered = { voices: await this.loadVoices(languageCode), expiresAt: Date.now() + 60 * 60 * 1000 };
+        this.discoveredVoices.set(languageCode, discovered);
+      } catch (error) {
+        if (configured) return configured;
+        throw error;
+      }
+    }
+    const preferred = selectGenderedVoiceIds(
+      speakers, configuredForLanguage, discovered.voices, randomInt, previousVoiceIds,
+    );
+    const selected = preferred ?? selectGenderedVoiceIds(
+      speakers, configuredForLanguage, discovered.voices,
     );
     if (!selected) {
       throw new ServiceUnavailableException(
@@ -90,25 +112,42 @@ export class ElevenLabsDialogueAdapter {
     return { id: value['voice_id'], gender };
   }
 
-  private async loadVoices(): Promise<readonly ElevenLabsVoiceCandidate[]> {
+  private async loadVoices(languageCode: string): Promise<readonly ElevenLabsVoiceCandidate[]> {
     const controller = new AbortController();
     const timeout = setTimeout(() => controller.abort(), ELEVENLABS_REQUEST_TIMEOUT_MS);
     try {
-      const response = await fetch('https://api.elevenlabs.io/v2/voices?page_size=100', {
-        headers: { 'xi-api-key': this.apiKey },
-        signal: controller.signal,
-      });
-      if (!response.ok) {
-        throw new ServiceUnavailableException('Podcast voices could not be loaded from ElevenLabs');
-      }
-      const value: unknown = await response.json();
-      if (!isRecord(value) || !Array.isArray(value['voices'])) {
-        throw new ServiceUnavailableException('ElevenLabs returned an invalid voice list');
-      }
-      const voices = value['voices'].flatMap(voice => {
-        const candidate = this.voiceCandidate(voice);
-        return candidate ? [candidate] : [];
-      });
+      const voices: ElevenLabsVoiceCandidate[] = [];
+      let nextPageToken: string | null = null;
+      const seenPageTokens = new Set<string>();
+      do {
+        const url = new URL('https://api.elevenlabs.io/v2/voices');
+        url.searchParams.set('page_size', '100');
+        url.searchParams.set('language', languageCode);
+        url.searchParams.set('voice_type', 'saved');
+        if (nextPageToken) url.searchParams.set('next_page_token', nextPageToken);
+        const response = await fetch(url, {
+          headers: { 'xi-api-key': this.apiKey }, signal: controller.signal,
+        });
+        if (!response.ok) {
+          throw new ServiceUnavailableException('Podcast voices could not be loaded from ElevenLabs');
+        }
+        const value: unknown = await response.json();
+        if (!isRecord(value) || !Array.isArray(value['voices'])) {
+          throw new ServiceUnavailableException('ElevenLabs returned an invalid voice list');
+        }
+        for (const voice of value['voices']) {
+          const candidate = this.voiceCandidate(voice);
+          if (candidate) voices.push(candidate);
+        }
+        nextPageToken = value['has_more'] === true && typeof value['next_page_token'] === 'string'
+          ? value['next_page_token'] : null;
+        if (nextPageToken) {
+          if (seenPageTokens.has(nextPageToken)) {
+            throw new ServiceUnavailableException('ElevenLabs returned a repeated voice page');
+          }
+          seenPageTokens.add(nextPageToken);
+        }
+      } while (nextPageToken);
       return [...new Map(voices.map(voice => [voice.id, voice])).values()]
         .sort((left, right) => left.id.localeCompare(right.id));
     } catch (error) {
@@ -204,20 +243,37 @@ export class ElevenLabsDialogueAdapter {
 }
 
 export function selectGenderedVoiceIds(
-  genders: readonly PodcastVoiceGender[],
+  speakers: readonly { gender: PodcastVoiceGender; voiceId: string }[],
   configured: Readonly<Record<PodcastVoiceGender, readonly string[]>>,
   discovered: readonly ElevenLabsVoiceCandidate[],
+  chooseIndex: (length: number) => number = randomInt,
+  previousVoiceIds: readonly string[] = [],
 ): string[] | null {
+  const candidateGroups = speakers.map((speaker, position) => {
+    const eligible = [...new Set([
+      ...configured[speaker.gender],
+      ...discovered.filter(voice => voice.gender === speaker.gender).map(voice => voice.id),
+    ])].filter(id => id !== previousVoiceIds[position]);
+    if (speaker.voiceId) return eligible.includes(speaker.voiceId) ? [speaker.voiceId] : [];
+    if (!eligible.length) return [];
+    const offset = chooseIndex(eligible.length);
+    return [...eligible.slice(offset), ...eligible.slice(0, offset)];
+  });
   const used = new Set<string>();
   const selected: string[] = [];
-  for (const gender of genders) {
-    const voiceId = configured[gender].find(id => !used.has(id))
-      ?? discovered.find(voice => voice.gender === gender && !used.has(voice.id))?.id;
-    if (!voiceId) return null;
-    used.add(voiceId);
-    selected.push(voiceId);
-  }
-  return selected;
+  const assign = (position: number): boolean => {
+    if (position === candidateGroups.length) return true;
+    for (const voiceId of candidateGroups[position]) {
+      if (used.has(voiceId)) continue;
+      used.add(voiceId);
+      selected.push(voiceId);
+      if (assign(position + 1)) return true;
+      selected.pop();
+      used.delete(voiceId);
+    }
+    return false;
+  };
+  return assign(0) ? selected : null;
 }
 
 function parseAlignment(value: unknown): ElevenLabsAlignment | null {

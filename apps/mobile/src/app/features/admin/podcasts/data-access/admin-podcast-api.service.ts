@@ -74,6 +74,25 @@ export class AdminPodcastApiService {
     return this.http.patch<AdminPodcastEpisodeListItem>(`${this.episodeUrl}/${episodeId}`, dto);
   }
 
+  updateDraftInput(
+    episodeId: string,
+    input: { vocabulary: string[]; direction?: string; title?: string; titleTranslation?: string },
+  ): Observable<AdminPodcastEpisodeListItem> {
+    return this.http.patch<AdminPodcastEpisodeListItem>(`${this.episodeUrl}/${episodeId}/draft-input`, input);
+  }
+
+  approveAudio(episodeId: string, audioVersion: number): Observable<AdminPodcastEpisodeListItem> {
+    return this.http.patch<AdminPodcastEpisodeListItem>(
+      `${this.episodeUrl}/${episodeId}/audio/approve`, { audioVersion },
+    );
+  }
+
+  recastVoices(episodeId: string): Observable<AdminPodcastEpisodeListItem> {
+    return this.http.post<AdminPodcastEpisodeListItem>(
+      `${this.episodeUrl}/${episodeId}/voices/recast`, {},
+    );
+  }
+
   deleteEpisode(episodeId: string): Observable<void> {
     return this.http.delete<void>(`${this.episodeUrl}/${episodeId}`);
   }

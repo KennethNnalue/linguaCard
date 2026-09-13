@@ -19,6 +19,37 @@ export interface AiConfig {
   elevenLabsDialogueModel: string;
   elevenLabsFemaleVoiceIds: string[];
   elevenLabsMaleVoiceIds: string[];
+  elevenLabsVoicePools: Record<string, { female: string[]; male: string[] }>;
+}
+
+function elevenLabsVoicePools(value: string | undefined): AiConfig['elevenLabsVoicePools'] {
+  if (!value?.trim()) return {};
+  let parsed: unknown;
+  try { parsed = JSON.parse(value); } catch {
+    throw new Error('ELEVENLABS_VOICE_POOLS_JSON must contain valid JSON');
+  }
+  if (typeof parsed !== 'object' || parsed === null || Array.isArray(parsed)) {
+    throw new Error('ELEVENLABS_VOICE_POOLS_JSON must be an object keyed by language');
+  }
+  const pools: AiConfig['elevenLabsVoicePools'] = {};
+  for (const [language, genders] of Object.entries(parsed)) {
+    if (!/^[a-z]{2}$/u.test(language) || typeof genders !== 'object'
+      || genders === null || Array.isArray(genders)) {
+      throw new Error(`Invalid ElevenLabs voice pool for ${language}`);
+    }
+    const female = 'female' in genders ? genders.female : null;
+    const male = 'male' in genders ? genders.male : null;
+    if (!Array.isArray(female) || !Array.isArray(male)
+      || !female.every(item => typeof item === 'string' && item.trim())
+      || !male.every(item => typeof item === 'string' && item.trim())) {
+      throw new Error(`Invalid ElevenLabs voice IDs for ${language}`);
+    }
+    pools[language] = {
+      female: [...new Set(female.map(id => id.trim()))],
+      male: [...new Set(male.map(id => id.trim()))],
+    };
+  }
+  return pools;
 }
 
 function defaultProvider(value: string | undefined): AiConfig['defaultProvider'] {
@@ -50,5 +81,6 @@ export const aiConfig = (): { ai: AiConfig } => ({
       .split(',').map(value => value.trim()).filter(Boolean),
     elevenLabsMaleVoiceIds: (process.env['ELEVENLABS_MALE_VOICE_IDS'] ?? '')
       .split(',').map(value => value.trim()).filter(Boolean),
+    elevenLabsVoicePools: elevenLabsVoicePools(process.env['ELEVENLABS_VOICE_POOLS_JSON']),
   },
 });

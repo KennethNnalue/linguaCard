@@ -24,7 +24,9 @@ export class ElevenLabsPodcastGenerationService {
     }
     const topic = await this.dataSource.getRepository(PodcastTopicEntity).findOneBy({ id: episode.topicId });
     if (!topic) throw new NotFoundException(`Podcast topic ${episode.topicId} not found`);
-    const [hostVoiceId, guestVoiceId] = await this.voices.resolveVoiceIds(['female', 'male']);
+    const [hostVoiceId, guestVoiceId] = await this.voices.resolveVoiceIds([
+      { gender: 'female', voiceId: '' }, { gender: 'male', voiceId: '' },
+    ], topic.targetLanguage);
     const projectId = await this.podcasts.create({
       title: episode.title,
       language: topic.targetLanguage,

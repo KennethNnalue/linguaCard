@@ -13,7 +13,7 @@ describe('ReviewSessionsService history retention', () => {
     where: jest.fn().mockReturnThis(),
     andWhere: jest.fn().mockReturnThis(),
     orderBy: jest.fn().mockReturnThis(),
-    take: jest.fn().mockReturnThis(),
+    limit: jest.fn().mockReturnThis(),
     getMany,
     delete: jest.fn().mockReturnThis(),
     execute,
@@ -55,7 +55,7 @@ describe('ReviewSessionsService history retention', () => {
     expect(query.andWhere).toHaveBeenCalledWith(
       '(clearance."clearedAt" IS NULL OR session."startedAt"::timestamptz > clearance."clearedAt")',
     );
-    expect(query.take).toHaveBeenCalledWith(500);
+    expect(query.limit).toHaveBeenCalledWith(500);
   });
 
   it('clears only the signed-in user’s session history', async () => {

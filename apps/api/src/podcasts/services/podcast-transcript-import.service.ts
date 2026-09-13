@@ -51,6 +51,11 @@ export class PodcastTranscriptImportService {
   }
 
   async commit(episodeId: string, dto: CommitPodcastTranscriptDto): Promise<AdminCommitPodcastTranscriptResult> {
+    const currentEpisode = await this.dataSource.getRepository(PodcastEpisodeEntity).findOneBy({ id: episodeId });
+    if (!currentEpisode) throw new NotFoundException(`Podcast episode ${episodeId} not found`);
+    if (currentEpisode.status === 'published' || currentEpisode.audioGenerationStatus === 'generating') {
+      throw new ConflictException('Cannot replace a published transcript or one with audio generation in progress');
+    }
     let payload = normalizeTranscriptVocabularyReferences(dto.payload);
     let resolved = await this.resolve(episodeId, payload);
     payload = resolved.payload;
@@ -73,6 +78,10 @@ export class PodcastTranscriptImportService {
         where: { id: episodeId }, lock: { mode: 'pessimistic_write' },
       });
       if (!episode) throw new NotFoundException(`Podcast episode ${episodeId} not found`);
+
+      if (episode.status === 'published' || episode.audioGenerationStatus === 'generating') {
+        throw new ConflictException('Cannot replace a published transcript or one with audio generation in progress');
+      }
 
       await manager.delete(PodcastTurnEntity, { episodeId });
       await manager.delete(PodcastEpisodeVocabularyEntity, { episodeId });
@@ -109,19 +118,23 @@ export class PodcastTranscriptImportService {
       episode.audioStoragePath = null;
       episode.audioDurationMs = 0;
       episode.audioVersion = 0;
+      episode.approvedAudioVersion = null;
+      episode.audioGenerationStatus = 'idle';
+      episode.audioGenerationAttemptId = null;
       episode.generationError = null;
-      episode.generationInput = null;
       await manager.save(episode);
     });
-    if (obsoleteAudioPath) await this.storage.delete(obsoleteAudioPath);
+    if (obsoleteAudioPath) {
+      try { await this.storage.delete(obsoleteAudioPath); } catch { /* The new transcript is committed. */ }
+    }
+    const savedEpisode = await this.dataSource.getRepository(PodcastEpisodeEntity).findOneBy({ id: episodeId });
+    if (!savedEpisode) throw new NotFoundException(`Podcast episode ${episodeId} not found`);
 
     return {
       episodeId, fingerprint: dto.fingerprint,
-      title: payload.episode?.title.trim() ?? this.requireEpisodeMetadata(resolved.preview).title,
-      titleTranslation: payload.episode?.titleTranslation.trim()
-        ?? this.requireEpisodeMetadata(resolved.preview).titleTranslation,
-      description: payload.episode?.description.trim()
-        ?? this.requireEpisodeMetadata(resolved.preview).description,
+      title: savedEpisode.title,
+      titleTranslation: savedEpisode.titleTranslation,
+      description: savedEpisode.description,
       speakerCount: payload.speakers.length, turnCount: payload.turns.length,
       vocabularyCount: payload.vocabulary.length,
       estimatedDurationMs: resolved.preview.estimatedDurationMs,
@@ -416,10 +429,4 @@ export class PodcastTranscriptImportService {
     return value;
   }
 
-  private requireEpisodeMetadata(
-    preview: AdminPodcastTranscriptPreview,
-  ): NonNullable<AdminPodcastTranscriptPreview['episode']> {
-    if (!preview.episode) throw new ConflictException('Transcript episode metadata is missing');
-    return preview.episode;
-  }
 }

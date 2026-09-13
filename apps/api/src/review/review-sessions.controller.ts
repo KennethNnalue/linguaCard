@@ -19,7 +19,7 @@ export class ReviewSessionsController {
     return this.sessionsService.upsertBatch(userId, dto.sessions);
   }
 
-  /** Fetch recent sessions for cross-device hydration (max 50). */
+  /** Fetch recent sessions for cross-device hydration (max 500). */
   @Get()
   findRecent(
     @CurrentUser() userId: string,

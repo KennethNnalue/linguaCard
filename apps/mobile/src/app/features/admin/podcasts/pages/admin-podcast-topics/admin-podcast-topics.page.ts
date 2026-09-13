@@ -15,6 +15,7 @@ import {
 } from '@ionic/angular';
 import type {
   AdminPodcastTranscriptPayload,
+  AdminPodcastEpisodeListItem,
   AdminPodcastTranscriptPromptNeedsResolutionResult,
   AdminPodcastVocabularyResolutionCandidate,
   AdminPodcastVocabularySelection,
@@ -81,6 +82,9 @@ export class AdminPodcastTopicsPage implements OnInit {
   readonly promptCopying = signal(false);
   readonly transcriptOpen = signal(false);
   readonly transcriptReviewed = signal(false);
+  readonly savingDraft = signal(false);
+  private lastFormEpisodeId: string | null = null;
+  private lastTranscriptContentVersion: number | null = null;
   readonly topic = computed(() => this.store.topics().find(item => item.id === this.topicId()) ?? null);
   readonly episode = computed(() => {
     const topic = this.topic();
@@ -164,12 +168,25 @@ export class AdminPodcastTopicsPage implements OnInit {
     effect(() => {
       const item = this.episode();
       if (item) untracked(() => {
+        const isDifferentEpisode = item.id !== this.lastFormEpisodeId;
         this.detailsForm.patchValue({
           title: item.title,
           translation: item.titleTranslation,
           description: item.description
         });
-        this.transcriptReviewed.set(Boolean(item.audioUrl) || item.status === 'published');
+        if (isDifferentEpisode) {
+          this.lastFormEpisodeId = item.id;
+          this.episodeForm.patchValue({
+            title: item.title,
+            titleTranslation: item.titleTranslation,
+            vocabulary: item.generationInput?.vocabulary.join('\n') ?? '',
+            direction: item.generationInput?.direction ?? '',
+          });
+        }
+        if (isDifferentEpisode || item.contentVersion !== this.lastTranscriptContentVersion) {
+          this.lastTranscriptContentVersion = item.contentVersion ?? null;
+          this.transcriptReviewed.set(Boolean(item.audioUrl) || item.status === 'published');
+        }
         if (this.view() === 'review' && !item.hasTranscript) void this.router.navigate(['/admin/podcasts', item.topicId, 'episodes', item.id, 'transcript']);
       });
     });
@@ -205,6 +222,19 @@ export class AdminPodcastTopicsPage implements OnInit {
         this.pendingPrompt.set(null);
         void this.copyPromptForEpisode(id, input.words, input.direction);
       });
+    });
+    effect(() => {
+      const id = this.store.lastCreatedEpisodeId();
+      const topicId = this.topicId();
+      if (id && topicId && this.savingDraft()) untracked(() => {
+        this.savingDraft.set(false);
+        void this.router.navigate(['/admin/podcasts', topicId, 'episodes', id, 'transcript']);
+      });
+    });
+    effect(() => {
+      if (this.savingDraft() && this.store.mutationStatus() === 'error') {
+        untracked(() => this.savingDraft.set(false));
+      }
     });
     effect(() => {
       const id = this.store.lastDeletedTopicId();
@@ -295,6 +325,24 @@ export class AdminPodcastTopicsPage implements OnInit {
     });
   }
 
+  saveEpisodeDraft(): void {
+    const topicId = this.topicId();
+    if (!topicId || this.episode()) return;
+    const value = this.episodeForm.getRawValue();
+    const input = parsePodcastVocabularyInput(value.vocabulary);
+    this.savingDraft.set(true);
+    this.store.createEpisodeDraft({
+      topicId,
+      dto: {
+        requestId: crypto.randomUUID(),
+        title: value.title.trim() || undefined,
+        titleTranslation: value.titleTranslation.trim() || undefined,
+        vocabulary: input.vocabulary,
+        direction: podcastGenerationDirection(input.episodeTitle, value.direction),
+      },
+    });
+  }
+
   submitTranscriptStep(): void {
     if (this.route.snapshot.paramMap.get('episodeId')) this.generateTranscriptForEpisode(); else this.createEpisode();
   }
@@ -307,6 +355,17 @@ export class AdminPodcastTopicsPage implements OnInit {
     if (!topicId || !episodeId) return;
     const episode = this.store.topics().find(topic => topic.id === topicId)?.episodes.find(item => item.id === episodeId);
     void this.router.navigate(['/admin/podcasts', topicId, 'episodes', episodeId, episode?.hasTranscript ? 'review' : 'transcript']);
+  }
+
+  episodeProductionLabel(episode: AdminPodcastEpisodeListItem): string {
+    if (episode.audioGenerationStatus === 'generating') return 'Audio generating';
+    if (episode.audioGenerationStatus === 'failed') return 'Audio needs attention';
+    if (episode.status === 'queued' || episode.status === 'generating') return 'Transcript generating';
+    if (episode.status === 'ready_for_review') return episode.approvedAudioVersion === episode.audioVersion
+      ? 'Ready to publish' : 'Audio ready for review';
+    if (episode.status === 'published') return 'Published';
+    if (episode.status === 'failed') return 'Transcript needs attention';
+    return 'Draft';
   }
 
   reviewTranscript(): void {
@@ -344,12 +403,42 @@ export class AdminPodcastTopicsPage implements OnInit {
       episodeId: episode.id,
       vocabulary,
       direction: podcastGenerationDirection(input.episodeTitle, value.direction),
+      title: value.title.trim() || undefined,
+      titleTranslation: value.titleTranslation.trim(),
+    });
+  }
+
+  saveDraftChanges(): void {
+    const episode = this.episode();
+    if (!episode || episode.status === 'published') return;
+    const value = this.episodeForm.getRawValue();
+    const input = parsePodcastVocabularyInput(value.vocabulary);
+    this.store.saveDraftInput({
+      episodeId: episode.id,
+      vocabulary: input.vocabulary,
+      direction: podcastGenerationDirection(input.episodeTitle, value.direction),
+      title: value.title.trim() || undefined,
+      titleTranslation: value.titleTranslation.trim(),
     });
   }
 
   publishEpisode(): void {
     const episode = this.episode();
     if (episode) this.store.publishEpisode(episode.id);
+  }
+
+  approveAudio(): void {
+    const episode = this.episode();
+    if (episode?.audioUrl) this.store.approveAudio({
+      episodeId: episode.id, audioVersion: episode.audioVersion,
+    });
+  }
+
+  recastVoices(): void {
+    const episode = this.episode();
+    if (episode?.hasTranscript && episode.status !== 'published') {
+      this.store.recastVoices(episode.id);
+    }
   }
 
   publishEpisodeVocabulary(): void {
@@ -409,7 +498,7 @@ export class AdminPodcastTopicsPage implements OnInit {
     }
     if (!topicId) return;
     this.pendingPrompt.set({words: input.vocabulary, direction});
-    this.store.createEpisodeDraft(topicId);
+    this.store.createEpisodeDraft({ topicId, dto: { requestId: crypto.randomUUID() } });
   }
 
   selectPromptResolution(key: string, lexemeId: unknown): void {
@@ -450,7 +539,7 @@ export class AdminPodcastTopicsPage implements OnInit {
       const episode = this.episode(), topicId = this.topicId();
       if (episode) this.store.previewTranscript({episodeId: episode.id, payload: parsed}); else if (topicId) {
         this.pendingTranscript.set(parsed);
-        this.store.createEpisodeDraft(topicId);
+        this.store.createEpisodeDraft({ topicId, dto: { requestId: crypto.randomUUID() } });
       }
     } catch (error) {
       this.store.setLocalError(error instanceof SyntaxError ? 'The file contains invalid JSON. Correct its syntax and try again.' : error instanceof Error ? error.message : 'Could not read the transcript file. Select it again to retry.');

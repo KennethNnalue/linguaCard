@@ -79,6 +79,40 @@ export class CreatePodcastEpisodeDto {
 export class CreatePodcastEpisodeDraftDto {
   @IsUUID()
   requestId!: string;
+
+  @IsOptional() @IsString() @Matches(CONTAINS_NON_WHITESPACE) @MaxLength(160)
+  title?: string;
+
+  @IsOptional() @IsString() @Matches(CONTAINS_NON_WHITESPACE) @MaxLength(160)
+  titleTranslation?: string;
+
+  @IsOptional() @IsArray() @ArrayMaxSize(40)
+  @IsString({ each: true }) @MinLength(1, { each: true })
+  @Matches(CONTAINS_NON_WHITESPACE, { each: true }) @MaxLength(200, { each: true })
+  vocabulary?: string[];
+
+  @IsOptional() @IsString() @Matches(CONTAINS_NON_WHITESPACE) @MaxLength(500)
+  direction?: string;
+}
+
+export class UpdatePodcastEpisodeDraftInputDto {
+  @IsOptional() @IsString() @Matches(CONTAINS_NON_WHITESPACE) @MaxLength(160)
+  title?: string;
+
+  @IsOptional() @IsString() @MaxLength(160)
+  titleTranslation?: string;
+
+  @IsArray() @ArrayMaxSize(40)
+  @IsString({ each: true }) @MinLength(1, { each: true })
+  @Matches(CONTAINS_NON_WHITESPACE, { each: true }) @MaxLength(200, { each: true })
+  vocabulary!: string[];
+
+  @IsOptional() @IsString() @MaxLength(500)
+  direction?: string;
+}
+
+export class ApprovePodcastAudioDto {
+  @IsInt() @Min(1) audioVersion!: number;
 }
 
 export class UpdatePodcastEpisodeDto {
