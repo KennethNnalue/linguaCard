@@ -1,8 +1,8 @@
 import { ConflictException, Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import type {
-  ArticleType, CefrLevel, LearningStage, PodcastEpisodeActivity, PodcastEpisodeCompletion, PodcastEpisodePlayer,
-  PodcastEpisodePreparation, PodcastLibraryEpisode, PodcastLibraryResponse, PodcastLibraryTopic,
+  ArticleType, LearningStage, PodcastEpisodeActivity, PodcastEpisodeCompletion, PodcastEpisodePlayer,
+  PodcastEpisodePreparation, PodcastLibraryEpisode, PodcastLibraryLevel, PodcastLibraryResponse, PodcastLibraryTopic,
   PodcastPreparationVocabulary, PodcastThumbnail,
   PodcastTopicDetail,
 } from '@lingua-card/shared/domain';
@@ -57,7 +57,7 @@ export class PodcastCatalogueService {
     private readonly learningLoop: PodcastLearningLoopService,
   ) {}
 
-  async listTopics(userId: string, selectedLevel: CefrLevel = 'A1'): Promise<PodcastLibraryResponse> {
+  async listTopics(userId: string, selectedLevel: PodcastLibraryLevel = 'A1'): Promise<PodcastLibraryResponse> {
     const topics = await this.topicRepo.find({ where: { status: 'published' }, order: { publishedAt: 'DESC' } });
     if (!topics.length) return { topics: [], continueListening: null, recentEpisodes: [], suggestedEpisodes: [] };
     const episodes = await this.episodeRepo.find({

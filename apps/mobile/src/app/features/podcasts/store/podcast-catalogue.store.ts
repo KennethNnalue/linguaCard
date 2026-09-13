@@ -3,7 +3,7 @@ import { patchState, signalStore, withComputed, withMethods, withState } from '@
 import { rxMethod } from '@ngrx/signals/rxjs-interop';
 import type {
   CefrLevel, OnboardingLevel, PodcastEpisodeActivity, PodcastEpisodeCompletion, PodcastEpisodePreparation,
-  PodcastLibraryFeaturedEpisode, PodcastLibraryResponse, PodcastLibraryTopic, PodcastTopicDetail,
+  PodcastLibraryFeaturedEpisode, PodcastLibraryLevel, PodcastLibraryResponse, PodcastLibraryTopic, PodcastTopicDetail,
 } from '@lingua-card/shared/domain';
 import { EMPTY, catchError, firstValueFrom, pipe, switchMap, tap } from 'rxjs';
 import { AuthService } from '../../../core/services/auth.service';
@@ -16,11 +16,11 @@ const onboardingLevel: Record<OnboardingLevel, CefrLevel> = {
   beginner: 'A1', some: 'A2', intermediate: 'B1',
 };
 
-function storedPodcastLevel(): CefrLevel | null {
+function storedPodcastLevel(): PodcastLibraryLevel | null {
   try {
     for (const key of [levelStorageKey, 'lc_explore_level']) {
       const level = localStorage.getItem(key);
-      if (level === 'A1' || level === 'A2' || level === 'B1' || level === 'B2' || level === 'C1') return level;
+      if (level === 'all' || level === 'A1' || level === 'A2' || level === 'B1' || level === 'B2') return level;
     }
     return null;
   } catch { return null; }
@@ -40,7 +40,7 @@ interface PodcastCatalogueState {
   continueListening: PodcastEpisodeActivity | null;
   recentEpisodes: PodcastEpisodeActivity[];
   suggestedEpisodes: PodcastLibraryFeaturedEpisode[];
-  selectedLevel: CefrLevel;
+  selectedLevel: PodcastLibraryLevel;
   topic: PodcastTopicDetail | null;
   preparation: PodcastEpisodePreparation | null;
   completion: PodcastEpisodeCompletion | null;
@@ -58,7 +58,7 @@ const initialState: PodcastCatalogueState = {
 
 export const PodcastCatalogueStore = signalStore(
   withState(initialState),
-  withComputed(({ status, preparation, continueListening, suggestedEpisodes, recentEpisodes }) => ({
+  withComputed(({ status, preparation, continueListening, suggestedEpisodes, recentEpisodes, selectedLevel }) => ({
     isLoading: computed(() => status() === 'loading'),
     essentialVocabulary: computed(() => preparation()?.vocabulary.filter(
       item => item.importance === 'essential',
@@ -73,24 +73,19 @@ export const PodcastCatalogueStore = signalStore(
       const items: PodcastFeaturedEpisode[] = [];
       const seen = new Set<string>();
       const current = continueListening();
-      if (current) {
-        items.push({ episode: current.episode, source: 'continue', progressPercent: current.progressPercent, completed: false });
-        seen.add(current.episode.id);
-      }
-      const recentCandidates = recentEpisodes().filter(activity => !seen.has(activity.episode.id));
-      const suggestionLimit = 9 - Math.min(2, recentCandidates.length);
-      for (const episode of suggestedEpisodes()) {
-        if (seen.has(episode.id) || items.length >= suggestionLimit) continue;
-        items.push({ episode, source: 'suggested', progressPercent: null, completed: false });
-        seen.add(episode.id);
-      }
-      for (const activity of recentCandidates) {
-        if (seen.has(activity.episode.id) || items.length >= 9) continue;
+      const recent = recentEpisodes().length ? recentEpisodes() : current ? [current] : [];
+      for (const activity of recent) {
+        if (seen.has(activity.episode.id) || items.length >= 3) continue;
         items.push({
           episode: activity.episode, source: 'recent', progressPercent: activity.progressPercent,
           completed: activity.status === 'completed',
         });
         seen.add(activity.episode.id);
+      }
+      for (const episode of suggestedEpisodes()) {
+        if (seen.has(episode.id) || items.length >= 10 || (selectedLevel() !== 'all' && episode.level !== selectedLevel())) continue;
+        items.push({ episode, source: 'suggested', progressPercent: null, completed: false });
+        seen.add(episode.id);
       }
       return items;
     }),
@@ -98,7 +93,7 @@ export const PodcastCatalogueStore = signalStore(
   withMethods((store, api = inject(PodcastApiService), localData = inject(LocalDataService), auth = inject(AuthService), settings = inject(SettingsStore)) => {
     let libraryRequest = 0;
     let levelInitialized = false;
-    function loadForLevel(level: CefrLevel): void {
+    function loadForLevel(level: PodcastLibraryLevel): void {
       const request = ++libraryRequest;
       patchState(store, { selectedLevel: level });
       void (async () => {
@@ -126,7 +121,7 @@ export const PodcastCatalogueStore = signalStore(
         loadForLevel(storedPodcastLevel() ?? (userLevel ? onboardingLevel[userLevel] : 'A1'));
       } else loadForLevel(store.selectedLevel());
     },
-    selectLevel(level: CefrLevel): void {
+    selectLevel(level: PodcastLibraryLevel): void {
       levelInitialized = true;
       try { localStorage.setItem(levelStorageKey, level); } catch { /* Browser storage may be unavailable. */ }
       loadForLevel(level);

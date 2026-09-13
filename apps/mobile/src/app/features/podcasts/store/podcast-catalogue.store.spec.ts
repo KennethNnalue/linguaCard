@@ -81,20 +81,21 @@ describe('PodcastCatalogueStore level selection', () => {
     expect(listTopics).toHaveBeenCalledWith('B2');
   });
 
-  it('keeps a recent episode visible when suggestions fill the featured grid', async () => {
-    const episode = (id: string): PodcastLibraryFeaturedEpisode => ({
-      id, title: `Episode ${id}`, titleTranslation: `Translated ${id}`, level: 'A1',
+  it('places the three most recent listens first and fills up to ten with level picks', async () => {
+    const episode = (id: string, level: PodcastLibraryFeaturedEpisode['level'] = 'A1'): PodcastLibraryFeaturedEpisode => ({
+      id, title: `Episode ${id}`, titleTranslation: `Translated ${id}`, level,
       position: 0, durationMs: 60_000, focusVocabularyCount: 0, thumbnail,
       topicId: topic.id, topicTitle: topic.title, topicTitleTranslation: topic.titleTranslation,
     });
-    const recent: PodcastEpisodeActivity = {
-      episode: episode('played'), positionMs: 60_000, progressPercent: 100,
+    const recent = (id: string, index: number): PodcastEpisodeActivity => ({
+      episode: episode(id, 'B1'), positionMs: 60_000, progressPercent: 100,
       status: 'completed', completedAt: '2026-09-13T00:00:00.000Z',
-      updatedAt: '2026-09-13T00:00:00.000Z',
-    };
+      updatedAt: `2026-09-1${3 - index}T00:00:00.000Z`,
+    });
     const response: PodcastLibraryResponse = {
-      topics: [topic], continueListening: null, recentEpisodes: [recent],
-      suggestedEpisodes: Array.from({ length: 9 }, (_, index) => episode(`suggested-${index}`)),
+      topics: [topic], continueListening: null,
+      recentEpisodes: Array.from({ length: 4 }, (_, index) => recent(`played-${index}`, index)),
+      suggestedEpisodes: [episode('wrong-level', 'B2'), ...Array.from({ length: 10 }, (_, index) => episode(`suggested-${index}`))],
     };
     TestBed.configureTestingModule({ providers: [
       PodcastCatalogueStore,
@@ -108,9 +109,11 @@ describe('PodcastCatalogueStore level selection', () => {
     store.loadTopics();
     await waitFor(() => store.status() === 'success');
 
-    expect(store.featuredEpisodes()).toHaveLength(9);
-    expect(store.featuredEpisodes().at(-1)?.episode.id).toBe('played');
-    expect(store.featuredEpisodes().at(-1)?.source).toBe('recent');
+    expect(store.featuredEpisodes()).toHaveLength(10);
+    expect(store.featuredEpisodes().slice(0, 3).map(item => item.episode.id))
+      .toEqual(['played-0', 'played-1', 'played-2']);
+    expect(store.featuredEpisodes().slice(3).every(item => item.episode.level === 'A1')).toBe(true);
+    expect(store.featuredEpisodes().at(-1)?.episode.id).toBe('suggested-6');
   });
 });
 

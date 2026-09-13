@@ -1801,6 +1801,8 @@ export interface PodcastEpisodeActivity {
 
 export type PodcastLibraryFeaturedEpisode = PodcastEpisodeActivity['episode'];
 
+export type PodcastLibraryLevel = CefrLevel | 'all';
+
 export interface PodcastLibraryResponse {
   topics: PodcastLibraryTopic[];
   continueListening: PodcastEpisodeActivity | null;

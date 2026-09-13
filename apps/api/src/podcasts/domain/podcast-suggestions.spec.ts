@@ -6,7 +6,7 @@ function episode(id: string, topicId: string, level: CefrLevel, published: strin
 }
 
 describe('podcast suggestions', () => {
-  it('prefers unplayed episodes at the selected level, then nearby levels', () => {
+  it('returns only unplayed episodes at the selected level', () => {
     const episodes = [
       episode('c1', 'advanced', 'C1', '2026-09-13'),
       episode('a2', 'next', 'A2', '2026-09-11'),
@@ -14,7 +14,17 @@ describe('podcast suggestions', () => {
       episode('a1-played', 'first', 'A1', '2026-09-12'),
     ];
     expect(selectPodcastSuggestions(episodes, 'A1', new Set(['a1-played'])).map(item => item.id))
-      .toEqual(['a1-old', 'a2', 'c1']);
+      .toEqual(['a1-old']);
+  });
+
+  it('includes every level in All, ordered by publication date', () => {
+    const episodes = [
+      episode('a1', 'first', 'A1', '2026-09-11'),
+      episode('b2', 'second', 'B2', '2026-09-13'),
+      episode('c1', 'third', 'C1', '2026-09-12'),
+    ];
+    expect(selectPodcastSuggestions(episodes, 'all', new Set()).map(item => item.id))
+      .toEqual(['b2', 'c1', 'a1']);
   });
 
   it('diversifies topics at the same level before repeating one', () => {

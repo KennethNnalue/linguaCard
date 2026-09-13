@@ -1,11 +1,11 @@
-import { ChangeDetectionStrategy, Component, inject, OnInit, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, inject, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { IonContent, IonHeader, IonSpinner, IonToolbar } from '@ionic/angular';
 import { PodcastCatalogueStore } from '../../store/podcast-catalogue.store';
 import type { PodcastFeaturedEpisode } from '../../store/podcast-catalogue.store';
 import { OfflineImageDirective } from '../../../../shared/image/offline-image.directive';
 import { TranslatePipe } from '@ngx-translate/core';
-import type { CefrLevel } from '@lingua-card/shared/domain';
+import type { PodcastLibraryLevel } from '@lingua-card/shared/domain';
 
 @Component({
   selector: 'lc-podcast-library', standalone: true,
@@ -15,8 +15,7 @@ import type { CefrLevel } from '@lingua-card/shared/domain';
 })
 export class PodcastLibraryPage implements OnInit {
   readonly store = inject(PodcastCatalogueStore);
-  readonly showAllTopics = signal(false);
-  readonly levels: readonly CefrLevel[] = ['A1', 'A2', 'B1', 'B2', 'C1'];
+  readonly levels: readonly PodcastLibraryLevel[] = ['all', 'A1', 'A2', 'B1', 'B2'];
   private readonly router = inject(Router);
 
   ngOnInit(): void { this.store.loadTopics(); }

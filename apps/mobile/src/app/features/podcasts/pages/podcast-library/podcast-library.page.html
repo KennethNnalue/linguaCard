@@ -9,7 +9,7 @@
     <div class="pod-levels" [attr.aria-label]="'podcasts.library.levelFilter' | translate">
       @for (level of levels; track level) {
         <button type="button" [class.selected]="store.selectedLevel() === level"
-          [attr.aria-pressed]="store.selectedLevel() === level" (click)="store.selectLevel(level)">{{ level }}</button>
+          [attr.aria-pressed]="store.selectedLevel() === level" (click)="store.selectLevel(level)">{{ level === 'all' ? ('podcasts.library.allLevels' | translate) : level }}</button>
       }
     </div>
 
@@ -20,8 +20,8 @@
     } @else {
       @if (store.featuredEpisodes().length) {
         <section class="pod-section" aria-labelledby="pod-featured-heading">
-          <div class="pod-section-title"><span>{{ 'podcasts.library.levelPicks' | translate:{ level: store.selectedLevel() } }}</span><h2 id="pod-featured-heading">{{ 'podcasts.library.episodesForYou' | translate }}</h2></div>
-          <div class="pod-featured-grid">
+          <div class="pod-section-title"><span>{{ 'podcasts.library.pickedForYou' | translate }}</span><h2 id="pod-featured-heading">{{ 'podcasts.library.episodesForYou' | translate }}</h2></div>
+          <div class="pod-featured-rail">
             @for (item of store.featuredEpisodes(); track item.episode.id) {
               <button type="button" class="pod-episode" (click)="openFeatured(item)">
                 <div class="pod-episode-art">
@@ -43,15 +43,10 @@
 
       @if (store.topics().length) {
         <section class="pod-section" aria-labelledby="pod-topics-heading">
-          <div class="pod-section-title pod-section-title--action">
-            <div><span>{{ 'podcasts.library.browseByScene' | translate }}</span><h2 id="pod-topics-heading">{{ 'podcasts.library.exploreTopics' | translate }}</h2></div>
-            @if (store.topics().length > 3) {
-              <button type="button" class="pod-see-all" (click)="showAllTopics.update(value => !value)">
-                {{ (showAllTopics() ? 'podcasts.library.showLess' : 'podcasts.library.seeAll') | translate }}
-              </button>
-            }
+          <div class="pod-section-title">
+            <span>{{ 'podcasts.library.browseByTopics' | translate }}</span><h2 id="pod-topics-heading">{{ 'podcasts.library.exploreTopics' | translate }}</h2>
           </div>
-          <div class="pod-topics" [class.all]="showAllTopics()">
+          <div class="pod-topics">
             @for (topic of store.topics(); track topic.id) {
               <button type="button" class="pod-topic" (click)="openTopic(topic.id)">
                 <img [lcOfflineSrc]="topic.thumbnail.cardUrl" [alt]="topic.thumbnail.accessibilityDescription"
