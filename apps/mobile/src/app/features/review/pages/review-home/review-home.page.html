@@ -209,7 +209,7 @@
           </section>
         }
       }
-      @if (activeReview()?.definition.source.continuation; as continuation) {
+      @if (activeReview()?.definition?.source?.continuation; as continuation) {
         <ion-button fill="outline" (click)="returnToConversation()">Return to {{ continuation.title }}</ion-button>
       }
       <lc-podcast-recommendation-slot placement="home" />
