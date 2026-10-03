@@ -98,6 +98,8 @@ export const PodcastCatalogueStore = signalStore(
   })),
   withMethods((store, api = inject(PodcastApiService), localData = inject(LocalDataService), auth = inject(AuthService), settings = inject(SettingsStore)) => {
     let libraryRequest = 0;
+    let topicRequest = 0;
+    let preparationRequest = 0;
     let levelInitialized = false;
     function loadForLevel(level: PodcastLibraryLevel): void {
       const request = ++libraryRequest;
@@ -133,23 +135,31 @@ export const PodcastCatalogueStore = signalStore(
       loadForLevel(level);
     },
     loadTopic(topicId: string): void {
+      const request = ++topicRequest;
       void (async () => {
-        const cached = await localData.getPodcastTopic(topicId);
+        let cached: PodcastTopicDetail | null = null;
+        try { cached = await localData.getPodcastTopic(topicId); } catch { /* Try the API. */ }
+        if (request !== topicRequest) return;
         if (cached) patchState(store, { topic: cached, status: 'success', error: null });
         else patchState(store, { topic: null, status: 'loading', error: null });
         try {
           const topic = await firstValueFrom(api.getTopic(topicId));
+          if (request !== topicRequest) return;
           patchState(store, { topic, status: 'success', error: null });
-          await localData.setPodcastTopic(topic);
+          try { await localData.setPodcastTopic(topic); } catch { /* Keep the network result. */ }
         } catch {
-          if (!cached) patchState(store, { status: 'error', error: 'Could not load this podcast topic.' });
+          if (request === topicRequest && !cached) patchState(store, { status: 'error', error: 'Could not load this podcast topic.' });
         }
       })();
     },
     loadPreparation(episodeId: string): void {
+      const request = ++preparationRequest;
       void (async () => {
         const userId = auth.currentUser()?.id;
-        const cached = userId ? await localData.getPodcastPreparation(userId, episodeId) : null;
+        const isCurrent = () => request === preparationRequest && userId === auth.currentUser()?.id;
+        let cached: PodcastEpisodePreparation | null = null;
+        try { if (userId) cached = await localData.getPodcastPreparation(userId, episodeId); } catch { /* Try the API. */ }
+        if (!isCurrent()) return;
         if (cached) patchState(store, {
           preparation: cached, preparationCollectionId: cached.preparationCollectionId,
           status: 'success', error: null,
@@ -159,13 +169,14 @@ export const PodcastCatalogueStore = signalStore(
         });
         try {
           const preparation = await firstValueFrom(api.getPreparation(episodeId));
+          if (!isCurrent()) return;
           patchState(store, {
             preparation, preparationCollectionId: preparation.preparationCollectionId,
             status: 'success', error: null,
           });
-          if (userId) await localData.setPodcastPreparation(userId, preparation);
+          try { if (userId) await localData.setPodcastPreparation(userId, preparation); } catch { /* Keep the network result. */ }
         } catch {
-          if (!cached) patchState(store, { status: 'error', error: 'Could not prepare this episode.' });
+          if (isCurrent() && !cached) patchState(store, { status: 'error', error: 'Could not prepare this episode.' });
         }
       })();
     },

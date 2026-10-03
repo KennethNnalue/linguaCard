@@ -31,6 +31,19 @@ interface PodcastProgressUpdate {
   completedAt: Date | null;
 }
 
+/** Listening evidence belongs to one recording, even when the episode ID is unchanged. */
+export function resetPodcastProgressForAudioVersion(
+  progress: PodcastListeningProgressEntity,
+  audioVersion: number,
+): void {
+  if (progress.audioVersion === audioVersion) return;
+  progress.audioVersion = audioVersion;
+  progress.positionMs = 0;
+  progress.qualifyingListenedMs = 0;
+  progress.listenedRanges = [];
+  progress.completedAt = null;
+}
+
 export function qualifiesPodcastCompletion(
   qualifyingListenedMs: number,
   episodeDurationMs: number,
@@ -87,6 +100,7 @@ export class PodcastLearningLoopService {
         id: randomUUID(), userId, episodeId, audioVersion: dto.audioVersion,
         positionMs: 0, qualifyingListenedMs: 0, listenedRanges: [], completedAt: null,
       });
+      resetPodcastProgressForAudioVersion(progress, episode.audioVersion);
       const wasCompleted = progress.completedAt !== null;
       progress.listenedRanges = mergePodcastPlaybackRanges(
         progress.listenedRanges,

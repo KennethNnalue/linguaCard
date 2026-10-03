@@ -1,6 +1,6 @@
 import { signal } from '@angular/core';
 import { TestBed } from '@angular/core/testing';
-import type { PodcastEpisodeActivity, PodcastEpisodePlayer, PodcastLibraryFeaturedEpisode, PodcastLibraryResponse, PodcastLibraryTopic } from '@lingua-card/shared/domain';
+import type { PodcastEpisodeActivity, PodcastEpisodePlayer, PodcastEpisodePreparation, PodcastLibraryFeaturedEpisode, PodcastLibraryResponse, PodcastLibraryTopic } from '@lingua-card/shared/domain';
 import { Subject, of, throwError } from 'rxjs';
 import { AuthService } from '../../../core/services/auth.service';
 import { LocalDataService } from '../../../core/services/local-data.service';
@@ -162,3 +162,54 @@ async function waitFor(predicate: () => boolean): Promise<void> {
   }
   throw new Error('Expected store transition did not complete');
 }
+
+
+describe('PodcastCatalogueStore preparation resilience', () => {
+  const preparation: PodcastEpisodePreparation = {
+    targetLanguage: 'de', translationLanguage: 'en',
+    episode: { id: 'episode-1', topicId: topic.id, title: 'Conversation', titleTranslation: 'Conversation',
+      topicTitle: topic.title, topicTitleTranslation: topic.titleTranslation, description: '', audioUrl: '/audio.mp3',
+      level: 'A1', position: 1, durationMs: 60000, focusVocabularyCount: 0, thumbnail },
+    readiness: { percent: 0, recommendation: 'learn_first', learnFirstCount: 0 },
+    vocabulary: [], preparationCollectionId: null,
+  };
+  it('keeps API preparation usable when reading and writing cache fail', async () => {
+    TestBed.configureTestingModule({ providers: [
+      PodcastCatalogueStore,
+      { provide: PodcastApiService, useValue: { getPreparation: () => of(preparation) } },
+      { provide: LocalDataService, useValue: {
+        getPodcastPreparation: async () => { throw new Error('Storage unavailable'); },
+        setPodcastPreparation: async () => { throw new Error('Storage unavailable'); },
+      } },
+      { provide: AuthService, useValue: { currentUser: () => ({ id: 'learner' }) } },
+      { provide: SettingsStore, useValue: {} },
+    ] });
+    const store = TestBed.inject(PodcastCatalogueStore);
+    store.loadPreparation('episode-1');
+    await waitFor(() => store.status() === 'success');
+    await Promise.resolve();
+    expect(store.preparation()).toEqual(preparation);
+    expect(store.error()).toBeNull();
+  });
+  it('ignores preparation requested before an account switch', async () => {
+    const response = new Subject<PodcastEpisodePreparation>();
+    const currentUser = signal({ id: 'learner' });
+    let requested = false;
+    const getPreparation = jest.fn((_episodeId: string) => { requested = true; return response; });
+    TestBed.configureTestingModule({ providers: [
+      PodcastCatalogueStore,
+      { provide: PodcastApiService, useValue: { getPreparation } },
+      { provide: LocalDataService, useValue: { getPodcastPreparation: async () => null } },
+      { provide: AuthService, useValue: { currentUser } },
+      { provide: SettingsStore, useValue: {} },
+    ] });
+    const store = TestBed.inject(PodcastCatalogueStore);
+    store.loadPreparation('episode-1');
+    await waitFor(() => requested);
+    expect(getPreparation).toHaveBeenCalledWith('episode-1');
+    currentUser.set({ id: 'another-learner' });
+    response.next(preparation); response.complete();
+    await Promise.resolve();
+    expect(store.preparation()).toBeNull();
+  });
+});

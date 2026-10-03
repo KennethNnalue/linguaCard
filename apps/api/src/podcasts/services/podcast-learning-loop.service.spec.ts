@@ -1,7 +1,9 @@
+import { PodcastListeningProgressEntity } from '../entities/podcast-listening-progress.entity';
 import { describe, expect, it } from '@jest/globals';
 import { mergePodcastPlaybackRanges, podcastPlaybackRangeDuration } from '@lingua-card/shared/domain';
 import {
   qualifiesPodcastCompletion,
+  resetPodcastProgressForAudioVersion,
   resolvePodcastProgressUpdate,
 } from './podcast-learning-loop.service';
 
@@ -61,5 +63,31 @@ describe('podcast playback range accounting', () => {
     expect(ranges).toEqual([{ startMs: 0, endMs: 60_000 }]);
     expect(podcastPlaybackRangeDuration(ranges)).toBe(60_000);
     expect(qualifiesPodcastCompletion(podcastPlaybackRangeDuration(ranges), 120_000)).toBe(false);
+  });
+});
+
+
+describe('audio-version listening evidence', () => {
+  const progress = () => Object.assign(new PodcastListeningProgressEntity(), {
+    id: 'progress', userId: 'learner', episodeId: 'episode', audioVersion: 1,
+    positionMs: 120000, qualifyingListenedMs: 120000,
+    listenedRanges: [{ startMs: 0, endMs: 120000 }],
+    completedAt: new Date('2026-09-01T00:00:00Z'),
+  });
+  it('requires new listening after the recording changes', () => {
+    const saved = progress();
+    resetPodcastProgressForAudioVersion(saved, 2);
+    expect(saved.audioVersion).toBe(2);
+    expect(saved.listenedRanges).toEqual([]);
+    expect(saved.qualifyingListenedMs).toBe(0);
+    expect(saved.positionMs).toBe(0);
+    expect(saved.completedAt).toBeNull();
+    expect(qualifiesPodcastCompletion(saved.qualifyingListenedMs, 120000)).toBe(false);
+  });
+  it('preserves completed evidence for retries of the same recording', () => {
+    const saved = progress();
+    const original = progress();
+    resetPodcastProgressForAudioVersion(saved, 1);
+    expect(saved).toEqual(original);
   });
 });

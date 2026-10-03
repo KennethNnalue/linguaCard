@@ -47,3 +47,9 @@ Verification: API TypeScript, Angular development build and readiness/ranking te
 Player responses expose validated turn-level lexeme references and vocabulary details. Users can replay a sentence and inspect its focus words, meanings, examples and saved status. Word inspection pauses playback. Focused controls and open word details prevent automatic control hiding. The recap offers an optional three-word recall activity with reveal buttons; neither inspection nor recall changes mastery.
 
 Verification: API/app TypeScript and development Angular build passed; player/store suites passed (25 tests), including sentence replay. Mapping is sentence-level; precise token alignment is intentionally not claimed.
+
+## Step 8 — Recording changes and cache resilience (P0-A)
+
+Confirmed and fixed old listening evidence being merged into a replaced audio recording. A version change now resets ranges, position and completion before new playback is counted; same-version retries preserve evidence. Existing episode-level reward deduplication is retained. Preparation/topic cache failures no longer prevent API loading or turn a successful response into an error; late preparation responses are ignored after navigation or account changes.
+
+Verification: API/app TypeScript, development Angular build, playback qualification/version tests (8) and catalogue tests (6) passed. Live blank-review exit, ambiguous content and malformed canonical headwords remain separate audit items; these changes do not claim to diagnose them.
