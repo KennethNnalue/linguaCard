@@ -6,11 +6,7 @@
 
 <ion-content>
   <main class="pod-page">
-    <section class="pod-introduction" aria-labelledby="listening-loop-heading">
-      <h2 id="listening-loop-heading">Learn a word. Hear it in a real conversation.</h2>
-      <p>Practise vocabulary from your cards in short LinguaCard conversations. Preview the focus words or start listening with translations.</p>
-    </section>
-    <p class="pod-filter-hint">Choose a level for new conversations. Your unfinished episodes stay available below.</p>
+    <p class="pod-introduction">Hear your vocabulary in short conversations.</p>
     <div class="pod-levels" [attr.aria-label]="'podcasts.library.levelFilter' | translate">
       @for (level of levels; track level) {
         <button type="button" [class.selected]="store.selectedLevel() === level"
@@ -23,21 +19,6 @@
     } @else if (store.error(); as error) {
       <div class="pod-state"><span>{{ error }}</span><button type="button" (click)="store.loadTopics()">{{ 'podcasts.library.retry' | translate }}</button></div>
     } @else {
-      @if (store.resumableEpisodes().length) {
-        <section class="pod-section" aria-labelledby="continue-listening-heading">
-          <h2 id="continue-listening-heading">Continue listening</h2>
-          <div class="pod-featured-rail">
-            @for (activity of store.resumableEpisodes(); track activity.episode.id) {
-              <button type="button" class="pod-episode" (click)="resume(activity.episode.id)">
-                <div class="pod-episode-art"><img [lcOfflineSrc]="activity.episode.thumbnail.cardUrl" alt="" />
-                  <span class="pod-episode-title">{{ activity.episode.title }}</span></div>
-                <span class="pod-episode-translation">{{ activity.episode.titleTranslation }}</span>
-                <span class="pod-episode-meta">{{ activity.episode.level }} · {{ duration(activity.episode.durationMs) }} · {{ activity.progressPercent }}% through</span>
-              </button>
-            }
-          </div>
-        </section>
-      }
       @if (recommendationsEnabled) {
         <section class="pod-section" aria-label="Practise your words">
           <lc-podcast-recommendation-slot placement="library" [level]="store.selectedLevel()" />
@@ -56,6 +37,24 @@
           </div>
         </section>
       }
+      @if (store.resumableEpisodes().length) {
+        <section class="pod-section" aria-labelledby="continue-listening-heading">
+          <h2 id="continue-listening-heading">Continue listening</h2>
+          <div class="pod-featured-rail">
+            @for (activity of store.resumableEpisodes(); track activity.episode.id) {
+              <button type="button" class="pod-episode" (click)="resume(activity.episode.id)">
+                <div class="pod-episode-art"><img [lcOfflineSrc]="activity.episode.thumbnail.cardUrl" alt="" />
+                  </div>
+                <strong class="pod-episode-title">{{ activity.episode.title }}</strong>
+                <span class="pod-episode-translation">{{ activity.episode.titleTranslation }}</span>
+                <span class="pod-episode-meta">{{ activity.episode.level }} · {{ duration(activity.episode.durationMs) }} · {{ activity.progressPercent }}% through</span>
+                <span class="pod-progress" aria-hidden="true"><span [style.width.%]="activity.progressPercent"></span></span>
+              </button>
+            }
+          </div>
+        </section>
+      }
+
 
       @if (store.topics().length) {
         <section class="pod-section" aria-labelledby="pod-topics-heading">
@@ -84,7 +83,8 @@
           <div class="pod-featured-rail">
             @for (activity of store.completedEpisodes(); track activity.episode.id) {
               <button type="button" class="pod-episode" (click)="preview(activity.episode.id)">
-                <div class="pod-episode-art"><img [lcOfflineSrc]="activity.episode.thumbnail.cardUrl" alt="" /><span class="pod-episode-title">{{ activity.episode.title }}</span></div>
+                <div class="pod-episode-art"><img [lcOfflineSrc]="activity.episode.thumbnail.cardUrl" alt="" /></div>
+                <strong class="pod-episode-title">{{ activity.episode.title }}</strong>
                 <span class="pod-episode-meta">{{ activity.episode.level }} · {{ duration(activity.episode.durationMs) }} · Replay available</span>
               </button>
             }

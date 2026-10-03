@@ -38,7 +38,7 @@ h1 { margin: 3px 0 0; font-size: t.$lc-text-2xl; }
   cursor: pointer;
 }
 .pod-levels button.selected { background: #e9ede4; border-color: #e9ede4; color: #15251c; }
-.pod-section { margin-top: 30px; }
+.pod-section { margin-top: 24px; }
 .pod-section-title { margin-bottom: 16px; }
 .pod-section-title h2 { margin: 4px 0 0; font-size: t.$lc-text-2xl; line-height: 1.1; }
 .pod-state button { min-height: 44px; border: 1px solid var(--pod-line); border-radius: 10px; padding: 8px 14px; background: var(--pod-surface); color: var(--pod-text); cursor: pointer; }
@@ -80,3 +80,9 @@ h1 { margin: 3px 0 0; font-size: t.$lc-text-2xl; }
 .pod-introduction { margin-bottom: 20px; }
 .pod-introduction h2 { margin: 0 0 8px; font-size: 1.25rem; line-height: 1.35; }
 .pod-introduction p { margin: 0; color: var(--pod-muted); line-height: 1.55; }
+
+.pod-introduction { margin:0 0 16px; color:var(--pod-muted); line-height:1.5; }
+.pod-episode-title { position:static; display:block; margin-top:8px; color:var(--pod-text); font-size:1rem; line-height:1.35; }
+.pod-episode-art::after { display:none; }
+.pod-progress { display:block; height:4px; margin-top:10px; overflow:hidden; border-radius:4px; background:var(--pod-line); }
+.pod-progress span { display:block; height:100%; background:var(--lc-ss-sage); }

@@ -20,17 +20,20 @@ import { OfflineImageDirective } from '../../../../shared/image/offline-image.di
         @if (evidence() === 'pending_sync') { <p role="status">Suggestions will refresh after your reviews sync.</p> }
         @if (evidence() === 'unavailable') { <p>Saved suggestion · Connect to refresh</p> }
         <div class="actions">
-          <ion-button (click)="listenSelected.emit()">Listen now</ion-button>
+          <ion-button class="primary" (click)="listenSelected.emit()">Listen now</ion-button>
           <ion-button fill="outline" (click)="preview.emit()">Preview words</ion-button>
         </div>
       </div>
     </article>`,
-  styles: [`article { display:flex; gap:16px; background:var(--lc-surface, #1c2b24); border:1px solid #35483f; border-radius:20px; padding:18px; margin:20px 0; color:var(--lc-text-primary, #e9eee9); }
-    img { width:100px; height:100px; object-fit:cover; border-radius:12px; flex-shrink:0; }
-    .copy { min-width:0; } h2 { margin:8px 0; font-size:1.3rem; overflow-wrap:anywhere; } small { color:#8cc9b5; }
-    p { margin:8px 0; line-height:1.5; } .words { display:flex; flex-wrap:wrap; gap:8px; } .words span { border:1px solid #567969; border-radius:8px; padding:2px 6px; }
-    .actions { display:flex; flex-wrap:wrap; gap:8px; } ion-button { margin:0; min-height:44px; }
-    @media(max-width:420px) { article { flex-direction:column; } img { width:100%; height:130px; } }`],
+  styles: [`
+    article { display:grid; grid-template-columns:80px minmax(0,1fr); gap:16px; background:var(--lc-surface, #14241c); border:1px solid #35483f; border-radius:20px; padding:18px; color:var(--lc-text-primary, #f4efe4); }
+    img { width:80px; height:80px; object-fit:cover; border-radius:12px; }
+    .copy { min-width:0; } h2 { margin:6px 0; font-size:1.25rem; line-height:1.3; overflow-wrap:anywhere; } small { color:var(--lc-ss-sage); }
+    p { margin:6px 0; line-height:1.4; font-size:.875rem; } .words { display:flex; flex-wrap:wrap; gap:6px; } .words span { background:#23352a; border-radius:6px; padding:3px 8px; }
+    .actions { display:flex; flex-wrap:wrap; gap:8px; margin-top:12px; } ion-button { margin:0; min-height:44px; --border-radius:12px; --color:var(--lc-ss-sage); --border-color:#567969; text-transform:none; }
+    .primary { --background:var(--lc-ss-sage); --color:#102119; }
+    @media(max-width:420px) { article { grid-template-columns:56px minmax(0,1fr); gap:12px; padding:14px; } img { width:56px; height:56px; } }
+  `],
 })
 export class PodcastRecommendationComponent implements AfterViewInit {
   readonly recommendation = input.required<PodcastRecommendation>();
