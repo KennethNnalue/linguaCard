@@ -41,6 +41,7 @@ describe('AdminPodcastStore transcript completion', () => {
     };
     const api = {
       listTopics: jest.fn(() => of([topic])),
+      createTopic: jest.fn(() => of(topic)),
       getTranscript: jest.fn(() => of({ episodeId: 'episode', speakers: payload.speakers, turns: payload.turns })),
       previewTranscript: jest.fn(() => of(preview)),
       generateTranscript: jest.fn(() => of({ payload, preview })),
@@ -93,6 +94,30 @@ describe('AdminPodcastStore transcript completion', () => {
     });
     expect(api.generateTranscript).not.toHaveBeenCalled();
     expect(store.lastCreatedEpisodeId()).toBe('episode');
+  });
+
+  it('continues directly to the first episode after creating a topic', () => {
+    const navigate = jest.fn().mockResolvedValue(true);
+    TestBed.configureTestingModule({ providers: [
+      { provide: Router, useValue: { navigate } },
+      { provide: ActivatedRoute, useValue: {
+        snapshot: { paramMap: { get: () => null }, data: { podcastView: 'create' } },
+      } },
+      { provide: AppNotificationService, useValue: { present: jest.fn().mockResolvedValue(undefined) } },
+      { provide: PodcastTranscriptClipboardService, useValue: {} },
+      { provide: AlertController, useValue: {} },
+    ] });
+    const { store } = setup();
+    const page = TestBed.runInInjectionContext(() => new AdminPodcastTopicsPage());
+    page.view.set('new-topic');
+
+    store.createTopic({
+      title: 'Topic', titleTranslation: 'Translated topic', description: '',
+      targetLanguage: 'de', translationLanguage: 'en', level: 'A1',
+    });
+    TestBed.tick();
+
+    expect(navigate).toHaveBeenCalledWith(['/admin/podcasts', 'topic', 'episodes', 'new']);
   });
 
   it('saves edited draft input before requesting transcript generation', () => {

@@ -1,5 +1,5 @@
 import {
-  BadRequestException, Body, Controller, Delete, Get, HttpCode, HttpStatus, Param, Patch, Post, UploadedFile,
+  BadRequestException, Body, Controller, Delete, Get, Header, HttpCode, HttpStatus, Param, Patch, Post, UploadedFile,
   UseGuards, UseInterceptors,
 } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
@@ -48,6 +48,7 @@ export class AdminPodcastsController {
   ) {}
 
   @Get()
+  @Header('Cache-Control', 'no-store')
   listTopics(): Promise<AdminPodcastTopicListItem[]> {
     return this.podcasts.listTopics();
   }

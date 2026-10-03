@@ -178,7 +178,9 @@ export class AdminPodcastTopicsPage implements OnInit {
     });
     effect(() => {
       const id = this.store.lastCreatedTopicId();
-      if (id && this.view() === 'new-topic') untracked(() => void this.router.navigate(['/admin/podcasts', id]));
+      if (id && this.view() === 'new-topic') {
+        untracked(() => void this.router.navigate(['/admin/podcasts', id, 'episodes', 'new']));
+      }
     });
     effect(() => {
       const item = this.episode();
@@ -563,7 +565,7 @@ export class AdminPodcastTopicsPage implements OnInit {
 
   createAudio(): void {
     const episode = this.episode();
-    if (episode) this.store.generateAudio(episode.id);
+    if (episode?.hasTranscript) this.store.generateAudio(episode.id);
   }
 
   formatDuration(ms: number): string {

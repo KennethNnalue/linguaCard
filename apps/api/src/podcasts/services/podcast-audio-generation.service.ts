@@ -164,7 +164,6 @@ export class PodcastAudioGenerationService {
         throw new ConflictException('Published episodes cannot be regenerated while they are live');
       }
       if (!episode.transcriptFingerprint) throw new ConflictException('Import a valid transcript before generating audio');
-      if (!episode.thumbnailAssetId) throw new ConflictException('Upload an episode thumbnail before generating audio');
       const generationIsActive = episode.audioGenerationStatus === 'generating'
         && episode.updatedAt.getTime() > Date.now() - 5 * 60 * 1000;
       if (generationIsActive || episode.status === 'queued' || episode.status === 'generating') {

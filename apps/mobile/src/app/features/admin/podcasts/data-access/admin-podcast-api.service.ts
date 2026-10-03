@@ -37,7 +37,9 @@ export class AdminPodcastApiService {
   private readonly episodeUrl = `${environment.apiUrl}/admin/podcast-episodes`;
 
   listTopics(): Observable<AdminPodcastTopicListItem[]> {
-    return this.http.get<AdminPodcastTopicListItem[]>(this.topicUrl);
+    return this.http.get<AdminPodcastTopicListItem[]>(this.topicUrl, {
+      params: { refresh: Date.now().toString() },
+    });
   }
 
   createTopic(dto: AdminCreatePodcastTopicDto): Observable<AdminPodcastTopicListItem> {
