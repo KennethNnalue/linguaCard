@@ -278,6 +278,40 @@ describe('PodcastPlayerPage immersive presentation', () => {
     expect(screenAwake.playbackStopped).toHaveBeenCalledTimes(1);
   });
 
+  it('keeps secondary listening settings hidden until More is opened', () => {
+    const options = playerRoot().querySelector('#listening-options');
+    expect(options?.hasAttribute('hidden')).toBe(true);
+    playerRoot().querySelector('.more-control')?.dispatchEvent(new MouseEvent('click', { bubbles: true }));
+    fixture.detectChanges();
+    expect(options?.hasAttribute('hidden')).toBe(false);
+    expect(playerRoot().querySelector('.more-control')?.getAttribute('aria-expanded')).toBe('true');
+    page.toggleOptions();
+    fixture.detectChanges();
+    expect(options?.hasAttribute('hidden')).toBe(true);
+  });
+
+  it('preserves the episode sentence separately from the vocabulary definition', () => {
+    page.inspectWord({ lexemeId: 'word-1', text: 'auf', article: null, translation: 'on',
+      example: null, importance: 'essential', mastery: 'learning', masteryWeight: 0.5, isInVault: true });
+    expect(page.selectedContext()).toEqual({ target: currentTurn.targetText, translation: currentTurn.translation });
+    store.currentTurn.set({ ...currentTurn, id: 'turn-2', targetText: 'Another sentence.' });
+    expect(page.selectedContext()?.target).toBe(currentTurn.targetText);
+    expect(page.selectedVocabulary()?.translation).toBe('on');
+  });
+
+  it('limits word chips and resets expansion when the sentence changes', () => {
+    const vocabulary = ['a', 'b', 'c', 'd'].map(text => ({ lexemeId: text, text, article: null,
+      translation: text, example: null, importance: 'essential' as const, mastery: 'new' as const,
+      masteryWeight: 0, isInVault: false }));
+    store.episode.set({ ...episode, vocabulary });
+    store.currentTurn.set({ ...currentTurn, vocabularyLexemeIds: ['a', 'b', 'c', 'd'] });
+    expect(page.visibleSentenceVocabulary()).toHaveLength(3);
+    page.expandedVocabularyTurn.set(currentTurn.id);
+    expect(page.visibleSentenceVocabulary()).toHaveLength(4);
+    store.currentTurn.set({ ...currentTurn, id: 'turn-2', vocabularyLexemeIds: ['a', 'b', 'c', 'd'] });
+    expect(page.visibleSentenceVocabulary()).toHaveLength(3);
+  });
+
   it('keeps the screen awake while playing and lets the listener allow sleep', async () => {
     page.started();
 

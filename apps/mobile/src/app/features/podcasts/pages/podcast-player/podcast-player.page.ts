@@ -16,7 +16,7 @@ import { TranslatePipe } from '@ngx-translate/core';
 import {
   arrowBackOutline, arrowRedoOutline, arrowUndoOutline, chatbubbles, chatbubblesOutline,
   contractOutline, documentTextOutline, expandOutline, moonOutline, pause, play, repeatOutline,
-  sunnyOutline,
+  sunnyOutline, ellipsisHorizontal,
 } from 'ionicons/icons';
 import { combineLatest, distinctUntilChanged, map } from 'rxjs';
 import {
@@ -68,6 +68,10 @@ export class PodcastPlayerPage implements OnInit, ViewWillLeave {
     const ids = new Set(this.store.currentTurn()?.vocabularyLexemeIds ?? []);
     return (this.store.episode()?.vocabulary ?? []).filter(word => ids.has(word.lexemeId));
   });
+  readonly expandedVocabularyTurn = signal<string | null>(null);
+  readonly visibleSentenceVocabulary = computed(() => this.expandedVocabularyTurn() === this.store.currentTurn()?.id ? this.sentenceVocabulary() : this.sentenceVocabulary().slice(0, 3));
+  readonly optionsOpen = signal(false);
+  readonly selectedContext = signal<{ target: string; translation: string } | null>(null);
   readonly transcriptOpen = signal(false);
   readonly isChromeVisible = computed(
     () => this.transcriptOpen() || !this.immersiveMode.isLandscape() || this.chromeVisible(),
@@ -86,7 +90,7 @@ export class PodcastPlayerPage implements OnInit, ViewWillLeave {
     addIcons({
       arrowBackOutline, arrowRedoOutline, arrowUndoOutline, chatbubbles, chatbubblesOutline,
       contractOutline, documentTextOutline, expandOutline, moonOutline, pause, play, repeatOutline,
-      sunnyOutline,
+      sunnyOutline, ellipsisHorizontal,
     });
     this.destroyRef.onDestroy(() => {
       this.clearChromeAutoHide();
@@ -113,6 +117,10 @@ export class PodcastPlayerPage implements OnInit, ViewWillLeave {
       takeUntilDestroyed(this.destroyRef),
     ).subscribe(config => {
       this.transcriptOpen.set(false);
+      this.optionsOpen.set(false);
+      this.expandedVocabularyTurn.set(null);
+      this.selectedVocabulary.set(null);
+      this.selectedContext.set(null);
       this.store.playbackScopeChanged(config.isTopicQueue);
       this.store.playbackQueueChanged(
         config.playbackQueue.split(',').filter(episodeId => episodeId.length > 0),
@@ -208,7 +216,14 @@ export class PodcastPlayerPage implements OnInit, ViewWillLeave {
     const audio = this.audio()?.nativeElement;
     if (audio) { try { await audio.play(); } catch { this.playbackFailed(); } }
   }
+  toggleOptions(): void {
+    this.optionsOpen.update(open => !open);
+    this.chromeVisible.set(true);
+    this.scheduleChromeAutoHide();
+  }
   inspectWord(word: PodcastPreparationVocabulary): void {
+    const turn = this.store.currentTurn();
+    this.selectedContext.set(turn ? { target: turn.targetText, translation: turn.translation } : null);
     this.stopAudioPlayback(); this.selectedVocabulary.set(word);
   }
   timeChanged(event: Event): void { if (event.target instanceof HTMLAudioElement) this.store.playbackTimeChanged(Math.round(event.target.currentTime * 1000)); }
@@ -325,7 +340,7 @@ export class PodcastPlayerPage implements OnInit, ViewWillLeave {
 
   private scheduleChromeAutoHide(): void {
     this.clearChromeAutoHide();
-    if (!this.chromeVisible() || !this.store.isPlaying() || this.transcriptOpen() || this.selectedVocabulary()) return;
+    if (!this.chromeVisible() || !this.store.isPlaying() || this.transcriptOpen() || this.selectedVocabulary() || this.optionsOpen()) return;
     const focused = this.playerHost()?.nativeElement.ownerDocument.activeElement;
     if (focused instanceof Element && focused.closest('.controls, .top-chrome')) return;
     if (!this.immersiveMode.isLandscape()) return;

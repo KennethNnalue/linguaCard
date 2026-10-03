@@ -49,8 +49,11 @@
           }
           @if (sentenceVocabulary().length) {
             <div class="sentence-vocabulary" aria-label="Focus words in this sentence">
-              @for (word of sentenceVocabulary(); track word.lexemeId) {
+              @for (word of visibleSentenceVocabulary(); track word.lexemeId) {
                 <ion-button fill="outline" size="small" (click)="$event.stopPropagation(); inspectWord(word)">{{ word.text }}</ion-button>
+              }
+              @if (sentenceVocabulary().length > 3) {
+                <ion-button fill="clear" size="small" (click)="$event.stopPropagation(); expandedVocabularyTurn.set(expandedVocabularyTurn() === turn.id ? null : turn.id)" [attr.aria-expanded]="expandedVocabularyTurn() === turn.id">{{ expandedVocabularyTurn() === turn.id ? 'Fewer words' : '+' + (sentenceVocabulary().length - 3) + ' words' }}</ion-button>
               }
             </div>
           }
@@ -86,11 +89,24 @@
             [attr.aria-label]="'podcasts.player.playbackSpeed' | translate:{ speed: store.speed() }">
             <span aria-hidden="true">{{ store.speed() }}×</span>
           </ion-button>
+          <ion-button fill="clear" shape="round" (click)="toggleSubtitles()"
+            [class.active]="store.translationMode() !== 'target'"
+            [attr.aria-pressed]="store.translationMode() !== 'target'"
+            [attr.aria-label]="(store.translationMode() === 'target' ? 'podcasts.player.showSubtitles' : 'podcasts.player.hideSubtitles') | translate">
+            <ion-icon [name]="store.translationMode() === 'target' ? 'chatbubbles-outline' : 'chatbubbles'" /><span>Translation</span>
+          </ion-button>
+          <ion-button class="transcript-control" fill="clear" shape="round" (click)="openTranscript()"
+            [attr.aria-label]="'podcasts.player.openTranscript' | translate">
+            <ion-icon name="document-text-outline" /><span>Transcript</span>
+          </ion-button>
+          <ion-button class="more-control" fill="clear" (click)="toggleOptions()" aria-label="More listening options" [attr.aria-expanded]="optionsOpen()" aria-controls="listening-options"><ion-icon name="ellipsis-horizontal" /><span>More</span></ion-button>
+          <div class="player-options" id="listening-options" [hidden]="!optionsOpen()">
+            <strong>Listening options</strong>
           <ion-button class="repeat-control" fill="clear" shape="round" (click)="toggleRepeat()"
             [class.active]="store.repeatMode() !== 'off'"
             [attr.aria-pressed]="store.repeatMode() !== 'off'"
             [attr.aria-label]="(store.repeatMode() === 'off' ? 'podcasts.player.repeatEpisode' : 'podcasts.player.turnOffRepeat') | translate">
-            <ion-icon slot="icon-only" name="repeat-outline" />
+            <ion-icon name="repeat-outline" /><span>Repeat {{ store.repeatMode() }}</span>
             @if (store.repeatMode() !== 'off') {
               <span class="repeat-mode-badge" aria-hidden="true">{{ store.repeatMode() === 'episode' ? '1' : '∞' }}</span>
             }
@@ -99,18 +115,10 @@
             [class.active]="screenAwake.isKeepingScreenAwake()"
             [attr.aria-pressed]="screenAwake.isKeepingScreenAwake()"
             [attr.aria-label]="(screenAwake.isSleepAllowed() ? 'podcasts.player.keepScreenAwake' : 'podcasts.player.allowScreenSleep') | translate">
-            <ion-icon [name]="screenAwake.isSleepAllowed() ? 'moon-outline' : 'sunny-outline'" />
+            <ion-icon [name]="screenAwake.isSleepAllowed() ? 'moon-outline' : 'sunny-outline'" /><span>{{ screenAwake.isSleepAllowed() ? 'Keep screen awake' : 'Allow screen sleep' }}</span>
           </ion-button>
-          <ion-button fill="clear" shape="round" (click)="toggleSubtitles()"
-            [class.active]="store.translationMode() !== 'target'"
-            [attr.aria-pressed]="store.translationMode() !== 'target'"
-            [attr.aria-label]="(store.translationMode() === 'target' ? 'podcasts.player.showSubtitles' : 'podcasts.player.hideSubtitles') | translate">
-            <ion-icon [name]="store.translationMode() === 'target' ? 'chatbubbles-outline' : 'chatbubbles'" />
-          </ion-button>
-          <ion-button class="transcript-control" fill="clear" shape="round" (click)="openTranscript()"
-            [attr.aria-label]="'podcasts.player.openTranscript' | translate">
-            <ion-icon name="document-text-outline" />
-          </ion-button>
+            <ion-button fill="clear" (click)="toggleOptions()">Close options</ion-button>
+          </div>
         </div>
       </section>
       <ion-modal [isOpen]="selectedVocabulary() !== null" (didDismiss)="selectedVocabulary.set(null)">
@@ -118,7 +126,11 @@
           <ion-content>
             @if (selectedVocabulary(); as word) {
               <section class="word-detail">
-                <h2>{{ word.article }} {{ word.text }}</h2><p>{{ word.translation }}</p>
+                <h2>{{ word.article }} {{ word.text }}</h2>
+                @if (selectedContext(); as context) {
+                  <h3>In this conversation</h3><p>{{ context.target }}</p><p>{{ context.translation }}</p>
+                }
+                <h3>Vocabulary definition</h3><p>{{ word.translation }}</p>
                 <p>{{ word.isInVault ? 'Saved in your vocabulary' : 'New to your vault' }}</p>
                 @if (word.example; as example) { <p>{{ example.target }}</p><p>{{ example.native }}</p> }
                 <ion-button (click)="selectedVocabulary.set(null)">Back to conversation</ion-button>
