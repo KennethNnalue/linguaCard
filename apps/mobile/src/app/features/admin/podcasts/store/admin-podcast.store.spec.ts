@@ -1,6 +1,6 @@
 import { HttpErrorResponse } from '@angular/common/http';
 import { TestBed } from '@angular/core/testing';
-import type { AdminPodcastTopicListItem, AdminPodcastTranscriptPayload, AdminPodcastTranscriptPreview } from '@lingua-card/shared/domain';
+import type { AdminPodcastTopicListItem, AdminPodcastTranscriptPayload, AdminPodcastTranscriptPreview, PodcastThumbnail } from '@lingua-card/shared/domain';
 import { ActivatedRoute, Router } from '@angular/router';
 import { AlertController } from '@ionic/angular';
 import { AppNotificationService } from '@lingua-card/mobile/notifications';
@@ -24,6 +24,11 @@ const preview: AdminPodcastTranscriptPreview = {
 const result = {
   episodeId: 'episode', title: 'Conversation', titleTranslation: 'Conversation', description: '',
   fingerprint: 'fingerprint', speakerCount: 1, turnCount: 1, vocabularyCount: 0, estimatedDurationMs: 1000,
+};
+const thumbnail: PodcastThumbnail = {
+  assetId: 'asset', cardUrl: '/card.webp', cardWidth: 640, cardHeight: 360,
+  heroUrl: '/hero.webp', heroWidth: 1280, heroHeight: 720,
+  accessibilityDescription: 'Episode artwork', focalPoint: { x: .5, y: .5 }, version: 1,
 };
 
 describe('AdminPodcastStore transcript completion', () => {
@@ -50,6 +55,8 @@ describe('AdminPodcastStore transcript completion', () => {
       approveAudio: jest.fn(() => of(topic.episodes[0])),
       commitTranscript: jest.fn(() => of(result)),
       deleteEpisode: jest.fn(() => of(undefined)),
+      uploadTopicThumbnail: jest.fn(() => of(thumbnail)),
+      uploadEpisodeThumbnail: jest.fn(() => of(thumbnail)),
       publishVocabularyCollection: jest.fn(() => of({
         collection: {
           id: 'platform-collection', title: 'Podcast · Draft', emoji: '🎙️', coverImageUrl: null,
@@ -94,6 +101,26 @@ describe('AdminPodcastStore transcript completion', () => {
     });
     expect(api.generateTranscript).not.toHaveBeenCalled();
     expect(store.lastCreatedEpisodeId()).toBe('episode');
+  });
+
+  it('exposes artwork upload progress until the upload finishes', () => {
+    const { api, store } = setup();
+    const uploaded = new Subject<PodcastThumbnail>();
+    api.uploadEpisodeThumbnail.mockReturnValue(uploaded);
+
+    store.uploadEpisodeThumbnail({
+      episodeId: 'episode',
+      upload: {
+        file: new File(['image'], 'episode.webp', { type: 'image/webp' }),
+        accessibilityDescription: 'Episode artwork', focalPointX: .5, focalPointY: .5,
+      },
+    });
+
+    expect(store.uploadingEpisodeThumbnailId()).toBe('episode');
+    uploaded.next(thumbnail);
+    uploaded.complete();
+    expect(store.uploadingEpisodeThumbnailId()).toBeNull();
+    expect(store.topics()[0].episodes[0].thumbnail).toEqual(thumbnail);
   });
 
   it('continues directly to the first episode after creating a topic', () => {
@@ -184,7 +211,10 @@ describe('AdminPodcastStore transcript completion', () => {
     expect(api.commitTranscript).not.toHaveBeenCalled();
     expect(store.completedTranscriptEpisodeId()).toBeNull();
     expect(store.transcriptStatus()).toBe('error');
-    expect(store.error()).toContain('/turns/0/speakerKey: Unknown speaker. Use a declared speaker key.');
+    expect(store.error()).toBe('Transcript validation found 1 issue. Review the details below.');
+    expect(store.transcriptPreview()?.conflicts).toEqual([expect.objectContaining({
+      pointer: '/turns/0/speakerKey', message: 'Unknown speaker.',
+    })]);
     store.previewTranscript({ episodeId: 'episode', payload });
     expect(store.error()).toBeNull();
     expect(store.completedTranscriptEpisodeId()).toBe('episode');
@@ -258,6 +288,25 @@ describe('AdminPodcastStore transcript completion', () => {
 
     expect(store.topics()[0].episodes).toEqual([]);
     expect(navigate).toHaveBeenCalledWith(['/admin/podcasts', 'topic']);
+  });
+
+  it('reloads topics whenever the cached Ionic page becomes active', () => {
+    TestBed.configureTestingModule({ providers: [
+      { provide: Router, useValue: { navigate: jest.fn().mockResolvedValue(true) } },
+      { provide: ActivatedRoute, useValue: {
+        snapshot: { paramMap: { get: () => 'topic' }, data: { podcastView: 'topic' } },
+      } },
+      { provide: AppNotificationService, useValue: { present: jest.fn().mockResolvedValue(undefined) } },
+      { provide: PodcastTranscriptClipboardService, useValue: {} },
+      { provide: AlertController, useValue: {} },
+    ] });
+    const { api } = setup();
+    const page = TestBed.runInInjectionContext(() => new AdminPodcastTopicsPage());
+    page.ngOnInit();
+
+    page.ionViewWillEnter();
+
+    expect(api.listTopics).toHaveBeenCalledTimes(2);
   });
 
   it('collects exceptional vocabulary choices before copying the prompt once', async () => {

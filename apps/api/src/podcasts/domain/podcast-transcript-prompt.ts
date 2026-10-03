@@ -33,8 +33,8 @@ export function normalizePodcastVocabularyItem(rawItem: string): string {
   const headword = suppliedText
     .trim()
     .replace(/^[-*]\s+/u, '')
-    .split(',', 1)[0]
     .replace(/\s*\([^)]*\)/gu, '')
+    .split(',', 1)[0]
     .replace(/\|/gu, '')
     .replace(/^(?:der|die|das)\s+/iu, '')
     .trim();

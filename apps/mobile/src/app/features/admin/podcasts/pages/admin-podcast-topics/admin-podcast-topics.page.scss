@@ -32,3 +32,65 @@
   gap: 0.5rem;
   color: var(--ion-color-success);
 }
+
+.upload-button.is-uploading {
+  cursor: wait;
+  gap: 0.75rem;
+  opacity: 0.8;
+  pointer-events: none;
+}
+
+.upload-button ion-spinner {
+  width: 1.5rem;
+  height: 1.5rem;
+}
+
+.route-loading {
+  display: grid;
+  justify-items: center;
+  gap: 1rem;
+  padding: 3rem 1rem;
+  color: var(--muted);
+  text-align: center;
+}
+
+.transcript-conflicts {
+  display: grid;
+  gap: 1rem;
+  margin-top: 1.5rem;
+  padding: 1.25rem;
+  border: 2px solid var(--ion-color-danger);
+  border-radius: 1rem;
+  background: var(--panel);
+
+  h3,
+  p {
+    margin: 0;
+  }
+
+  > p {
+    color: var(--muted);
+  }
+}
+
+.conflict-list {
+  display: grid;
+  gap: 0.75rem;
+
+  article {
+    display: grid;
+    gap: 0.45rem;
+    padding: 1rem;
+    border-radius: 0.75rem;
+    background: var(--bg);
+  }
+
+  code {
+    color: var(--gold);
+    overflow-wrap: anywhere;
+  }
+
+  small {
+    color: var(--muted);
+  }
+}
