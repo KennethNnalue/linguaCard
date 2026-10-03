@@ -35,6 +35,13 @@ export class CollectionsService {
   async findOne(userId: string, id: string): Promise<Collection> {
     const entity = await this.repo.findOneBy({ id, userId });
     if (!entity) throw new NotFoundException(`Collection ${id} not found`);
+    if (entity.sourcePodcastEpisodeId) {
+      const published: Array<{ id: string }> = await this.repo.manager.query(`
+        SELECT episode.id FROM podcast_episodes episode JOIN podcast_topics topic ON topic.id = episode."topicId"
+        WHERE episode.id = $1 AND episode.status = 'published' AND topic.status = 'published' AND episode."audioUrl" IS NOT NULL
+      `, [entity.sourcePodcastEpisodeId]);
+      if (!published.length) entity.sourcePodcastEpisodeId = null;
+    }
     const countsMap = await this.buildCountsMap(userId);
     return this.toModel(entity, countsMap.get(id) ?? { cardCount: 0, masteredCount: 0, dueCount: 0 });
   }
@@ -137,6 +144,7 @@ export class CollectionsService {
       pendingWords: e.pendingWords ?? [],
       sourceImageDescription: e.sourceImageDescription ?? undefined,
       sourcePlatformCollectionId: e.sourcePlatformCollectionId ?? null,
+      sourcePodcastEpisodeId: e.sourcePodcastEpisodeId ?? null,
       level: e.level ?? null,
       topic: e.topic ?? null,
       createdAt: e.createdAt instanceof Date ? e.createdAt.toISOString() : e.createdAt,

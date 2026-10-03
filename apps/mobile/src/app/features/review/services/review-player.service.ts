@@ -90,7 +90,9 @@ export class ReviewPlayerService {
       stopTrackingViewport();
       await this.restoreKeyboardBehavior();
     }
-    if (completed) await this.router.navigate([ReviewRoute.SUMMARY]);
+    if (completed) await this.router.navigate([ReviewRoute.SUMMARY], {
+      queryParams: { sessionId: this.reviewStore.completedSession()?.id },
+    });
     return completed;
   }
 

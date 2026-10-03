@@ -224,6 +224,7 @@ export const ReviewStore = signalStore(
       const ratings = store.sessionRatings();
       return {
         id: session.definition.id,
+        continuation: session.definition.source.continuation,
         startedAt: session.definition.startedAt.toISOString(),
         completedAt: session.completedAt?.toISOString() ?? new Date().toISOString(),
         totalCards: session.definition.originalCardIds.length,
@@ -313,6 +314,13 @@ export const ReviewStore = signalStore(
     }
 
     return {
+      async restoreCompletedSession(sessionId: string): Promise<void> {
+        const userId = authService.currentUser()?.id;
+        if (!userId) return;
+        const history = await readPersistedSessionHistory(userId);
+        if (authService.currentUser()?.id !== userId) return;
+        patchState(store, { completedSession: history.find(session => session.id === sessionId) ?? null });
+      },
       async initializeFromPersistence(): Promise<void> {
         const userId = authService.currentUser()?.id;
         if (!userId) return;

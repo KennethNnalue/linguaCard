@@ -1,6 +1,6 @@
 import {ComponentFixture, TestBed} from '@angular/core/testing';
 import {By} from '@angular/platform-browser';
-import {Router} from '@angular/router';
+import {ActivatedRoute, Router} from '@angular/router';
 import type {ReviewSessionHistoryEntry} from '../../models/review.model';
 import {ReviewStore} from '../../store/review.store';
 import {SessionStatsService} from '../../shared/services/session-stats.service';
@@ -34,6 +34,7 @@ describe('SessionSummaryPage', () => {
       imports: [SessionSummaryPage],
       providers: [
         {provide: Router, useValue: {navigate}},
+        {provide: ActivatedRoute, useValue: {snapshot: {queryParamMap: {get: () => null}}}},
         {provide: ReviewStore, useValue: {completedSession: () => session, clearSession}},
         {provide: SessionStatsService, useValue: {formatDuration: () => '1m 0s', recallRate: () => 0}},
         {

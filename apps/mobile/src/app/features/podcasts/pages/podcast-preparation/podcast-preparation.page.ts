@@ -1,4 +1,5 @@
-import { ChangeDetectionStrategy, Component, ElementRef, inject, OnInit, signal, viewChild } from '@angular/core';
+import { PodcastDiscoveryEventsService } from '../../services/podcast-discovery-events.service';
+import { ChangeDetectionStrategy, Component, ElementRef, inject, signal, viewChild } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { IonButton, IonContent, IonIcon, IonSpinner } from '@ionic/angular';
 import { addIcons } from 'ionicons';
@@ -22,11 +23,12 @@ import { PodcastTranscriptComponent } from '../../components/podcast-transcript/
   styleUrls: ['./podcast-preparation.page.scss', './podcast-preparation-actions.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class PodcastPreparationPage implements OnInit {
+export class PodcastPreparationPage {
   readonly store = inject(PodcastCatalogueStore);
   readonly transcriptOpen = signal(false);
   private readonly route = inject(ActivatedRoute);
   private readonly router = inject(Router);
+  private readonly discoveryEvents = inject(PodcastDiscoveryEventsService);
   private readonly reviewPlayer = inject(ReviewPlayerService);
   private readonly cardStore = inject(CardStore);
   private readonly collectionStore = inject(CollectionStore);
@@ -36,7 +38,7 @@ export class PodcastPreparationPage implements OnInit {
   constructor() {
     addIcons({ arrowBackOutline, closeOutline, documentTextOutline, libraryOutline, play, schoolOutline, volumeHighOutline });
   }
-  ngOnInit(): void { this.store.loadPreparation(this.route.snapshot.paramMap.get('episodeId') ?? ''); }
+  ionViewWillEnter(): void { this.store.loadPreparation(this.route.snapshot.paramMap.get('episodeId') ?? ''); }
   goBack(topicId: string): void { void this.router.navigate(['/podcasts/topics', topicId]); }
   listenNow(): void {
     const episodeId = this.store.preparation()?.episode.id;
@@ -60,13 +62,14 @@ export class PodcastPreparationPage implements OnInit {
     const collectionId = await this.store.prepareSuggestedVocabulary(preparation.episode.id);
     if (!collectionId) return;
     await this.refreshVaultState();
+    this.discoveryEvents.record({ name: 'preparation_review_started', episodeId: preparation.episode.id });
     await this.reviewPlayer.openSource(
-      { kind: 'collection', collectionId }, preparation.readiness.learnFirstCount,
+      { kind: 'collection', collectionId, continuation: { kind: 'podcast', episodeId: preparation.episode.id, title: preparation.episode.title } }, preparation.readiness.learnFirstCount,
     );
   }
   async prepareWords(episodeId: string): Promise<void> {
     const collectionId = await this.store.prepareSuggestedVocabulary(episodeId);
-    if (collectionId) await this.refreshVaultState();
+    if (collectionId) { await this.refreshVaultState(); this.discoveryEvents.refresh(); }
   }
   async openPreparedCollection(): Promise<void> {
     const collectionId = this.store.preparationCollectionId();

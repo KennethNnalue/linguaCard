@@ -1,6 +1,6 @@
 import { PodcastRecommendationSlotComponent } from '../../../podcasts/components/podcast-recommendation/podcast-recommendation-slot.component';
 import { ChangeDetectionStrategy, Component, computed, inject, OnInit } from '@angular/core';
-import { Router } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { IonButton, IonContent, IonIcon } from '@ionic/angular';
 import { addIcons } from 'ionicons';
 import { checkmarkOutline, closeOutline, refreshOutline, sparklesOutline } from 'ionicons/icons';
@@ -40,6 +40,7 @@ const RATING_BAR_CLS: Record<ReviewRating, string> = {
 export class SessionSummaryPage implements OnInit {
   private readonly reviewStore = inject(ReviewStore);
   private readonly router = inject(Router);
+  private readonly route = inject(ActivatedRoute, { optional: true });
   private readonly statsService = inject(SessionStatsService);
   private readonly engagementStore = inject(EngagementStore);
   private readonly feedback = inject(ReviewFeedbackService);
@@ -54,7 +55,12 @@ export class SessionSummaryPage implements OnInit {
   readonly celebration = this.engagementStore.activeCelebration;
   readonly celebrationShouldAnimate = this.engagementStore.celebrationShouldAnimate;
 
-  ngOnInit(): void {
+  async ngOnInit(): Promise<void> {
+    const sessionId = this.route?.snapshot.queryParamMap.get('sessionId');
+    if (!this.session() && sessionId) {
+      try { await this.reviewStore.restoreCompletedSession(sessionId); }
+      catch { void this.router.navigate([ReviewRoute.HUB], { replaceUrl: true }); return; }
+    }
     const session = this.session();
     if (!session) {
       void this.router.navigate([ReviewRoute.HUB], { replaceUrl: true });
@@ -124,6 +130,13 @@ export class SessionSummaryPage implements OnInit {
     });
     this.dismissCelebration();
     void this.reviewPlayer.open(cards, { kind: 'explicit', cardIds });
+  }
+
+  continueToConversation(): void {
+    const continuation = this.session()?.continuation;
+    if (!continuation) return;
+    this.dismissCelebration();
+    void this.router.navigate(['/podcasts/episodes', continuation.episodeId]);
   }
 
   goToStories(): void {

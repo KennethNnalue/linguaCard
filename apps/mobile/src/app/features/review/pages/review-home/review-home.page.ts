@@ -1,3 +1,4 @@
+import { ReviewStore } from '../../store/review.store';
 import { PodcastRecommendationSlotComponent } from '../../../podcasts/components/podcast-recommendation/podcast-recommendation-slot.component';
 import { PodcastDiscoveryEventsService } from '../../../podcasts/services/podcast-discovery-events.service';
 import {ChangeDetectionStrategy, Component, inject, signal} from '@angular/core';
@@ -77,6 +78,7 @@ import {ReviewHomeStore} from '../../store/review-home.store';
   ],
 })
 export class ReviewHomePage {
+  readonly activeReview = inject(ReviewStore).session;
   readonly store = inject(ReviewHomeStore);
   readonly reviewLaunching = inject(ReviewPlayerService).isLaunching;
   readonly user = inject(AuthService).currentUser;
@@ -116,6 +118,11 @@ export class ReviewHomePage {
 
   ionViewWillLeave(): void {
     this.closeMenu();
+  }
+
+  returnToConversation(): void {
+    const continuation = this.activeReview()?.definition.source.continuation;
+    if (continuation) void this.router.navigate(['/podcasts/episodes', continuation.episodeId]);
   }
 
   async performPrimaryAction(viewModel: ReviewHomeViewModel): Promise<void> {

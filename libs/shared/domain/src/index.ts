@@ -510,6 +510,7 @@ export interface Collection {
   sourceImageDescription?: string;
   /** Set when adopted from a platform collection (LC-405). */
   sourcePlatformCollectionId?: string | null;
+  sourcePodcastEpisodeId?: string | null;
   /** CEFR level from source platform collection (LC-405). */
   level?: string | null;
   /** Topic from source platform collection (LC-405). */
@@ -2193,3 +2194,5 @@ export interface PodcastClientEvent {
   recommendationId?: string;
   policyVersion?: string;
 }
+
+export type ReviewContinuation = { kind: 'podcast'; episodeId: string; title: string };

@@ -49,7 +49,14 @@
       </div>
     }
 
-    <lc-podcast-recommendation-slot placement="review_summary" [sessionId]="session()?.id" />
+    @if (session()?.continuation; as continuation) {
+      <section class="ss-card">
+        <h2>Continue to your conversation</h2><p>{{ continuation.title }}</p>
+        <ion-button (click)="continueToConversation()">Continue to conversation</ion-button>
+      </section>
+    } @else {
+      <lc-podcast-recommendation-slot placement="review_summary" [sessionId]="session()?.id" />
+    }
 
     <!-- How it went -->
     <div class="ss-card">

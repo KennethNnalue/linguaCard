@@ -13,13 +13,15 @@ export interface ReviewFilters {
   readonly stages?: readonly LearningStage[];
   readonly problemStatus?: ProblemStatus;
 }
-export type ReviewSessionSource =
+import type { ReviewContinuation } from '@lingua-card/shared/domain';
+
+export type ReviewSessionSource = (
   | { readonly kind: 'daily' }
   | { readonly kind: 'collection'; readonly collectionId: string }
   | { readonly kind: 'explicit'; readonly cardIds: readonly string[] }
   | { readonly kind: 'new-only' }
   | { readonly kind: 'struggling' }
-  | { readonly kind: 'custom'; readonly filters: ReviewFilters };
+  | { readonly kind: 'custom'; readonly filters: ReviewFilters }) & { readonly continuation?: ReviewContinuation };
 export type ReviewResponseType = 'self_rated' | 'typed_answer' | 'dont_know';
 export type RelearningStep = 'immediate' | 'one_day' | 'final';
 export type AnswerEvaluationResult = 'correct' | 'partially_correct' | 'incorrect';

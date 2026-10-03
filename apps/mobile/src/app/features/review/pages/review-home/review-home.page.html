@@ -209,6 +209,9 @@
           </section>
         }
       }
+      @if (activeReview()?.definition.source.continuation; as continuation) {
+        <ion-button fill="outline" (click)="returnToConversation()">Return to {{ continuation.title }}</ion-button>
+      }
       <lc-podcast-recommendation-slot placement="home" />
       <lc-review-home-controls
         [dashboard]="store.dashboard()"

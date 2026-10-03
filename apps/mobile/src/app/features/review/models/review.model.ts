@@ -246,7 +246,10 @@ export const RING_CIRCUMFERENCE_INNER = 2 * Math.PI * RING_RADIUS_INNER;
 
 // ─── REVIEW SESSION HISTORY ──────────────────────────────────────────────────
 
+import type { ReviewContinuation } from '@lingua-card/shared/domain';
+
 export interface ReviewSessionHistoryEntry {
+  continuation?: ReviewContinuation;
   id: string;
   startedAt: string;
   completedAt: string;

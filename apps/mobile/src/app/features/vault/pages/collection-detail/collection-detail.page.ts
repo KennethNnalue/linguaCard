@@ -6,6 +6,7 @@ import {
   ActionSheetController,
   AlertController,
   IonContent,
+  IonButton,
   IonSpinner,
   ModalController,
   } from '@ionic/angular';
@@ -73,7 +74,7 @@ function firstPluralFromGrammar(value: unknown): string | null {
   templateUrl: './collection-detail.page.html',
   styleUrls: ['./collection-detail.page.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [IonContent, IonSpinner, FabButtonComponent, TranslatePipe, CollectionCoverComponent, WordRowComponent],
+  imports: [IonButton, IonContent, IonSpinner, FabButtonComponent, TranslatePipe, CollectionCoverComponent, WordRowComponent],
 })
 export class CollectionDetailPage implements OnInit {
   private readonly route = inject(ActivatedRoute);
@@ -308,6 +309,11 @@ export class CollectionDetailPage implements OnInit {
     const col = this.collection();
     if (!col) return;
     void this.reviewPlayer.open(this.reviewCards(), { kind: 'collection', collectionId: col.id });
+  }
+
+  playConversation(): void {
+    const episodeId = this.collection()?.sourcePodcastEpisodeId;
+    if (episodeId) void this.router.navigate(['/podcasts/episodes', episodeId, 'player'], { queryParams: { autoplay: '1' } });
   }
 
   startListen(): void {

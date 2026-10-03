@@ -27,3 +27,9 @@ Verification: development Angular build and app TypeScript passed; existing Home
 Separated unfinished episodes, vocabulary recommendations, topic browsing and completed replay history. The level filter explicitly applies to new conversations, while unfinished episodes remain available across levels. The flag-disabled fallback uses generic discovery wording. Library refreshes on re-entry.
 
 Verification: Angular development build, app TypeScript and catalogue behavior tests (4) passed; added assertions that discovery excludes history and respects the selected level.
+
+## Step 5 — Preserve episode context (P1-D)
+
+Preparation review sources now contain a typed episode continuation, serialized with the active session and copied to completed history. Summary URLs include a session ID and can restore their matching local history after reload. The originating episode takes precedence over a new recommendation; Home offers a return link for an unfinished preparation review. Collection detail distinguishes word audio from conversation playback, using API provenance rather than names; unpublished source episodes are hidden on detail reads.
+
+Verification: API/app TypeScript passed; existing review persistence/player/Home and collections suites passed (13 tests). Summary route fixture was updated for its new route dependency; summary and continuation serialization tests passed (5 tests). Angular development build passed. Continuation is device-local, consistent with current review persistence; cross-device continuation requires a server contract extension.
