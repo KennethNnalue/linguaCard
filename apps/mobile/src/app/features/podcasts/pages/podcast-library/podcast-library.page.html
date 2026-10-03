@@ -6,6 +6,7 @@
 
 <ion-content>
   <main class="pod-page">
+    <p class="pod-filter-hint">Choose a level for new conversations. Your unfinished episodes stay available below.</p>
     <div class="pod-levels" [attr.aria-label]="'podcasts.library.levelFilter' | translate">
       @for (level of levels; track level) {
         <button type="button" [class.selected]="store.selectedLevel() === level"
@@ -18,23 +19,34 @@
     } @else if (store.error(); as error) {
       <div class="pod-state"><span>{{ error }}</span><button type="button" (click)="store.loadTopics()">{{ 'podcasts.library.retry' | translate }}</button></div>
     } @else {
-      @if (store.featuredEpisodes().length) {
-        <section class="pod-section" aria-labelledby="pod-featured-heading">
-          <div class="pod-section-title"><span>{{ 'podcasts.library.pickedForYou' | translate }}</span><h2 id="pod-featured-heading">{{ 'podcasts.library.episodesForYou' | translate }}</h2></div>
+      @if (store.resumableEpisodes().length) {
+        <section class="pod-section" aria-labelledby="continue-listening-heading">
+          <h2 id="continue-listening-heading">Continue listening</h2>
           <div class="pod-featured-rail">
-            @for (item of store.featuredEpisodes(); track item.episode.id) {
-              <button type="button" class="pod-episode" (click)="openFeatured(item)">
-                <div class="pod-episode-art">
-                  <img [lcOfflineSrc]="item.episode.thumbnail.cardUrl"
-                    [alt]="item.episode.thumbnail.accessibilityDescription"
-                    [style.object-position]="(item.episode.thumbnail.focalPoint.x * 100) + '% ' + (item.episode.thumbnail.focalPoint.y * 100) + '%'" />
-                  @if (item.source === 'continue') { <span class="pod-episode-badge">{{ 'podcasts.library.continue' | translate }} · {{ item.progressPercent }}%</span> }
-                  @else if (item.completed) { <span class="pod-episode-badge">{{ 'podcasts.library.listened' | translate }}</span> }
-                  @else if (item.source === 'recent') { <span class="pod-episode-badge">{{ 'podcasts.library.continue' | translate }} · {{ item.progressPercent }}%</span> }
-                  <span class="pod-episode-title">{{ item.episode.title }}</span>
-                </div>
-                @if (item.episode.titleTranslation) { <span class="pod-episode-translation">{{ item.episode.titleTranslation }}</span> }
-                <span class="pod-episode-meta">{{ item.episode.level }} · {{ duration(item.episode.durationMs) }} · {{ item.episode.topicTitle }}</span>
+            @for (activity of store.resumableEpisodes(); track activity.episode.id) {
+              <button type="button" class="pod-episode" (click)="resume(activity.episode.id)">
+                <div class="pod-episode-art"><img [lcOfflineSrc]="activity.episode.thumbnail.cardUrl" alt="" />
+                  <span class="pod-episode-title">{{ activity.episode.title }}</span></div>
+                <span class="pod-episode-translation">{{ activity.episode.titleTranslation }}</span>
+                <span class="pod-episode-meta">{{ activity.episode.level }} · {{ duration(activity.episode.durationMs) }} · {{ activity.progressPercent }}% through</span>
+              </button>
+            }
+          </div>
+        </section>
+      }
+      @if (recommendationsEnabled) {
+        <section class="pod-section" aria-label="Practise your words">
+          <lc-podcast-recommendation-slot placement="library" [level]="store.selectedLevel()" />
+        </section>
+      } @else if (store.discoveryEpisodes().length) {
+        <section class="pod-section" aria-labelledby="discover-heading">
+          <h2 id="discover-heading">Discover short conversations</h2>
+          <div class="pod-featured-rail">
+            @for (episode of store.discoveryEpisodes(); track episode.id) {
+              <button type="button" class="pod-episode" (click)="preview(episode.id)">
+                <div class="pod-episode-art"><img [lcOfflineSrc]="episode.thumbnail.cardUrl" alt="" /><span class="pod-episode-title">{{ episode.title }}</span></div>
+                <span class="pod-episode-translation">{{ episode.titleTranslation }}</span>
+                <span class="pod-episode-meta">{{ episode.level }} · {{ duration(episode.durationMs) }}</span>
               </button>
             }
           </div>
@@ -61,6 +73,19 @@
         </section>
       } @else {
         <p class="pod-state">{{ 'podcasts.library.empty' | translate }}</p>
+      }
+      @if (store.completedEpisodes().length) {
+        <section class="pod-section" aria-labelledby="recently-listened-heading">
+          <h2 id="recently-listened-heading">Recently listened</h2>
+          <div class="pod-featured-rail">
+            @for (activity of store.completedEpisodes(); track activity.episode.id) {
+              <button type="button" class="pod-episode" (click)="preview(activity.episode.id)">
+                <div class="pod-episode-art"><img [lcOfflineSrc]="activity.episode.thumbnail.cardUrl" alt="" /><span class="pod-episode-title">{{ activity.episode.title }}</span></div>
+                <span class="pod-episode-meta">{{ activity.episode.level }} · {{ duration(activity.episode.durationMs) }} · Replay available</span>
+              </button>
+            }
+          </div>
+        </section>
       }
     }
   </main>

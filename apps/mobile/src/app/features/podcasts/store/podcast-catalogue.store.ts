@@ -72,6 +72,9 @@ export const PodcastCatalogueStore = signalStore(
     hasSuggestedVocabularyToAdd: computed(() => preparation()?.vocabulary.some(
       item => item.importance === 'essential' && !item.isInVault,
     ) ?? false),
+    resumableEpisodes: computed(() => recentEpisodes().filter(item => item.status === 'in_progress')),
+    completedEpisodes: computed(() => recentEpisodes().filter(item => item.status === 'completed')),
+    discoveryEpisodes: computed(() => suggestedEpisodes().filter(item => selectedLevel() === 'all' || item.level === selectedLevel())),
     featuredEpisodes: computed(() => {
       const items: PodcastFeaturedEpisode[] = [];
       const seen = new Set<string>();

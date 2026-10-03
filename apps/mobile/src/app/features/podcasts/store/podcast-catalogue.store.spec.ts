@@ -144,6 +144,10 @@ describe('PodcastCatalogueStore level selection', () => {
     await waitFor(() => store.status() === 'success');
 
     expect(store.featuredEpisodes()).toHaveLength(10);
+    expect(store.discoveryEpisodes().every(item => item.level === 'A1')).toBe(true);
+    expect(store.discoveryEpisodes().some(item => item.id.startsWith('played'))).toBe(false);
+    expect(store.completedEpisodes().every(item => item.status === 'completed')).toBe(true);
+    expect(store.resumableEpisodes().every(item => item.status === 'in_progress')).toBe(true);
     expect(store.featuredEpisodes().slice(0, 3).map(item => item.episode.id))
       .toEqual(['played-0', 'played-1', 'played-2']);
     expect(store.featuredEpisodes().slice(3).every(item => item.episode.level === 'A1')).toBe(true);

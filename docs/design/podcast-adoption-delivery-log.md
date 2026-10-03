@@ -21,3 +21,9 @@ Verification: API TypeScript passed; telemetry validation and playback qualifica
 Added a reusable presentational card and scoped recommendation store. Home/summary load independently from review; Play bypasses preparation, Preview is read-only navigation. Visible cards record impressions; selections and actual audio play are tracked. Pending commits suppress session/recent-review wording. Cache keys include user, language context, level, placement and session. Results ignore reset/stale requests. Successful review sync refreshes recommendations.
 
 Verification: development Angular build and app TypeScript passed; existing Home/summary tests (4) and new failure/cache/reset behavior tests (3) passed. Production is disabled by default until `PODCAST_RECOMMENDATIONS_ENABLED=true` is set at build time; development enables it. Offline cache needs a previously saved active Vault context and does not promise downloaded audio. Telemetry delivery failures are counted locally; no outbound third-party analytics is used.
+
+## Step 4 — Honest library sections (P1-C)
+
+Separated unfinished episodes, vocabulary recommendations, topic browsing and completed replay history. The level filter explicitly applies to new conversations, while unfinished episodes remain available across levels. The flag-disabled fallback uses generic discovery wording. Library refreshes on re-entry.
+
+Verification: Angular development build, app TypeScript and catalogue behavior tests (4) passed; added assertions that discovery excludes history and respects the selected level.
