@@ -13,7 +13,7 @@ describe('PodcastAudioGenerationService', () => {
   it('keeps the existing approved audio when a new provider attempt fails', async () => {
     const episode = Object.assign(new PodcastEpisodeEntity(), {
       id: 'episode', topicId: 'topic', status: 'ready_for_review' as const,
-      transcriptFingerprint: 'fingerprint', thumbnailAssetId: 'thumbnail',
+      transcriptFingerprint: 'fingerprint', thumbnailAssetId: null,
       contentVersion: 2, audioVersion: 1, audioUrl: 'https://audio.example/old.mp3',
       audioStoragePath: 'old.mp3', approvedAudioVersion: 1,
       audioGenerationStatus: 'idle' as const, audioGenerationAttemptId: null,
@@ -52,6 +52,7 @@ describe('PodcastAudioGenerationService', () => {
     const service = module.get(PodcastAudioGenerationService);
 
     await expect(service.generate('episode')).rejects.toThrow('Provider unavailable');
+    expect(voices.resolveVoiceIds).toHaveBeenCalled();
     expect(episode.status).toBe('ready_for_review');
     expect(episode.audioUrl).toBe('https://audio.example/old.mp3');
     expect(episode.approvedAudioVersion).toBe(1);
