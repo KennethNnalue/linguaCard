@@ -37,7 +37,7 @@ export const PodcastRecommendationsStore = signalStore(
           cacheKey = `${userId}:${context.id}:${level}:${placement}:${sessionId ?? 'recent'}`;
           try {
             const cached = await local.getPodcastRecommendations(cacheKey);
-            if (sequence !== request) return;
+            if (sequence !== request || auth.currentUser()?.id !== userId) return;
             if (cached) patchState(store, { response: { ...cached, evidence: 'unavailable' }, status: 'success', cached: true });
           } catch { /* Recommendations remain optional when cache storage fails. */ }
           const response = await firstValueFrom(api.recommendations(placement, level, sessionId));

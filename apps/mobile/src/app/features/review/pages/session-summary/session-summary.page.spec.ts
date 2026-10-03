@@ -1,3 +1,4 @@
+import { signal } from '@angular/core';
 import {ComponentFixture, TestBed} from '@angular/core/testing';
 import {By} from '@angular/platform-browser';
 import {ActivatedRoute, Router} from '@angular/router';
@@ -26,16 +27,21 @@ describe('SessionSummaryPage', () => {
     reviewedCardIds: ['card-1'],
     manuallyMasteredCardIds: [],
   };
+  const currentSession = signal<ReviewSessionHistoryEntry | null>(null);
+  let requestedSessionId: string | null = null;
+  const restoreCompletedSession = jest.fn(async (id: string) => currentSession.set({ ...session, id, continuation: { kind: 'podcast', episodeId: 'original-episode', title: 'Original conversation' } }));
   const clearSession = jest.fn();
   const navigate = jest.fn().mockResolvedValue(true);
 
   beforeEach(async () => {
+    currentSession.set(session); requestedSessionId = null;
+    jest.clearAllMocks();
     await TestBed.configureTestingModule({
       imports: [SessionSummaryPage],
       providers: [
         {provide: Router, useValue: {navigate}},
-        {provide: ActivatedRoute, useValue: {snapshot: {queryParamMap: {get: () => null}}}},
-        {provide: ReviewStore, useValue: {completedSession: () => session, clearSession}},
+        {provide: ActivatedRoute, useValue: {snapshot: {queryParamMap: {get: () => requestedSessionId}}}},
+        {provide: ReviewStore, useValue: {completedSession: currentSession, clearSession, restoreCompletedSession}},
         {provide: SessionStatsService, useValue: {formatDuration: () => '1m 0s', recallRate: () => 0}},
         {
           provide: EngagementStore,
@@ -54,6 +60,15 @@ describe('SessionSummaryPage', () => {
 
     fixture = TestBed.createComponent(SessionSummaryPage);
     fixture.detectChanges();
+  });
+
+  it('restores the URL session instead of retaining a different completed session', async () => {
+    requestedSessionId = 'older-session';
+    await fixture.componentInstance.ngOnInit();
+    expect(restoreCompletedSession).toHaveBeenCalledWith('older-session');
+    expect(fixture.componentInstance.session()?.id).toBe('older-session');
+    fixture.componentInstance.continueToConversation();
+    expect(navigate).toHaveBeenCalledWith(['/podcasts/episodes', 'original-episode'], { queryParams: { fromReview: '1' } });
   });
 
   it('returns to Review home from the top close button', () => {

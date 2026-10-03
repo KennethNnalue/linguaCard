@@ -301,14 +301,18 @@ export class CollectionDetailPage implements OnInit {
     const now = new Date();
     void this.reviewPlayer.open(
       this.reviewCards().filter(card => this.isViewDue(card.reviewState, now)),
-      { kind: 'collection', collectionId: col.id },
+      { kind: 'collection', collectionId: col.id,
+        ...(col.sourcePodcastEpisodeId ? { continuation: { kind: 'podcast', episodeId: col.sourcePodcastEpisodeId, title: col.name } } : {}),
+      },
     );
   }
 
   startReviewAll(): void {
     const col = this.collection();
     if (!col) return;
-    void this.reviewPlayer.open(this.reviewCards(), { kind: 'collection', collectionId: col.id });
+    void this.reviewPlayer.open(this.reviewCards(), { kind: 'collection', collectionId: col.id,
+      ...(col.sourcePodcastEpisodeId ? { continuation: { kind: 'podcast', episodeId: col.sourcePodcastEpisodeId, title: col.name } } : {}),
+    });
   }
 
   playConversation(): void {
@@ -322,7 +326,9 @@ export class CollectionDetailPage implements OnInit {
     void this.vocabularyPlayer.open({
       playlistId: `collection:${col.id}`,
       title: col.name,
-      source: { kind: 'collection', collectionId: col.id },
+      source: { kind: 'collection', collectionId: col.id,
+        ...(col.sourcePodcastEpisodeId ? { continuation: { kind: 'podcast', episodeId: col.sourcePodcastEpisodeId, title: col.name } } : {}),
+      },
       languages: {
         target: this.targetLocale(),
         native: this.sourceLocale(),

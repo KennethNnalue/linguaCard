@@ -251,10 +251,10 @@ export class PodcastPlayerPage implements OnInit, ViewWillLeave {
     void this.screenAwake.playbackStopped();
   }
   async completed(): Promise<void> {
-    this.discoveryEvents.refresh();
     const currentEpisodeId = this.store.episode()?.id;
     const nextEpisodeId = this.store.nextPlaybackTarget();
     const pointsAwarded = await this.store.completeCurrentEpisode();
+    if (pointsAwarded !== null) this.discoveryEvents.refresh();
     if (pointsAwarded === null || !currentEpisodeId) {
       void this.screenAwake.playbackStopped();
       return;

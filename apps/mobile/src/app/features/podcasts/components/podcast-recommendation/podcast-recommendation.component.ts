@@ -20,7 +20,7 @@ import { OfflineImageDirective } from '../../../../shared/image/offline-image.di
         @if (evidence() === 'pending_sync') { <p role="status">Suggestions will refresh after your reviews sync.</p> }
         @if (evidence() === 'unavailable') { <p>Saved suggestion · Connect to refresh</p> }
         <div class="actions">
-          <ion-button (click)="play.emit()">Listen now</ion-button>
+          <ion-button (click)="listenSelected.emit()">Listen now</ion-button>
           <ion-button fill="outline" (click)="preview.emit()">Preview words</ion-button>
         </div>
       </div>
@@ -35,7 +35,7 @@ import { OfflineImageDirective } from '../../../../shared/image/offline-image.di
 export class PodcastRecommendationComponent implements AfterViewInit {
   readonly recommendation = input.required<PodcastRecommendation>();
   readonly evidence = input<PodcastRecommendationResponse['evidence']>('current');
-  readonly play = output<void>(); readonly preview = output<void>(); readonly visible = output<void>();
+  readonly listenSelected = output<void>(); readonly preview = output<void>(); readonly visible = output<void>();
   readonly minutes = computed(() => Math.max(1, Math.round(this.recommendation().episode.durationMs / 60000)));
   readonly reason = computed(() => {
     const item = this.recommendation();
@@ -49,7 +49,7 @@ export class PodcastRecommendationComponent implements AfterViewInit {
   ngAfterViewInit(): void {
     if (typeof IntersectionObserver === 'undefined') return;
     const observer = new IntersectionObserver(entries => {
-      if (entries.some(entry => entry.isIntersecting)) { this.visible.emit(); observer.disconnect(); }
+      if (entries.some(entry => entry.isIntersecting && entry.intersectionRatio >= 0.5)) { this.visible.emit(); observer.disconnect(); }
     }, { threshold: 0.5 });
     observer.observe(this.host.nativeElement); this.destroyRef.onDestroy(() => observer.disconnect());
   }

@@ -39,7 +39,15 @@ export class PodcastPreparationPage {
   constructor() {
     addIcons({ arrowBackOutline, closeOutline, documentTextOutline, libraryOutline, play, schoolOutline, volumeHighOutline });
   }
-  ionViewWillEnter(): void { this.store.loadPreparation(this.route.snapshot.paramMap.get('episodeId') ?? ''); }
+  private returnedReviewRecorded = false;
+  ionViewWillEnter(): void {
+    const episodeId = this.route.snapshot.paramMap.get('episodeId') ?? '';
+    this.store.loadPreparation(episodeId);
+    if (episodeId && this.route.snapshot.queryParamMap.get('fromReview') === '1' && !this.returnedReviewRecorded) {
+      this.discoveryEvents.record({ name: 'preparation_review_returned', episodeId });
+      this.returnedReviewRecorded = true;
+    }
+  }
   goBack(topicId: string): void { void this.router.navigate(['/podcasts/topics', topicId]); }
   listenNow(): void {
     const episodeId = this.store.preparation()?.episode.id;

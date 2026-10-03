@@ -224,7 +224,7 @@ export const PodcastCatalogueStore = signalStore(
         });
         const userId = auth.currentUser()?.id;
         if (userId && updatedPreparation) {
-          await localData.setPodcastPreparation(userId, updatedPreparation);
+          try { await localData.setPodcastPreparation(userId, updatedPreparation); } catch { /* Preparation succeeded on the server. */ }
         }
         return result.collectionId;
       } catch {

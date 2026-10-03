@@ -11,7 +11,7 @@ import { AuthService } from '../../../../core/services/auth.service';
   providers: [PodcastRecommendationsStore], changeDetection: ChangeDetectionStrategy.OnPush,
   template: `@for (item of store.response()?.recommendations ?? []; track item.id) {
     <lc-podcast-recommendation [recommendation]="item" [evidence]="store.response()?.evidence ?? 'unavailable'"
-      (visible)="recordImpression(item)" (play)="open(item, false)" (preview)="open(item, true)" />
+      (visible)="recordImpression(item)" (listenSelected)="open(item, false)" (preview)="open(item, true)" />
   }`,
 })
 export class PodcastRecommendationSlotComponent {
@@ -21,7 +21,7 @@ export class PodcastRecommendationSlotComponent {
   private readonly router = inject(Router); private readonly events = inject(PodcastDiscoveryEventsService);
   private readonly auth = inject(AuthService);
   constructor() {
-    effect(() => { this.events.revision(); this.auth.currentUser()?.id; void this.store.load(this.placement(), this.level(), this.sessionId()); });
+    effect(() => { this.events.revision(); this.auth.currentUser(); void this.store.load(this.placement(), this.level(), this.sessionId()); });
   }
   refresh(): void { void this.store.load(this.placement(), this.level(), this.sessionId()); }
   recordImpression(item: PodcastRecommendation): void {

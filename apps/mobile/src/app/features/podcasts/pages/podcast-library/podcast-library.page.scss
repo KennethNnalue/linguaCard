@@ -76,3 +76,7 @@ h1 { margin: 3px 0 0; font-size: t.$lc-text-2xl; }
 .pod-levels button:focus-visible, .pod-episode:focus-visible, .pod-topic:focus-visible { outline: 3px solid var(--lc-ss-sage); outline-offset: 3px; }
 
 @media (max-width: 360px) { .pod-page { padding-inline: 14px; } }
+
+.pod-introduction { margin-bottom: 20px; }
+.pod-introduction h2 { margin: 0 0 8px; font-size: 1.25rem; line-height: 1.35; }
+.pod-introduction p { margin: 0; color: var(--pod-muted); line-height: 1.55; }

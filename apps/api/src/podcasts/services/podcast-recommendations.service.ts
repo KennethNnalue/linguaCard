@@ -38,7 +38,7 @@ export class PodcastRecommendationsService {
       order: { publishedAt: 'DESC', id: 'ASC' }, take: 200,
     });
     const valid = episodes.filter(episode => episode.audioUrl?.trim() && episode.audioDurationMs > 0);
-    if (!valid.length) return { recommendations: [], evidence: 'current' };
+    if (!valid.length) return { recommendations: [], evidence: pendingSession ? 'pending_sync' : 'current' };
     const ids = valid.map(episode => episode.id);
     const [rows, progress, thumbnails] = await Promise.all([
       this.dataSource.query<WordRow[]>(`
@@ -63,8 +63,12 @@ export class PodcastRecommendationsService {
     ]);
     const thumbnailById = new Map(thumbnails.map(item => [item.id, item]));
     const topicById = new Map(topics.map(topic => [topic.id, topic]));
-    const completed = new Set(progress.filter(item => item.completedAt).map(item => item.episodeId));
-    const candidates = valid.filter(episode => !completed.has(episode.id) && thumbnailById.has(episode.thumbnailAssetId ?? ''))
+    const audioVersionById = new Map(valid.map(episode => [episode.id, episode.audioVersion]));
+    const alreadyListening = new Set(progress.filter(item =>
+      item.audioVersion === audioVersionById.get(item.episodeId)
+      && (item.completedAt !== null || item.positionMs > 0 || item.qualifyingListenedMs > 0),
+    ).map(item => item.episodeId));
+    const candidates = valid.filter(episode => !alreadyListening.has(episode.id) && thumbnailById.has(episode.thumbnailAssetId ?? ''))
       .map(episode => ({ ...episode, durationMs: episode.audioDurationMs,
         words: rows.filter(row => row.episodeId === episode.id) }));
     const recommendations = rankPodcastRecommendations(candidates, query.placement === 'library' ? 10 : 1).flatMap(episode => {

@@ -57,7 +57,7 @@ export class SessionSummaryPage implements OnInit {
 
   async ngOnInit(): Promise<void> {
     const sessionId = this.route?.snapshot.queryParamMap.get('sessionId');
-    if (!this.session() && sessionId) {
+    if (sessionId && this.session()?.id !== sessionId) {
       try { await this.reviewStore.restoreCompletedSession(sessionId); }
       catch { void this.router.navigate([ReviewRoute.HUB], { replaceUrl: true }); return; }
     }
@@ -136,7 +136,7 @@ export class SessionSummaryPage implements OnInit {
     const continuation = this.session()?.continuation;
     if (!continuation) return;
     this.dismissCelebration();
-    void this.router.navigate(['/podcasts/episodes', continuation.episodeId]);
+    void this.router.navigate(['/podcasts/episodes', continuation.episodeId], { queryParams: { fromReview: '1' } });
   }
 
   goToStories(): void {

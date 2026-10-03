@@ -6,6 +6,10 @@
 
 <ion-content>
   <main class="pod-page">
+    <section class="pod-introduction" aria-labelledby="listening-loop-heading">
+      <h2 id="listening-loop-heading">Learn a word. Hear it in a real conversation.</h2>
+      <p>Practise vocabulary from your cards in short LinguaCard conversations. Preview the focus words or start listening with translations.</p>
+    </section>
     <p class="pod-filter-hint">Choose a level for new conversations. Your unfinished episodes stay available below.</p>
     <div class="pod-levels" [attr.aria-label]="'podcasts.library.levelFilter' | translate">
       @for (level of levels; track level) {

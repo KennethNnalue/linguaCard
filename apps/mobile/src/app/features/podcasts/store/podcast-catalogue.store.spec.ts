@@ -195,7 +195,7 @@ describe('PodcastCatalogueStore preparation resilience', () => {
     const response = new Subject<PodcastEpisodePreparation>();
     const currentUser = signal({ id: 'learner' });
     let requested = false;
-    const getPreparation = jest.fn((_episodeId: string) => { requested = true; return response; });
+    const getPreparation = jest.fn(() => { requested = true; return response; });
     TestBed.configureTestingModule({ providers: [
       PodcastCatalogueStore,
       { provide: PodcastApiService, useValue: { getPreparation } },
