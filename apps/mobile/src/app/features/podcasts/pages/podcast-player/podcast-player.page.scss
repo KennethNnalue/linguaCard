@@ -85,7 +85,7 @@ ion-content { --background:#050806; }
   .dialogue {
     z-index:3;
     bottom:calc(14px + var(--player-safe-bottom));
-    width:min(calc(100% - var(--player-safe-left) - var(--player-safe-right) - 36px),920px);
+    width:min(calc(100% - var(--player-safe-left) - var(--player-safe-right) - 180px),920px);
     max-height:min(45dvh,220px);
     padding:10px 16px;
     border:0;
@@ -151,9 +151,9 @@ ion-content { --background:#050806; }
   .secondary-controls {
     position:absolute;
     top:50%;
-    right:calc(14px + var(--player-safe-right));
+    right:calc(4px + var(--player-safe-right));
     display:flex;
-    width:58px;
+    width:72px;
     flex-direction:column;
     gap:3px;
     border:0;
@@ -161,7 +161,7 @@ ion-content { --background:#050806; }
     transform:translateY(-50%);
     pointer-events:auto;
   }
-  .secondary-controls ion-button { width:46px; height:46px; }
+  .secondary-controls ion-button { width:72px; height:46px; }
   .progress-error { right:calc(12px + var(--player-safe-right)); bottom:calc(48px + var(--player-safe-bottom)); left:calc(12px + var(--player-safe-left)); }
   .immersive-status { top:calc(58px + var(--player-safe-top)); }
 
@@ -189,7 +189,7 @@ ion-content { --background:#050806; }
     .transport .seek { width:44px; height:46px; }
     .dialogue { padding:7px 12px; }
     .dialogue>span { font-size:.56rem; }
-    .target { font-size:clamp(1.05rem,3.4vw,1.65rem); }
+    .target { font-size:clamp(1.05rem,2.4vw,1.35rem); }
     .translation { font-size:clamp(.75rem,1.8vw,.95rem); }
   }
 }
@@ -206,7 +206,7 @@ ion-content { --background:#050806; }
 .word-detail { padding:32px 24px; line-height:1.6; }
 
 .secondary-controls { position:relative; }
-.secondary-controls>ion-button { width:auto; min-width:52px; --border-radius:12px; }
+.secondary-controls>ion-button { width:auto; min-width:52px; --border-radius:12px; text-transform:none; }
 .secondary-controls>ion-button::part(native) { display:flex; flex-direction:column; gap:3px; padding:4px; }
 .secondary-controls>ion-button span { font-size:.65rem; }
 .secondary-controls>.speed span { font-size:.95rem; }
