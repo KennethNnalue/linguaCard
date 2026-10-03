@@ -1,5 +1,5 @@
 import { PodcastDiscoveryEventsService } from '../../services/podcast-discovery-events.service';
-import { ChangeDetectionStrategy, Component, ElementRef, inject, signal, viewChild } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, ElementRef, inject, signal, viewChild } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { IonButton, IonContent, IonIcon, IonSpinner } from '@ionic/angular';
 import { addIcons } from 'ionicons';
@@ -26,6 +26,7 @@ import { PodcastTranscriptComponent } from '../../components/podcast-transcript/
 export class PodcastPreparationPage {
   readonly store = inject(PodcastCatalogueStore);
   readonly wordsExpanded = signal(false);
+  readonly previewVocabulary = computed(() => [...this.store.essentialVocabulary()].sort((first, second) => Number(second.isInVault) - Number(first.isInVault)));
   readonly transcriptOpen = signal(false);
   private readonly route = inject(ActivatedRoute);
   private readonly router = inject(Router);
