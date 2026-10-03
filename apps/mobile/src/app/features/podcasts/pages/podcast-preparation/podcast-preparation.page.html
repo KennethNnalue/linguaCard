@@ -15,31 +15,28 @@
       </header>
 
       <section class="readiness">
-        <div class="ring" [style.--progress]="prep.readiness.percent">
-          <strong>{{ prep.readiness.percent }}%</strong><span>ready</span>
-        </div>
         <div>
-          <span>Before you listen</span>
-          <h2>
-            @switch (prep.readiness.recommendation) {
-              @case ('ready') { You’re ready for this conversation }
-              @case ('review_first') { A quick word review will help }
-              @default { Learn the essential words first }
-            }
-          </h2>
-          <p>Your current LinguaCard vocabulary progress is already included.</p>
+          <span>Optional vocabulary preview</span>
+          <h2>Try this conversation with translations</h2>
+          @if (prep.familiarity; as familiarity) {
+            @if (familiarity.total) {
+              <p>{{ familiarity.familiar }} familiar · {{ familiarity.learning }} to practise · {{ familiarity.new }} new to your vault</p>
+              @if (familiarity.unknown) { <p>{{ familiarity.unknown }} saved words have no review progress yet.</p> }
+            } @else { <p>No focus vocabulary is available for this episode yet.</p> }
+          }
+          <p>These are selected focus words, not a prediction of how much you will understand. You can listen at any time.</p>
         </div>
       </section>
-
       <div class="actions">
-        <ion-button class="secondary" fill="outline" (click)="reviewWords()">
-          <ion-icon slot="start" name="school-outline" />
-          {{ prep.readiness.learnFirstCount ? 'Review ' + prep.readiness.learnFirstCount + ' essential words' : 'View vocabulary' }}
-        </ion-button>
-        <ion-button class="primary" (click)="listenNow()">
-          <ion-icon slot="start" name="play" /> Listen now
-        </ion-button>
+        <ion-button class="primary" (click)="listenNow()"><ion-icon slot="start" name="play" /> Listen now</ion-button>
+        <ion-button class="secondary" fill="outline" (click)="previewWords()">Preview useful words</ion-button>
       </div>
+      @if (prep.readiness.learnFirstCount) {
+        <ion-button class="learn-action" fill="outline" expand="block" [disabled]="store.preparationMutationStatus()==='loading'" (click)="reviewWords()">
+          <ion-icon slot="start" name="school-outline" /> Add and review {{ prep.readiness.learnFirstCount }} useful words
+        </ion-button>
+        <p class="preparation-hint">This adds missing words to your vault and reuses words you already have.</p>
+      }
       <ion-button class="transcript-action" fill="clear" (click)="openTranscript()">
         <ion-icon slot="start" name="document-text-outline" />
         {{ 'podcasts.player.openTranscript' | translate }}
@@ -63,8 +60,13 @@
       @if (store.error()) { <p class="mutation-error" role="alert">{{ store.error() }}</p> }
 
       <section #wordList class="words">
-        <h2>Essential vocabulary</h2>
-        @for(item of store.essentialVocabulary(); track item.lexemeId) {
+        <h2>Useful words</h2>
+        @if (store.essentialVocabulary().length > 3) {
+          <ion-button fill="clear" (click)="wordsExpanded.set(!wordsExpanded())" [attr.aria-expanded]="wordsExpanded()">
+            {{ wordsExpanded() ? 'Show fewer words' : 'Show all focus words' }}
+          </ion-button>
+        }
+        @for(item of (wordsExpanded() ? store.essentialVocabulary() : store.essentialVocabulary().slice(0, 3)); track item.lexemeId) {
           <article>
             <lc-article-badge [article]="item.article" />
             <div class="word-copy">
@@ -81,7 +83,7 @@
             </ion-button>
           </article>
         }
-        @if(store.supportingVocabulary().length) {
+        @if(wordsExpanded() && store.supportingVocabulary().length) {
           <h2>Supporting vocabulary</h2>
           @for(item of store.supportingVocabulary(); track item.lexemeId) {
             <article>

@@ -1828,6 +1828,7 @@ export interface PodcastPreparationVocabulary {
 }
 
 export interface PodcastEpisodePreparation {
+  familiarity?: PodcastVocabularyFamiliarity;
   targetLanguage: LanguageCode;
   translationLanguage: LanguageCode;
   episode: PodcastLibraryEpisode & {

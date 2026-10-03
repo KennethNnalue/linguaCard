@@ -35,3 +35,9 @@ Preparation review sources now contain a typed episode continuation, serialized 
 Verification: API/app TypeScript passed; existing review persistence/player/Home and collections suites passed (13 tests). Summary route fixture was updated for its new route dependency; summary and continuation serialization tests passed (4 tests). The first Angular build caught a missing template null guard after the commit; the immediate follow-up fixes it and re-runs the build. Continuation is device-local, consistent with current review persistence; cross-device continuation requires a server contract extension.
 
 Step 5 correction: Angular template null guard fixed; the full development build now passes (7.9 seconds). The failed build was acknowledged and corrected immediately rather than recorded as a pass.
+
+## Step 6 — Optional, encouraging preparation (P1-E)
+
+Replaced the dominant readiness percentage with focus-word familiarity counts, explicitly including unknown progress. Listening is primary and always available; preview expands words without mutation. Add-and-review describes its vault side effect. Long vocabulary lists start with three essentials; supporting words appear on expansion. Empty vocabulary no longer returns 100% readiness.
+
+Verification: API TypeScript, Angular development build and readiness/ranking tests (8) passed. Existing readiness calculation remains for compatibility and word selection, but is not presented as listening comprehension.

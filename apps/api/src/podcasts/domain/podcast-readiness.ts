@@ -28,7 +28,7 @@ export function podcastMasteryWeight(mastery: PodcastVocabularyMastery): number 
 export function calculatePodcastReadiness(
   vocabulary: readonly PodcastReadinessInput[],
 ): PodcastReadinessResult {
-  if (!vocabulary.length) return { percent: 100, recommendation: 'ready', learnFirstCount: 0 };
+  if (!vocabulary.length) return { percent: 0, recommendation: 'learn_first', learnFirstCount: 0 };
   const readiness = vocabulary.reduce(
     (total, item) => total + podcastMasteryWeight(item.mastery), 0,
   ) / vocabulary.length;

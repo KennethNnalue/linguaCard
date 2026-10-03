@@ -1,4 +1,5 @@
 import { LearningItemReadService } from '../../learning-items/services/learning-item-read.service';
+import { vocabularyFamiliarity } from '../domain/podcast-recommendations';
 import { ConflictException, Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import type {
@@ -227,6 +228,10 @@ export class PodcastCatalogueService {
         description: episode.description,
         audioUrl: episode.audioUrl,
       },
+      familiarity: vocabularyFamiliarity(vocabulary.map(word => ({
+        lexemeId: word.lexemeId, text: word.text, translation: word.translation, owned: word.isInVault,
+        mastery: masteryByLexeme.get(word.lexemeId)?.mastery ? word.mastery : null, reviewed: false,
+      }))),
       readiness: calculatePodcastReadiness(vocabulary),
       vocabulary,
       preparationCollectionId: preparationCollection?.id ?? null,

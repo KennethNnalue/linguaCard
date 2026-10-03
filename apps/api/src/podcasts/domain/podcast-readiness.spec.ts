@@ -24,3 +24,8 @@ describe('podcast readiness', () => {
     ])).toEqual({ percent: 80, recommendation: 'ready', learnFirstCount: 0 });
   });
 });
+
+
+it('does not imply complete comprehension when no focus words exist', () => {
+  expect(calculatePodcastReadiness([])).toEqual({ percent: 0, recommendation: 'learn_first', learnFirstCount: 0 });
+});

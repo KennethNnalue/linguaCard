@@ -25,6 +25,7 @@ import { PodcastTranscriptComponent } from '../../components/podcast-transcript/
 })
 export class PodcastPreparationPage {
   readonly store = inject(PodcastCatalogueStore);
+  readonly wordsExpanded = signal(false);
   readonly transcriptOpen = signal(false);
   private readonly route = inject(ActivatedRoute);
   private readonly router = inject(Router);
@@ -51,6 +52,10 @@ export class PodcastPreparationPage {
     if (!episodeId) return;
     this.transcriptOpen.set(true);
     this.store.loadTranscript(episodeId);
+  }
+  previewWords(): void {
+    this.wordsExpanded.set(true);
+    this.wordList()?.nativeElement.scrollIntoView({ behavior: 'smooth' });
   }
   closeTranscript(): void { this.transcriptOpen.set(false); }
   async reviewWords(): Promise<void> {
