@@ -1,3 +1,4 @@
+import { PodcastRecommendationSlotComponent } from '../../../podcasts/components/podcast-recommendation/podcast-recommendation-slot.component';
 import { ChangeDetectionStrategy, Component, computed, inject, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { IonButton, IonContent, IonIcon } from '@ionic/angular';
@@ -34,7 +35,7 @@ const RATING_BAR_CLS: Record<ReviewRating, string> = {
   templateUrl: './session-summary.page.html',
   styleUrls: ['./session-summary.page.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [IonButton, IonContent, IonIcon, TranslatePipe, SessionCelebrationComponent],
+  imports: [PodcastRecommendationSlotComponent, IonButton, IonContent, IonIcon, TranslatePipe, SessionCelebrationComponent],
 })
 export class SessionSummaryPage implements OnInit {
   private readonly reviewStore = inject(ReviewStore);

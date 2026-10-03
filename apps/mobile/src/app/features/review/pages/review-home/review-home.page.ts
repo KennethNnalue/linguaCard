@@ -1,3 +1,5 @@
+import { PodcastRecommendationSlotComponent } from '../../../podcasts/components/podcast-recommendation/podcast-recommendation-slot.component';
+import { PodcastDiscoveryEventsService } from '../../../podcasts/services/podcast-discovery-events.service';
 import {ChangeDetectionStrategy, Component, inject, signal} from '@angular/core';
 import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
 import {NavigationStart, Router, RouterLink} from '@angular/router';
@@ -70,6 +72,7 @@ import {ReviewHomeStore} from '../../store/review-home.store';
     IonToolbar,
     TranslatePipe,
     ReviewHomeControlsComponent,
+    PodcastRecommendationSlotComponent,
     UserMenuComponent,
   ],
 })
@@ -81,6 +84,7 @@ export class ReviewHomePage {
   readonly menuOpen = signal(false);
   readonly menuEvent = signal<Event | undefined>(undefined);
 
+  private readonly podcastEvents = inject(PodcastDiscoveryEventsService);
   private readonly reviewPlayer = inject(ReviewPlayerService);
   private readonly prefs = inject(ReviewPrefsService);
   private readonly router = inject(Router);
@@ -106,6 +110,7 @@ export class ReviewHomePage {
   }
 
   ionViewWillEnter(): void {
+    this.podcastEvents.refresh();
     void this.store.refresh();
   }
 

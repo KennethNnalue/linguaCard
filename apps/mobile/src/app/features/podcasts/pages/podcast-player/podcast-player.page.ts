@@ -1,3 +1,4 @@
+import { PodcastDiscoveryEventsService } from '../../services/podcast-discovery-events.service';
 import {
   ChangeDetectionStrategy, Component, computed, DestroyRef, ElementRef, inject, OnInit, signal,
   viewChild,
@@ -203,7 +204,14 @@ export class PodcastPlayerPage implements OnInit, ViewWillLeave {
     event.target.preservesPitch = true;
     event.target.currentTime = this.store.currentTimeMs() / 1000;
   }
+  private readonly discoveryEvents = inject(PodcastDiscoveryEventsService);
+  private startedEpisodeId: string | null = null;
   started(): void {
+    const episodeId = this.store.episode()?.id;
+    if (episodeId && episodeId !== this.startedEpisodeId) {
+      this.startedEpisodeId = episodeId;
+      this.discoveryEvents.record({ name: 'playback_started', episodeId });
+    }
     this.autoplayNext = false;
     this.store.playbackStateChanged(true);
     void this.screenAwake.playbackStarted();
@@ -228,6 +236,7 @@ export class PodcastPlayerPage implements OnInit, ViewWillLeave {
     void this.screenAwake.playbackStopped();
   }
   async completed(): Promise<void> {
+    this.discoveryEvents.refresh();
     const currentEpisodeId = this.store.episode()?.id;
     const nextEpisodeId = this.store.nextPlaybackTarget();
     const pointsAwarded = await this.store.completeCurrentEpisode();

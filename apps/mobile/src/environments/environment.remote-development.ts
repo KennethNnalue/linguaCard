@@ -1,4 +1,5 @@
 export const environment = {
+  podcastRecommendationsEnabled: true,
   production: false,
   storageNamespace: 'remote-development',
   apiUrl: 'https://linguacard-api-dev.onrender.com/api/v1',

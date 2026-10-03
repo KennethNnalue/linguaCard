@@ -2,6 +2,7 @@ import { inject, Injectable } from '@angular/core';
 import { Storage } from '@ionic/storage-angular';
 import {
   CardView, Category, Collection, PlatformStory, PlatformStoryCard, PodcastEpisodePlayer,
+  PodcastRecommendationResponse,
   PodcastEpisodePreparation, PodcastLibraryResponse, PodcastTopicDetail, ScheduledCard, Story,
   UserSettings, VaultView,
   UserStoryProgress,
@@ -135,6 +136,15 @@ export class LocalDataService {
   async setPlatformStoriesList(nativeLang: string, stories: PlatformStoryCard[]): Promise<void> {
     await this.init();
     await this.storage.set(`platform_stories_list:${nativeLang}`, stories);
+  }
+
+  async getPodcastRecommendations(key: string): Promise<PodcastRecommendationResponse | null> {
+    await this.init();
+    return (await this.storage.get(`podcast_recommendations:${key}`)) ?? null;
+  }
+  async setPodcastRecommendations(key: string, value: PodcastRecommendationResponse): Promise<void> {
+    await this.init();
+    await this.storage.set(`podcast_recommendations:${key}`, value);
   }
 
   async getPodcastLibrary(userId: string, level: string): Promise<PodcastLibraryResponse | null> {

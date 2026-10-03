@@ -1,6 +1,7 @@
 import { HttpClient } from '@angular/common/http';
 import { inject, Injectable } from '@angular/core';
 import type {
+  PodcastClientEvent, PodcastRecommendationResponse, PodcastRecommendationPlacement,
   PodcastEpisodeCompletion, PodcastEpisodePlayer, PodcastEpisodePreparation, PodcastLibraryLevel, PodcastLibraryResponse,
   PodcastListeningProgress, PodcastTopicDetail, PreparePodcastVocabularyResult,
   SavePodcastProgressDto,
@@ -12,6 +13,15 @@ import { environment } from '../../../../environments/environment';
 export class PodcastApiService {
   private readonly http = inject(HttpClient);
   private readonly url = `${environment.apiUrl}/podcasts`;
+
+  recommendations(placement: PodcastRecommendationPlacement, level: PodcastLibraryLevel, sessionId?: string): Observable<PodcastRecommendationResponse> {
+    return this.http.get<PodcastRecommendationResponse>(`${this.url}/recommendations`, {
+      params: { placement, level, ...(sessionId ? { sessionId } : {}) },
+    });
+  }
+  recordEvent(event: PodcastClientEvent): Observable<void> {
+    return this.http.post<void>(`${this.url}/events`, event);
+  }
 
   listTopics(level: PodcastLibraryLevel): Observable<PodcastLibraryResponse> {
     return this.http.get<PodcastLibraryResponse>(this.url, { params: { level } });

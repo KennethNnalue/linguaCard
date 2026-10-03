@@ -1,4 +1,5 @@
 export const environment = {
+  podcastRecommendationsEnabled: false,
   production: true,
   storageNamespace: 'production',
   // Replaced at build time — set API_URL in the Vercel project environment variables

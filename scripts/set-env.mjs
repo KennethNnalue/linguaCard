@@ -25,6 +25,7 @@ const apiOrigin = apiUrl
   .replace(/\/+$/, '')
   .replace(/(?:\/api\/v1)+$/, '');
 const normalizedApiUrl = `${apiOrigin}/api/v1`;
-const updated = source.replace(apiUrlProperty, `apiUrl: '${normalizedApiUrl}'`);
+const flaggedSource = source.replace(/podcastRecommendationsEnabled:\s*(true|false)/, `podcastRecommendationsEnabled: ${process.env['PODCAST_RECOMMENDATIONS_ENABLED'] === 'true'}`);
+const updated = flaggedSource.replace(apiUrlProperty, `apiUrl: '${normalizedApiUrl}'`);
 writeFileSync(file, updated);
 console.log(`environment.prod.ts → apiUrl set to ${normalizedApiUrl}`);

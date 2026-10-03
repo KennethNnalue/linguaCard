@@ -1,3 +1,4 @@
+import { PodcastDiscoveryEventsService } from '../../podcasts/services/podcast-discovery-events.service';
 import { inject, Injectable } from '@angular/core';
 import { firstValueFrom } from 'rxjs';
 import type { SyncHandler } from '../../../core/models/sync-handler.model';
@@ -7,6 +8,7 @@ import { ReviewLocalRepository } from './review-local.repository';
 
 @Injectable({ providedIn: 'root' })
 export class ReviewCommitSyncHandler implements SyncHandler {
+  private readonly podcastEvents = inject(PodcastDiscoveryEventsService);
   readonly type = SyncOperationType.FLUSH_REVIEW_COMMITS;
   private readonly localRepository = inject(ReviewLocalRepository);
   private readonly api = inject(ReviewCommitApiService);
@@ -18,6 +20,7 @@ export class ReviewCommitSyncHandler implements SyncHandler {
     await firstValueFrom(this.api.commitBatch(commits));
     const acceptedIds = new Set(commits.map(commit => commit.event.eventId));
     await this.localRepository.removeOutboxEvents(payload.userId, acceptedIds);
+    this.podcastEvents.refresh();
   }
 }
 
