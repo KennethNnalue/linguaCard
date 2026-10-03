@@ -59,3 +59,33 @@ Verification: API/app TypeScript, development Angular build, playback qualificat
 Added the card-to-conversation explanation in the library and a concrete release/editorial/experiment checklist. Linked-collection reviews now retain episode continuation. Returning from a preparation review is measured; discovery refreshes after completion is saved. Recommendations exclude current-version listening history but allow replaced recordings; unsynced empty candidate results retain pending evidence. Summary restoration honours the requested session even if another completed session is in memory. Impressions require at least 50% visibility. Corrected the three lint issues introduced by implementation. Cache write failure after a successful vocabulary preparation no longer reports server preparation as failed.
 
 Verification: API/app TypeScript and production Angular build passed. All API tests passed (59 suites, 212 tests); mobile/shared full run passed (88 suites, 360 tests), followed by podcast/summary tests (9 suites, 64 tests) and updated summary/cache regression tests (5 tests). Local browser fixture verified recommendation and preparation layouts and actions on desktop and 390px portrait; it used simulated vocabulary and no account mutations. Chrome control became unavailable, so this check used the in-app browser. The temporary fixture and public route were removed. See the final verification section for final counts and limitations.
+
+## Final verification and comparison with the plan
+
+Verified the final implementation on main after removing the temporary UI fixture:
+
+- API TypeScript and app TypeScript: passed.
+- Full configured API suite: 59 suites, 212 tests passed.
+- Full mobile/shared suite: 88 suites, 361 tests passed.
+- Production Angular build: passed, with stylesheet budget warnings; development builds passed during individual increments.
+- Changed frontend files: ESLint passed. Repository-wide mobile lint still reports 17 existing errors in unchanged network, AI, authentication-test, onboarding-shell, settings-refresher and share-sheet files; these files have no diff against starting main `588deed`.
+- Default mixed Jest command was stopped after backend AWS ESM-loading failures under the browser configuration; separate mobile/shared and API configurations passed. This is not recorded as a green default `npm test` run.
+- Local browser UI fixture: desktop and 390×844 portrait checks of the real recommendation component and preparation template/actions passed. Screenshot saved outside the repository. Fixture used simulated data and no account mutations; it was removed before final builds.
+- Whitespace checks passed. Implementation commits were pushed directly to main; the pre-existing `.gitignore` edit was preserved and excluded.
+
+| Plan item | Delivery status | Remaining verification or work |
+| --- | --- | --- |
+| P0-A reliability/content audit | Partial: confirmed audio-version and cache defects fixed | Reproduce live blank review, startup/sync failures; trace and curate the observed production vocabulary/cue. |
+| P0-B first-party measurement | Code implemented | Staging migration/database validation, retention/consent alignment and actual baseline reporting. Offline event delivery is best effort. |
+| P1-A vocabulary recommendations | Implemented | Production mapping coverage and query plans; candidate limit is 200; personal cards need canonical identities to match. |
+| P1-B Home/summary entry points | Implemented | Authenticated two-account/language/offline journey and user validation before activation. |
+| P1-C library separation | Implemented | Verify against production content volume; in-progress history is distinct from new suggestions. |
+| P1-D continuation/collection bridge | Implemented on the current device | Cross-device continuation requires a future server contract. |
+| P1-E optional preparation | Implemented | User study and native device checks. Counts describe focus words, not comprehension. |
+| P2-A listening reinforcement | Implemented | Screen-reader/native validation; word references are turn-level, not token-level. Recall does not modify mastery. |
+| P2-B onboarding/editorial coverage | Partial: explanation and editorial workflow documented | Publish reviewed content addressing real coverage gaps; validate a real card/audio onboarding example. |
+| P3 interests/reminders/discovery | Deferred as required by the plan's repeat-listening dependency | Establish repeat-listening evidence, stable experiments and consent before implementing growth nudges. No campaign was sent. |
+
+Production vocabulary recommendations remain disabled by default. Set `PODCAST_RECOMMENDATIONS_ENABLED=true` through the web build workflow after the documented release gates. The build flag does not gate the other podcast preparation/player improvements, and it is not a percentage rollout mechanism.
+
+The application implementation is ready for staged integration validation; the entire evidence-dependent product programme is not claimed complete. See `podcast-adoption-rollout.md` for the concrete next release checks.
