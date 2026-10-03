@@ -1,3 +1,4 @@
+import { LearningItemReadService } from '../../learning-items/services/learning-item-read.service';
 import { ConflictException, Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import type {
@@ -55,10 +56,13 @@ export class PodcastCatalogueService {
     @InjectRepository(PodcastEpisodeVocabularyEntity) private readonly vocabularyRepo: Repository<PodcastEpisodeVocabularyEntity>,
     private readonly dataSource: DataSource,
     private readonly learningLoop: PodcastLearningLoopService,
+    private readonly contexts: LearningItemReadService,
   ) {}
 
   async listTopics(userId: string, selectedLevel: PodcastLibraryLevel = 'A1'): Promise<PodcastLibraryResponse> {
-    const topics = await this.topicRepo.find({ where: { status: 'published' }, order: { publishedAt: 'DESC' } });
+    const context = await this.contexts.loadActiveLearningContext(userId);
+    const topics = await this.topicRepo.find({ where: { status: 'published', targetLanguage: context.targetLanguage,
+      translationLanguage: context.sourceLanguage }, order: { publishedAt: 'DESC' } });
     if (!topics.length) return { topics: [], continueListening: null, recentEpisodes: [], suggestedEpisodes: [] };
     const episodes = await this.episodeRepo.find({
       where: { topicId: In(topics.map(topic => topic.id)), status: 'published' },

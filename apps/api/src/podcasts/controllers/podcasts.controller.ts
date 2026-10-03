@@ -3,6 +3,8 @@ import type {
   PodcastEpisodeCompletion, PodcastEpisodePlayer, PodcastEpisodePreparation, PodcastLibraryResponse,
   PodcastListeningProgress, PodcastTopicDetail, PreparePodcastVocabularyResult,
 } from '@lingua-card/shared/domain';
+import { PodcastRecommendationsService } from '../services/podcast-recommendations.service';
+import { PodcastRecommendationsQueryDto } from '../dto/podcast-recommendations-query.dto';
 import { JwtAuthGuard } from '../../auth/guards/jwt-auth.guard';
 import { CurrentUser } from '../../common/decorators/current-user.decorator';
 import { PodcastCatalogueService } from '../services/podcast-catalogue.service';
@@ -15,8 +17,14 @@ import { PodcastLibraryQueryDto } from '../dto/podcast-library-query.dto';
 export class PodcastsController {
   constructor(
     private readonly catalogue: PodcastCatalogueService,
+    private readonly recommendations: PodcastRecommendationsService,
     private readonly learningLoop: PodcastLearningLoopService,
   ) {}
+
+  @Get('recommendations')
+  recommend(@CurrentUser() userId: string, @Query() query: PodcastRecommendationsQueryDto) {
+    return this.recommendations.recommend(userId, query);
+  }
 
   @Get()
   listTopics(@CurrentUser() userId: string, @Query() query: PodcastLibraryQueryDto): Promise<PodcastLibraryResponse> {

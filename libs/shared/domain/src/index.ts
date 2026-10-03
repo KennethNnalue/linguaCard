@@ -2160,3 +2160,26 @@ export interface AdminCommitPodcastTranscriptResult {
   vocabularyCount: number;
   estimatedDurationMs: number;
 }
+
+
+export type PodcastRecommendationPlacement = 'home' | 'review_summary' | 'library';
+export interface PodcastVocabularyFamiliarity {
+  familiar: number;
+  learning: number;
+  new: number;
+  unknown: number;
+  total: number;
+}
+export interface PodcastRecommendation {
+  id: string;
+  policyVersion: string;
+  episode: PodcastLibraryFeaturedEpisode;
+  reason: 'session_words' | 'recent_words' | 'vocabulary' | 'starter';
+  matchCount: number;
+  matchedWords: Array<{ lexemeId: string; text: string; translation: string }>;
+  familiarity: PodcastVocabularyFamiliarity;
+}
+export interface PodcastRecommendationResponse {
+  recommendations: PodcastRecommendation[];
+  evidence: 'current' | 'pending_sync' | 'unavailable';
+}
