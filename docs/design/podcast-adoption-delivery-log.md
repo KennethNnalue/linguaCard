@@ -41,3 +41,9 @@ Step 5 correction: Angular template null guard fixed; the full development build
 Replaced the dominant readiness percentage with focus-word familiarity counts, explicitly including unknown progress. Listening is primary and always available; preview expands words without mutation. Add-and-review describes its vault side effect. Long vocabulary lists start with three essentials; supporting words appear on expansion. Empty vocabulary no longer returns 100% readiness.
 
 Verification: API TypeScript, Angular development build and readiness/ranking tests (8) passed. Existing readiness calculation remains for compatibility and word selection, but is not presented as listening comprehension.
+
+## Step 7 — Listening reinforcement (P2-A)
+
+Player responses expose validated turn-level lexeme references and vocabulary details. Users can replay a sentence and inspect its focus words, meanings, examples and saved status. Word inspection pauses playback. Focused controls and open word details prevent automatic control hiding. The recap offers an optional three-word recall activity with reveal buttons; neither inspection nor recall changes mastery.
+
+Verification: API/app TypeScript and development Angular build passed; player/store suites passed (25 tests), including sentence replay. Mapping is sentence-level; precise token alignment is intentionally not claimed.

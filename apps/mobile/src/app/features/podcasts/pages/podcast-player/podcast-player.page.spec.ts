@@ -164,6 +164,16 @@ describe('PodcastPlayerPage immersive presentation', () => {
 
   afterEach(() => jest.useRealTimers());
 
+  it('replays the current sentence from its start', async () => {
+    const audio = playerRoot().querySelector('audio');
+    if (!audio) throw new Error('Expected audio element');
+    const play = jest.spyOn(audio, 'play').mockResolvedValue();
+    store.currentTurn.set({ ...currentTurn, startMs: 2500 });
+    await page.replaySentence();
+    expect(audio.currentTime).toBe(2.5);
+    expect(play).toHaveBeenCalledTimes(1);
+  });
+
   it('shows the episode title translation beneath the original title', () => {
     expect(playerRoot().querySelector('.top-chrome .title-translation')?.textContent?.trim())
       .toBe('My New Apartment');

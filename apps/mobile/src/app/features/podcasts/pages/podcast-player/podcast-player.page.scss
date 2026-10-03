@@ -195,3 +195,8 @@ ion-content { --background:#050806; }
 }
 
 .title-translation { display:block; color:var(--lc-ss-muted); font-size:0.875rem; line-height:1.4; margin-block:0.2rem 0.5rem; overflow-wrap:anywhere; }
+
+.sentence-vocabulary { display:flex; flex-wrap:wrap; gap:4px; margin-top:8px; }
+.sentence-vocabulary ion-button { --color:#e5efeb; --border-color:#8acbb6; margin:0; min-height:44px; }
+.controls-hint { color:#d8e2dc; font-size:.75rem; text-align:center; margin:4px; }
+.word-detail { padding:32px 24px; line-height:1.6; }

@@ -1865,6 +1865,7 @@ export interface PodcastPlayerSpeaker {
 }
 
 export interface PodcastPlayerTurn {
+  vocabularyLexemeIds?: string[];
   id: string;
   speakerId: string;
   position: number;
@@ -1876,6 +1877,7 @@ export interface PodcastPlayerTurn {
 }
 
 export interface PodcastEpisodePlayer {
+  vocabulary?: PodcastPreparationVocabulary[];
   id: string;
   topicId: string;
   topicTitle: string;

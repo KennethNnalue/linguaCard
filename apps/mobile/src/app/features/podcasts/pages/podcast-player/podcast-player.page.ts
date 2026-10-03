@@ -1,3 +1,4 @@
+import type { PodcastPreparationVocabulary } from '@lingua-card/shared/domain';
 import { PodcastDiscoveryEventsService } from '../../services/podcast-discovery-events.service';
 import {
   ChangeDetectionStrategy, Component, computed, DestroyRef, ElementRef, inject, OnInit, signal,
@@ -6,7 +7,7 @@ import {
 import { Location } from '@angular/common';
 import { ActivatedRoute, Router } from '@angular/router';
 import {
-  IonButton, IonContent, IonIcon, IonRange, IonSpinner,
+  IonButton, IonContent, IonIcon, IonRange, IonSpinner, IonModal,
 } from '@ionic/angular';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import type { ViewWillLeave } from '@ionic/angular/lazy';
@@ -51,7 +52,7 @@ export function nextPodcastPlaybackSpeed(currentSpeed: number): number {
 @Component({
   selector: 'lc-podcast-player', standalone: true,
   imports: [
-    IonButton, IonContent, IonIcon, IonRange, IonSpinner, OfflineImageDirective,
+    IonButton, IonContent, IonIcon, IonRange, IonSpinner, IonModal, OfflineImageDirective,
     PodcastTranscriptComponent, TranslatePipe,
   ],
   providers: [PodcastPlayerStore, PodcastImmersiveModeService, ScreenAwakeService], templateUrl: './podcast-player.page.html',
@@ -62,6 +63,11 @@ export class PodcastPlayerPage implements OnInit, ViewWillLeave {
   readonly immersiveMode = inject(PodcastImmersiveModeService);
   readonly screenAwake = inject(ScreenAwakeService);
   readonly chromeVisible = signal(true);
+  readonly selectedVocabulary = signal<PodcastPreparationVocabulary | null>(null);
+  readonly sentenceVocabulary = computed(() => {
+    const ids = new Set(this.store.currentTurn()?.vocabularyLexemeIds ?? []);
+    return (this.store.episode()?.vocabulary ?? []).filter(word => ids.has(word.lexemeId));
+  });
   readonly transcriptOpen = signal(false);
   readonly isChromeVisible = computed(
     () => this.transcriptOpen() || !this.immersiveMode.isLandscape() || this.chromeVisible(),
@@ -196,6 +202,15 @@ export class PodcastPlayerPage implements OnInit, ViewWillLeave {
     const audio = this.audio()?.nativeElement;
     if (audio) audio.currentTime = value / 1000;
   }
+  async replaySentence(): Promise<void> {
+    const turn = this.store.currentTurn(); if (!turn) return;
+    this.seek(turn.startMs);
+    const audio = this.audio()?.nativeElement;
+    if (audio) { try { await audio.play(); } catch { this.playbackFailed(); } }
+  }
+  inspectWord(word: PodcastPreparationVocabulary): void {
+    this.stopAudioPlayback(); this.selectedVocabulary.set(word);
+  }
   timeChanged(event: Event): void { if (event.target instanceof HTMLAudioElement) this.store.playbackTimeChanged(Math.round(event.target.currentTime * 1000)); }
   prepareAudio(event: Event): void {
     if (!(event.target instanceof HTMLAudioElement)) return;
@@ -310,7 +325,9 @@ export class PodcastPlayerPage implements OnInit, ViewWillLeave {
 
   private scheduleChromeAutoHide(): void {
     this.clearChromeAutoHide();
-    if (!this.chromeVisible() || !this.store.isPlaying() || this.transcriptOpen()) return;
+    if (!this.chromeVisible() || !this.store.isPlaying() || this.transcriptOpen() || this.selectedVocabulary()) return;
+    const focused = this.playerHost()?.nativeElement.ownerDocument.activeElement;
+    if (focused instanceof Element && focused.closest('.controls, .top-chrome')) return;
     if (!this.immersiveMode.isLandscape()) return;
 
     this.chromeAutoHideTimer = setTimeout(() => {

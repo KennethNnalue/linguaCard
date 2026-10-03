@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, inject, OnInit } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, inject, OnInit, signal } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { IonButton, IonContent, IonIcon } from '@ionic/angular';
 import { addIcons } from 'ionicons';
@@ -12,6 +12,10 @@ import { OfflineImageDirective } from '../../../../shared/image/offline-image.di
   styleUrl: './podcast-completion.page.scss', changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class PodcastCompletionPage implements OnInit {
+  readonly recallOpen = signal(false);
+  readonly revealedRecall = signal<readonly string[]>([]);
+  readonly recallWords = computed(() => (this.store.completion()?.vocabulary ?? []).filter(word => word.isInVault).slice(0, 3));
+  revealRecall(lexemeId: string): void { this.revealedRecall.update(ids => [...ids, lexemeId]); }
   readonly store = inject(PodcastCatalogueStore);
   private readonly route = inject(ActivatedRoute);
   private readonly router = inject(Router);

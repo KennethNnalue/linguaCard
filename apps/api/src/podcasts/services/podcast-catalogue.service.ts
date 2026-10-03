@@ -241,7 +241,7 @@ export class PodcastCatalogueService {
   async getPlayer(userId: string, episodeId: string): Promise<PodcastEpisodePlayer> {
     const episode = await this.episodeRepo.findOneBy({ id: episodeId, status: 'published' });
     if (!episode?.audioUrl) throw new NotFoundException(`Podcast episode ${episodeId} not found`);
-    const [topic, thumbnail, speakers, turns, progress, playbackContext] = await Promise.all([
+    const [topic, thumbnail, speakers, turns, progress, playbackContext, preparation, vocabularyLinks] = await Promise.all([
       this.topicRepo.findOneBy({ id: episode.topicId, status: 'published' }),
       this.thumbnailRepo.findOneBy({ id: episode.thumbnailAssetId ?? '' }),
       this.dataSource.getRepository(PodcastSpeakerEntity).find({
@@ -252,9 +252,12 @@ export class PodcastCatalogueService {
       }),
       this.learningLoop.getProgress(userId, episodeId),
       this.loadPlaybackContext(episode),
+      this.getPreparation(userId, episodeId),
+      this.vocabularyRepo.findBy({ episodeId }),
     ]);
     if (!topic || !thumbnail) throw new NotFoundException(`Podcast episode ${episodeId} is incomplete`);
     return {
+      vocabulary: preparation.vocabulary,
       id: episode.id, topicId: topic.id, topicTitle: topic.title,
       topicTitleTranslation: topic.titleTranslation, title: episode.title,
       titleTranslation: episode.titleTranslation,
@@ -268,6 +271,7 @@ export class PodcastCatalogueService {
         targetText: turn.targetText, translation: turn.translation,
         startMs: turn.startMs ?? 0, endMs: turn.endMs ?? episode.audioDurationMs,
         wordTimings: turn.wordTimings,
+        vocabularyLexemeIds: vocabularyLinks.filter(link => turn.vocabularyKeys.includes(link.vocabularyKey)).map(link => link.lexemeId),
       })),
       progress: progress?.audioVersion === episode.audioVersion ? progress : null,
       playbackContext,

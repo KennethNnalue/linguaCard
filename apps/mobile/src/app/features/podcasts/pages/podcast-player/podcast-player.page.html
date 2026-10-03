@@ -47,6 +47,13 @@
           } @else if(store.translationMode()==='reveal') {
             <ion-button fill="clear" size="small" (click)="$event.stopPropagation(); store.revealTranslation()">{{'podcasts.player.revealTranslation' | translate}}</ion-button>
           }
+          @if (sentenceVocabulary().length) {
+            <div class="sentence-vocabulary" aria-label="Focus words in this sentence">
+              @for (word of sentenceVocabulary(); track word.lexemeId) {
+                <ion-button fill="outline" size="small" (click)="$event.stopPropagation(); inspectWord(word)">{{ word.text }}</ion-button>
+              }
+            </div>
+          }
         </section>
       }
 
@@ -72,6 +79,8 @@
           </ion-button>
         </div>
 
+        <ion-button fill="clear" (click)="replaySentence()" [disabled]="!store.currentTurn()">Replay sentence</ion-button>
+        <p class="controls-hint">Tap the scene to show or hide controls.</p>
         <div class="secondary-controls">
           <ion-button class="speed" fill="clear" shape="round" (click)="changeSpeed()"
             [attr.aria-label]="'podcasts.player.playbackSpeed' | translate:{ speed: store.speed() }">
@@ -104,6 +113,20 @@
           </ion-button>
         </div>
       </section>
+      <ion-modal [isOpen]="selectedVocabulary() !== null" (didDismiss)="selectedVocabulary.set(null)">
+        <ng-template>
+          <ion-content>
+            @if (selectedVocabulary(); as word) {
+              <section class="word-detail">
+                <h2>{{ word.article }} {{ word.text }}</h2><p>{{ word.translation }}</p>
+                <p>{{ word.isInVault ? 'Saved in your vocabulary' : 'New to your vault' }}</p>
+                @if (word.example; as example) { <p>{{ example.target }}</p><p>{{ example.native }}</p> }
+                <ion-button (click)="selectedVocabulary.set(null)">Back to conversation</ion-button>
+              </section>
+            }
+          </ion-content>
+        </ng-template>
+      </ion-modal>
       @if (transcriptOpen()) {
         <lc-podcast-transcript [episode]="episode" [currentTurnId]="store.currentTurn()?.id ?? null"
           (dismissed)="closeTranscript()" (turnSelected)="seek($event)" />
