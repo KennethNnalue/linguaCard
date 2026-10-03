@@ -23,7 +23,7 @@ ion-content { --background:#050806; }
 .player header ion-button { width:44px; height:44px; margin:0; --color:white; }
 .player header div { display:grid; text-align:center; }
 .player header small { color:rgba(255,255,255,.65); }
-.dialogue { position:absolute; z-index:2; left:50%; bottom:calc(282px + env(safe-area-inset-bottom, 0px)); width:min(calc(100% - 36px),780px); max-height:calc(100dvh - 410px - env(safe-area-inset-top, 0px) - env(safe-area-inset-bottom, 0px)); transform:translateX(-50%); overflow:auto; padding:20px; border:1px solid rgba(255,255,255,.12); border-radius:t.$lc-radius-xl; background:rgba(5,8,6,.94); text-align:center; }
+.dialogue { position:absolute; z-index:2; left:50%; bottom:calc(322px + env(safe-area-inset-bottom, 0px)); width:min(calc(100% - 36px),780px); max-height:calc(100dvh - 450px - env(safe-area-inset-top, 0px) - env(safe-area-inset-bottom, 0px)); transform:translateX(-50%); overflow:auto; padding:20px; border:1px solid rgba(255,255,255,.12); border-radius:t.$lc-radius-xl; background:rgba(5,8,6,.94); text-align:center; }
 .dialogue>span { color:var(--lc-ss-premium-star); font-size:.7rem; font-weight:700; text-transform:uppercase; }
 .target { margin:10px 0; font-family:t.$lc-font-display; font-size:clamp(1.6rem,6vw,3rem); line-height:1.25; text-transform:none; word-break:normal; overflow-wrap:normal; }
 .target mark { display:inline-block; margin-inline-end:.2em; padding:0 2px; background:transparent; color:white; border-radius:4px; text-transform:none; white-space:nowrap; }
@@ -52,7 +52,7 @@ ion-content { --background:#050806; }
 .state { display:flex; height:100%; align-items:center; justify-content:center; gap:10px; padding:30px; color:white; text-align:center; }
 
 @media(max-height:650px) {
-  .dialogue { bottom:calc(262px + env(safe-area-inset-bottom, 0px)); max-height:calc(100dvh - 365px - env(safe-area-inset-top, 0px) - env(safe-area-inset-bottom, 0px)); padding:14px; }
+  .dialogue { bottom:calc(302px + env(safe-area-inset-bottom, 0px)); max-height:calc(100dvh - 405px - env(safe-area-inset-top, 0px) - env(safe-area-inset-bottom, 0px)); padding:14px; }
   .target { font-size:1.5rem; }
   .transport .play { width:58px; height:58px; }
 }
@@ -86,7 +86,7 @@ ion-content { --background:#050806; }
     z-index:3;
     bottom:calc(14px + var(--player-safe-bottom));
     width:min(calc(100% - var(--player-safe-left) - var(--player-safe-right) - 36px),920px);
-    max-height:min(42dvh,170px);
+    max-height:min(45dvh,220px);
     padding:10px 16px;
     border:0;
     border-radius:t.$lc-radius-lg;
@@ -138,6 +138,25 @@ ion-content { --background:#050806; }
     gap:clamp(20px,5vw,48px);
     pointer-events:auto;
   }
+  .sentence-replay {
+    position:absolute;
+    top:max(calc(68px + var(--player-safe-top)),calc(43% - 90px));
+    left:50%;
+    margin:0;
+    transform:translateX(-50%);
+    pointer-events:auto;
+    --color:#f2cf67;
+    --background:rgba(5,8,6,.85);
+  }
+  .controls-hint {
+    display:block;
+    position:absolute;
+    top:calc(43% - 116px);
+    left:50%;
+    width:max-content;
+    max-width:calc(100% - 120px);
+    transform:translateX(-50%);
+  }
   .secondary-controls {
     position:absolute;
     top:50%;
@@ -166,7 +185,7 @@ ion-content { --background:#050806; }
     .top-chrome,.controls { opacity:1; visibility:visible; transition-delay:0s; }
     .top-chrome { pointer-events:auto; transform:translateY(0); }
     .controls { pointer-events:none; }
-    .dialogue { bottom:calc(50px + var(--player-safe-bottom)); max-height:min(26dvh,112px); }
+    .dialogue { bottom:calc(50px + var(--player-safe-bottom)); max-height:min(45dvh,220px); }
   }
 }
 
@@ -181,6 +200,7 @@ ion-content { --background:#050806; }
     .top-chrome { min-height:48px; }
     .top-chrome ion-button { width:44px; height:44px; }
     .transport { top:40%; }
+    .controls-hint { display:none; }
     .transport .play { width:58px; height:58px; }
     .transport .seek { width:44px; height:46px; }
     .dialogue { padding:7px 12px; }
@@ -198,5 +218,6 @@ ion-content { --background:#050806; }
 
 .sentence-vocabulary { display:flex; flex-wrap:wrap; gap:4px; margin-top:8px; }
 .sentence-vocabulary ion-button { --color:#e5efeb; --border-color:#8acbb6; margin:0; min-height:44px; }
-.controls-hint { color:#d8e2dc; font-size:.75rem; text-align:center; margin:4px; }
+.sentence-replay { display:block; min-height:44px; margin-inline:auto; }
+.controls-hint { display:none; color:#d8e2dc; font-size:.75rem; text-align:center; margin:4px; }
 .word-detail { padding:32px 24px; line-height:1.6; }
