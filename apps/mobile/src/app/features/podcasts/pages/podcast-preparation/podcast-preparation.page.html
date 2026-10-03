@@ -59,6 +59,9 @@
 
       <section #wordList class="words">
         <h2>Useful words</h2>
+        @if (store.essentialVocabulary().length > previewVocabulary().length || allWordsShown()) {
+          <ion-button fill="clear" (click)="allWordsShown.set(!allWordsShown())" [attr.aria-expanded]="allWordsShown()">{{ allWordsShown() ? 'Show fewer words' : 'Show all focus words' }}</ion-button>
+        }
         @for(item of previewVocabulary(); track item.lexemeId) {
           <article>
             <lc-article-badge [article]="item.article" />
@@ -70,13 +73,13 @@
                 @if (example.native) { <span class="example-native">{{ example.native }}</span> }
               }
             </div>
-            <small [attr.data-mastery]="item.mastery">{{ item.mastery }}</small>
+            <small [attr.data-mastery]="item.mastery">{{ item.isInVault ? (item.mastery === 'new' ? 'Saved' : item.mastery) : 'New' }}</small>
             <ion-button class="word-audio" fill="clear" type="button" (click)="playVocabulary(item)" [attr.aria-label]="'common.aria.playPronunciation' | translate">
               <ion-icon slot="icon-only" name="volume-high-outline" />
             </ion-button>
           </article>
         }
-        @if(wordsExpanded() && store.supportingVocabulary().length) {
+        @if(allWordsShown() && store.supportingVocabulary().length) {
           <h2>Supporting vocabulary</h2>
           @for(item of store.supportingVocabulary(); track item.lexemeId) {
             <article>
@@ -89,7 +92,7 @@
                   @if (example.native) { <span class="example-native">{{ example.native }}</span> }
                 }
               </div>
-              <small [attr.data-mastery]="item.mastery">{{ item.mastery }}</small>
+              <small [attr.data-mastery]="item.mastery">{{ item.isInVault ? (item.mastery === 'new' ? 'Saved' : item.mastery) : 'New' }}</small>
               <ion-button class="word-audio" fill="clear" type="button" (click)="playVocabulary(item)" [attr.aria-label]="'common.aria.playPronunciation' | translate">
                 <ion-icon slot="icon-only" name="volume-high-outline" />
               </ion-button>

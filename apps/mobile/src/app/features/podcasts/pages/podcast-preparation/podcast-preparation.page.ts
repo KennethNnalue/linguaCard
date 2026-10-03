@@ -26,7 +26,13 @@ import { PodcastTranscriptComponent } from '../../components/podcast-transcript/
 export class PodcastPreparationPage {
   readonly store = inject(PodcastCatalogueStore);
   readonly wordsExpanded = signal(false);
-  readonly previewVocabulary = computed(() => [...this.store.essentialVocabulary()].sort((first, second) => Number(second.isInVault) - Number(first.isInVault)));
+  readonly allWordsShown = signal(false);
+  readonly previewVocabulary = computed(() => {
+    const words = this.store.essentialVocabulary();
+    const saved = words.filter(word => word.isInVault);
+    const newWords = words.filter(word => !word.isInVault);
+    return [...saved, ...(this.allWordsShown() ? newWords : newWords.slice(0, 3))];
+  });
   readonly transcriptOpen = signal(false);
   private readonly route = inject(ActivatedRoute);
   private readonly router = inject(Router);
