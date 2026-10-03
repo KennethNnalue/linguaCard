@@ -1,5 +1,6 @@
 import { LearningItemsModule } from '../learning-items/learning-items.module';
 import { PodcastRecommendationsService } from './services/podcast-recommendations.service';
+import { PodcastEventsService } from './services/podcast-events.service';
 import { forwardRef, Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { AuthModule } from '../auth/auth.module';
@@ -45,6 +46,7 @@ import { PodcastTranscriptManifestService } from './services/podcast-transcript-
     PodcastAudioGenerationService, ElevenLabsDialogueAdapter, StorageService,
     PodcastCatalogueService,
     PodcastRecommendationsService,
+    PodcastEventsService,
     PodcastLearningLoopService,
     PodcastTranscriptGenerationService, ElevenLabsPodcastAdapter,
     ElevenLabsPodcastGenerationService,

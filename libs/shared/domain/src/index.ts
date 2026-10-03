@@ -2183,3 +2183,13 @@ export interface PodcastRecommendationResponse {
   recommendations: PodcastRecommendation[];
   evidence: 'current' | 'pending_sync' | 'unavailable';
 }
+
+export type PodcastClientEventName = 'recommendation_impression' | 'recommendation_selected' | 'playback_started' | 'preview_opened' | 'preparation_review_started' | 'preparation_review_returned';
+export interface PodcastClientEvent {
+  eventId: string;
+  name: PodcastClientEventName;
+  episodeId: string;
+  placement?: PodcastRecommendationPlacement;
+  recommendationId?: string;
+  policyVersion?: string;
+}

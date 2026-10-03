@@ -1,3 +1,4 @@
+import { recordPodcastMilestone } from './podcast-events.service';
 import { ConflictException, Injectable, NotFoundException } from '@nestjs/common';
 import { randomUUID } from 'node:crypto';
 import type {
@@ -110,6 +111,10 @@ export class PodcastLearningLoopService {
       progress.positionMs = update.positionMs;
       progress.completedAt = update.completedAt;
       const saved = await manager.save(progress);
+      if (saved.qualifyingListenedMs >= Math.min(30000, episode.audioDurationMs)) {
+        await recordPodcastMilestone(manager, userId, episodeId, episode.audioVersion, 'meaningful_listening');
+      }
+      if (saved.completedAt) await recordPodcastMilestone(manager, userId, episodeId, episode.audioVersion, 'completed');
       const pointsAwarded = !wasCompleted && saved.completedAt
         ? await this.engagementRewards.awardPodcastCompletion(
           manager, userId, episodeId, completedAt, settings.timezone,

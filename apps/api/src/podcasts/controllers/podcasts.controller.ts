@@ -5,6 +5,8 @@ import type {
 } from '@lingua-card/shared/domain';
 import { PodcastRecommendationsService } from '../services/podcast-recommendations.service';
 import { PodcastRecommendationsQueryDto } from '../dto/podcast-recommendations-query.dto';
+import { PodcastEventsService } from '../services/podcast-events.service';
+import { PodcastEventDto } from '../dto/podcast-event.dto';
 import { JwtAuthGuard } from '../../auth/guards/jwt-auth.guard';
 import { CurrentUser } from '../../common/decorators/current-user.decorator';
 import { PodcastCatalogueService } from '../services/podcast-catalogue.service';
@@ -18,8 +20,14 @@ export class PodcastsController {
   constructor(
     private readonly catalogue: PodcastCatalogueService,
     private readonly recommendations: PodcastRecommendationsService,
+    private readonly events: PodcastEventsService,
     private readonly learningLoop: PodcastLearningLoopService,
   ) {}
+
+  @Post('events')
+  recordEvent(@CurrentUser() userId: string, @Body() event: PodcastEventDto): Promise<void> {
+    return this.events.record(userId, event);
+  }
 
   @Get('recommendations')
   recommend(@CurrentUser() userId: string, @Query() query: PodcastRecommendationsQueryDto) {

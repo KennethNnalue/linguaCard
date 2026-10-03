@@ -1,3 +1,4 @@
+import { PodcastEventEntity } from './podcast-event.entity';
 import { PodcastEpisodeEntity } from './podcast-episode.entity';
 import { PodcastThumbnailAssetEntity } from './podcast-thumbnail-asset.entity';
 import { PodcastTopicEntity } from './podcast-topic.entity';
@@ -8,6 +9,7 @@ import { PodcastListeningProgressEntity } from './podcast-listening-progress.ent
 
 export const PODCAST_ENTITIES = [
   PodcastTopicEntity,
+  PodcastEventEntity,
   PodcastEpisodeEntity,
   PodcastThumbnailAssetEntity,
   PodcastSpeakerEntity,
