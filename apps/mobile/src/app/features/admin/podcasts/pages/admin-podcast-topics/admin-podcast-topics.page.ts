@@ -14,6 +14,7 @@ import {
   IonTextarea,
 } from '@ionic/angular';
 import type {
+  AdminPodcastTranscriptConflict,
   AdminPodcastTranscriptPayload,
   AdminPodcastEpisodeListItem,
   AdminPodcastTranscriptPromptNeedsResolutionResult,
@@ -53,6 +54,19 @@ interface PromptCopyRequest {
   words: readonly string[];
   direction?: string;
 }
+
+const TRANSCRIPT_CONFLICT_LABELS: Record<AdminPodcastTranscriptConflict['code'], string> = {
+  'duplicate-key': 'Duplicate key',
+  'unknown-reference': 'Unknown reference',
+  'unresolved-vocabulary': 'Unresolved vocabulary',
+  'ambiguous-vocabulary': 'Ambiguous vocabulary',
+  'missing-vocabulary': 'Missing vocabulary',
+  'unreferenced-vocabulary': 'Unused vocabulary',
+  'translation-mismatch': 'Translation mismatch',
+  'duration-limit': 'Duration limit',
+  'provider-limit': 'Provider limit',
+  'manifest-mismatch': 'Transcript mismatch',
+};
 
 @Component({
   selector: 'lc-admin-podcast-topics',
@@ -272,10 +286,13 @@ export class AdminPodcastTopicsPage implements OnInit {
   }
 
   ngOnInit(): void {
-    this.store.loadTopics();
     this.topicId.set(this.route.snapshot.paramMap.get('topicId'));
     const value = this.route.snapshot.data['podcastView'];
     this.view.set(value === 'create' ? 'new-topic' : value === 'new-episode' ? 'new-episode' : value === 'review' ? 'review' : this.topicId() ? 'topic' : 'library');
+  }
+
+  ionViewWillEnter(): void {
+    this.store.loadTopics();
   }
 
   goBack(): void {
@@ -545,6 +562,10 @@ export class AdminPodcastTopicsPage implements OnInit {
     return [candidate.translation ?? 'No translation', grammar, candidate.definition]
       .filter(Boolean)
       .join(' — ');
+  }
+
+  transcriptConflictLabel(code: AdminPodcastTranscriptConflict['code']): string {
+    return TRANSCRIPT_CONFLICT_LABELS[code];
   }
 
   async uploadTranscript(event: Event): Promise<void> {

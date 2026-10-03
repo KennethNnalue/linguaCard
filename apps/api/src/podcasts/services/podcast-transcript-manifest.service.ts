@@ -68,10 +68,14 @@ export class PodcastTranscriptManifestService {
         && this.areEquivalentCandidates(equivalentCandidates)
         ? this.preferredCandidate(equivalentCandidates)
         : null;
+      const specificGrammarMatch = !hasArticleConflict
+        ? this.preferredSpecificGrammarCandidate(selectableCandidates)
+        : null;
       const match = selectedMatch
         ?? (!hasArticleConflict && translationMatches.length === 1 ? translationMatches[0] : null)
         ?? (!hasArticleConflict && selectableCandidates.length === 1 ? selectableCandidates[0] : null)
-        ?? equivalentMatch;
+        ?? equivalentMatch
+        ?? specificGrammarMatch;
       const localization = match ? localizationByLexeme.get(match.id) : null;
       if (!match && (selectableCandidates.length > 1 || hasArticleConflict)) {
         ambiguities.push(this.ambiguity(item, selectableCandidates, localizationByLexeme));
@@ -128,6 +132,14 @@ export class PodcastTranscriptManifestService {
       );
     });
     return currentIdentityCandidate ?? [...candidates].sort((left, right) => left.id.localeCompare(right.id))[0];
+  }
+
+  private preferredSpecificGrammarCandidate(candidates: readonly LexemeEntity[]): LexemeEntity | null {
+    const specificCandidates = candidates.filter(candidate => candidate.partOfSpeech !== 'other');
+    if (specificCandidates.length !== 1) return null;
+    return candidates.every(candidate => candidate === specificCandidates[0] || candidate.partOfSpeech === 'other')
+      ? specificCandidates[0]
+      : null;
   }
 
   private ambiguity(

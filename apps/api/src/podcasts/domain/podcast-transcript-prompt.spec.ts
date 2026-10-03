@@ -76,11 +76,13 @@ describe('buildPodcastTranscriptPrompt', () => {
       'aus|sehen, er sieht aus, hat ausgesehen',
       'die Begeisterung (Sg.)',
       'doch (Die Lampe ist doch toll!)',
+      'ja (Liest du gern? - Ja, sehr gern.)',
+      'so (Schwimmst du gern? - Nein, nicht so gern.)',
       'nicht mehr',
       'die Äußerung, -en = statement',
     ])).toEqual([
       'Einweihungsfeier', 'genau', 'hinter', 'über', 'aussehen',
-      'Begeisterung', 'doch', 'nicht mehr', 'Äußerung = statement',
+      'Begeisterung', 'doch', 'ja', 'so', 'nicht mehr', 'Äußerung = statement',
     ]);
   });
 

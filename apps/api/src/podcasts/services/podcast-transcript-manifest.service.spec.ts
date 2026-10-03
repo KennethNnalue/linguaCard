@@ -112,6 +112,37 @@ describe('PodcastTranscriptManifestService', () => {
     }
   });
 
+  it('prefers a specific grammar identity over a legacy other duplicate', async () => {
+    const verb = Object.assign(new LexemeEntity(), {
+      id: 'fotografieren-verb', language: 'de', normalizedLemma: 'fotografieren',
+      displayText: 'fotografieren', partOfSpeech: 'verb', grammarDiscriminator: '', grammar: {},
+    });
+    const legacyOther = Object.assign(new LexemeEntity(), {
+      id: 'fotografieren-other', language: 'de', normalizedLemma: 'fotografieren',
+      displayText: 'fotografieren', partOfSpeech: 'other', grammarDiscriminator: '', grammar: {},
+    });
+    const dataSource = {
+      getRepository: jest.fn(entity => entity === LexemeEntity
+        ? { find: jest.fn().mockResolvedValue([verb, legacyOther]) }
+        : { find: jest.fn().mockResolvedValue([]) }),
+    };
+    const module = await Test.createTestingModule({ providers: [
+      PodcastTranscriptManifestService,
+      LexemeIdentityService,
+      { provide: DataSource, useValue: dataSource },
+    ] }).compile();
+    try {
+      const preparation = await module.get(PodcastTranscriptManifestService).prepare(
+        ['fotografieren'], 'de', 'en',
+      );
+
+      expect(preparation.ambiguities).toEqual([]);
+      expect(preparation.manifest.items[0].canonicalLexemeId).toBe(verb.id);
+    } finally {
+      await module.close();
+    }
+  });
+
   it('returns genuine ambiguity candidates and accepts a valid administrator selection', async () => {
     const masculine = Object.assign(new LexemeEntity(), {
       id: '11111111-1111-5111-a111-111111111111', language: 'de', normalizedLemma: 'band',

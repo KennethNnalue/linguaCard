@@ -41,6 +41,8 @@ interface AdminPodcastState {
   lastDeletedEpisodeId: string | null;
   lastUploadedTopicThumbnailId: string | null;
   lastUploadedEpisodeThumbnailId: string | null;
+  uploadingTopicThumbnailId: string | null;
+  uploadingEpisodeThumbnailId: string | null;
   elevenLabsProjects: Record<string, string>;
 }
 
@@ -65,6 +67,8 @@ const initialState: AdminPodcastState = {
   lastDeletedEpisodeId: null,
   lastUploadedTopicThumbnailId: null,
   lastUploadedEpisodeThumbnailId: null,
+  uploadingTopicThumbnailId: null,
+  uploadingEpisodeThumbnailId: null,
   elevenLabsProjects: {},
 };
 
@@ -146,9 +150,9 @@ export const AdminPodcastStore = signalStore(
       if (preview.status !== 'valid') {
         patchState(store, {
           transcriptStatus: 'error',
-          error: preview.conflicts.map(conflict =>
-            `${conflict.pointer}: ${conflict.message} ${conflict.remediation}`,
-          ).join(' ') || 'Resolve transcript conflicts before continuing.',
+          error: preview.conflicts.length
+            ? `Transcript validation found ${preview.conflicts.length} ${preview.conflicts.length === 1 ? 'issue' : 'issues'}. Review the details below.`
+            : 'Resolve transcript conflicts before continuing.',
         });
         return EMPTY;
       }
@@ -391,19 +395,24 @@ export const AdminPodcastStore = signalStore(
     uploadTopicThumbnail: rxMethod<UploadTopicThumbnailCommand>(
       pipe(
         exhaustMap(command => {
-          patchState(store, { mutationStatus: 'loading', error: null, success: null });
+          patchState(store, {
+            mutationStatus: 'loading', uploadingTopicThumbnailId: command.topicId,
+            error: null, success: null,
+          });
           return api.uploadTopicThumbnail(command.topicId, command.upload).pipe(
             tap(thumbnail => patchState(store, {
               topics: store.topics().map(topic => topic.id === command.topicId
                 ? { ...topic, thumbnail }
                 : topic),
               mutationStatus: 'success',
+              uploadingTopicThumbnailId: null,
               lastUploadedTopicThumbnailId: command.topicId,
               success: 'The topic image was saved.',
             })),
             catchError(error => {
               patchState(store, {
                 mutationStatus: 'error',
+                uploadingTopicThumbnailId: null,
                 error: adminPodcastErrorMessage(error, 'Could not upload the topic thumbnail.'),
               });
               return EMPTY;
@@ -415,7 +424,10 @@ export const AdminPodcastStore = signalStore(
     uploadEpisodeThumbnail: rxMethod<UploadEpisodeThumbnailCommand>(
       pipe(
         exhaustMap(command => {
-          patchState(store, { mutationStatus: 'loading', error: null, success: null });
+          patchState(store, {
+            mutationStatus: 'loading', uploadingEpisodeThumbnailId: command.episodeId,
+            error: null, success: null,
+          });
           return api.uploadEpisodeThumbnail(command.episodeId, command.upload).pipe(
             tap(thumbnail => patchState(store, {
               topics: store.topics().map(topic => ({
@@ -425,12 +437,14 @@ export const AdminPodcastStore = signalStore(
                   : episode),
               })),
               mutationStatus: 'success',
+              uploadingEpisodeThumbnailId: null,
               lastUploadedEpisodeThumbnailId: command.episodeId,
               success: 'The episode image was saved.',
             })),
             catchError(error => {
               patchState(store, {
                 mutationStatus: 'error',
+                uploadingEpisodeThumbnailId: null,
                 error: adminPodcastErrorMessage(error, 'Could not upload the episode thumbnail.'),
               });
               return EMPTY;
