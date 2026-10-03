@@ -158,6 +158,7 @@ ion-content { --background:#050806; }
     transform:translateX(-50%);
   }
   .secondary-controls {
+    position:absolute;
     top:50%;
     right:calc(14px + var(--player-safe-right));
     display:flex;

@@ -53,7 +53,7 @@
                 <ion-button fill="outline" size="small" (click)="$event.stopPropagation(); inspectWord(word)">{{ word.text }}</ion-button>
               }
               @if (sentenceVocabulary().length > 3) {
-                <ion-button fill="clear" size="small" (click)="$event.stopPropagation(); expandedVocabularyTurn.set(expandedVocabularyTurn() === turn.id ? null : turn.id)" [attr.aria-expanded]="expandedVocabularyTurn() === turn.id">{{ expandedVocabularyTurn() === turn.id ? 'Fewer words' : '+' + (sentenceVocabulary().length - 3) + ' words' }}</ion-button>
+                <ion-button fill="clear" size="small" (click)="$event.stopPropagation(); expandedVocabularyTurn.set(expandedVocabularyTurn() === turn.id ? null : turn.id)" [attr.aria-expanded]="expandedVocabularyTurn() === turn.id">{{ expandedVocabularyTurn() === turn.id ? 'Fewer words' : '+' + (sentenceVocabulary().length - 3) + (sentenceVocabulary().length === 4 ? ' word' : ' words') }}</ion-button>
               }
             </div>
           }
@@ -106,7 +106,7 @@
             [class.active]="store.repeatMode() !== 'off'"
             [attr.aria-pressed]="store.repeatMode() !== 'off'"
             [attr.aria-label]="(store.repeatMode() === 'off' ? 'podcasts.player.repeatEpisode' : 'podcasts.player.turnOffRepeat') | translate">
-            <ion-icon name="repeat-outline" /><span>Repeat {{ store.repeatMode() }}</span>
+            <ion-icon name="repeat-outline" /><span>{{ store.repeatMode() === 'off' ? 'Repeat episode' : 'Repeat ' + store.repeatMode() }}</span>
             @if (store.repeatMode() !== 'off') {
               <span class="repeat-mode-badge" aria-hidden="true">{{ store.repeatMode() === 'episode' ? '1' : '∞' }}</span>
             }
