@@ -148,15 +148,6 @@ ion-content { --background:#050806; }
     --color:#f2cf67;
     --background:rgba(5,8,6,.85);
   }
-  .controls-hint {
-    display:block;
-    position:absolute;
-    top:calc(43% - 116px);
-    left:50%;
-    width:max-content;
-    max-width:calc(100% - 120px);
-    transform:translateX(-50%);
-  }
   .secondary-controls {
     position:absolute;
     top:50%;
@@ -194,7 +185,6 @@ ion-content { --background:#050806; }
     .top-chrome { min-height:48px; }
     .top-chrome ion-button { width:44px; height:44px; }
     .transport { top:40%; }
-    .controls-hint { display:none; }
     .transport .play { width:58px; height:58px; }
     .transport .seek { width:44px; height:46px; }
     .dialogue { padding:7px 12px; }
@@ -213,7 +203,6 @@ ion-content { --background:#050806; }
 .sentence-vocabulary { display:flex; flex-wrap:wrap; gap:4px; margin-top:8px; }
 .sentence-vocabulary ion-button { --color:#e5efeb; --border-color:#8acbb6; margin:0; min-height:44px; }
 .sentence-replay { display:block; min-height:44px; margin-inline:auto; }
-.controls-hint { display:none; color:#d8e2dc; font-size:.75rem; text-align:center; margin:4px; }
 .word-detail { padding:32px 24px; line-height:1.6; }
 
 .secondary-controls { position:relative; }
@@ -230,3 +219,5 @@ ion-content { --background:#050806; }
 .word-detail h3 { margin-top:24px; font-size:.875rem; color:var(--lc-ss-sage); }
 .player--landscape .player-options { right:64px; top:0; bottom:auto; }
 @media(orientation:landscape) { .player .player-options { right:64px; top:0; bottom:auto; } }
+
+.word-detail ion-button { --background:var(--lc-ss-sage); --color:#102119; --border-radius:12px; text-transform:none; min-height:44px; }

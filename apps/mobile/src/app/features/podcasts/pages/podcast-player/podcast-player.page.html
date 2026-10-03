@@ -83,7 +83,6 @@
         </div>
 
         <ion-button class="sentence-replay" fill="clear" (click)="replaySentence()" [disabled]="!store.currentTurn()">Replay sentence</ion-button>
-        <p class="controls-hint">Tap the scene to show or hide controls.</p>
         <div class="secondary-controls">
           <ion-button class="speed" fill="clear" shape="round" (click)="changeSpeed()"
             [attr.aria-label]="'podcasts.player.playbackSpeed' | translate:{ speed: store.speed() }">
