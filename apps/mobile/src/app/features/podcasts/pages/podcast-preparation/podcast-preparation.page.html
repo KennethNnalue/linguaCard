@@ -24,7 +24,7 @@
       <section class="readiness">
         <div>
           <span>Optional vocabulary preview</span>
-          <h2>Try this conversation with translations</h2>
+          <h2 #vocabularyHeading tabindex="-1">Try this conversation with translations</h2>
           @if (prep.familiarity; as familiarity) {
             @if (familiarity.total) {
               <p>{{ familiarity.familiar }} familiar · {{ familiarity.learning }} to practise · {{ familiarity.new }} new to your vault</p>

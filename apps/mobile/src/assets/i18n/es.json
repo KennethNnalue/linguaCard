@@ -1260,6 +1260,29 @@
         "saveProgress": "No se pudo guardar el progreso de escucha.",
         "completionThreshold": "Escucha al menos el 70 % del episodio antes de completarlo."
       }
+    },
+    "discovery": {
+      "heading": "Practica tus palabras",
+      "showMore": "Ver más conversaciones",
+      "showLess": "Ver menos conversaciones",
+      "levelScope": "El nivel se aplica a las conversaciones nuevas. Los episodios sin terminar y los temas siguen disponibles en todos los niveles.",
+      "translations": "Traducciones disponibles",
+      "saved": {
+        "one": "{{count}} palabra de tu vocabulario guardado",
+        "other": "{{count}} palabras de tu vocabulario guardado"
+      },
+      "session": {
+        "one": "{{count}} palabra de esta sesión",
+        "other": "{{count}} palabras de esta sesión"
+      },
+      "recent": {
+        "one": "{{count}} palabra de repasos recientes",
+        "other": "{{count}} palabras de repasos recientes"
+      },
+      "vocabulary": {
+        "one": "{{count}} palabra de tu vocabulario",
+        "other": "{{count}} palabras de tu vocabulario"
+      }
     }
   },
   "stories": {

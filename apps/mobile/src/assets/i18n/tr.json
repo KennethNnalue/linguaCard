@@ -1260,6 +1260,29 @@
         "saveProgress": "Dinleme ilerlemesi kaydedilemedi.",
         "completionThreshold": "Bölümü tamamlamadan önce en az %70'ini dinleyin."
       }
+    },
+    "discovery": {
+      "heading": "Kelimelerini çalış",
+      "showMore": "Daha fazla konuşma göster",
+      "showLess": "Daha az konuşma göster",
+      "levelScope": "Seviye yeni konuşmalar için geçerlidir. Tamamlanmamış bölümler ve konular tüm seviyelerde kullanılabilir.",
+      "translations": "Çeviriler mevcut",
+      "saved": {
+        "one": "kayıtlı kelimelerinden {{count}} kelime",
+        "other": "kayıtlı kelimelerinden {{count}} kelime"
+      },
+      "session": {
+        "one": "bu oturumdan {{count}} kelime",
+        "other": "bu oturumdan {{count}} kelime"
+      },
+      "recent": {
+        "one": "son tekrarlardan {{count}} kelime",
+        "other": "son tekrarlardan {{count}} kelime"
+      },
+      "vocabulary": {
+        "one": "kelimelerinden {{count}} kelime",
+        "other": "kelimelerinden {{count}} kelime"
+      }
     }
   },
   "stories": {

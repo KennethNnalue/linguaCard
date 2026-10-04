@@ -1,10 +1,11 @@
 import { AfterViewInit, ChangeDetectionStrategy, Component, DestroyRef, ElementRef, computed, inject, input, output } from '@angular/core';
+import { TranslatePipe } from '@ngx-translate/core';
 import { IonButton } from '@ionic/angular';
 import type { PodcastRecommendation, PodcastRecommendationResponse } from '@lingua-card/shared/domain';
 import { OfflineImageDirective } from '../../../../shared/image/offline-image.directive';
 
 @Component({
-  selector: 'lc-podcast-recommendation', standalone: true, imports: [IonButton, OfflineImageDirective],
+  selector: 'lc-podcast-recommendation', standalone: true, imports: [IonButton, OfflineImageDirective, TranslatePipe],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
     <article aria-label="Recommended conversation">
@@ -13,7 +14,7 @@ import { OfflineImageDirective } from '../../../../shared/image/offline-image.di
         <small>{{ recommendation().reason === 'starter' ? 'Try a short conversation' : 'Hear your words in a conversation' }}</small>
         <h2>{{ recommendation().episode.title }}</h2>
         <p>{{ recommendation().episode.titleTranslation }}</p>
-        <p>{{ recommendation().episode.level }} · {{ minutes() }} min · {{ reason() }}</p>
+        <p>{{ recommendation().episode.level }} · {{ minutes() }} min · {{ reasonKey() | translate:{ count: recommendation().matchCount } }}</p>
         @if (recommendation().matchedWords.length) {
           <p class="words">@for (word of recommendation().matchedWords; track word.lexemeId) { <span>{{ word.text }}</span> }</p>
         }
@@ -40,12 +41,11 @@ export class PodcastRecommendationComponent implements AfterViewInit {
   readonly evidence = input<PodcastRecommendationResponse['evidence']>('current');
   readonly listenSelected = output<void>(); readonly preview = output<void>(); readonly visible = output<void>();
   readonly minutes = computed(() => Math.max(1, Math.round(this.recommendation().episode.durationMs / 60000)));
-  readonly reason = computed(() => {
+  readonly reasonKey = computed(() => {
     const item = this.recommendation();
-    if (item.reason === 'starter') return 'Translations available';
-    if (this.evidence() !== 'current') return `${item.matchCount} words from your saved vocabulary`;
-    const source = item.reason === 'session_words' ? 'this session' : item.reason === 'recent_words' ? 'recent reviews' : 'your vocabulary';
-    return `${item.matchCount} words from ${source}`;
+    if (item.reason === 'starter') return 'podcasts.discovery.translations';
+    const source = this.evidence() !== 'current' ? 'saved' : item.reason === 'session_words' ? 'session' : item.reason === 'recent_words' ? 'recent' : 'vocabulary';
+    return `podcasts.discovery.${source}.${item.matchCount === 1 ? 'one' : 'other'}`;
   });
   private readonly host = inject<ElementRef<HTMLElement>>(ElementRef);
   private readonly destroyRef = inject(DestroyRef);

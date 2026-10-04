@@ -1,5 +1,5 @@
 import { PodcastDiscoveryEventsService } from '../../services/podcast-discovery-events.service';
-import { ChangeDetectionStrategy, Component, computed, ElementRef, inject, signal, viewChild } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, effect, ElementRef, inject, signal, viewChild } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { IonButton, IonContent, IonIcon, IonSpinner } from '@ionic/angular';
 import { addIcons } from 'ionicons';
@@ -44,11 +44,23 @@ export class PodcastPreparationPage {
   private readonly wordAudio = inject(WordAudioService);
   private readonly wordList = viewChild<ElementRef<HTMLElement>>('wordList');
   constructor() {
+    effect(() => {
+      const heading = this.vocabularyHeading();
+      if (this.previewFocusPending && this.wordsExpanded() && heading) {
+        heading.nativeElement.focus();
+        this.previewFocusPending = false;
+      }
+    });
     addIcons({ arrowBackOutline, closeOutline, documentTextOutline, libraryOutline, play, schoolOutline, volumeHighOutline });
   }
+  private readonly vocabularyHeading = viewChild<ElementRef<HTMLElement>>('vocabularyHeading');
+  private previewFocusPending = false;
   private returnedReviewRecorded = false;
   ionViewWillEnter(): void {
     const episodeId = this.route.snapshot.paramMap.get('episodeId') ?? '';
+    this.previewFocusPending = this.route.snapshot.queryParamMap.get('preview') === 'words';
+    this.wordsExpanded.set(this.previewFocusPending);
+    this.allWordsShown.set(false);
     this.store.loadPreparation(episodeId);
     if (episodeId && this.route.snapshot.queryParamMap.get('fromReview') === '1' && !this.returnedReviewRecorded) {
       this.discoveryEvents.record({ name: 'preparation_review_returned', episodeId });

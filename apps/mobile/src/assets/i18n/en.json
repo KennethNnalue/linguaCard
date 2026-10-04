@@ -109,6 +109,29 @@
     "reset": {
       "passwordIncorrect": "Incorrect password. Please try again.",
       "success": "✓ All data has been reset. Start fresh!"
+    },
+    "discovery": {
+      "heading": "Practise your words",
+      "showMore": "Show more conversations",
+      "showLess": "Show fewer conversations",
+      "levelScope": "Level applies to new conversations. Unfinished episodes and topics remain available at every level.",
+      "translations": "Translations available",
+      "saved": {
+        "one": "{{count}} word from your saved vocabulary",
+        "other": "{{count}} words from your saved vocabulary"
+      },
+      "session": {
+        "one": "{{count}} word from this session",
+        "other": "{{count}} words from this session"
+      },
+      "recent": {
+        "one": "{{count}} word from recent reviews",
+        "other": "{{count}} words from recent reviews"
+      },
+      "vocabulary": {
+        "one": "{{count}} word from your vocabulary",
+        "other": "{{count}} words from your vocabulary"
+      }
     }
   },
   "home": {
