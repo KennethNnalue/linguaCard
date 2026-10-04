@@ -1,3 +1,4 @@
+import { PodcastAttributionService } from './services/podcast-attribution.service';
 import { LearningItemsModule } from '../learning-items/learning-items.module';
 import { PodcastRecommendationsService } from './services/podcast-recommendations.service';
 import { PodcastEventsService } from './services/podcast-events.service';
@@ -47,6 +48,7 @@ import { PodcastTranscriptManifestService } from './services/podcast-transcript-
     PodcastCatalogueService,
     PodcastRecommendationsService,
     PodcastEventsService,
+    PodcastAttributionService,
     PodcastLearningLoopService,
     PodcastTranscriptGenerationService, ElevenLabsPodcastAdapter,
     ElevenLabsPodcastGenerationService,

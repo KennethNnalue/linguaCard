@@ -1952,6 +1952,7 @@ export interface SavePodcastProgressDto {
   positionMs: number;
   completed: boolean;
   playedRanges?: readonly PodcastPlaybackRange[];
+  journeyId?: string;
 }
 
 export interface PreparePodcastVocabularyResult {
@@ -2174,10 +2175,30 @@ export interface PodcastVocabularyFamiliarity {
   unknown: number;
   total: number;
 }
+export interface PodcastRecommendationContext {
+  recommendationId: string;
+  episodeId: string;
+  audioVersion: number;
+  placement: PodcastRecommendationPlacement;
+  policyVersion: string;
+  discoveryLevel: PodcastLibraryLevel;
+  targetLanguage: string;
+  sourceLanguage: string;
+  experimentVersion: string;
+  cohort: 'treatment' | 'control';
+}
+export interface PodcastPlaybackJourney {
+  journeyId: string;
+  episodeId: string;
+  audioVersion: number;
+  recommendationId?: string;
+  assisted: boolean;
+}
 export interface PodcastRecommendation {
   id: string;
   policyVersion: string;
   fit?: 'strong' | 'overlap' | 'starter';
+  context?: PodcastRecommendationContext;
   episode: PodcastLibraryFeaturedEpisode;
   reason: 'session_words' | 'recent_words' | 'vocabulary' | 'starter';
   matchCount: number;
@@ -2187,6 +2208,7 @@ export interface PodcastRecommendation {
 export interface PodcastRecommendationResponse {
   recommendations: PodcastRecommendation[];
   evidence: 'current' | 'pending_sync' | 'unavailable';
+  rollout?: { enabled: boolean; experimentVersion: string; cohort: 'treatment' | 'control' };
 }
 
 export type PodcastClientEventName = 'recommendation_impression' | 'recommendation_selected' | 'playback_started' | 'preview_opened' | 'preparation_review_started' | 'preparation_review_returned';
@@ -2197,6 +2219,8 @@ export interface PodcastClientEvent {
   placement?: PodcastRecommendationPlacement;
   recommendationId?: string;
   policyVersion?: string;
+  journeyId?: string;
+  assisted?: boolean;
 }
 
 export type ReviewContinuation = { kind: 'podcast'; episodeId: string; title: string };

@@ -237,6 +237,7 @@ export class PodcastPlaybackRangeDto {
 }
 
 export class SavePodcastProgressDto {
+  @IsOptional() @IsUUID() journeyId?: string;
   @IsInt() @Min(1) audioVersion!: number;
   @IsInt() @Min(0) @Max(300000) positionMs!: number;
   @IsIn([true, false]) completed!: boolean;

@@ -1,3 +1,4 @@
+import { PodcastRecommendationAssignmentEntity } from './podcast-recommendation-assignment.entity';
 import { PodcastEventEntity } from './podcast-event.entity';
 import { PodcastEpisodeEntity } from './podcast-episode.entity';
 import { PodcastThumbnailAssetEntity } from './podcast-thumbnail-asset.entity';
@@ -8,6 +9,7 @@ import { PodcastEpisodeVocabularyEntity } from './podcast-episode-vocabulary.ent
 import { PodcastListeningProgressEntity } from './podcast-listening-progress.entity';
 
 export const PODCAST_ENTITIES = [
+  PodcastRecommendationAssignmentEntity,
   PodcastTopicEntity,
   PodcastEventEntity,
   PodcastEpisodeEntity,

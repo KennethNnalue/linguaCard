@@ -1,3 +1,4 @@
+import { PodcastAttributionService } from './podcast-attribution.service';
 import { recordPodcastMilestone } from './podcast-events.service';
 import { ConflictException, Injectable, NotFoundException } from '@nestjs/common';
 import { randomUUID } from 'node:crypto';
@@ -78,6 +79,7 @@ export class PodcastLearningLoopService {
     private readonly dataSource: DataSource,
     private readonly engagementRewards: EngagementActivityRewardService,
     private readonly settings: UserSettingsService,
+    private readonly attribution: PodcastAttributionService,
   ) {}
 
   async getProgress(userId: string, episodeId: string): Promise<PodcastListeningProgress | null> {
@@ -125,10 +127,12 @@ export class PodcastLearningLoopService {
       progress.positionMs = update.positionMs;
       progress.completedAt = update.completedAt;
       const saved = await manager.save(progress);
+      const attribution = await this.attribution.progress(manager, userId, episodeId, episode.audioVersion,
+        episode.audioDurationMs, dto.journeyId, dto.playedRanges ?? [], settings.timezone);
       if (saved.qualifyingListenedMs >= Math.min(30000, episode.audioDurationMs)) {
-        await recordPodcastMilestone(manager, userId, episodeId, episode.audioVersion, 'meaningful_listening');
+        await recordPodcastMilestone(manager, userId, episodeId, episode.audioVersion, 'meaningful_listening', attribution);
       }
-      if (saved.completedAt) await recordPodcastMilestone(manager, userId, episodeId, episode.audioVersion, 'completed');
+      if (saved.completedAt) await recordPodcastMilestone(manager, userId, episodeId, episode.audioVersion, 'completed', attribution);
       const pointsAwarded = !wasCompleted && saved.completedAt
         ? await this.engagementRewards.awardPodcastCompletion(
           manager, userId, episodeId, completedAt, settings.timezone,

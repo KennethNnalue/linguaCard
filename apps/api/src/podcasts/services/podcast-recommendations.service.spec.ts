@@ -1,3 +1,4 @@
+import { PodcastAttributionService } from './podcast-attribution.service';
 import { Test } from '@nestjs/testing';
 import { NotFoundException } from '@nestjs/common';
 import { DataSource } from 'typeorm';
@@ -40,6 +41,7 @@ describe('PodcastRecommendationsService scope and listening evidence', () => {
     ]);
     const module = await Test.createTestingModule({ providers: [
       PodcastRecommendationsService,
+      { provide: PodcastAttributionService, useValue: { rollout: async () => ({ enabled: true, cohort: 'treatment', experimentVersion: 'test-v2' }), issue: jest.fn(async () => undefined) } },
       { provide: DataSource, useValue: { query, getRepository: (entity: Function) => {
         const repository = repositories.get(entity);
         if (!repository) throw new Error('Unexpected repository');

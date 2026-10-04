@@ -1,6 +1,8 @@
-import { IsIn, IsOptional, IsString, IsUUID, MaxLength } from 'class-validator';
+import { IsBoolean, IsIn, IsOptional, IsString, IsUUID, MaxLength } from 'class-validator';
 import type { PodcastClientEventName, PodcastRecommendationPlacement } from '@lingua-card/shared/domain';
 export class PodcastEventDto {
+  @IsOptional() @IsUUID() journeyId?: string;
+  @IsOptional() @IsBoolean() assisted?: boolean;
   @IsUUID() eventId!: string;
   @IsUUID() episodeId!: string;
   @IsIn(['recommendation_impression', 'recommendation_selected', 'playback_started', 'preview_opened', 'preparation_review_started', 'preparation_review_returned'])

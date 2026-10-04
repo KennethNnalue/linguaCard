@@ -1,7 +1,8 @@
+import { PodcastAttributionService } from './podcast-attribution.service';
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { DataSource, In, Not, IsNull } from 'typeorm';
 import { randomUUID } from 'node:crypto';
-import type { LearningStage, PodcastRecommendationResponse } from '@lingua-card/shared/domain';
+import type { LearningStage, PodcastRecommendation, PodcastRecommendationResponse } from '@lingua-card/shared/domain';
 import { LearningItemReadService } from '../../learning-items/services/learning-item-read.service';
 import { PodcastEpisodeEntity } from '../entities/podcast-episode.entity';
 import { PodcastTopicEntity } from '../entities/podcast-topic.entity';
@@ -18,9 +19,11 @@ interface WordRow {
 }
 @Injectable()
 export class PodcastRecommendationsService {
-  constructor(private readonly dataSource: DataSource, private readonly contexts: LearningItemReadService) {}
+  constructor(private readonly dataSource: DataSource, private readonly contexts: LearningItemReadService, private readonly attribution: PodcastAttributionService) {}
 
   async recommend(userId: string, query: PodcastRecommendationsQueryDto): Promise<PodcastRecommendationResponse> {
+    const rollout = await this.attribution.rollout(userId, query.placement ?? 'home');
+    if (!rollout.enabled) return { recommendations: [], evidence: 'current', rollout };
     const context = await this.contexts.loadActiveLearningContext(userId);
     let pendingSession = false;
     if (query.sessionId) {
@@ -71,7 +74,7 @@ export class PodcastRecommendationsService {
     const candidates = valid.filter(episode => !alreadyListening.has(episode.id) && thumbnailById.has(episode.thumbnailAssetId ?? ''))
       .map(episode => ({ ...episode, durationMs: episode.audioDurationMs,
         words: rows.filter(row => row.episodeId === episode.id) }));
-    const recommendations = rankPodcastRecommendations(candidates, query.placement === 'library' ? 10 : 1).flatMap(episode => {
+    const recommendations: PodcastRecommendation[] = rankPodcastRecommendations(candidates, query.placement === 'library' ? 10 : 1).flatMap(episode => {
       const thumbnail = thumbnailById.get(episode.thumbnailAssetId ?? '');
       const topic = topicById.get(episode.topicId);
       if (!thumbnail || !topic) return [];
@@ -87,6 +90,15 @@ export class PodcastRecommendationsService {
           topicId: topic.id, topicTitle: topic.title, topicTitleTranslation: topic.titleTranslation },
       }];
     });
-    return { recommendations, evidence: pendingSession ? 'pending_sync' : 'current' };
+    for (const recommendation of recommendations) {
+      const audioVersion = audioVersionById.get(recommendation.episode.id);
+      if (!audioVersion) continue;
+      recommendation.context = { recommendationId: recommendation.id, episodeId: recommendation.episode.id,
+        audioVersion, placement: query.placement ?? 'home', policyVersion: recommendation.policyVersion,
+        discoveryLevel: query.level ?? 'all', targetLanguage: context.targetLanguage, sourceLanguage: context.sourceLanguage,
+        experimentVersion: rollout.experimentVersion, cohort: rollout.cohort };
+      await this.attribution.issue(userId, recommendation.context);
+    }
+    return { recommendations, evidence: pendingSession ? 'pending_sync' : 'current', rollout };
   }
 }

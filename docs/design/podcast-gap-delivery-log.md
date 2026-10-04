@@ -33,3 +33,11 @@ Follow-up `386c4dd` is live on the API. The production collection now visibly ha
 Added backward-compatible explicit fit (strong / overlap / starter), truthful translated fit copy in six languages, policy vocabulary-v2 and topic variety restricted to the same fit tier. Strong means three distinct reviewed matches with no more than half focus words new; this is a product rule, not a comprehension prediction.
 
 Twelve focused recommendation tests passed, both application TypeScript checks passed, changed frontend ESLint passed, and the production Angular build passed with existing stylesheet budget warnings. Read-only production coverage is recorded under docs/verification: 11 playable German/English episodes, 141 of 1,105 reviewed canonical lexemes covered, and 457 unmapped legacy cards. No older-episode omission exists within the current 200 candidate bound. Deployment and live fit copy verification pending.
+
+Stage 3 live at `cc99f4a`: after activating the visible PWA update, Home displays Some vocabulary overlap with the unchanged exact 1-word count. The in-progress review remains at 48 cards; no review answer or listening completion was submitted. Screenshot: gap-verification/stage3-fit.jpg. The PWA can serve a prior build until its update prompt is activated, even when the public version endpoint reports the newest deployment.
+
+## Stage 4 API contract — 4 October 2026
+
+Server-issued, user/version/language-bound exposures validate attribution. Explicit selection establishes a journey; unselected impressions never receive listening credit. Review transitions mark assisted journeys; actual-play events establish starts. Progress retains canonical milestone/reward idempotency and adds unique journey/local-date listening ranges for repeat-day analysis. Optional fields preserve older clients. Independent switches and separately persisted stable assignments have cascading account deletion.
+
+Five focused suites (22 tests) and API TypeScript pass. Assignment migration repeated-up, conflict behavior, account cascade and down passed against PostgreSQL inside a rolled-back transaction. Report/metric definitions and rollout configuration are documented; legacy repeat-day baseline is unknown. API deployment and frontend context propagation remain pending.
