@@ -1,3 +1,4 @@
+import { PodcastOnboardingExampleService } from '../services/podcast-onboarding-example.service';
 import { Body, Controller, Get, Param, Patch, Post, Query, UseGuards } from '@nestjs/common';
 import type {
   PodcastEpisodeCompletion, PodcastEpisodePlayer, PodcastEpisodePreparation, PodcastLibraryResponse,
@@ -18,6 +19,7 @@ import { PodcastLibraryQueryDto } from '../dto/podcast-library-query.dto';
 @UseGuards(JwtAuthGuard)
 export class PodcastsController {
   constructor(
+    private readonly onboardingExample: PodcastOnboardingExampleService,
     private readonly catalogue: PodcastCatalogueService,
     private readonly recommendations: PodcastRecommendationsService,
     private readonly events: PodcastEventsService,
@@ -27,6 +29,11 @@ export class PodcastsController {
   @Post('events')
   recordEvent(@CurrentUser() userId: string, @Body() event: PodcastEventDto): Promise<void> {
     return this.events.record(userId, event);
+  }
+
+  @Get('onboarding-example/:collectionId')
+  onboarding(@CurrentUser() userId: string, @Param('collectionId') collectionId: string) {
+    return this.onboardingExample.forCollection(userId, collectionId);
   }
 
   @Get('recommendations')

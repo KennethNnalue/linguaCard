@@ -1,3 +1,5 @@
+import { PodcastOnboardingExampleRepository } from './repositories/podcast-onboarding-example.repository';
+import { PodcastOnboardingExampleService } from './services/podcast-onboarding-example.service';
 import { PodcastAttributionService } from './services/podcast-attribution.service';
 import { LearningItemsModule } from '../learning-items/learning-items.module';
 import { PodcastRecommendationsService } from './services/podcast-recommendations.service';
@@ -49,6 +51,8 @@ import { PodcastTranscriptManifestService } from './services/podcast-transcript-
     PodcastRecommendationsService,
     PodcastEventsService,
     PodcastAttributionService,
+    PodcastOnboardingExampleService,
+    PodcastOnboardingExampleRepository,
     PodcastLearningLoopService,
     PodcastTranscriptGenerationService, ElevenLabsPodcastAdapter,
     ElevenLabsPodcastGenerationService,

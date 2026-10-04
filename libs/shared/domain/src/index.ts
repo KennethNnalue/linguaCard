@@ -2176,6 +2176,20 @@ export interface PodcastVocabularyFamiliarity {
   unknown: number;
   total: number;
 }
+export interface PodcastOnboardingExample {
+  episodeId: string;
+  episodeTitle: string;
+  episodeTitleTranslation: string;
+  audioUrl: string;
+  audioVersion: number;
+  lexemeId: string;
+  word: string;
+  translation: string;
+  transcriptText: string;
+  transcriptTranslation: string;
+  startMs: number;
+  endMs: number;
+}
 export interface PodcastRecommendationContext {
   learningContextId?: string;
   recommendationId: string;
