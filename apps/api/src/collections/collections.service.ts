@@ -27,6 +27,7 @@ export class CollectionsService {
       this.repo.find({ where: { userId }, order: { createdAt: 'ASC' } }),
       this.buildCountsMap(userId),
     ]);
+    await this.resolvePodcastSources(userId, collections);
     return collections.map(col =>
       this.toModel(col, countsMap.get(col.id) ?? { cardCount: 0, masteredCount: 0, dueCount: 0 }),
     );
@@ -35,19 +36,26 @@ export class CollectionsService {
   async findOne(userId: string, id: string): Promise<Collection> {
     const entity = await this.repo.findOneBy({ id, userId });
     if (!entity) throw new NotFoundException(`Collection ${id} not found`);
-    if (entity.sourcePodcastEpisodeId || entity.sourcePlatformCollectionId) {
-      const published: Array<{ id: string }> = await this.cardRepo.manager.query(`
-        SELECT episode.id FROM podcast_episodes episode
-        JOIN podcast_topics topic ON topic.id = episode."topicId"
-        WHERE (episode.id = $1 OR ($1::varchar IS NULL AND episode.id = (
-          SELECT "sourcePodcastEpisodeId" FROM platform_collections WHERE id = $2)))
-          AND episode.status = 'published' AND topic.status = 'published' AND episode."audioUrl" IS NOT NULL
-        LIMIT 1
-      `, [entity.sourcePodcastEpisodeId, entity.sourcePlatformCollectionId]);
-      entity.sourcePodcastEpisodeId = published[0]?.id ?? null;
-    }
+    await this.resolvePodcastSources(userId, [entity]);
     const countsMap = await this.buildCountsMap(userId);
     return this.toModel(entity, countsMap.get(id) ?? { cardCount: 0, masteredCount: 0, dueCount: 0 });
+  }
+
+  private async resolvePodcastSources(userId: string, collections: CollectionEntity[]): Promise<void> {
+    const linked = collections.filter(item => item.sourcePodcastEpisodeId || item.sourcePlatformCollectionId);
+    if (!linked.length) return;
+    const rows: Array<{ collectionId: string; episodeId: string }> = await this.cardRepo.manager.query(`
+      SELECT collection.id AS "collectionId", episode.id AS "episodeId"
+      FROM collections collection
+      LEFT JOIN platform_collections platform ON platform.id = collection."sourcePlatformCollectionId"
+      JOIN podcast_episodes episode ON episode.id = COALESCE(collection."sourcePodcastEpisodeId", platform."sourcePodcastEpisodeId")
+      JOIN podcast_topics topic ON topic.id = episode."topicId"
+      WHERE collection."userId" = $1 AND collection.id = ANY($2::varchar[])
+        AND episode.status = 'published' AND topic.status = 'published'
+        AND NULLIF(trim(episode."audioUrl"), '') IS NOT NULL AND episode."audioDurationMs" > 0
+    `, [userId, linked.map(item => item.id)]);
+    const sources = new Map(rows.map(row => [row.collectionId, row.episodeId]));
+    for (const collection of linked) collection.sourcePodcastEpisodeId = sources.get(collection.id) ?? null;
   }
 
   private async buildCountsMap(userId: string): Promise<Map<string, LiveCounts>> {
