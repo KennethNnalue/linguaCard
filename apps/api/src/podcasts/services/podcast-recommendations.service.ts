@@ -9,7 +9,7 @@ import { PodcastThumbnailAssetEntity } from '../entities/podcast-thumbnail-asset
 import { PodcastListeningProgressEntity } from '../entities/podcast-listening-progress.entity';
 import { ReviewSessionEntity } from '../../review/review-session.entity';
 import { toPodcastThumbnail } from '../podcast-thumbnail.mapper';
-import { rankPodcastRecommendations, recommendationReason, vocabularyFamiliarity, type RecommendationWord } from '../domain/podcast-recommendations';
+import { rankPodcastRecommendations, recommendationFit, recommendationReason, vocabularyFamiliarity, type RecommendationWord } from '../domain/podcast-recommendations';
 import { PodcastRecommendationsQueryDto } from '../dto/podcast-recommendations-query.dto';
 
 interface WordRow {
@@ -78,7 +78,7 @@ export class PodcastRecommendationsService {
       const words: RecommendationWord[] = [...new Map(episode.words.map(word => [word.lexemeId, word])).values()];
       const reason = recommendationReason(words, !!query.sessionId && !pendingSession);
       const matched = words.filter(word => word.owned && (reason === 'vocabulary' || word.reviewed));
-      return [{ id: randomUUID(), policyVersion: 'vocabulary-v1', reason,
+      return [{ id: randomUUID(), policyVersion: 'vocabulary-v2', fit: recommendationFit(words), reason,
         matchCount: matched.length, matchedWords: matched.slice(0, 3).map(({ lexemeId, text, translation }) => ({ lexemeId, text, translation })),
         familiarity: vocabularyFamiliarity(words),
         episode: { id: episode.id, title: episode.title, titleTranslation: episode.titleTranslation,

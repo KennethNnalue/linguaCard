@@ -2177,6 +2177,7 @@ export interface PodcastVocabularyFamiliarity {
 export interface PodcastRecommendation {
   id: string;
   policyVersion: string;
+  fit?: 'strong' | 'overlap' | 'starter';
   episode: PodcastLibraryFeaturedEpisode;
   reason: 'session_words' | 'recent_words' | 'vocabulary' | 'starter';
   matchCount: number;

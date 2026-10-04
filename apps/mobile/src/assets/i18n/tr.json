@@ -1262,6 +1262,7 @@
       }
     },
     "discovery": {
+      "fit": {"strong": "Tekrar ettiğin birkaç kelimeyi çalış", "overlap": "Bazı kelimeler örtüşüyor", "starter": "Kısa bir konuşma dene"},
       "heading": "Kelimelerini çalış",
       "showMore": "Daha fazla konuşma göster",
       "showLess": "Daha az konuşma göster",

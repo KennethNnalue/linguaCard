@@ -1351,6 +1351,7 @@
       }
     },
     "discovery": {
+      "fit": {"strong": "Practise several reviewed words", "overlap": "Some vocabulary overlap", "starter": "Try a short conversation"},
       "heading": "Practise your words",
       "showMore": "Show more conversations",
       "showLess": "Show fewer conversations",

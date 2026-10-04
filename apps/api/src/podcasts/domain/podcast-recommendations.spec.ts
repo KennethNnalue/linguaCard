@@ -1,4 +1,4 @@
-import { rankPodcastRecommendations, recommendationReason, vocabularyFamiliarity, type RecommendationWord } from './podcast-recommendations';
+import { rankPodcastRecommendations, recommendationFit, recommendationReason, vocabularyFamiliarity, type RecommendationWord } from './podcast-recommendations';
 
 function word(lexemeId: string, overrides: Partial<RecommendationWord> = {}): RecommendationWord {
   return { lexemeId, text: lexemeId, translation: lexemeId, owned: true, mastery: 'learning', reviewed: true, ...overrides };
@@ -31,4 +31,18 @@ describe('vocabulary recommendations', () => {
     expect(rankPodcastRecommendations([], 1)).toEqual([]);
     expect(vocabularyFamiliarity([]).total).toBe(0);
   });
+  it('labels one function-word match and high novelty as overlap, preserving exact identities', () => {
+    const weak = [word('also'), ...Array.from({ length: 5 }, (_, i) => word(`new-${i}`, { owned: false, reviewed: false, mastery: null }))];
+    expect(recommendationFit(weak)).toBe('overlap');
+    expect(recommendationFit([word('a'), word('a'), word('b')])).toBe('overlap');
+    expect(recommendationFit([word('a'), word('b'), word('c')])).toBe('strong');
+    expect(recommendationFit([word('a', { owned: false, reviewed: false, mastery: null })])).toBe('starter');
+    expect(vocabularyFamiliarity([word('bank-finance'), word('bank-seat')]).total).toBe(2);
+  });
+  it('keeps all strong fits ahead of weaker overlap when diversifying topics', () => {
+    const strong = [word('a'), word('b'), word('c')];
+    expect(rankPodcastRecommendations([episode('a', strong, 'same'), episode('b', strong, 'same'),
+      episode('c', [word('a')], 'different')], 3).map(item => item.id)).toEqual(['a', 'b', 'c']);
+  });
+
 });

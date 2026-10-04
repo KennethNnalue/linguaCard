@@ -11,7 +11,7 @@ import { OfflineImageDirective } from '../../../../shared/image/offline-image.di
     <article aria-label="Recommended conversation">
       <img [lcOfflineSrc]="recommendation().episode.thumbnail.cardUrl" alt="" />
       <div class="copy">
-        <small>{{ recommendation().reason === 'starter' ? 'Try a short conversation' : 'Hear your words in a conversation' }}</small>
+        <small>{{ fitKey() | translate }}</small>
         <h2>{{ recommendation().episode.title }}</h2>
         <p>{{ recommendation().episode.titleTranslation }}</p>
         <p>{{ recommendation().episode.level }} · {{ minutes() }} min · {{ reasonKey() | translate:{ count: recommendation().matchCount } }}</p>
@@ -41,6 +41,7 @@ export class PodcastRecommendationComponent implements AfterViewInit {
   readonly evidence = input<PodcastRecommendationResponse['evidence']>('current');
   readonly listenSelected = output<void>(); readonly preview = output<void>(); readonly visible = output<void>();
   readonly minutes = computed(() => Math.max(1, Math.round(this.recommendation().episode.durationMs / 60000)));
+  readonly fitKey = computed(() => `podcasts.discovery.fit.${this.recommendation().fit ?? (this.recommendation().reason === 'starter' ? 'starter' : 'overlap')}`);
   readonly reasonKey = computed(() => {
     const item = this.recommendation();
     if (item.reason === 'starter') return 'podcasts.discovery.translations';

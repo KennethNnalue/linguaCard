@@ -25,3 +25,11 @@ Review-sync regression tests verify failure retention, commits added during an i
 API health and frontend version metadata expose deployed revisions. Translation cache policy is corrected so updated resource files can revalidate. Local verification: 24 focused API tests and 11 review-sync/persistence tests passed; API build and whitespace checks passed. Production deployment/content verification pending.
 
 Deployment `6368baa`: both public revision endpoints match. Production read-only queries confirm corrected `also` and `to talk / chat`; translation Cache-Control is now no-cache. The live collection journey exposed that cached list navigation bypasses the detail endpoint: source eligibility must also be resolved in the authenticated list read. Added one batched resolver shared by both paths and a list-navigation regression test; live verification remains pending this follow-up.
+
+Follow-up `386c4dd` is live on the API. The production collection now visibly has distinct Listen to words and Play conversation actions, retaining 15 words and 7 due. Screenshot: gap-verification/stage2-collection.jpg. Review/Review all already carry the resolved episode ID in their source contract; live completion on a disposable account is still pending.
+
+## Stage 3 — 4 October 2026
+
+Added backward-compatible explicit fit (strong / overlap / starter), truthful translated fit copy in six languages, policy vocabulary-v2 and topic variety restricted to the same fit tier. Strong means three distinct reviewed matches with no more than half focus words new; this is a product rule, not a comprehension prediction.
+
+Twelve focused recommendation tests passed, both application TypeScript checks passed, changed frontend ESLint passed, and the production Angular build passed with existing stylesheet budget warnings. Read-only production coverage is recorded under docs/verification: 11 playable German/English episodes, 141 of 1,105 reviewed canonical lexemes covered, and 457 unmapped legacy cards. No older-episode omission exists within the current 200 candidate bound. Deployment and live fit copy verification pending.
