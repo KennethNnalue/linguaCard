@@ -9,3 +9,5 @@ Implemented explicit read-only preview intent with focus after data arrives and 
 Local verification: four focused preview/discovery tests passed; app TypeScript passed; production Angular build passed with existing stylesheet budget warnings; changed-file ESLint and whitespace checks passed. Live deployed verification pending after push.
 
 The existing main checkout's unrelated `.gitignore` edit is excluded from commits.
+
+Deployment verification caught a translation insertion error in `8b25d1f`: the new namespace had been inserted into a different top-level object. Corrected against the original JSON with an anchored podcast namespace; parsed and checked all six resource bundles. Stage 1 remains pending until the correction is deployed and checked live.
