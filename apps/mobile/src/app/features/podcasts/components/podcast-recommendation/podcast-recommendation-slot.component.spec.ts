@@ -1,3 +1,4 @@
+import { PodcastJourneyStore } from '../../store/podcast-journey.store';
 import { signal } from '@angular/core';
 import { TestBed } from '@angular/core/testing';
 import { Router } from '@angular/router';
@@ -20,6 +21,7 @@ describe('bounded conversation discovery', () => {
     const navigate = jest.fn(); const record = jest.fn();
     const response = signal<PodcastRecommendationResponse>({ evidence: 'current', recommendations: [recommendation('first'), recommendation('second')] });
     TestBed.configureTestingModule({ imports: [PodcastRecommendationSlotComponent], providers: [
+      { provide: PodcastJourneyStore, useValue: { select: jest.fn(async () => undefined) } },
       { provide: Router, useValue: { navigate } },
       { provide: PodcastDiscoveryEventsService, useValue: { record, revision: signal(0) } },
       { provide: AuthService, useValue: { currentUser: signal({ id: 'user' }) } },
@@ -34,8 +36,8 @@ describe('bounded conversation discovery', () => {
     const { page } = setup(); expect(page.items().map(item => item.id)).toEqual(['first']);
     page.expanded.set(true); expect(page.items().map(item => item.id)).toEqual(['first', 'second']);
   });
-  it('carries a read-only preview intent to preparation', () => {
-    const { page, navigate } = setup(); page.open(recommendation('first'), true);
+  it('carries a read-only preview intent to preparation', async () => {
+    const { page, navigate } = setup(); await page.open(recommendation('first'), true);
     expect(navigate).toHaveBeenCalledWith(['/podcasts/episodes', 'first'], { queryParams: { preview: 'words' } });
   });
 });

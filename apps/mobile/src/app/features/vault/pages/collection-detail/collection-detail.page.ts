@@ -1,3 +1,4 @@
+import { PodcastJourneyStore } from '../../../podcasts/store/podcast-journey.store';
 import { AppNotificationService } from '@lingua-card/mobile/notifications';
 import {ChangeDetectionStrategy, Component, computed, effect, inject, OnInit, signal, untracked} from '@angular/core';
 import {ActivatedRoute, Router} from '@angular/router';
@@ -315,8 +316,10 @@ export class CollectionDetailPage implements OnInit {
     });
   }
 
+  private readonly podcastJourneys = inject(PodcastJourneyStore);
   playConversation(): void {
     const episodeId = this.collection()?.sourcePodcastEpisodeId;
+    if (episodeId) this.podcastJourneys.catalogueEntrySelected(episodeId);
     if (episodeId) void this.router.navigate(['/podcasts/episodes', episodeId, 'player'], { queryParams: { autoplay: '1' } });
   }
 

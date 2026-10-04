@@ -1,5 +1,5 @@
 import { Injectable, inject, signal } from '@angular/core';
-import { firstValueFrom } from 'rxjs';
+import { firstValueFrom, timeout } from 'rxjs';
 import type { PodcastClientEvent } from '@lingua-card/shared/domain';
 import { PodcastApiService } from '../data-access/podcast-api.service';
 
@@ -12,7 +12,10 @@ export class PodcastDiscoveryEventsService {
   readonly failedEventCount = this.failed.asReadonly();
   refresh(): void { this.changed.update(value => value + 1); }
   record(event: Omit<PodcastClientEvent, 'eventId'>): void {
-    void firstValueFrom(this.api.recordEvent({ ...event, eventId: crypto.randomUUID() }))
-      .catch(() => this.failed.update(value => value + 1));
+    void this.recordAndWait(event);
+  }
+  async recordAndWait(event: Omit<PodcastClientEvent, 'eventId'>): Promise<void> {
+    try { await firstValueFrom(this.api.recordEvent({ ...event, eventId: crypto.randomUUID() }).pipe(timeout(5000))); }
+    catch { this.failed.update(value => value + 1); }
   }
 }

@@ -227,6 +227,7 @@ export class PodcastCatalogueService {
         topicId: topic.id, topicTitle: topic.title, topicTitleTranslation: topic.titleTranslation,
         description: episode.description,
         audioUrl: episode.audioUrl,
+        audioVersion: episode.audioVersion,
       },
       familiarity: vocabularyFamiliarity(vocabulary.map(word => ({
         lexemeId: word.lexemeId, text: word.text, translation: word.translation, owned: word.isInVault,

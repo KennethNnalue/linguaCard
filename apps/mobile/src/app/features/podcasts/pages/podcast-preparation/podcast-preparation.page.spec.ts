@@ -1,3 +1,4 @@
+import { PodcastJourneyStore } from '../../store/podcast-journey.store';
 import { signal } from '@angular/core';
 import { TestBed } from '@angular/core/testing';
 import { ActivatedRoute, convertToParamMap, Router } from '@angular/router';
@@ -19,6 +20,7 @@ describe('conversation preview handoff', () => {
       essentialVocabulary: () => [], preparation: available };
     const record = jest.fn();
     TestBed.configureTestingModule({ imports: [PodcastPreparationPage], providers: [
+      { provide: PodcastJourneyStore, useValue: { restore: jest.fn(async () => undefined), journey: signal(null), reviewTransition: jest.fn(async () => undefined) } },
       { provide: ActivatedRoute, useValue: route }, { provide: Router, useValue: { navigate: jest.fn() } },
       { provide: PodcastDiscoveryEventsService, useValue: { record } },
       ...[ReviewPlayerService, CardStore, CollectionStore, VaultV2Store, WordAudioService].map(provide => ({ provide, useValue: {} })),

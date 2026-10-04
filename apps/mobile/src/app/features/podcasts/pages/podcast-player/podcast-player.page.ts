@@ -1,3 +1,4 @@
+import { PodcastJourneyStore } from '../../store/podcast-journey.store';
 import type { PodcastPreparationVocabulary } from '@lingua-card/shared/domain';
 import { PodcastDiscoveryEventsService } from '../../services/podcast-discovery-events.service';
 import {
@@ -235,12 +236,14 @@ export class PodcastPlayerPage implements OnInit, ViewWillLeave {
     event.target.currentTime = this.store.currentTimeMs() / 1000;
   }
   private readonly discoveryEvents = inject(PodcastDiscoveryEventsService);
+  private readonly journeys = inject(PodcastJourneyStore);
   private startedEpisodeId: string | null = null;
   started(): void {
     const episodeId = this.store.episode()?.id;
     if (episodeId && episodeId !== this.startedEpisodeId) {
       this.startedEpisodeId = episodeId;
-      this.discoveryEvents.record({ name: 'playback_started', episodeId });
+      const episode = this.store.episode();
+      if (episode) this.journeys.started(episodeId, episode.audioVersion);
     }
     this.autoplayNext = false;
     this.store.playbackStateChanged(true);
@@ -275,6 +278,10 @@ export class PodcastPlayerPage implements OnInit, ViewWillLeave {
       return;
     }
     if (currentEpisodeId && nextEpisodeId === currentEpisodeId) {
+      this.journeys.catalogueEntrySelected(currentEpisodeId);
+      const version = this.store.episode()?.audioVersion;
+      if (version) await this.journeys.restore(currentEpisodeId, version);
+      this.startedEpisodeId = null;
       const audio = this.audio()?.nativeElement;
       if (audio) {
         audio.currentTime = 0;
@@ -296,6 +303,7 @@ export class PodcastPlayerPage implements OnInit, ViewWillLeave {
     this.autoplayNext = true;
     const audio = this.audio()?.nativeElement;
     if (audio) audio.autoplay = true;
+    this.journeys.catalogueEntrySelected(nextEpisodeId);
     this.replacePlayerUrl(nextEpisodeId);
     this.store.loadEpisode(nextEpisodeId);
   }

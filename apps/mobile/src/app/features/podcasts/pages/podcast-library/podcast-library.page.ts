@@ -1,3 +1,4 @@
+import { PodcastJourneyStore } from '../../store/podcast-journey.store';
 import { PodcastRecommendationSlotComponent } from '../../components/podcast-recommendation/podcast-recommendation-slot.component';
 import { environment } from '../../../../../environments/environment';
 import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
@@ -19,13 +20,15 @@ export class PodcastLibraryPage {
   readonly recommendationsEnabled = environment.podcastRecommendationsEnabled;
   readonly store = inject(PodcastCatalogueStore);
   readonly levels: readonly PodcastLibraryLevel[] = ['all', 'A1', 'A2', 'B1', 'B2'];
+  private readonly journeys = inject(PodcastJourneyStore);
   private readonly router = inject(Router);
 
   resume(episodeId: string): void { void this.router.navigate(['/podcasts/episodes', episodeId, 'player']); }
-  preview(episodeId: string): void { void this.router.navigate(['/podcasts/episodes', episodeId]); }
+  preview(episodeId: string): void { this.journeys.catalogueEntrySelected(episodeId); void this.router.navigate(['/podcasts/episodes', episodeId]); }
   ionViewWillEnter(): void { this.store.loadTopics(); }
   openTopic(topicId: string): void { void this.router.navigate(['/podcasts/topics', topicId]); }
   openFeatured(item: PodcastFeaturedEpisode): void {
+    if (item.source !== 'continue' && (item.source !== 'recent' || item.completed)) this.journeys.catalogueEntrySelected(item.episode.id);
     const episodeRoute = ['/podcasts/episodes', item.episode.id];
     void this.router.navigate(item.source === 'continue' || (item.source === 'recent' && !item.completed)
       ? [...episodeRoute, 'player'] : episodeRoute);

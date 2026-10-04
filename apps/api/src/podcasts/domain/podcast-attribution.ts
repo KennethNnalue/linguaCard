@@ -24,7 +24,8 @@ export function readRecommendationContext(value: unknown): PodcastRecommendation
     || (discoveryLevel !== 'all' && discoveryLevel !== 'A1' && discoveryLevel !== 'A2' && discoveryLevel !== 'B1'
       && discoveryLevel !== 'B2' && discoveryLevel !== 'C1')) return null;
   return { recommendationId, episodeId, audioVersion, placement, policyVersion, discoveryLevel,
-    targetLanguage, sourceLanguage, experimentVersion, cohort };
+    targetLanguage, sourceLanguage, experimentVersion, cohort,
+    ...(typeof value['learningContextId'] === 'string' ? { learningContextId: value['learningContextId'] } : {}) };
 }
 export function readPlaybackRanges(value: unknown): PodcastPlaybackRange[] {
   if (!Array.isArray(value)) return [];

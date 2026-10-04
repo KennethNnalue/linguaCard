@@ -1,5 +1,6 @@
+import { PodcastJourneyStore } from '../../store/podcast-journey.store';
 import { PodcastDiscoveryEventsService } from '../../services/podcast-discovery-events.service';
-import { ChangeDetectionStrategy, Component, computed, effect, ElementRef, inject, signal, viewChild } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, effect, ElementRef, inject, signal, untracked, viewChild } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { IonButton, IonContent, IonIcon, IonSpinner } from '@ionic/angular';
 import { addIcons } from 'ionicons';
@@ -36,6 +37,7 @@ export class PodcastPreparationPage {
   readonly transcriptOpen = signal(false);
   private readonly route = inject(ActivatedRoute);
   private readonly router = inject(Router);
+  private readonly journeys = inject(PodcastJourneyStore);
   private readonly discoveryEvents = inject(PodcastDiscoveryEventsService);
   private readonly reviewPlayer = inject(ReviewPlayerService);
   private readonly cardStore = inject(CardStore);
@@ -44,6 +46,11 @@ export class PodcastPreparationPage {
   private readonly wordAudio = inject(WordAudioService);
   private readonly wordList = viewChild<ElementRef<HTMLElement>>('wordList');
   constructor() {
+    effect(() => {
+      const episode = this.store.preparation()?.episode;
+      if (!episode || episode.id !== this.route.snapshot.paramMap.get('episodeId')) return;
+      untracked(() => void this.restoreJourney(episode.id, episode.audioVersion ?? this.journeys.journey()?.audioVersion ?? 1));
+    });
     effect(() => {
       const heading = this.vocabularyHeading();
       if (this.previewFocusPending && this.wordsExpanded() && heading) {
@@ -62,9 +69,13 @@ export class PodcastPreparationPage {
     this.wordsExpanded.set(this.previewFocusPending);
     this.allWordsShown.set(false);
     this.store.loadPreparation(episodeId);
-    if (episodeId && this.route.snapshot.queryParamMap.get('fromReview') === '1' && !this.returnedReviewRecorded) {
-      this.discoveryEvents.record({ name: 'preparation_review_returned', episodeId });
+  }
+  private async restoreJourney(episodeId: string, audioVersion: number): Promise<void> {
+    if (this.route.snapshot.queryParamMap.get('fromReview') === '1' && !this.route.snapshot.queryParamMap.get('journeyId')) this.journeys.catalogueEntrySelected(episodeId);
+    await this.journeys.restore(episodeId, audioVersion, this.route.snapshot.queryParamMap.get('journeyId') ?? undefined);
+    if (this.route.snapshot.queryParamMap.get('fromReview') === '1' && !this.returnedReviewRecorded) {
       this.returnedReviewRecorded = true;
+      await this.journeys.reviewTransition('preparation_review_returned');
     }
   }
   goBack(topicId: string): void { void this.router.navigate(['/podcasts/topics', topicId]); }
@@ -94,9 +105,10 @@ export class PodcastPreparationPage {
     const collectionId = await this.store.prepareSuggestedVocabulary(preparation.episode.id);
     if (!collectionId) return;
     await this.refreshVaultState();
-    this.discoveryEvents.record({ name: 'preparation_review_started', episodeId: preparation.episode.id });
+    await this.journeys.restore(preparation.episode.id, preparation.episode.audioVersion ?? this.journeys.journey()?.audioVersion ?? 1);
+    await this.journeys.reviewTransition('preparation_review_started');
     await this.reviewPlayer.openSource(
-      { kind: 'collection', collectionId, continuation: { kind: 'podcast', episodeId: preparation.episode.id, title: preparation.episode.title } }, preparation.readiness.learnFirstCount,
+      { kind: 'collection', collectionId, continuation: { kind: 'podcast', episodeId: preparation.episode.id, title: preparation.episode.title, ...(this.journeys.journey() ? { journey: this.journeys.journey() ?? undefined } : {}) } }, preparation.readiness.learnFirstCount,
     );
   }
   async prepareWords(episodeId: string): Promise<void> {

@@ -46,7 +46,7 @@ export class PodcastAttributionService {
     const context = readRecommendationContext(event?.metadata);
     if (!context || context.episodeId !== episodeId || context.audioVersion !== audioVersion) return null;
     const active = await this.contexts.loadActiveLearningContext(userId);
-    return active.targetLanguage === context.targetLanguage && active.sourceLanguage === context.sourceLanguage ? context : null;
+    return (!context.learningContextId || context.learningContextId === active.id) && active.targetLanguage === context.targetLanguage && active.sourceLanguage === context.sourceLanguage ? context : null;
   }
   async selection(manager: EntityManager, userId: string, episodeId: string, audioVersion: number, journeyId?: string): Promise<object> {
     if (!journeyId) return {};
@@ -54,7 +54,7 @@ export class PodcastAttributionService {
     const context = readRecommendationContext(event?.metadata);
     if (!context || context.audioVersion !== audioVersion) return {};
     const active = await this.contexts.loadActiveLearningContext(userId);
-    return active.targetLanguage === context.targetLanguage && active.sourceLanguage === context.sourceLanguage
+    return (!context.learningContextId || context.learningContextId === active.id) && active.targetLanguage === context.targetLanguage && active.sourceLanguage === context.sourceLanguage
       ? { ...context, assisted: isRecord(event?.metadata) && event.metadata['assisted'] === true } : {};
   }
   async progress(manager: EntityManager, userId: string, episodeId: string, audioVersion: number,

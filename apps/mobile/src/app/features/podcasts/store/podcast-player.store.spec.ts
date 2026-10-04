@@ -1,3 +1,4 @@
+import { PodcastJourneyStore } from './podcast-journey.store';
 import { TestBed } from '@angular/core/testing';
 import type { PodcastEpisodePlayer } from '@lingua-card/shared/domain';
 import { NEVER, of } from 'rxjs';
@@ -31,6 +32,7 @@ describe('PodcastPlayerStore episode transitions', () => {
     TestBed.configureTestingModule({
       providers: [
         PodcastPlayerStore,
+        { provide: PodcastJourneyStore, useValue: { restore: jest.fn(async () => undefined), progressJourneyId: jest.fn(async () => undefined) } },
         { provide: PodcastApiService, useValue: { getPlayer } },
         { provide: AuthService, useValue: { currentUser: jest.fn(() => null) } },
         { provide: LocalDataService, useValue: {} },

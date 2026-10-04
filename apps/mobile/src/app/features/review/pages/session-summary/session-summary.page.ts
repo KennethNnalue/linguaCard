@@ -136,7 +136,7 @@ export class SessionSummaryPage implements OnInit {
     const continuation = this.session()?.continuation;
     if (!continuation) return;
     this.dismissCelebration();
-    void this.router.navigate(['/podcasts/episodes', continuation.episodeId], { queryParams: { fromReview: '1' } });
+    void this.router.navigate(['/podcasts/episodes', continuation.episodeId], { queryParams: { fromReview: '1', ...(continuation.journey ? { journeyId: continuation.journey.journeyId } : {}) } });
   }
 
   goToStories(): void {

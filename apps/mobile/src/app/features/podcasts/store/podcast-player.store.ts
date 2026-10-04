@@ -1,8 +1,9 @@
+import { PodcastJourneyStore } from './podcast-journey.store';
 import { computed, inject } from '@angular/core';
 import { patchState, signalStore, withComputed, withMethods, withState } from '@ngrx/signals';
 import { rxMethod } from '@ngrx/signals/rxjs-interop';
 import type { PodcastEpisodePlayer } from '@lingua-card/shared/domain';
-import { EMPTY, catchError, concatMap, firstValueFrom, pipe, tap } from 'rxjs';
+import { EMPTY, catchError, concatMap, firstValueFrom, from, pipe, switchMap, tap } from 'rxjs';
 import { PodcastApiService } from '../data-access/podcast-api.service';
 import { AuthService } from '../../../core/services/auth.service';
 import { LocalDataService } from '../../../core/services/local-data.service';
@@ -70,6 +71,7 @@ export const PodcastPlayerStore = signalStore(
     auth = inject(AuthService),
     audioCache = inject(AiAudioCacheService),
     engagement = inject(EngagementStore),
+    journeys = inject(PodcastJourneyStore),
   ) => ({
     loadEpisode(episodeId: string): void {
       void (async () => {
@@ -87,7 +89,9 @@ export const PodcastPlayerStore = signalStore(
             `podcast-${episode.id}-v${episode.audioVersion}`,
             episode.audioUrl,
           );
-          if (store.requestedEpisodeId() !== episodeId) return;
+          if (store.requestedEpisodeId() !== episodeId || auth.currentUser()?.id !== userId) return;
+          await journeys.restore(episode.id, episode.audioVersion, undefined, !!episode.progress?.completedAt);
+          if (store.requestedEpisodeId() !== episodeId || auth.currentUser()?.id !== userId) return;
           patchState(store, {
             episode: { ...episode, audioUrl: audioUrl ?? episode.audioUrl },
             currentTimeMs: episode.progress?.completedAt ? 0 : episode.progress?.positionMs ?? 0,
@@ -142,15 +146,21 @@ export const PodcastPlayerStore = signalStore(
         const episode = store.episode();
         if (!episode) return EMPTY;
         const playedRanges = store.unsyncedPlayedRanges();
+        const userId = auth.currentUser()?.id;
+        const positionMs = store.currentTimeMs();
         patchState(store, { unsyncedPlayedRanges: [] });
-        return api.saveProgress(episode.id, {
+        return from(journeys.progressJourneyId(episode.id, episode.audioVersion)).pipe(switchMap(journeyId => {
+          if (auth.currentUser()?.id !== userId || store.episode()?.id !== episode.id) return EMPTY;
+          return api.saveProgress(episode.id, {
           audioVersion: episode.audioVersion,
-          positionMs: store.currentTimeMs(),
+          positionMs,
           completed,
-          playedRanges,
-        }).pipe(
+          playedRanges, journeyId,
+        });
+        }),
           tap(() => patchState(store, { progressError: null })),
           catchError(() => {
+            if (auth.currentUser()?.id !== userId || store.episode()?.id !== episode.id) return EMPTY;
             patchState(store, {
               progressError: 'save-progress',
               unsyncedPlayedRanges: [...playedRanges, ...store.unsyncedPlayedRanges()],
@@ -165,11 +175,14 @@ export const PodcastPlayerStore = signalStore(
       if (!episode) return null;
       try {
         const playedRanges = store.unsyncedPlayedRanges();
+        const userId = auth.currentUser()?.id;
+        const journeyId = await journeys.progressJourneyId(episode.id, episode.audioVersion);
+        if (auth.currentUser()?.id !== userId || store.episode()?.id !== episode.id) return null;
         const progress = await firstValueFrom(api.saveProgress(episode.id, {
           audioVersion: episode.audioVersion,
           positionMs: episode.audioDurationMs,
           completed: true,
-          playedRanges,
+          playedRanges, journeyId,
         }));
         if (!progress.completedAt) {
           patchState(store, {

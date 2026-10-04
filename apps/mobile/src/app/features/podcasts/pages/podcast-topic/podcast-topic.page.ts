@@ -1,3 +1,4 @@
+import { PodcastJourneyStore } from '../../store/podcast-journey.store';
 import { ChangeDetectionStrategy, Component, inject, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { IonButton, IonContent, IonIcon, IonItem, IonLabel, IonList, IonSpinner } from '@ionic/angular';
@@ -16,13 +17,14 @@ import { OfflineImageDirective } from '../../../../shared/image/offline-image.di
 export class PodcastTopicPage implements OnInit {
   readonly store = inject(PodcastCatalogueStore);
   private readonly route = inject(ActivatedRoute);
+  private readonly journeys = inject(PodcastJourneyStore);
   private readonly router = inject(Router);
   constructor() {
     addIcons({ arrowBackOutline, chevronForwardOutline, play, repeatOutline, shuffleOutline });
   }
   ngOnInit(): void { this.store.loadTopic(this.route.snapshot.paramMap.get('topicId') ?? ''); }
   goBack(): void { void this.router.navigate(['/podcasts']); }
-  openEpisode(id: string): void { void this.router.navigate(['/podcasts/episodes', id]); }
+  openEpisode(id: string): void { this.journeys.catalogueEntrySelected(id); void this.router.navigate(['/podcasts/episodes', id]); }
   playTopic(repeat = false): void {
     const episodeIds = this.store.topic()?.episodes.map(episode => episode.id) ?? [];
     this.startQueue(episodeIds, repeat);
@@ -36,6 +38,7 @@ export class PodcastTopicPage implements OnInit {
   private startQueue(episodeIds: readonly string[], repeat: boolean): void {
     const firstEpisodeId = episodeIds[0];
     if (!firstEpisodeId) return;
+    this.journeys.catalogueEntrySelected(firstEpisodeId);
     void this.router.navigate(['/podcasts/episodes', firstEpisodeId, 'player'], {
       queryParams: {
         scope: 'topic',

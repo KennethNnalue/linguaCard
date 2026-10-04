@@ -86,10 +86,10 @@ describe('podcast review continuation', () => {
   it('retains the episode when a review is serialized and resumed', () => {
     const session = createReviewSession({
       id: 'podcast-review', source: { kind: 'collection', collectionId: 'words',
-        continuation: { kind: 'podcast', episodeId: 'episode', title: 'At the café' } },
+        continuation: { kind: 'podcast', episodeId: 'episode', title: 'At the café', journey: { journeyId: 'journey', episodeId: 'episode', audioVersion: 2, recommendationId: 'issued', assisted: true } } },
       mode: 'recall', direction: 'source_to_target', originalCardIds: ['card'], startedAt: new Date('2026-10-03T10:00:00Z'),
     });
     const restored = deserializeReviewSessionState(serializeReviewSessionState(session));
-    expect(restored.definition.source.continuation).toEqual({ kind: 'podcast', episodeId: 'episode', title: 'At the café' });
+    expect(restored.definition.source.continuation).toEqual({ kind: 'podcast', episodeId: 'episode', title: 'At the café', journey: { journeyId: 'journey', episodeId: 'episode', audioVersion: 2, recommendationId: 'issued', assisted: true } });
   });
 });

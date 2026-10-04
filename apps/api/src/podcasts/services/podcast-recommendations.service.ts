@@ -93,7 +93,7 @@ export class PodcastRecommendationsService {
     for (const recommendation of recommendations) {
       const audioVersion = audioVersionById.get(recommendation.episode.id);
       if (!audioVersion) continue;
-      recommendation.context = { recommendationId: recommendation.id, episodeId: recommendation.episode.id,
+      recommendation.context = { learningContextId: context.id, recommendationId: recommendation.id, episodeId: recommendation.episode.id,
         audioVersion, placement: query.placement ?? 'home', policyVersion: recommendation.policyVersion,
         discoveryLevel: query.level ?? 'all', targetLanguage: context.targetLanguage, sourceLanguage: context.sourceLanguage,
         experimentVersion: rollout.experimentVersion, cohort: rollout.cohort };

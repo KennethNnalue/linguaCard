@@ -1837,6 +1837,7 @@ export interface PodcastEpisodePreparation {
     topicTitleTranslation: string;
     description: string;
     audioUrl: string;
+    audioVersion?: number;
   };
   readiness: {
     percent: number;
@@ -2176,6 +2177,7 @@ export interface PodcastVocabularyFamiliarity {
   total: number;
 }
 export interface PodcastRecommendationContext {
+  learningContextId?: string;
   recommendationId: string;
   episodeId: string;
   audioVersion: number;
@@ -2193,6 +2195,16 @@ export interface PodcastPlaybackJourney {
   audioVersion: number;
   recommendationId?: string;
   assisted: boolean;
+  started?: boolean;
+}
+export function readPodcastPlaybackJourney(value: unknown): PodcastPlaybackJourney | null {
+  if (typeof value !== 'object' || value === null || !('journeyId' in value) || typeof value.journeyId !== 'string'
+    || !('episodeId' in value) || typeof value.episodeId !== 'string'
+    || !('audioVersion' in value) || typeof value.audioVersion !== 'number' || !Number.isInteger(value.audioVersion) || value.audioVersion < 1
+    || !('assisted' in value) || typeof value.assisted !== 'boolean') return null;
+  const recommendationId = 'recommendationId' in value && typeof value.recommendationId === 'string' ? value.recommendationId : undefined;
+  return { journeyId: value.journeyId, episodeId: value.episodeId, audioVersion: value.audioVersion, assisted: value.assisted, started: 'started' in value && value.started === true,
+    ...(recommendationId ? { recommendationId } : {}) };
 }
 export interface PodcastRecommendation {
   id: string;
@@ -2223,4 +2235,4 @@ export interface PodcastClientEvent {
   assisted?: boolean;
 }
 
-export type ReviewContinuation = { kind: 'podcast'; episodeId: string; title: string };
+export type ReviewContinuation = { kind: 'podcast'; episodeId: string; title: string; journey?: PodcastPlaybackJourney };

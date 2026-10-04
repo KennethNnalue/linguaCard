@@ -1,3 +1,4 @@
+import { PodcastJourneyStore } from '../../store/podcast-journey.store';
 import { ChangeDetectionStrategy, Component, computed, inject, OnInit, signal } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { IonButton, IonContent, IonIcon } from '@ionic/angular';
@@ -18,6 +19,7 @@ export class PodcastCompletionPage implements OnInit {
   revealRecall(lexemeId: string): void { this.revealedRecall.update(ids => [...ids, lexemeId]); }
   readonly store = inject(PodcastCatalogueStore);
   private readonly route = inject(ActivatedRoute);
+  private readonly journeys = inject(PodcastJourneyStore);
   private readonly router = inject(Router);
   readonly pointsAwarded = Number(this.route.snapshot.queryParamMap.get('earned') ?? 0);
 
@@ -28,12 +30,14 @@ export class PodcastCompletionPage implements OnInit {
   }
 
   replay(episodeId: string): void {
+    this.journeys.catalogueEntrySelected(episodeId);
     void this.router.navigate(['/podcasts/episodes', episodeId, 'player'], {
       queryParams: { autoplay: '1' },
     });
   }
 
   openNext(episodeId: string): void {
+    this.journeys.catalogueEntrySelected(episodeId);
     void this.router.navigate(['/podcasts/episodes', episodeId]);
   }
 
