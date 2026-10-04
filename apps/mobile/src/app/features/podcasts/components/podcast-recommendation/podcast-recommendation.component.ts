@@ -18,8 +18,8 @@ import { OfflineImageDirective } from '../../../../shared/image/offline-image.di
         @if (recommendation().matchedWords.length) {
           <p class="words">@for (word of recommendation().matchedWords; track word.lexemeId) { <span>{{ word.text }}</span> }</p>
         }
-        @if (evidence() === 'pending_sync') { <p role="status">Suggestions will refresh after your reviews sync.</p> }
-        @if (evidence() === 'unavailable') { <p>Saved suggestion · Connect to refresh</p> }
+        @if (evidence() === 'pending_sync') { <p role="status">{{ 'podcasts.discovery.pending' | translate }}</p> }
+        @if (evidence() === 'unavailable') { <p>{{ 'podcasts.discovery.offline' | translate }}</p> }
         <div class="actions">
           <ion-button class="primary" (click)="listenSelected.emit()">Listen now</ion-button>
           <ion-button fill="outline" (click)="preview.emit()">Preview words</ion-button>

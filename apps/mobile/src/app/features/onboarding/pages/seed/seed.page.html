@@ -11,6 +11,17 @@
         <span class="seed-done-text">{{ 'onboarding.seed.adopted' | translate:{ count: seededCount() } }}</span>
       </div>
 
+      @if (listeningExample(); as example) {
+        <section class="listening-example" aria-labelledby="listening-example-heading">
+          <h2 id="listening-example-heading">{{ 'podcasts.discovery.example.heading' | translate }}</h2>
+          <p><strong>{{ example.word }}</strong> · {{ example.translation }}</p>
+          <p>{{ example.episodeTitle }} · {{ example.episodeTitleTranslation }}</p>
+          <blockquote>{{ example.transcriptText }}<br /><small>{{ example.transcriptTranslation }}</small></blockquote>
+          <p>{{ 'podcasts.discovery.example.excerpt' | translate }}</p>
+          <audio controls preload="none" [src]="exampleAudioUrl()" [attr.aria-label]="'podcasts.discovery.example.excerpt' | translate"></audio>
+        </section>
+      }
+
       <div class="spacer"></div>
 
       <button class="ob-cta" (click)="onNext()">

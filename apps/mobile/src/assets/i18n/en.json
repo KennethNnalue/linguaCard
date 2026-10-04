@@ -1351,6 +1351,11 @@
       }
     },
     "discovery": {
+      "example": {"heading": "Review a card, then hear the word in a conversation", "excerpt": "Conversation excerpt"},
+      "pending": "Suggestions will refresh after your reviews sync.",
+      "offline": "Saved suggestion · Connect to refresh",
+      "practise": {"one": "Save and practise {{count}} word", "other": "Save and practise {{count}} words"},
+      "unknown": {"one": "{{count}} saved word has no review progress yet.", "other": "{{count}} saved words have no review progress yet."},
       "fit": {"strong": "Practise several reviewed words", "overlap": "Some vocabulary overlap", "starter": "Try a short conversation"},
       "heading": "Practise your words",
       "showMore": "Show more conversations",

@@ -28,7 +28,7 @@
           @if (prep.familiarity; as familiarity) {
             @if (familiarity.total) {
               <p>{{ familiarity.familiar }} familiar · {{ familiarity.learning }} to practise · {{ familiarity.new }} new to your vault</p>
-              @if (familiarity.unknown) { <p>{{ familiarity.unknown }} saved words have no review progress yet.</p> }
+              @if (familiarity.unknown) { <p>{{ ('podcasts.discovery.unknown.' + (familiarity.unknown === 1 ? 'one' : 'other')) | translate:{ count: familiarity.unknown } }}</p> }
             } @else { <p>No focus vocabulary is available for this episode yet.</p> }
           }
           <p>These are selected focus words, not a prediction of how much you will understand. You can listen at any time.</p>
@@ -36,7 +36,7 @@
       </section>
       @if (prep.readiness.learnFirstCount) {
         <ion-button class="learn-action" fill="outline" expand="block" [disabled]="store.preparationMutationStatus()==='loading'" (click)="reviewWords()">
-          <ion-icon slot="start" name="school-outline" /> Save and practise {{ prep.readiness.learnFirstCount }} words
+          <ion-icon slot="start" name="school-outline" /> {{ ('podcasts.discovery.practise.' + (prep.readiness.learnFirstCount === 1 ? 'one' : 'other')) | translate:{ count: prep.readiness.learnFirstCount } }}
         </ion-button>
         <p class="preparation-hint">This adds missing words to your vault and reuses words you already have.</p>
       }

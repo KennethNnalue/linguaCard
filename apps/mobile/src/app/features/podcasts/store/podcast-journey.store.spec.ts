@@ -90,6 +90,20 @@ describe('same-device podcast attribution journey', () => {
     release?.(); await waitFor(() => recordAndWait.mock.calls.length === 2);
   });
 
+  it('keeps queued progress tied to the captured journey after a new selection', async () => {
+    const { store, recordAndWait } = setup();
+    await store.select(recommendation, false); const original = store.journey()?.journeyId;
+    let release: (() => void) | undefined;
+    recordAndWait.mockImplementationOnce(() => new Promise<void>(resolve => { release = resolve; }));
+    store.started('episode', 2);
+    const pendingProgress = store.progressJourneyId('episode', 2);
+    await waitFor(() => recordAndWait.mock.calls.length >= 2);
+    await store.select(recommendation, false);
+    expect(store.journey()?.journeyId).not.toBe(original);
+    release?.();
+    expect(await pendingProgress).toBe(original);
+  });
+
 });
 
 async function waitFor(predicate: () => boolean): Promise<void> {

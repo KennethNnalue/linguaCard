@@ -1262,6 +1262,11 @@
       }
     },
     "discovery": {
+      "example": {"heading": "Repasa una tarjeta y escucha la palabra en una conversación", "excerpt": "Fragmento de conversación"},
+      "pending": "Las sugerencias se actualizarán cuando se sincronicen tus repasos.",
+      "offline": "Sugerencia guardada · Conéctate para actualizar",
+      "practise": {"one": "Guarda y practica {{count}} palabra", "other": "Guarda y practica {{count}} palabras"},
+      "unknown": {"one": "{{count}} palabra guardada aún no tiene progreso de repaso.", "other": "{{count}} palabras guardadas aún no tienen progreso de repaso."},
       "fit": {"strong": "Practica varias palabras repasadas", "overlap": "Coinciden algunas palabras", "starter": "Prueba una conversación corta"},
       "heading": "Practica tus palabras",
       "showMore": "Ver más conversaciones",

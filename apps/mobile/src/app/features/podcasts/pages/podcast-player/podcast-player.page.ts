@@ -237,14 +237,9 @@ export class PodcastPlayerPage implements OnInit, ViewWillLeave {
   }
   private readonly discoveryEvents = inject(PodcastDiscoveryEventsService);
   private readonly journeys = inject(PodcastJourneyStore);
-  private startedEpisodeId: string | null = null;
   started(): void {
-    const episodeId = this.store.episode()?.id;
-    if (episodeId && episodeId !== this.startedEpisodeId) {
-      this.startedEpisodeId = episodeId;
-      const episode = this.store.episode();
-      if (episode) this.journeys.started(episodeId, episode.audioVersion);
-    }
+    const episode = this.store.episode();
+    if (episode) this.journeys.started(episode.id, episode.audioVersion);
     this.autoplayNext = false;
     this.store.playbackStateChanged(true);
     void this.screenAwake.playbackStarted();
@@ -281,7 +276,6 @@ export class PodcastPlayerPage implements OnInit, ViewWillLeave {
       this.journeys.catalogueEntrySelected(currentEpisodeId);
       const version = this.store.episode()?.audioVersion;
       if (version) await this.journeys.restore(currentEpisodeId, version);
-      this.startedEpisodeId = null;
       const audio = this.audio()?.nativeElement;
       if (audio) {
         audio.currentTime = 0;

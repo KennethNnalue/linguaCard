@@ -93,13 +93,13 @@ export class PodcastPreparationPage {
   }
   previewWords(): void {
     this.wordsExpanded.set(true);
-    this.wordList()?.nativeElement.scrollIntoView({ behavior: 'smooth' });
+    this.wordList()?.nativeElement.scrollIntoView({ behavior: window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth' });
   }
   closeTranscript(): void { this.transcriptOpen.set(false); }
   async reviewWords(): Promise<void> {
     const preparation = this.store.preparation();
     if (!preparation?.readiness.learnFirstCount) {
-      this.wordList()?.nativeElement.scrollIntoView({ behavior: 'smooth' });
+      this.wordList()?.nativeElement.scrollIntoView({ behavior: window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth' });
       return;
     }
     const collectionId = await this.store.prepareSuggestedVocabulary(preparation.episode.id);

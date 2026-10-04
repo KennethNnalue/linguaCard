@@ -4,7 +4,7 @@ import type {
   PodcastClientEvent, PodcastRecommendationResponse, PodcastRecommendationPlacement,
   PodcastEpisodeCompletion, PodcastEpisodePlayer, PodcastEpisodePreparation, PodcastLibraryLevel, PodcastLibraryResponse,
   PodcastListeningProgress, PodcastTopicDetail, PreparePodcastVocabularyResult,
-  SavePodcastProgressDto,
+  SavePodcastProgressDto, PodcastOnboardingExample,
 } from '@lingua-card/shared/domain';
 import type { Observable } from 'rxjs';
 import { environment } from '../../../../environments/environment';
@@ -14,6 +14,9 @@ export class PodcastApiService {
   private readonly http = inject(HttpClient);
   private readonly url = `${environment.apiUrl}/podcasts`;
 
+  onboardingExample(collectionId: string): Observable<PodcastOnboardingExample | null> {
+    return this.http.get<PodcastOnboardingExample | null>(`${this.url}/onboarding-example/${collectionId}`);
+  }
   recommendations(placement: PodcastRecommendationPlacement, level: PodcastLibraryLevel, sessionId?: string): Observable<PodcastRecommendationResponse> {
     return this.http.get<PodcastRecommendationResponse>(`${this.url}/recommendations`, {
       params: { placement, level, ...(sessionId ? { sessionId } : {}) },

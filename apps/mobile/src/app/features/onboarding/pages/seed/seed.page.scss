@@ -217,3 +217,8 @@
 .spacer {
   flex: 1;
 }
+
+.listening-example { margin-top: 1.5rem; overflow-wrap: anywhere; }
+.listening-example h2 { font-size: 1.15rem; }
+.listening-example blockquote { margin: .75rem 0; padding-left: 1rem; border-left: 2px solid currentColor; }
+.listening-example audio { display: block; width: 100%; max-width: 100%; }

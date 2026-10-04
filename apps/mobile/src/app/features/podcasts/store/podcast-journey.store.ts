@@ -88,7 +88,7 @@ export const PodcastJourneyStore = signalStore(
       },
       started(episodeId: string, audioVersion: number): void {
         const request = generation;
-        startPending = (async () => {
+        startPending = startPending.then(async () => {
           const key = await scope();
           if (!key || request !== generation) return;
           let journey = store.journey();
@@ -102,11 +102,12 @@ export const PodcastJourneyStore = signalStore(
           patchState(store, { journey: started }); await persist(key, started);
           await selectionPending;
           if (request === generation) await event('playback_started', started);
-        })();
+        });
       },
       async progressJourneyId(episodeId: string, audioVersion: number): Promise<string | undefined> {
+        const captured = store.journey(); const request = generation;
         await startPending;
-        const journey = store.journey();
+        const journey = captured ?? (generation === request ? store.journey() : null);
         return journey?.episodeId === episodeId && journey.audioVersion === audioVersion ? journey.journeyId : undefined;
       },
     };

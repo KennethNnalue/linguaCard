@@ -1262,6 +1262,11 @@
       }
     },
     "discovery": {
+      "example": {"heading": "Bir kartı tekrar et, sonra kelimeyi konuşmada dinle", "excerpt": "Konuşmadan bir bölüm"},
+      "pending": "Tekrarların eşitlendikten sonra öneriler yenilenecek.",
+      "offline": "Kayıtlı öneri · Yenilemek için bağlan",
+      "practise": {"one": "{{count}} kelimeyi kaydet ve çalış", "other": "{{count}} kelimeyi kaydet ve çalış"},
+      "unknown": {"one": "{{count}} kayıtlı kelimenin henüz tekrar ilerlemesi yok.", "other": "{{count}} kayıtlı kelimenin henüz tekrar ilerlemesi yok."},
       "fit": {"strong": "Tekrar ettiğin birkaç kelimeyi çalış", "overlap": "Bazı kelimeler örtüşüyor", "starter": "Kısa bir konuşma dene"},
       "heading": "Kelimelerini çalış",
       "showMore": "Daha fazla konuşma göster",

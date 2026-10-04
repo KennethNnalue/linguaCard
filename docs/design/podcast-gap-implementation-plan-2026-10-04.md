@@ -1,6 +1,6 @@
 # LinguaCard gap implementation and verification plan
 
-Date: 4 October 2026. Status: proposed implementation backlog; no implementation or deployment performed by this plan.
+Date: 4 October 2026. Status: implementation in progress; committed and deployed results and remaining gates are recorded in podcast-gap-delivery-log.md.
 
 Baseline: [live comparison](podcast-live-plan-comparison-2026-10-04.md), original vocabulary-to-listening improvement plan, existing delivery log and rollout checklist. Preserve the already implemented journey and extend the existing Angular Signal Stores, API boundaries and NestJS domain/application services.
 

@@ -1,7 +1,10 @@
-import { computed, inject } from '@angular/core';
+import { firstValueFrom } from 'rxjs';
+import { PodcastApiService } from '../../podcasts/data-access/podcast-api.service';
+import { AuthService } from '../../../core/services/auth.service';
+import { computed, effect, inject } from '@angular/core';
 import { Router } from '@angular/router';
-import { patchState, signalStore, withComputed, withMethods, withState } from '@ngrx/signals';
-import type { OnboardingMotivation, OnboardingLevel, PlatformCollectionSummary } from '@lingua-card/shared/domain';
+import { patchState, signalStore, withComputed, withHooks, withMethods, withState } from '@ngrx/signals';
+import type { OnboardingMotivation, OnboardingLevel, PlatformCollectionSummary, PodcastOnboardingExample } from '@lingua-card/shared/domain';
 import { SUGGESTED_DAILY_GOAL } from '@lingua-card/shared/domain';
 import { SettingsStore } from '../../settings/store/settings.store';
 import { PlatformCollectionStore } from '../../vault/store/platform-collection.store';
@@ -14,6 +17,7 @@ interface OnboardingState {
   isSeeding: boolean;
   seedError: string | null;
   seededCount: number;
+  listeningExample: PodcastOnboardingExample | null;
 }
 
 const initial: OnboardingState = {
@@ -24,6 +28,7 @@ const initial: OnboardingState = {
   isSeeding: false,
   seedError: null,
   seededCount: 0,
+  listeningExample: null,
 };
 
 const STEP_ROUTES = ['language', 'welcome', 'motivation', 'level', 'seed', 'goal'] as const;
@@ -44,12 +49,24 @@ export const OnboardingStore = signalStore(
     const settings = inject(SettingsStore);
     const platformStore = inject(PlatformCollectionStore);
     const router = inject(Router);
+    const podcasts = inject(PodcastApiService);
+    const auth = inject(AuthService);
+    let exampleSequence = 0;
+    async function loadListeningExample(collectionId: string): Promise<void> {
+      const request = ++exampleSequence; const userId = auth.currentUser()?.id;
+      patchState(store, { listeningExample: null });
+      try {
+        const example = await firstValueFrom(podcasts.onboardingExample(collectionId));
+        if (request === exampleSequence && auth.currentUser()?.id === userId) patchState(store, { listeningExample: example });
+      } catch { /* Optional demonstration never blocks card adoption or onboarding. */ }
+    }
 
     const persistStep = async (step: number): Promise<void> => {
       await settings.update({ onboardingStep: step });
     };
 
     return {
+      reset(): void { exampleSequence++; patchState(store, initial); },
       init(): void {
         const s = settings.settings();
         if (s) {
@@ -85,7 +102,9 @@ export const OnboardingStore = signalStore(
       },
 
       setRecommendedCollection(collection: PlatformCollectionSummary | null): void {
-        patchState(store, { recommendedCollection: collection });
+        patchState(store, { recommendedCollection: collection, listeningExample: null });
+        if (collection) void loadListeningExample(collection.id);
+        else exampleSequence++;
       },
 
       async adoptCollection(collectionId: string): Promise<void> {
@@ -123,4 +142,14 @@ export const OnboardingStore = signalStore(
       },
     };
   }),
+  withHooks(store => {
+    const auth = inject(AuthService); let userId = auth.currentUser()?.id;
+    return { onInit(): void {
+      effect(() => {
+        const next = auth.currentUser()?.id;
+        if (next !== userId) { userId = next; store.reset(); }
+      });
+    } };
+  }),
+
 );

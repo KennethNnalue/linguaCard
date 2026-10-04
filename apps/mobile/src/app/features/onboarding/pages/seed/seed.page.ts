@@ -31,6 +31,11 @@ export class SeedPage {
   readonly collection = computed(() => this.store.recommendedCollection());
   readonly isSeeding = computed(() => this.store.isSeeding());
   readonly seedError = computed(() => this.store.seedError());
+  readonly listeningExample = computed(() => this.store.listeningExample());
+  readonly exampleAudioUrl = computed(() => {
+    const example = this.listeningExample();
+    return example ? `${example.audioUrl.split('#')[0]}#t=${example.startMs / 1000},${example.endMs / 1000}` : null;
+  });
   readonly seededCount = computed(() => this.store.seededCount());
 
   constructor() {
