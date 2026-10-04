@@ -221,3 +221,17 @@ describe('external transcript manifest import', () => {
     }
   });
 });
+
+describe('truncated vocabulary import', () => {
+  it('rejects malformed headwords before reading or creating canonical vocabulary', async () => {
+    const getRepository = jest.fn();
+    const module = await Test.createTestingModule({ providers: [PodcastTranscriptImportService,
+      { provide: DataSource, useValue: { getRepository } }, { provide: LexemeIdentityService, useValue: {} },
+      { provide: LegacyVocabularyProjectionService, useValue: {} }, { provide: StorageService, useValue: {} },
+    ] }).compile();
+    await expect(module.get(PodcastTranscriptImportService).preview('episode', {
+      ...payload, vocabulary: [{ ...payload.vocabulary[0], text: 'also (Meine Mutter ist Italienerin' }],
+    })).rejects.toThrow('Complete parenthetical vocabulary notes');
+    expect(getRepository).not.toHaveBeenCalled();
+  });
+});

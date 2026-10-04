@@ -1,4 +1,4 @@
-import { ConflictException, Injectable, NotFoundException } from '@nestjs/common';
+import { BadRequestException, ConflictException, Injectable, NotFoundException } from '@nestjs/common';
 import { createHash, randomUUID } from 'node:crypto';
 import type {
   AdminCommitPodcastTranscriptResult, AdminPodcastTranscriptConflict,
@@ -15,7 +15,7 @@ import { PodcastSpeakerEntity } from '../entities/podcast-speaker.entity';
 import { PodcastTopicEntity } from '../entities/podcast-topic.entity';
 import { PodcastTurnEntity } from '../entities/podcast-turn.entity';
 import { normalizeTranscriptVocabularyReferences } from '../domain/normalize-transcript-vocabulary-references';
-import { normalizePodcastVocabulary } from '../domain/podcast-transcript-prompt';
+import { hasBalancedVocabularyParentheses, normalizePodcastVocabulary } from '../domain/podcast-transcript-prompt';
 import { StorageService } from '../../storage/storage.service';
 import { LegacyVocabularyProjectionService } from '../../vocabulary/services/legacy-vocabulary-projection.service';
 import type { PodcastTranscriptManifest } from '../domain/podcast-transcript-manifest';
@@ -142,6 +142,9 @@ export class PodcastTranscriptImportService {
   }
 
   private async resolve(episodeId: string, payload: PodcastTranscriptPayloadDto): Promise<ResolvedTranscript> {
+    if (payload.vocabulary.some(item => !hasBalancedVocabularyParentheses(item.text))) {
+      throw new BadRequestException('Complete parenthetical vocabulary notes and keep examples separate from headwords.');
+    }
     const episode = await this.dataSource.getRepository(PodcastEpisodeEntity).findOneBy({ id: episodeId });
     if (!episode) throw new NotFoundException(`Podcast episode ${episodeId} not found`);
     const topic = await this.dataSource.getRepository(PodcastTopicEntity).findOneBy({ id: episode.topicId });

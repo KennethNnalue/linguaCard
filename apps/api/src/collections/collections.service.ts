@@ -35,12 +35,16 @@ export class CollectionsService {
   async findOne(userId: string, id: string): Promise<Collection> {
     const entity = await this.repo.findOneBy({ id, userId });
     if (!entity) throw new NotFoundException(`Collection ${id} not found`);
-    if (entity.sourcePodcastEpisodeId) {
-      const published: Array<{ id: string }> = await this.repo.manager.query(`
-        SELECT episode.id FROM podcast_episodes episode JOIN podcast_topics topic ON topic.id = episode."topicId"
-        WHERE episode.id = $1 AND episode.status = 'published' AND topic.status = 'published' AND episode."audioUrl" IS NOT NULL
-      `, [entity.sourcePodcastEpisodeId]);
-      if (!published.length) entity.sourcePodcastEpisodeId = null;
+    if (entity.sourcePodcastEpisodeId || entity.sourcePlatformCollectionId) {
+      const published: Array<{ id: string }> = await this.cardRepo.manager.query(`
+        SELECT episode.id FROM podcast_episodes episode
+        JOIN podcast_topics topic ON topic.id = episode."topicId"
+        WHERE (episode.id = $1 OR ($1::varchar IS NULL AND episode.id = (
+          SELECT "sourcePodcastEpisodeId" FROM platform_collections WHERE id = $2)))
+          AND episode.status = 'published' AND topic.status = 'published' AND episode."audioUrl" IS NOT NULL
+        LIMIT 1
+      `, [entity.sourcePodcastEpisodeId, entity.sourcePlatformCollectionId]);
+      entity.sourcePodcastEpisodeId = published[0]?.id ?? null;
     }
     const countsMap = await this.buildCountsMap(userId);
     return this.toModel(entity, countsMap.get(id) ?? { cardCount: 0, masteredCount: 0, dueCount: 0 });

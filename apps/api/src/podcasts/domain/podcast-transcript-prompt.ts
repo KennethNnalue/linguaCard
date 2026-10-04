@@ -34,6 +34,7 @@ export function normalizePodcastVocabularyItem(rawItem: string): string {
     .trim()
     .replace(/^[-*]\s+/u, '')
     .replace(/\s*\([^)]*\)/gu, '')
+    .replace(/\s*\([^)]*$/gu, '')
     .split(',', 1)[0]
     .replace(/\|/gu, '')
     .replace(/^(?:der|die|das)\s+/iu, '')
@@ -113,4 +114,13 @@ export function podcastVocabularyTarget(suppliedCount: number): number {
   if (suppliedCount >= 12) return 15;
   if (suppliedCount >= 5) return 12;
   return 8;
+}
+
+export function hasBalancedVocabularyParentheses(text: string): boolean {
+  let depth = 0;
+  for (const character of text) {
+    if (character === '(') depth++;
+    if (character === ')' && --depth < 0) return false;
+  }
+  return depth === 0;
 }

@@ -36,7 +36,7 @@
     "backfill:multilingual-vocabulary": "npx ts-node -r tsconfig-paths/register --project apps/api/tsconfig.json apps/api/src/scripts/backfill-multilingual-vocabulary.ts",
     "backfill:canonical-learning-items": "node dist/api/apps/api/src/scripts/backfill-multilingual-vocabulary.js",
     "validate:canonical-learning-items": "node dist/api/apps/api/src/scripts/backfill-multilingual-vocabulary.js --validate-only",
-    "build:web": "node scripts/set-env.mjs && ng build --project=mobile --configuration=production",
+    "build:web": "node scripts/set-env.mjs && ng build --project=mobile --configuration=production && node scripts/write-build-revision.mjs",
     "test": "jest",
     "test:api": "jest --config jest.api.config.ts",
     "test:watch": "jest --watch",

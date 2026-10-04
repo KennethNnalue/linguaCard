@@ -1,5 +1,5 @@
 import {
-  buildPodcastTranscriptPrompt, normalizePodcastVocabulary, podcastVocabularyTarget,
+  buildPodcastTranscriptPrompt, normalizePodcastVocabulary, normalizePodcastVocabularyItem, hasBalancedVocabularyParentheses, podcastVocabularyTarget,
 } from './podcast-transcript-prompt';
 import { createPodcastTranscriptManifestDraft } from './podcast-transcript-manifest';
 
@@ -127,5 +127,17 @@ describe('buildPodcastTranscriptPrompt', () => {
     expect(prompt).toContain('"sourceContext":"das Kinderzimmer, -"');
     expect(prompt).toContain('Beata ist in eine Wohnung gezogen.');
     expect(prompt).toContain('Copy every supplied LinguaCard key and text exactly');
+  });
+});
+
+describe('vocabulary annotation validation', () => {
+  it('rejects the observed truncated example rather than creating a malformed headword', () => {
+    expect(hasBalancedVocabularyParentheses('also (Meine Mutter ist Italienerin')).toBe(false);
+    expect(normalizePodcastVocabularyItem('also (Meine Mutter ist Italienerin')).toBe('also');
+    expect(hasBalancedVocabularyParentheses('also)')).toBe(false);
+  });
+  it('preserves multiword expressions and complete annotations', () => {
+    expect(normalizePodcastVocabularyItem('teilnehmen (an + D.) = take part')).toBe('teilnehmen = take part');
+    expect(normalizePodcastVocabularyItem('von ... nach = from ... to')).toBe('von ... nach = from ... to');
   });
 });

@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable } from '@nestjs/common';
 import { In, DataSource } from 'typeorm';
 import type {
   AdminPodcastVocabularyAmbiguity,
@@ -15,6 +15,7 @@ import {
   type PodcastTranscriptManifest,
   type PodcastTranscriptManifestPreparation,
 } from '../domain/podcast-transcript-manifest';
+import { hasBalancedVocabularyParentheses } from '../domain/podcast-transcript-prompt';
 import { stableResourceId } from '../../vocabulary/domain/stable-resource-id';
 
 @Injectable()
@@ -30,6 +31,9 @@ export class PodcastTranscriptManifestService {
     translationLanguage: LanguageCode,
     selections: readonly AdminPodcastVocabularySelection[] = [],
   ): Promise<PodcastTranscriptManifestPreparation> {
+    if (vocabulary.some(item => !hasBalancedVocabularyParentheses(item.split('=', 1)[0]))) {
+      throw new BadRequestException('Complete parenthetical vocabulary notes and keep examples separate from headwords.');
+    }
     const draft = createPodcastTranscriptManifestDraft(vocabulary, targetLanguage, translationLanguage);
     const selectionByKey = new Map(selections.map(selection => [selection.key, selection.lexemeId]));
     const identities = draft.items.map(item => this.lexemeIdentity.createIdentity({

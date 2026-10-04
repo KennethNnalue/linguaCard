@@ -57,4 +57,23 @@ describe('CollectionsService', () => {
       level: 'A1',
     }));
   });
+  it('resolves a published conversation through stored platform provenance', async () => {
+    const entity = createCollectionEntity();
+    const query = jest.fn().mockResolvedValueOnce([{ id: 'source-episode' }]).mockResolvedValueOnce([]);
+    const module = await Test.createTestingModule({ providers: [CollectionsService,
+      { provide: getRepositoryToken(CollectionEntity), useValue: { findOneBy: async () => entity } },
+      { provide: getRepositoryToken(CardEntity), useValue: { manager: { query } } },
+    ] }).compile();
+    expect((await module.get(CollectionsService).findOne('user-1', entity.id)).sourcePodcastEpisodeId).toBe('source-episode');
+    expect(query).toHaveBeenCalledWith(expect.stringContaining('platform_collections'), [null, 'platform-collection-1']);
+  });
+  it('keeps unavailable source conversations out of collection actions', async () => {
+    const entity = createCollectionEntity(); entity.sourcePodcastEpisodeId = 'unpublished';
+    const module = await Test.createTestingModule({ providers: [CollectionsService,
+      { provide: getRepositoryToken(CollectionEntity), useValue: { findOneBy: async () => entity } },
+      { provide: getRepositoryToken(CardEntity), useValue: { manager: { query: async () => [] } } },
+    ] }).compile();
+    expect((await module.get(CollectionsService).findOne('user-1', entity.id)).sourcePodcastEpisodeId).toBeNull();
+  });
+
 });
