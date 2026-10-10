@@ -116,12 +116,12 @@ export class PodcastAudioGenerationService {
         ],
       }));
       const totalCharacters = inputs.reduce((total, input) => total + input.text.length, 0);
-      if (totalCharacters > 2_000) {
-        throw new BadRequestException('ElevenLabs dialogue input must not exceed 2,000 characters');
+      if (totalCharacters > 10_000) {
+        throw new BadRequestException('ElevenLabs dialogue input must not exceed 10,000 characters');
       }
       const generated = await this.elevenLabs.generate(inputs, snapshot.topic.targetLanguage);
       const alignedWords = await this.elevenLabs.alignAudio(
-        generated.audio, snapshot.turns.map(turn => turn.targetText).join('\n'),
+        generated.audio, snapshot.turns.map(turn => turn.targetText).join('\n'), generated.format,
       );
       const timings = normalizeForcedAlignmentTimings(
         snapshot.turns.map(turn => turn.targetText), alignedWords,
@@ -140,9 +140,9 @@ export class PodcastAudioGenerationService {
       if (!fingerprint) throw new ConflictException('The episode transcript is missing its fingerprint');
       uploadedPath = this.storagePath(
         snapshot.episode.id, snapshot.episode.contentVersion,
-        snapshot.episode.audioVersion + 1, fingerprint,
+        snapshot.episode.audioVersion + 1, fingerprint, generated.format,
       );
-      const audioUrl = await this.storage.upload(generated.audio, uploadedPath, 'audio/mpeg');
+      const audioUrl = await this.storage.upload(generated.audio, uploadedPath, generated.format === 'wav' ? 'audio/wav' : 'audio/mpeg');
       const result = await this.commitGeneration(snapshot, timings, uploadedPath, audioUrl, durationMs);
       uploadedPath = null;
       return result;
@@ -297,8 +297,8 @@ export class PodcastAudioGenerationService {
   }
 
   private storagePath(
-    episodeId: string, contentVersion: number, audioVersion: number, fingerprint: string,
+    episodeId: string, contentVersion: number, audioVersion: number, fingerprint: string, format?: 'wav',
   ): string {
-    return `podcasts/${episodeId}/content-${contentVersion}-audio-${audioVersion}-${fingerprint.slice(0, 12)}.mp3`;
+    return `podcasts/${episodeId}/content-${contentVersion}-audio-${audioVersion}-${fingerprint.slice(0, 12)}.${format ?? 'mp3'}`;
   }
 }

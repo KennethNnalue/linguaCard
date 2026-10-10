@@ -206,9 +206,9 @@ export class PodcastTranscriptImportService {
     const dialogueCharacters = payload.turns.reduce(
       (total, turn) => total + podcastDeliveryText(turn).length, 0,
     );
-    if (dialogueCharacters > 2_000) conflicts.push({
+    if (dialogueCharacters > 10_000) conflicts.push({
       code: 'provider-limit', pointer: '/turns', severity: 'error',
-      message: `The dialogue contains ${dialogueCharacters} characters including delivery cues; the generation limit is 2,000.`,
+      message: `The dialogue contains ${dialogueCharacters} characters including delivery cues; the episode limit is 10,000.`,
       remediation: 'Shorten the conversation or split it into multiple episodes.',
     });
     return {

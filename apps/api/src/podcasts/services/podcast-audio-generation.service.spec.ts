@@ -95,7 +95,7 @@ describe('PodcastAudioGenerationService', () => {
     } as unknown as StorageService, {} as AdminPodcastsService);
     await service.generate('episode');
     expect(provider.generate).toHaveBeenCalledWith([{ text: '[warm] Hallo', voiceId: 'voice' }], 'de');
-    expect(provider.alignAudio).toHaveBeenCalledWith(audio, 'Hallo');
+    expect(provider.alignAudio).toHaveBeenCalledWith(audio, 'Hallo', undefined);
     expect(turn.targetText).toBe('Hallo');
     expect(turn.wordTimings.map(word => word.text)).toEqual(['Hallo']);
     expect(episode.status).toBe('ready_for_review');

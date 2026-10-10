@@ -2,7 +2,7 @@ import { ConflictException } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { Test } from '@nestjs/testing';
 import { ElevenLabsDialogueAdapter } from './elevenlabs-dialogue.adapter';
-import { selectGenderedVoiceIds } from './elevenlabs-dialogue.adapter';
+import { selectGenderedVoiceIds, splitDialogueInputs, pcmToWav } from './elevenlabs-dialogue.adapter';
 
 describe('ElevenLabs voice discovery', () => {
   afterEach(() => jest.restoreAllMocks());
@@ -131,4 +131,33 @@ describe('Eleven v4 dialogue request', () => {
       .rejects.toThrow('ElevenLabs credits are insufficient for this episode. Shorten the script or add credits, then retry.');
   });
 
+});
+
+describe('long dialogue generation', () => {
+  afterEach(() => jest.restoreAllMocks());
+  it('splits at turn boundaries while preserving speakers and rejects oversized turns', () => {
+    const turns = [{ text: 'a'.repeat(1300), voiceId: 'female' }, { text: 'b'.repeat(800), voiceId: 'male' }];
+    expect(splitDialogueInputs(turns)).toEqual([[turns[0]], [turns[1]]]);
+    expect(() => splitDialogueInputs([{ text: 'a'.repeat(2001), voiceId: 'female' }])).toThrow();
+    expect(() => splitDialogueInputs(Array.from({ length: 6 }, () => ({ text: 'a'.repeat(2000), voiceId: 'female' })))).toThrow();
+  });
+  it('joins PCM samples into one WAV and offsets timing and dialogue indices', async () => {
+    const fetchMock = jest.spyOn(globalThis, 'fetch').mockImplementation(async () => Response.json({
+      audio_base64: Buffer.alloc(48_000).toString('base64'),
+      alignment: { characters: ['a'], character_start_times_seconds: [0.1], character_end_times_seconds: [0.9] },
+      voice_segments: [{ voice_id: 'host', start_time_seconds: 0.1, end_time_seconds: 0.9,
+        character_start_index: 0, character_end_index: 1, dialogue_input_index: 0 }],
+    }));
+    const adapter = new ElevenLabsDialogueAdapter({ get: () => ({ elevenLabsApiKey: 'test' }) } as unknown as ConfigService);
+    const result = await adapter.generate([{ text: 'a'.repeat(1300), voiceId: 'host' }, { text: 'b'.repeat(800), voiceId: 'guest' }], 'de');
+    expect(fetchMock.mock.calls.map(call => String(call[0]))).toEqual([
+      expect.stringContaining('output_format=pcm_24000'), expect.stringContaining('output_format=pcm_24000'),
+    ]);
+    expect(result.format).toBe('wav');
+    expect(result.audio.subarray(0, 4).toString()).toBe('RIFF');
+    expect(result.audio.readUInt32LE(40)).toBe(96_000);
+    expect(result.alignment.characterStartTimesSeconds).toEqual([0.1, 1.1]);
+    expect(result.voiceSegments[1]).toEqual(expect.objectContaining({ startTimeSeconds: 1.1, dialogueInputIndex: 1, characterStartIndex: 1 }));
+    expect(pcmToWav(Buffer.alloc(4)).readUInt32LE(24)).toBe(24_000);
+  });
 });

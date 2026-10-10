@@ -26,6 +26,7 @@ export interface ElevenLabsVoiceSegment {
 
 export interface ElevenLabsDialogueResult {
   audio: Buffer;
+  format?: 'wav';
   alignment: ElevenLabsAlignment;
   voiceSegments: ElevenLabsVoiceSegment[];
 }
@@ -160,12 +161,45 @@ export class ElevenLabsDialogueAdapter {
   }
 
   async generate(inputs: DialogueInput[], languageCode: string): Promise<ElevenLabsDialogueResult> {
+    const batches = splitDialogueInputs(inputs);
+    if (batches.length === 1) return this.generateBatch(inputs, languageCode);
+    const combined: ElevenLabsDialogueResult = {
+      audio: Buffer.alloc(0), format: 'wav',
+      alignment: { characters: [], characterStartTimesSeconds: [], characterEndTimesSeconds: [] },
+      voiceSegments: [],
+    };
+    const pcm: Buffer[] = [];
+    let seconds = 0;
+    let inputOffset = 0;
+    for (const batch of batches) {
+      const result = await this.generateBatch(batch, languageCode, 'pcm_24000');
+      if (result.audio.length % 2) throw new ServiceUnavailableException('Invalid PCM audio data');
+      const characterOffset = combined.alignment.characters.length;
+      combined.alignment.characters.push(...result.alignment.characters);
+      combined.alignment.characterStartTimesSeconds.push(...result.alignment.characterStartTimesSeconds.map(time => time + seconds));
+      combined.alignment.characterEndTimesSeconds.push(...result.alignment.characterEndTimesSeconds.map(time => time + seconds));
+      combined.voiceSegments.push(...result.voiceSegments.map(segment => ({
+        ...segment, startTimeSeconds: segment.startTimeSeconds + seconds,
+        endTimeSeconds: segment.endTimeSeconds + seconds,
+        characterStartIndex: segment.characterStartIndex + characterOffset,
+        characterEndIndex: segment.characterEndIndex + characterOffset,
+        dialogueInputIndex: segment.dialogueInputIndex + inputOffset,
+      })));
+      pcm.push(result.audio);
+      seconds += result.audio.length / 48_000;
+      inputOffset += batch.length;
+    }
+    combined.audio = pcmToWav(Buffer.concat(pcm));
+    return combined;
+  }
+
+  private async generateBatch(inputs: DialogueInput[], languageCode: string, outputFormat = 'mp3_44100_128'): Promise<ElevenLabsDialogueResult> {
     if (!this.apiKey) throw new ServiceUnavailableException('ElevenLabs is not configured');
     const controller = new AbortController();
     const timeout = setTimeout(() => controller.abort(), ELEVENLABS_REQUEST_TIMEOUT_MS);
     try {
       const response = await fetch(
-        'https://api.elevenlabs.io/v1/text-to-dialogue/with-timestamps?output_format=mp3_44100_128',
+        `https://api.elevenlabs.io/v1/text-to-dialogue/with-timestamps?output_format=${outputFormat}`,
         {
           method: 'POST',
           headers: { 'content-type': 'application/json', 'xi-api-key': this.apiKey },
@@ -202,13 +236,13 @@ export class ElevenLabsDialogueAdapter {
     }
   }
 
-  async alignAudio(audio: Buffer, text: string): Promise<readonly ElevenLabsAlignedWord[]> {
+  async alignAudio(audio: Buffer, text: string, format?: 'wav'): Promise<readonly ElevenLabsAlignedWord[]> {
     if (!this.apiKey) throw new ServiceUnavailableException('ElevenLabs is not configured');
     const controller = new AbortController();
     const timeout = setTimeout(() => controller.abort(), ELEVENLABS_REQUEST_TIMEOUT_MS);
     try {
       const body = new FormData();
-      body.append('file', new Blob([new Uint8Array(audio)], { type: 'audio/mpeg' }), 'podcast.mp3');
+      body.append('file', new Blob([new Uint8Array(audio)], { type: format === 'wav' ? 'audio/wav' : 'audio/mpeg' }), `podcast.${format ?? 'mp3'}`);
       body.append('text', text);
       const response = await fetch('https://api.elevenlabs.io/v1/forced-alignment', {
         method: 'POST', headers: { 'xi-api-key': this.apiKey }, body, signal: controller.signal,
@@ -370,4 +404,35 @@ function isNonDecreasing(values: readonly number[]): boolean {
     if (values[index] < values[index - 1]) return false;
   }
   return true;
+}
+
+/** Preserve complete turns and speaker identity within the dialogue endpoint's request limit. */
+export function splitDialogueInputs(inputs: readonly DialogueInput[]): DialogueInput[][] {
+  if (!inputs.length || inputs.reduce((total, input) => total + input.text.length, 0) > 10_000) {
+    throw new ConflictException('Dialogue must contain between one and 10,000 characters');
+  }
+  const batches: DialogueInput[][] = [];
+  let batch: DialogueInput[] = [];
+  let characters = 0;
+  for (const input of inputs) {
+    if (!input.text.length || input.text.length > 2_000) throw new ConflictException('Each dialogue turn must contain between one and 2,000 characters');
+    if (characters + input.text.length > 2_000) {
+      batches.push(batch); batch = []; characters = 0;
+    }
+    batch.push(input); characters += input.text.length;
+  }
+  if (batch.length) batches.push(batch);
+  return batches;
+}
+
+/** PCM requests return mono signed 16-bit samples at 24 kHz. A single WAV avoids MP3 stitching gaps. */
+export function pcmToWav(pcm: Buffer): Buffer {
+  const header = Buffer.alloc(44);
+  header.write('RIFF', 0); header.writeUInt32LE(36 + pcm.length, 4);
+  header.write('WAVEfmt ', 8); header.writeUInt32LE(16, 16);
+  header.writeUInt16LE(1, 20); header.writeUInt16LE(1, 22);
+  header.writeUInt32LE(24_000, 24); header.writeUInt32LE(48_000, 28);
+  header.writeUInt16LE(2, 32); header.writeUInt16LE(16, 34);
+  header.write('data', 36); header.writeUInt32LE(pcm.length, 40);
+  return Buffer.concat([header, pcm]);
 }

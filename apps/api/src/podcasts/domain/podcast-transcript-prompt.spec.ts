@@ -14,9 +14,9 @@ describe('buildPodcastTranscriptPrompt', () => {
     expect(prompt).toContain('Creative direction: Two friends at breakfast');
     expect(prompt).toContain('- Kaffee = coffee');
     expect(prompt).toContain('Include 8 vocabulary items total');
-    expect(prompt).toContain('Aim for a little over 2 minutes');
-    expect(prompt).toContain('aim for 1,650–1,800 target-language characters');
-    expect(prompt).toContain('Use about 18–26 concise turns');
+    expect(prompt).toContain('Aim for approximately five minutes');
+    expect(prompt).toContain('roughly 3,500–5,000 target-language characters');
+    expect(prompt).toContain('Use about 40–55 conversational turns');
     expect(prompt).toContain('Count targetText plus rendered audioTags');
     expect(prompt).toContain('preserve any supplied translation exactly');
     expect(prompt).toContain('must contain every supplied headword exactly once');
@@ -58,13 +58,13 @@ describe('buildPodcastTranscriptPrompt', () => {
       ...context, vocabulary: Array.from({ length: 15 }, (_, index) => `word-${index}`),
     });
 
-    expect(shortPrompt).toContain('Aim for a little over 2 minutes');
-    expect(shortPrompt).not.toContain('Use about 26–36 concise turns');
-    expect(extendedPrompt).toContain('Aim for 3–5 minutes of spoken audio');
-    expect(extendedPrompt).toContain('at least 3 minutes for 15 or more supplied vocabulary items');
-    expect(extendedPrompt).toContain('Use about 26–36 concise turns');
-    expect(extendedPrompt).toContain('aim for 1,750–1,850 target-language characters');
-    expect(extendedPrompt).toContain('maximum of 2,000 characters');
+    expect(shortPrompt).toContain('Aim for approximately five minutes');
+    expect(shortPrompt).toContain('Use about 40–55 conversational turns');
+    expect(extendedPrompt).toContain('Aim for approximately five minutes of spoken audio');
+    expect(extendedPrompt).toContain('550–590 target-language words');
+    expect(extendedPrompt).toContain('Use about 40–55 conversational turns');
+    expect(extendedPrompt).toContain('roughly 3,500–5,000 target-language characters');
+    expect(extendedPrompt).toContain('episode limit is 10,000 characters');
   });
 
   it('reduces dictionary entries to clean headwords while preserving translations', () => {
