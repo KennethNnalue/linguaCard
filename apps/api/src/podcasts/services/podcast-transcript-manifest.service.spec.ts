@@ -220,4 +220,12 @@ describe('PodcastTranscriptManifestService', () => {
       await module.close();
     }
   });
+  it('accepts a balanced abbreviation explanation containing an equals sign', async () => {
+    const service = new PodcastTranscriptManifestService({
+      getRepository: () => ({ find: async () => [] }),
+    } as unknown as DataSource, new LexemeIdentityService());
+    const result = await service.prepare(['qm (= Quadratmeter)'], 'de', 'en');
+    expect(result.manifest.items).toEqual([expect.objectContaining({ text: 'qm', translation: null })]);
+  });
+
 });

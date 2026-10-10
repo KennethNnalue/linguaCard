@@ -182,6 +182,14 @@ export class ElevenLabsDialogueAdapter {
       if (!response.ok) {
         const detail = (await response.text()).slice(0, 500);
         this.logger.warn(`ElevenLabs dialogue generation failed with status ${response.status}: ${detail}`);
+        let failure: unknown;
+        try { failure = JSON.parse(detail); } catch { /* Keep the generic provider error. */ }
+        if (isRecord(failure) && isRecord(failure['detail'])
+          && failure['detail']['code'] === 'quota_exceeded') {
+          throw new ServiceUnavailableException(
+            'ElevenLabs credits are insufficient for this episode. Shorten the script or add credits, then retry.',
+          );
+        }
         throw new ServiceUnavailableException('Podcast audio provider rejected the generation request');
       }
       return this.parseResponse(await response.json());

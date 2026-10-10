@@ -122,4 +122,13 @@ describe('Eleven v4 dialogue request', () => {
       inputs: [{ text: '[warm] Hallo!', voice_id: 'host' }],
     }));
   });
+  it('reports an actionable credit limit without exposing arbitrary provider details', async () => {
+    jest.spyOn(globalThis, 'fetch').mockResolvedValue(Response.json({
+      detail: { code: 'quota_exceeded', message: 'Not enough credits' },
+    }, { status: 401 }));
+    const adapter = new ElevenLabsDialogueAdapter({ get: () => ({ elevenLabsApiKey: 'test' }) } as unknown as ConfigService);
+    await expect(adapter.generate([{ text: 'Hallo', voiceId: 'host' }], 'de'))
+      .rejects.toThrow('ElevenLabs credits are insufficient for this episode. Shorten the script or add credits, then retry.');
+  });
+
 });

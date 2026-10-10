@@ -31,7 +31,7 @@ export class PodcastTranscriptManifestService {
     translationLanguage: LanguageCode,
     selections: readonly AdminPodcastVocabularySelection[] = [],
   ): Promise<PodcastTranscriptManifestPreparation> {
-    if (vocabulary.some(item => !hasBalancedVocabularyParentheses(item.split('=', 1)[0]))) {
+    if (vocabulary.some(item => !hasBalancedVocabularyParentheses(item))) {
       throw new BadRequestException('Complete parenthetical vocabulary notes and keep examples separate from headwords.');
     }
     const draft = createPodcastTranscriptManifestDraft(vocabulary, targetLanguage, translationLanguage);
