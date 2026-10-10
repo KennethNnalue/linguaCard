@@ -48,6 +48,14 @@ services:
         value: de-DE-Wavenet-B
       - key: GOOGLE_CLOUD_TTS_LANGUAGE
         value: de-DE
+      - key: ELEVENLABS_API_KEY
+        sync: false
+      - key: ELEVENLABS_DIALOGUE_MODEL
+        value: eleven_v4
+      - key: ELEVENLABS_DIALOGUE_STABILITY
+        value: "0.5"
+      - key: ELEVENLABS_DIALOGUE_SIMILARITY
+        value: "0.75"
       - key: API_PUBLIC_URL
         value: https://linguacard-api.onrender.com  # fallback for local-disk mode
       # ── Cloudflare R2 (audio file storage) ─────────────────────────────────
@@ -128,7 +136,11 @@ services:
       - key: ELEVENLABS_API_KEY
         sync: false
       - key: ELEVENLABS_DIALOGUE_MODEL
-        value: eleven_v3
+        value: eleven_v4
+      - key: ELEVENLABS_DIALOGUE_STABILITY
+        value: "0.5"
+      - key: ELEVENLABS_DIALOGUE_SIMILARITY
+        value: "0.75"
       - key: ELEVENLABS_FEMALE_VOICE_IDS
         sync: false
       - key: ELEVENLABS_MALE_VOICE_IDS

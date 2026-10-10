@@ -3,7 +3,7 @@ import {
   ArrayMaxSize, ArrayMinSize, IsArray, IsIn, IsInt, IsNumber, IsOptional,
   IsString, IsUUID, Matches, Max, MaxLength, Min, MinLength, ValidateNested,
 } from 'class-validator';
-import type { CefrLevel, LanguageCode } from '@lingua-card/shared/domain';
+import { PODCAST_AUDIO_TAGS, type PodcastAudioTag, type CefrLevel, type LanguageCode } from '@lingua-card/shared/domain';
 
 const CEFR_LEVELS = ['A1', 'A2', 'B1', 'B2', 'C1'] as const;
 const LANGUAGE_CODES = ['en', 'de', 'fr', 'es', 'it', 'pt', 'ja', 'zh', 'ko', 'ar', 'uk', 'tr', 'ru'] as const;
@@ -191,6 +191,8 @@ export class PodcastTranscriptSpeakerDto {
 }
 
 export class PodcastTranscriptTurnDto {
+  @IsOptional() @IsArray() @ArrayMaxSize(2) @IsIn(PODCAST_AUDIO_TAGS, { each: true })
+  audioTags?: PodcastAudioTag[];
   @IsString() @MaxLength(60) speakerKey!: string;
   @IsString() @MinLength(1) @Matches(CONTAINS_NON_WHITESPACE) @MaxLength(1000) targetText!: string;
   @IsString() @MinLength(1) @Matches(CONTAINS_NON_WHITESPACE) @MaxLength(1000) translation!: string;

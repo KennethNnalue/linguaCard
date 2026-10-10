@@ -17,6 +17,8 @@ export interface AiConfig {
   googleCloudTtsLanguage:  string;
   elevenLabsApiKey:       string;
   elevenLabsDialogueModel: string;
+  elevenLabsDialogueStability: number;
+  elevenLabsDialogueSimilarity: number;
   elevenLabsFemaleVoiceIds: string[];
   elevenLabsMaleVoiceIds: string[];
   elevenLabsVoicePools: Record<string, { female: string[]; male: string[] }>;
@@ -58,6 +60,16 @@ function defaultProvider(value: string | undefined): AiConfig['defaultProvider']
     : 'gemini';
 }
 
+function dialogueSetting(name: string, fallback: number): number {
+  const raw = process.env[name];
+  if (!raw?.trim()) return fallback;
+  const value = Number(raw);
+  if (!Number.isFinite(value) || value < 0 || value > 1) {
+    throw new Error(`${name} must be a number between 0 and 1`);
+  }
+  return value;
+}
+
 export const aiConfig = (): { ai: AiConfig } => ({
   ai: {
     anthropicApiKey:      process.env['ANTHROPIC_API_KEY']        ?? '',
@@ -76,7 +88,9 @@ export const aiConfig = (): { ai: AiConfig } => ({
     googleCloudTtsVoice:     process.env['GOOGLE_CLOUD_TTS_VOICE']      ?? 'de-DE-Chirp3-HD-Charon',
     googleCloudTtsLanguage:  process.env['GOOGLE_CLOUD_TTS_LANGUAGE']   ?? 'de-DE',
     elevenLabsApiKey:        process.env['ELEVENLABS_API_KEY']          ?? '',
-    elevenLabsDialogueModel: process.env['ELEVENLABS_DIALOGUE_MODEL']   ?? 'eleven_v3',
+    elevenLabsDialogueModel: process.env['ELEVENLABS_DIALOGUE_MODEL']   ?? 'eleven_v4',
+    elevenLabsDialogueStability: dialogueSetting('ELEVENLABS_DIALOGUE_STABILITY', 0.5),
+    elevenLabsDialogueSimilarity: dialogueSetting('ELEVENLABS_DIALOGUE_SIMILARITY', 0.75),
     elevenLabsFemaleVoiceIds: (process.env['ELEVENLABS_FEMALE_VOICE_IDS'] ?? '')
       .split(',').map(value => value.trim()).filter(Boolean),
     elevenLabsMaleVoiceIds: (process.env['ELEVENLABS_MALE_VOICE_IDS'] ?? '')

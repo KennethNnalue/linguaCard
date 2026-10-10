@@ -2,6 +2,7 @@ import 'reflect-metadata';
 import { plainToInstance } from 'class-transformer';
 import { validate } from 'class-validator';
 import {
+  PodcastTranscriptTurnDto,
   CreatePodcastEpisodeDto,
   CreatePodcastTopicDto,
   CreatePodcastTranscriptPromptDto,
@@ -90,5 +91,17 @@ describe('CreatePodcastTranscriptPromptDto', () => {
     });
 
     await expect(validate(dto)).resolves.not.toHaveLength(0);
+  });
+});
+
+
+describe('podcast delivery cues', () => {
+  const turn = { speakerKey: 'host', targetText: 'Hallo!', translation: 'Hello!', vocabularyRefs: [] };
+  it('accepts legacy turns and optional supported cues', async () => {
+    expect(await validate(plainToInstance(PodcastTranscriptTurnDto, turn))).toHaveLength(0);
+    expect(await validate(plainToInstance(PodcastTranscriptTurnDto, { ...turn, audioTags: ['short pause', 'relieved'] }))).toHaveLength(0);
+  });
+  it.each([{ audioTags: ['door slams'] }, { audioTags: ['warm', 'curious', 'chuckles'] }])('rejects unsuitable or excessive cues %j', async ({ audioTags }) => {
+    expect(await validate(plainToInstance(PodcastTranscriptTurnDto, { ...turn, audioTags }))).not.toHaveLength(0);
   });
 });

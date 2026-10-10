@@ -337,6 +337,7 @@ export class AdminPodcastsService {
       turns: turns.map(turn => ({
         speakerKey: speakerKeyById.get(turn.speakerId) ?? 'unknown',
         targetText: turn.targetText,
+        audioTags: turn.audioTags ?? [],
         translation: turn.translation,
         vocabularyRefs: turn.vocabularyKeys,
       })),

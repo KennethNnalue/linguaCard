@@ -23,7 +23,13 @@ export function normalizePodcastVocabulary(vocabulary: readonly string[]): strin
 }
 
 export function normalizePodcastVocabularyItem(rawItem: string): string {
-  const separatorIndex = rawItem.indexOf('=');
+  let depth = 0;
+  let separatorIndex = -1;
+  for (let index = 0; index < rawItem.length; index += 1) {
+    if (rawItem[index] === '(') depth += 1;
+    if (rawItem[index] === ')') depth = Math.max(0, depth - 1);
+    if (rawItem[index] === '=' && depth === 0) { separatorIndex = index; break; }
+  }
   const suppliedText = separatorIndex >= 0
     ? rawItem.slice(0, separatorIndex)
     : rawItem;
@@ -83,17 +89,20 @@ ${vocabularyList}
 
 Schema:
 ${context.manifest
-    ? `{"schemaVersion":2,"manifestId":"${context.manifest.id}","episode":{"title":"","titleTranslation":"","description":""},"speakers":[{"key":"host","name":"","voiceGender":"female"},{"key":"guest","name":"","voiceGender":"male"}],"turns":[{"speakerKey":"host","targetText":"","translation":"","vocabularyRefs":["linguacard-key"]}],"vocabulary":[{"key":"linguacard-key","text":"","translation":"","importance":"essential"}]}`
-    : '{"schemaVersion":1,"episode":{"title":"","titleTranslation":"","description":""},"speakers":[{"key":"host","name":"","voiceGender":"female"},{"key":"guest","name":"","voiceGender":"male"}],"turns":[{"speakerKey":"host","targetText":"","translation":"","vocabularyRefs":["word-key"]}],"vocabulary":[{"key":"word-key","text":"","translation":"","importance":"essential"}]}' }
+    ? `{"schemaVersion":2,"manifestId":"${context.manifest.id}","episode":{"title":"","titleTranslation":"","description":""},"speakers":[{"key":"host","name":"","voiceGender":"female"},{"key":"guest","name":"","voiceGender":"male"}],"turns":[{"speakerKey":"host","targetText":"","audioTags":[],"translation":"","vocabularyRefs":["linguacard-key"]}],"vocabulary":[{"key":"linguacard-key","text":"","translation":"","importance":"essential"}]}`
+    : '{"schemaVersion":1,"episode":{"title":"","titleTranslation":"","description":""},"speakers":[{"key":"host","name":"","voiceGender":"female"},{"key":"guest","name":"","voiceGender":"male"}],"turns":[{"speakerKey":"host","targetText":"","audioTags":[],"translation":"","vocabularyRefs":["word-key"]}],"vocabulary":[{"key":"word-key","text":"","translation":"","importance":"essential"}]}' }
 
 Requirements:
 - Derive a concise natural episode title in the target language, its accurate translation, and a learner-facing description in the translation language.
 - Use exactly two speakers with consistent female or male voiceGender values.
 - Write a natural conversation appropriate for the CEFR level. ${durationRequirement}
 - ${dialogueRequirement} Include a clear opening, a small development or change in the situation, and a natural closing so the dialogue feels complete rather than padded.
-- Use most of the available dialogue budget: aim for ${hasExtendedVocabulary ? '1,900–1,990' : '1,750–1,950'} target-language characters across all targetText fields, with an absolute maximum of 2,000 characters. Count only targetText, not translations or JSON syntax.
+- Use most of the available dialogue budget: aim for ${hasExtendedVocabulary ? '1,750–1,850' : '1,650–1,800'} target-language characters across all targetText fields, with an absolute maximum of 2,000 characters. Count targetText plus rendered audioTags (each becomes [tag] followed by a space), not translations or JSON syntax. Keep the combined provider input at or below 2,000 characters.
 - Before returning JSON, check the estimated spoken duration against the target above; revise short dialogue by adding relevant exchanges, not filler, while staying within the character limit.
 - Keep the speaking pace natural for ${context.level} learners. Prefer short sentences, brief pauses implied by punctuation, and useful repetition in context.
+- Make each reply respond to the preceding turn. Use believable questions, small hesitations and reactions, and a modest emotional arc. Keep clear articulation and an unhurried pace; do not add theatrical acting or overlapping speech.
+- Add optional audioTags arrays to a few turns (roughly 4–8 across the episode), with at most two tags per turn. Allowed values: warm, curious, thoughtful, surprised, relieved, excited, chuckles, short pause. Choose cues appropriate to the scene; use short pause before a considered response and chuckles sparingly. These cues direct Eleven v4 and are not spoken words.
+- Keep targetText and translation free of bracketed stage directions, SSML, speaker labels, and sound effects. Use punctuation for pauses within sentences. Write numbers and units as spoken words in targetText (for example, vierzig Quadratmeter), while preserving the vocabulary headword qm when supplied.
 - Treat vocabulary supplied under Required vocabulary or elsewhere alongside this prompt as required input.
 - Reduce dictionary notation to the headword before creating vocabulary entries: remove articles, plural endings, conjugation notes, grammar notes, example sentences, and separable-verb bars. For example, "neben (+ D.)" becomes "neben", "doch (Die Lampe ist doch toll!)" becomes "doch", "die Einweihungsfeier, -n" becomes "Einweihungsfeier", and "aus|sehen, er sieht aus, hat ausgesehen" becomes "aussehen".
 - The vocabulary array must contain every supplied headword exactly once. Do not omit or replace any supplied headword.

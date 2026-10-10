@@ -48,6 +48,7 @@ export class ElevenLabsDialogueAdapter {
   private readonly logger = new Logger(ElevenLabsDialogueAdapter.name);
   private readonly apiKey: string;
   private readonly modelId: string;
+  private readonly settings: { stability: number; similarity: number };
   private readonly configuredVoiceIds: Readonly<Record<PodcastVoiceGender, readonly string[]>>;
   private readonly languageVoicePools: Readonly<Record<string, Readonly<Record<PodcastVoiceGender, readonly string[]>>>>;
   private discoveredVoices: { voices: readonly ElevenLabsVoiceCandidate[]; expiresAt: number } | null = null;
@@ -55,7 +56,11 @@ export class ElevenLabsDialogueAdapter {
   constructor(config: ConfigService) {
     const ai = config.get<AiConfig>('ai');
     this.apiKey = ai?.elevenLabsApiKey ?? '';
-    this.modelId = ai?.elevenLabsDialogueModel ?? 'eleven_v3';
+    this.modelId = ai?.elevenLabsDialogueModel ?? 'eleven_v4';
+    this.settings = {
+      stability: ai?.elevenLabsDialogueStability ?? 0.5,
+      similarity: ai?.elevenLabsDialogueSimilarity ?? 0.75,
+    };
     this.configuredVoiceIds = {
       female: ai?.elevenLabsFemaleVoiceIds ?? [],
       male: ai?.elevenLabsMaleVoiceIds ?? [],
@@ -167,6 +172,7 @@ export class ElevenLabsDialogueAdapter {
           body: JSON.stringify({
             inputs: inputs.map(input => ({ text: input.text, voice_id: input.voiceId })),
             model_id: this.modelId,
+            settings: this.settings,
             language_code: languageCode,
             apply_text_normalization: 'auto',
           }),

@@ -13,6 +13,7 @@ import { PodcastSpeakerEntity } from '../entities/podcast-speaker.entity';
 import { PodcastTopicEntity } from '../entities/podcast-topic.entity';
 import { PodcastTurnEntity } from '../entities/podcast-turn.entity';
 import { ElevenLabsDialogueAdapter } from '../infrastructure/elevenlabs-dialogue.adapter';
+import { podcastDeliveryText } from '../domain/podcast-delivery';
 import { AdminPodcastsService } from './admin-podcasts.service';
 
 interface GenerationSnapshot {
@@ -109,7 +110,7 @@ export class PodcastAudioGenerationService {
       );
       await this.persistVoiceAssignment(snapshot, automaticallyAssignedVoiceIds);
       const inputs = snapshot.turns.map(turn => ({
-        text: turn.targetText,
+        text: podcastDeliveryText(turn),
         voiceId: automaticallyAssignedVoiceIds[
           this.requireSpeaker(speakerById, turn.speakerId).position
         ],
@@ -120,10 +121,10 @@ export class PodcastAudioGenerationService {
       }
       const generated = await this.elevenLabs.generate(inputs, snapshot.topic.targetLanguage);
       const alignedWords = await this.elevenLabs.alignAudio(
-        generated.audio, inputs.map(input => input.text).join('\n'),
+        generated.audio, snapshot.turns.map(turn => turn.targetText).join('\n'),
       );
       const timings = normalizeForcedAlignmentTimings(
-        inputs.map(input => input.text), alignedWords,
+        snapshot.turns.map(turn => turn.targetText), alignedWords,
       );
       if (timings.length !== snapshot.turns.length) {
         throw new ConflictException('ElevenLabs did not return timing data for every dialogue turn');

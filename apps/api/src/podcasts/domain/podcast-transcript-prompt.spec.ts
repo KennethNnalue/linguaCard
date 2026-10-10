@@ -15,9 +15,9 @@ describe('buildPodcastTranscriptPrompt', () => {
     expect(prompt).toContain('- Kaffee = coffee');
     expect(prompt).toContain('Include 8 vocabulary items total');
     expect(prompt).toContain('Aim for a little over 2 minutes');
-    expect(prompt).toContain('aim for 1,750–1,950 target-language characters');
+    expect(prompt).toContain('aim for 1,650–1,800 target-language characters');
     expect(prompt).toContain('Use about 18–26 concise turns');
-    expect(prompt).toContain('Count only targetText');
+    expect(prompt).toContain('Count targetText plus rendered audioTags');
     expect(prompt).toContain('preserve any supplied translation exactly');
     expect(prompt).toContain('must contain every supplied headword exactly once');
   });
@@ -63,7 +63,7 @@ describe('buildPodcastTranscriptPrompt', () => {
     expect(extendedPrompt).toContain('Aim for 3–5 minutes of spoken audio');
     expect(extendedPrompt).toContain('at least 3 minutes for 15 or more supplied vocabulary items');
     expect(extendedPrompt).toContain('Use about 26–36 concise turns');
-    expect(extendedPrompt).toContain('aim for 1,900–1,990 target-language characters');
+    expect(extendedPrompt).toContain('aim for 1,750–1,850 target-language characters');
     expect(extendedPrompt).toContain('maximum of 2,000 characters');
   });
 
@@ -139,5 +139,13 @@ describe('vocabulary annotation validation', () => {
   it('preserves multiword expressions and complete annotations', () => {
     expect(normalizePodcastVocabularyItem('teilnehmen (an + D.) = take part')).toBe('teilnehmen = take part');
     expect(normalizePodcastVocabularyItem('von ... nach = from ... to')).toBe('von ... nach = from ... to');
+  });
+});
+
+
+describe('apartment-search vocabulary', () => {
+  it('keeps an equals sign inside a unit annotation out of the translation', () => {
+    expect(normalizePodcastVocabularyItem('qm (= Quadratmeter)')).toBe('qm');
+    expect(normalizePodcastVocabularyItem('qm (= Quadratmeter) = square metre')).toBe('qm = square metre');
   });
 });

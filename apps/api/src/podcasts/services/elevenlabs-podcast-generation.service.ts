@@ -30,6 +30,7 @@ export class ElevenLabsPodcastGenerationService {
     const projectId = await this.podcasts.create({
       title: episode.title,
       language: topic.targetLanguage,
+      level: topic.level,
       sourceText: normalizePodcastVocabulary(vocabulary).join('\n'),
       hostVoiceId,
       guestVoiceId,

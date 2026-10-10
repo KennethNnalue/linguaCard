@@ -8,14 +8,18 @@ const REQUEST_TIMEOUT_MS = 120_000;
 export class ElevenLabsPodcastAdapter {
   private readonly logger = new Logger(ElevenLabsPodcastAdapter.name);
   private readonly apiKey: string;
+  private readonly modelId: string;
 
   constructor(config: ConfigService) {
-    this.apiKey = config.get<AiConfig>('ai')?.elevenLabsApiKey ?? '';
+    const ai = config.get<AiConfig>('ai');
+    this.apiKey = ai?.elevenLabsApiKey ?? '';
+    this.modelId = ai?.elevenLabsDialogueModel ?? 'eleven_v4';
   }
 
   async create(input: {
     title: string;
     language: string;
+    level: string;
     sourceText: string;
     hostVoiceId: string;
     guestVoiceId: string;
@@ -28,14 +32,14 @@ export class ElevenLabsPodcastAdapter {
         method: 'POST',
         headers: { 'content-type': 'application/json', 'xi-api-key': this.apiKey },
         body: JSON.stringify({
-          model_id: 'eleven_multilingual_v2',
+          model_id: this.modelId,
           mode: { type: 'conversation', conversation: {
             host_voice_id: input.hostVoiceId, guest_voice_id: input.guestVoiceId,
           } },
           source: { type: 'text', text: input.sourceText },
           language: input.language,
           duration_scale: 'short',
-          instructions_prompt: `Create a beginner-friendly language-learning podcast named “${input.title}”. Use every vocabulary item and explain each naturally.`,
+          instructions_prompt: `Create a beginner-friendly language-learning podcast named “${input.title}”. Speak only in the target language at CEFR ${input.level}. Use every vocabulary item in an everyday scene. Keep turns concise and learner-friendly. Include natural reactions, brief thinking pauses, restrained emotion and a clear ending. Avoid overlapping speech, music and sound effects. Use sparse inline audio tags for delivery; never read them aloud.`,
         }),
         signal: controller.signal,
       });

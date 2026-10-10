@@ -2073,6 +2073,11 @@ export interface AdminPodcastVocabularySelection {
 
 export type PodcastVocabularyImportance = 'essential' | 'supporting';
 export type PodcastVoiceGender = 'female' | 'male';
+export const PODCAST_AUDIO_TAGS = [
+  'warm', 'curious', 'thoughtful', 'surprised', 'relieved', 'excited',
+  'chuckles', 'short pause',
+] as const;
+export type PodcastAudioTag = typeof PODCAST_AUDIO_TAGS[number];
 
 export interface AdminPodcastTranscriptSpeakerInput {
   key: string;
@@ -2082,6 +2087,7 @@ export interface AdminPodcastTranscriptSpeakerInput {
 }
 
 export interface AdminPodcastTranscriptTurnInput {
+  audioTags?: PodcastAudioTag[];
   speakerKey: string;
   targetText: string;
   translation: string;

@@ -101,3 +101,25 @@ describe('ElevenLabs gendered voice selection', () => {
     )).toEqual(['female-b']);
   });
 });
+
+
+describe('Eleven v4 dialogue request', () => {
+  afterEach(() => jest.restoreAllMocks());
+  it('uses v4 and dialogue settings while preserving cues and language', async () => {
+    const fetchMock = jest.spyOn(globalThis, 'fetch').mockResolvedValue(Response.json({
+      audio_base64: Buffer.from('audio').toString('base64'),
+      alignment: { characters: ['H'], character_start_times_seconds: [0], character_end_times_seconds: [1] },
+      voice_segments: [{ voice_id: 'host', start_time_seconds: 0, end_time_seconds: 1,
+        character_start_index: 0, character_end_index: 1, dialogue_input_index: 0 }],
+    }));
+    const adapter = new ElevenLabsDialogueAdapter({ get: () => ({
+      elevenLabsApiKey: 'test', elevenLabsDialogueStability: 0.5, elevenLabsDialogueSimilarity: 0.8,
+    }) } as unknown as ConfigService);
+    await adapter.generate([{ text: '[warm] Hallo!', voiceId: 'host' }], 'de');
+    const init = fetchMock.mock.calls[0][1];
+    expect(JSON.parse(String(init?.body))).toEqual(expect.objectContaining({
+      model_id: 'eleven_v4', language_code: 'de', settings: { stability: 0.5, similarity: 0.8 },
+      inputs: [{ text: '[warm] Hallo!', voice_id: 'host' }],
+    }));
+  });
+});

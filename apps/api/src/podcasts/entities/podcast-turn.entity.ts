@@ -1,5 +1,5 @@
 import { Column, Entity, Index, PrimaryColumn } from 'typeorm';
-import type { PodcastWordTiming } from '@lingua-card/shared/domain';
+import type { PodcastAudioTag, PodcastWordTiming } from '@lingua-card/shared/domain';
 
 @Entity('podcast_turns')
 @Index('uq_podcast_turns_episode_position', ['episodeId', 'position'], { unique: true })
@@ -9,6 +9,7 @@ export class PodcastTurnEntity {
   @Column() speakerId!: string;
   @Column() position!: number;
   @Column({ type: 'text' }) targetText!: string;
+  @Column({ type: 'jsonb', default: [] }) audioTags!: PodcastAudioTag[];
   @Column({ type: 'text' }) translation!: string;
   @Column({ type: 'jsonb', default: [] }) vocabularyKeys!: string[];
   @Column({ type: 'integer', nullable: true }) startMs!: number | null;

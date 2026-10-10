@@ -16,6 +16,7 @@ import { PodcastTopicEntity } from '../entities/podcast-topic.entity';
 import { PodcastTurnEntity } from '../entities/podcast-turn.entity';
 import { normalizeTranscriptVocabularyReferences } from '../domain/normalize-transcript-vocabulary-references';
 import { hasBalancedVocabularyParentheses, normalizePodcastVocabulary } from '../domain/podcast-transcript-prompt';
+import { podcastDeliveryText } from '../domain/podcast-delivery';
 import { StorageService } from '../../storage/storage.service';
 import { LegacyVocabularyProjectionService } from '../../vocabulary/services/legacy-vocabulary-projection.service';
 import type { PodcastTranscriptManifest } from '../domain/podcast-transcript-manifest';
@@ -96,7 +97,7 @@ export class PodcastTranscriptImportService {
       await manager.save(payload.turns.map((turn, position) => manager.create(PodcastTurnEntity, {
         id: randomUUID(), episodeId,
         speakerId: this.requireMapValue(speakerByKey, turn.speakerKey, 'speaker').id, position,
-        targetText: turn.targetText.trim(), translation: turn.translation.trim(),
+        targetText: turn.targetText.trim(), audioTags: turn.audioTags ?? [], translation: turn.translation.trim(),
         vocabularyKeys: [...turn.vocabularyRefs], startMs: null, endMs: null, wordTimings: [],
       })));
       await manager.save(payload.vocabulary.map((item, position) => manager.create(PodcastEpisodeVocabularyEntity, {
@@ -203,11 +204,11 @@ export class PodcastTranscriptImportService {
       remediation: 'Split the conversation into episodes no longer than five minutes.',
     });
     const dialogueCharacters = payload.turns.reduce(
-      (total, turn) => total + turn.targetText.length, 0,
+      (total, turn) => total + podcastDeliveryText(turn).length, 0,
     );
     if (dialogueCharacters > 2_000) conflicts.push({
       code: 'provider-limit', pointer: '/turns', severity: 'error',
-      message: `The dialogue contains ${dialogueCharacters} characters; the generation limit is 2,000.`,
+      message: `The dialogue contains ${dialogueCharacters} characters including delivery cues; the generation limit is 2,000.`,
       remediation: 'Shorten the conversation or split it into multiple episodes.',
     });
     return {
