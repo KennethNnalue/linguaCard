@@ -38,8 +38,8 @@ export class ElevenLabsPodcastAdapter {
           } },
           source: { type: 'text', text: input.sourceText },
           language: input.language,
-          duration_scale: 'short',
-          instructions_prompt: `Create a beginner-friendly language-learning podcast named “${input.title}”. Speak only in the target language at CEFR ${input.level}. Use every vocabulary item in an everyday scene. Keep turns concise and learner-friendly. Include natural reactions, brief thinking pauses, restrained emotion and a clear ending. Avoid overlapping speech, music and sound effects. Use sparse inline audio tags for delivery; never read them aloud.`,
+          duration_scale: 'default',
+          instructions_prompt: `Create a beginner-friendly language-learning podcast named “${input.title}”. Speak only in the target language at CEFR ${input.level}. Use every vocabulary item in an everyday scene. Aim for approximately five minutes (4:30–5:00), about 550–590 spoken words. Develop the scene with meaningful follow-up questions and revisit the vocabulary in context. Keep turns concise and learner-friendly. Include natural reactions, brief thinking pauses, restrained emotion and a clear ending. Avoid overlapping speech, music and sound effects. Use sparse inline audio tags for delivery; never read them aloud.`,
         }),
         signal: controller.signal,
       });
