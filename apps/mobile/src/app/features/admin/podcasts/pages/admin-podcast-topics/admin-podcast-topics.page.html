@@ -30,16 +30,24 @@
               <p>LinguaCard resolved the other words automatically. Select a meaning only for these {{ resolution.ambiguities.length }} ambiguous {{ resolution.ambiguities.length === 1 ? 'entry' : 'entries' }}.</p>
               @for (ambiguity of resolution.ambiguities; track ambiguity.key) {
                 <ion-item>
-                  <ion-select label="{{ ambiguity.article ? ambiguity.article + ' ' : '' }}{{ ambiguity.text }}" labelPlacement="stacked" placeholder="Choose a meaning" (ionChange)="selectPromptResolution(ambiguity.key, $event.detail.value)">
+                  <ion-select label="{{ ambiguity.article ? ambiguity.article + ' ' : '' }}{{ ambiguity.text }}" labelPlacement="stacked" placeholder="Choose a meaning" [value]="promptSelections()[ambiguity.key]" [disabled]="creatingMeaning()" (ionChange)="selectPromptResolution(ambiguity.key, $event.detail.value)">
                     @for (candidate of ambiguity.candidates; track candidate.lexemeId) {
                       <ion-select-option [value]="candidate.lexemeId">{{ promptCandidateLabel(candidate) }}</ion-select-option>
                     }
                   </ion-select>
                 </ion-item>
+                <ion-item>
+                  <ion-input label="New meaning for {{ ambiguity.text }}" labelPlacement="stacked" maxlength="500"
+                    [value]="meaningDrafts()[ambiguity.key] ?? ambiguity.suppliedTranslation ?? ''"
+                    [disabled]="creatingMeaning()" (ionInput)="updateMeaningDraft(ambiguity.key, $event.detail.value)"></ion-input>
+                </ion-item>
+                <small>Add a separate dictionary meaning. Existing vocabulary cards keep their meanings.</small>
+                <ion-button fill="outline" type="button" [disabled]="creatingMeaning() || promptCopying() || !(meaningDrafts()[ambiguity.key] ?? ambiguity.suppliedTranslation ?? '').trim()"
+                  (click)="addPromptMeaning(ambiguity.key, ambiguity.suppliedTranslation)">Add meaning for {{ ambiguity.text }}</ion-button>
               }
               <div class="resolution-actions">
-                <ion-button fill="clear" type="button" [disabled]="promptCopying()" (click)="cancelPromptResolution()">Cancel</ion-button>
-                <ion-button class="primary" type="button" [disabled]="!canCopyResolvedPrompt() || promptCopying()" (click)="copyResolvedPrompt()">{{ promptCopying() ? 'Preparing prompt…' : 'Confirm and copy prompt' }}</ion-button>
+                <ion-button fill="clear" type="button" [disabled]="promptCopying() || creatingMeaning()" (click)="cancelPromptResolution()">Cancel</ion-button>
+                <ion-button class="primary" type="button" [disabled]="!canCopyResolvedPrompt() || promptCopying() || creatingMeaning()" (click)="copyResolvedPrompt()">{{ promptCopying() ? 'Preparing prompt…' : 'Confirm and copy prompt' }}</ion-button>
               </div>
             </section>
           }

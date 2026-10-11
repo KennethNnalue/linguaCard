@@ -16,6 +16,7 @@ import type {
   AdminCreateElevenLabsPodcastResult,
   AdminPodcastTranscriptPromptResult,
   AdminPodcastVocabularySelection,
+  AdminPodcastVocabularyResolutionCandidate,
   AdminUpdatePodcastTopicDto,
   PodcastThumbnail,
   AdminPublishPodcastVocabularyResult,
@@ -178,6 +179,12 @@ export class AdminPodcastApiService {
   ): Observable<AdminPodcastTranscriptPromptResult> {
     return this.http.post<AdminPodcastTranscriptPromptResult>(
       `${this.episodeUrl}/${episodeId}/transcript/prompt`, { vocabulary, direction, resolutions },
+    );
+  }
+
+  createVocabularySense(episodeId: string, key: string, translation: string): Observable<AdminPodcastVocabularyResolutionCandidate> {
+    return this.http.post<AdminPodcastVocabularyResolutionCandidate>(
+      `${this.episodeUrl}/${episodeId}/vocabulary-senses`, { key, translation },
     );
   }
 

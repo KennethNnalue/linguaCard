@@ -93,6 +93,10 @@ export class PodcastTranscriptGenerationService {
     };
   }
 
+  createVocabularySense(episodeId: string, key: string, translation: string) {
+    return this.transcriptManifests.createSense(episodeId, key, translation);
+  }
+
   private async parsePayload(response: string): Promise<AdminPodcastTranscriptPayload> {
     const json = response.match(/```(?:json)?\s*([\s\S]*?)\s*```/iu)?.[1] ?? response;
     let parsed: unknown;

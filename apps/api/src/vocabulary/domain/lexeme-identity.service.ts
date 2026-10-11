@@ -61,10 +61,12 @@ export class LexemeIdentityService {
     grammar: Readonly<Record<string, unknown>>,
     parsedArticle: string | null,
   ): string {
-    if (language !== 'de' || partOfSpeech !== 'noun') return '';
+    const senseKey = this.readString(grammar['senseKey']);
+    const senseDiscriminator = senseKey ? `sense=${encodeURIComponent(senseKey)}` : '';
+    if (language !== 'de' || partOfSpeech !== 'noun') return senseDiscriminator;
     const article = this.readGermanArticle(grammar['article']) ?? parsedArticle ?? '';
     const gender = this.readString(grammar['gender']);
-    return `article=${article};gender=${gender}`;
+    return `article=${article};gender=${gender}${senseDiscriminator ? `;${senseDiscriminator}` : ''}`;
   }
 
   private readGermanArticle(value: unknown): string | null {

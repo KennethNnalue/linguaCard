@@ -2051,6 +2051,7 @@ export interface AdminPodcastVocabularyResolutionCandidate {
 }
 
 export interface AdminPodcastVocabularyAmbiguity {
+  suppliedTranslation?: string | null;
   key: string;
   text: string;
   article: string | null;

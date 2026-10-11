@@ -24,6 +24,7 @@ import {
   PodcastTranscriptPayloadDto,
   GeneratePodcastTranscriptDto,
   CreatePodcastTranscriptPromptDto,
+  CreatePodcastVocabularySenseDto,
   CreateElevenLabsPodcastDto,
   UpdatePodcastEpisodeDto,
   UpdatePodcastEpisodeDraftInputDto,
@@ -190,6 +191,11 @@ export class AdminPodcastEpisodesController {
       dto.direction,
       dto.resolutions,
     );
+  }
+
+  @Post(':episodeId/vocabulary-senses')
+  createVocabularySense(@Param('episodeId') episodeId: string, @Body() dto: CreatePodcastVocabularySenseDto) {
+    return this.transcriptGeneration.createVocabularySense(episodeId, dto.key, dto.translation);
   }
 
   @Post(':episodeId/elevenlabs-podcast')

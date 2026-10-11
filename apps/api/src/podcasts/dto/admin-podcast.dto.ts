@@ -153,6 +153,14 @@ export class CreatePodcastTranscriptPromptDto {
   resolutions?: PodcastVocabularySelectionDto[];
 }
 
+export class CreatePodcastVocabularySenseDto {
+  @IsString() @Matches(/^[a-z0-9]+(?:-[a-z0-9]+)*$/) @MaxLength(60)
+  key!: string;
+
+  @IsString() @Matches(CONTAINS_NON_WHITESPACE) @MaxLength(500)
+  translation!: string;
+}
+
 export class PodcastVocabularySelectionDto {
   @IsString() @Matches(/^[a-z0-9]+(?:-[a-z0-9]+)*$/) @MaxLength(60)
   key!: string;

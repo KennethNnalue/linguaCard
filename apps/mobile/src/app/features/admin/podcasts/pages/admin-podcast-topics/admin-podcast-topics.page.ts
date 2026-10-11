@@ -39,6 +39,8 @@ import {
   sparklesOutline,
   trashOutline
 } from 'ionicons/icons';
+import {firstValueFrom} from 'rxjs';
+import {AdminPodcastApiService} from '../../data-access/admin-podcast-api.service';
 import {AppNotificationService} from '@lingua-card/mobile/notifications';
 import {PodcastTranscriptClipboardService} from '../../application/podcast-transcript-clipboard.service';
 import {
@@ -94,6 +96,9 @@ export class AdminPodcastTopicsPage implements OnInit {
   readonly promptResolution = signal<AdminPodcastTranscriptPromptNeedsResolutionResult | null>(null);
   readonly promptSelections = signal<Readonly<Record<string, string>>>({});
   readonly promptCopying = signal(false);
+  readonly meaningDrafts = signal<Readonly<Record<string, string | undefined>>>({});
+  readonly creatingMeaning = signal(false);
+  private readonly podcastApi = inject(AdminPodcastApiService);
   readonly transcriptOpen = signal(false);
   readonly transcriptReviewed = signal(false);
   readonly savingDraft = signal(false);
@@ -112,7 +117,7 @@ export class AdminPodcastTopicsPage implements OnInit {
   readonly canCopyResolvedPrompt = computed(() => {
     const resolution = this.promptResolution();
     const selections = this.promptSelections();
-    return resolution !== null
+    return !this.creatingMeaning() && resolution !== null
       && resolution.ambiguities.length > 0
       && resolution.ambiguities.every(ambiguity => Boolean(selections[ambiguity.key]));
   });
@@ -540,6 +545,28 @@ export class AdminPodcastTopicsPage implements OnInit {
     this.promptSelections.update(selections => ({ ...selections, [key]: lexemeId }));
   }
 
+  updateMeaningDraft(key: string, value: unknown): void {
+    if (typeof value === 'string') this.meaningDrafts.update(values => ({...values, [key]: value}));
+  }
+
+  async addPromptMeaning(key: string, supplied: string | null | undefined): Promise<void> {
+    const request = this.promptCopyRequest();
+    const translation = (this.meaningDrafts()[key] ?? supplied ?? '').trim();
+    if (!request || !translation || this.creatingMeaning()) return;
+    this.creatingMeaning.set(true);
+    try {
+      const candidate = await firstValueFrom(this.podcastApi.createVocabularySense(request.episodeId, key, translation));
+      this.promptResolution.update(resolution => resolution ? {...resolution,
+        ambiguities: resolution.ambiguities.map(item => item.key === key
+          ? {...item, candidates: [...item.candidates.filter(existing => existing.lexemeId !== candidate.lexemeId), candidate]} : item),
+      } : null);
+      this.selectPromptResolution(key, candidate.lexemeId);
+      await this.notifications.present({message: 'New meaning added and selected.', duration: 1800, color: 'success'});
+    } catch {
+      this.store.setLocalError('Could not add the meaning. Save vocabulary changes and try again.');
+    } finally { this.creatingMeaning.set(false); }
+  }
+
   async copyResolvedPrompt(): Promise<void> {
     const request = this.promptCopyRequest();
     const resolution = this.promptResolution();
@@ -555,6 +582,7 @@ export class AdminPodcastTopicsPage implements OnInit {
     this.promptCopyRequest.set(null);
     this.promptResolution.set(null);
     this.promptSelections.set({});
+    this.meaningDrafts.set({});
   }
 
   promptCandidateLabel(candidate: AdminPodcastVocabularyResolutionCandidate): string {

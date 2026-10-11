@@ -6,6 +6,7 @@ export type SpeechAssetStatus = 'pending' | 'generating' | 'ready' | 'failed';
 export type SpeechContentKind = 'word' | 'example' | 'sentence';
 
 export interface LexemeGrammar {
+  senseKey?: string;
   article: string | null;
   gender: string | null;
   plurals: string[];

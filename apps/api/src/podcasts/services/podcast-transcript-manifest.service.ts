@@ -1,6 +1,7 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
+import { BadRequestException, ConflictException, NotFoundException, Injectable } from '@nestjs/common';
 import { In, DataSource } from 'typeorm';
 import type {
+  AdminPodcastVocabularyResolutionCandidate,
   AdminPodcastVocabularyAmbiguity,
   AdminPodcastVocabularySelection,
   LanguageCode,
@@ -16,6 +17,9 @@ import {
   type PodcastTranscriptManifestPreparation,
 } from '../domain/podcast-transcript-manifest';
 import { hasBalancedVocabularyParentheses } from '../domain/podcast-transcript-prompt';
+import { createHash } from 'node:crypto';
+import { PodcastEpisodeEntity } from '../entities/podcast-episode.entity';
+import { PodcastTopicEntity } from '../entities/podcast-topic.entity';
 import { stableResourceId } from '../../vocabulary/domain/stable-resource-id';
 
 @Injectable()
@@ -97,6 +101,54 @@ export class PodcastTranscriptManifestService {
     return { manifest: finalizePodcastTranscriptManifest(draft, items), ambiguities };
   }
 
+  /** Create an independent, explicitly authored meaning. Existing cards are never updated. */
+  async createSense(episodeId: string, key: string, translation: string): Promise<AdminPodcastVocabularyResolutionCandidate> {
+    const meaning = translation.normalize('NFC').trim().replace(/\s+/gu, ' ');
+    if (!meaning || meaning.length > 500) throw new BadRequestException('Enter a meaning of up to 500 characters.');
+    return this.dataSource.transaction(async manager => {
+      const episode = await manager.findOne(PodcastEpisodeEntity, {
+        where: { id: episodeId }, lock: { mode: 'pessimistic_write' },
+      });
+      if (!episode) throw new NotFoundException('Episode not found');
+      if (episode.status !== 'draft' || episode.audioGenerationStatus === 'generating') {
+        throw new ConflictException('Add meanings only to an editable draft.');
+      }
+      const topic = await manager.findOneBy(PodcastTopicEntity, { id: episode.topicId });
+      if (!topic) throw new NotFoundException('Topic not found');
+      const draft = createPodcastTranscriptManifestDraft(episode.generationInput?.vocabulary ?? [],
+        topic.targetLanguage, topic.translationLanguage);
+      const item = draft.items.find(entry => entry.key === key);
+      if (!item) throw new BadRequestException('Save the vocabulary entry before adding its meaning.');
+      const senseKey = createHash('sha256').update(JSON.stringify([
+        topic.translationLanguage, this.normalize(meaning),
+      ])).digest('hex');
+      const partOfSpeech = item.article ? 'noun' : 'other';
+      const grammar = { article: item.article, gender: null, plurals: [], senseKey };
+      const identity = this.lexemeIdentity.createIdentity({ language: topic.targetLanguage,
+        text: item.text, partOfSpeech, grammar });
+      const lexemeId = stableResourceId('lexeme', identity.language, identity.normalizedLemma,
+        identity.partOfSpeech, identity.grammarDiscriminator);
+      await manager.getRepository(LexemeEntity).createQueryBuilder().insert().values({
+        id: lexemeId, language: identity.language, normalizedLemma: identity.normalizedLemma,
+        displayText: identity.displayText, partOfSpeech, grammarDiscriminator: identity.grammarDiscriminator,
+        grammar, phonetic: null, cefrLevel: topic.level, source: 'admin', model: null,
+      }).orIgnore().execute();
+      await manager.getRepository(LexemeLocalizationEntity).createQueryBuilder().insert().values({
+        id: stableResourceId('lexeme-localization', lexemeId, topic.translationLanguage, '1'),
+        lexemeId, language: topic.translationLanguage, translation: meaning, definition: null,
+        synonyms: [], status: 'ready', contentVersion: 1, isActive: true, source: 'admin', model: null,
+      }).orIgnore().execute();
+      const localization = await manager.getRepository(LexemeLocalizationEntity).findOneBy({
+        lexemeId, language: topic.translationLanguage, isActive: true,
+      });
+      if (!localization || this.normalize(localization.translation) !== this.normalize(meaning)) {
+        throw new ConflictException('This meaning already exists with different content. Review the dictionary entry.');
+      }
+      return { lexemeId, text: item.text, translation: localization.translation,
+        definition: localization.definition, partOfSpeech, article: item.article };
+    });
+  }
+
   private haveCompatibleTranslations(
     candidates: readonly LexemeEntity[],
     localizations: ReadonlyMap<string, LexemeLocalizationEntity>,
@@ -133,6 +185,7 @@ export class PodcastTranscriptManifestService {
         article: candidate.grammar.article,
         gender: candidate.grammar.gender,
         plurals: candidate.grammar.plurals,
+        senseKey: candidate.grammar.senseKey,
       },
     });
   }
@@ -167,6 +220,7 @@ export class PodcastTranscriptManifestService {
   ): AdminPodcastVocabularyAmbiguity {
     return {
       key: item.key,
+      suppliedTranslation: item.translation,
       text: item.text,
       article: item.article,
       candidates: [...candidates].sort((left, right) => {
