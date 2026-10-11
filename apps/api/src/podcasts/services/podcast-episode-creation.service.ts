@@ -3,7 +3,7 @@ import type { AdminPodcastEpisodeListItem } from '@lingua-card/shared/domain';
 import { AdminPodcastsService } from './admin-podcasts.service';
 import { PodcastTranscriptGenerationService } from './podcast-transcript-generation.service';
 import { PodcastTranscriptImportService } from './podcast-transcript-import.service';
-import { normalizePodcastVocabulary } from '../domain/podcast-transcript-prompt';
+import { preservePodcastVocabularyInput } from '../domain/podcast-transcript-prompt';
 
 @Injectable()
 export class PodcastEpisodeCreationService implements OnApplicationBootstrap {
@@ -25,7 +25,7 @@ export class PodcastEpisodeCreationService implements OnApplicationBootstrap {
     input: { requestId: string; vocabulary: readonly string[]; direction?: string; title?: string; titleTranslation?: string },
   ): Promise<AdminPodcastEpisodeListItem> {
     const generationInput = {
-      vocabulary: normalizePodcastVocabulary(input.vocabulary),
+      vocabulary: preservePodcastVocabularyInput(input.vocabulary),
       ...(input.direction?.trim() ? { direction: input.direction.trim() } : {}),
     };
     const episode = input.title || input.titleTranslation

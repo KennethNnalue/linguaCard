@@ -35,7 +35,7 @@ export function createPodcastTranscriptManifestDraft(
     const text = normalizePodcastVocabularyItem(item).split('=', 1)[0].trim();
     const translation = separatorIndex >= 0 ? item.slice(separatorIndex + 1).trim() || null : null;
     const originalInput = findOriginalInput(vocabulary, text) ?? item;
-    const article = targetLanguage === 'de'
+    const article = targetLanguage === 'de' && !['der', 'die', 'das'].includes(text.toLocaleLowerCase('de'))
       ? originalInput.trim().match(/^(der|die|das)\s+/iu)?.[1]?.toLocaleLowerCase('de') ?? null
       : null;
     const baseKey = vocabularyKey(text, index);

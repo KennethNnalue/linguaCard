@@ -61,6 +61,21 @@ describe('PodcastEpisodeCreationService', () => {
     expect(transcriptGeneration.generate).not.toHaveBeenCalled();
   });
 
+  test('keeps source examples and noun articles in reserved episode input', async () => {
+    podcasts.reserveEpisode.mockResolvedValue(createEpisode('draft'));
+    await service.create('topic-1', {
+      requestId: 'request-1', vocabulary: [
+        ' das (Das ist Frau Kowalski.) = this; that ', 'das',
+        'die Wohnung, -en', 'aus (Ich komme aus Deutschland.) = from',
+      ],
+    });
+    expect(podcasts.reserveEpisode).toHaveBeenCalledWith('topic-1', 'request-1', {
+      vocabulary: ['das (Das ist Frau Kowalski.) = this; that', 'die Wohnung, -en',
+        'aus (Ich komme aus Deutschland.) = from'],
+    });
+    expect(transcriptGeneration.generate).not.toHaveBeenCalled();
+  });
+
   test('persists a failure instead of deleting the reserved episode', async () => {
     podcasts.reserveEpisode.mockResolvedValue(createEpisode());
     podcasts.markEpisodeGenerationStarted.mockResolvedValue(true);

@@ -22,6 +22,17 @@ export function normalizePodcastVocabulary(vocabulary: readonly string[]): strin
   return [...unique.values()];
 }
 
+/** Retain examples and noun articles in saved input; normalization is only for matching. */
+export function preservePodcastVocabularyInput(vocabulary: readonly string[]): string[] {
+  const unique = new Map<string, string>();
+  for (const rawItem of vocabulary) {
+    const normalized = normalizePodcastVocabularyItem(rawItem);
+    const key = normalized.split('=', 1)[0].trim().toLocaleLowerCase();
+    if (normalized && !unique.has(key)) unique.set(key, rawItem.trim());
+  }
+  return [...unique.values()];
+}
+
 export function normalizePodcastVocabularyItem(rawItem: string): string {
   let depth = 0;
   let separatorIndex = -1;

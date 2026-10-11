@@ -26,3 +26,15 @@ describe('podcast transcript manifest', () => {
     ]);
   });
 });
+
+describe('standalone German function words', () => {
+  it('does not treat the headword before an example as a noun article', () => {
+    const manifest = createPodcastTranscriptManifestDraft([
+      'das (Das ist Frau Kowalski.) = this; that', 'der (Sie kommt aus der Schweiz.)',
+      'die (die Flasche)', 'das Telefon, -e',
+    ], 'de', 'en');
+    expect(manifest.items.map(item => [item.text, item.article])).toEqual([
+      ['das', null], ['der', null], ['die', null], ['Telefon', 'das'],
+    ]);
+  });
+});

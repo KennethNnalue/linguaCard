@@ -61,6 +61,8 @@ export class PodcastTranscriptManifestService {
         ? selectableCandidates.filter(candidate => this.normalize(localizationByLexeme.get(candidate.id)?.translation ?? '')
           === this.normalize(item.translation ?? ''))
         : [];
+      const hasTranslationConflict = Boolean(item.translation && selectableCandidates.length
+        && !translationMatches.length);
       const selectedLexemeId = selectionByKey.get(item.key);
       const selectedMatch = selectedLexemeId
         ? selectableCandidates.find(candidate => candidate.id === selectedLexemeId) ?? null
@@ -68,20 +70,22 @@ export class PodcastTranscriptManifestService {
       const equivalentCandidates = translationMatches.length > 1
         ? translationMatches
         : item.translation ? [] : selectableCandidates;
-      const equivalentMatch = !hasArticleConflict
+      const equivalentMatch = !hasArticleConflict && !hasTranslationConflict
+        && this.haveCompatibleTranslations(equivalentCandidates, localizationByLexeme)
         && this.areEquivalentCandidates(equivalentCandidates)
         ? this.preferredCandidate(equivalentCandidates)
         : null;
-      const specificGrammarMatch = !hasArticleConflict
+      const specificGrammarMatch = !hasArticleConflict && !hasTranslationConflict
+        && this.haveCompatibleTranslations(selectableCandidates, localizationByLexeme)
         ? this.preferredSpecificGrammarCandidate(selectableCandidates)
         : null;
       const match = selectedMatch
         ?? (!hasArticleConflict && translationMatches.length === 1 ? translationMatches[0] : null)
-        ?? (!hasArticleConflict && selectableCandidates.length === 1 ? selectableCandidates[0] : null)
+        ?? (!hasArticleConflict && !hasTranslationConflict && selectableCandidates.length === 1 ? selectableCandidates[0] : null)
         ?? equivalentMatch
         ?? specificGrammarMatch;
       const localization = match ? localizationByLexeme.get(match.id) : null;
-      if (!match && (selectableCandidates.length > 1 || hasArticleConflict)) {
+      if (!match && (selectableCandidates.length > 1 || hasArticleConflict || hasTranslationConflict)) {
         ambiguities.push(this.ambiguity(item, selectableCandidates, localizationByLexeme));
       }
       return {
@@ -91,6 +95,16 @@ export class PodcastTranscriptManifestService {
       };
     });
     return { manifest: finalizePodcastTranscriptManifest(draft, items), ambiguities };
+  }
+
+  private haveCompatibleTranslations(
+    candidates: readonly LexemeEntity[],
+    localizations: ReadonlyMap<string, LexemeLocalizationEntity>,
+  ): boolean {
+    const translations = candidates.map(candidate => localizations.get(candidate.id)?.translation)
+      .filter((translation): translation is string => Boolean(translation))
+      .map(translation => this.normalize(translation));
+    return new Set(translations).size <= 1;
   }
 
   private areEquivalentCandidates(

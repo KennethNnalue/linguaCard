@@ -74,3 +74,6 @@ testem.log
 Thumbs.db
 apps/api/.env
 /uploads
+
+# Resources
+/resources

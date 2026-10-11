@@ -22,7 +22,7 @@ import { podcastEpisodeExternalId, podcastExternalId } from '../domain/podcast-e
 import { StorageService } from '../../storage/storage.service';
 import { PlatformCollectionEntity } from '../../admin/platform-collection.entity';
 import { PodcastEpisodeVocabularyEntity } from '../entities/podcast-episode-vocabulary.entity';
-import { normalizePodcastVocabulary } from '../domain/podcast-transcript-prompt';
+import { preservePodcastVocabularyInput } from '../domain/podcast-transcript-prompt';
 
 const PG_UNIQUE_VIOLATION = '23505';
 
@@ -138,7 +138,7 @@ export class AdminPodcastsService {
   }
 
   async createDraft(topicId: string, dto: CreatePodcastEpisodeDraftDto): Promise<AdminPodcastEpisodeListItem> {
-    const vocabulary = normalizePodcastVocabulary(dto.vocabulary ?? []);
+    const vocabulary = preservePodcastVocabularyInput(dto.vocabulary ?? []);
     const direction = dto.direction?.trim();
     const generationInput = vocabulary.length || direction
       ? { vocabulary, ...(direction ? { direction } : {}) }
@@ -256,7 +256,7 @@ export class AdminPodcastsService {
         throw new ConflictException('The episode cannot be edited during generation or after publication');
       }
       episode.generationInput = {
-        vocabulary: normalizePodcastVocabulary(dto.vocabulary),
+        vocabulary: preservePodcastVocabularyInput(dto.vocabulary),
         ...(dto.direction?.trim() ? { direction: dto.direction.trim() } : {}),
       };
       if (dto.title !== undefined) episode.title = dto.title.trim();

@@ -229,3 +229,47 @@ describe('PodcastTranscriptManifestService', () => {
   });
 
 });
+
+describe('podcast vocabulary sense conflicts', () => {
+  function service(lexemes: LexemeEntity[], translations: string[]) {
+    const localizations = lexemes.map((lexeme, index) => Object.assign(new LexemeLocalizationEntity(), {
+      lexemeId: lexeme.id, translation: translations[index], language: 'en', isActive: true,
+    }));
+    return new PodcastTranscriptManifestService({
+      getRepository: (entity: unknown) => ({ find: async () => entity === LexemeEntity ? lexemes : localizations }),
+    } as unknown as DataSource, new LexemeIdentityService());
+  }
+  function lexeme(id: string, lemma: string, partOfSpeech = 'other') {
+    return Object.assign(new LexemeEntity(), {
+      id, language: 'de', normalizedLemma: lemma, displayText: lemma, partOfSpeech, grammar: {},
+    });
+  }
+  it.each([
+    ['aus (Ich komme aus Deutschland.) = from', 'aus', 'made of', 'from'],
+    ['das (Das ist Frau Kowalski.) = this; that', 'das', 'the (neuter article)', 'this; that'],
+  ])('preserves the intended meaning and asks before accepting %s', async (input, lemma, existing, intended) => {
+    const result = await service([lexeme('existing', lemma)], [existing]).prepare([input], 'de', 'en');
+    expect(result.manifest.items[0]).toMatchObject({ translation: intended, article: null, canonicalLexemeId: null });
+    expect(result.ambiguities).toEqual([expect.objectContaining({
+      candidates: [expect.objectContaining({ lexemeId: 'existing', translation: existing })],
+    })]);
+  });
+  it('does not merge identical grammar identities with different meanings', async () => {
+    const result = await service([lexeme('from', 'aus'), lexeme('material', 'aus')], ['from', 'made of'])
+      .prepare(['aus'], 'de', 'en');
+    expect(result.manifest.items[0].canonicalLexemeId).toBeNull();
+    expect(result.ambiguities).toHaveLength(1);
+  });
+  it('selects the exact supplied meaning when it exists', async () => {
+    const result = await service([lexeme('from', 'aus'), lexeme('material', 'aus')], ['from', 'made of'])
+      .prepare(['aus = from'], 'de', 'en');
+    expect(result.ambiguities).toEqual([]);
+    expect(result.manifest.items[0]).toMatchObject({ canonicalLexemeId: 'from', translation: 'from' });
+  });
+  it('does not prefer a specific part of speech when translations disagree', async () => {
+    const result = await service([lexeme('specific', 'aus', 'preposition'), lexeme('legacy', 'aus')], ['made of', 'from'])
+      .prepare(['aus'], 'de', 'en');
+    expect(result.manifest.items[0].canonicalLexemeId).toBeNull();
+    expect(result.ambiguities).toHaveLength(1);
+  });
+});

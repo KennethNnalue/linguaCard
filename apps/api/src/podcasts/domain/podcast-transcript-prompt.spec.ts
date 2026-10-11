@@ -1,5 +1,5 @@
 import {
-  buildPodcastTranscriptPrompt, normalizePodcastVocabulary, normalizePodcastVocabularyItem, hasBalancedVocabularyParentheses, podcastVocabularyTarget,
+  buildPodcastTranscriptPrompt, preservePodcastVocabularyInput, normalizePodcastVocabulary, normalizePodcastVocabularyItem, hasBalancedVocabularyParentheses, podcastVocabularyTarget,
 } from './podcast-transcript-prompt';
 import { createPodcastTranscriptManifestDraft } from './podcast-transcript-manifest';
 
@@ -147,5 +147,17 @@ describe('apartment-search vocabulary', () => {
   it('keeps an equals sign inside a unit annotation out of the translation', () => {
     expect(normalizePodcastVocabularyItem('qm (= Quadratmeter)')).toBe('qm');
     expect(normalizePodcastVocabularyItem('qm (= Quadratmeter) = square metre')).toBe('qm = square metre');
+  });
+});
+
+describe('saved podcast vocabulary input', () => {
+  it('deduplicates headwords while retaining articles, examples and explicit meanings', () => {
+    expect(preservePodcastVocabularyInput([
+      ' das (Das ist Frau Kowalski.) = this; that ', 'das',
+      'die Wohnung, -en', 'Wohnung', 'aus (Ich komme aus Deutschland.) = from', ' ',
+    ])).toEqual([
+      'das (Das ist Frau Kowalski.) = this; that', 'die Wohnung, -en',
+      'aus (Ich komme aus Deutschland.) = from',
+    ]);
   });
 });

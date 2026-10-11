@@ -178,12 +178,14 @@ export class PodcastTranscriptImportService {
       const translationMatches = matches.filter(match =>
         this.normalize(localizationByLexeme.get(match.id)?.translation ?? '')
           === this.normalize(item.translation));
+      const hasTranslationConflict = Boolean(matches.length && !translationMatches.length
+        && matches.some(match => localizationByLexeme.get(match.id)?.translation));
       const matchedLexeme = manifestMatch ?? (translationMatches.length === 1
         ? translationMatches[0]
-        : matches.length === 1 ? matches[0] : null);
+        : matches.length === 1 && !hasTranslationConflict ? matches[0] : null);
       let status: AdminPodcastVocabularyResolution['status'] = matchedLexeme ? 'resolved' : 'new';
       let lexemeId: string | null = matchedLexeme?.id ?? null;
-      if (matches.length > 1 && !matchedLexeme) status = 'ambiguous';
+      if ((matches.length > 1 || hasTranslationConflict) && !matchedLexeme) status = 'ambiguous';
       if (manifestLexemeId && !manifestMatch) status = 'ambiguous';
       if (lexemeId && usedLexemes.has(lexemeId)) {
         status = 'ambiguous';

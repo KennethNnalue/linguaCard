@@ -235,3 +235,39 @@ describe('truncated vocabulary import', () => {
     expect(getRepository).not.toHaveBeenCalled();
   });
 });
+
+describe('import vocabulary sense safety', () => {
+  it.each([1, 2])('rejects a conflicting single dictionary match in schema %i', async schemaVersion => {
+    const draft = createPodcastTranscriptManifestDraft(['aus = from'], 'de', 'en');
+    const input = plainToInstance(PodcastTranscriptPayloadDto, {
+      schemaVersion, ...(schemaVersion === 2 ? { manifestId: draft.id } : {}),
+      episode: episodeMetadata,
+      speakers: [{ key: 'host', name: 'Mia', voiceGender: 'female' }],
+      turns: [{ speakerKey: 'host', targetText: 'Ich komme aus Deutschland.',
+        translation: 'I come from Germany.', vocabularyRefs: ['aus'] }],
+      vocabulary: [{ key: 'aus', text: 'aus', translation: 'from', importance: 'essential' }],
+    });
+    const dataSource = new DataSource({ type: 'postgres' });
+    jest.spyOn(dataSource.getRepository(PodcastEpisodeEntity), 'findOneBy').mockResolvedValue(
+      Object.assign(new PodcastEpisodeEntity(), { id: 'episode', topicId: 'topic',
+        generationInput: { vocabulary: ['aus = from'], transcriptManifest: draft } }));
+    jest.spyOn(dataSource.getRepository(PodcastTopicEntity), 'findOneBy').mockResolvedValue(
+      Object.assign(new PodcastTopicEntity(), { id: 'topic', targetLanguage: 'de', translationLanguage: 'en' }));
+    jest.spyOn(dataSource.getRepository(LexemeEntity), 'find').mockResolvedValue([
+      Object.assign(new LexemeEntity(), { id: 'material', language: 'de', normalizedLemma: 'aus' }),
+    ]);
+    jest.spyOn(dataSource.getRepository(LexemeLocalizationEntity), 'find').mockResolvedValue([
+      Object.assign(new LexemeLocalizationEntity(), { lexemeId: 'material', translation: 'made of', isActive: true }),
+    ]);
+    const module = await Test.createTestingModule({ providers: [PodcastTranscriptImportService, LexemeIdentityService,
+      { provide: DataSource, useValue: dataSource },
+      { provide: LegacyVocabularyProjectionService, useValue: {} },
+      { provide: StorageService, useValue: {} },
+    ] }).compile();
+    try {
+      const preview = await module.get(PodcastTranscriptImportService).preview('episode', input);
+      expect(preview.status).toBe('conflicts');
+      expect(preview.vocabulary[0]).toMatchObject({ status: 'ambiguous', lexemeId: null });
+    } finally { await module.close(); }
+  });
+});
