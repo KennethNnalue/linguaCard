@@ -2,6 +2,7 @@ import { TestBed } from '@angular/core/testing';
 import { AiAudioCacheService } from '../../features/ai/audio/ai-audio-cache.service';
 import { AudioReadinessStore } from './audio-readiness.store';
 import { WordAudioApiService } from './word-audio-api.service';
+import { BrowserPronunciationAudioService } from './browser-pronunciation-audio.service';
 import { WordAudioService } from './word-audio.service';
 import { audioCacheKey, legacyAudioCacheKey } from './audio-cache-key';
 
@@ -147,4 +148,48 @@ describe('WordAudioService prepared audio', () => {
       pause.mockRestore();
     }
   });
+  it('plays the padded resource for both German words and usage examples', async () => {
+    const prepare = jest.fn(async (url: string) => `padded:${url}`);
+    TestBed.overrideProvider(BrowserPronunciationAudioService, {useValue: {prepare}});
+    const playedSources: string[] = [];
+    const play = jest.spyOn(HTMLMediaElement.prototype, 'play').mockImplementation(function (this: HTMLMediaElement) {
+      playedSources.push(this.src);
+      queueMicrotask(() => this.dispatchEvent(new Event('ended')));
+      return Promise.resolve();
+    });
+    const pause = jest.spyOn(HTMLMediaElement.prototype, 'pause').mockImplementation(() => undefined);
+    const service = TestBed.inject(WordAudioService);
+    jest.spyOn(service, 'resolveUrl').mockImplementation(async text => text === 'das Computerproblem' ? 'blob:word' : 'blob:example');
+    try {
+      await service.playUsage('das Computerproblem', 'Wegen eines Computerproblems.', 'de-DE');
+      expect(playedSources).toEqual(['padded:blob:word', 'padded:blob:example']);
+    } finally {
+      play.mockRestore();
+      pause.mockRestore();
+    }
+  });
+
+  it('does not start German audio if stopped while the lead-in is being prepared', async () => {
+    let finishPreparation: (url: string) => void = () => undefined;
+    const prepare = jest.fn(() => new Promise<string>(resolve => { finishPreparation = resolve; }));
+    TestBed.overrideProvider(BrowserPronunciationAudioService, {useValue: {prepare}});
+    const play = jest.spyOn(HTMLMediaElement.prototype, 'play').mockResolvedValue();
+    const pause = jest.spyOn(HTMLMediaElement.prototype, 'pause').mockImplementation(() => undefined);
+    const service = TestBed.inject(WordAudioService);
+    jest.spyOn(service, 'resolveUrl').mockResolvedValue('blob:word');
+    try {
+      const playback = service.playRequired('das Computerproblem', 'de-DE');
+      await Promise.resolve();
+      await Promise.resolve();
+      expect(prepare).toHaveBeenCalledWith('blob:word', 1);
+      service.stop();
+      finishPreparation('blob:padded');
+      await playback;
+      expect(play).not.toHaveBeenCalled();
+    } finally {
+      play.mockRestore();
+      pause.mockRestore();
+    }
+  });
+
 });

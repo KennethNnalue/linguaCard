@@ -6,6 +6,7 @@ import {
 } from '../../features/ai/audio/ai-audio-cache.service';
 import { WordAudioApiService } from './word-audio-api.service';
 import { AudioReadinessStore, AudioReadinessStatus } from './audio-readiness.store';
+import { BrowserPronunciationAudioService } from './browser-pronunciation-audio.service';
 import { normalizeForAudio } from './normalize';
 import { audioCacheKey, legacyAudioCacheKey } from './audio-cache-key';
 
@@ -24,6 +25,8 @@ export function cardPronunciationText(card: Card): string {
 
 @Injectable({ providedIn: 'root' })
 export class WordAudioService {
+  private readonly browserPronunciation = inject(BrowserPronunciationAudioService);
+  private playbackSequence = 0;
   private readonly api = inject(WordAudioApiService);
   private readonly cache = inject(AiAudioCacheService);
   private readonly audioReadiness = inject(AudioReadinessStore);
@@ -196,8 +199,18 @@ export class WordAudioService {
    * whole app — so reusing a single element is safe and avoids the per-element
    * autoplay unlock that `new Audio()` would require on iOS.
    */
-  private _playUrl(url: string, rate: number): Promise<void> {
+  private async _playUrl(url: string, rate: number): Promise<void> {
     this._stopPlayer();
+    const sequence = this.playbackSequence;
+    let preparedUrl: string;
+    try {
+      preparedUrl = await this.browserPronunciation.prepare(url, rate);
+    } catch (error: unknown) {
+      if (sequence !== this.playbackSequence) return;
+      this._playbackError.set(true);
+      throw error;
+    }
+    if (sequence !== this.playbackSequence) return;
     return new Promise(resolve => {
       const player = this._ensurePlayer();
       this._playbackError.set(false);
@@ -221,7 +234,7 @@ export class WordAudioService {
       // 'lc-stop' is dispatched by stop() so the promise resolves immediately
       // instead of hanging (pause() fires no standard event).
       player.addEventListener('lc-stop', cleanup, { once: true });
-      player.src = url;
+      player.src = preparedUrl;
       player.currentTime = 0;
       player.playbackRate = rate;
       player.play().catch(fail);
@@ -552,6 +565,7 @@ export class WordAudioService {
   }
 
   private _stopPlayer(): void {
+    this.playbackSequence += 1;
     if (this._player) {
       this._player.pause();
       this._player.currentTime = 0;

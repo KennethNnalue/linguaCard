@@ -294,6 +294,7 @@ export class ListenPlaybackEngine {
               map(() => generation),
             );
           }
+          this.nativeTranslationSpeech.stop();
           return from(this.wordAudio.playRequired(segment.text, segment.language, rate)).pipe(
             map(() => generation),
           );

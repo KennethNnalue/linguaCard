@@ -75,6 +75,20 @@ describe('ListenPlaybackEngine collection playback', () => {
     expect(completed).toHaveBeenCalledWith(item.id);
   });
 
+  it('releases speech focus before every German segment, including the first word', async () => {
+    const speech = TestBed.inject(NativeTranslationSpeechService);
+    const stopped = jest.fn();
+    jest.spyOn(speech, 'stop').mockImplementation(stopped);
+    playRequired.mockImplementation(async () => {
+      expect(stopped).toHaveBeenCalled();
+      stopped.mockClear();
+    });
+    engine.restart();
+    await settleSequence();
+    expect(playRequired).toHaveBeenCalledTimes(2);
+    expect(status).toBe('complete');
+  });
+
   it('exposes translation failure and retries the same segment successfully', async () => {
     speak.mockRejectedValueOnce(new Error('Translation speech did not complete. Tap Play to try again.'));
     engine.restart();
