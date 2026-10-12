@@ -1,12 +1,16 @@
-import {Injectable} from '@angular/core';
+import {inject, Injectable} from '@angular/core';
+import {Capacitor} from '@capacitor/core';
+import {BrowserTranslationSpeechService} from './browser-translation-speech.service';
 import {QueueStrategy, TextToSpeech} from '@capacitor-community/text-to-speech';
 
 @Injectable({providedIn: 'root'})
 export class NativeTranslationSpeechService {
+  private readonly browserSpeech = inject(BrowserTranslationSpeechService);
   private finishActive: (() => void) | null = null;
   private generation = 0;
 
   async speak(text: string, language: string, rate = 1): Promise<void> {
+    if (!Capacitor.isNativePlatform()) return this.browserSpeech.speak(text, language, rate);
     const generation = ++this.generation;
     this.finishActive?.();
     this.finishActive = null;
@@ -37,6 +41,10 @@ export class NativeTranslationSpeechService {
   }
 
   stop(): void {
+    if (!Capacitor.isNativePlatform()) {
+      this.browserSpeech.stop();
+      return;
+    }
     this.generation += 1;
     const finish = this.finishActive;
     this.finishActive = null;

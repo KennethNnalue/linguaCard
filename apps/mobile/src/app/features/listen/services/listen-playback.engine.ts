@@ -176,6 +176,7 @@ export class ListenPlaybackEngine {
   /** Stop all audio without touching generation/state. */
   stopAudio(): void {
     this.wordAudio.stop();
+    this.nativeTranslationSpeech.stop();
   }
 
   // ── Prefetch ──────────────────────────────────────────────────────────────
