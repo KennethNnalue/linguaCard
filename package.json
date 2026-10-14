@@ -36,13 +36,15 @@
     "backfill:multilingual-vocabulary": "npx ts-node -r tsconfig-paths/register --project apps/api/tsconfig.json apps/api/src/scripts/backfill-multilingual-vocabulary.ts",
     "backfill:canonical-learning-items": "node dist/api/apps/api/src/scripts/backfill-multilingual-vocabulary.js",
     "validate:canonical-learning-items": "node dist/api/apps/api/src/scripts/backfill-multilingual-vocabulary.js --validate-only",
-    "build:web": "node scripts/set-env.mjs && ng build --project=mobile --configuration=production && node scripts/write-build-revision.mjs",
+    "build:web": "node scripts/set-env.mjs && ng build --project=mobile --configuration=production && node scripts/write-build-revision.mjs && node scripts/build-seo-pages.mjs",
     "test": "jest",
     "test:api": "jest --config jest.api.config.ts",
     "test:watch": "jest --watch",
     "test:coverage": "jest --coverage",
     "lint": "ng lint --project=mobile",
-    "start-db": "npx json-server db.json --middlewares json-server-middleware.js"
+    "start-db": "npx json-server db.json --middlewares json-server-middleware.js",
+    "build:seo": "node scripts/build-seo-pages.mjs",
+    "validate:seo": "node scripts/validate-seo.mjs"
   },
   "private": true,
   "dependencies": {

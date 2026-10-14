@@ -2,46 +2,211 @@
   "buildCommand": "npm run build:web",
   "outputDirectory": "www",
   "rewrites": [
-    { "source": "/privacy", "destination": "/privacy/index.html" },
-    { "source": "/privacy/", "destination": "/privacy/index.html" },
-    { "source": "/delete-account", "destination": "/delete-account/index.html" },
-    { "source": "/delete-account/", "destination": "/delete-account/index.html" },
-    { "source": "/support", "destination": "/support/index.html" },
-    { "source": "/support/", "destination": "/support/index.html" },
-    { "source": "/(.*)", "destination": "/index.html" }
+    {
+      "source": "/",
+      "destination": "/marketing/index.html"
+    },
+    {
+      "source": "/privacy",
+      "destination": "/privacy/index.html"
+    },
+    {
+      "source": "/privacy/",
+      "destination": "/privacy/index.html"
+    },
+    {
+      "source": "/delete-account",
+      "destination": "/delete-account/index.html"
+    },
+    {
+      "source": "/delete-account/",
+      "destination": "/delete-account/index.html"
+    },
+    {
+      "source": "/support",
+      "destination": "/support/index.html"
+    },
+    {
+      "source": "/support/",
+      "destination": "/support/index.html"
+    },
+    {
+      "source": "/de",
+      "destination": "/de/index.html"
+    },
+    {
+      "source": "/de/",
+      "destination": "/de/index.html"
+    },
+    {
+      "source": "/de/deutsch-vokabeln",
+      "destination": "/de/deutsch-vokabeln/index.html"
+    },
+    {
+      "source": "/de/deutsch-vokabeln/",
+      "destination": "/de/deutsch-vokabeln/index.html"
+    },
+    {
+      "source": "/de/deutsch-karteikarten",
+      "destination": "/de/deutsch-karteikarten/index.html"
+    },
+    {
+      "source": "/de/deutsch-karteikarten/",
+      "destination": "/de/deutsch-karteikarten/index.html"
+    },
+    {
+      "source": "/de/deutsch-hoerverstehen",
+      "destination": "/de/deutsch-hoerverstehen/index.html"
+    },
+    {
+      "source": "/de/deutsch-hoerverstehen/",
+      "destination": "/de/deutsch-hoerverstehen/index.html"
+    },
+    {
+      "source": "/learn/german-vocabulary",
+      "destination": "/learn/german-vocabulary/index.html"
+    },
+    {
+      "source": "/learn/german-vocabulary/",
+      "destination": "/learn/german-vocabulary/index.html"
+    },
+    {
+      "source": "/learn/german-flashcards",
+      "destination": "/learn/german-flashcards/index.html"
+    },
+    {
+      "source": "/learn/german-flashcards/",
+      "destination": "/learn/german-flashcards/index.html"
+    },
+    {
+      "source": "/learn/german-listening",
+      "destination": "/learn/german-listening/index.html"
+    },
+    {
+      "source": "/learn/german-listening/",
+      "destination": "/learn/german-listening/index.html"
+    },
+    {
+      "source": "/auth/:path*",
+      "destination": "/index.html"
+    },
+    {
+      "source": "/onboarding/:path*",
+      "destination": "/index.html"
+    },
+    {
+      "source": "/home/:path*",
+      "destination": "/index.html"
+    },
+    {
+      "source": "/vault/:path*",
+      "destination": "/index.html"
+    },
+    {
+      "source": "/review/:path*",
+      "destination": "/index.html"
+    },
+    {
+      "source": "/listen/:path*",
+      "destination": "/index.html"
+    },
+    {
+      "source": "/podcasts/:path*",
+      "destination": "/index.html"
+    },
+    {
+      "source": "/stories/:path*",
+      "destination": "/index.html"
+    },
+    {
+      "source": "/progress/:path*",
+      "destination": "/index.html"
+    },
+    {
+      "source": "/settings/:path*",
+      "destination": "/index.html"
+    },
+    {
+      "source": "/admin/:path*",
+      "destination": "/index.html"
+    },
+    {
+      "source": "/notifications/:path*",
+      "destination": "/index.html"
+    }
   ],
   "headers": [
     {
       "source": "/ngsw-worker.js",
-      "headers": [{ "key": "Cache-Control", "value": "no-cache, no-store, must-revalidate" }]
+      "headers": [
+        {
+          "key": "Cache-Control",
+          "value": "no-cache, no-store, must-revalidate"
+        }
+      ]
     },
     {
       "source": "/ngsw.json",
-      "headers": [{ "key": "Cache-Control", "value": "no-cache, no-store, must-revalidate" }]
+      "headers": [
+        {
+          "key": "Cache-Control",
+          "value": "no-cache, no-store, must-revalidate"
+        }
+      ]
     },
     {
       "source": "/safety-worker.js",
-      "headers": [{ "key": "Cache-Control", "value": "no-cache, no-store, must-revalidate" }]
+      "headers": [
+        {
+          "key": "Cache-Control",
+          "value": "no-cache, no-store, must-revalidate"
+        }
+      ]
     },
     {
       "source": "/index.html",
-      "headers": [{ "key": "Cache-Control", "value": "no-cache, no-store, must-revalidate" }]
+      "headers": [
+        {
+          "key": "Cache-Control",
+          "value": "no-cache, no-store, must-revalidate"
+        }
+      ]
     },
     {
       "source": "/assets/(.*)",
-      "headers": [{ "key": "Cache-Control", "value": "public, max-age=31536000, immutable" }]
+      "headers": [
+        {
+          "key": "Cache-Control",
+          "value": "public, max-age=31536000, immutable"
+        }
+      ]
     },
     {
       "source": "/assets/i18n/(.*)",
-      "headers": [{ "key": "Cache-Control", "value": "no-cache, must-revalidate" }]
+      "headers": [
+        {
+          "key": "Cache-Control",
+          "value": "no-cache, must-revalidate"
+        }
+      ]
     },
     {
       "source": "/version.json",
-      "headers": [{ "key": "Cache-Control", "value": "no-cache, no-store, must-revalidate" }]
+      "headers": [
+        {
+          "key": "Cache-Control",
+          "value": "no-cache, no-store, must-revalidate"
+        }
+      ]
     },
     {
       "source": "/(.*)",
-      "headers": [{ "key": "X-Content-Type-Options", "value": "nosniff" }]
+      "headers": [
+        {
+          "key": "X-Content-Type-Options",
+          "value": "nosniff"
+        }
+      ]
     }
   ]
 }
